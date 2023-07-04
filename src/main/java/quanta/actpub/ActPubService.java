@@ -123,9 +123,6 @@ public class ActPubService extends ServiceBase {
      * notification to foreign servers. This call returns immediately and delegates the actual
      * proccessing to a daemon thread.
      *
-     * For concurrency reasons, note that we pass in the nodeId to this method rather than the node even
-     * if we do have the node, because we want to make sure there's no concurrent access.
-     *
      * IMPORTANT: This method ONLY sends notifications to users who ARE in the 'acl' which means these
      * can only be users ALREADY imported into the system, however this is ok, because we will have
      * called saveMentionsToNodeACL() right before calling this method so the 'acl' should completely
@@ -135,6 +132,7 @@ public class ActPubService extends ServiceBase {
         exec.run(() -> {
             try {
                 boolean isAccnt = node.isType(NodeType.ACCOUNT);
+
                 String inReplyTo = !isAccnt ? apFactory.makeForeignInReplyTo(ms, node.getStr(NodeProp.INREPLYTO), parent) : null;
                 APList attachments = !isAccnt ? apub.createAttachmentsList(node) : null;
                 String boostTarget = node.getStr(NodeProp.BOOST);
@@ -167,6 +165,7 @@ public class ActPubService extends ServiceBase {
                 String privateKey = apCrypto.getPrivateKey(ms, fromUser);
                 String objUrl = snUtil.getIdBasedUrl(node);
                 APObj message = null;
+
                 if (node.isType(NodeType.ACCOUNT)) {
                     // construct the Update-type wrapper around teh Person object, and send
                     message = apFactory.newUpdateForPerson(fromUser, toUserNames, fromActor, privateMessage, node);
@@ -791,7 +790,8 @@ public class ActPubService extends ServiceBase {
                         "### Posts",
                         NodeType.ACT_PUB_POSTS.s(),
                         Arrays.asList(PrivilegeType.READ.s()),
-                        NodeName.POSTS
+                        NodeName.POSTS,
+                        true
                     );
                     saveInboundForeignObj(
                         as,
@@ -934,7 +934,8 @@ public class ActPubService extends ServiceBase {
                     "### Posts",
                     NodeType.ACT_PUB_POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s()),
-                    NodeName.POSTS
+                    NodeName.POSTS,
+                    true
                 );
                 saveInboundForeignObj(
                     as,

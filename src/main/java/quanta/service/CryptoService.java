@@ -179,7 +179,7 @@ public class CryptoService extends ServiceBase {
                 if (node != null && node.set(NodeProp.CRYPTO_SIG, data.getData())) {
                     // clean so we won't let this node get persisted, because we're doing the persist in this bulk op
                     ThreadLocals.clean(node);
-                    bops = update.bulkOpSetPropVal(bops, id, SubNode.PROPS, node.getProps());
+                    bops = update.bulkOpSetPropVal(ms, bops, id, SubNode.PROPS, node.getProps());
                     if (++batchSize > Const.MAX_BULK_OPS) {
                         bops.execute();
                         batchSize = 0;
@@ -211,14 +211,15 @@ public class CryptoService extends ServiceBase {
         }
 
         // query all nodes under the path that are owned by 'ms'
-        Criteria criteria = Criteria //
+        Criteria crit = Criteria
             .where(SubNode.PATH)
             .regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
             .and(SubNode.OWNER)
             .is(ms.getUserNodeId());
         Val<NodeSigPushInfo> pushInfo = new Val<>();
         Query query = new Query();
-        query.addCriteria(criteria);
+        crit = auth.addReadSecurity(ms, crit);
+        query.addCriteria(crit);
         IntVal count = new IntVal();
         // add in root node first
         pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));

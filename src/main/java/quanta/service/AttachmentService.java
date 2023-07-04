@@ -1176,7 +1176,10 @@ public class AttachmentService extends ServiceBase {
             long totalBytes = user.getTotalAttachmentBytes(ms, node);
             user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
         }
-        grid.delete(new Query(Criteria.where("_id").is(att.getBin())));
+
+        Criteria crit = Criteria.where("_id").is(att.getBin());
+        crit = auth.addWriteSecurity(ms, crit);
+        grid.delete(new Query(crit));
     }
 
     /*
@@ -1185,8 +1188,8 @@ public class AttachmentService extends ServiceBase {
      *
      * tood-0: search all calls to this and verify attName is correct.
      */
-    public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean doAuth) {
-        if (doAuth) {
+    public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean allowAuth) {
+        if (allowAuth) {
             auth.auth(ms, node, PrivilegeType.READ);
         }
         Attachment att = node.getAttachment(attName, false, false);
@@ -1213,7 +1216,7 @@ public class AttachmentService extends ServiceBase {
         if (att == null || att.getBin() == null) return null;
         /* why not an import here? */
         com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
-        // new Query(Criteria.where("metadata.nodeId").is(nodeId)));
+
         if (gridFile == null) {
             log.debug("gridfs ID not found");
             return null;
@@ -1251,7 +1254,6 @@ public class AttachmentService extends ServiceBase {
         Attachment att = node.getFirstAttachment();
         if (att == null || att.getBin() == null) return null;
         com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
-        // new Query(Criteria.where("metadata.nodeId").is(nodeId)));
         if (gridFile == null) {
             log.debug("gridfs ID not found");
             return null;
@@ -1318,6 +1320,7 @@ public class AttachmentService extends ServiceBase {
                             if (subNode == null) {
                                 log.debug("Grid Orphan Delete: " + id.toHexString());
                                 // Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
+
                                 Query q = new Query(Criteria.where("_id").is(file.getId()));
                                 // Note: It's not a bug that we don't call this here:
                                 // usrMgr.addNodeBytesToUserNodeBytes(session, node, null, -1);

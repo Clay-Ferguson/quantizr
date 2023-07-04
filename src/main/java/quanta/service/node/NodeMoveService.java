@@ -137,7 +137,7 @@ public class NodeMoveService extends ServiceBase {
                 return res;
             }
             auth.ownerAuth(ms, node);
-            if (read.hasChildren(ms, node, false, false)) {
+            if (read.hasChildren(ms, node)) {
                 res.error("Failed. Nodes to be joined cannot have any children/subnodes");
                 return res;
             }
@@ -321,7 +321,9 @@ public class NodeMoveService extends ServiceBase {
             if (bops == null) {
                 bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
             }
-            Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+            Criteria crit = new Criteria("id").is(node.getId());
+            crit = auth.addWriteSecurity(ms, crit);
+            Query query = new Query().addCriteria(crit);
             Update update = new Update().set(SubNode.PATH, newPath);
             if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
                 // crypto sig uses path as part of it, so we just invalidated the signature.

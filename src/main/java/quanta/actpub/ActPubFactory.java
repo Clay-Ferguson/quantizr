@@ -333,7 +333,7 @@ public class ActPubFactory extends ServiceBase {
                         return replyTo;
                     }
                 }
-            } else { // else the repyTo is already in the form of a URL so use it.
+            } else {
                 return inReplyTo;
             }
         } else { // If there's no reply to on the node treat the parent as the thing being replied to.

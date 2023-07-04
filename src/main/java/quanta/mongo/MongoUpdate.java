@@ -48,7 +48,7 @@ public class MongoUpdate extends ServiceBase {
     public void setParentHasChildren(SubNode node) {
         if (node == null) return;
         arun.run(as -> {
-            SubNode parent = read.findNodeByPath(null, node.getParentPath());
+            SubNode parent = read.findNodeByPath(null, node.getParentPath(), false);
             if (parent != null) {
                 parent.setHasChildren(true);
             }
@@ -208,11 +208,14 @@ public class MongoUpdate extends ServiceBase {
     }
 
     // returns a new BulkOps if one not yet existing
-    public BulkOperations bulkOpSetPropVal(BulkOperations bops, ObjectId id, String prop, Object val) {
+    public BulkOperations bulkOpSetPropVal(MongoSession ms, BulkOperations bops, ObjectId id, String prop, Object val) {
         if (bops == null) {
             bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
         }
-        Query query = new Query().addCriteria(new Criteria("id").is(id));
+        Criteria crit = new Criteria("id").is(id);
+        crit = auth.addWriteSecurity(ms, crit);
+
+        Query query = new Query().addCriteria(crit);
         Update update = new Update().set(prop, val);
         bops.updateOne(query, update);
         return bops;

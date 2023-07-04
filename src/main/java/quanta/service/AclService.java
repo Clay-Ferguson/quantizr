@@ -82,7 +82,10 @@ public class AclService extends ServiceBase {
                 try {
                     auth.ownerAuth(ms, n);
                     n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
-                    Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+                    Criteria crit = new Criteria("id").is(n.getId());
+                    crit = auth.addReadSecurity(ms, crit);
+
+                    Query query = new Query().addCriteria(crit);
                     Update update = new Update().set(SubNode.AC, node.getAc()).set(SubNode.PROPS, n.getProps());
                     bops.updateOne(query, update);
                     if (++batchSize > Const.MAX_BULK_OPS) {

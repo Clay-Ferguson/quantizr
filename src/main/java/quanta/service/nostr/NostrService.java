@@ -412,7 +412,8 @@ public class NostrService extends ServiceBase {
                 "### Posts",
                 NodeType.POSTS.s(),
                 Arrays.asList(PrivilegeType.READ.s()),
-                NodeName.POSTS
+                NodeName.POSTS,
+                true
             );
             postsNode.setVal(postsNodeFound);
         }
@@ -485,6 +486,10 @@ public class NostrService extends ServiceBase {
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(id);
+
+        if (allowAuth) {
+            crit = auth.addReadSecurity(ms, crit);
+        }
         q.addCriteria(crit);
         return opsw.findOne(allowAuth ? ms : null, q);
     }

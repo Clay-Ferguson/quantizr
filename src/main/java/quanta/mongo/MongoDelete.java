@@ -206,7 +206,10 @@ public class MongoDelete extends ServiceBase {
          * single operation!
          */
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+
+        crit = auth.addWriteSecurity(ms, crit);
+        q.addCriteria(crit);
         DeleteResult res = ops.remove(q, SubNode.class);
         log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
         long totalDelCount = res.getDeletedCount();
@@ -245,6 +248,7 @@ public class MongoDelete extends ServiceBase {
     public void deleteByPropVal(MongoSession ms, String prop, String val) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PROPS + "." + prop).is(val);
+        crit = auth.addWriteSecurity(ms, crit);
         q.addCriteria(crit);
 
         // since we're deleting all nodes matching the query 'q' we set the parents of all those nodes do
@@ -278,7 +282,7 @@ public class MongoDelete extends ServiceBase {
                 if (parent != null && parentIds.add(parent.getId())) {
                     // we have a known 'bops' in this one and don't lazy create so we don't care about the
                     // return value of this call
-                    update.bulkOpSetPropVal(bops.getVal(), parent.getId(), prop, val);
+                    update.bulkOpSetPropVal(ms, bops.getVal(), parent.getId(), prop, val);
                     batchSize.inc();
                 }
                 if (batchSize.getVal() > Const.MAX_BULK_OPS) {
@@ -292,12 +296,12 @@ public class MongoDelete extends ServiceBase {
         }
     }
 
-    public void bulkSetPropsByIdObjs(Collection<ObjectId> ids, String prop, Object val) {
+    public void bulkSetPropsByIdObjs(MongoSession ms, Collection<ObjectId> ids, String prop, Object val) {
         BulkOperations bops = null;
         int batchSize = 0;
 
         for (ObjectId id : ids) {
-            bops = update.bulkOpSetPropVal(bops, id, prop, null);
+            bops = update.bulkOpSetPropVal(ms, bops, id, prop, null);
             if (++batchSize > Const.MAX_BULK_OPS) {
                 bops.execute();
                 batchSize = 0;
@@ -309,12 +313,12 @@ public class MongoDelete extends ServiceBase {
         }
     }
 
-    public void bulkSetPropsByIdStr(Collection<String> ids, String prop, Object val) {
+    public void bulkSetPropsByIdStr(MongoSession ms, Collection<String> ids, String prop, Object val) {
         BulkOperations bops = null;
         int batchSize = 0;
 
         for (String id : ids) {
-            bops = update.bulkOpSetPropVal(bops, new ObjectId(id), prop, null);
+            bops = update.bulkOpSetPropVal(ms, bops, new ObjectId(id), prop, null);
             if (++batchSize > Const.MAX_BULK_OPS) {
                 bops.execute();
                 batchSize = 0;
@@ -361,6 +365,7 @@ public class MongoDelete extends ServiceBase {
                             bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
                         }
                         // add bulk ops command to delete this orphan
+
                         bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(node.getId())));
                         // update counters
                         opsPending.inc();
@@ -475,6 +480,7 @@ public class MongoDelete extends ServiceBase {
                         bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
                     }
                     allNodes.remove(entry.getKey());
+
                     bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(entry.getValue())));
                     opsPending.inc();
                     deletesInPass.inc();
@@ -554,14 +560,14 @@ public class MongoDelete extends ServiceBase {
              * there's no chilren it indicates we don't KNOW if it still has children or not.
              */
             if (parentIds.add(parent.getId())) {
-                bops = update.bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
+                bops = update.bulkOpSetPropVal(ms, bops, parent.getId(), SubNode.HAS_CHILDREN, null);
             }
             /*
              * we remove the actual specified nodes synchronously here (instead of including root in
              * deleteSubGraphChildren below), so that the client can refresh as soon as it wants and get back
              * correct results.
              */
-            bops = bulkOpRemoveNode(bops, node.getId());
+            bops = bulkOpRemoveNode(ms, bops, node.getId());
             if (++batchSize > Const.MAX_BULK_OPS) {
                 bops.execute();
                 batchSize = 0;
@@ -594,11 +600,11 @@ public class MongoDelete extends ServiceBase {
             // hasChildren for
             SubNode parent = read.getParent(ms, node, false);
             if (parent != null) {
-                bops = update.bulkOpSetPropVal(bops, parent.getId(), SubNode.HAS_CHILDREN, null);
+                bops = update.bulkOpSetPropVal(ms, bops, parent.getId(), SubNode.HAS_CHILDREN, null);
             }
-            bops = bulkOpRemoveNode(bops, node.getId());
+            bops = bulkOpRemoveNode(ms, bops, node.getId());
         } else { // if deleting all children and NOT root we know we can just update the node hasChildren to false
-            bops = update.bulkOpSetPropVal(bops, node.getId(), SubNode.HAS_CHILDREN, null);
+            bops = update.bulkOpSetPropVal(ms, bops, node.getId(), SubNode.HAS_CHILDREN, null);
         }
         int opCount = 0;
         /*
@@ -615,7 +621,7 @@ public class MongoDelete extends ServiceBase {
              * minutes even, and that kind of thing, but for now we can just get by without this capability
              */
             // apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
-            bops = bulkOpRemoveNode(bops, child.getId());
+            bops = bulkOpRemoveNode(ms, bops, child.getId());
             if (++opCount > Const.MAX_BULK_OPS) {
                 bops.execute();
                 bops = null;
@@ -629,11 +635,13 @@ public class MongoDelete extends ServiceBase {
     }
 
     // returns a new BulkOps if one not yet existing
-    public BulkOperations bulkOpRemoveNode(BulkOperations bops, ObjectId id) {
+    public BulkOperations bulkOpRemoveNode(MongoSession ms, BulkOperations bops, ObjectId id) {
         if (bops == null) {
             bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
         }
-        Query query = new Query().addCriteria(new Criteria("id").is(id));
+        Criteria crit = new Criteria("id").is(id);
+        crit = auth.addWriteSecurity(ms, crit);
+        Query query = new Query().addCriteria(crit);
         bops.remove(query);
         return bops;
     }
@@ -656,6 +664,7 @@ public class MongoDelete extends ServiceBase {
             .and(SubNode.PATH)
             .not()
             .regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
+        crit = auth.addWriteSecurity(ms, crit);
         q.addCriteria(crit);
         // we'll be deleting every node in 'q' so we need to set the parents of all those to
         // hasChildren=null (unknown)

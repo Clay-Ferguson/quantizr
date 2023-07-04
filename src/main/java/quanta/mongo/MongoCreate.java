@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.instrument.PerfMon;
 import quanta.model.PropertyInfo;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
@@ -186,6 +185,7 @@ public class MongoCreate extends ServiceBase {
             if (bops == null) {
                 bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
             }
+
             Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
             Update update = new Update().set(SubNode.ORDINAL, child.getOrdinal() + rangeSize);
             bops.updateOne(query, update);

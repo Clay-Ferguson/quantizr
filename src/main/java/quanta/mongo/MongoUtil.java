@@ -412,7 +412,8 @@ public class MongoUtil extends ServiceBase {
                 } else {
                     return;
                 }
-                Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+                Criteria crit = new Criteria("id").is(node.getId());
+                Query query = new Query().addCriteria(crit);
                 Update update = new Update().set(SubNode.PATH, newPath);
                 if (!bops.hasVal()) {
                     bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
@@ -958,7 +959,8 @@ public class MongoUtil extends ServiceBase {
             "### Posts",
             NodeType.POSTS.s(),
             Arrays.asList(PrivilegeType.READ.s()),
-            NodeName.POSTS
+            NodeName.POSTS,
+            true
         );
         if (postsNodeVal != null) {
             postsNodeVal.setVal(postsNode);

@@ -84,7 +84,8 @@ public class ActPubOutbox extends ServiceBase {
                 "### Posts",
                 NodeType.ACT_PUB_POSTS.s(),
                 Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                NodeName.POSTS
+                NodeName.POSTS,
+                true
             );
             if (outboxNode == null) {
                 log.debug("no posts node for user: " + apUserName);

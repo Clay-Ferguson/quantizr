@@ -119,7 +119,6 @@ public class NodeSearchService extends ServiceBase {
                 false,
                 false,
                 false,
-                false,
                 true,
                 null,
                 false
@@ -167,7 +166,6 @@ public class NodeSearchService extends ServiceBase {
                     false,
                     false,
                     false,
-                    false,
                     true,
                     null,
                     false
@@ -195,7 +193,6 @@ public class NodeSearchService extends ServiceBase {
                     node,
                     false,
                     counter + 1,
-                    false,
                     false,
                     false,
                     false,
@@ -269,7 +266,6 @@ public class NodeSearchService extends ServiceBase {
                                 false,
                                 false,
                                 false,
-                                false,
                                 true,
                                 null,
                                 false
@@ -324,7 +320,6 @@ public class NodeSearchService extends ServiceBase {
                         false,
                         false,
                         false,
-                        false,
                         null,
                         false
                     );
@@ -356,7 +351,6 @@ public class NodeSearchService extends ServiceBase {
                             userNode,
                             false,
                             counter + 1,
-                            false,
                             false,
                             false,
                             false,
@@ -440,7 +434,6 @@ public class NodeSearchService extends ServiceBase {
                 node,
                 false,
                 counter + 1,
-                false,
                 false,
                 false,
                 false,
@@ -540,14 +533,12 @@ public class NodeSearchService extends ServiceBase {
                 orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
                 // this regex simply is "Starts with a period"
                 orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
-                // crit = crit.andOperator(new Criteria().orOperator(orCrit));
             } //
             else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) { // ActivityPub
                 // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
                 orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
                 // this regex simly is "Starts with a period"
                 orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
-                // crit = crit.andOperator(new Criteria().orOperator(orCrit));
             }
 
             ands.add(new Criteria().orOperator(orCrit));
@@ -567,7 +558,8 @@ public class NodeSearchService extends ServiceBase {
             if (blockedUserIds.size() > 0) {
                 ands.add(Criteria.where(SubNode.OWNER).nin(blockedUserIds));
             }
-            crit.andOperator(ands);
+
+            crit = auth.addReadSecurity(ms, crit, ands);
             q.addCriteria(crit);
             q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
             q.limit(TRENDING_LIMIT);
@@ -600,11 +592,7 @@ public class NodeSearchService extends ServiceBase {
                 sort = Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME);
                 limit = TRENDING_LIMIT;
             }
-            // We pass true if this is a basic subgraph (not a Trending analysis), so that running Node Stats
-            // has the side effect of cleaning out orphans.
-            // Note doAuth is saying here if there's any potential secrets in the results then use doAuth=true
-            boolean doAuth = wordMap != null || tagMap != null || mentionMap != null;
-            iter = read.getSubGraph(ms, searchRoot, sort, limit, false, doAuth, null);
+            iter = read.getSubGraph(ms, searchRoot, sort, limit, false, true, null);
         }
         HashSet<String> uniqueUsersSharedTo = new HashSet<>();
         HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;

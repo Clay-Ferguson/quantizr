@@ -229,49 +229,77 @@ public class MongoAuth extends ServiceBase {
         );
     }
 
-    public Criteria getSecurity(MongoSession ms) {
-        return getSecurity(ms, true, true, true);
+    public Criteria addReadSecurity(MongoSession ms, Criteria crit) {
+        return addSecurity(ms, false, crit, null);
+    }
+
+    public Criteria addWriteSecurity(MongoSession ms, Criteria crit) {
+        return addSecurity(ms, true, crit, null);
+    }
+
+    public Criteria addReadSecurity(MongoSession ms, Criteria crit, List<Criteria> ands) {
+        return addSecurity(ms, false, crit, ands);
+    }
+
+    public Criteria addWriteSecurity(MongoSession ms, Criteria crit, List<Criteria> ands) {
+        return addSecurity(ms, true, crit, ands);
     }
 
     /*
-     * Filters to get only nodes that are public OR are shared to the current user. For single node
-     * lookups we won't need this because we can do it the old way and be faster, but for queries of
+     * Filters to get only nodes that are public, are shared to the current user, or owned by current user.
+     * For single node lookups we won't need this because we can do it the old way and be faster, but for queries of
      * multiple records (page rendering, timeline, search, etc.) we need to build this security right
      * into the query using this method.
      */
-    public Criteria getSecurity(MongoSession ms, boolean allowPublic, boolean toMe, boolean mine) {
-        if (!allowPublic && !toMe && !mine) return null;
-
-        List<Criteria> ors = new LinkedList<>();
-        SessionContext sc = ThreadLocals.getSC();
-
-        // node is public
-        if (allowPublic) {
-            ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+    public Criteria addSecurity(MongoSession ms, boolean write, Criteria crit, List<Criteria> ands) {
+        // admin can bypass all security
+        if (ms != null && ms.isAdmin()) {
+            return crit;
         }
 
-        // anon users will nave null rootID here.
-        if ((toMe || mine) && sc.getRootId() != null) {
-            SubNode myAcntNode = read.getNode(ms, sc.getRootId());
+        SessionContext sc = ThreadLocals.getSC();
+        SubNode myAcntNode = null;
 
-            // if we have a user add their privileges in addition to public.
-            if (myAcntNode != null) {
-                if (toMe) {
-                    // or node is shared to us
+        // special case where we can collapse this "and (a | b | c)" to just "and a"
+        if (sc == null) {
+            if (write) {
+                throw new RuntimeException("Unable to build writable query by unknown session context");
+            }
+            // if unknown person the simple requirement is to be public
+            return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+        } else {
+            // if we have a person/account get their account node first
+            myAcntNode = read.getNode(ms, sc.getRootId());
+
+            // if unknown person then again only a condition for public what we want
+            if (myAcntNode == null) {
+                if (write) {
+                    throw new RuntimeException("Unable to build writable query by unknown user");
+                }
+                return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+            } else {
+                // if we have a person, set up conditions, for whatever they should be able to see
+                List<Criteria> ors = new LinkedList<>();
+
+                // if this is write access then equire a criteria of them owning the node or having it being
+                // transferred to them, but don't include public or 'shard to me' condition
+                if (!write) {
+                    ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+                    // or node is shared to me
                     ors.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
                 }
+                // or node is OWNED by me
+                ors.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
+                // or node was Transferred by me
+                ors.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
 
-                if (mine) {
-                    // or node is OWNED by us
-                    ors.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
-                    // or node was Transferred by us
-                    ors.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
+                if (ands == null) {
+                    ands = new LinkedList<Criteria>();
                 }
+                ands.add(new Criteria().orOperator(ors));
+                return crit.andOperator(ands);
             }
         }
-
-        if (ors.size() == 0) return null;
-        return new Criteria().orOperator(ors);
     }
 
     public void ownerAuth(SubNode node) {
@@ -540,6 +568,7 @@ public class MongoAuth extends ServiceBase {
         if (pathToSearch == null) {
             pathToSearch = NodePath.USERS_PATH;
         }
+        List<Criteria> ands = new LinkedList<Criteria>();
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
         if (sharedToAny != null && sharedToAny.size() > 0) {
@@ -548,11 +577,12 @@ public class MongoAuth extends ServiceBase {
             for (String share : sharedToAny) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
             }
-            crit = crit.andOperator(new Criteria().orOperator(orCriteria));
+            ands.add(new Criteria().orOperator(orCriteria));
         }
         if (ownerIdMatch != null) {
-            crit = crit.and(SubNode.OWNER).is(ownerIdMatch);
+            ands.add(Criteria.where(SubNode.OWNER).is(ownerIdMatch));
         }
+        crit = auth.addReadSecurity(ms, crit, ands);
         q.addCriteria(crit);
         return q;
     }
@@ -591,6 +621,7 @@ public class MongoAuth extends ServiceBase {
     }
 
     public Query subGraphByAcl_query(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
+        List<Criteria> ands = new LinkedList<Criteria>();
         Query q = new Query();
         if (pathToSearch == null) {
             pathToSearch = NodePath.USERS_PATH;
@@ -600,15 +631,15 @@ public class MongoAuth extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria criteria = Criteria
-            .where(SubNode.PATH)
-            .regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch))
-            .and(SubNode.AC)
-            .ne(null);
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
+
+        ands.add(Criteria.where(SubNode.AC).ne(null));
         if (ownerIdMatch != null) {
-            criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
+            ands.add(Criteria.where(SubNode.OWNER).is(ownerIdMatch));
         }
-        q.addCriteria(criteria);
+
+        crit = auth.addReadSecurity(ms, crit, ands);
+        q.addCriteria(crit);
         return q;
     }
 

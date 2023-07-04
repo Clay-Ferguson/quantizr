@@ -121,7 +121,8 @@ public class NodeEditService extends ServiceBase {
                     "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
                     NodeType.POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s()),
-                    NodeName.POSTS
+                    NodeName.POSTS,
+                    true
                 );
 
             if (parentNode != null) {
@@ -131,8 +132,9 @@ public class NodeEditService extends ServiceBase {
         }
         /* Node still null, then try other ways of getting it */
         if (parentNode == null && !linkBookmark) {
-            if (nodeId.equals("~" + NodeType.NOTES.s())) {
-                parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
+            if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
+                parentNode =
+                    read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null, false);
             } else {
                 parentNode = read.getNode(ms, nodeId);
             }
@@ -292,7 +294,6 @@ public class NodeEditService extends ServiceBase {
                 false,
                 false,
                 false,
-                false,
                 null,
                 false
             )
@@ -394,7 +395,6 @@ public class NodeEditService extends ServiceBase {
                 Convert.LOGICAL_ORDINAL_GENERATE,
                 false,
                 false,
-                false, //
                 false,
                 false,
                 false,
@@ -461,7 +461,16 @@ public class NodeEditService extends ServiceBase {
             res.setMessage("Sorry, can't drop that there.");
             return res;
         }
-        SubNode linksNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
+        SubNode linksNode = read.getUserNodeByType(
+            ms,
+            ms.getUserName(),
+            null,
+            "### Notes",
+            NodeType.NOTES.s(),
+            null,
+            null,
+            false
+        );
         if (linksNode == null) {
             log.warn("unable to get linksNode");
             return null;
@@ -682,11 +691,10 @@ public class NodeEditService extends ServiceBase {
             ThreadLocals.getSC(),
             ms,
             node,
-            false, //
+            false,
             Convert.LOGICAL_ORDINAL_GENERATE,
             false,
             false,
-            true, //
             false,
             true,
             true,

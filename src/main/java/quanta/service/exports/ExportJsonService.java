@@ -61,6 +61,8 @@ public class ExportJsonService extends ServiceBase {
             byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
             Query q = new Query();
             Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
+            crit = auth.addReadSecurity(ms, crit);
+
             q.addCriteria(crit);
             Iterable<SubNode> iter = opsw.find(ms, q);
             BufferedOutputStream os = null;

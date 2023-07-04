@@ -111,11 +111,10 @@ public class PushService extends ServiceBase {
             sc,
             ms,
             node,
-            false, //
+            false,
             Convert.LOGICAL_ORDINAL_IGNORE,
             false,
             false,
-            true, //
             false,
             true,
             true,

@@ -55,10 +55,6 @@ public class Convert extends ServiceBase {
      * browser/client to encapsulate the data for a given node which is used by the browser to render
      * the node.
      *
-     * Note: childrenCheck=true means that we DO need the correct value for hasChildren (from a global,
-     * non-user specific point of view) to be set on this node. Node that we do set hasChildren to true
-     * if there ARE an children REGARDLESS of whether the given user can access those children.
-     *
      * todo-1: make sure any saving that's triggered in here is done in an async thread that doesn't block
      * this method from returning fast
      */
@@ -71,7 +67,6 @@ public class Convert extends ServiceBase {
         long logicalOrdinal,
         boolean allowInlineChildren,
         boolean lastChild,
-        boolean childrenCheck,
         boolean getFollowers,
         boolean loadLikes,
         boolean attachBoosted,
@@ -112,7 +107,7 @@ public class Convert extends ServiceBase {
         }
         attach.fixAllAttachmentMimes(node);
 
-        boolean hasChildren = read.hasChildren(ms, node, false, childrenCheck);
+        boolean hasChildren = read.hasChildren(ms, node);
         List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
         List<AccessControlInfo> acList = buildAccessControlList(sc, node);
         if (node.getOwner() == null) {
@@ -259,7 +254,6 @@ public class Convert extends ServiceBase {
                         inlineOrdinal++,
                         multiLevel,
                         lastChild,
-                        childrenCheck,
                         false,
                         loadLikes,
                         false,
@@ -319,7 +313,6 @@ public class Convert extends ServiceBase {
                     boostedNode,
                     false,
                     Convert.LOGICAL_ORDINAL_IGNORE,
-                    false,
                     false,
                     false,
                     false,

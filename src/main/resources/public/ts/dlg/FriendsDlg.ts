@@ -89,7 +89,7 @@ export class FriendsDlg extends DialogBase {
         if (state.loading) {
             message = "Loading...";
         }
-        else if (!state.friends || state.friends.length === 0) {
+        else if (state.friends?.length > 0) {
             if (!this.nodeId) {
                 message = "Once you add some friends you can pick from a list here.";
             }
@@ -100,7 +100,7 @@ export class FriendsDlg extends DialogBase {
 
         let friendsTagDropDown: Selection = null;
 
-        if (ast.friendHashTags && ast.friendHashTags.length > 0) {
+        if (ast.friendHashTags?.length > 0) {
             const items: any[] = [
                 { key: "", val: "All Tags" }
             ];
@@ -129,11 +129,11 @@ export class FriendsDlg extends DialogBase {
         const filteredFriends = state.friends?.map(friend => {
             if (!friend) return null;
 
+            // todo-1: Until we make this clear to user what the filter is, let's show everyone
             // if this is a nostr user and we're not filtering for nostr, return
-            if (friend.userName.startsWith(".") && ast.protocolFilter !== J.Constant.NETWORK_NOSTR) return null;
-
+            // if (friend.userName.startsWith(".") && ast.protocolFilter !== J.Constant.NETWORK_NOSTR) return null;
             // if this is an ActPub user and we're not filtering for ActPub, return
-            if (friend.userName.indexOf("@") !== -1 && ast.protocolFilter !== J.Constant.NETWORK_ACTPUB) return null;
+            // if (friend.userName.indexOf("@") !== -1 && ast.protocolFilter !== J.Constant.NETWORK_ACTPUB) return null;
 
             if ((!searchText || this.friendMatchesString(friend, searchText)) &&
                 (!tagSearch || this.friendMatchesString(friend, tagSearch))) {

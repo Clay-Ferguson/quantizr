@@ -860,7 +860,8 @@ public class UserManagerService extends ServiceBase {
             null,
             NodeType.BLOCKED_USERS.s(),
             null,
-            NodeName.BLOCKED_USERS
+            NodeName.BLOCKED_USERS,
+            false
         );
         SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, req.getUserName());
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
@@ -974,7 +975,8 @@ public class UserManagerService extends ServiceBase {
             null,
             NodeType.FRIEND_LIST.s(),
             null,
-            NodeName.FRIENDS
+            NodeName.FRIENDS,
+            false
         );
         if (followerFriendList == null) {
             log.debug("Can't access Friend list for: " + userDoingFollow);
@@ -1131,7 +1133,8 @@ public class UserManagerService extends ServiceBase {
             null,
             NodeType.FRIEND_LIST.s(),
             null,
-            NodeName.BLOCKED_USERS
+            NodeName.BLOCKED_USERS,
+            false
         );
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.
@@ -1149,7 +1152,8 @@ public class UserManagerService extends ServiceBase {
             null,
             NodeType.BLOCKED_USERS.s(),
             null,
-            NodeName.BLOCKED_USERS
+            NodeName.BLOCKED_USERS,
+            false
         );
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.

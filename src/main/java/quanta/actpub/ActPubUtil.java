@@ -786,11 +786,10 @@ public class ActPubUtil extends ServiceBase {
             ThreadLocals.getSC(),
             ms,
             node,
-            false, //
+            false,
             Convert.LOGICAL_ORDINAL_IGNORE,
             false,
             false,
-            false, //
             false,
             true,
             true,
@@ -848,16 +847,15 @@ public class ActPubUtil extends ServiceBase {
                             false,
                             ThreadLocals.getSC(),
                             ms,
-                            node, //
+                            node,
                             false,
                             Convert.LOGICAL_ORDINAL_IGNORE,
                             false,
                             false,
-                            false, //
                             false,
                             true,
                             true,
-                            null, //
+                            null,
                             true
                         );
                     // we only collect children at this level if it's not an account top level post
@@ -882,7 +880,6 @@ public class ActPubUtil extends ServiceBase {
                                         child,
                                         false,
                                         Convert.LOGICAL_ORDINAL_IGNORE,
-                                        false,
                                         false,
                                         false,
                                         false,
@@ -926,7 +923,6 @@ public class ActPubUtil extends ServiceBase {
                                         child,
                                         false,
                                         Convert.LOGICAL_ORDINAL_IGNORE,
-                                        false,
                                         false,
                                         false,
                                         false,
@@ -1024,12 +1020,11 @@ public class ActPubUtil extends ServiceBase {
             false,
             ThreadLocals.getSC(),
             ms,
-            node, //
+            node,
             false,
             Convert.LOGICAL_ORDINAL_IGNORE,
             false,
-            false, //
-            true,
+            false,
             false,
             true,
             true,
@@ -1045,12 +1040,11 @@ public class ActPubUtil extends ServiceBase {
             false,
             ThreadLocals.getSC(),
             ms,
-            node, //
+            node,
             false,
             Convert.LOGICAL_ORDINAL_IGNORE,
             false,
-            false, //
-            true,
+            false,
             false,
             true,
             true,
@@ -1119,7 +1113,8 @@ public class ActPubUtil extends ServiceBase {
                                 "### Posts",
                                 NodeType.ACT_PUB_POSTS.s(),
                                 Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                                NodeName.POSTS
+                                NodeName.POSTS,
+                                false
                             );
                             if (outboxNode == null) {
                                 log.debug("no outbox for user: " + apUserName);

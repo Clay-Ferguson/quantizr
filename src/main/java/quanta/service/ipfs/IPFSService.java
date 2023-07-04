@@ -261,7 +261,8 @@ public class IPFSService extends ServiceBase {
             "### Exports",
             NodeType.EXPORTS.s(),
             null,
-            null
+            null,
+            false
         );
         if (exportParent != null) {
             SubNode node = create.createNode(

@@ -674,7 +674,7 @@ export class Nav {
             feedFilterMyMentions: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
-            feedFilterToPublic: true,
+            feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
             feedResults: null,

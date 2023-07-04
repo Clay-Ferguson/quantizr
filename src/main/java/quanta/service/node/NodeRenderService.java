@@ -90,7 +90,6 @@ public class NodeRenderService extends ServiceBase {
                 Convert.LOGICAL_ORDINAL_IGNORE,
                 false,
                 false,
-                true, //
                 false,
                 true,
                 true,
@@ -127,7 +126,6 @@ public class NodeRenderService extends ServiceBase {
                 Convert.LOGICAL_ORDINAL_GENERATE,
                 false,
                 false,
-                true,
                 false,
                 true,
                 true,
@@ -143,9 +141,9 @@ public class NodeRenderService extends ServiceBase {
          * end when the query returns, and the page root node will of course be the parent of scanToNode
          */
         SubNode scanToNode = null;
-        // we pass doAuth=true because right here we DO care that the hasChildren is considering only based
+        // we pass allowAuth=true because right here we DO care that the hasChildren is considering only based
         // on what WE can access.
-        if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node, true, false))) {
+        if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node))) {
             req.setUpLevel(true);
         }
         /*
@@ -227,7 +225,6 @@ public class NodeRenderService extends ServiceBase {
             logicalOrdinal,
             level > 0,
             false,
-            true,
             false,
             true,
             true,
@@ -329,7 +326,9 @@ public class NodeRenderService extends ServiceBase {
                     if (bops == null) {
                         bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
                     }
-                    Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+                    Criteria crit = new Criteria("id").is(n.getId());
+                    crit = auth.addReadSecurity(ms, crit);
+                    Query query = new Query().addCriteria(crit);
                     Update update = new Update().set(SubNode.ORDINAL, lastOrdinal);
                     bops.updateOne(query, update);
                     if (++batchSize > Const.MAX_BULK_OPS) {
@@ -527,11 +526,10 @@ public class NodeRenderService extends ServiceBase {
             ThreadLocals.getSC(),
             ms,
             node,
-            true, //
+            true,
             Convert.LOGICAL_ORDINAL_IGNORE,
             false,
-            false, //
-            true,
+            false,
             false,
             false,
             false,

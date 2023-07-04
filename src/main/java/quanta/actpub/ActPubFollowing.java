@@ -188,7 +188,8 @@ public class ActPubFollowing extends ServiceBase {
                         null,
                         NodeType.FRIEND_LIST.s(),
                         null,
-                        NodeName.FRIENDS
+                        NodeName.FRIENDS,
+                        false
                     );
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
@@ -405,7 +406,6 @@ public class ActPubFollowing extends ServiceBase {
                     false,
                     false,
                     false,
-                    false,
                     null,
                     false
                 );
@@ -463,7 +463,8 @@ public class ActPubFollowing extends ServiceBase {
             null,
             NodeType.FRIEND_LIST.s(),
             null,
-            NodeName.FRIENDS
+            NodeName.FRIENDS,
+            false
         );
         if (friendsListNode == null) return null;
         /*
@@ -475,6 +476,8 @@ public class ActPubFollowing extends ServiceBase {
             .regex(mongoUtil.regexDirectChildrenOfPath(friendsListNode.getPath()))
             .and(SubNode.TYPE)
             .is(NodeType.FRIEND.s());
+
+        crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         return q;
     }

@@ -184,7 +184,6 @@ public class ActPubFollower extends ServiceBase {
                     counter + 1,
                     false,
                     false,
-                    false,
                     true,
                     false,
                     false,
@@ -251,6 +250,7 @@ public class ActPubFollower extends ServiceBase {
             .is(userNode.getIdStr())
             .and(SubNode.TYPE)
             .is(NodeType.FRIEND.s());
+        crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         return q;
     }
