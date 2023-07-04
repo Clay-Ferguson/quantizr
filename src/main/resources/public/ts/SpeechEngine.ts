@@ -429,8 +429,7 @@ export class SpeechEngine {
         text = text.replace("?\"", "?");
         text = text.replace("?'", "?");
 
-        // need to create a list to iterate thru for these.
-        text = text.replace("Rep.", "Rep");
+        text = text.replace(/[@#_*]/g, " ");
         return text;
     }
 
