@@ -265,8 +265,15 @@ public class MongoAuth extends ServiceBase {
             if (write) {
                 throw new RuntimeException("Unable to build writable query by unknown session context");
             }
-            // if unknown person the simple requirement is to be public
-            return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+
+            // if we have no 'ands', just tack on to existing criterial
+            if (ands == null) {
+                // if unknown person the simple requirement is to be public
+                return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+            } else {
+                ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+                return crit.andOperator(ands);
+            }
         } else {
             // if we have a person/account get their account node first
             myAcntNode = read.getNode(ms, sc.getRootId());
@@ -276,7 +283,14 @@ public class MongoAuth extends ServiceBase {
                 if (write) {
                     throw new RuntimeException("Unable to build writable query by unknown user");
                 }
-                return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+
+                // if we have no 'ands', just tack on to existing criterial
+                if (ands == null) {
+                    return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+                } else {
+                    ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+                    return crit.andOperator(ands);
+                }
             } else {
                 // if we have a person, set up conditions, for whatever they should be able to see
                 List<Criteria> ors = new LinkedList<>();
