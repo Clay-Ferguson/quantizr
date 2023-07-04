@@ -257,6 +257,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;
+    directMessage: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
@@ -264,7 +265,6 @@ export interface CreateSubNodeRequest extends RequestBase {
     fediSend: boolean;
     payloadType?: string;
     reply: boolean;
-    directMessage: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {

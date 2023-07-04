@@ -257,6 +257,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;
+    directMessage: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
