@@ -1195,8 +1195,6 @@ export class Edit {
         });
     }
 
-    // todo-0: when posting from UserProfileDlg pass an isDm=true into here and sent to server so the 
-    // node will NOT default to public (currently it's public)
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
     addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
         boostTarget: string, fediSend: boolean, directMessage: boolean) => {
