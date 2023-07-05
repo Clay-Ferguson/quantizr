@@ -16,14 +16,14 @@ The following test instance is open to the public, so anyone can sign up and bro
 
 https://quanta.wiki
 
-## How to Build/Deploy
-
-See [./distro/README.md](./distro/README.md) for details on how to build and/or run a Quanta instance. 
-
 Quanta is a browser-based SPA (Single Page App), that works on both mobile and desktop browsers. 
 
 The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS front end. Deployed and installed via docker (docker compose), MongoDB as the primary data store, and an option for running an IPFS Gateway.
 
+### To Run the Server
+
+Edit `/distro/setenv-run-distro.sh` to define your environment settings, and point the docker IMAGE name to Docker Hub. Then run `/distro/run-distro.sh`, which will startup a Docker Compose Swarm with one replica. All the defaults in the `setenv` file should probably work as is (port numbers, folder names, etc), but you do need to set the docker image names (`DOCKER_IMAGE` and `TSERVER_IMAGE`) to point to Docker Hub, unless you've already built locally and can just point to your local images.
+
 ### Keywords
 
-Decentralized, Social Media, Fediverse, ActivityPub, Nostr, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, docker, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
+Decentralized, Social Media, Fediverse, ActivityPub, Nostr, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
