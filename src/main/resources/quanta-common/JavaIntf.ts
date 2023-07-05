@@ -1341,7 +1341,6 @@ export const enum NodeType {
     BLOCKED_USERS = "sn:blockedUsers",
     FRIEND = "sn:friend",
     POSTS = "sn:posts",
-    ACT_PUB_POSTS = "ap:posts",
     NONE = "u",
     NOSTR_ENC_DM = "sn:ned",
     PLAIN_TEXT = "sn:txt",

@@ -2,7 +2,6 @@ import { getAs } from "./AppContext";
 import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
 import { AccountType } from "./plugins/AccountType";
-import { APPostsType } from "./plugins/APPostsType";
 import { BlockedUsersType } from "./plugins/BlockedUsersType";
 import { BookmarkListType } from "./plugins/BookmarkListType";
 import { BookmarkType } from "./plugins/BookmarkType";
@@ -81,7 +80,6 @@ export class PluginMgr {
         this.addType(ordinal++, new RepoRootType());
         this.addType(ordinal++, new AccountType());
         this.addType(ordinal++, new PostsType());
-        this.addType(ordinal++, new APPostsType());
         this.addType(ordinal++, new ExportsType());
         this.addType(ordinal++, new InboxNodeType());
         this.addType(ordinal++, new InboxEntryType());

@@ -23,7 +23,6 @@ public enum NodeType {
     BLOCKED_USERS("sn:blockedUsers"), //
     FRIEND("sn:friend"), //
     POSTS("sn:posts"), //
-    ACT_PUB_POSTS("ap:posts"), //
 
     NONE("u"), //same as 'markdown' really (untyped, default to markdown)
     NOSTR_ENC_DM("sn:ned"), //

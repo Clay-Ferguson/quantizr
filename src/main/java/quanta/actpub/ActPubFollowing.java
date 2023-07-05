@@ -189,7 +189,7 @@ public class ActPubFollowing extends ServiceBase {
                         NodeType.FRIEND_LIST.s(),
                         null,
                         NodeName.FRIENDS,
-                        false
+                        true
                     );
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it

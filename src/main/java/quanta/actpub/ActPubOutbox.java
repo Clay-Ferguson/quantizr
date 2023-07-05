@@ -82,7 +82,7 @@ public class ActPubOutbox extends ServiceBase {
                 apUserName,
                 userNode,
                 "### Posts",
-                NodeType.ACT_PUB_POSTS.s(),
+                NodeType.POSTS.s(),
                 Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
                 NodeName.POSTS,
                 true

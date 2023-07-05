@@ -44,8 +44,7 @@ public class UserFeedService extends ServiceBase {
     // DO NOT DELETE (part of example to keep below)
     // private static List<String> excludeTypes = Arrays.asList( //
     // NodeType.FRIEND.s(), //
-    // NodeType.POSTS.s(), //
-    // NodeType.ACT_PUB_POSTS.s());
+    // NodeType.POSTS.s());
     public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
         SessionContext sc = ThreadLocals.getSC();
         CheckMessagesResponse res = new CheckMessagesResponse();
@@ -61,8 +60,7 @@ public class UserFeedService extends ServiceBase {
         // DO NOT DELETE (keep as example)
         // This pattern is what is required when you have multiple conditions added to a single field.
         // .andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
-        // Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
-        // Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+        // Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()));
         SubNode searchRoot = read.getNode(ms, sc.getRootId());
         if (searchRoot == null) {
             return res;

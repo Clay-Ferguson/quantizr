@@ -490,6 +490,35 @@ public class MongoUtil extends ServiceBase {
         // log.debug("setParentNodes completed.");
     }
 
+    // DO NOT DELETE
+    // Leave as an example for future DB Conversions
+    public void fixTypes(MongoSession ms) {
+        IntVal batchSize = new IntVal();
+        Query q = new Query();
+        q.addCriteria(Criteria.where(SubNode.TYPE).is("ap:posts"));
+        BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+        ops
+            .stream(q, SubNode.class)
+            .forEachRemaining(node -> {
+                // log.debug("BULK FOUND: " + XString.prettyPrint(node));
+
+                Criteria crit = new Criteria("id").is(node.getId());
+                Query query = new Query().addCriteria(crit);
+                Update update = new Update().set(SubNode.TYPE, NodeType.POSTS.s());
+                bops.updateOne(query, update);
+                batchSize.inc();
+
+                if (batchSize.getVal() > Const.MAX_BULK_OPS) {
+                    bops.execute();
+                    batchSize.setVal(0);
+                }
+            });
+
+        if (batchSize.getVal() > 0) {
+            bops.execute();
+        }
+    }
+
     // Alters all paths parts that are over 10 characters long, on all nodes
     public void shortenPathParts(MongoSession ms) {
         // WARNING: use 'ops.strea' (findAll will be out of memory error on prod)

@@ -788,7 +788,7 @@ public class ActPubService extends ServiceBase {
                         userName,
                         actorAccountNode,
                         "### Posts",
-                        NodeType.ACT_PUB_POSTS.s(),
+                        NodeType.POSTS.s(),
                         Arrays.asList(PrivilegeType.READ.s()),
                         NodeName.POSTS,
                         true
@@ -932,7 +932,7 @@ public class ActPubService extends ServiceBase {
                     userName,
                     actorAccountNode,
                     "### Posts",
-                    NodeType.ACT_PUB_POSTS.s(),
+                    NodeType.POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s()),
                     NodeName.POSTS,
                     true

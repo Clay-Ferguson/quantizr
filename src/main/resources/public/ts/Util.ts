@@ -979,7 +979,6 @@ export class Util {
     showMetaData = (ast: AppState, node: J.NodeInfo) => {
         return ast.userPrefs.showMetaData ||
             J.NodeType.POSTS === node?.type ||
-            J.NodeType.ACT_PUB_POSTS === node?.type ||
             J.NodeType.COMMENT === node?.type;
     }
 

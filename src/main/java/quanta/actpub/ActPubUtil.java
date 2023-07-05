@@ -839,8 +839,7 @@ public class ActPubUtil extends ServiceBase {
                  * note topNode doesn't necessarily mean we're done iterating because it's 'inReplyTo' still may
                  * point to further places 'logically above' (in this conversation thread)
                  */
-                boolean topNode =
-                    node.isType(NodeType.POSTS) || node.isType(NodeType.ACT_PUB_POSTS) || node.isType(NodeType.ACCOUNT);
+                boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
                 if (!topNode) {
                     info =
                         convert.convertToNodeInfo(
@@ -876,7 +875,7 @@ public class ActPubUtil extends ServiceBase {
                                     convert.convertToNodeInfo(
                                         false,
                                         ThreadLocals.getSC(),
-                                        ms, //
+                                        ms,
                                         child,
                                         false,
                                         Convert.LOGICAL_ORDINAL_IGNORE,
@@ -950,7 +949,7 @@ public class ActPubUtil extends ServiceBase {
                 if (topNode) {} else { // leave parent == null;
                     parent = read.getParent(ms, node);
                 }
-                boolean top = parent != null && (parent.isType(NodeType.POSTS) || parent.isType(NodeType.ACT_PUB_POSTS));
+                boolean top = parent != null && parent.isType(NodeType.POSTS);
                 // if we didn't get a usable (non root) parent from the tree structure, try using the 'inReplyTo'
                 // value
                 if (parent == null || top) {
@@ -1016,6 +1015,9 @@ public class ActPubUtil extends ServiceBase {
 
     public NodeInfo loadObjectNodeInfo(MongoSession ms, String userDoingAction, String url) {
         SubNode node = loadObject(ms, userDoingAction, url);
+        if (node == null) {
+            throw new RuntimeException("Unable to load: " + url);
+        }
         NodeInfo info = convert.convertToNodeInfo(
             false,
             ThreadLocals.getSC(),
@@ -1111,10 +1113,10 @@ public class ActPubUtil extends ServiceBase {
                                 apUserName,
                                 accountNode,
                                 "### Posts",
-                                NodeType.ACT_PUB_POSTS.s(),
+                                NodeType.POSTS.s(),
                                 Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
                                 NodeName.POSTS,
-                                false
+                                true
                             );
                             if (outboxNode == null) {
                                 log.debug("no outbox for user: " + apUserName);

@@ -260,7 +260,7 @@ public class MongoDelete extends ServiceBase {
         log.debug("Nodes deleted: " + res.getDeletedCount());
     }
 
-    // iterates over 'q' setting prop=val on ever PARENT node of all those nodes.
+    // iterates over 'q' setting prop=val on every PARENT node of all those nodes.
     public void bulkSetPropValOnParents(MongoSession ms, Query q, String prop, Object val) {
         Val<BulkOperations> bops = new Val<>(null);
         IntVal batchSize = new IntVal();
@@ -270,7 +270,7 @@ public class MongoDelete extends ServiceBase {
         ops
             .stream(q, SubNode.class)
             .forEachRemaining(node -> {
-                // lazy careate bops
+                // lazy create bops
                 if (!bops.hasVal()) {
                     bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
                 }

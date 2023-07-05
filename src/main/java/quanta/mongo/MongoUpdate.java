@@ -214,7 +214,6 @@ public class MongoUpdate extends ServiceBase {
         }
         Criteria crit = new Criteria("id").is(id);
         crit = auth.addWriteSecurity(ms, crit);
-
         Query query = new Query().addCriteria(crit);
         Update update = new Update().set(prop, val);
         bops.updateOne(query, update);
