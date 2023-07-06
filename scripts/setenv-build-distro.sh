@@ -14,9 +14,8 @@ export WEBPACK_SCRIPT=build-prod
 export SASS_SCRIPT=sass-prod
 
 export DOCKER_IMAGE=quanta
-
-# tserver-tag
 export TSERVER_IMAGE=tserver
+
 export TSERVER_API_KEY=yourkey
 export nostrDaemonEnabled=false
 
@@ -41,7 +40,7 @@ export ipfsEnabled=
 export ipfs_container=ipfs-distro
 
 # deploy target folder is where we will be running the app from or what will become the ZIP file content
-export DEPLOY_TARGET=${PRJROOT}/distro
+export DEPLOY_TARGET=/home/clay/ferguson/quanta-distro
 mkdir -p ${DEPLOY_TARGET}
 
 export ipfs_data=${DEPLOY_TARGET}/ipfs

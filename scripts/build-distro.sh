@@ -1,6 +1,10 @@
 #!/bin/bash -i
 # (NOTE: -i arg makes .bashrc get sourced and without this NPM commands won't be found)
 
+# To just build a folder to deploy from (which can be used to run remote docker IMAGES from) set this
+# compile variable to "no", and be sure DEPLOY_TARGET (set in setenv-*.sh) is set to the folder you want to build 
+COMPILE=yes
+
 # --------------------------------------------------------------------
 # Builds a folder in ${DEPLOY_TARGET}, (which is normally just the ./distro folder in the project)
 # that can be used to run the app.
@@ -14,9 +18,8 @@ clear
 source ./setenv-build-distro.sh
 checkFunctions
 
-sudo rm -r ${DEPLOY_TARGET}
-
 echo "Preparing DEPLOY_TARGET: ${DEPLOY_TARGET}"
+sudo rm -r ${DEPLOY_TARGET}
 mkdir -p ${DEPLOY_TARGET}
 verifySuccess "Cleaned deploy target"
 
@@ -63,17 +66,19 @@ rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
+genMongoConfig
+
+if [ "${COMPILE}" == "yes" ]; then
 # build the project (compile all source)
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
-
-genMongoConfig
 
 # This builds the images locally, and saves them into local docker repository, so that 'docker-compose up',
 # is all that's required.
 cd ${DEPLOY_TARGET}
 dockerBuild
 echo "Docker build complete..."
+fi
 
 imageCheck ${DOCKER_IMAGE}
 
@@ -93,5 +98,3 @@ echo
 echo "************ Build Complete in ${DEPLOY_TARGET}"
 
 read -p "Press a Key"
-
-
