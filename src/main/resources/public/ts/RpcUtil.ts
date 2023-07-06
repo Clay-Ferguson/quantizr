@@ -6,10 +6,11 @@ import { Constants as C } from "./Constants";
 import { RpcQueueItem } from "./RpcQueueItem";
 
 export class RpcUtil {
+    log: boolean = false;
+    logVerbose: boolean = false;
+
     rpcPath: string = null;
     rhost: string = null;
-    log: boolean = true;
-    logVerbose: boolean = false;
     callId: number = 0;
     concurrency: number = 0;
     timer: any = null;

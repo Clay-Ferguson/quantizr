@@ -266,13 +266,13 @@ export class NodeCompRowHeader extends Div {
                     onMouseOut: () => { S.quanta.selectedForTts = null; },
                     onClick: async () => {
                         if (getAs().speechSpeaking) {
-                            await S.speech.stopSpeaking();
+                            S.speech.stopSpeaking();
                         }
-                        else if (this.node.content) {
-                            const id = NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
+                        else {
+                            let id = NodeCompContent.PRE_PREFIX + this.prefix + (this.isBoost ? "-boost" : "") + this.node.id;
                             // console.log("Speaking DOM ID: " + id);
                             const elm = document.getElementById(id);
-                            if (elm && elm.textContent) {
+                            if (elm?.textContent) {
                                 S.speech.speakText(elm.textContent, false);
                             }
                         }
