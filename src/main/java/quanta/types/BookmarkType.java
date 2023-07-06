@@ -23,8 +23,8 @@ public class BookmarkType extends TypeBase {
         if (node != null) {
             nodeToBookmark = node.getVal();
             node.setVal(
-                read.getUserNodeByType(ms, ms.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null, null, false)
-            );
+                    read.getUserNodeByType(ms, ms.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(),
+                            null, null, false));
         }
         if (!linkBookmark && nodeToBookmark != null && StringUtils.isEmpty(req.getContent())) {
             req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent(), 50));

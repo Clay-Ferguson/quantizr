@@ -1,14 +1,5 @@
 package quanta.mongo.model;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,11 +11,21 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
+// todo-0: fix this deprecation
 import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -44,8 +45,7 @@ import quanta.util.XString;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(
-    {
+@JsonPropertyOrder({
         SubNode.PATH,
         SubNode.CONTENT,
         SubNode.NAME,
@@ -58,8 +58,7 @@ import quanta.util.XString;
         SubNode.AC,
         SubNode.PROPS,
         SubNode.ATTACHMENTS,
-    }
-)
+})
 public class SubNode {
 
     private static Logger log = LoggerFactory.getLogger(SubNode.class);
@@ -219,23 +218,23 @@ public class SubNode {
     private Object acLock = new Object();
 
     public static final String[] ALL_FIELDS = { //
-        SubNode.PATH, //
-        SubNode.TYPE, //
-        SubNode.CONTENT, //
-        SubNode.TAGS, //
-        SubNode.NAME, //
-        SubNode.ID, //
-        SubNode.ORDINAL, //
-        SubNode.HAS_CHILDREN, //
-        SubNode.OWNER, //
-        SubNode.XFR, //
-        SubNode.CREATE_TIME, //
-        SubNode.MODIFY_TIME, //
-        SubNode.AC, //
-        SubNode.PROPS, //
-        SubNode.ATTACHMENTS, //
-        SubNode.LINKS, //
-        SubNode.LIKES,
+            SubNode.PATH, //
+            SubNode.TYPE, //
+            SubNode.CONTENT, //
+            SubNode.TAGS, //
+            SubNode.NAME, //
+            SubNode.ID, //
+            SubNode.ORDINAL, //
+            SubNode.HAS_CHILDREN, //
+            SubNode.OWNER, //
+            SubNode.XFR, //
+            SubNode.CREATE_TIME, //
+            SubNode.MODIFY_TIME, //
+            SubNode.AC, //
+            SubNode.PROPS, //
+            SubNode.ATTACHMENTS, //
+            SubNode.LINKS, //
+            SubNode.LIKES,
     };
 
     @Transient
@@ -296,14 +295,16 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public String getParentPath() {
-        if (getPath() == null) return null;
+        if (getPath() == null)
+            return null;
         return XString.truncAfterLast(getPath(), "/");
     }
 
     @Transient
     @JsonIgnore
     public String getLastPathPart() {
-        if (getPath() == null) return null;
+        if (getPath() == null)
+            return null;
         return XString.parseAfterLast(getPath(), "/");
     }
 
@@ -313,7 +314,8 @@ public class SubNode {
      */
     @JsonProperty(PATH)
     public void setPath(String path) {
-        if (Util.equalObjs(path, this.path)) return;
+        if (Util.equalObjs(path, this.path))
+            return;
         ServiceBase.auth.ownerAuth(this);
         this.verifyParentPath = true;
         ThreadLocals.dirty(this);
@@ -343,7 +345,8 @@ public class SubNode {
 
     @JsonProperty(ORDINAL)
     public void setOrdinal(Long ordinal) {
-        if (Util.equalObjs(ordinal, this.ordinal)) return;
+        if (Util.equalObjs(ordinal, this.ordinal))
+            return;
         ThreadLocals.dirty(this);
         this.ordinal = ordinal;
     }
@@ -355,7 +358,8 @@ public class SubNode {
 
     @JsonProperty(HAS_CHILDREN)
     public void setHasChildren(Boolean hch) {
-        if (Util.equalObjs(hch, this.hch)) return;
+        if (Util.equalObjs(hch, this.hch))
+            return;
         ThreadLocals.dirty(this);
         this.hch = hch;
     }
@@ -368,7 +372,8 @@ public class SubNode {
 
     @JsonProperty(OWNER)
     public void setOwner(ObjectId owner) {
-        if (Util.equalObjs(owner, this.owner)) return;
+        if (Util.equalObjs(owner, this.owner))
+            return;
         ThreadLocals.dirty(this);
         this.owner = owner;
     }
@@ -384,7 +389,8 @@ public class SubNode {
 
     @JsonProperty(XFR)
     public void setTransferFrom(ObjectId transferFrom) {
-        if (Util.equalObjs(transferFrom, this.transferFrom)) return;
+        if (Util.equalObjs(transferFrom, this.transferFrom))
+            return;
         ThreadLocals.dirty(this);
         this.transferFrom = transferFrom;
     }
@@ -444,7 +450,8 @@ public class SubNode {
     @JsonIgnore
     public void putAc(String key, AccessControl ac) {
         // don't allow adding this node to it's own sharing.
-        if (getOwner() != null && getOwner().toHexString().equals(key)) return;
+        if (getOwner() != null && getOwner().toHexString().equals(key))
+            return;
         synchronized (acLock) {
             // look up any ac already existing for this key
             AccessControl thisAc = safeGetAc().get(key);
@@ -459,7 +466,8 @@ public class SubNode {
 
     @JsonProperty(AC)
     public void setAc(HashMap<String, AccessControl> ac) {
-        if (ac == null && this.ac == null) return;
+        if (ac == null && this.ac == null)
+            return;
         ThreadLocals.dirty(this);
         synchronized (acLock) {
             // sanity check do disallow this this node sharing to it's owner
@@ -492,7 +500,8 @@ public class SubNode {
 
     @JsonProperty(PROPS)
     public void setProps(HashMap<String, Object> props) {
-        if (props == null && this.props == null) return;
+        if (props == null && this.props == null)
+            return;
         ThreadLocals.dirty(this);
         synchronized (propLock) {
             this.props = props;
@@ -508,7 +517,8 @@ public class SubNode {
 
     @JsonProperty(ATTACHMENTS)
     public void setAttachments(HashMap<String, Attachment> attachments) {
-        if (attachments == null && this.attachments == null) return;
+        if (attachments == null && this.attachments == null)
+            return;
         ThreadLocals.dirty(this);
         synchronized (attLock) {
             this.attachments = attachments;
@@ -524,7 +534,8 @@ public class SubNode {
 
     @JsonProperty(LINKS)
     public void setLinks(HashMap<String, NodeLink> links) {
-        if (links == null && this.links == null) return;
+        if (links == null && this.links == null)
+            return;
         ThreadLocals.dirty(this);
         synchronized (linksLock) {
             this.links = links;
@@ -636,12 +647,12 @@ public class SubNode {
                 setAttachments(null);
             } else {
                 getAttachments()
-                    .forEach((String key, Attachment att) -> {
-                        att.setOwnerNode(this);
-                        if ("blob".equals(att.getFileName())) {
-                            att.setFileName("file-" + key);
-                        }
-                    });
+                        .forEach((String key, Attachment att) -> {
+                            att.setOwnerNode(this);
+                            if ("blob".equals(att.getFileName())) {
+                                att.setFileName("file-" + key);
+                            }
+                        });
             }
         }
     }
@@ -655,7 +666,8 @@ public class SubNode {
 
     @JsonProperty(LIKES)
     public void setLikes(HashSet<String> likes) {
-        if (likes == null && this.likes == null) return;
+        if (likes == null && this.likes == null)
+            return;
         ThreadLocals.dirty(this);
         synchronized (likesLock) {
             this.likes = likes;
@@ -677,7 +689,8 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public void removeLike(String actor) {
-        if (getLikes() == null) return;
+        if (getLikes() == null)
+            return;
         if (getLikes().remove(actor)) {
             // set node to dirty only if it just changed.
             ThreadLocals.dirty(this);
@@ -709,7 +722,8 @@ public class SubNode {
             if (props == null) {
                 // if there are no props currently, and the val is null we do nothing, because
                 // the way we set a null prop anyway is by REMOVING it from the props.
-                if (val == null) return false;
+                if (val == null)
+                    return false;
                 props = props();
             }
             boolean changed = false;
@@ -736,7 +750,8 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public void delete(String key) {
-        if (props == null) return;
+        if (props == null)
+            return;
         synchronized (propLock) {
             if (props().remove(key) != null) {
                 ThreadLocals.dirty(this);
@@ -753,11 +768,13 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public String getStr(String key) {
-        if (props == null) return null;
+        if (props == null)
+            return null;
         try {
             synchronized (propLock) {
                 Object v = props().get(key);
-                if (v == null) return null;
+                if (v == null)
+                    return null;
                 return v.toString();
             }
         } catch (Exception e) {
@@ -775,11 +792,13 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public Long getInt(String key) {
-        if (props == null) return 0L;
+        if (props == null)
+            return 0L;
         try {
             synchronized (propLock) {
                 Object v = props().get(key);
-                if (v == null) return 0L;
+                if (v == null)
+                    return 0L;
                 if (v instanceof Integer) {
                     return Long.valueOf((Integer) v);
                 }
@@ -808,11 +827,13 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public Date getDate(String key) {
-        if (props == null) return null;
+        if (props == null)
+            return null;
         try {
             synchronized (propLock) {
                 Object v = props().get(key);
-                if (v == null) return null;
+                if (v == null)
+                    return null;
                 return (Date) v;
             }
         } catch (Exception e) {
@@ -823,7 +844,8 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public <T> T getObj(String key, Class<T> classType) {
-        if (props == null) return null;
+        if (props == null)
+            return null;
         synchronized (propLock) {
             try {
                 return (T) props().get(key);
@@ -837,7 +859,8 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public <T> T getTypedObj(String key, TypeReference ref) {
-        if (props == null) return null;
+        if (props == null)
+            return null;
         synchronized (propLock) {
             try {
                 return (T) mapper.convertValue(props().get(key), ref);
@@ -857,11 +880,13 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public Double getFloat(String key) {
-        if (props == null) return 0.0;
+        if (props == null)
+            return 0.0;
         try {
             synchronized (propLock) {
                 Object v = props().get(key);
-                if (v == null) return 0.0;
+                if (v == null)
+                    return 0.0;
                 return (Double) v;
             }
         } catch (Exception e) {
@@ -879,11 +904,13 @@ public class SubNode {
     @Transient
     @JsonIgnore
     public Boolean getBool(String key) {
-        if (props == null) return false;
+        if (props == null)
+            return false;
         try {
             synchronized (propLock) {
                 Object v = props().get(key);
-                if (v == null) return false;
+                if (v == null)
+                    return false;
                 /*
                  * Our current property editor only knows how to save strings, so we just cope with that here, but
                  * eventually we will have type-safety and types even in the editor.
@@ -925,7 +952,8 @@ public class SubNode {
 
     @JsonProperty(TYPE)
     public void setType(String type) {
-        if (Util.equalObjs(type, this.type)) return;
+        if (Util.equalObjs(type, this.type))
+            return;
         ThreadLocals.dirty(this);
         this.type = type;
     }
@@ -937,7 +965,8 @@ public class SubNode {
 
     @JsonProperty(NAME)
     public void setName(String name) {
-        if (Util.equalObjs(name, this.name)) return;
+        if (Util.equalObjs(name, this.name))
+            return;
         ThreadLocals.dirty(this);
         this.name = name;
     }
@@ -949,7 +978,8 @@ public class SubNode {
 
     @JsonProperty(CONTENT)
     public void setContent(String content) {
-        if (Util.equalObjs(content, this.content)) return;
+        if (Util.equalObjs(content, this.content))
+            return;
         ThreadLocals.dirty(this);
         this.content = content;
     }
@@ -961,9 +991,11 @@ public class SubNode {
 
     @JsonProperty(TAGS)
     public void setTags(String tags) {
-        if (Util.equalObjs(tags, this.tags)) return;
+        if (Util.equalObjs(tags, this.tags))
+            return;
         // temporary hack (I saw empty tags prop in some JSON)
-        if ("".equals(tags)) tags = null;
+        if ("".equals(tags))
+            tags = null;
         ThreadLocals.dirty(this);
         this.tags = tags;
     }
@@ -988,7 +1020,8 @@ public class SubNode {
     }
 
     public void setMcid(String mcid) {
-        if (Util.equalObjs(mcid, this.mcid)) return;
+        if (Util.equalObjs(mcid, this.mcid))
+            return;
         ThreadLocals.dirty(this);
         this.mcid = mcid;
     }
@@ -998,7 +1031,8 @@ public class SubNode {
     }
 
     public void setPrevMcid(String prevMcid) {
-        if (Util.equalObjs(prevMcid, this.prevMcid)) return;
+        if (Util.equalObjs(prevMcid, this.prevMcid))
+            return;
         ThreadLocals.dirty(this);
         this.prevMcid = prevMcid;
     }

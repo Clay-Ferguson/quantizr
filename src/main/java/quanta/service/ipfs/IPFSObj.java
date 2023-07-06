@@ -59,7 +59,8 @@ public class IPFSObj extends ServiceBase {
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
@@ -102,8 +103,8 @@ public class IPFSObj extends ServiceBase {
             filePath = fileCid;
         }
         return objectOperation(
-            API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true"
-        );
+                API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid
+                        + "&create=true");
     }
 
     public IPFSObjectStat objectStat(String cid, boolean humanReadable) {

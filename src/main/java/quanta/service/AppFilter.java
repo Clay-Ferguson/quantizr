@@ -49,8 +49,10 @@ public class AppFilter extends GenericFilterBean {
     public static String BEARER_TOKEN = "token";
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        if (!Util.gracefulReadyCheck(res)) return;
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        if (!Util.gracefulReadyCheck(res))
+            return;
 
         String token = null;
         SessionContext sc = null;
@@ -77,7 +79,8 @@ public class AppFilter extends GenericFilterBean {
 
             // bypass locking for these two
             switch (httpReq.getRequestURI()) {
-                // todo-1: need to add everything else we can that we KNOW can run concurrently to any user's session
+                // todo-1: need to add everything else we can that we KNOW can run concurrently to any user's
+                // session
                 case AppController.API_PATH + "/serverPush":
                 case AppController.API_PATH + "/signNodes":
                 case AppController.API_PATH + "/getOpenGraph":
@@ -91,7 +94,8 @@ public class AppFilter extends GenericFilterBean {
                 mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
                 if (mutex != null) {
                     boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
-                    if (!isLockAcquired) throw new RuntimeException("Server too busy.");
+                    if (!isLockAcquired)
+                        throw new RuntimeException("Server too busy.");
                 }
             }
 
@@ -151,8 +155,8 @@ public class AppFilter extends GenericFilterBean {
 
                 if (isNewSession) {
                     log.debug(
-                        "New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token=" + sc.getUserToken()
-                    );
+                            "New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token="
+                                    + sc.getUserToken());
                 }
             }
 
@@ -164,8 +168,10 @@ public class AppFilter extends GenericFilterBean {
             }
         } catch (RuntimeEx e) {
             // NOTE: Normal flow for this exception case is NOT thru here by by a successful code=200 with the
-            // error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able to
-            // still respond to this error even in the case where no ResponseBase is being returned which is rare but
+            // error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able
+            // to
+            // still respond to this error even in the case where no ResponseBase is being returned which is
+            // rare but
             // is still possible
             sendError(httpRes, httpReq.getRequestURI(), e.getCode(), e);
         } catch (Exception e) {
@@ -191,7 +197,8 @@ public class AppFilter extends GenericFilterBean {
         ExUtil.error(log, "Failed in " + msg, e);
         try {
             res.sendError(code);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     private String getConfigParamInfo() {
@@ -397,23 +404,24 @@ public class AppFilter extends GenericFilterBean {
     }
 
     private void preProcess(HttpServletRequest sreq) {
-        if (sreq == null) return;
+        if (sreq == null)
+            return;
         // // NON-VERBOSE Logging
         // if (log.isDebugEnabled() && !log.isTraceEnabled()) {
-        //     StringBuilder sb = new StringBuilder();
-        //     sb.append("REQ: ");
-        //     sb.append(sreq.getMethod());
-        //     sb.append(" ");
-        //     sb.append(sreq.getRequestURI());
-        //     if (sreq.getQueryString() != null) {
-        //         sb.append(" -> ");
-        //         sb.append(sreq.getQueryString());
-        //     }
-        //     sb.append(" [from ");
-        //     sb.append(sreq.getRemoteAddr());
-        //     sb.append("]");
-        //     // sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
-        //     log.debug(sb.toString());
+        // StringBuilder sb = new StringBuilder();
+        // sb.append("REQ: ");
+        // sb.append(sreq.getMethod());
+        // sb.append(" ");
+        // sb.append(sreq.getRequestURI());
+        // if (sreq.getQueryString() != null) {
+        // sb.append(" -> ");
+        // sb.append(sreq.getQueryString());
+        // }
+        // sb.append(" [from ");
+        // sb.append(sreq.getRemoteAddr());
+        // sb.append("]");
+        // // sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
+        // log.debug(sb.toString());
         // } //
         if (audit) { // VERBOSE Logging
             try {
@@ -436,7 +444,8 @@ public class AppFilter extends GenericFilterBean {
 
     private void postProcess(HttpServletRequest sreq, HttpServletResponse sres) {
         try {
-            if (sreq == null || sres == null) return;
+            if (sreq == null || sres == null)
+                return;
             StringBuilder sb = new StringBuilder();
             sb.append("\n<: RET_CODE=" + String.valueOf(sres.getStatus()) + " mime=" + sres.getContentType() + "\n");
             sb.append(getHeaderInfo(sres));

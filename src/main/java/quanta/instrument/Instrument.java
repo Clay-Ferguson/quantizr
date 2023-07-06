@@ -28,8 +28,8 @@ import quanta.util.ThreadLocals;
  * proxied by spring which would make sense, but I don't kow if that's the case.
  *
  * Commenting class annotations to turn all the proxy objects back into direct object references for
- * all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is
- * mostly cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the
+ * all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is mostly
+ * cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the
  * Instrumentation unless turning on temporarily for performance analysis.
  *
  * For reference: import org.aspectj.lang.annotation.Aspect; import
@@ -37,9 +37,8 @@ import quanta.util.ThreadLocals;
  *
  * Example Call
  *
- *  @PerfMon(category = "apub")
- *   public APOPerson generatePersonObj(SubNode userNode) {
- *       String host = prop.getProtocolHostAndPort();
+ * @PerfMon(category = "apub") public APOPerson generatePersonObj(SubNode userNode) { String host =
+ *                   prop.getProtocolHostAndPort();
  */
 public class Instrument {
 
@@ -84,11 +83,10 @@ public class Instrument {
         Method method = signature.getMethod();
         PerfMon annotation = method.getAnnotation(PerfMon.class);
         if (duration > CAPTURE_THRESHOLD) {
-            new PerfMonEvent(
-                duration,
-                annotation.category().equals("") ? signature.getName() : (annotation.category() + "." + signature.getName()), //
-                userName
-            );
+            new PerfMonEvent(duration,
+                    annotation.category().equals("") ? signature.getName()
+                            : (annotation.category() + "." + signature.getName()), //
+                    userName);
         }
 
         return value;

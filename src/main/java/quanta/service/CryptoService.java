@@ -61,7 +61,8 @@ public class CryptoService extends ServiceBase {
     }
 
     public boolean nodeSigVerify(SubNode node, String sig) {
-        if (sig == null || node == null) return false;
+        if (sig == null || node == null)
+            return false;
         PublicKey pubKey = null;
         try {
             // if we didn't get this as admin key we'll be generating the key
@@ -75,11 +76,10 @@ public class CryptoService extends ServiceBase {
 
                 if (pubKeyJson == null) {
                     log.debug(
-                        "User Account didn't have SIG KEY: accntNodeId=" +
-                        ownerAccntNode.getIdStr() +
-                        " They own nodeId=" +
-                        node.getIdStr()
-                    );
+                            "User Account didn't have SIG KEY: accntNodeId=" +
+                                    ownerAccntNode.getIdStr() +
+                                    " They own nodeId=" +
+                                    node.getIdStr());
                     return false;
                 }
                 pubKey = parseJWK(pubKeyJson, ownerAccntNode);
@@ -89,7 +89,8 @@ public class CryptoService extends ServiceBase {
                 }
             }
             String strToSign = getNodeSigData(node);
-            boolean verified = sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
+            boolean verified =
+                    sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
 
             return verified;
         } catch (Exception e) {
@@ -212,10 +213,10 @@ public class CryptoService extends ServiceBase {
 
         // query all nodes under the path that are owned by 'ms'
         Criteria crit = Criteria
-            .where(SubNode.PATH)
-            .regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
-            .and(SubNode.OWNER)
-            .is(ms.getUserNodeId());
+                .where(SubNode.PATH)
+                .regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
+                .and(SubNode.OWNER)
+                .is(ms.getUserNodeId());
         Val<NodeSigPushInfo> pushInfo = new Val<>();
         Query query = new Query();
         crit = auth.addReadSecurity(ms, crit);
@@ -232,49 +233,50 @@ public class CryptoService extends ServiceBase {
         count.inc();
         BooleanVal failed = new BooleanVal();
         ops
-            .stream(query, SubNode.class)
-            .forEachRemaining(node -> {
-                // make sure session is still alive
-                if (failed.getVal() || !sc.isLive()) return;
-                // create new push object lazily
-                if (pushInfo.getVal() == null) {
-                    pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
-                    pushInfo.getVal().setListToSign(new LinkedList<>());
-                }
-                // add this node.
-                String sig1 = getNodeSigData(node);
-                pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sig1));
-                if (debugSigning) {
-                    log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sig1);
-                }
-                count.inc();
-                // if we have enough to send a block send it.
-                if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
-                    if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
-                        failed.setVal(true);
+                .stream(query, SubNode.class)
+                .forEachRemaining(node -> {
+                    // make sure session is still alive
+                    if (failed.getVal() || !sc.isLive())
+                        return;
+                    // create new push object lazily
+                    if (pushInfo.getVal() == null) {
+                        pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
+                        pushInfo.getVal().setListToSign(new LinkedList<>());
                     }
-                    // reset the push object.
-                    pushInfo.setVal(null);
-                }
-            });
+                    // add this node.
+                    String sig1 = getNodeSigData(node);
+                    pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sig1));
+                    if (debugSigning) {
+                        log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sig1);
+                    }
+                    count.inc();
+                    // if we have enough to send a block send it.
+                    if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
+                        if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+                            failed.setVal(true);
+                        }
+                        // reset the push object.
+                        pushInfo.setVal(null);
+                    }
+                });
         // make sure session is still alive
-        if (failed.getVal() || !sc.isLive()) return;
+        if (failed.getVal() || !sc.isLive())
+            return;
         // send the accumulated remainder
         if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
             if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
                 failed.setVal(true);
             }
             // make sure session is still alive
-            if (failed.getVal() || !sc.isLive()) return;
+            if (failed.getVal() || !sc.isLive())
+                return;
         }
         push.sendServerPushInfo(
-            sc,
-            new PushPageMessage(
-                "SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.",
-                true,
-                "note"
-            )
-        );
+                sc,
+                new PushPageMessage(
+                        "SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.",
+                        true,
+                        "note"));
     }
 
     // This method pushes data down to the browser to be signed and waits for the reply here.

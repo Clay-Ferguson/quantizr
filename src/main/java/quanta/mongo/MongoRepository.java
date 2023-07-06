@@ -42,22 +42,20 @@ public class MongoRepository extends ServiceBase {
      */
     public MongoRepository() {
         Runtime
-            .getRuntime()
-            .addShutdownHook(
-                new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            synchronized (lock) {
-                                if (ServiceBase.mongoRepo != null) {
-                                    log.debug("********** runtime shutdownHook executing. **********");
-                                    ServiceBase.mongoRepo.close();
-                                }
-                            }
-                        }
-                    }
-                )
-            );
+                .getRuntime()
+                .addShutdownHook(
+                        new Thread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        synchronized (lock) {
+                                            if (ServiceBase.mongoRepo != null) {
+                                                log.debug("********** runtime shutdownHook executing. **********");
+                                                ServiceBase.mongoRepo.close();
+                                            }
+                                        }
+                                    }
+                                }));
     }
 
     @PreDestroy
@@ -70,9 +68,11 @@ public class MongoRepository extends ServiceBase {
     public void handleContextRefresh(ContextRefreshedEvent event) {
         ServiceBase.init(event.getApplicationContext());
         log.debug("ContextRefreshedEvent");
-        if (initialized) return;
+        if (initialized)
+            return;
         synchronized (lock) {
-            if (initialized) return;
+            if (initialized)
+                return;
             MongoSession as = auth.getAdminSession();
             ThreadLocals.setMongoSession(as);
             mongoUtil.createAdminUser(as);
@@ -81,7 +81,8 @@ public class MongoRepository extends ServiceBase {
             // mongoUtil.fixTypes(as);
             // mongoUtil.processAccounts(as);
             /* can shutdown during startup. */
-            if (AppServer.isShuttingDown()) return;
+            if (AppServer.isShuttingDown())
+                return;
             log.debug("initializing MongoRepository");
             /*
              * IMPORTANT: Do not move this line below this point. An infinite loop of re-entry can occur into
@@ -111,7 +112,8 @@ public class MongoRepository extends ServiceBase {
 
     public void close() {
         AppServer.setShuttingDown(true);
-        if (ServiceBase.mongoRepo == null) return;
+        if (ServiceBase.mongoRepo == null)
+            return;
         synchronized (lock) {
             try {
                 log.debug("Closing MongoClient connection.");

@@ -104,10 +104,9 @@ public class RSSFeedService extends ServiceBase {
     private static final boolean debug = true;
 
     public static final LinkedHashMap<String, byte[]> proxyCache = new LinkedHashMap<String, byte[]>(
-        MAX_CACHE_SIZE + 1,
-        0.75F,
-        false
-    ) {
+            MAX_CACHE_SIZE + 1,
+            0.75F,
+            false) {
         protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
             return size() > MAX_CACHE_SIZE;
         }
@@ -121,7 +120,8 @@ public class RSSFeedService extends ServiceBase {
      */
     @Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
     public void run() {
-        if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit) return;
+        if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+            return;
         try {
             run = true;
             if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
@@ -278,11 +278,11 @@ public class RSSFeedService extends ServiceBase {
              */
             if (USE_HTTP_READER) {
                 RequestConfig config = RequestConfig
-                    .custom()
-                    .setConnectTimeout(timeout * 1000)
-                    .setConnectionRequestTimeout(timeout * 1000)
-                    .setSocketTimeout(timeout * 1000)
-                    .build();
+                        .custom()
+                        .setConnectTimeout(timeout * 1000)
+                        .setConnectionRequestTimeout(timeout * 1000)
+                        .setSocketTimeout(timeout * 1000)
+                        .build();
 
                 HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
                 HttpGet request = new HttpGet(url);
@@ -299,38 +299,38 @@ public class RSSFeedService extends ServiceBase {
             if (USE_SPRING_READER) {
                 if (ThreadLocals.getSC() != null) {
                     push.sendServerPushInfo(
-                        ThreadLocals.getSC(),
-                        new PushPageMessage("Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText")
-                    );
+                            ThreadLocals.getSC(),
+                            new PushPageMessage("Reading (" + index + " / " + maxIndex + ") " + url, false,
+                                    "rssProgressText"));
                 }
 
                 inFeed =
-                    restTemplate.execute(
-                        url,
-                        HttpMethod.GET,
-                        null,
-                        response -> {
-                            SyndFeedInput input = new SyndFeedInput();
-                            long start = System.currentTimeMillis();
-                            try {
-                                return input.build(
-                                    new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB))
-                                );
-                            } catch (FeedException e) {
-                                throw new IOException("Could not parse response for feed: " + url, e);
-                            } finally {
-                                long time = System.currentTimeMillis() - start;
-                                if (time > 2000) {
-                                    log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
-                                }
-                                new PerfMonEvent(
-                                    System.currentTimeMillis() - start,
-                                    "readFeed",
-                                    ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin"
-                                );
-                            }
-                        }
-                    );
+                        restTemplate.execute(
+                                url,
+                                HttpMethod.GET,
+                                null,
+                                response -> {
+                                    SyndFeedInput input = new SyndFeedInput();
+                                    long start = System.currentTimeMillis();
+                                    try {
+                                        return input.build(
+                                                new XmlReader(new LimitedInputStreamEx(response.getBody(),
+                                                        100 * Const.ONE_MB)));
+                                    } catch (FeedException e) {
+                                        throw new IOException("Could not parse response for feed: " + url, e);
+                                    } finally {
+                                        long time = System.currentTimeMillis() - start;
+                                        if (time > 2000) {
+                                            log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true)
+                                                    + " url=" + url);
+                                        }
+                                        new PerfMonEvent(
+                                                System.currentTimeMillis() - start,
+                                                "readFeed",
+                                                ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName()
+                                                        : "admin");
+                                    }
+                                });
             }
 
             // another example from online (that I've never tried):
@@ -390,7 +390,8 @@ public class RSSFeedService extends ServiceBase {
 
     // See also: https://github.com/OWASP/java-html-sanitizer
     private String sanitizeHtml(String html) {
-        if (StringUtils.isEmpty(html)) return html;
+        if (StringUtils.isEmpty(html))
+            return html;
         // this sanitizer seems to choke on these special quotes so replace them first.
         html = quoteFix(html);
         if (policy == null) {
@@ -399,12 +400,12 @@ public class RSSFeedService extends ServiceBase {
                  * I have removed IMAGES only because it looks silly when we display an image that's also displayed
                  * as part of the feed formatting
                  */
-                policy =/* .and(Sanitizers.IMAGES) *///
-                    Sanitizers.FORMATTING
-                        .and(Sanitizers.BLOCKS)
-                        .and(Sanitizers.LINKS)
-                        .and(Sanitizers.STYLES)
-                        .and(Sanitizers.TABLES);
+                policy = /* .and(Sanitizers.IMAGES) *///
+                        Sanitizers.FORMATTING
+                                .and(Sanitizers.BLOCKS)
+                                .and(Sanitizers.LINKS)
+                                .and(Sanitizers.STYLES)
+                                .and(Sanitizers.TABLES);
             }
         }
         html = policy.sanitize(html);
@@ -577,7 +578,8 @@ public class RSSFeedService extends ServiceBase {
                     if (itunesMod.getImage() != null) {
                         try {
                             e.setImage(itunesMod.getImage().toURI().toString());
-                        } catch (Exception e1) {}
+                        } catch (Exception e1) {
+                        }
                     } else { // ignore
                         e.setImage(itunesMod.getImageUri());
                     }
@@ -589,7 +591,10 @@ public class RSSFeedService extends ServiceBase {
                         e.setDescription(sanitizeHtml(itunesMod.getSummary()));
                     }
                 } //
-                else if (m instanceof DCModuleImpl) {} else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource = dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) // DCModuleImpl dm = (DCModuleImpl) m;
+                else if (m instanceof DCModuleImpl) {
+                } else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource =
+                         // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
+                         // DCModuleImpl dm = (DCModuleImpl) m;
                     log.debug("Unknown module type: " + m.getClass().getName());
                 }
             }
@@ -649,12 +654,24 @@ public class RSSFeedService extends ServiceBase {
                         }
                     }
                 } //
-                else if (m instanceof ContentModuleImpl) {} else if (m instanceof EntryInformationImpl) { // } // } // log.debug("CI.url: " + ci.getContentResource()); // log.debug("CI.value: " + ci.getContentValue()); // log.debug("CI.format: " + ci.getContentFormat()); // log.debug("CI.encoding: " + ci.getContentEncoding()); // for (ContentItem ci : contentMod.getContentItems()) { // if (ok(contentMod.getContentItems() )) { // } // } // log.debug("CI.contents: " + contents); // for (String contents : contentMod.getContents()) { // if (ok(contentMod.getContents() )) { // ContentModuleImpl contentMod = (ContentModuleImpl) m;
+                else if (m instanceof ContentModuleImpl) {
+                } else if (m instanceof EntryInformationImpl) { // } // } // log.debug("CI.url: " +
+                                                                // ci.getContentResource()); // log.debug("CI.value: " +
+                                                                // ci.getContentValue()); // log.debug("CI.format: " +
+                                                                // ci.getContentFormat()); // log.debug("CI.encoding: "
+                                                                // + ci.getContentEncoding()); // for (ContentItem ci :
+                                                                // contentMod.getContentItems()) { // if
+                                                                // (ok(contentMod.getContentItems() )) { // } // } //
+                                                                // log.debug("CI.contents: " + contents); // for (String
+                                                                // contents : contentMod.getContents()) { // if
+                                                                // (ok(contentMod.getContents() )) { //
+                                                                // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                     EntryInformationImpl itunesMod = (EntryInformationImpl) m;
                     if (itunesMod.getImage() != null) {
                         try {
                             e.setImage(itunesMod.getImage().toURI().toString());
-                        } catch (Exception e1) {}
+                        } catch (Exception e1) {
+                        }
                     } else { // ignore
                         e.setImage(itunesMod.getImageUri());
                     }
@@ -666,7 +683,10 @@ public class RSSFeedService extends ServiceBase {
                         e.setDescription(sanitizeHtml(itunesMod.getSummary()));
                     }
                 } //
-                else if (m instanceof DCModuleImpl) {} else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource = dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) // DCModuleImpl dm = (DCModuleImpl) m;
+                else if (m instanceof DCModuleImpl) {
+                } else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource =
+                         // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
+                         // DCModuleImpl dm = (DCModuleImpl) m;
                     log.debug("Unknown module type: " + m.getClass().getName());
                 }
             }
@@ -692,7 +712,8 @@ public class RSSFeedService extends ServiceBase {
         int pageNo = page - 1;
         int startIdx = pageNo * FEED_ITEMS_PER_PAGE;
         int idx = 0;
-        // log.debug("Feed: " + cachedFeed.getLink() + " has " + cachedFeed.getEntries().size() + " entries.");
+        // log.debug("Feed: " + cachedFeed.getLink() + " has " + cachedFeed.getEntries().size() + "
+        // entries.");
 
         for (SyndEntry entry : cachedFeed.getEntries()) {
             if (idx >= startIdx) {
@@ -718,10 +739,12 @@ public class RSSFeedService extends ServiceBase {
         feed.setEntries(entries);
         if (AclService.isPublic(node)) {
             Criteria crit = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
-            Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
+            Iterable<SubNode> iter =
+                    read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
             if (iter != null) {
                 for (SubNode n : iter) {
-                    if (!AclService.isPublic(n)) continue;
+                    if (!AclService.isPublic(n))
+                        continue;
                     metaInfo = snUtil.getNodeMetaInfo(n);
                     // Currently the link will be an attachment URL, but need to research how ROME
                     // handles attachments.
@@ -731,8 +754,8 @@ public class RSSFeedService extends ServiceBase {
                     SyndEntry entry = new SyndEntryImpl();
                     entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getIdStr());
                     entry.setLink(
-                        metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort()
-                    );
+                            metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl()
+                                    : prop.getProtocolHostAndPort());
                     /*
                      * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
                      * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
@@ -754,7 +777,8 @@ public class RSSFeedService extends ServiceBase {
                      */
                     description.setType("text/plain");
                     description.setType("text/html");
-                    description.setValue(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
+                    description
+                            .setValue(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
                     entry.setDescription(description);
                     entries.add(entry);
                 }
@@ -764,13 +788,20 @@ public class RSSFeedService extends ServiceBase {
     }
 
     private void fixFeed(SyndFeed feed) {
-        if (feed == null) return;
-        if (StringUtils.isEmpty(feed.getEncoding())) feed.setEncoding("UTF-8");
-        if (StringUtils.isEmpty(feed.getFeedType())) feed.setFeedType("rss_2.0");
-        if (StringUtils.isEmpty(feed.getTitle())) feed.setTitle("");
-        if (StringUtils.isEmpty(feed.getDescription())) feed.setDescription("");
-        if (StringUtils.isEmpty(feed.getAuthor())) feed.setAuthor("");
-        if (StringUtils.isEmpty(feed.getLink())) feed.setLink("");
+        if (feed == null)
+            return;
+        if (StringUtils.isEmpty(feed.getEncoding()))
+            feed.setEncoding("UTF-8");
+        if (StringUtils.isEmpty(feed.getFeedType()))
+            feed.setFeedType("rss_2.0");
+        if (StringUtils.isEmpty(feed.getTitle()))
+            feed.setTitle("");
+        if (StringUtils.isEmpty(feed.getDescription()))
+            feed.setDescription("");
+        if (StringUtils.isEmpty(feed.getAuthor()))
+            feed.setAuthor("");
+        if (StringUtils.isEmpty(feed.getLink()))
+            feed.setLink("");
     }
 
     private void writeFeed(SyndFeed feed, Writer writer) {

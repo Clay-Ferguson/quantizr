@@ -56,7 +56,8 @@ public class AppServer extends ServiceBase {
     }
 
     public static void shutdownCheck() {
-        if (shuttingDown) throw ExUtil.wrapEx("Server is shutting down.");
+        if (shuttingDown)
+            throw ExUtil.wrapEx("Server is shutting down.");
     }
 
     public static boolean isShuttingDown() {

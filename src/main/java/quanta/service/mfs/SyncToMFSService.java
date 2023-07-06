@@ -122,7 +122,8 @@ public class SyncToMFSService extends ServiceBase {
                     log.debug("DELETE ORPHAN: " + path);
                     ipfsFiles.deletePath(path);
                     orphansRemoved++;
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
         });
         /*

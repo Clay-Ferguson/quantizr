@@ -38,20 +38,18 @@ public class IPFSKey extends ServiceBase {
             // Use a rest call with no timeout because publish can take a LONG time.
             log.debug("Generate IPFS Key: " + url);
             ResponseEntity<String> response = ipfs.restTemplateNoTimeout.exchange(
-                url,
-                HttpMethod.POST,
-                requestEntity,
-                String.class
-            );
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class);
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
-            // ret output:
-            // {
-            // "Id" : ...
-            // "Name" : ...
-            // }
-            Exception e
-        ) {
+        // ret output:
+        // {
+        // "Id" : ...
+        // "Name" : ...
+        // }
+        Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }
         return ret;

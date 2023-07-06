@@ -31,13 +31,12 @@ public class MongoCreate extends ServiceBase {
     private static long RESERVE_BLOCK_SIZE = 1000;
 
     public SubNode createNode(
-        MongoSession ms,
-        SubNode parent,
-        String type,
-        Long ordinal,
-        CreateNodeLocation location,
-        boolean updateParentOrdinals
-    ) {
+            MongoSession ms,
+            SubNode parent,
+            String type,
+            Long ordinal,
+            CreateNodeLocation location,
+            boolean updateParentOrdinals) {
         return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals, true);
     }
 
@@ -64,17 +63,16 @@ public class MongoCreate extends ServiceBase {
      * relPath can be null if no path is known
      */
     public SubNode createNode(
-        MongoSession ms,
-        SubNode parent,
-        String relPath,
-        String type,
-        Long ordinal,
-        CreateNodeLocation location,
-        List<PropertyInfo> properties,
-        ObjectId ownerId,
-        boolean updateOrdinals,
-        boolean updateParent
-    ) {
+            MongoSession ms,
+            SubNode parent,
+            String relPath,
+            String type,
+            Long ordinal,
+            CreateNodeLocation location,
+            List<PropertyInfo> properties,
+            ObjectId ownerId,
+            boolean updateOrdinals,
+            boolean updateParent) {
         if (relPath == null) {
             /*
              * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
@@ -98,9 +96,9 @@ public class MongoCreate extends ServiceBase {
                 }
                 Long _ordinal = ordinal;
                 ordinal =
-                    (Long) arun.run(as -> {
-                        return create.prepOrdinalForLocation(as, location, parent, _ordinal);
-                    });
+                        (Long) arun.run(as -> {
+                            return create.prepOrdinalForLocation(as, location, parent, _ordinal);
+                        });
             }
         }
         SubNode node = new SubNode(ownerId, path, type, ordinal);
@@ -167,7 +165,8 @@ public class MongoCreate extends ServiceBase {
                         ret = ret / 2;
                     }
                     return ret;
-                } else { // "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now // else minOrdinal is already at zero so we insert a new block, and then let
+                } else { // "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now // else minOrdinal is already at zero so
+                         // we insert a new block, and then let
                     rangeSize = RESERVE_BLOCK_SIZE;
                     newOrdinal = RESERVE_BLOCK_SIZE - 1;
                 }

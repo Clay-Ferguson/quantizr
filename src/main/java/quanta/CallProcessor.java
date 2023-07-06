@@ -32,13 +32,12 @@ public class CallProcessor extends ServiceBase {
      * to perform the login if the user is not logged in, and then call the function to be processed
      */
     public Object run(
-        String command,
-        boolean authBearer,
-        boolean authSig,
-        RequestBase req,
-        HttpSession httpSession,
-        MongoRunnableEx<Object> runner
-    ) {
+            String command,
+            boolean authBearer,
+            boolean authSig,
+            RequestBase req,
+            HttpSession httpSession,
+            MongoRunnableEx<Object> runner) {
         if (AppServer.isShuttingDown()) {
             throw ExUtil.wrapEx("Server not available.");
         }
@@ -90,13 +89,15 @@ public class CallProcessor extends ServiceBase {
                 setResponse(orb, orb.getCode(), null);
             }
         } catch (RuntimeEx e) {
-            if (ret == null) ret = orb;
+            if (ret == null)
+                ret = orb;
             if (ret instanceof ResponseBase) {
                 // NOTE: Do not rethrow (return via http, code 200) in this case
                 setResponse(orb, e.getCode(), e);
             }
         } catch (Exception e) {
-            if (ret == null) ret = orb;
+            if (ret == null)
+                ret = orb;
             if (ret instanceof ResponseBase) {
                 // NOTE: Do not rethrow (return via http, code 200) in this case
                 setResponse(orb, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
@@ -114,11 +115,11 @@ public class CallProcessor extends ServiceBase {
         if (ret instanceof ResponseBase) {
             String callId = ThreadLocals.getServletRequest().getHeader("callId");
             ((ResponseBase) ret).setReplica(
-                    "callId=" + callId + " Slot=" + prop.getSwarmTaskSlot() + " ID=" + prop.getSwarmTaskId()
-                );
+                    "callId=" + callId + " Slot=" + prop.getSwarmTaskSlot() + " ID=" + prop.getSwarmTaskId());
             log.trace("RES=" + XString.prettyPrint(ret));
 
-            // make sure whatever ResponseBase we ended up with here (may change during processing) is set in the
+            // make sure whatever ResponseBase we ended up with here (may change during processing) is set in
+            // the
             // thread to the AppFilter can pick it up, although it currently not used.
             ThreadLocals.setResponse((ResponseBase) ret);
         }

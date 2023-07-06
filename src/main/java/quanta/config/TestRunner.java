@@ -42,7 +42,8 @@ public class TestRunner {
                     testInst.test();
                 } catch (Exception e) {
                     log.error("test failed.", e);
-                } finally {}
+                } finally {
+                }
             });
             log.debug("Finished running tests.");
             log.debug("====================================================================");

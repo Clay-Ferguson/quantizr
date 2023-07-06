@@ -34,11 +34,8 @@ public class APConst {
     public static final MediaType MTYPE_JSON = new MediaType("application", "json");
     public static final MediaType MTYPE_JRD_JSON = new MediaType("application", "jrd+json");
 
-    public static final MediaType MTYPE_LD_JSON_PROF = new MediaType(
-        "application",
-        "ld+json",
-        Map.of("profile", "\"https://www.w3.org/ns/activitystreams\"")
-    );
+    public static final MediaType MTYPE_LD_JSON_PROF =
+            new MediaType("application", "ld+json", Map.of("profile", "\"https://www.w3.org/ns/activitystreams\""));
 
     public static final String TRUE = "true";
 

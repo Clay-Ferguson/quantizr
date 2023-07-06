@@ -121,10 +121,10 @@ public class ThreadLocals {
 
         // this has WAY too many false positives. Not sure what to do about this.
         // if (sc == null && ThreadLocals.getServletRequest() == null) {
-        //     log.warn(
-        //         "***THIS MAY NOT INDICATE A BUG*** getSC() called in Non-WEB Request Thread!\n\nStack=" +
-        //         ExUtil.getStackTrace(null)
-        //     );
+        // log.warn(
+        // "***THIS MAY NOT INDICATE A BUG*** getSC() called in Non-WEB Request Thread!\n\nStack=" +
+        // ExUtil.getStackTrace(null)
+        // );
         // }
         return sc;
     }
@@ -182,7 +182,8 @@ public class ThreadLocals {
     }
 
     public static Boolean getSaving() {
-        if (saving.get() == null) return false;
+        if (saving.get() == null)
+            return false;
         return saving.get();
     }
 
@@ -191,7 +192,8 @@ public class ThreadLocals {
     }
 
     public static Boolean getParentCheckEnabled() {
-        if (parentCheckEnabled.get() == null) return false;
+        if (parentCheckEnabled.get() == null)
+            return false;
         return parentCheckEnabled.get();
     }
 
@@ -262,14 +264,14 @@ public class ThreadLocals {
         }
         log.debug("Dirty Nodes...");
         getDirtyNodes()
-            .forEach((key, value) -> {
-                if (!key.toHexString().equals(value.getIdStr())) {
-                    throw new RuntimeException(
-                        "Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr()
-                    );
-                }
-                log.debug("    " + key.toHexString());
-            });
+                .forEach((key, value) -> {
+                    if (!key.toHexString().equals(value.getIdStr())) {
+                        throw new RuntimeException(
+                                "Node originally cached as ID " + key.toHexString() + " now has key"
+                                        + value.getIdStr());
+                    }
+                    log.debug("    " + key.toHexString());
+                });
     }
 
     /*

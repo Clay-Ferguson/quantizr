@@ -34,62 +34,66 @@ public class OutboxMgr extends ServiceBase {
         // if you re-enable this code be sure to add a new partialIndex on "pro."+NodeProp.TARGET_ID.s(), so
         // the findNodeByProp will be fast.
 
-        if (true) throw new RuntimeException("currently not used.");
+        if (true)
+            throw new RuntimeException("currently not used.");
         // arun.run(as -> {
-        //     SubNode userInbox = read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
-        //     if (userInbox != null) {
-        //         /*
-        //          * First look to see if there is a target node already existing in this persons inbox that points to
-        //          * the node in question
-        //          */
-        //         SubNode notifyNode = read.findNodeByProp(as, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
-        //         /*
-        //          * If there's no notification for this node already in the user's inbox then add one
-        //          */
-        //         if (notifyNode == null) {
-        //             notifyNode =
-        //                 create.createNode(
-        //                     as,
-        //                     userInbox,
-        //                     null,
-        //                     NodeType.INBOX_ENTRY.s(),
-        //                     0L,
-        //                     CreateNodeLocation.FIRST,
-        //                     null,
-        //                     null,
-        //                     true,
-        //                     true
-        //                 );
-        //             // trim to 280 like twitter.
-        //             String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
-        //             String content = String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
-        //             notifyNode.setOwner(userInbox.getOwner());
-        //             notifyNode.setContent(content);
-        //             notifyNode.touch();
-        //             notifyNode.set(NodeProp.TARGET_ID, node.getIdStr());
-        //             update.save(as, notifyNode);
-        //         }
-        //         /*
-        //          * Send push notification so the user sees live there's a new share comming in or being re-added
-        //          * even.
-        //          */
-        //         List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
-        //         if (scList != null) {
-        //             for (SessionContext sc : scList) {
-        //                 push.sendServerPushInfo(
-        //                     sc,
-        //                     // todo-2: fill in the two null parameters here if/when you ever bring this method back.
-        //                     new NotificationMessage(
-        //                         "newInboxNode",
-        //                         node.getIdStr(),
-        //                         "New node shared to you.",
-        //                         ThreadLocals.getSC().getUserName()
-        //                     )
-        //                 );
-        //             }
-        //         }
-        //     }
-        //     return null;
+        // SubNode userInbox = read.getUserNodeByType(as, null, userNode, "### Inbox", NodeType.INBOX.s(),
+        // null, NodeName.INBOX);
+        // if (userInbox != null) {
+        // /*
+        // * First look to see if there is a target node already existing in this persons inbox that points
+        // to
+        // * the node in question
+        // */
+        // SubNode notifyNode = read.findNodeByProp(as, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
+        // /*
+        // * If there's no notification for this node already in the user's inbox then add one
+        // */
+        // if (notifyNode == null) {
+        // notifyNode =
+        // create.createNode(
+        // as,
+        // userInbox,
+        // null,
+        // NodeType.INBOX_ENTRY.s(),
+        // 0L,
+        // CreateNodeLocation.FIRST,
+        // null,
+        // null,
+        // true,
+        // true
+        // );
+        // // trim to 280 like twitter.
+        // String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
+        // String content = String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(),
+        // shortContent);
+        // notifyNode.setOwner(userInbox.getOwner());
+        // notifyNode.setContent(content);
+        // notifyNode.touch();
+        // notifyNode.set(NodeProp.TARGET_ID, node.getIdStr());
+        // update.save(as, notifyNode);
+        // }
+        // /*
+        // * Send push notification so the user sees live there's a new share comming in or being re-added
+        // * even.
+        // */
+        // List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
+        // if (scList != null) {
+        // for (SessionContext sc : scList) {
+        // push.sendServerPushInfo(
+        // sc,
+        // // todo-2: fill in the two null parameters here if/when you ever bring this method back.
+        // new NotificationMessage(
+        // "newInboxNode",
+        // node.getIdStr(),
+        // "New node shared to you.",
+        // ThreadLocals.getSC().getUserName()
+        // )
+        // );
+        // }
+        // }
+        // }
+        // return null;
         // });
     }
 
@@ -103,13 +107,9 @@ public class OutboxMgr extends ServiceBase {
         String toUserName = toUserNode.getStr(NodeProp.USER);
         String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
         String content = String.format(
-            prop.getConfigText("brandingAppName") +
-            " user '%s' shared a node to your '%s' account.<p>\n\n" + //
-            "%s",
-            fromUserName,
-            toUserName,
-            nodeUrl
-        );
+                prop.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
+                        "%s",
+                fromUserName, toUserName, nodeUrl);
         queueMail(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!", content);
     }
 
@@ -150,18 +150,8 @@ public class OutboxMgr extends ServiceBase {
                 return OutboxMgr.outboxNode;
             }
             snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX, null, "Outbox", null, true, null, null);
-            OutboxMgr.outboxNode =
-                snUtil.ensureNodeExists(
-                    ms,
-                    NodePath.ROOT_PATH,
-                    NodePath.OUTBOX + "/" + NodePath.SYSTEM,
-                    null,
-                    "System Messages",
-                    null,
-                    true,
-                    null,
-                    null
-                );
+            OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH,
+                    NodePath.OUTBOX + "/" + NodePath.SYSTEM, null, "System Messages", null, true, null, null);
             return OutboxMgr.outboxNode;
         }
     }

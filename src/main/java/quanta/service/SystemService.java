@@ -168,7 +168,8 @@ public class SystemService extends ServiceBase {
     }
 
     public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-        if (!prop.ipfsEnabled()) return "IPFS Disabled.";
+        if (!prop.ipfsEnabled())
+            return "IPFS Disabled.";
         String ret = ipfsRepo.gc();
         ret += update.releaseOrphanIPFSPins(statsMap);
         return ret;
@@ -184,18 +185,16 @@ public class SystemService extends ServiceBase {
     // })
     public String validateDb() {
         String ret =
-            "validate: " +
-            runMongoDbCommand(
-                MongoAppConfig.databaseName, //
-                //
-                new Document("validate", "nodes").append("full", true)
-            );
+                "validate: " +
+                        runMongoDbCommand(
+                                MongoAppConfig.databaseName, //
+                                //
+                                new Document("validate", "nodes").append("full", true));
         ret +=
-            "\n\ndbStats: " +
-            runMongoDbCommand(
-                MongoAppConfig.databaseName, //
-                new Document("dbStats", 1).append("scale", 1024)
-            );
+                "\n\ndbStats: " +
+                        runMongoDbCommand(
+                                MongoAppConfig.databaseName, //
+                                new Document("dbStats", 1).append("scale", 1024));
         ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
         if (prop.ipfsEnabled()) {
             ret += ipfsRepo.verify();
@@ -302,7 +301,8 @@ public class SystemService extends ServiceBase {
         Map<String, String> env = System.getenv();
         LinkedList<String> envList = new LinkedList<String>();
         env.forEach((k, v) -> {
-            if (k.toLowerCase().contains("pass")) return;
+            if (k.toLowerCase().contains("pass"))
+                return;
             envList.add(k + ":" + v + "\n");
         });
         envList.sort(null);
@@ -314,7 +314,8 @@ public class SystemService extends ServiceBase {
     // tserver-tag
     @Scheduled(fixedDelay = 20 * DateUtil.MINUTE_MILLIS)
     public String nostrQueryUpdate() {
-        if (!MongoRepository.fullInit) return "App not yet ready";
+        if (!MongoRepository.fullInit)
+            return "App not yet ready";
 
         if (!prop.isNostrDaemonEnabled()) {
             return "nostrDaemon not enabled";
@@ -367,11 +368,10 @@ public class SystemService extends ServiceBase {
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
         String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
         ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(
-            url,
-            HttpMethod.POST,
-            requestEntity,
-            new ParameterizedTypeReference<List<NostrEvent>>() {}
-        );
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<List<NostrEvent>>() {});
         IntVal saveCount = new IntVal(0);
         HashSet<String> accountNodeIds = new HashSet<>();
         List<String> eventNodeIds = new ArrayList<>();
@@ -385,16 +385,14 @@ public class SystemService extends ServiceBase {
             }
             return null;
         });
-        return (
-            "NostrQueryUpdate: relays=" +
-            relayList.size() +
-            " people=" +
-            authors.size() +
-            " eventCount=" +
-            eventCount +
-            " newCount=" +
-            saveCount.getVal()
-        );
+        return ("NostrQueryUpdate: relays=" +
+                relayList.size() +
+                " people=" +
+                authors.size() +
+                " eventCount=" +
+                eventCount +
+                " newCount=" +
+                saveCount.getVal());
     }
 
     private static String runBashCommand(String title, String command) {
@@ -416,12 +414,11 @@ public class SystemService extends ServiceBase {
                 output.append("\n");
             }
         } catch (
-            // output.append("Exit value: " + p.waitFor());
-            // p.getInputStream().close();
-            // p.getOutputStream().close();
-            // p.getErrorStream().close();
-            Exception e
-        ) {
+        // output.append("Exit value: " + p.waitFor());
+        // p.getInputStream().close();
+        // p.getOutputStream().close();
+        // p.getErrorStream().close();
+        Exception e) {
             ExUtil.error(log, "Unable to run script", e);
         }
         output.append("\n\n");

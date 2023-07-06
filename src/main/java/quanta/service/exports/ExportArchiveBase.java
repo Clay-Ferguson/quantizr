@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+// todo-0: fix this deprecation
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -118,7 +119,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 addFileEntry("content.md", out.toString().getBytes(StandardCharsets.UTF_8));
             }
             if (req.isIncludeJypyter()) {
-                addFileEntry("content.ipynb", XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
+                addFileEntry("content.ipynb",
+                        XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
             }
             res.setFileName(shortFileName);
             success = true;
@@ -134,23 +136,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private JupyterNB makeJupyterNotebook() {
         return new JupyterNB(
-            jupyterCells, //
-            new JupyterMetadata( //
-                new JupyterKernelSpec("Python 3", "python", "python3"), //
-                new JupyterLangInfo( //
-                    new JupyterCodeMirrorMode("ipython", 3),
-                    ".py", //
-                    "text/x-python",
-                    "python",
-                    "python", //
-                    "ipython3",
-                    "3.10.6"
-                ),
-                4
-            ), //
-            4,
-            2
-        );
+                jupyterCells, //
+                new JupyterMetadata( //
+                        new JupyterKernelSpec("Python 3", "python", "python3"), //
+                        new JupyterLangInfo( //
+                                new JupyterCodeMirrorMode("ipython", 3),
+                                ".py", //
+                                "text/x-python",
+                                "python",
+                                "python", //
+                                "ipython3",
+                                "3.10.6"),
+                        4), //
+                4,
+                2);
     }
 
     private void writeRootFiles() {
@@ -176,15 +175,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void recurseNode(
-        String rootPath,
-        String parentFolder,
-        TreeNode tn,
-        ArrayList<SubNode> nodeStack,
-        int level,
-        String parentId
-    ) {
+            String rootPath,
+            String parentFolder,
+            TreeNode tn,
+            ArrayList<SubNode> nodeStack,
+            int level,
+            String parentId) {
         SubNode node = tn.node;
-        if (node == null) return;
+        if (node == null)
+            return;
         // If a node has a property "noexport" (added by power users) then this node will not be exported.
         String noExport = node.getStr(NodeProp.NO_EXPORT);
         if (noExport != null) {
@@ -234,15 +233,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * extension.
      */
     private void processNodeExport(
-        MongoSession ms,
-        String parentFolder,
-        String deeperPath,
-        SubNode node,
-        boolean writeFile,
-        Val<String> fileNameCont,
-        int level,
-        boolean isTopRow
-    ) {
+            MongoSession ms,
+            String parentFolder,
+            String deeperPath,
+            SubNode node,
+            boolean writeFile,
+            Val<String> fileNameCont,
+            int level,
+            boolean isTopRow) {
         try {
             String nodeId = node.getIdStr();
             String fileName = nodeId;
@@ -251,7 +249,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (req.isUpdateHeadings()) {
                 int slashCount = StringUtils.countMatches(node.getPath(), "/");
                 int lev = slashCount - baseSlashCount;
-                if (lev > 6) lev = 6;
+                if (lev > 6)
+                    lev = 6;
                 content = edit.translateHeadingsForLevel(ms, content, lev);
             }
             if (writeFile && req.isIncludeToc()) {
@@ -277,17 +276,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         continue;
                     }
                     handleAttachment(
-                        true,
-                        null,
-                        mdContent,
-                        deeperPath,
-                        req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
-                        cell,
-                        writeFile,
-                        nodeId,
-                        fileName,
-                        att
-                    );
+                            true,
+                            null,
+                            mdContent,
+                            deeperPath,
+                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
+                            cell,
+                            writeFile,
+                            nodeId,
+                            fileName,
+                            att);
                 }
             }
             if (req.isIncludeHTML()) {
@@ -301,17 +299,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
                             continue;
                         }
                         handleAttachment(
-                            true,
-                            htmlContent,
-                            null,
-                            deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
-                            null,
-                            writeFile,
-                            nodeId,
-                            fileName,
-                            att
-                        );
+                                true,
+                                htmlContent,
+                                null,
+                                deeperPath,
+                                req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
+                                null,
+                                writeFile,
+                                nodeId,
+                                fileName,
+                                att);
                     }
                 }
                 fullHtml.append(htmlContent.getVal());
@@ -326,17 +323,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         continue;
                     }
                     handleAttachment(
-                        false,
-                        null,
-                        null,
-                        deeperPath,
-                        req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
-                        cell,
-                        writeFile,
-                        nodeId,
-                        fileName,
-                        att
-                    );
+                            false,
+                            null,
+                            null,
+                            deeperPath,
+                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
+                            cell,
+                            writeFile,
+                            nodeId,
+                            fileName,
+                            att);
                 }
             }
             if (req.isIncludeHTML()) {
@@ -352,7 +348,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private void addToTableOfContents(int level, String content, String nodeId) {
         // add to table of contents
-        if (content == null) return;
+        if (content == null)
+            return;
         String headerContent = content.trim();
         if (XString.isMarkdownHeading(headerContent)) {
             // chop string at newline if there's a newline
@@ -369,16 +366,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
                 String clazz = level == 0 ? "class='topLevelToc'" : "";
                 htmlToc.append(
-                    "<div " +
-                    clazz +
-                    " style='margin-left: " +
-                    (25 + level * 25) +
-                    "px'><a class='tocLink' href='#" +
-                    nodeId +
-                    "'>" +
-                    StringEscapeUtils.escapeHtml4(heading) +
-                    "</a></div>"
-                );
+                        "<div " +
+                                clazz +
+                                " style='margin-left: " +
+                                (25 + level * 25) +
+                                "px'><a class='tocLink' href='#" +
+                                nodeId +
+                                "'>" +
+                                StringEscapeUtils.escapeHtml4(heading) +
+                                "</a></div>");
             }
         }
     }
@@ -409,14 +405,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void writeFilesForNode(
-        MongoSession ms,
-        String parentFolder,
-        SubNode node,
-        Val<String> fileNameCont,
-        String fileName,
-        String content,
-        List<Attachment> atts
-    ) {
+            MongoSession ms,
+            String parentFolder,
+            SubNode node,
+            Val<String> fileNameCont,
+            String fileName,
+            String content,
+            List<Attachment> atts) {
         String fileNameBase = parentFolder + "/" + fileName + "/" + fileName;
         fileNameCont.setVal(fileNameBase);
         String json = getNodeJson(node);
@@ -446,7 +441,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return json;
     }
 
-    private void writeAttachmentFileForNode(MongoSession ms, String parentFolder, SubNode node, String fileName, Attachment att) {
+    private void writeAttachmentFileForNode(MongoSession ms, String parentFolder, SubNode node, String fileName,
+            Attachment att) {
         String ext = null;
         String binFileNameProp = att.getFileName();
         if (binFileNameProp != null) {
@@ -463,12 +459,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
             InputStream is = null;
             try {
                 is = attach.getStream(ms, att.getKey(), node, false);
-                if (is == null) return;
+                if (is == null)
+                    return;
                 BufferedInputStream bis = new BufferedInputStream(is);
                 long length = att != null ? att.getSize() : null;
                 String binFileName = req.isAttOneFolder()
-                    ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
-                    : (parentFolder + "/" + fileName + "/" + att.getKey() + ext); //
+                        ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
+                        : (parentFolder + "/" + fileName + "/" + att.getKey() + ext); //
                 if (length > 0) {
                     /* NOTE: the archive WILL fail if no length exists in this codepath */
                     addFileEntry(binFileName, bis, length);
@@ -493,17 +490,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * content and return the content
      */
     private void handleAttachment(
-        boolean injectingTag,
-        Val<String> htmlContent,
-        Val<String> mdContent,
-        String deeperPath,
-        String parentFolder,
-        JupyterCell cell,
-        boolean writeFile,
-        String nodeId,
-        String fileName,
-        Attachment att
-    ) {
+            boolean injectingTag,
+            Val<String> htmlContent,
+            Val<String> mdContent,
+            String deeperPath,
+            String parentFolder,
+            JupyterCell cell,
+            boolean writeFile,
+            String nodeId,
+            String fileName,
+            Attachment att) {
         String ext = null;
         String binFileNameProp = att.getFileName();
         if (binFileNameProp != null) {
@@ -523,7 +519,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         } else {
             binFileNameStr = "External image";
         }
-        if (mimeType == null) return;
+        if (mimeType == null)
+            return;
         if (mimeType.startsWith("image/")) {
             if (req.isIncludeHTML()) {
                 String htmlLink = appendImgLink(nodeId, binFileNameStr, fullUrl);
@@ -555,7 +552,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    private void processMdAtt(boolean injectingTag, Val<String> mdContent, JupyterCell cell, Attachment att, String mdLink) {
+    private void processMdAtt(boolean injectingTag, Val<String> mdContent, JupyterCell cell, Attachment att,
+            String mdLink) {
         if (injectingTag) {
             if (mdContent != null) {
                 mdContent.setVal(insertMdLink(mdContent.getVal(), att, mdLink));
@@ -589,7 +587,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
             // then inject our HTML, and then reopen a new div so keep the markdown separate from the
             // RAW html "imgLink" we're inserting here.
             content =
-                content.replace("{{" + att.getFileName() + "}}", "\n</div>" + imgLink + "<div class='markdown container'>\n");
+                    content.replace("{{" + att.getFileName() + "}}",
+                            "\n</div>" + imgLink + "<div class='markdown container'>\n");
         }
         return content;
     }
@@ -602,21 +601,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private String appendImgLink(String nodeId, String binFileNameStr, String url) {
-        return (
-            "<div class='attachment'><img title='" +
-            binFileNameStr +
-            "' id='img_" +
-            nodeId +
-            "' style='width:50%' onclick='document.getElementById(\"img_" +
-            nodeId +
-            "\").style.width=\"\"' src='" +
-            url +
-            "'/></div>"
-        );
+        return ("<div class='attachment'><img title='" +
+                binFileNameStr +
+                "' id='img_" +
+                nodeId +
+                "' style='width:50%' onclick='document.getElementById(\"img_" +
+                nodeId +
+                "\").style.width=\"\"' src='" +
+                url +
+                "'/></div>");
     }
 
     private String appendNonImgLink(String binFileNameStr, String url) {
-        return ("<div class='attachment'><a class='link' target='_blank' href='" + url + "'>" + binFileNameStr + "</a></div>");
+        return ("<div class='attachment'><a class='link' target='_blank' href='" + url + "'>" + binFileNameStr
+                + "</a></div>");
     }
 
     private String formatContentToHtml(SubNode node, String content) {
@@ -629,9 +627,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 prefix += "<hr>";
             }
             if (req.isIncludeIDs()) {
-                prefix += "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr() + "</div></div>";
+                prefix += "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr()
+                        + "</div></div>";
             }
-            return prefix + "\n<div id='" + node.getIdStr() + "' class='markdown container'>" + escapedContent + "\n</div>\n";
+            return prefix + "\n<div id='" + node.getIdStr() + "' class='markdown container'>" + escapedContent
+                    + "\n</div>\n";
         }
     }
 

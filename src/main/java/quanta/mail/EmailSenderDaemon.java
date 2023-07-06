@@ -38,7 +38,8 @@ public class EmailSenderDaemon extends ServiceBase {
      */
     @Scheduled(fixedDelay = 30000)
     public void run() {
-        if (run || !MongoRepository.fullInit) return;
+        if (run || !MongoRepository.fullInit)
+            return;
         try {
             run = true;
             if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {

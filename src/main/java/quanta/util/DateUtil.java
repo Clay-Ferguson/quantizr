@@ -193,31 +193,39 @@ public class DateUtil {
         }
 
         if (months > 0) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0)
+                sb.append(" ");
             sb.append(String.valueOf(months));
             sb.append("mo");
-            if (++units == 2 || (!highRes && months > 10)) return sb.toString();
+            if (++units == 2 || (!highRes && months > 10))
+                return sb.toString();
         }
 
         if (days > 0) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0)
+                sb.append(" ");
             sb.append(String.valueOf(days));
             sb.append("d");
-            if (++units == 2 || (!highRes && days > 10)) return sb.toString();
+            if (++units == 2 || (!highRes && days > 10))
+                return sb.toString();
         }
 
         if (hours > 0) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0)
+                sb.append(" ");
             sb.append(String.valueOf(hours));
             sb.append("h");
-            if (++units == 2 || (!highRes && hours > 10)) return sb.toString();
+            if (++units == 2 || (!highRes && hours > 10))
+                return sb.toString();
         }
 
         if (minutes > 0) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0)
+                sb.append(" ");
             sb.append(String.valueOf(minutes));
             sb.append("m");
-            if (++units == 2 || (!highRes && minutes > 10)) return sb.toString();
+            if (++units == 2 || (!highRes && minutes > 10))
+                return sb.toString();
         }
 
         // If we will only have seconds and/or millis and the time is less than 30 seconds
@@ -227,14 +235,17 @@ public class DateUtil {
         }
 
         if (seconds > 0) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0)
+                sb.append(" ");
             sb.append(String.valueOf(seconds));
             sb.append("s");
-            if (++units == 2) return sb.toString();
+            if (++units == 2)
+                return sb.toString();
         }
 
         if (highRes && millis > 0) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0)
+                sb.append(" ");
             sb.append(String.valueOf(millis));
             sb.append("ms");
         }
@@ -266,7 +277,8 @@ public class DateUtil {
     }
 
     public static long getMillisFromDuration(String durationStr) {
-        if (StringUtils.isEmpty(durationStr)) return 0;
+        if (StringUtils.isEmpty(durationStr))
+            return 0;
 
         int colonIdx = durationStr.indexOf(":");
         if (colonIdx == -1) {
@@ -280,17 +292,20 @@ public class DateUtil {
     }
 
     public static String formatTimeForUserTimezone(Date date, String timezone, String timeZoneAbbrev) {
-        if (date == null) return null;
+        if (date == null)
+            return null;
 
         /* If we have a short timezone abbreviation display timezone with it */
         if (timeZoneAbbrev != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+            SimpleDateFormat dateFormat =
+                    new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
             if (timezone != null) {
                 dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }
             return dateFormat.format(date) + " " + timeZoneAbbrev;
-        }/* else display timezone in standard GMT format */ else {
-            SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+        } /* else display timezone in standard GMT format */ else {
+            SimpleDateFormat dateFormat =
+                    new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
             if (timezone != null) {
                 dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }

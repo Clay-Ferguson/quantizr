@@ -109,20 +109,19 @@ public class NodeSearchService extends ServiceBase {
 
         for (SubNode n : nodes) {
             NodeInfo info = convert.convertToNodeInfo(
-                false,
-                ThreadLocals.getSC(),
-                ms,
-                n,
-                false,
-                counter + 1,
-                false,
-                false,
-                false,
-                false,
-                true,
-                null,
-                false
-            );
+                    false,
+                    ThreadLocals.getSC(),
+                    ms,
+                    n,
+                    false,
+                    counter + 1,
+                    false,
+                    false,
+                    false,
+                    false,
+                    true,
+                    null,
+                    false);
             if (info != null) {
                 if (truncates.contains(n.getIdStr())) {
                     info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
@@ -142,11 +141,10 @@ public class NodeSearchService extends ServiceBase {
         String searchText = req.getSearchText();
         // if no search text OR sort order specified that's a bad request.
         if ( //
-            StringUtils.isEmpty(searchText) &&
-            StringUtils.isEmpty(req.getSearchType()) && //
-            // note: for timelines this is called but with a sort
-            StringUtils.isEmpty(req.getSortField())
-        ) {
+        StringUtils.isEmpty(searchText) &&
+                StringUtils.isEmpty(req.getSearchType()) && //
+                // note: for timelines this is called but with a sort
+                StringUtils.isEmpty(req.getSortField())) {
             throw new RuntimeException("Search text or ordering required.");
         }
         List<NodeInfo> searchResults = new LinkedList<>();
@@ -156,20 +154,19 @@ public class NodeSearchService extends ServiceBase {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
                 NodeInfo info = convert.convertToNodeInfo(
-                    false,
-                    ThreadLocals.getSC(),
-                    ms,
-                    node,
-                    false,
-                    counter + 1,
-                    false,
-                    false,
-                    false,
-                    false,
-                    true,
-                    null,
-                    false
-                );
+                        false,
+                        ThreadLocals.getSC(),
+                        ms,
+                        node,
+                        false,
+                        counter + 1,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        null,
+                        false);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -187,20 +184,19 @@ public class NodeSearchService extends ServiceBase {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
                 NodeInfo info = convert.convertToNodeInfo(
-                    false,
-                    ThreadLocals.getSC(),
-                    ms,
-                    node,
-                    false,
-                    counter + 1,
-                    false,
-                    false,
-                    false,
-                    false,
-                    true,
-                    null,
-                    false
-                );
+                        false,
+                        ThreadLocals.getSC(),
+                        ms,
+                        node,
+                        false,
+                        counter + 1,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        null,
+                        false);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -208,10 +204,9 @@ public class NodeSearchService extends ServiceBase {
         } else { // othwerwise we're searching all node properties
             /* USER Search */
             if ( //
-                Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()) ||
-                Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
-                Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())
-            ) {
+            Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()) ||
+                    Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
+                    Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
                 userSearch(ms, null, req, searchResults);
             } else { // else we're doing a normal subgraph search for the text
                 SubNode searchRoot = null;
@@ -227,49 +222,46 @@ public class NodeSearchService extends ServiceBase {
                 }
                 if (req.isDeleteMatches()) {
                     delete.deleteMatches(
-                        ms,
-                        searchRoot,
-                        req.getSearchProp(),
-                        searchText,
-                        req.isFuzzy(),
-                        req.isCaseSensitive(),
-                        req.getTimeRangeType(),
-                        req.isRecursive(),
-                        req.isRequirePriority()
-                    );
+                            ms,
+                            searchRoot,
+                            req.getSearchProp(),
+                            searchText,
+                            req.isFuzzy(),
+                            req.isCaseSensitive(),
+                            req.getTimeRangeType(),
+                            req.isRecursive(),
+                            req.isRequirePriority());
                 } else {
                     for (SubNode node : read.searchSubGraph(
-                        ms,
-                        searchRoot,
-                        req.getSearchProp(),
-                        searchText,
-                        req.getSortField(),
-                        req.getSortDir(),
-                        ConstantInt.ROWS_PER_PAGE.val(),
-                        ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
-                        req.isFuzzy(),
-                        req.isCaseSensitive(),
-                        req.getTimeRangeType(),
-                        req.isRecursive(),
-                        req.isRequirePriority(),
-                        req.isRequireAttachment()
-                    )) {
+                            ms,
+                            searchRoot,
+                            req.getSearchProp(),
+                            searchText,
+                            req.getSortField(),
+                            req.getSortDir(),
+                            ConstantInt.ROWS_PER_PAGE.val(),
+                            ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
+                            req.isFuzzy(),
+                            req.isCaseSensitive(),
+                            req.getTimeRangeType(),
+                            req.isRecursive(),
+                            req.isRequirePriority(),
+                            req.isRequireAttachment())) {
                         try {
                             NodeInfo info = convert.convertToNodeInfo(
-                                adminOnly,
-                                ThreadLocals.getSC(),
-                                ms,
-                                node,
-                                false,
-                                counter + 1,
-                                false,
-                                false,
-                                false,
-                                false,
-                                true,
-                                null,
-                                false
-                            );
+                                    adminOnly,
+                                    ThreadLocals.getSC(),
+                                    ms,
+                                    node,
+                                    false,
+                                    counter + 1,
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    true,
+                                    null,
+                                    false);
                             if (info != null) {
                                 searchResults.add(info);
                             }
@@ -283,22 +275,21 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
-    private void userSearch(MongoSession ms, String userDoingAction, NodeSearchRequest req, List<NodeInfo> searchResults) {
+    private void userSearch(MongoSession ms, String userDoingAction, NodeSearchRequest req,
+            List<NodeInfo> searchResults) {
         int counter = 0;
         Val<Iterable<SubNode>> accountNodes = new Val<>();
         // Run this as admin because ordinary users don't have access to account nodes.
         arun.run(as -> {
             accountNodes.setVal(
-                read.getAccountNodes(
-                    as,
-                    Criteria.where("p." + NodeProp.USER.s()).regex(req.getSearchText(), "i"),
-                    null, //
-                    ConstantInt.ROWS_PER_PAGE.val(), //
-                    ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), //
-                    Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()), //
-                    Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())
-                )
-            );
+                    read.getAccountNodes(
+                            as,
+                            Criteria.where("p." + NodeProp.USER.s()).regex(req.getSearchText(), "i"),
+                            null, //
+                            ConstantInt.ROWS_PER_PAGE.val(), //
+                            ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), //
+                            Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()), //
+                            Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())));
             return null;
         });
         if (accountNodes.getVal() != null) {
@@ -309,20 +300,19 @@ public class NodeSearchService extends ServiceBase {
             for (SubNode node : accountNodes.getVal()) {
                 try {
                     NodeInfo info = convert.convertToNodeInfo(
-                        false,
-                        ThreadLocals.getSC(),
-                        ms,
-                        node,
-                        false,
-                        counter + 1,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        null,
-                        false
-                    );
+                            false,
+                            ThreadLocals.getSC(),
+                            ms,
+                            node,
+                            false,
+                            counter + 1,
+                            false,
+                            false,
+                            false,
+                            false,
+                            false,
+                            null,
+                            false);
                     if (info != null) {
                         searchResults.add(info);
                     }
@@ -345,20 +335,19 @@ public class NodeSearchService extends ServiceBase {
                 if (userNode != null) {
                     try {
                         NodeInfo info = convert.convertToNodeInfo(
-                            false,
-                            ThreadLocals.getSC(),
-                            as,
-                            userNode,
-                            false,
-                            counter + 1,
-                            false,
-                            false,
-                            false,
-                            false,
-                            false,
-                            null,
-                            false
-                        );
+                                false,
+                                ThreadLocals.getSC(),
+                                as,
+                                userNode,
+                                false,
+                                counter + 1,
+                                false,
+                                false,
+                                false,
+                                false,
+                                false,
+                                null,
+                                false);
                         if (info != null) {
                             searchResults.add(info);
                         }
@@ -393,14 +382,14 @@ public class NodeSearchService extends ServiceBase {
          * here
          */
         for (SubNode node : auth.searchSubGraphByAcl(
-            ms,
-            req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
-            searchRoot.getPath(),
-            searchRoot.getOwner(),
-            Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME),
-            ConstantInt.ROWS_PER_PAGE.val()
-        )) {
-            if (node.getAc() == null || node.getAc().size() == 0) continue;
+                ms,
+                req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
+                searchRoot.getPath(),
+                searchRoot.getOwner(),
+                Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME),
+                ConstantInt.ROWS_PER_PAGE.val())) {
+            if (node.getAc() == null || node.getAc().size() == 0)
+                continue;
             /*
              * If we're only looking for shares to a specific person (or public) then check here
              */
@@ -411,37 +400,31 @@ public class NodeSearchService extends ServiceBase {
                 // if specifically searching for rd or wr
                 if (req.getAccessOption() != null) {
                     AccessControl ac = node.getAc().get(req.getShareTarget());
-                    if (
-                        req.getAccessOption().contains(PrivilegeType.READ.s()) && //
-                        (
-                            !ac.getPrvs().contains(PrivilegeType.READ.s()) || //
-                            ac.getPrvs().contains(PrivilegeType.WRITE.s())
-                        )
-                    ) {
+                    if (req.getAccessOption().contains(PrivilegeType.READ.s()) && //
+                            (!ac.getPrvs().contains(PrivilegeType.READ.s()) || //
+                                    ac.getPrvs().contains(PrivilegeType.WRITE.s()))) {
                         continue;
                     }
-                    if (
-                        req.getAccessOption().contains(PrivilegeType.WRITE.s()) && !ac.getPrvs().contains(PrivilegeType.WRITE.s())
-                    ) {
+                    if (req.getAccessOption().contains(PrivilegeType.WRITE.s())
+                            && !ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
                         continue;
                     }
                 }
             }
             NodeInfo info = convert.convertToNodeInfo(
-                false,
-                ThreadLocals.getSC(),
-                ms,
-                node,
-                false,
-                counter + 1,
-                false,
-                false,
-                false,
-                false,
-                true,
-                null,
-                false
-            );
+                    false,
+                    ThreadLocals.getSC(),
+                    ms,
+                    node,
+                    false,
+                    counter + 1,
+                    false,
+                    false,
+                    false,
+                    false,
+                    true,
+                    null,
+                    false);
             if (info != null) {
                 searchResults.add(info);
             }
@@ -524,7 +507,8 @@ public class NodeSearchService extends ServiceBase {
             strictFiltering = true;
             List<Criteria> ands = new LinkedList<>();
             Query q = new Query();
-            Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
+            Criteria crit =
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
 
             List<Criteria> orCrit = new LinkedList<>();
             // Nostr
@@ -569,9 +553,9 @@ public class NodeSearchService extends ServiceBase {
         }
         //
         else /*
-         * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
-         * running a stats request under the 'Node Info' main menu
-         */{
+              * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
+              * running a stats request under the 'Node Info' main menu
+              */ {
             ms = ThreadLocals.ensure(ms);
             SubNode searchRoot = read.getNode(ms, req.getNodeId());
             if (req.isSignatureVerify()) {
@@ -633,7 +617,8 @@ public class NodeSearchService extends ServiceBase {
             }
 
             // PART 2: process 'content' text.
-            if (node.getContent() == null) continue;
+            if (node.getContent() == null)
+                continue;
             String content = node.getContent();
             if (node.getTags() != null) {
                 content += " " + node.getTags();
@@ -649,14 +634,16 @@ public class NodeSearchService extends ServiceBase {
                 String token = tokens.nextToken().trim();
                 // todo-a: temporary hack to fix bug where "### quanta.service.UserManagerService@40226788's Node"
                 // was getting processed by lots of nodes
-                if ("node".equalsIgnoreCase(token) || "service".equalsIgnoreCase(token) || "quanta".equalsIgnoreCase(token)) {
+                if ("node".equalsIgnoreCase(token) || "service".equalsIgnoreCase(token)
+                        || "quanta".equalsIgnoreCase(token)) {
                     continue;
                 }
                 if (!english.isStopWord(token)) {
                     String lcToken = token.toLowerCase();
                     // if word is a mention.
                     if (token.startsWith("@")) {
-                        if (token.length() < 3) continue;
+                        if (token.length() < 3)
+                            continue;
                         // lazy create and update knownTokens
                         if (knownTokens == null) {
                             knownTokens = new HashSet<>();
@@ -672,12 +659,15 @@ public class NodeSearchService extends ServiceBase {
                         }
                     } //
                     else if (token.startsWith("#")) { // if word is a hashtag.
-                        if (token.endsWith("#") || token.length() < 4) continue;
+                        if (token.endsWith("#") || token.length() < 4)
+                            continue;
                         String tokSearch = token.replace("#", "").toLowerCase();
-                        if (blockTerms != null && blockTerms.contains(tokSearch)) continue;
+                        if (blockTerms != null && blockTerms.contains(tokSearch))
+                            continue;
                         // ignore stuff like #1 #23
                         String numCheck = token.substring(1);
-                        if (StringUtils.isNumeric(numCheck)) continue;
+                        if (StringUtils.isNumeric(numCheck))
+                            continue;
                         // lazy create and update knownTokens
                         if (knownTokens == null) {
                             knownTokens = new HashSet<>();
@@ -695,7 +685,8 @@ public class NodeSearchService extends ServiceBase {
                         if (!StringUtils.isAlpha(token) || token.length() < 3) {
                             continue;
                         }
-                        if (blockTerms != null && blockTerms.contains(token.toLowerCase())) continue;
+                        if (blockTerms != null && blockTerms.contains(token.toLowerCase()))
+                            continue;
                         if (wordMap != null) {
                             WordStats ws = wordMap.get(lcToken);
                             if (ws == null) {
@@ -730,10 +721,14 @@ public class NodeSearchService extends ServiceBase {
         List<WordStats> mentionList = req.isGetMentions() ? new ArrayList<>(mentionMap.values()) : null;
         List<WordStats> voteList = countVotes ? new ArrayList<>(voteMap.values()) : null;
 
-        if (wordList != null) wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
-        if (tagList != null) tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
-        if (mentionList != null) mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
-        if (voteList != null) voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
+        if (wordList != null)
+            wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
+        if (tagList != null)
+            tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
+        if (mentionList != null)
+            mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
+        if (voteList != null)
+            voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Node count: " + nodeCount + ", Total Words: " + totalWords + "\n");
@@ -750,7 +745,8 @@ public class NodeSearchService extends ServiceBase {
         sb.append("User Shares: " + userShareCount + "\n");
         sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
         if (req.isSignatureVerify()) {
-            sb.append("Signed: " + signedNodeCount + ", Unsigned: " + unsignedNodeCount + ", FAILED SIGS: " + failedSigCount);
+            sb.append("Signed: " + signedNodeCount + ", Unsigned: " + unsignedNodeCount + ", FAILED SIGS: "
+                    + failedSigCount);
         }
 
         res.setStats(sb.toString());
@@ -760,7 +756,8 @@ public class NodeSearchService extends ServiceBase {
 
             for (WordStats ws : wordList) {
                 topWords.add(ws.word); // + "," + ws.count);
-                if (topWords.size() >= 100) break;
+                if (topWords.size() >= 100)
+                    break;
             }
         }
 
@@ -770,7 +767,8 @@ public class NodeSearchService extends ServiceBase {
 
             for (WordStats ws : voteList) {
                 topVotes.add(ws.word + "(" + ws.count + ")");
-                if (topVotes.size() >= 100) break;
+                if (topVotes.size() >= 100)
+                    break;
             }
         }
 
@@ -780,7 +778,8 @@ public class NodeSearchService extends ServiceBase {
 
             for (WordStats ws : tagList) {
                 topTags.add(ws.word); // + "," + ws.count);
-                if (topTags.size() >= 100) break;
+                if (topTags.size() >= 100)
+                    break;
             }
         }
 
@@ -790,7 +789,8 @@ public class NodeSearchService extends ServiceBase {
 
             for (WordStats ws : mentionList) {
                 topMentions.add(ws.word); // + "," + ws.count);
-                if (topMentions.size() >= 100) break;
+                if (topMentions.size() >= 100)
+                    break;
             }
         }
         /*
@@ -826,15 +826,15 @@ public class NodeSearchService extends ServiceBase {
 
     // #tag-array
     private void extractTagsAndMentions(
-        SubNode node,
-        HashSet<String> knownTokens,
-        HashMap<String, WordStats> tagMap,
-        HashMap<String, WordStats> mentionMap,
-        HashSet<String> blockTerms,
-        boolean trending
-    ) {
+            SubNode node,
+            HashSet<String> knownTokens,
+            HashMap<String, WordStats> tagMap,
+            HashMap<String, WordStats> mentionMap,
+            HashSet<String> blockTerms,
+            boolean trending) {
         List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
-        if (tags == null) return;
+        if (tags == null)
+            return;
 
         for (APTag tag : tags) {
             try {
@@ -844,8 +844,10 @@ public class NodeSearchService extends ServiceBase {
                 }
                 String _name = tag.getName().toLowerCase();
                 // we use the knownTags to avoid double counting stuff we already counted from the content text
-                if (knownTokens != null && knownTokens.contains(_name)) continue;
-                if (blockTerms != null && blockTerms.contains(_name.replace("#", ""))) continue;
+                if (knownTokens != null && knownTokens.contains(_name))
+                    continue;
+                if (blockTerms != null && blockTerms.contains(_name.replace("#", "")))
+                    continue;
                 // Mentions
                 if (tag.getType().equals("Mention")) {
                     /*
@@ -869,7 +871,8 @@ public class NodeSearchService extends ServiceBase {
                     }
                     ws.inc(node, trending);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             // just ignore this.
         }
     }

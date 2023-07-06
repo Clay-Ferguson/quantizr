@@ -70,21 +70,19 @@ public class IPFSFiles extends ServiceBase {
     }
 
     public MerkleLink addFileFromStream(
-        MongoSession ms,
-        String fileName,
-        InputStream stream,
-        String mimeType,
-        Val<Integer> streamSize
-    ) {
+            MongoSession ms,
+            String fileName,
+            InputStream stream,
+            String mimeType,
+            Val<Integer> streamSize) {
         checkIpfs();
         // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
         return ipfs.writeFromStream(
-            ms,
-            API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true",
-            stream,
-            null,
-            streamSize
-        );
+                ms,
+                API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true",
+                stream,
+                null,
+                streamSize);
     }
 
     public IPFSDirStat pathStat(String path) {
@@ -156,7 +154,8 @@ public class IPFSFiles extends ServiceBase {
         return readFile(req.getId());
     }
 
-    public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
+    public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid,
+            GetIPFSFilesRequest req) {
         checkIpfs();
         LinkedList<MFSDirEntry> files = new LinkedList<>();
         if (!ThreadLocals.getSC().allowWeb3()) {
@@ -167,7 +166,8 @@ public class IPFSFiles extends ServiceBase {
         String mfsPath = req.getFolder() == null ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
         // opps, not a path
-        if (!mfsPath.startsWith("/")) return null;
+        if (!mfsPath.startsWith("/"))
+            return null;
         IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
         if (pathStat != null) {
             cid.setVal(pathStat.getHash());

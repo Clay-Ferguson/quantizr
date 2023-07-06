@@ -68,7 +68,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     @Override
     @Bean
     public MongoDatabaseFactory mongoDbFactory() {
-        if (connectionFailed) return null;
+        if (connectionFailed)
+            return null;
         if (factory == null) {
             log.debug("create mongoDbFactory");
             try {
@@ -90,7 +91,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
     @Bean
     public GridFSBucket gridFsBucket() {
-        if (connectionFailed) return null;
+        if (connectionFailed)
+            return null;
         if (gridFsBucket == null) {
             log.debug("create gridFdBucket");
             MongoDatabaseFactory mdbf = mongoDbFactory();
@@ -110,7 +112,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
     @Override
     public MongoClient mongoClient() {
-        if (connectionFailed) return null;
+        if (connectionFailed)
+            return null;
         if (mongoClient == null) {
             log.debug("create mongoClient");
             MongoCredential credential = null;
@@ -142,9 +145,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                  * example the way we're storing AccessControl objects in a map inside SubNode
                  */
                 CodecRegistry pojoCodecRegistry = fromRegistries(
-                    MongoClientSettings.getDefaultCodecRegistry(),
-                    fromProviders(PojoCodecProvider.builder().automatic(true).build())
-                );
+                        MongoClientSettings.getDefaultCodecRegistry(),
+                        fromProviders(PojoCodecProvider.builder().automatic(true).build()));
                 MongoClientSettings.Builder builder = MongoClientSettings.builder();
                 if (credential != null) {
                     builder = builder.credential(credential);
@@ -190,7 +192,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
     @Bean
     public GridFsTemplate gridFsTemplate(MappingMongoConverter converter) throws Exception {
-        if (connectionFailed) return null;
+        if (connectionFailed)
+            return null;
         if (grid == null) {
             log.debug("create gridFsTemplate");
             MongoDatabaseFactory mdbf = mongoDbFactory();

@@ -131,7 +131,8 @@ public class ExportPdfServicePdfBox extends ServiceBase {
     }
 
     private void recurseNode(SubNode node, int level) {
-        if (node == null) return;
+        if (node == null)
+            return;
         processNode(node);
         Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 
@@ -154,12 +155,15 @@ public class ExportPdfServicePdfBox extends ServiceBase {
     private void writeImage(SubNode node) {
         try {
             List<Attachment> atts = node.getOrderedAttachments();
-            if (atts == null) return;
+            if (atts == null)
+                return;
             // process all attachments specifically to embed the image ones
             for (Attachment att : atts) {
-                if (att.getBin() == null) continue;
+                if (att.getBin() == null)
+                    continue;
                 String mime = att.getMime();
-                if (!ImageUtil.isImageMime(mime)) continue;
+                if (!ImageUtil.isImageMime(mime))
+                    continue;
                 String imgSize = att.getCssSize();
                 float sizeFactor = 1.0F;
                 if (imgSize != null && imgSize.endsWith("%")) {
@@ -168,7 +172,8 @@ public class ExportPdfServicePdfBox extends ServiceBase {
                     sizeFactor = Float.valueOf(size).floatValue() / 100;
                 }
                 InputStream is = attach.getStream(session, att.getKey(), node, false);
-                if (is == null) continue;
+                if (is == null)
+                    continue;
                 PDImageXObject pdImage = null;
                 try {
                     if ("image/jpeg".equals(mime) || "image/jpg".equals(mime)) {
@@ -181,7 +186,8 @@ public class ExportPdfServicePdfBox extends ServiceBase {
                 } finally {
                     IOUtils.closeQuietly(is);
                 }
-                if (pdImage == null) continue;
+                if (pdImage == null)
+                    continue;
                 float imgWidth = width * sizeFactor;
                 float scale = imgWidth / pdImage.getWidth();
                 advanceY(pdImage.getHeight() * scale);

@@ -35,11 +35,10 @@ public class ImportBookService extends ServiceBase {
          */
         ImportWarAndPeace iwap = context.getBean(ImportWarAndPeace.class);
         iwap.importBook(
-            ms,
-            "classpath:public/data/war-and-peace.txt",
-            node,
-            safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE
-        );
+                ms,
+                "classpath:public/data/war-and-peace.txt",
+                node,
+                safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
         update.saveSession(ms);
         return res;
     }

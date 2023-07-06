@@ -92,22 +92,18 @@ public class MongoTest extends ServiceBase implements TestIntf {
         SubNode node = opsw.findById(null, new ObjectId(nodeId));
         // APObj payload = new APObj().put("tag", new APList().val(new APObj().put("propname", "propval")));
         node.set(
-            NodeProp.ACT_PUB_TAG,
-            new APList()
-                .val( //
-                    //
-                    new APObj()
-                        .put("name", ":catjam:")
-                        .put(
-                            "icon", //
-                            new APObj()
-                                .put(
-                                    "url",
-                                    "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"
-                                )
-                        )
-                )
-        );
+                NodeProp.ACT_PUB_TAG,
+                new APList()
+                        .val( //
+                              //
+                                new APObj()
+                                        .put("name", ":catjam:")
+                                        .put(
+                                                "icon", //
+                                                new APObj()
+                                                        .put(
+                                                                "url",
+                                                                "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"))));
         log.debug("Complex Object: " + XString.prettyPrint(node));
         update.saveSession(as);
     }
@@ -247,15 +243,14 @@ public class MongoTest extends ServiceBase implements TestIntf {
             update.save(ms, node);
             long maxFileSize = user.getUserStorageRemaining(ms);
             attach.writeStream(
-                ms,
-                false,
-                "",
-                node,
-                new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize),
-                null,
-                "image/png",
-                null
-            );
+                    ms,
+                    false,
+                    "",
+                    node,
+                    new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize),
+                    null,
+                    "image/png",
+                    null);
             update.save(ms, node);
             log.debug("inserted root for binary testing.", null, "image/png", null);
             InputStream inStream = attach.getStream(ms, "", node, true);

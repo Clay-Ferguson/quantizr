@@ -93,7 +93,8 @@ public class AclService extends ServiceBase {
                         batchSize = 0;
                         bops = null;
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             } else { // not an error, we just can't properties on nodes we don't own, so we skip them
                 auth.ownerAuth(ms, n);
                 n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
@@ -159,12 +160,11 @@ public class AclService extends ServiceBase {
     }
 
     public boolean setCipherKey(
-        MongoSession ms,
-        SubNode node,
-        String principalNodeId,
-        String cipherKey,
-        SetCipherKeyResponse res
-    ) {
+            MongoSession ms,
+            SubNode node,
+            String principalNodeId,
+            String cipherKey,
+            SetCipherKeyResponse res) {
         boolean ret = false;
         HashMap<String, AccessControl> acl = node.getAc();
         AccessControl ac = acl.get(principalNodeId);
@@ -184,15 +184,15 @@ public class AclService extends ServiceBase {
      * If BulkOperations is non-null we use it instead of a non-bulk operation.
      */
     public boolean addPrivilege(
-        MongoSession ms,
-        BulkOperations bops,
-        SubNode node,
-        String principal,
-        SubNode principalNode,
-        List<String> privileges,
-        AddPrivilegeResponse res
-    ) {
-        if ((principal == null && principalNode == null) || node == null) return false;
+            MongoSession ms,
+            BulkOperations bops,
+            SubNode node,
+            String principal,
+            SubNode principalNode,
+            List<String> privileges,
+            AddPrivilegeResponse res) {
+        if ((principal == null && principalNode == null) || node == null)
+            return false;
         if (principal != null) {
             principal = principal.trim();
         }
@@ -206,8 +206,8 @@ public class AclService extends ServiceBase {
             }
             mapKey = PrincipalName.PUBLIC.s();
         } else /*
-         * otherwise we're sharing to a person so we now get their userNodeId to use as map key
-         */{
+                * otherwise we're sharing to a person so we now get their userNodeId to use as map key
+                */ {
             // if no principal node passed in, then look it up
             if (principalNode == null) {
                 String _principal = principal;
@@ -321,7 +321,8 @@ public class AclService extends ServiceBase {
             return;
         }
         HashMap<String, AccessControl> acl = node.getAc();
-        if (acl == null) return;
+        if (acl == null)
+            return;
         String newPrivs = "";
         boolean removed = false;
         AccessControl ac = null;
@@ -418,7 +419,8 @@ public class AclService extends ServiceBase {
             }
             if (principals.size() == 0) {
                 node = read.getParent(ms, node);
-                if (node == null) break;
+                if (node == null)
+                    break;
             } else {
                 break;
             }
@@ -452,7 +454,8 @@ public class AclService extends ServiceBase {
             node.putAc(key, new AccessControl(null, prvs));
         } else { // otherwise first check to see if it's already added
             AccessControl ac = node.getAc().get(key);
-            if (ac != null && ac.getPrvs().equals(prvs)) {} else { // else need to add it. // already had the correct ac, nothing to do here
+            if (ac != null && ac.getPrvs().equals(prvs)) {
+            } else { // else need to add it. // already had the correct ac, nothing to do here
                 node.putAc(key, new AccessControl(null, prvs));
             }
         }
@@ -465,7 +468,8 @@ public class AclService extends ServiceBase {
     }
 
     public boolean isAdminOwned(SubNode node) {
-        if (node == null) return false;
+        if (node == null)
+            return false;
         return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
     }
 }

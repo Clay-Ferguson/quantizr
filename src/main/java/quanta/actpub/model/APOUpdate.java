@@ -13,12 +13,9 @@ public class APOUpdate extends APOActivity {
     }
 
     public APOUpdate() {
-        put(
-            context,
-            new APList() //
+        put(context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(new APOLanguage())
-        );
+                .val(new APOLanguage()));
         put(type, APType.Update);
     }
 

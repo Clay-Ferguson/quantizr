@@ -56,7 +56,8 @@ public class ImportZipService extends ImportArchiveBase {
      *
      * Assumes ms has already been verified as owner of 'node'
      */
-    public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node, boolean isNonRequestThread) {
+    public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node,
+            boolean isNonRequestThread) {
         SessionContext sc = ThreadLocals.getSC();
         if (used) {
             throw new RuntimeEx("Prototype bean used multiple times is not allowed.");

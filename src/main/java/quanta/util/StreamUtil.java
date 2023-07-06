@@ -36,8 +36,10 @@ public class StreamUtil {
 
     public static boolean streamsIdentical(InputStream a, InputStream b) {
         /* wrap in Buffered streams only if not currently buffered */
-        BufferedInputStream aBuffered = (a instanceof BufferedInputStream) ? (BufferedInputStream) a : new BufferedInputStream(a);
-        BufferedInputStream bBuffered = (b instanceof BufferedInputStream) ? (BufferedInputStream) b : new BufferedInputStream(b);
+        BufferedInputStream aBuffered =
+                (a instanceof BufferedInputStream) ? (BufferedInputStream) a : new BufferedInputStream(a);
+        BufferedInputStream bBuffered =
+                (b instanceof BufferedInputStream) ? (BufferedInputStream) b : new BufferedInputStream(b);
         try {
             int aByte;
             int bByte;

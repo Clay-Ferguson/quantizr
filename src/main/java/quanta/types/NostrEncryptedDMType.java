@@ -19,7 +19,8 @@ public class NostrEncryptedDMType extends TypeBase {
 
     @Override
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, SubNode ownerAcctNode, boolean getFollowers) {
-        if (ownerAcctNode == null) return;
+        if (ownerAcctNode == null)
+            return;
 
         String pubKey = null;
         String userName = ownerAcctNode.getStr(NodeProp.USER);

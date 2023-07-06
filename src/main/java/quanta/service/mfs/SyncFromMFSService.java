@@ -69,7 +69,8 @@ public class SyncFromMFSService extends ServiceBase {
                 } else {
                     res.error("Unable to process: " + req.getPath());
                 }
-            } else { // access data from the local MFS // Loading from an actual MFS path was completed, but is not very usable because we can only
+            } else { // access data from the local MFS // Loading from an actual MFS path was completed, but is not very
+                     // usable because we can only
                 if (processPath(req.getPath())) {
                     res.setMessage(buildReport());
                 } else {
@@ -188,16 +189,17 @@ public class SyncFromMFSService extends ServiceBase {
                             SubNodeIdentity node = null;
                             try {
                                 /*
-                                 * UPDATE: Now that we have SubNodePojo.java for deseralizing we no longer need SubNodeIdentity
-                                 * and we can refactor it out.
+                                 * UPDATE: Now that we have SubNodePojo.java for deseralizing we no longer need
+                                 * SubNodeIdentity and we can refactor it out.
                                  *
-                                 * todo-2: WARNING! Simply deserializing a SubNode object causes it to become a REAL node and
-                                 * behave as if it were inserted into the DB, so that after json parses it 'read.getNode()' Mongo
-                                 * query will immediately find it and 'claim' that it's been inserted into the DB already.
+                                 * todo-2: WARNING! Simply deserializing a SubNode object causes it to become a REAL
+                                 * node and behave as if it were inserted into the DB, so that after json parses it
+                                 * 'read.getNode()' Mongo query will immediately find it and 'claim' that it's been
+                                 * inserted into the DB already.
                                  *
-                                 * Solution: I created SubNodeIdentity to perform a pure (partial) deserialization, but I need to
-                                 * check the rest of the codebase to be sure there's nowhere that this surprise will break things.
-                                 * (import/export logic?)
+                                 * Solution: I created SubNodeIdentity to perform a pure (partial) deserialization, but
+                                 * I need to check the rest of the codebase to be sure there's nowhere that this
+                                 * surprise will break things. (import/export logic?)
                                  */
                                 node = jsonMapper.readValue(json, SubNodeIdentity.class);
                                 // we assume the node.id values can be the same across Federated instances.

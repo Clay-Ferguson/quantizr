@@ -87,12 +87,14 @@ public class IPFSService extends ServiceBase {
     /* On regular interval forget which CIDs have failed and allow them to be retried */
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         failedCIDs.clear();
     }
 
     public LinkedHashMap<String, Object> getInstanceId() {
-        if (!prop.ipfsEnabled()) return null;
+        if (!prop.ipfsEnabled())
+            return null;
         synchronized (instanceIdLock) {
             if (instanceId == null) {
                 instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
@@ -127,7 +129,8 @@ public class IPFSService extends ServiceBase {
         return cid;
     }
 
-    public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType, boolean wrapInFolder) {
+    public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType,
+            boolean wrapInFolder) {
         checkIpfs();
         InputStream stream = IOUtils.toInputStream(text);
         try {
@@ -142,13 +145,12 @@ public class IPFSService extends ServiceBase {
      * DOES pin the file
      */
     public MerkleLink addFromStream(
-        MongoSession ms,
-        InputStream stream,
-        String fileName,
-        String mimeType,
-        Val<Integer> streamSize,
-        boolean wrapInFolder
-    ) {
+            MongoSession ms,
+            InputStream stream,
+            String fileName,
+            String mimeType,
+            Val<Integer> streamSize,
+            boolean wrapInFolder) {
         checkIpfs();
         String endpoint = prop.getIPFSApiBase() + "/add?stream-channels=true";
         if (wrapInFolder) {
@@ -179,12 +181,11 @@ public class IPFSService extends ServiceBase {
      * always basing off extension on this filename?
      */
     public MerkleLink writeFromStream(
-        MongoSession ms,
-        String endpoint,
-        InputStream stream,
-        String fileName,
-        Val<Integer> streamSize
-    ) {
+            MongoSession ms,
+            String endpoint,
+            InputStream stream,
+            String fileName,
+            Val<Integer> streamSize) {
         checkIpfs();
         MerkleLink ret = null;
         try {
@@ -194,7 +195,8 @@ public class IPFSService extends ServiceBase {
             bodyMap.add("file", makeFileEntity(lis, fileName));
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response =
+                    restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             if (response.getStatusCodeValue() != 200) {
                 throw new RuntimeException("Failed. StatusCode: " + response.getStatusCode());
             }
@@ -206,7 +208,8 @@ public class IPFSService extends ServiceBase {
                 String body = response.getBody();
                 try {
                     ret = XString.jsonMapper.readValue(body, MerkleLink.class);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
                 // some calls, like the mfs file add, don't send back the MerkleLink, so for now let's just tolerate
                 // that until we design better around it, and return a null.
                 // log.debug("Unable to parse response string: " + body);
@@ -229,7 +232,8 @@ public class IPFSService extends ServiceBase {
             fileName = "file";
         }
         MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
-        ContentDisposition contentDisposition = ContentDisposition.builder("form-data").name("file").filename(fileName).build();
+        ContentDisposition contentDisposition =
+                ContentDisposition.builder("form-data").name("file").filename(fileName).build();
         fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
         HttpEntity<InputStreamResource> fileEntity = new HttpEntity<>(new InputStreamResource(is), fileMap);
         return fileEntity;
@@ -247,36 +251,33 @@ public class IPFSService extends ServiceBase {
      * nice-feature for user to be able to browse them individually.
      */
     public void writeIpfsExportNode(
-        MongoSession ms,
-        String cid,
-        String mime,
-        String fileName,
-        List<ExportIpfsFile> childrenFiles
-    ) {
+            MongoSession ms,
+            String cid,
+            String mime,
+            String fileName,
+            List<ExportIpfsFile> childrenFiles) {
         checkIpfs();
         SubNode exportParent = read.getUserNodeByType(
-            ms,
-            ms.getUserName(),
-            null,
-            "### Exports",
-            NodeType.EXPORTS.s(),
-            null,
-            null,
-            false
-        );
+                ms,
+                ms.getUserName(),
+                null,
+                "### Exports",
+                NodeType.EXPORTS.s(),
+                null,
+                null,
+                false);
         if (exportParent != null) {
             SubNode node = create.createNode(
-                ms,
-                exportParent,
-                null,
-                NodeType.NONE.s(),
-                0L,
-                CreateNodeLocation.FIRST,
-                null,
-                null,
-                true,
-                true
-            );
+                    ms,
+                    exportParent,
+                    null,
+                    NodeType.NONE.s(),
+                    0L,
+                    CreateNodeLocation.FIRST,
+                    null,
+                    null,
+                    true,
+                    true);
             // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             node.setOwner(exportParent.getOwner());
@@ -290,17 +291,16 @@ public class IPFSService extends ServiceBase {
             if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
                     SubNode child = create.createNode(
-                        ms,
-                        node,
-                        null,
-                        NodeType.NONE.s(),
-                        0L,
-                        CreateNodeLocation.LAST,
-                        null,
-                        null,
-                        true,
-                        true
-                    );
+                            ms,
+                            node,
+                            null,
+                            NodeType.NONE.s(),
+                            0L,
+                            CreateNodeLocation.LAST,
+                            null,
+                            null,
+                            true,
+                            true);
                     // todo-2: make this handle multiple attachments, and all calls to it
                     Attachment childAtt = child.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
                     child.setOwner(exportParent.getOwner());
@@ -349,14 +349,14 @@ public class IPFSService extends ServiceBase {
         try {
             int timeout = 15;
             RequestConfig config = //
-                //
-                //
-                RequestConfig
-                    .custom()
-                    .setConnectTimeout(timeout * 1000)
-                    .setConnectionRequestTimeout(timeout * 1000)
-                    .setSocketTimeout(timeout * 1000)
-                    .build();
+                    //
+                    //
+                    RequestConfig
+                            .custom()
+                            .setConnectTimeout(timeout * 1000)
+                            .setConnectionRequestTimeout(timeout * 1000)
+                            .setSocketTimeout(timeout * 1000)
+                            .build();
             HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
             HttpGet request = new HttpGet(sourceUrl);
             request.addHeader("User-Agent", Const.FAKE_USER_AGENT);

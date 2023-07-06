@@ -88,7 +88,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
      */
     @Override
     public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
-        // super.onBeforeSave(event);  todo-1: this needed?
+        // super.onBeforeSave(event); todo-1: this needed?
         SubNode node = event.getSource();
         log.trace("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
         Document dbObj = event.getDocument();
@@ -178,11 +178,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             dbObj.put(SubNode.AC, null);
             node.setAc(null);
         }
-        if (
-            !node.getPath().startsWith(NodePath.PENDING_PATH + "/") &&
-            ThreadLocals.getParentCheckEnabled() &&
-            (isNew || node.verifyParentPath)
-        ) {
+        if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") &&
+                ThreadLocals.getParentCheckEnabled() &&
+                (isNew || node.verifyParentPath)) {
             read.checkParentExists(null, node.getPath());
         }
         saveAuthByThread(node, isNew);
@@ -275,7 +273,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     @Override
     public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
         // super.onBeforeDelete(event); todo-1: this needed?
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         Document doc = event.getDocument();
         if (doc != null) {
             Object id = doc.get("_id");
@@ -297,17 +296,21 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         if (!MongoRepository.fullInit) {
             return;
         }
-        if (node.adminUpdate) return;
-        if (verbose) log.trace("saveAuth in MongoListener");
+        if (node.adminUpdate)
+            return;
+        if (verbose)
+            log.trace("saveAuth in MongoListener");
         MongoSession ms = ThreadLocals.getMongoSession();
         if (ms != null) {
-            if (ms.isAdmin()) return;
+            if (ms.isAdmin())
+                return;
             // Must have write privileges to this node.
             auth.ownerAuth(node);
             // only if this is creating a new node do we need to check that the parent will allow it
             if (isNew) {
                 SubNode parent = read.getParent(ms, node);
-                if (parent == null) throw new RuntimeException("unable to get node parent: " + node.getParentPath());
+                if (parent == null)
+                    throw new RuntimeException("unable to get node parent: " + node.getParentPath());
                 auth.authForChildNodeCreate(ms, parent);
                 if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
                     throw new ForbiddenException();

@@ -19,7 +19,8 @@ public class ActPubTest extends ServiceBase implements TestIntf {
             if (prop.getHostAndPort().contains("//q2:")) {
                 testConnection("q1:8184");
             }
-        } finally {}
+        } finally {
+        }
     }
 
     /**

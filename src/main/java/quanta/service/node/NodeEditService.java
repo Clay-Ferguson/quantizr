@@ -114,16 +114,15 @@ public class NodeEditService extends ServiceBase {
          */
         if (nodeId == null && !linkBookmark) {
             parentNode =
-                read.getUserNodeByType(
-                    ms,
-                    null,
-                    null,
-                    "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
-                    NodeType.POSTS.s(),
-                    Arrays.asList(PrivilegeType.READ.s()),
-                    NodeName.POSTS,
-                    true
-                );
+                    read.getUserNodeByType(
+                            ms,
+                            null,
+                            null,
+                            "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
+                            NodeType.POSTS.s(),
+                            Arrays.asList(PrivilegeType.READ.s()),
+                            NodeName.POSTS,
+                            true);
 
             if (parentNode != null) {
                 nodeId = parentNode.getIdStr();
@@ -134,7 +133,8 @@ public class NodeEditService extends ServiceBase {
         if (parentNode == null && !linkBookmark) {
             if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
                 parentNode =
-                    read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null, false);
+                        read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null,
+                                false);
             } else {
                 parentNode = read.getNode(ms, nodeId);
             }
@@ -158,17 +158,16 @@ public class NodeEditService extends ServiceBase {
         }
         CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
         SubNode newNode = create.createNode(
-            ms,
-            parentNode,
-            null,
-            req.getTypeName(),
-            0L,
-            createLoc,
-            req.getProperties(),
-            null,
-            true,
-            false
-        );
+                ms,
+                parentNode,
+                null,
+                req.getTypeName(),
+                0L,
+                createLoc,
+                req.getProperties(),
+                null,
+                true,
+                false);
         if (req.isPendingEdit()) {
             mongoUtil.setPendingPath(newNode, true);
         }
@@ -209,9 +208,8 @@ public class NodeEditService extends ServiceBase {
                     newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
                 }
                 // inherit UNPUBLISHED prop from parent, if we own the parent
-                if (
-                    nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED) && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())
-                ) {
+                if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
+                        && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
                     newNode.set(NodeProp.UNPUBLISHED, true);
                 }
                 String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
@@ -221,23 +219,18 @@ public class NodeEditService extends ServiceBase {
             }
 
             /* Always make public if we're replying to public node or posting under our POSTs node */
-            if (
-                !req.isDirectMessage() &&
-                (
-                    makePublicWritable ||
-                    (req.isReply() && AclService.isPublic(nodeBeingRepliedTo)) ||
-                    parentNode.isType(NodeType.POSTS)
-                )
-            ) {
+            if (!req.isDirectMessage() &&
+                    (makePublicWritable ||
+                            (req.isReply() && AclService.isPublic(nodeBeingRepliedTo)) ||
+                            parentNode.isType(NodeType.POSTS))) {
                 acl.addPrivilege(
-                    ms,
-                    null,
-                    newNode,
-                    PrincipalName.PUBLIC.s(),
-                    null,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                    null
-                );
+                        ms,
+                        null,
+                        newNode,
+                        PrincipalName.PUBLIC.s(),
+                        null,
+                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                        null);
             }
         }
 
@@ -251,18 +244,18 @@ public class NodeEditService extends ServiceBase {
             tags.add(element);
             newNode.set(NodeProp.NOSTR_TAGS.s(), tags);
             // if this is a reply to a nostr node and is not a DM, then it needs to be made public. If user
-            // tries to remove the public setting from and then save it, the system will reject that and tell the user
+            // tries to remove the public setting from and then save it, the system will reject that and tell
+            // the user
             // that only DMs are able to be private in Nostr.
             if (!newNode.getType().equals(NodeType.NOSTR_ENC_DM.s())) {
                 acl.addPrivilege(
-                    ms,
-                    null,
-                    newNode,
-                    PrincipalName.PUBLIC.s(),
-                    null,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                    null
-                );
+                        ms,
+                        null,
+                        newNode,
+                        PrincipalName.PUBLIC.s(),
+                        null,
+                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                        null);
             }
         }
         if (!StringUtils.isEmpty(req.getBoostTarget())) {
@@ -285,22 +278,20 @@ public class NodeEditService extends ServiceBase {
             processAfterSave(ms, newNode, parentNode, true);
         }
         res.setNewNode(
-            convert.convertToNodeInfo(
-                false,
-                ThreadLocals.getSC(),
-                ms,
-                newNode,
-                false, //
-                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE,
-                false,
-                false,
-                false,
-                false,
-                false,
-                null,
-                false
-            )
-        );
+                convert.convertToNodeInfo(
+                        false,
+                        ThreadLocals.getSC(),
+                        ms,
+                        newNode,
+                        false, //
+                        req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        null,
+                        false));
         return res;
     }
 
@@ -324,17 +315,16 @@ public class NodeEditService extends ServiceBase {
             throw new ForbiddenException();
         }
         SubNode newNode = create.createNode(
-            ms,
-            parentNode,
-            null,
-            req.getTypeName(),
-            req.getTargetOrdinal(),
-            CreateNodeLocation.ORDINAL,
-            null,
-            null,
-            true,
-            true
-        );
+                ms,
+                parentNode,
+                null,
+                req.getTypeName(),
+                req.getTargetOrdinal(),
+                CreateNodeLocation.ORDINAL,
+                null,
+                null,
+                true,
+                true);
         if (req.getInitialValue() != null) {
             newNode.setContent(req.getInitialValue());
         } else {
@@ -355,14 +345,13 @@ public class NodeEditService extends ServiceBase {
             // Note: some logic may be common between this insertNode() and the createSubNode()
             if (parentNode.isType(NodeType.POSTS)) {
                 acl.addPrivilege(
-                    ms,
-                    null,
-                    newNode,
-                    PrincipalName.PUBLIC.s(),
-                    null,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                    null
-                );
+                        ms,
+                        null,
+                        newNode,
+                        PrincipalName.PUBLIC.s(),
+                        null,
+                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                        null);
             } else {
                 // we always copy the access controls from the parent for any new nodes
                 auth.setDefaultReplyAcl(parentNode, newNode);
@@ -389,22 +378,20 @@ public class NodeEditService extends ServiceBase {
         openGraph.parseNode(newNode, true);
         update.save(ms, newNode);
         res.setNewNode(
-            convert.convertToNodeInfo(
-                false,
-                ThreadLocals.getSC(),
-                ms,
-                newNode,
-                false, //
-                Convert.LOGICAL_ORDINAL_GENERATE,
-                false,
-                false,
-                false,
-                false,
-                false,
-                null,
-                false
-            )
-        );
+                convert.convertToNodeInfo(
+                        false,
+                        ThreadLocals.getSC(),
+                        ms,
+                        newNode,
+                        false, //
+                        Convert.LOGICAL_ORDINAL_GENERATE,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        null,
+                        false));
         // if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
         // // don't evern send notifications when 'admin' is the one doing the editing.
         // && !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
@@ -425,17 +412,16 @@ public class NodeEditService extends ServiceBase {
                 properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
             }
             SubNode newNode = create.createNode(
-                ms,
-                parentFriendsList,
-                null,
-                NodeType.FRIEND.s(),
-                0L,
-                CreateNodeLocation.LAST,
-                properties,
-                parentFriendsList.getOwner(),
-                true,
-                true
-            );
+                    ms,
+                    parentFriendsList,
+                    null,
+                    NodeType.FRIEND.s(),
+                    0L,
+                    CreateNodeLocation.LAST,
+                    properties,
+                    parentFriendsList.getOwner(),
+                    true,
+                    true);
             newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
             String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
             if (userToFollowActorId != null) {
@@ -465,31 +451,29 @@ public class NodeEditService extends ServiceBase {
             return res;
         }
         SubNode linksNode = read.getUserNodeByType(
-            ms,
-            ms.getUserName(),
-            null,
-            "### Notes",
-            NodeType.NOTES.s(),
-            null,
-            null,
-            false
-        );
+                ms,
+                ms.getUserName(),
+                null,
+                "### Notes",
+                NodeType.NOTES.s(),
+                null,
+                null,
+                false);
         if (linksNode == null) {
             log.warn("unable to get linksNode");
             return null;
         }
         SubNode newNode = create.createNode(
-            ms,
-            linksNode,
-            null,
-            NodeType.NONE.s(),
-            0L,
-            CreateNodeLocation.LAST,
-            null,
-            null,
-            true,
-            true
-        );
+                ms,
+                linksNode,
+                null,
+                NodeType.NONE.s(),
+                0L,
+                CreateNodeLocation.LAST,
+                null,
+                null,
+                true,
+                true);
         String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
         String content = title != null ? "#### " + title + "\n" : "";
         content += data;
@@ -576,11 +560,9 @@ public class NodeEditService extends ServiceBase {
             throw new RuntimeEx("Max text length is 64K");
         }
         /* If current content exists content is being edited reset likes */
-        if (
-            node.getContent() != null &&
-            node.getContent().trim().length() > 0 &&
-            !Util.equalObjs(node.getContent(), nodeInfo.getContent())
-        ) {
+        if (node.getContent() != null &&
+                node.getContent().trim().length() > 0 &&
+                !Util.equalObjs(node.getContent(), nodeInfo.getContent())) {
             node.setLikes(null);
         }
         node.setContent(nodeInfo.getContent());
@@ -594,9 +576,11 @@ public class NodeEditService extends ServiceBase {
         if (StringUtils.isEmpty(nodeInfo.getName())) {
             node.setName(null);
         } //
-        else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) { // if we're setting node name to a different node name
+        else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
+                && !nodeInfo.getName().equals(node.getName())) { // if we're setting node name to a different node name
             if (!snUtil.validNodeName(nodeInfo.getName())) {
-                throw new RuntimeEx("Node names can only contain letter, digit, underscore, dash, and period characters.");
+                throw new RuntimeEx(
+                        "Node names can only contain letter, digit, underscore, dash, and period characters.");
             }
             String nodeName = nodeInfo.getName().trim();
             // if not admin we have to lookup the node with "userName:nodeName" format
@@ -656,7 +640,7 @@ public class NodeEditService extends ServiceBase {
         String encKey = node.getStr(NodeProp.ENC_KEY);
         if (encKey == null) {
             mongoUtil.removeAllEncryptionKeys(node);
-        } else /* if node is currently encrypted */{
+        } else /* if node is currently encrypted */ {
             res.setAclEntries(auth.getAclEntries(ms, node));
         }
         attach.pinLocalIpfsAttachments(node);
@@ -690,20 +674,19 @@ public class NodeEditService extends ServiceBase {
             processAfterSave(ms, node, parent, req.isSaveToActPub());
         }
         NodeInfo newNodeInfo = convert.convertToNodeInfo(
-            false,
-            ThreadLocals.getSC(),
-            ms,
-            node,
-            false,
-            Convert.LOGICAL_ORDINAL_GENERATE,
-            false,
-            false,
-            false,
-            true,
-            true,
-            null,
-            false
-        );
+                false,
+                ThreadLocals.getSC(),
+                ms,
+                node,
+                false,
+                Convert.LOGICAL_ORDINAL_GENERATE,
+                false,
+                false,
+                false,
+                true,
+                true,
+                null,
+                false);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }
@@ -717,17 +700,18 @@ public class NodeEditService extends ServiceBase {
      * cannot ever be entered)
      */
     public void removeDeletedAttachments(MongoSession ms, SubNode node, HashMap<String, Attachment> newAtts) {
-        if (node.getAttachments() == null) return;
+        if (node.getAttachments() == null)
+            return;
         // we need toDelete as separate list to avoid "concurrent modification exception" by deleting
         // from the attachments set during iterating it.
         List<String> toDelete = new LinkedList<>();
         node
-            .getAttachments()
-            .forEach((key, att) -> {
-                if (newAtts == null || !newAtts.containsKey(key)) {
-                    toDelete.add(key);
-                }
-            });
+                .getAttachments()
+                .forEach((key, att) -> {
+                    if (newAtts == null || !newAtts.containsKey(key)) {
+                        toDelete.add(key);
+                    }
+                });
         // run these actual deletes in a separate async thread
         arun.run(as -> {
             for (String key : toDelete) {
@@ -768,7 +752,8 @@ public class NodeEditService extends ServiceBase {
             boolean forceSendToPublic = isAccnt;
             if (forceSendToPublic || node.getAc() != null) {
                 // We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-                if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
+                if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED)
+                        && node.getType().equals(NodeType.COMMENT.s())) {
                     SubNode _parent = parent;
                     if (_parent == null) {
                         _parent = read.getParent(ms, node, false);
@@ -905,8 +890,8 @@ public class NodeEditService extends ServiceBase {
                                 apub.getAcctNodeByForeignUserName(s, userDoingAction, friendUserName, false, true);
                             }
                             /*
-                             * The only time we pass true to load the user into the system is when they're being added as a
-                             * friend.
+                             * The only time we pass true to load the user into the system is when they're being added
+                             * as a friend.
                              */
                             apub.userEncountered(friendUserName, true);
                             return null;
@@ -974,9 +959,9 @@ public class NodeEditService extends ServiceBase {
             parentForNewNodes = parentNode;
             firstOrdinal = node.getOrdinal();
         } else /*
-         * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
-         * the top (ordinal), regardless of whether this node already has any children or not.
-         */{
+                * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
+                * the top (ordinal), regardless of whether this node already has any children or not.
+                */ {
             parentForNewNodes = node;
             firstOrdinal = 0L;
         }
@@ -997,13 +982,12 @@ public class NodeEditService extends ServiceBase {
                 update.save(ms, node);
             } else {
                 SubNode newNode = create.createNode(
-                    ms,
-                    parentForNewNodes,
-                    null,
-                    firstOrdinal + idx,
-                    CreateNodeLocation.ORDINAL,
-                    false
-                );
+                        ms,
+                        parentForNewNodes,
+                        null,
+                        firstOrdinal + idx,
+                        CreateNodeLocation.ORDINAL,
+                        false);
                 newNode.setContent(part);
                 newNode.setAc(node.getAc());
                 newNode.touch();
@@ -1037,7 +1021,8 @@ public class NodeEditService extends ServiceBase {
             if (req.isRecursive()) {
                 StringBuilder sb = new StringBuilder();
 
-                for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false, false, null)) {
+                for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false, false,
+                        null)) {
                     nodeCount++;
                     sb.append(n.getPath());
                     sb.append("-");
@@ -1068,7 +1053,8 @@ public class NodeEditService extends ServiceBase {
                 }
             }
             byte[] encodedHash = digest.digest();
-            newHash = String.valueOf(nodeCount) + " nodes, " + String.valueOf(totalBytes) + " bytes: " + bytesToHex(encodedHash);
+            newHash = String.valueOf(nodeCount) + " nodes, " + String.valueOf(totalBytes) + " bytes: "
+                    + bytesToHex(encodedHash);
             prevHash = node.getStr(NodeProp.SUBGRAPH_HASH);
             node.set(NodeProp.SUBGRAPH_HASH, newHash);
         } catch (Exception e) {
@@ -1076,7 +1062,8 @@ public class NodeEditService extends ServiceBase {
             return res;
         }
         boolean hashChanged = prevHash != null && !prevHash.equals(newHash);
-        res.setMessage((hashChanged ? "Hash CHANGED: " : (prevHash == null ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
+        res.setMessage(
+                (hashChanged ? "Hash CHANGED: " : (prevHash == null ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
         return res;
     }
 
@@ -1144,7 +1131,8 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public void transferNode(MongoSession ms, String op, SubNode node, SubNode fromUserNode, SubNode toUserNode, IntVal ops) {
+    public void transferNode(MongoSession ms, String op, SubNode node, SubNode fromUserNode, SubNode toUserNode,
+            IntVal ops) {
         if (node.getContent() != null && node.getContent().startsWith(Constant.ENC_TAG.s())) {
             // for now we silently ignore encrypted nodes during transfers. This needs some more thought
             // (todo-1)
@@ -1171,14 +1159,13 @@ public class NodeEditService extends ServiceBase {
             // still see the node
             if (ownerAccnt != null) {
                 acl.addPrivilege(
-                    ms,
-                    null,
-                    node,
-                    null,
-                    ownerAccnt,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                    null
-                );
+                        ms,
+                        null,
+                        node,
+                        null,
+                        ownerAccnt,
+                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                        null);
             }
             node.adminUpdate = true;
             ops.inc();
@@ -1193,14 +1180,13 @@ public class NodeEditService extends ServiceBase {
                 SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getTransferFrom()));
                 if (frmUsrNode != null) {
                     acl.addPrivilege(
-                        ms,
-                        null,
-                        node,
-                        null,
-                        frmUsrNode,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                        null
-                    );
+                            ms,
+                            null,
+                            node,
+                            null,
+                            frmUsrNode,
+                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                            null);
                 }
                 node.setTransferFrom(null);
                 node.adminUpdate = true;
@@ -1219,14 +1205,13 @@ public class NodeEditService extends ServiceBase {
                 node.setTransferFrom(null);
                 if (frmUsrNode != null) {
                     acl.addPrivilege(
-                        ms,
-                        null,
-                        node,
-                        null,
-                        frmUsrNode,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                        null
-                    );
+                            ms,
+                            null,
+                            node,
+                            null,
+                            frmUsrNode,
+                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                            null);
                 }
                 node.adminUpdate = true;
                 ops.inc();
@@ -1244,14 +1229,13 @@ public class NodeEditService extends ServiceBase {
                 node.setTransferFrom(null);
                 if (frmUsrNode != null) {
                     acl.addPrivilege(
-                        ms,
-                        null,
-                        node,
-                        null,
-                        frmUsrNode,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                        null
-                    );
+                            ms,
+                            null,
+                            node,
+                            null,
+                            frmUsrNode,
+                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
+                            null);
                 }
                 node.adminUpdate = true;
                 ops.inc();
@@ -1287,7 +1271,8 @@ public class NodeEditService extends ServiceBase {
             for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
                 int slashCount = StringUtils.countMatches(n.getPath(), "/");
                 int level = baseLevel + (slashCount - baseSlashCount);
-                if (level > 6) level = 6;
+                if (level > 6)
+                    level = 6;
                 String c = translateHeadingsForLevel(ms, n.getContent(), level);
                 if (c != null && !c.equals(n.getContent())) {
                     n.setContent(c);
@@ -1302,7 +1287,8 @@ public class NodeEditService extends ServiceBase {
     }
 
     public String translateHeadingsForLevel(MongoSession ms, final String nodeContent, int level) {
-        if (nodeContent == null) return null;
+        if (nodeContent == null)
+            return null;
         StringTokenizer t = new StringTokenizer(nodeContent, "\n", true);
         StringBuilder ret = new StringBuilder();
 
@@ -1407,7 +1393,8 @@ public class NodeEditService extends ServiceBase {
 
     private boolean replaceText(MongoSession ms, SubNode node, String search, String replace) {
         String content = node.getContent();
-        if (content == null) return false;
+        if (content == null)
+            return false;
         if (content.contains(search)) {
             node.setContent(content.replace(search, replace));
             node.touch();

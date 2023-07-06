@@ -68,7 +68,8 @@ public class SchemaOrgService extends ServiceBase {
 
     private void parseSchema() {
         List graph = (List) schema.get("@graph"); // will be ArrayList<Object>
-        if (graph == null) return;
+        if (graph == null)
+            return;
         // first scan graph to build classes
         log.debug("Scanning Schema.org Classes.");
 

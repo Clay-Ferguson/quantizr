@@ -58,13 +58,8 @@ public class ActPubOutbox extends ServiceBase {
      *
      * Returns true only if everything successful
      */
-    public boolean loadForeignOutbox(
-        MongoSession ms,
-        String userDoingAction,
-        APOActor actor,
-        SubNode userNode,
-        String apUserName
-    ) {
+    public boolean loadForeignOutbox(MongoSession ms, String userDoingAction, APOActor actor, SubNode userNode,
+            String apUserName) {
         Val<Boolean> success = new Val<>(true);
         try {
             // try to read outboxUrl first and if we can't we just return false
@@ -77,16 +72,8 @@ public class ActPubOutbox extends ServiceBase {
             if (userNode == null) {
                 userNode = read.getUserNodeByUserName(ms, apUserName);
             }
-            SubNode outboxNode = read.getUserNodeByType(
-                ms,
-                apUserName,
-                userNode,
-                "### Posts",
-                NodeType.POSTS.s(),
-                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                NodeName.POSTS,
-                true
-            );
+            SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.POSTS.s(),
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS, true);
             if (outboxNode == null) {
                 log.debug("no posts node for user: " + apUserName);
                 return false;
@@ -94,13 +81,8 @@ public class ActPubOutbox extends ServiceBase {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            Iterable<SubNode> outboxItems = read.getChildren(
-                ms,
-                outboxNode,
-                Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME),
-                MAX_OUTBOX_READ,
-                0
-            );
+            Iterable<SubNode> outboxItems = read.getChildren(ms, outboxNode,
+                    Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), MAX_OUTBOX_READ, 0);
             /*
              * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
              * foreign server
@@ -115,71 +97,56 @@ public class ActPubOutbox extends ServiceBase {
             }
             Val<Integer> count = new Val<>(0);
             final SubNode _userNode = userNode;
-            apUtil.iterateCollection(
-                ms,
-                userDoingAction,
-                outbox,
-                MAX_OUTBOX_READ,
-                obj -> {
-                    try {
-                        String apId = apStr(obj, APObj.id);
-                        // If this is a new post our server hasn't yet injested.
-                        if (!apIdSet.contains(apId)) {
-                            APObj object = apAPObj(obj, APObj.object);
-                            if (object != null) {
-                                String type = apStr(object, APObj.type);
-                                // if (object instanceof String) {
-                                // // todo-1: handle boosts.
-                                // //
-                                // // + XString.prettyPrint(obj));
-                                // // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
-                                // // {
-                                // // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                                // // AP.type : "Announce",
-                                // // AP.actor : "https://dobbs.town/users/onan",
-                                // // AP.published : "2021-01-25T01:20:30Z",
-                                // // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
-                                // // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers"
-                                // ],
-                                // // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
-                                // // }
-                                // }
-                                // // todo-1: need to handle "Boosts" and other types here too.
-                                // else
-                                if (APType.Note.equals(type)) {
-                                    try {
-                                        ActPubService.newPostsInCycle++;
-                                        apub.saveInboundForeignObj(
-                                            ms,
-                                            userDoingAction,
-                                            _userNode,
-                                            outboxNode,
-                                            object,
-                                            APType.Create,
-                                            null,
-                                            null,
-                                            true,
-                                            null
-                                        );
-                                        count.setVal(count.getVal() + 1);
-                                    } catch (DuplicateKeyException dke) {
-                                        log.debug("Record already existed: " + dke.getMessage());
-                                    } catch (Exception e) {
-                                        // log and ignore.
-                                        log.error("error in saveNode()", e);
-                                    }
-                                } else {
-                                    // this captures videos? and other things (todo-1: add more support)
+            apUtil.iterateCollection(ms, userDoingAction, outbox, MAX_OUTBOX_READ, obj -> {
+                try {
+                    String apId = apStr(obj, APObj.id);
+                    // If this is a new post our server hasn't yet injested.
+                    if (!apIdSet.contains(apId)) {
+                        APObj object = apAPObj(obj, APObj.object);
+                        if (object != null) {
+                            String type = apStr(object, APObj.type);
+                            // if (object instanceof String) {
+                            // // todo-1: handle boosts.
+                            // //
+                            // // + XString.prettyPrint(obj));
+                            // // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
+                            // // {
+                            // // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
+                            // // AP.type : "Announce",
+                            // // AP.actor : "https://dobbs.town/users/onan",
+                            // // AP.published : "2021-01-25T01:20:30Z",
+                            // // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
+                            // // "cc" : [ "https://mastodon.sdf.org/users/stunder",
+                            // "https://dobbs.town/users/onan/followers"
+                            // ],
+                            // // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
+                            // // }
+                            // }
+                            // // todo-1: need to handle "Boosts" and other types here too.
+                            // else
+                            if (APType.Note.equals(type)) {
+                                try {
+                                    ActPubService.newPostsInCycle++;
+                                    apub.saveInboundForeignObj(ms, userDoingAction, _userNode, outboxNode, object,
+                                            APType.Create, null, null, true, null);
+                                    count.setVal(count.getVal() + 1);
+                                } catch (DuplicateKeyException dke) {
+                                    log.debug("Record already existed: " + dke.getMessage());
+                                } catch (Exception e) {
+                                    // log and ignore.
+                                    log.error("error in saveNode()", e);
                                 }
+                            } else {
+                                // this captures videos? and other things (todo-1: add more support)
                             }
                         }
-                    } catch (Exception e) {
-                        log.error("Failed processing collection item.", e);
-                        success.setVal(false);
                     }
-                    return (count.getVal() < ActPubService.MAX_MESSAGES);
+                } catch (Exception e) {
+                    log.error("Failed processing collection item.", e);
+                    success.setVal(false);
                 }
-            );
+                return (count.getVal() < ActPubService.MAX_MESSAGES);
+            });
         } catch (Exception e) {
             log.error("Error reading outbox of: " + apUserName, e);
             success.setVal(false);
@@ -188,7 +155,8 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APObj getOutbox(MongoSession ms, String userDoingAction, String url) {
-        if (url == null) return null;
+        if (url == null)
+            return null;
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
@@ -199,12 +167,8 @@ public class ActPubOutbox extends ServiceBase {
     public APOOrderedCollection generateOutbox(String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
-        APOOrderedCollection ret = new APOOrderedCollection(
-            url,
-            totalItems,
-            url + "?page=true", //
-            url + "?min_id=0&page=true"
-        );
+        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
+                url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -232,13 +196,10 @@ public class ActPubOutbox extends ServiceBase {
     public APOOrderedCollectionPage generateOutboxPage(HttpServletRequest httpReq, String userName, String minId) {
         APList items = getOutboxItems(httpReq, userName, minId);
         // this is a self-reference url (id)
-        String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(
-            url,
-            items,
-            prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName,
-            items.size()
-        );
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
+                + "&page=true";
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, items,
+                prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName, items.size());
         return ret;
     }
 
@@ -281,23 +242,23 @@ public class ActPubOutbox extends ServiceBase {
                          * final step is just validate the signature.
                          *
                          * todo-1: in all cases where we grab a public key off our own DB, and use it, we need to have a
-                         * fallback logic where we check by reading the actual actor object again off the original host and
-                         * if the publickey has changed for whatever reason we need to update it in our own db.
+                         * fallback logic where we check by reading the actual actor object again off the original host
+                         * and if the publickey has changed for whatever reason we need to update it in our own db.
                          */
-                        PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
+                        PublicKey pubKey =
+                                apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
                         if (pubKey != null) {
                             try {
                                 log.debug("Checking with pubKey.");
                                 apCrypto.verifySignature(httpReq, pubKey, null);
                                 log.debug("Sig ok.");
                             } catch (
-                                /*
-                                 * this will remain PUBLIC until we set it here. by commenting out this settor of sharedTo, we can
-                                 * leave this 'experimental' block harmlessly turned on just so we collect the logging to tell us if
-                                 * my assumptions are correct. sharedTo = actorAccnt.getIdStr();
-                                 */
-                                Exception e
-                            ) {
+                            /*
+                             * this will remain PUBLIC until we set it here. by commenting out this settor of sharedTo,
+                             * we can leave this 'experimental' block harmlessly turned on just so we collect the
+                             * logging to tell us if my assumptions are correct. sharedTo = actorAccnt.getIdStr();
+                             */
+                            Exception e) {
                                 log.error("Sig failed: getOutboxItems user=" + userName);
                                 return null;
                             }
@@ -314,67 +275,60 @@ public class ActPubOutbox extends ServiceBase {
                 return null;
             }
             final String _sharedTo = sharedTo;
-            retItems =
-                (APList) arun.run(as -> {
-                    APList items = new APList();
-                    int MAX_PER_PAGE = 25;
-                    boolean collecting = false;
-                    // todo-1: is this just unfinished code or a bug? Either way this paging is broken.
-                    if (minId == null) {
-                        collecting = true;
-                    }
-                    List<String> sharedToList = new LinkedList<String>();
-                    sharedToList.add(_sharedTo);
+            retItems = (APList) arun.run(as -> {
+                APList items = new APList();
+                int MAX_PER_PAGE = 25;
+                boolean collecting = false;
+                // todo-1: is this just unfinished code or a bug? Either way this paging is broken.
+                if (minId == null) {
+                    collecting = true;
+                }
+                List<String> sharedToList = new LinkedList<String>();
+                sharedToList.add(_sharedTo);
 
-                    for (SubNode child : auth.searchSubGraphByAclUser(
-                        as,
-                        null,
-                        sharedToList,
-                        Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME),
-                        MAX_PER_PAGE,
-                        userNode.getOwner()
-                    )) {
-                        // as a general security rule never send back any admin nodes.
-                        if (child.getOwner().equals(as.getUserNodeId())) {
-                            continue;
-                        }
-                        if (items.size() >= MAX_PER_PAGE) {
-                            // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
-                            // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
-                            break;
-                        }
-                        if (collecting) {
-                            String boostTarget = child.getStr(NodeProp.BOOST);
-                            APObj ret = null;
-                            /*
-                             * This branch of code is not yet tested (not sure how to get foreign server to run this), but
-                             * similar code is working. There is one other similar block of code elsewhere in the app where
-                             * boosts are published.
-                             */
-                            if (!StringUtils.isEmpty(boostTarget)) {
-                                String published = DateUtil.isoStringFromDate(child.getModifyTime());
-                                String actor = apUtil.makeActorUrlForUserName(userName);
-                                String id = nodeIdBase + child.getIdStr();
-                                // To create an Announce that other instances can consume we go to the boosted Node ID,
-                                // and get it's ACT_PUB_OBJ_URL property and use that for the object being boosted
-                                SubNode boostTargetNode = read.getNode(as, boostTarget);
-                                if (boostTargetNode != null) {
-                                    String boostedId = boostTargetNode.getStr(NodeProp.OBJECT_ID);
-                                    if (boostedId == null) {
-                                        boostedId = host + "?id=" + boostTarget;
-                                    }
-                                    ret = new APOAnnounce(actor, id, published, boostedId);
+                for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
+                        Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
+                    // as a general security rule never send back any admin nodes.
+                    if (child.getOwner().equals(as.getUserNodeId())) {
+                        continue;
+                    }
+                    if (items.size() >= MAX_PER_PAGE) {
+                        // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
+                        // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
+                        break;
+                    }
+                    if (collecting) {
+                        String boostTarget = child.getStr(NodeProp.BOOST);
+                        APObj ret = null;
+                        /*
+                         * This branch of code is not yet tested (not sure how to get foreign server to run this), but
+                         * similar code is working. There is one other similar block of code elsewhere in the app where
+                         * boosts are published.
+                         */
+                        if (!StringUtils.isEmpty(boostTarget)) {
+                            String published = DateUtil.isoStringFromDate(child.getModifyTime());
+                            String actor = apUtil.makeActorUrlForUserName(userName);
+                            String id = nodeIdBase + child.getIdStr();
+                            // To create an Announce that other instances can consume we go to the boosted Node ID,
+                            // and get it's ACT_PUB_OBJ_URL property and use that for the object being boosted
+                            SubNode boostTargetNode = read.getNode(as, boostTarget);
+                            if (boostTargetNode != null) {
+                                String boostedId = boostTargetNode.getStr(NodeProp.OBJECT_ID);
+                                if (boostedId == null) {
+                                    boostedId = host + "?id=" + boostTarget;
                                 }
-                            } else {
-                                ret = apFactory.makeAPOCreateNote(as, userName, nodeIdBase, child);
+                                ret = new APOAnnounce(actor, id, published, boostedId);
                             }
-                            if (ret != null) {
-                                items.add(ret);
-                            }
+                        } else {
+                            ret = apFactory.makeAPOCreateNote(as, userName, nodeIdBase, child);
+                        }
+                        if (ret != null) {
+                            items.add(ret);
                         }
                     }
-                    return items;
-                });
+                }
+                return items;
+            });
         } catch (Exception e) {
             log.error("failed generating outbox page: ", e);
             throw new RuntimeException(e);
@@ -384,7 +338,8 @@ public class ActPubOutbox extends ServiceBase {
 
     /* Gets the object identified by nodeId as an ActPub object */
     public APObj getResource(HttpServletRequest httpReq, String nodeId) {
-        if (nodeId == null) return null;
+        if (nodeId == null)
+            return null;
         // this is breaking whenever a CURL command is used other scenarios
         // where no signature is in the header.
         boolean experimental = false;
@@ -427,7 +382,8 @@ public class ActPubOutbox extends ServiceBase {
                             auth.auth(userSess, node, PrivilegeType.READ);
                             log.debug("auth granted.");
                             // final step is just validate the signature.
-                            PublicKey pubKey = apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
+                            PublicKey pubKey =
+                                    apCrypto.getPublicKeyFromEncoding(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM));
                             if (pubKey != null) {
                                 try {
                                     log.debug("Checking with pubKey.");

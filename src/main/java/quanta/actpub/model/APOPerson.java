@@ -13,12 +13,9 @@ public class APOPerson extends APOActor {
     }
 
     public APOPerson() {
-        put(
-            APObj.context,
-            new APList() //
+        put(APObj.context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
-                .val(APConst.CONTEXT_SECURITY)
-        );
+                .val(APConst.CONTEXT_SECURITY));
         put(APObj.type, APType.Person); //
     }
 

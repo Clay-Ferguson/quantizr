@@ -25,9 +25,9 @@ public class ExportTarService extends ExportArchiveBase {
         log.debug("Opening Export File: " + fileName);
         try {
             out =
-                gzip
-                    ? new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(fileName)))
-                    : new TarArchiveOutputStream(new FileOutputStream(fileName));
+                    gzip
+                            ? new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(fileName)))
+                            : new TarArchiveOutputStream(new FileOutputStream(fileName));
             // TAR has an 8 gig file limit by default, this gets around that
             out.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
             // TAR originally didn't support long file names, so enable the support for it

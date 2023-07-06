@@ -39,25 +39,24 @@ public class AsyncExec extends ServiceBase {
      */
     private void run(ThreadLocalsContext tlc, Runnable runnable) {
         executor.execute(
-            new Runnable() {
-                public void run() {
-                    try {
-                        execCounter++;
-                        if (execCounter > maxExecCounter) {
-                            maxExecCounter = execCounter;
+                new Runnable() {
+                    public void run() {
+                        try {
+                            execCounter++;
+                            if (execCounter > maxExecCounter) {
+                                maxExecCounter = execCounter;
+                            }
+                            if (tlc != null) {
+                                tlc.setValsIntoThread();
+                            }
+                            runnable.run();
+                        } catch (Exception e) {
+                            ExUtil.error(log, "exception in AsyncExec", e);
+                        } finally {
+                            ThreadLocals.removeAll();
+                            execCounter--;
                         }
-                        if (tlc != null) {
-                            tlc.setValsIntoThread();
-                        }
-                        runnable.run();
-                    } catch (Exception e) {
-                        ExUtil.error(log, "exception in AsyncExec", e);
-                    } finally {
-                        ThreadLocals.removeAll();
-                        execCounter--;
                     }
-                }
-            }
-        );
+                });
     }
 }

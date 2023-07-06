@@ -30,7 +30,8 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public Map<String, Object> connect(String peer) {
-        if (!prop.ipfsEnabled()) return null;
+        if (!prop.ipfsEnabled())
+            return null;
         Map<String, Object> ret = null;
         try {
             log.debug("Swarm connect: " + peer);
@@ -38,7 +39,8 @@ public class IPFSSwarm extends ServiceBase {
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
             log.debug("IPFS swarm connect: " + XString.prettyPrint(ret));
         } catch (Exception e) {
@@ -56,7 +58,8 @@ public class IPFSSwarm extends ServiceBase {
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
             log.debug("IPFS swarm peers: " + XString.prettyPrint(ret));
         } catch (Exception e) {
@@ -66,7 +69,8 @@ public class IPFSSwarm extends ServiceBase {
     }
 
     public void connect() {
-        if (!prop.ipfsEnabled()) return;
+        if (!prop.ipfsEnabled())
+            return;
         arun.run(as -> {
             List<String> adrsList = getConnectAddresses(as);
             if (adrsList != null) {

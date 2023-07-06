@@ -24,7 +24,7 @@ public enum NodeType {
     FRIEND("sn:friend"), //
     POSTS("sn:posts"), //
 
-    NONE("u"), //same as 'markdown' really (untyped, default to markdown)
+    NONE("u"), // same as 'markdown' really (untyped, default to markdown)
     NOSTR_ENC_DM("sn:ned"), //
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //

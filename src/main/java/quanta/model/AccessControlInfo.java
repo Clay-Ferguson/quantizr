@@ -24,15 +24,14 @@ public class AccessControlInfo {
     private String publicKey;
 
     public AccessControlInfo(
-        String displayName,
-        String principalName,
-        String principalNodeId,
-        String publicKey,
-        String nostrNpub,
-        String nostrRelays,
-        String avatarVer,
-        String foreignAvatarUrl
-    ) {
+            String displayName,
+            String principalName,
+            String principalNodeId,
+            String publicKey,
+            String nostrNpub,
+            String nostrRelays,
+            String avatarVer,
+            String foreignAvatarUrl) {
         this.displayName = displayName;
         this.principalName = principalName;
         this.principalNodeId = principalNodeId;

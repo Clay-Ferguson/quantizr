@@ -122,12 +122,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     public static void shutdown() {
         if (executor != null) {
-            log.debug(
-                "Shutting down global executor: executor.hashCode=" +
-                executor.hashCode() +
-                " class=" +
-                executor.getClass().getName()
-            );
+            log.debug("Shutting down global executor: executor.hashCode=" + executor.hashCode() + " class="
+                    + executor.getClass().getName());
             executor.shutdown();
         }
     }
@@ -179,18 +175,17 @@ public class AppConfiguration implements WebMvcConfigurer {
         TomcatServletWebServerFactory factory = null;
         if ("https".equalsIgnoreCase(appProp.getHttpProtocol())) {
             // This function is part of what's required to enable SSL on port 80.
-            factory =
-                new TomcatServletWebServerFactory() {
-                    @Override
-                    protected void postProcessContext(Context context) {
-                        SecurityConstraint securityConstraint = new SecurityConstraint();
-                        securityConstraint.setUserConstraint("CONFIDENTIAL");
-                        SecurityCollection collection = new SecurityCollection();
-                        collection.addPattern("/*");
-                        securityConstraint.addCollection(collection);
-                        context.addConstraint(securityConstraint);
-                    }
-                };
+            factory = new TomcatServletWebServerFactory() {
+                @Override
+                protected void postProcessContext(Context context) {
+                    SecurityConstraint securityConstraint = new SecurityConstraint();
+                    securityConstraint.setUserConstraint("CONFIDENTIAL");
+                    SecurityCollection collection = new SecurityCollection();
+                    collection.addPattern("/*");
+                    securityConstraint.addCollection(collection);
+                    context.addConstraint(securityConstraint);
+                }
+            };
             factory.addAdditionalTomcatConnectors(redirectConnector());
         } else {
             factory = new TomcatServletWebServerFactory();

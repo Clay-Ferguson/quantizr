@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
  * trying to get involved (no PersistenceConstructor issues)
  */
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(
-    {
+@JsonPropertyOrder({
         SubNode.PATH,
         SubNode.CONTENT,
         SubNode.NAME,
@@ -27,8 +26,7 @@ import org.slf4j.LoggerFactory;
         SubNode.MODIFY_TIME,
         SubNode.AC,
         SubNode.PROPS,
-    }
-)
+})
 public class SubNodePojo {
 
     private static Logger log = LoggerFactory.getLogger(SubNodePojo.class);

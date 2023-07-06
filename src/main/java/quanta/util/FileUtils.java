@@ -65,9 +65,8 @@ public class FileUtils extends ServiceBase {
             BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
             return attr.creationTime().toMillis();
         } catch (
-            // System.out.println("lastAccessTime: " + attr.lastAccessTime());
-            Exception e
-        ) {
+        // System.out.println("lastAccessTime: " + attr.lastAccessTime());
+        Exception e) {
             return -1;
         }
     }
@@ -90,7 +89,8 @@ public class FileUtils extends ServiceBase {
      * output: file.txt
      */
     public String getShortFileName(String fileName) {
-        if (fileName == null) return null;
+        if (fileName == null)
+            return null;
         String shortName = null;
         int idx = fileName.lastIndexOf(File.separatorChar);
         if (idx != -1) {
@@ -107,7 +107,8 @@ public class FileUtils extends ServiceBase {
      * If no extension exists empty string is returned
      */
     public String getFileNameExtension(String fileName) {
-        if (fileName == null) return null;
+        if (fileName == null)
+            return null;
         String ext = null;
         int idx = fileName.lastIndexOf(".");
         if (idx != -1) {
@@ -119,7 +120,8 @@ public class FileUtils extends ServiceBase {
     }
 
     public String stripExtension(String fileName) {
-        if (fileName == null) return null;
+        if (fileName == null)
+            return null;
         String ret = null;
         int idx = fileName.lastIndexOf(".");
         if (idx != -1) {
@@ -165,16 +167,15 @@ public class FileUtils extends ServiceBase {
         }
         /* First read folders and sort them */
         File[] folders = directory.listFiles(
-            new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
-                        return false;
+                new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
+                            return false;
+                        }
+                        return file.isDirectory() && !file.getName().startsWith(".");
                     }
-                    return file.isDirectory() && !file.getName().startsWith(".");
-                }
-            }
-        );
+                });
         if (folders != null) {
             Arrays.sort(folders, NameFileComparator.NAME_COMPARATOR);
         }
@@ -188,16 +189,15 @@ public class FileUtils extends ServiceBase {
         }
         /* Then read files and sort them */
         File[] files = directory.listFiles(
-            new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
-                        return false;
+                new FileFilter() {
+                    @Override
+                    public boolean accept(File file) {
+                        if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
+                            return false;
+                        }
+                        return file.isFile() && (file.getName().equals(".meta-fs") || !file.getName().startsWith("."));
                     }
-                    return file.isFile() && (file.getName().equals(".meta-fs") || !file.getName().startsWith("."));
-                }
-            }
-        );
+                });
         if (files != null) {
             Arrays.sort(files, NameFileComparator.NAME_COMPARATOR);
         }
@@ -205,30 +205,35 @@ public class FileUtils extends ServiceBase {
     }
 
     public boolean fileOrFolderExists(String fileName) {
-        if (fileName == null || fileName.trim().length() == 0) return false;
+        if (fileName == null || fileName.trim().length() == 0)
+            return false;
         return new File(fileName).exists();
     }
 
     public static boolean fileExists(String fileName) {
-        if (fileName == null || fileName.equals("")) return false;
+        if (fileName == null || fileName.equals(""))
+            return false;
         return new File(fileName).isFile();
     }
 
     public static boolean dirExists(String fileName) {
-        if (fileName == null || fileName.equals("")) return false;
+        if (fileName == null || fileName.equals(""))
+            return false;
         return new File(fileName).isDirectory();
     }
 
     public static boolean deleteFile(String fileName) {
         File f = new File(fileName);
         boolean exists = f.exists();
-        if (!exists) return true;
+        if (!exists)
+            return true;
         return f.delete();
     }
 
     public static boolean createDirectory(String dir) {
         File file = new File(dir);
-        if (file.isDirectory()) return true;
+        if (file.isDirectory())
+            return true;
         boolean success = file.mkdirs();
         log.debug("Created folder: " + dir + ". success=" + success);
         return success;
@@ -263,7 +268,8 @@ public class FileUtils extends ServiceBase {
     }
 
     public static String ensureValidFileNameChars(String text) {
-        if (text == null) return null;
+        if (text == null)
+            return null;
         int length = text.length();
         StringBuilder ret = new StringBuilder();
         char c;

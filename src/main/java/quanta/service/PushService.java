@@ -28,7 +28,8 @@ public class PushService extends ServiceBase {
     /* Notify all users being shared to on this node, or everyone if the node is public. */
     public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<String> sessionsPushed, SubNode node) {
         // if unpublished or not a comment don't push to browsers.
-        if (node.getBool(NodeProp.UNPUBLISHED) || !node.getType().equals(NodeType.COMMENT.s())) return;
+        if (node.getBool(NodeProp.UNPUBLISHED) || !node.getType().equals(NodeType.COMMENT.s()))
+            return;
 
         exec.run(() -> {
             boolean isPublic = AclService.isPublic(node);
@@ -46,15 +47,17 @@ public class PushService extends ServiceBase {
             }
 
             // if not public or shared to anyone we're done.
-            if (!isPublic && usersSharedToSet.size() == 0) return;
+            if (!isPublic && usersSharedToSet.size() == 0)
+                return;
 
             maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, ThreadLocals.getSC());
 
             List<SessionContext> scList = user.redisQuery("*");
             if (scList.size() > 0) {
                 for (SessionContext sc : scList) {
-                    //skip our own session because we already considered it first, above.
-                    if (ThreadLocals.getSC() != null && sc.getUserToken().equals(ThreadLocals.getSC().getUserToken())) continue;
+                    // skip our own session because we already considered it first, above.
+                    if (ThreadLocals.getSC() != null && sc.getUserToken().equals(ThreadLocals.getSC().getUserToken()))
+                        continue;
 
                     maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, sc);
                 }
@@ -63,20 +66,20 @@ public class PushService extends ServiceBase {
     }
 
     private void maybePushToBrowser(
-        MongoSession ms,
-        HashSet<String> sessionsPushed,
-        SubNode node,
-        HashSet<String> usersSharedToSet,
-        boolean isPublic,
-        SessionContext sc
-    ) {
+            MongoSession ms,
+            HashSet<String> sessionsPushed,
+            SubNode node,
+            HashSet<String> usersSharedToSet,
+            boolean isPublic,
+            SessionContext sc) {
         // if we know we already just pushed to this session, we can skip it in here.
         if (sessionsPushed != null && sessionsPushed.contains(sc.getUserToken())) {
             return;
         }
 
         /* Anonymous sessions won't have userName and can be ignored */
-        if (sc == null || sc.getUserName() == null) return;
+        if (sc == null || sc.getUserName() == null)
+            return;
 
         /*
          * We send a push to all users who are monitoring this node or any ancestor of it. This will be the
@@ -87,14 +90,16 @@ public class PushService extends ServiceBase {
          * node and therefore will be sent to their respecitve browsers
          */
         if (
-            // We don't include isPublic here, because we want don't want every message that comes into the
-            // server to show up right away on the feed. We expect user to 'refresh' for that.
-            // isPublic || // node is public
+        // We don't include isPublic here, because we want don't want every message that comes into the
+        // server to show up right away on the feed. We expect user to 'refresh' for that.
+        // isPublic || // node is public
 
-            node.getOwner().toHexString().equals(sc.getRootId()) || // node belongs to me
-            (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) || // I'm watching path it's on
-            (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) || // my timeline includes it
-            (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // it's shared to me
+        node.getOwner().toHexString().equals(sc.getRootId()) || // node belongs to me
+                (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) || // I'm watching
+                                                                                                     // path it's on
+                (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) || // my timeline
+                                                                                                     // includes it
+                (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // it's shared to me
         ) {
             pushToBrowser(ms, sc, sessionsPushed, node);
         }
@@ -107,20 +112,19 @@ public class PushService extends ServiceBase {
 
         /* build our push message payload */
         NodeInfo info = convert.convertToNodeInfo(
-            false,
-            sc,
-            ms,
-            node,
-            false,
-            Convert.LOGICAL_ORDINAL_IGNORE,
-            false,
-            false,
-            false,
-            true,
-            true,
-            null,
-            false
-        );
+                false,
+                sc,
+                ms,
+                node,
+                false,
+                Convert.LOGICAL_ORDINAL_IGNORE,
+                false,
+                false,
+                false,
+                true,
+                true,
+                null,
+                false);
 
         if (info != null) {
             FeedPushInfo pushInfo = new FeedPushInfo(info);
@@ -135,7 +139,8 @@ public class PushService extends ServiceBase {
 
     public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
         // If user is currently logged in we have a session here.
-        if (sc == null) return;
+        if (sc == null)
+            return;
         exec.run(() -> {
             SseEmitter pushEmitter = user.getPushEmitter(sc.getUserToken());
             if (pushEmitter == null) {
@@ -149,22 +154,21 @@ public class PushService extends ServiceBase {
             synchronized (pushEmitter) {
                 try {
                     SseEventBuilder event = SseEmitter
-                        .event()
-                        .data(info)
-                        .id(String.valueOf(info.hashCode()))
-                        .name(info.getType());
+                            .event()
+                            .data(info)
+                            .id(String.valueOf(info.hashCode()))
+                            .name(info.getType());
                     pushEmitter.send(event);
                 } catch (
-                    /*
-                     * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-                     * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-                     * and let the 'name' in the builder route different objects to different event listeners on the
-                     * client. Not really sure if either approach has major advantages over the other.
-                     *
-                     * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-                     */
-                    Exception ex
-                ) {
+                /*
+                 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
+                 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
+                 * and let the 'name' in the builder route different objects to different event listeners on the
+                 * client. Not really sure if either approach has major advantages over the other.
+                 *
+                 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
+                 */
+                Exception ex) {
                     log.error("FAILED Pushing to Session User: " + sc.getUserName());
                     pushEmitter.completeWithError(ex);
                 }

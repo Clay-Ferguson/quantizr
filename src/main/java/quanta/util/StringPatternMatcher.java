@@ -47,7 +47,8 @@ public class StringPatternMatcher {
     }
 
     public void addListOfPatterns(String input) {
-        if (input == null || input.length() == 0) return;
+        if (input == null || input.length() == 0)
+            return;
 
         StringTokenizer t = new StringTokenizer(input, ",", true);
         String token;

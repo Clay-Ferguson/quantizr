@@ -49,7 +49,8 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             log.debug("file1: " + XString.prettyPrint(file1));
             MerkleLink file2 = ipfs.addFileFromString(as, "Test file two", "filetwo.txt", "text/plain", false);
             log.debug("file2: " + XString.prettyPrint(file2));
-            MerkleNode newRootDir = ipfsObj.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
+            MerkleNode newRootDir =
+                    ipfsObj.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
             log.debug("newRoot (first file added): " + XString.prettyPrint(newRootDir));
             return null;
         });
@@ -104,7 +105,8 @@ public class IPFSTest extends ServiceBase implements TestIntf {
             log.debug("Querying for MerkleNode...");
             MerkleNode mnode = ipfsObj.getMerkleNode(hash, "json");
             log.debug("MerkleNode: " + XString.prettyPrint(mnode));
-        } finally {}
+        } finally {
+        }
         // String merkContent = ipfs.objectCat(hash);
     }
 }

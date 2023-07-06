@@ -43,7 +43,8 @@ public class Util {
             if (res instanceof HttpServletResponse) {
                 try {
                     ((HttpServletResponse) res).sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             } else { // silently ignore this exception.
                 throw new RuntimeException("Server not yet started.");
             }
@@ -81,9 +82,12 @@ public class Util {
     }
 
     public static boolean equalObjs(Object o1, Object o2) {
-        if (o1 == null && o2 == null) return true;
-        if (o1 != null && o2 == null) return false;
-        if (o2 != null && o1 == null) return false;
+        if (o1 == null && o2 == null)
+            return true;
+        if (o1 != null && o2 == null)
+            return false;
+        if (o2 != null && o1 == null)
+            return false;
         return o1.equals(o2);
     }
 
@@ -155,24 +159,23 @@ public class Util {
         try {
             int timeout = 20;
             RequestConfig config = //
-                //
-                //
-                RequestConfig
-                    .custom()
-                    .setConnectTimeout(timeout * 1000)
-                    .setConnectionRequestTimeout(timeout * 1000)
-                    .setSocketTimeout(timeout * 1000)
-                    .build();
+                    //
+                    //
+                    RequestConfig
+                            .custom()
+                            .setConnectTimeout(timeout * 1000)
+                            .setConnectionRequestTimeout(timeout * 1000)
+                            .setSocketTimeout(timeout * 1000)
+                            .build();
             HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
             HttpGet request = new HttpGet(url);
             request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
             HttpResponse response = client.execute(request);
             log.debug(
-                "Response Code: " +
-                response.getStatusLine().getStatusCode() +
-                " reason=" +
-                response.getStatusLine().getReasonPhrase()
-            );
+                    "Response Code: " +
+                            response.getStatusLine().getStatusCode() +
+                            " reason=" +
+                            response.getStatusLine().getReasonPhrase());
             scanner = new Scanner(response.getEntity().getContent());
             String responseBody = scanner.useDelimiter("\\A").next();
             title = responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>"));

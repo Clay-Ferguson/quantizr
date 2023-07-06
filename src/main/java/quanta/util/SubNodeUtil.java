@@ -42,7 +42,8 @@ public class SubNodeUtil extends ServiceBase {
 
         for (int i = 0; i < sz; i++) {
             char c = name.charAt(i);
-            if (c == '-' || c == '_' || c == '.') continue;
+            if (c == '-' || c == '_' || c == '.')
+                continue;
             if (!Character.isLetterOrDigit(c)) {
                 return false;
             }
@@ -80,7 +81,8 @@ public class SubNodeUtil extends ServiceBase {
     }
 
     public HashMap<String, AccessControl> cloneAcl(SubNode node) {
-        if (node.getAc() == null) return null;
+        if (node.getAc() == null)
+            return null;
         return new HashMap<String, AccessControl>(node.getAc());
     }
 
@@ -98,12 +100,11 @@ public class SubNodeUtil extends ServiceBase {
             return false;
         }
         if ( //
-            //
-            propName.equals(NodeProp.OBJECT_ID.s()) ||
-            propName.equals(NodeProp.BIN.s()) ||
-            propName.equals(NodeProp.BIN_TOTAL.s()) || //
-            propName.equals(NodeProp.BIN_QUOTA.s())
-        ) {
+             //
+        propName.equals(NodeProp.OBJECT_ID.s()) ||
+                propName.equals(NodeProp.BIN.s()) ||
+                propName.equals(NodeProp.BIN_TOTAL.s()) || //
+                propName.equals(NodeProp.BIN_QUOTA.s())) {
             return false;
         }
         return true;
@@ -136,16 +137,15 @@ public class SubNodeUtil extends ServiceBase {
      * provides), by creating said node if not already existing or leaving it as is if it does exist.
      */
     public SubNode ensureNodeExists(
-        MongoSession ms,
-        String parentPath,
-        String pathName,
-        String nodeName,
-        String defaultContent,
-        String primaryTypeName,
-        boolean saveImmediate,
-        HashMap<String, Object> props,
-        Val<Boolean> created
-    ) {
+            MongoSession ms,
+            String parentPath,
+            String pathName,
+            String nodeName,
+            String defaultContent,
+            String primaryTypeName,
+            boolean saveImmediate,
+            HashMap<String, Object> props,
+            Val<Boolean> created) {
         if (nodeName != null) {
             SubNode nodeByName = read.getNodeByName(ms, nodeName);
             if (nodeByName != null) {
@@ -190,18 +190,17 @@ public class SubNodeUtil extends ServiceBase {
             } else {
                 /* Note if parent PARAMETER here is null we are adding a root node */
                 parent =
-                    create.createNode(
-                        ms,
-                        parent,
-                        nameToken,
-                        primaryTypeName,
-                        0L,
-                        CreateNodeLocation.LAST,
-                        null,
-                        null,
-                        true,
-                        true
-                    );
+                        create.createNode(
+                                ms,
+                                parent,
+                                nameToken,
+                                primaryTypeName,
+                                0L,
+                                CreateNodeLocation.LAST,
+                                null,
+                                null,
+                                true,
+                                true);
                 if (parent == null) {
                     throw ExUtil.wrapEx("unable to create " + nameToken);
                 }
@@ -280,7 +279,8 @@ public class SubNodeUtil extends ServiceBase {
     }
 
     public NodeMetaInfo getNodeMetaInfo(SubNode node) {
-        if (node == null) return null;
+        if (node == null)
+            return null;
         NodeMetaInfo ret = new NodeMetaInfo();
         String description = node.getContent();
         if (description == null) {
@@ -327,7 +327,8 @@ public class SubNodeUtil extends ServiceBase {
 
     public String getFirstAttachmentUrl(SubNode node) {
         Attachment att = node.getFirstAttachment();
-        if (att == null) return null;
+        if (att == null)
+            return null;
         String ipfsLink = att.getIpfsLink();
         String bin = ipfsLink != null ? ipfsLink : att.getBin();
         if (bin != null) {

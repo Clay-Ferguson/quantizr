@@ -97,7 +97,8 @@ public class ExportJsonService extends ServiceBase {
             } finally {
                 StreamUtil.close(os);
             }
-            return "NodeCount: " + numDocs.getVal() + " exported to " + fileName + ". BinaryCount=" + numBins.getVal() + "<p>";
+            return "NodeCount: " + numDocs.getVal() + " exported to " + fileName + ". BinaryCount=" + numBins.getVal()
+                    + "<p>";
         } catch (Exception e) {
             return "Failed exporting " + fileName;
         }

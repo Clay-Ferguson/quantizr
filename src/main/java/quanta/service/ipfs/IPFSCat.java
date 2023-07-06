@@ -33,11 +33,10 @@ public class IPFSCat extends ServiceBase {
         try {
             String url = API_CAT + "?arg=" + hash;
             ResponseEntity<String> response = ipfs.restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                Util.getBasicRequestEntity(),
-                String.class
-            );
+                    url,
+                    HttpMethod.POST,
+                    Util.getBasicRequestEntity(),
+                    String.class);
             ret = response.getBody();
         } catch (Exception e) {
             log.error("Failed to cat: " + hash, e);

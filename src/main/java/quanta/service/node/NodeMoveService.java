@@ -190,12 +190,11 @@ public class NodeMoveService extends ServiceBase {
      * siblings posted in below it)
      */
     private void moveNodesInternal(
-        MongoSession ms,
-        String location,
-        String targetId,
-        List<String> nodeIds,
-        MoveNodesResponse res
-    ) {
+            MongoSession ms,
+            String location,
+            String targetId,
+            List<String> nodeIds,
+            MoveNodesResponse res) {
         // log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
         // get targetNode which is node we're pasting at or into.
         SubNode targetNode = read.getNode(ms, targetId);
@@ -207,7 +206,8 @@ public class NodeMoveService extends ServiceBase {
         // location==inside
         if (location.equalsIgnoreCase("inside")) {
             curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
-        } else if (location.equalsIgnoreCase("inline")) { // enum) // location==inline (todo-2: rename this to inline-below -- or better yet, do an
+        } else if (location.equalsIgnoreCase("inline")) { // enum) // location==inline (todo-2: rename this to
+                                                          // inline-below -- or better yet, do an
             curTargetOrdinal = targetNode.getOrdinal() + 1;
             create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
         } //
@@ -298,12 +298,11 @@ public class NodeMoveService extends ServiceBase {
      * all the children under it
      */
     public void changePathOfSubGraph(
-        MongoSession ms,
-        SubNode graphRoot,
-        String oldPathPrefix,
-        String newPathPrefix,
-        MoveNodesResponse res
-    ) {
+            MongoSession ms,
+            SubNode graphRoot,
+            String oldPathPrefix,
+            String newPathPrefix,
+            MoveNodesResponse res) {
         String originalPath = graphRoot.getPath();
         // log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" +
         // oldPathPrefix
@@ -313,7 +312,8 @@ public class NodeMoveService extends ServiceBase {
 
         for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, false, false, null)) {
             if (!node.getPath().startsWith(originalPath)) {
-                throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
+                throw new RuntimeEx(
+                        "Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
             }
             // log.debug(" PROCESSING oldPath: " + node.getPath());
             String newPath = node.getPath().replace(oldPathPrefix, newPathPrefix);

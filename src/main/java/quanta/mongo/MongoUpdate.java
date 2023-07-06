@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.mongo.model.SubNode;
@@ -37,7 +36,8 @@ public class MongoUpdate extends ServiceBase {
     }
 
     public void saveIfDirty(MongoSession ms, SubNode node) {
-        if (node == null || !ThreadLocals.hasDirtyNode(node.getId())) return;
+        if (node == null || !ThreadLocals.hasDirtyNode(node.getId()))
+            return;
         save(ms, node, true);
     }
 
@@ -46,7 +46,8 @@ public class MongoUpdate extends ServiceBase {
     }
 
     public void setParentHasChildren(SubNode node) {
-        if (node == null) return;
+        if (node == null)
+            return;
         arun.run(as -> {
             SubNode parent = read.findNodeByPath(null, node.getParentPath(), false);
             if (parent != null) {
@@ -67,7 +68,8 @@ public class MongoUpdate extends ServiceBase {
                 ops.save(node);
                 return null;
             });
-        } else { // thread. // otherwise leave same/current threadlocals as is and MongoEventListener will auth based on this
+        } else { // thread. // otherwise leave same/current threadlocals as is and MongoEventListener will auth based
+                 // on this
             ops.save(node);
         }
         ThreadLocals.clean(node);
@@ -78,20 +80,21 @@ public class MongoUpdate extends ServiceBase {
     }
 
     public void saveSession(MongoSession ms, boolean asAdmin) {
-        if (ms == null || ThreadLocals.getSaving().booleanValue() || !ThreadLocals.hasDirtyNodes()) return;
+        if (ms == null || ThreadLocals.getSaving().booleanValue() || !ThreadLocals.hasDirtyNodes())
+            return;
         try {
             // we check the saving flag to ensure we don't go into circular recursion here.
             ThreadLocals.setSaving(true);
             synchronized (ms) {
                 ThreadLocals
-                    .getDirtyNodes()
-                    .forEach((key, value) -> {
-                        if (!key.toHexString().equals(value.getIdStr())) {
-                            throw new RuntimeException(
-                                "Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr()
-                            );
-                        }
-                    });
+                        .getDirtyNodes()
+                        .forEach((key, value) -> {
+                            if (!key.toHexString().equals(value.getIdStr())) {
+                                throw new RuntimeException(
+                                        "Node originally cached as ID " + key.toHexString() + " now has key"
+                                                + value.getIdStr());
+                            }
+                        });
                 /*
                  * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
                  * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
@@ -106,13 +109,12 @@ public class MongoUpdate extends ServiceBase {
                         auth.ownerAuth(ms, node);
                     } catch (Exception e) {
                         log.debug( //
-                            "Dirty node save attempt failed: " +
-                            XString.prettyPrint(node) +
-                            "\bYour mongoSession has user: " +
-                            ms.getUserName() +
-                            " and your ThreadLocal session is: " +
-                            ThreadLocals.getSC().getUserName()
-                        );
+                                "Dirty node save attempt failed: " +
+                                        XString.prettyPrint(node) +
+                                        "\bYour mongoSession has user: " +
+                                        ms.getUserName() +
+                                        " and your ThreadLocal session is: " +
+                                        ThreadLocals.getSC().getUserName());
                     }
                     nodes.add(node);
                 }
@@ -126,8 +128,7 @@ public class MongoUpdate extends ServiceBase {
                 ThreadLocals.clearDirtyNodes();
             }
         } catch ( //
-            Exception e
-        ) {
+        Exception e) {
             // don't rethrow any exceptions from in here.
             ExUtil.error(log, "exception in call processor", e);
         } finally {
@@ -159,7 +160,10 @@ public class MongoUpdate extends ServiceBase {
                     // if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
                     if (ipfsNode == null) {
                         //
-                    } else { // ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear in the pinning system. // are // to pin it ever, so for now I'm leaving this code here, but we don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no matter what, so we don't need
+                    } else { // ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear
+                             // in the pinning system. // are // to pin it ever, so for now I'm leaving this code here,
+                             // but we don't need it, and the CIDs that // turns out MFS stuff will never be Garbage
+                             // Collected, no matter what, so we don't need
                         attachment = true;
                     }
                     if (ipfsNode != null) {
@@ -173,10 +177,10 @@ public class MongoUpdate extends ServiceBase {
                                 binSize = 0L;
                             }
                             /*
-                             * Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could be more
-                             * aggressive about 'correctness' here and actually call ipfs.objectStat on each CID, to get a more
-                             * bullet proof total bytes amount, but we are safe enough trusting what the node info holds,
-                             * because it should be correct.
+                             * Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could
+                             * be more aggressive about 'correctness' here and actually call ipfs.objectStat on each
+                             * CID, to get a more bullet proof total bytes amount, but we are safe enough trusting what
+                             * the node info holds, because it should be correct.
                              */
                             UserStats stats = statsMap.get(ipfsNode.getOwner());
                             if (stats == null) {

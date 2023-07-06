@@ -28,7 +28,7 @@ public class OpenGraphService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
     public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
     public static final String BROWSER_USER_AGENT =
-        "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
+            "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
 
     public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
         GetOpenGraphResponse res = new GetOpenGraphResponse();
@@ -124,7 +124,8 @@ public class OpenGraphService extends ServiceBase {
             return;
         }
 
-        ArrayList<String> ogList = reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
+        ArrayList<String> ogList =
+                reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
 
         // Adding the " " to the end is a hack because my regex isn't perfect (todo-1: fix the regex)
         Matcher matcher = urlPattern.matcher(node.getContent() + " ");
@@ -149,7 +150,8 @@ public class OpenGraphService extends ServiceBase {
                     break;
                 }
             }
-            if (!load) continue;
+            if (!load)
+                continue;
 
             OpenGraph og = getOpenGraph(url);
             ogList.add(XString.compactPrint(og));

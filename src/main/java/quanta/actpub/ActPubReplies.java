@@ -62,12 +62,9 @@ public class ActPubReplies extends ServiceBase {
                         nodes.add(child);
                     }
                 }
-                Iterable<SubNode> iter = read.findNodesByProp(
-                    as, //
-                    NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
-                    NodeProp.INREPLYTO.s(),
-                    nodeId
-                );
+                Iterable<SubNode> iter = read.findNodesByProp(as, //
+                        NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
+                        NodeProp.INREPLYTO.s(), nodeId);
 
                 for (SubNode child : iter) {
                     if (AclService.isPublic(child)) {

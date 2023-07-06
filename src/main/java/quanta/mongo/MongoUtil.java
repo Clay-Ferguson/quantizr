@@ -98,7 +98,8 @@ public class MongoUtil extends ServiceBase {
                     // ${parantPath}/* (that is, we append a slash and then find anything starting with that)
                     delete.deleteUnderPath(ms, parentPath);
                 }
-            } else { // otherwise add to our output results. // NOTE: we can also go ahead and DELETE these orphans as found (from the DB)
+            } else { // otherwise add to our output results. // NOTE: we can also go ahead and DELETE these orphans as
+                     // found (from the DB)
                 ret.add(node);
             }
         }
@@ -158,9 +159,8 @@ public class MongoUtil extends ServiceBase {
          * nodes can keep us from being able to consider a path 'available for use'
          */
         orCriteria.orOperator( //
-            Criteria.where(SubNode.PATH).is(path), //
-            Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path))
-        );
+                Criteria.where(SubNode.PATH).is(path), //
+                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
         Query q = new Query(orCriteria);
         return !ops.exists(q, SubNode.class);
     }
@@ -239,7 +239,8 @@ public class MongoUtil extends ServiceBase {
     }
 
     public String getHashOfPassword(String password) {
-        if (password == null) return null;
+        if (password == null)
+            return null;
         return DigestUtils.sha256Hex(password).substring(0, 20);
     }
 
@@ -323,39 +324,37 @@ public class MongoUtil extends ServiceBase {
         IntVal scanCount = new IntVal();
         LinkedList<SubNode> toDel = new LinkedList<>();
         ops
-            .stream(new Query(), SubNode.class)
-            .forEachRemaining(node -> {
-                String path = node.getPath();
-                if (
-                    path.equals(NodePath.LOCAL_USERS_PATH) ||
-                    path.equals(NodePath.REMOTE_USERS_PATH) ||
-                    path.startsWith(NodePath.LOCAL_USERS_PATH + "/") ||
-                    path.startsWith(NodePath.REMOTE_USERS_PATH + "/")
-                ) {
-                    toDel.add(node);
-                }
-                scanCount.inc();
-                if (scanCount.getVal() % 5000 == 0) {
-                    log.debug("scanCount: " + scanCount.getVal());
-                }
-            });
+                .stream(new Query(), SubNode.class)
+                .forEachRemaining(node -> {
+                    String path = node.getPath();
+                    if (path.equals(NodePath.LOCAL_USERS_PATH) ||
+                            path.equals(NodePath.REMOTE_USERS_PATH) ||
+                            path.startsWith(NodePath.LOCAL_USERS_PATH + "/") ||
+                            path.startsWith(NodePath.REMOTE_USERS_PATH + "/")) {
+                        toDel.add(node);
+                    }
+                    scanCount.inc();
+                    if (scanCount.getVal() % 5000 == 0) {
+                        log.debug("scanCount: " + scanCount.getVal());
+                    }
+                });
         log.debug("pre scan...deleting: " + toDel.size());
 
         for (SubNode node : toDel) {
             delete.delete(ms, node);
         }
         Iterable<SubNode> accntNodes = read.findSubNodesByType(
-            ms,
-            MongoUtil.allUsersRootNode,
-            NodeType.ACCOUNT.s(),
-            false,
-            null,
-            null
-        );
+                ms,
+                MongoUtil.allUsersRootNode,
+                NodeType.ACCOUNT.s(),
+                false,
+                null,
+                null);
 
         for (SubNode acctNode : accntNodes) {
             String userName = acctNode.getStr(NodeProp.USER.s());
-            if (userName == null) continue;
+            if (userName == null)
+                continue;
             String path = acctNode.getPath();
             log.debug("ProcUser: " + userName);
             String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
@@ -392,42 +391,42 @@ public class MongoUtil extends ServiceBase {
         IntVal total = new IntVal();
         // stream every node
         ops
-            .stream(new Query(), SubNode.class)
-            .forEachRemaining(node -> {
-                String path = node.getPath();
-                String newPath = null;
-                if ( //
+                .stream(new Query(), SubNode.class)
+                .forEachRemaining(node -> {
+                    String path = node.getPath();
+                    String newPath = null;
+                    if ( //
                     !path.startsWith(NodePath.USERS_PATH + "/") ||
-                    path.startsWith(NodePath.LOCAL_USERS_PATH + "/") ||
-                    path.startsWith(NodePath.REMOTE_USERS_PATH + "/")
-                ) return;
-                String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
-                String shortPiece = XString.truncAfterFirst(shortPart, "/");
-                // if this is a local node
-                if (localPathPart.contains(shortPiece)) {
-                    newPath = NodePath.LOCAL_USERS_PATH + "/" + shortPart;
-                } //
-                else if (remotePathPart.contains(shortPiece)) {
-                    newPath = NodePath.REMOTE_USERS_PATH + "/" + shortPart;
-                } else {
-                    return;
-                }
-                Criteria crit = new Criteria("id").is(node.getId());
-                Query query = new Query().addCriteria(crit);
-                Update update = new Update().set(SubNode.PATH, newPath);
-                if (!bops.hasVal()) {
-                    bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-                }
-                bops.getVal().updateOne(query, update);
-                opCount.inc();
-                total.inc();
-                if (opCount.getVal() > Const.MAX_BULK_OPS) {
-                    BulkWriteResult results = bops.getVal().execute();
-                    log.debug("Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
-                    bops.setVal(null);
-                    opCount.setVal(0);
-                }
-            });
+                            path.startsWith(NodePath.LOCAL_USERS_PATH + "/") ||
+                            path.startsWith(NodePath.REMOTE_USERS_PATH + "/"))
+                        return;
+                    String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
+                    String shortPiece = XString.truncAfterFirst(shortPart, "/");
+                    // if this is a local node
+                    if (localPathPart.contains(shortPiece)) {
+                        newPath = NodePath.LOCAL_USERS_PATH + "/" + shortPart;
+                    } //
+                    else if (remotePathPart.contains(shortPiece)) {
+                        newPath = NodePath.REMOTE_USERS_PATH + "/" + shortPart;
+                    } else {
+                        return;
+                    }
+                    Criteria crit = new Criteria("id").is(node.getId());
+                    Query query = new Query().addCriteria(crit);
+                    Update update = new Update().set(SubNode.PATH, newPath);
+                    if (!bops.hasVal()) {
+                        bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                    }
+                    bops.getVal().updateOne(query, update);
+                    opCount.inc();
+                    total.inc();
+                    if (opCount.getVal() > Const.MAX_BULK_OPS) {
+                        BulkWriteResult results = bops.getVal().execute();
+                        log.debug("Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
+                        bops.setVal(null);
+                        opCount.setVal(0);
+                    }
+                });
         if (bops.hasVal()) {
             BulkWriteResult results = bops.getVal().execute();
             log.debug("Final Bulk updated: " + results.getModifiedCount() + " total=" + total.getVal());
@@ -498,21 +497,21 @@ public class MongoUtil extends ServiceBase {
         q.addCriteria(Criteria.where(SubNode.TYPE).is("ap:posts"));
         BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
         ops
-            .stream(q, SubNode.class)
-            .forEachRemaining(node -> {
-                // log.debug("BULK FOUND: " + XString.prettyPrint(node));
+                .stream(q, SubNode.class)
+                .forEachRemaining(node -> {
+                    // log.debug("BULK FOUND: " + XString.prettyPrint(node));
 
-                Criteria crit = new Criteria("id").is(node.getId());
-                Query query = new Query().addCriteria(crit);
-                Update update = new Update().set(SubNode.TYPE, NodeType.POSTS.s());
-                bops.updateOne(query, update);
-                batchSize.inc();
+                    Criteria crit = new Criteria("id").is(node.getId());
+                    Query query = new Query().addCriteria(crit);
+                    Update update = new Update().set(SubNode.TYPE, NodeType.POSTS.s());
+                    bops.updateOne(query, update);
+                    batchSize.inc();
 
-                if (batchSize.getVal() > Const.MAX_BULK_OPS) {
-                    bops.execute();
-                    batchSize.setVal(0);
-                }
-            });
+                    if (batchSize.getVal() > Const.MAX_BULK_OPS) {
+                        bops.execute();
+                        batchSize.setVal(0);
+                    }
+                });
 
         if (batchSize.getVal() > 0) {
             bops.execute();
@@ -585,12 +584,11 @@ public class MongoUtil extends ServiceBase {
         createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.OBJECT_ID.s());
         createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
         createPartialUniqueIndexForType(
-            ms,
-            "unique-user-acct",
-            SubNode.class,
-            SubNode.PROPS + "." + NodeProp.USER.s(),
-            NodeType.ACCOUNT.s()
-        );
+                ms,
+                "unique-user-acct",
+                SubNode.class,
+                SubNode.PROPS + "." + NodeProp.USER.s(),
+                NodeType.ACCOUNT.s());
         /*
          * DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations prior
          * to adding some new constraint. And this one was for making sure the "UniqueFriends" Index could
@@ -631,15 +629,15 @@ public class MongoUtil extends ServiceBase {
         String indexName = "unique-friends";
         try {
             ops
-                .indexOps(SubNode.class)
-                .ensureIndex(
-                    new Index()
-                        .on(SubNode.OWNER, Direction.ASC)
-                        .on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC)
-                        .unique()
-                        .named(indexName)
-                        .partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s())))
-                );
+                    .indexOps(SubNode.class)
+                    .ensureIndex(
+                            new Index()
+                                    .on(SubNode.OWNER, Direction.ASC)
+                                    .on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC)
+                                    .unique()
+                                    .named(indexName)
+                                    .partial(PartialIndexFilter
+                                            .of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
         }
@@ -652,15 +650,14 @@ public class MongoUtil extends ServiceBase {
         String indexName = "unique-node-name";
         try {
             ops
-                .indexOps(SubNode.class)
-                .ensureIndex(
-                    new Index()
-                        .on(SubNode.OWNER, Direction.ASC)
-                        .on(SubNode.NAME, Direction.ASC)
-                        .unique()
-                        .named(indexName)
-                        .partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt("")))
-                );
+                    .indexOps(SubNode.class)
+                    .ensureIndex(
+                            new Index()
+                                    .on(SubNode.OWNER, Direction.ASC)
+                                    .on(SubNode.NAME, Direction.ASC)
+                                    .unique()
+                                    .named(indexName)
+                                    .partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
         }
@@ -702,21 +699,22 @@ public class MongoUtil extends ServiceBase {
      * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
      * needing any compound indexes (yet)
      */
-    public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1, String property2) {
+    public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1,
+            String property2) {
         auth.requireAdmin(ms);
         try {
             // Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
             ops
-                .indexOps(clazz)
-                .ensureIndex(
-                    // Note: also instead of exists, something like ".gt('')" would probably work too
-                    new Index()
-                        .on(property1, Direction.ASC)
-                        .on(property2, Direction.ASC)
-                        .unique()
-                        .named(name)
-                        .partial(PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true)))
-                );
+                    .indexOps(clazz)
+                    .ensureIndex(
+                            // Note: also instead of exists, something like ".gt('')" would probably work too
+                            new Index()
+                                    .on(property1, Direction.ASC)
+                                    .on(property2, Direction.ASC)
+                                    .unique()
+                                    .named(name)
+                                    .partial(PartialIndexFilter
+                                            .of(Criteria.where(property1).exists(true).and(property2).exists(true))));
             log.debug("Index verified: " + name);
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + name, e);
@@ -733,16 +731,15 @@ public class MongoUtil extends ServiceBase {
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
             ops
-                .indexOps(clazz)
-                .ensureIndex( //
-                    //
-                    //
-                    // Note: also instead of exists, something like ".gt('')" would probably work too
-                    new Index()
-                        .on(property, Direction.ASC)
-                        .named(name)
-                        .partial(PartialIndexFilter.of(Criteria.where(property).exists(true)))
-                );
+                    .indexOps(clazz)
+                    .ensureIndex( //
+                            //
+                            //
+                            // Note: also instead of exists, something like ".gt('')" would probably work too
+                            new Index()
+                                    .on(property, Direction.ASC)
+                                    .named(name)
+                                    .partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
             log.debug("Index verified: " + name);
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + name, e);
@@ -759,47 +756,44 @@ public class MongoUtil extends ServiceBase {
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
             ops
-                .indexOps(clazz)
-                .ensureIndex( //
-                    //
-                    //
-                    //
-                    // Note: also instead of exists, something like ".gt('')" would probably work too
-                    new Index()
-                        .on(property, Direction.ASC)
-                        .unique()
-                        .named(name)
-                        .partial(PartialIndexFilter.of(Criteria.where(property).exists(true)))
-                );
+                    .indexOps(clazz)
+                    .ensureIndex( //
+                            //
+                            //
+                            //
+                            // Note: also instead of exists, something like ".gt('')" would probably work too
+                            new Index()
+                                    .on(property, Direction.ASC)
+                                    .unique()
+                                    .named(name)
+                                    .partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
             log.debug("Index verified: " + name);
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + name, e);
         }
     }
 
-    public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property, String type) {
+    public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property,
+            String type) {
         log.debug("Ensuring unique partial index (for type) named: " + name);
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
             ops
-                .indexOps(clazz)
-                .ensureIndex( //
-                    //
-                    //
-                    //
-                    // Note: also instead of exists, something like ".gt('')" would probably work too
-                    new Index()
-                        .on(property, Direction.ASC)
-                        .unique()
-                        .named(name)
-                        .partial(
-                            PartialIndexFilter.of( //
-                                //
-                                Criteria.where(SubNode.TYPE).is(type).and(property).exists(true)
-                            )
-                        )
-                );
+                    .indexOps(clazz)
+                    .ensureIndex( //
+                            //
+                            //
+                            //
+                            // Note: also instead of exists, something like ".gt('')" would probably work too
+                            new Index()
+                                    .on(property, Direction.ASC)
+                                    .unique()
+                                    .named(name)
+                                    .partial(
+                                            PartialIndexFilter.of( //
+                                                    //
+                                                    Criteria.where(SubNode.TYPE).is(type).and(property).exists(true))));
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + name, e);
         }
@@ -869,17 +863,17 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         try {
             TextIndexDefinition textIndex = //
-                // note: Switching BACK to "all fields" because of how Mastodon mangles hashtags like this:
-                // "#<span>tag</span> making the only place we can find "#tag" as an actual string be inside
-                // the properties array attached to each node.
-                // Using 'none' as default language allows `stop words` to be indexed, which are words usually
-                // not searched for like "and, of, the, about, over" etc, however if you index without stop words
-                // that also means searching for these basic words in the content fails. But if you do index them
-                // (by using "none" here) then the index will be larger.
-                // .withDefaultLanguage("none")
-                // .onField(SubNode.CONTENT) //
-                // .onField(SubNode.TAGS) //
-                new TextIndexDefinitionBuilder().onAllFields().build();
+                    // note: Switching BACK to "all fields" because of how Mastodon mangles hashtags like this:
+                    // "#<span>tag</span> making the only place we can find "#tag" as an actual string be inside
+                    // the properties array attached to each node.
+                    // Using 'none' as default language allows `stop words` to be indexed, which are words usually
+                    // not searched for like "and, of, the, about, over" etc, however if you index without stop words
+                    // that also means searching for these basic words in the content fails. But if you do index them
+                    // (by using "none" here) then the index will be larger.
+                    // .withDefaultLanguage("none")
+                    // .onField(SubNode.CONTENT) //
+                    // .onField(SubNode.TAGS) //
+                    new TextIndexDefinitionBuilder().onAllFields().build();
             ops.indexOps(clazz).ensureIndex(textIndex);
             log.debug("createTextIndex successful.");
         } catch (Exception e) {
@@ -939,14 +933,13 @@ public class MongoUtil extends ServiceBase {
     }
 
     public SubNode createUser(
-        MongoSession ms,
-        String newUserName,
-        String email,
-        String password,
-        boolean automated,
-        Val<SubNode> postsNodeVal,
-        boolean forceRemoteUser
-    ) {
+            MongoSession ms,
+            String newUserName,
+            String email,
+            String password,
+            boolean automated,
+            Val<SubNode> postsNodeVal,
+            boolean forceRemoteUser) {
         SubNode userNode = read.getUserNodeByUserName(ms, newUserName);
         if (userNode != null) {
             throw new RuntimeException("User already existed: " + newUserName);
@@ -982,20 +975,20 @@ public class MongoUtil extends ServiceBase {
         update.save(ms, userNode);
         // ensure we've pre-created this node.
         SubNode postsNode = read.getUserNodeByType(
-            ms,
-            null,
-            userNode,
-            "### Posts",
-            NodeType.POSTS.s(),
-            Arrays.asList(PrivilegeType.READ.s()),
-            NodeName.POSTS,
-            true
-        );
+                ms,
+                null,
+                userNode,
+                "### Posts",
+                NodeType.POSTS.s(),
+                Arrays.asList(PrivilegeType.READ.s()),
+                NodeName.POSTS,
+                true);
         if (postsNodeVal != null) {
             postsNodeVal.setVal(postsNode);
         }
         // if (!nostr.isNostrUserName(newUserName)) {
-        //     user.ensureUserHomeNodeExists(ms, newUserName, "### " + newUserName + "'s Node", NodeType.NONE.s(), NodeName.HOME);
+        // user.ensureUserHomeNodeExists(ms, newUserName, "### " + newUserName + "'s Node",
+        // NodeType.NONE.s(), NodeName.HOME);
         // }
         update.save(ms, userNode);
         return userNode;
@@ -1012,7 +1005,8 @@ public class MongoUtil extends ServiceBase {
         String adminUser = prop.getMongoAdminUserName();
         SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
         if (adminNode == null) {
-            adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
+            adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true,
+                    null, null);
             adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
             adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
             adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
@@ -1024,34 +1018,37 @@ public class MongoUtil extends ServiceBase {
              */
             ms.setUserNodeId(adminNode.getId());
         }
-        allUsersRootNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
+        allUsersRootNode =
+                snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
         ensureUsersLocalAndRemotePath(ms);
         createPublicNodes(ms);
     }
 
     public void ensureUsersLocalAndRemotePath(MongoSession ms) {
         localUsersNode =
-            snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null, null);
+                snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null, true, null,
+                        null);
         remoteUsersNode =
-            snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true, null, null);
+                snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null, true,
+                        null, null);
     }
 
     public void createPublicNodes(MongoSession ms) {
         log.debug("creating Public Nodes");
         Val<Boolean> created = new Val<>(Boolean.FALSE);
         SubNode publicNode = snUtil.ensureNodeExists(
-            ms,
-            NodePath.ROOT_PATH,
-            NodePath.PUBLIC,
-            null,
-            "Public",
-            null,
-            true,
-            null,
-            created
-        );
+                ms,
+                NodePath.ROOT_PATH,
+                NodePath.PUBLIC,
+                null,
+                "Public",
+                null,
+                true,
+                null,
+                created);
         if (created.getVal()) {
-            acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()), null);
+            acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), null,
+                    Arrays.asList(PrivilegeType.READ.s()), null);
         }
         /////////////////////////////////////////////////////////
         created = new Val<>(Boolean.FALSE);
@@ -1061,18 +1058,18 @@ public class MongoUtil extends ServiceBase {
         created = new Val<>(Boolean.FALSE);
         // create home node (admin owned node named 'home').
         SubNode publicHome = snUtil.ensureNodeExists(
-            ms,
-            NodePath.ROOT_PATH + "/" + NodePath.PUBLIC,
-            NodeName.HOME,
-            NodeName.HOME,
-            "Public Home",
-            null,
-            true,
-            null,
-            created
-        );
+                ms,
+                NodePath.ROOT_PATH + "/" + NodePath.PUBLIC,
+                NodeName.HOME,
+                NodeName.HOME,
+                "Public Home",
+                null,
+                true,
+                null,
+                created);
         // make node public
-        acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()), null);
+        acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()),
+                null);
         publicHome.set(NodeProp.UNPUBLISHED, true);
         log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
     }

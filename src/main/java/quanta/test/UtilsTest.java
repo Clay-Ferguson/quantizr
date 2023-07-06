@@ -8,10 +8,9 @@ import org.slf4j.LoggerFactory;
 
 @Component("UtilsTest")
 public class UtilsTest extends ServiceBase implements TestIntf {
-	
+
 	private static Logger log = LoggerFactory.getLogger(UtilsTest.class);
 
 	@Override
-	public void test() throws Exception {
-	}
+	public void test() throws Exception {}
 }

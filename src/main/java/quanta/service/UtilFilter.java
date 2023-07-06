@@ -17,7 +17,10 @@ import quanta.util.Const;
 import quanta.util.Util;
 import quanta.util.XString;
 
-/* This does processing for pretty much everything that we don't do "logic" around which would be in AppFilter */
+/*
+ * This does processing for pretty much everything that we don't do "logic" around which would be in
+ * AppFilter
+ */
 // See AppConfiguration.java for Bean Registration
 @Component
 public class UtilFilter extends GenericFilterBean {
@@ -26,8 +29,10 @@ public class UtilFilter extends GenericFilterBean {
     public static boolean debug = false;
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        if (!Util.gracefulReadyCheck(res)) return;
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        if (!Util.gracefulReadyCheck(res))
+            return;
 
         HttpServletRequest httpReq = (HttpServletRequest) req;
         HttpServletResponse httpRes = (HttpServletResponse) res;
@@ -45,21 +50,17 @@ public class UtilFilter extends GenericFilterBean {
         }
 
         // Special checks for Cache-Controls
-        if (
-            httpReq.getRequestURI().contains("/images/") ||
-            httpReq.getRequestURI().contains("/fonts/") ||
-            httpReq.getRequestURI().contains("/dist/main.") ||
-            httpReq.getRequestURI().endsWith("/images/favicon.ico") ||
-            httpReq.getRequestURI().contains("/getOpenGraph")
-        ) {
+        if (httpReq.getRequestURI().contains("/images/") ||
+                httpReq.getRequestURI().contains("/fonts/") ||
+                httpReq.getRequestURI().contains("/dist/main.") ||
+                httpReq.getRequestURI().endsWith("/images/favicon.ico") ||
+                httpReq.getRequestURI().contains("/getOpenGraph")) {
             httpRes.setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
         }
 
         // Special check for CORS
-        if (
-            httpReq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
-            httpReq.getRequestURI().contains(APConst.PATH_AP + "/")
-        ) {
+        if (httpReq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
+                httpReq.getRequestURI().contains(APConst.PATH_AP + "/")) {
             httpRes.setHeader("Access-Control-Allow-Origin", "*");
         }
 

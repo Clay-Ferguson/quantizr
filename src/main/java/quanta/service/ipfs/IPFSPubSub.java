@@ -74,24 +74,23 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     public void setOptions() {
-        if (!prop.ipfsEnabled()) return;
+        if (!prop.ipfsEnabled())
+            return;
         // Only used this for some testing (shouldn't be required?)
         // if these are the defaults ?
         LinkedHashMap<String, Object> res = null;
         // Pubsub.Router="floodsub" | "gossipsub"
         // todo-2: we can add this to the startup bash scripts along with the CORS configs?
         res =
-            Cast.toLinkedHashMap(
-                ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class)
-            );
+                Cast.toLinkedHashMap(
+                        ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub",
+                                LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
         res =
-            Cast.toLinkedHashMap(
-                ipfs.postForJsonReply(
-                    ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true",
-                    LinkedHashMap.class
-                )
-            );
+                Cast.toLinkedHashMap(
+                        ipfs.postForJsonReply(
+                                ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true",
+                                LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }
 
@@ -172,7 +171,8 @@ public class IPFSPubSub extends ServiceBase {
             resp.write(buf, 0, r);
             if (buf[r - 1] == LINE_FEED) {
                 log.debug("LINE: " + new String(resp.toByteArray()));
-                Map<String, Object> event = mapper.readValue(resp.toByteArray(), new TypeReference<Map<String, Object>>() {});
+                Map<String, Object> event =
+                        mapper.readValue(resp.toByteArray(), new TypeReference<Map<String, Object>>() {});
                 processInboundEvent(event);
                 resp = new ByteArrayOutputStream();
             }
@@ -182,7 +182,8 @@ public class IPFSPubSub extends ServiceBase {
     // clear throttle counters every minute.
     @Scheduled(fixedDelay = DateUtil.MINUTE_MILLIS)
     public void clearThrottles() {
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         synchronized (fromCounter) {
             fromCounter.clear();
         }
@@ -191,8 +192,10 @@ public class IPFSPubSub extends ServiceBase {
     public void processInboundEvent(Map<String, Object> msg) {
         checkIpfs();
         String from = (String) msg.get("from");
-        if (from == null) return;
-        if (throttle(from)) return;
+        if (from == null)
+            return;
+        if (throttle(from))
+            return;
         String data = (String) msg.get("data");
         // String seqno = (String) msg.get("seqno");
         String payload = (new String(Base64.getDecoder().decode(data)));
@@ -219,12 +222,14 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private void processInboundPayload(String payload) {
-        if (payload == null) return;
+        if (payload == null)
+            return;
         ServerPushInfo pushInfo = null;
         payload = payload.trim();
         if (payload.startsWith("{") && payload.endsWith("}")) {
             IPSMMessage msg = parseIpsmPayload(payload);
-            if (msg == null) return;
+            if (msg == null)
+                return;
             String message = getMessageText(msg);
             pushInfo = new IPSMPushInfo(message);
         } else {
@@ -232,16 +237,17 @@ public class IPFSPubSub extends ServiceBase {
         }
         // renable for Redis
         // for (SessionContext sc : SessionContext.getAllSessions(true, false)) {
-        //     // only consider sessions that have viewed their IPSM tab
-        //     if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {
-        //         continue;
-        //     }
-        //     push.sendServerPushInfo(sc, pushInfo);
+        // // only consider sessions that have viewed their IPSM tab
+        // if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {
+        // continue;
+        // }
+        // push.sendServerPushInfo(sc, pushInfo);
         // }
     }
 
     private String getMessageText(IPSMMessage msg) {
-        if (msg == null || msg.getContent() == null) return null;
+        if (msg == null || msg.getContent() == null)
+            return null;
         StringBuilder sb = new StringBuilder();
 
         for (IPSMData data : msg.getContent()) {

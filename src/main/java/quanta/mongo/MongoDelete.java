@@ -50,10 +50,10 @@ public class MongoDelete extends ServiceBase {
         if (!childrenOnly && deleteAttachments) {
             if (node.getAttachments() != null) {
                 node
-                    .getAttachments()
-                    .forEach((String key, Attachment att) -> {
-                        attach.deleteBinary(ms, key, node, null, true);
-                    });
+                        .getAttachments()
+                        .forEach((String key, Attachment att) -> {
+                            attach.deleteBinary(ms, key, node, null, true);
+                        });
             }
         }
         delete(ms, node, childrenOnly);
@@ -88,7 +88,8 @@ public class MongoDelete extends ServiceBase {
         Iterable<SubNode> nodes = opsw.find(ms, q);
 
         for (SubNode node : nodes) {
-            if (node.getOwner() == null) continue;
+            if (node.getOwner() == null)
+                continue;
             String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID);
             if (keys.contains(key)) {
                 delete(ms, node);
@@ -111,10 +112,10 @@ public class MongoDelete extends ServiceBase {
         LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
         Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Criteria crit = Criteria //
-            .where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE)
-            .ne(null)
-            .and(SubNode.MODIFY_TIME)
-            .lt(date);
+                .where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE)
+                .ne(null)
+                .and(SubNode.MODIFY_TIME)
+                .lt(date);
         q.addCriteria(crit);
         DeleteResult res = ops.remove(q, SubNode.class);
         return res.getDeletedCount();
@@ -124,7 +125,8 @@ public class MongoDelete extends ServiceBase {
         Query q = new Query();
         LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
         Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\.").and(SubNode.MODIFY_TIME).lt(date); //
+        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\.").and(SubNode.MODIFY_TIME)
+                .lt(date); //
         q.addCriteria(crit);
         DeleteResult res = ops.remove(q, SubNode.class);
         return res.getDeletedCount();
@@ -141,10 +143,10 @@ public class MongoDelete extends ServiceBase {
         LocalDate ldt = LocalDate.now().minusDays(5);
         Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Criteria crit = Criteria //
-            .where(SubNode.PATH)
-            .regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath()))
-            .and(SubNode.MODIFY_TIME)
-            .lt(date); //
+                .where(SubNode.PATH)
+                .regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath()))
+                .and(SubNode.MODIFY_TIME)
+                .lt(date); //
         q.addCriteria(crit);
         // set all the parents of all nodes in 'q' to null child status
         bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
@@ -268,29 +270,29 @@ public class MongoDelete extends ServiceBase {
         HashSet<ObjectId> parentIds = new HashSet<>();
         long threadId = Thread.currentThread().getId();
         ops
-            .stream(q, SubNode.class)
-            .forEachRemaining(node -> {
-                // lazy create bops
-                if (!bops.hasVal()) {
-                    bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-                }
-                // since I'm new to ops.stream, I don't trust it to be threadsafe yet.
-                if (threadId != Thread.currentThread().getId()) {
-                    throw new RuntimeException("ops.stream unexpected concurrency");
-                }
-                SubNode parent = read.getParent(ms, node, false);
-                if (parent != null && parentIds.add(parent.getId())) {
-                    // we have a known 'bops' in this one and don't lazy create so we don't care about the
-                    // return value of this call
-                    update.bulkOpSetPropVal(ms, bops.getVal(), parent.getId(), prop, val);
-                    batchSize.inc();
-                }
-                if (batchSize.getVal() > Const.MAX_BULK_OPS) {
-                    bops.getVal().execute();
-                    batchSize.setVal(0);
-                    bops.setVal(null);
-                }
-            });
+                .stream(q, SubNode.class)
+                .forEachRemaining(node -> {
+                    // lazy create bops
+                    if (!bops.hasVal()) {
+                        bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                    }
+                    // since I'm new to ops.stream, I don't trust it to be threadsafe yet.
+                    if (threadId != Thread.currentThread().getId()) {
+                        throw new RuntimeException("ops.stream unexpected concurrency");
+                    }
+                    SubNode parent = read.getParent(ms, node, false);
+                    if (parent != null && parentIds.add(parent.getId())) {
+                        // we have a known 'bops' in this one and don't lazy create so we don't care about the
+                        // return value of this call
+                        update.bulkOpSetPropVal(ms, bops.getVal(), parent.getId(), prop, val);
+                        batchSize.inc();
+                    }
+                    if (batchSize.getVal() > Const.MAX_BULK_OPS) {
+                        bops.getVal().execute();
+                        batchSize.setVal(0);
+                        bops.setVal(null);
+                    }
+                });
         if (bops.hasVal()) {
             bops.getVal().execute();
         }
@@ -347,38 +349,40 @@ public class MongoDelete extends ServiceBase {
             deletesInPass.setVal(0L);
             // scan the entire DB
             ops
-                .stream(new Query(), SubNode.class)
-                .forEachRemaining(node -> {
-                    // if this node is root node, ignore
-                    if (NodePath.ROOT_PATH.equals(node.getPath())) return;
-                    // if this node's parent is root, also ignore it.
-                    String parentPath = node.getParentPath();
-                    if (NodePath.ROOT_PATH.equals(parentPath)) return;
-                    // query to see if node's parent exists.
-                    Query q = new Query();
-                    q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
-                    SubNode parent = opsw.findOne(null, q);
-                    // if parent node doesn't exist, this is an orphan we can delete.
-                    if (parent == null) {
-                        // lazy create our bulk ops here.
-                        if (bops.getVal() == null) {
-                            bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-                        }
-                        // add bulk ops command to delete this orphan
+                    .stream(new Query(), SubNode.class)
+                    .forEachRemaining(node -> {
+                        // if this node is root node, ignore
+                        if (NodePath.ROOT_PATH.equals(node.getPath()))
+                            return;
+                        // if this node's parent is root, also ignore it.
+                        String parentPath = node.getParentPath();
+                        if (NodePath.ROOT_PATH.equals(parentPath))
+                            return;
+                        // query to see if node's parent exists.
+                        Query q = new Query();
+                        q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
+                        SubNode parent = opsw.findOne(null, q);
+                        // if parent node doesn't exist, this is an orphan we can delete.
+                        if (parent == null) {
+                            // lazy create our bulk ops here.
+                            if (bops.getVal() == null) {
+                                bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                            }
+                            // add bulk ops command to delete this orphan
 
-                        bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(node.getId())));
-                        // update counters
-                        opsPending.inc();
-                        deletesInPass.inc();
-                        if (opsPending.getVal() > Const.MAX_BULK_OPS) {
-                            BulkWriteResult results = bops.getVal().execute();
-                            totalDeleted.add(results.getDeletedCount());
-                            log.debug("DEL TOTAL: " + totalDeleted.getVal());
-                            bops.setVal(null);
-                            opsPending.setVal(0L);
+                            bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(node.getId())));
+                            // update counters
+                            opsPending.inc();
+                            deletesInPass.inc();
+                            if (opsPending.getVal() > Const.MAX_BULK_OPS) {
+                                BulkWriteResult results = bops.getVal().execute();
+                                totalDeleted.add(results.getDeletedCount());
+                                log.debug("DEL TOTAL: " + totalDeleted.getVal());
+                                bops.setVal(null);
+                                opsPending.setVal(0L);
+                            }
                         }
-                    }
-                });
+                    });
             // after the DB scan is done delete the remainder left in ops pending
             if (opsPending.getVal() > 0) {
                 BulkWriteResult results = bops.getVal().execute();
@@ -426,15 +430,15 @@ public class MongoDelete extends ServiceBase {
         HashMap<String, ObjectId> allNodes = new HashMap<>();
         // first all we do is build up the 'allNodes' hashMap.
         ops
-            .stream(new Query(), SubNode.class)
-            .forEachRemaining(node -> {
-                // print progress every 1000th node
-                nodesProcessed.inc();
-                if (nodesProcessed.getVal() % 1000 == 0) {
-                    log.debug("SCAN: " + nodesProcessed.getVal());
-                }
-                allNodes.put(node.getPath(), node.getId());
-            });
+                .stream(new Query(), SubNode.class)
+                .forEachRemaining(node -> {
+                    // print progress every 1000th node
+                    nodesProcessed.inc();
+                    if (nodesProcessed.getVal() % 1000 == 0) {
+                        log.debug("SCAN: " + nodesProcessed.getVal());
+                    }
+                    allNodes.put(node.getPath(), node.getId());
+                });
         nodesProcessed.setVal(0);
         int passes = 0;
 
@@ -444,26 +448,26 @@ public class MongoDelete extends ServiceBase {
             HashMap<String, ObjectId> orphans = new HashMap<>();
             // scan every node we still have and any whose parent is not also in the map is a known orphan
             allNodes
-                .entrySet()
-                .stream()
-                .forEach(entry -> {
-                    nodesProcessed.inc();
-                    if (nodesProcessed.getVal() % 1000 == 0) {
-                        log.debug("FINDER SCAN: " + nodesProcessed.getVal());
-                    }
-                    if (entry.getKey().equals(NodePath.ROOT_PATH)) {
-                        return;
-                    }
-                    String parent = XString.truncAfterLast(entry.getKey(), "/");
-                    if (parent.equalsIgnoreCase(NodePath.ROOT_PATH)) {
-                        return;
-                    }
-                    if (!allNodes.containsKey(parent)) {
-                        log.debug("ORPH: " + entry.getValue().toHexString());
-                        // put the stuff to delete in a separate map to avoid a concurrent modification exception
-                        orphans.put(entry.getKey(), entry.getValue());
-                    }
-                });
+                    .entrySet()
+                    .stream()
+                    .forEach(entry -> {
+                        nodesProcessed.inc();
+                        if (nodesProcessed.getVal() % 1000 == 0) {
+                            log.debug("FINDER SCAN: " + nodesProcessed.getVal());
+                        }
+                        if (entry.getKey().equals(NodePath.ROOT_PATH)) {
+                            return;
+                        }
+                        String parent = XString.truncAfterLast(entry.getKey(), "/");
+                        if (parent.equalsIgnoreCase(NodePath.ROOT_PATH)) {
+                            return;
+                        }
+                        if (!allNodes.containsKey(parent)) {
+                            log.debug("ORPH: " + entry.getValue().toHexString());
+                            // put the stuff to delete in a separate map to avoid a concurrent modification exception
+                            orphans.put(entry.getKey(), entry.getValue());
+                        }
+                    });
             // found no orphans at all then we're done.
             if (orphans.size() == 0) {
                 log.debug("No more orphans found. Done!");
@@ -472,26 +476,26 @@ public class MongoDelete extends ServiceBase {
             }
             // delete all orphans identified in this pass
             orphans
-                .entrySet()
-                .stream()
-                .forEach(entry -> {
-                    // lazy create bops
-                    if (bops.getVal() == null) {
-                        bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
-                    }
-                    allNodes.remove(entry.getKey());
+                    .entrySet()
+                    .stream()
+                    .forEach(entry -> {
+                        // lazy create bops
+                        if (bops.getVal() == null) {
+                            bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                        }
+                        allNodes.remove(entry.getKey());
 
-                    bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(entry.getValue())));
-                    opsPending.inc();
-                    deletesInPass.inc();
-                    if (opsPending.getVal() > Const.MAX_BULK_OPS) {
-                        BulkWriteResult results = bops.getVal().execute();
-                        totalDeleted.add(results.getDeletedCount());
-                        log.debug("DEL TOTAL: " + totalDeleted.getVal());
-                        bops.setVal(null);
-                        opsPending.setVal(0L);
-                    }
-                });
+                        bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(entry.getValue())));
+                        opsPending.inc();
+                        deletesInPass.inc();
+                        if (opsPending.getVal() > Const.MAX_BULK_OPS) {
+                            BulkWriteResult results = bops.getVal().execute();
+                            totalDeleted.add(results.getDeletedCount());
+                            log.debug("DEL TOTAL: " + totalDeleted.getVal());
+                            bops.setVal(null);
+                            opsPending.setVal(0L);
+                        }
+                    });
             // since we delete in blocks of 100 at a time, we might have some left pending here so
             // finish deleting those
             if (opsPending.getVal() > 0) {
@@ -524,7 +528,8 @@ public class MongoDelete extends ServiceBase {
             // lookup the node we're going to delete, we call with allowAuth, becasuse it would be redundant
             // since the next thing we do is an 'ownerAuth', which is even more restrictive
             SubNode node = read.getNode(ms, nodeId, false, null);
-            if (node == null) continue;
+            if (node == null)
+                continue;
             auth.ownerAuth(ms, node);
             // get the parent of the node and add it's id to parentIds
             SubNode parent = read.getParent(ms, node, false);
@@ -659,11 +664,11 @@ public class MongoDelete extends ServiceBase {
         // criteria finds all nodes where we are the owner but they're not decendants under our own tree
         // root.
         Criteria crit = Criteria
-            .where(SubNode.OWNER)
-            .is(userNode.getOwner())
-            .and(SubNode.PATH)
-            .not()
-            .regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
+                .where(SubNode.OWNER)
+                .is(userNode.getOwner())
+                .and(SubNode.PATH)
+                .not()
+                .regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
         crit = auth.addWriteSecurity(ms, crit);
         q.addCriteria(crit);
         // we'll be deleting every node in 'q' so we need to set the parents of all those to
@@ -682,16 +687,15 @@ public class MongoDelete extends ServiceBase {
 
     // Deletes all matches to this search criteria. Very dangerous! Only admin can run.
     public void deleteMatches(
-        MongoSession ms,
-        SubNode node,
-        String prop,
-        String text,
-        boolean fuzzy,
-        boolean caseSensitive,
-        String timeRangeType,
-        boolean recursive,
-        boolean requirePriority
-    ) {
+            MongoSession ms,
+            SubNode node,
+            String prop,
+            String text,
+            boolean fuzzy,
+            boolean caseSensitive,
+            String timeRangeType,
+            boolean recursive,
+            boolean requirePriority) {
         ThreadLocals.requireAdmin();
         List<CriteriaDefinition> criterias = new LinkedList<>();
         /*
@@ -715,9 +719,10 @@ public class MongoDelete extends ServiceBase {
         // blocked user
         // nodes either, so for now we just delete if the type is a comment
         crit =
-            Criteria
-                .where(SubNode.TYPE)
-                .in(NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
+                Criteria
+                        .where(SubNode.TYPE)
+                        .in(NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s(), NodeType.NONE.s(),
+                                NodeType.PLAIN_TEXT.s());
         criterias.add(crit);
         if (!StringUtils.isEmpty(text)) {
             if (fuzzy) {

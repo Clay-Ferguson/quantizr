@@ -44,7 +44,8 @@ public class IPFSConfig extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, Object> res = null;
         if (prop.ipfsEnabled()) {
-            res = Cast.toLinkedHashMap(ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
+            res = Cast.toLinkedHashMap(
+                    ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
             sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
             res = Cast.toLinkedHashMap(ipfs.postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
             sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");

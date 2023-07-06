@@ -150,13 +150,12 @@ public class AppProp {
     }
 
     public String getProtocolHostAndPort() {
-        if (protocolHostAndPort != null) return protocolHostAndPort;
+        if (protocolHostAndPort != null)
+            return protocolHostAndPort;
         protocolHostAndPort = getHttpProtocol() + "://" + getMetaHost();
         // If port is needed (not default) then add it.
-        if (
-            !(getHttpProtocol().equals("https") && getServerPort().equals("443")) &&
-            !(getHttpProtocol().equals("http") && getServerPort().equals("80"))
-        ) {
+        if (!(getHttpProtocol().equals("https") && getServerPort().equals("443"))
+                && !(getHttpProtocol().equals("http") && getServerPort().equals("80"))) {
             protocolHostAndPort += ":" + getServerPort();
         }
         return protocolHostAndPort;
@@ -307,7 +306,8 @@ public class AppProp {
     /* considers property 'true' if it starts with letter 't', 'y' (yes), or 1 */
     public boolean getBooleanProp(String propName) {
         String val = env.getProperty(propName);
-        if (val == null) return false;
+        if (val == null)
+            return false;
         val = val.toLowerCase();
         return val.startsWith("t") || val.startsWith("y") || val.startsWith("1");
     }
@@ -321,7 +321,8 @@ public class AppProp {
     }
 
     public String translateDirs(String folder) {
-        if (folder == null) return folder;
+        if (folder == null)
+            return folder;
         String userDir = System.getProperty("user.dir");
         return folder.replace("{user.dir}", userDir);
     }

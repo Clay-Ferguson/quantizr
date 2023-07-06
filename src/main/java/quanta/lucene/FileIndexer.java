@@ -84,9 +84,7 @@ public class FileIndexer extends ServiceBase {
     private HashSet<String> suffixSet = new HashSet<>();
 
     private enum CompressionType {
-        NONE,
-        GZIP,
-        XZIP,
+        NONE, GZIP, XZIP,
     }
 
     public void index(String dirToIndex, String luceneIndexDataSubDir, String suffixes, boolean forceRebuild) {
@@ -133,7 +131,8 @@ public class FileIndexer extends ServiceBase {
     }
 
     private void init(boolean forceRebuild, String luceneIndexDataSubDir) {
-        if (initialized) return;
+        if (initialized)
+            return;
         initialized = true;
         if (StringUtils.isEmpty(appProp.getLuceneDir())) {
             throw ExUtil.wrapEx("Lucend Data Dir is not configured.");
@@ -177,40 +176,37 @@ public class FileIndexer extends ServiceBase {
         filesUpdated = 0;
         filesSkipped = 0;
         if (Files.isDirectory(path)) {
-            Files.walkFileTree(
-                path,
-                new SimpleFileVisitor<Path>() {
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        try {
-                            String absPath = file.toString();
-                            String ext = FilenameUtils.getExtension(absPath);
-                            if (!suffixSet.contains(ext)) {
-                                filesSkipped++;
-                                return FileVisitResult.CONTINUE;
-                            } //
-                            else if (isZipFileFormatFileName(absPath)) {
-                                indexZipFile(file, absPath);
-                            } //
-                            else if (isTarFileFormatFileName(absPath)) {
-                                indexTarFile(file, absPath, CompressionType.NONE);
-                            } //
-                            else if (isTgzFileFormatFileName(absPath)) {
-                                indexTarFile(file, absPath, CompressionType.GZIP);
-                            } //
-                            else if (isTxzFileFormatFileName(absPath)) {
-                                indexTarFile(file, absPath, CompressionType.XZIP);
-                            } else {
-                                indexDoc(file, attrs.lastModifiedTime().toMillis());
-                            }
-                        } catch (Exception ignore) {
-                            // don't index files that can't be read.
-                            log.debug("Unable to index file: " + file.getFileName().toString());
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    try {
+                        String absPath = file.toString();
+                        String ext = FilenameUtils.getExtension(absPath);
+                        if (!suffixSet.contains(ext)) {
+                            filesSkipped++;
+                            return FileVisitResult.CONTINUE;
+                        } //
+                        else if (isZipFileFormatFileName(absPath)) {
+                            indexZipFile(file, absPath);
+                        } //
+                        else if (isTarFileFormatFileName(absPath)) {
+                            indexTarFile(file, absPath, CompressionType.NONE);
+                        } //
+                        else if (isTgzFileFormatFileName(absPath)) {
+                            indexTarFile(file, absPath, CompressionType.GZIP);
+                        } //
+                        else if (isTxzFileFormatFileName(absPath)) {
+                            indexTarFile(file, absPath, CompressionType.XZIP);
+                        } else {
+                            indexDoc(file, attrs.lastModifiedTime().toMillis());
                         }
-                        return FileVisitResult.CONTINUE;
+                    } catch (Exception ignore) {
+                        // don't index files that can't be read.
+                        log.debug("Unable to index file: " + file.getFileName().toString());
                     }
+                    return FileVisitResult.CONTINUE;
                 }
-            );
+            });
         } else {
             String absPath = path.toString();
             String ext = FilenameUtils.getExtension(absPath);
@@ -260,7 +256,8 @@ public class FileIndexer extends ServiceBase {
         indexZipStream(zis, zipParent);
     }
 
-    private void indexTarInputStream(InputStream is, String zipParent, CompressionType compressionType) throws Exception {
+    private void indexTarInputStream(InputStream is, String zipParent, CompressionType compressionType)
+            throws Exception {
         InputStream bi = new BufferedInputStream(is);
         InputStream istream = null;
         switch (compressionType) {
@@ -284,11 +281,12 @@ public class FileIndexer extends ServiceBase {
         ZipEntry entry;
 
         while ((entry = zis.getNextEntry()) != null) {
-            if (entry.isDirectory()) {} else/*
-             * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
-             * doesn't require folders to be stored but only FILES, and actually the full path on each file is
-             * what determines the hierarchy.
-             */ // processDirectory(entry);
+            if (entry.isDirectory()) {
+            } else/*
+                   * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
+                   * doesn't require folders to be stored but only FILES, and actually the full path on each file is
+                   * what determines the hierarchy.
+                   */ // processDirectory(entry);
             {
                 String absPath = entry.getName();
                 // if we encountered a zip file inside a zip file this is the recursion for
@@ -313,7 +311,9 @@ public class FileIndexer extends ServiceBase {
                     log.warn("Can't read entry." + entry.getName());
                     continue;
                 }
-                if (entry.isDirectory()) {} else { // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories, but I'm not sure if this
+                if (entry.isDirectory()) {
+                } else { // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories,
+                         // but I'm not sure if this
                     String absPath = entry.getName();
                     log.debug("TAR ENTRY:" + absPath);
                     // todo-2: oops ZIP is missing here. plain zip in a tar
@@ -332,7 +332,8 @@ public class FileIndexer extends ServiceBase {
                 }
                 // NOTE: There's no entry.close() method. This is not a bug, or mistake.
             }
-        } finally {}
+        } finally {
+        }
         // We leave this stream open here
         // StreamUtil.close(ais);
     }
@@ -628,23 +629,16 @@ public class FileIndexer extends ServiceBase {
      */
     public static String getDocType(File f) {
         final int start = f.getName().lastIndexOf(".");
-        if (start == -1) return "";
+        if (start == -1)
+            return "";
         return f.getName().substring(start + 1);
     }
 
     /**
      * Create lucene document from file attributes
      */
-    public static Document newLuceneDoc(
-        String content,
-        String path,
-        String name,
-        String username,
-        String modified,
-        String size,
-        String created,
-        String docType
-    ) {
+    public static Document newLuceneDoc(String content, String path, String name, String username, String modified,
+            String size, String created, String docType) {
         Document doc = new Document();
         doc.add(new Field("contents", content, TextField.TYPE_NOT_STORED));
         doc.add(new StringField("filepath", path, Field.Store.YES));

@@ -40,11 +40,10 @@ public class IPFSDag extends ServiceBase {
         try {
             String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
             ResponseEntity<String> response = ipfs.restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                Util.getBasicRequestEntity(),
-                String.class
-            );
+                    url,
+                    HttpMethod.POST,
+                    Util.getBasicRequestEntity(),
+                    String.class);
             ret = response.getBody();
             log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {
@@ -65,14 +64,16 @@ public class IPFSDag extends ServiceBase {
         return ret;
     }
 
-    public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid, GetIPFSFilesRequest req) {
+    public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid,
+            GetIPFSFilesRequest req) {
         checkIpfs();
         LinkedList<MFSDirEntry> files = new LinkedList<>();
         if (!ThreadLocals.getSC().allowWeb3()) {
             return null;
         }
         // oops, looks like a path
-        if (req.getFolder().startsWith("/")) return null;
+        if (req.getFolder().startsWith("/"))
+            return null;
         cid.setVal(req.getFolder());
         folder.setVal(req.getFolder());
         DagNode dagNode = getNode(req.getFolder());

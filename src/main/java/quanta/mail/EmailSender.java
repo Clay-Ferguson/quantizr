@@ -46,7 +46,8 @@ public class EmailSender extends ServiceBase implements TransportListener {
      * mail is sent
      */
     public void init() {
-        if (!mailEnabled()) return;
+        if (!mailEnabled())
+            return;
         log.trace("MailSender.init()");
         String mailHost = appProp.getMailHost();
         String mailUser = appProp.getMailUser();
@@ -88,7 +89,8 @@ public class EmailSender extends ServiceBase implements TransportListener {
     }
 
     public void close() {
-        if (!mailEnabled()) return;
+        if (!mailEnabled())
+            return;
         if (transport != null) {
             try {
                 log.trace("closing transport");
@@ -102,7 +104,8 @@ public class EmailSender extends ServiceBase implements TransportListener {
     }
 
     public void sendMail(String sendToAddress, String fromAddress, String content, String subjectLine) {
-        if (!mailEnabled()) return;
+        if (!mailEnabled())
+            return;
         if (fromAddress == null) {
             fromAddress = appProp.getMailFrom();
         }
@@ -134,12 +137,11 @@ public class EmailSender extends ServiceBase implements TransportListener {
              */
             transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
         } catch (
-            // I'm not sure if the callbacks are on this same thread or not. Commenting out
-            // pending research into this.
-            // log.debug("Response: " + transport.getLastServerResponse() + " Code: " +
-            // transport.getLastReturnCode());
-            Exception e
-        ) {
+        // I'm not sure if the callbacks are on this same thread or not. Commenting out
+        // pending research into this.
+        // log.debug("Response: " + transport.getLastServerResponse() + " Code: " +
+        // transport.getLastReturnCode());
+        Exception e) {
             throw ExUtil.wrapEx(e);
         }
     }

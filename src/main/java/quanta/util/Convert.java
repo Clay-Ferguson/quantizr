@@ -55,24 +55,23 @@ public class Convert extends ServiceBase {
      * browser/client to encapsulate the data for a given node which is used by the browser to render
      * the node.
      *
-     * todo-1: make sure any saving that's triggered in here is done in an async thread that doesn't block
-     * this method from returning fast
+     * todo-1: make sure any saving that's triggered in here is done in an async thread that doesn't
+     * block this method from returning fast
      */
     public NodeInfo convertToNodeInfo(
-        boolean adminOnly,
-        SessionContext sc,
-        MongoSession ms,
-        SubNode node,
-        boolean initNodeEdit,
-        long logicalOrdinal,
-        boolean allowInlineChildren,
-        boolean lastChild,
-        boolean getFollowers,
-        boolean loadLikes,
-        boolean attachBoosted,
-        Val<SubNode> boostedNodeVal,
-        boolean attachLinkedNodes
-    ) {
+            boolean adminOnly,
+            SessionContext sc,
+            MongoSession ms,
+            SubNode node,
+            boolean initNodeEdit,
+            long logicalOrdinal,
+            boolean allowInlineChildren,
+            boolean lastChild,
+            boolean getFollowers,
+            boolean loadLikes,
+            boolean attachBoosted,
+            Val<SubNode> boostedNodeVal,
+            boolean attachLinkedNodes) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
         // if we have a signature, check it.
         boolean sigFail = false;
@@ -194,33 +193,32 @@ public class Convert extends ServiceBase {
         }
 
         NodeInfo nodeInfo = new NodeInfo(
-            node.jsonId(),
-            node.getPath(),
-            node.getName(),
-            content,
-            renderContent, //
-            node.getTags(),
-            displayName, //
-            owner,
-            ownerId,
-            nostrPubKey, //
-            node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
-            node.getOrdinal(), //
-            node.getModifyTime(),
-            propList,
-            node.getAttachments(),
-            node.getLinks(),
-            acList,
-            likes,
-            hasChildren, //
-            node.getType(),
-            logicalOrdinal,
-            lastChild,
-            cipherKey,
-            avatarVer,
-            apAvatar,
-            apImage
-        );
+                node.jsonId(),
+                node.getPath(),
+                node.getName(),
+                content,
+                renderContent, //
+                node.getTags(),
+                displayName, //
+                owner,
+                ownerId,
+                nostrPubKey, //
+                node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
+                node.getOrdinal(), //
+                node.getModifyTime(),
+                propList,
+                node.getAttachments(),
+                node.getLinks(),
+                acList,
+                likes,
+                hasChildren, //
+                node.getType(),
+                logicalOrdinal,
+                lastChild,
+                cipherKey,
+                avatarVer,
+                apAvatar,
+                apImage);
         // if this node type has a plugin run it's converter to let it contribute
         TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
         if (plugin != null) {
@@ -233,7 +231,8 @@ public class Convert extends ServiceBase {
         if (allowInlineChildren) {
             boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
             if (hasInlineChildren) {
-                Iterable<SubNode> nodeIter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0);
+                Iterable<SubNode> nodeIter =
+                        read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0);
                 Iterator<SubNode> iterator = nodeIter.iterator();
                 long inlineOrdinal = 0;
 
@@ -246,20 +245,19 @@ public class Convert extends ServiceBase {
                     // the 'inlineChildren' capability
                     boolean multiLevel = true;
                     NodeInfo info = convertToNodeInfo(
-                        false,
-                        sc,
-                        ms,
-                        n,
-                        initNodeEdit,
-                        inlineOrdinal++,
-                        multiLevel,
-                        lastChild,
-                        false,
-                        loadLikes,
-                        false,
-                        null,
-                        false
-                    );
+                            false,
+                            sc,
+                            ms,
+                            n,
+                            initNodeEdit,
+                            inlineOrdinal++,
+                            multiLevel,
+                            lastChild,
+                            false,
+                            loadLikes,
+                            false,
+                            null,
+                            false);
                     if (info != null) {
                         nodeInfo.safeGetChildren().add(info);
                     }
@@ -307,20 +305,19 @@ public class Convert extends ServiceBase {
             }
             if (boostedNode != null) {
                 NodeInfo info = convertToNodeInfo(
-                    false,
-                    sc,
-                    ms,
-                    boostedNode,
-                    false,
-                    Convert.LOGICAL_ORDINAL_IGNORE,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    null,
-                    false
-                );
+                        false,
+                        sc,
+                        ms,
+                        boostedNode,
+                        false,
+                        Convert.LOGICAL_ORDINAL_IGNORE,
+                        false,
+                        false,
+                        false,
+                        false,
+                        false,
+                        null,
+                        false);
                 if (info != null) {
                     nodeInfo.setBoostedNode(info);
                 }
@@ -351,7 +348,8 @@ public class Convert extends ServiceBase {
         }
         // sending back null for renderContent if no tags were inserted (no special HTML to send back, but
         // just markdown)
-        if (tags == null || tags.size() == 0) return null;
+        if (tags == null || tags.size() == 0)
+            return null;
         StringBuilder sb = new StringBuilder();
         StringTokenizer t = new StringTokenizer(node.getContent(), APConst.TAGS_TOKENIZER, true);
 
@@ -361,13 +359,11 @@ public class Convert extends ServiceBase {
             int atCount = 0;
             boolean formatted = false;
             // Hashtag
-            if (
-                includeHashtags &&
-                tokLen > 1 &&
-                tok.startsWith("#") &&
-                StringUtils.countMatches(tok, "#") == 1 &&
-                Character.isLetter(tok.charAt(1))
-            ) {
+            if (includeHashtags &&
+                    tokLen > 1 &&
+                    tok.startsWith("#") &&
+                    StringUtils.countMatches(tok, "#") == 1 &&
+                    Character.isLetter(tok.charAt(1))) {
                 APObj tag = tags.get(tok);
                 if (tag instanceof APOHashtag) {
                     String href = (String) tag.get(APObj.href);
@@ -376,17 +372,17 @@ public class Convert extends ServiceBase {
                         // having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
                         formatted = true;
                         sb.append( //
-                            "<a class='mention hashtag' href='" + href + "' target='_blank'>#<span>" + shortTok + "</span></a>"
-                        );
+                                "<a class='mention hashtag' href='" + href + "' target='_blank'>#<span>" + shortTok
+                                        + "</span></a>");
                     }
                 }
             } //
-            else if ( // Mention // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok + "</span></a>"); // sb.append("<a class='mention hashtag' href='" + href + // //
-                tokLen > 1 &&
-                tok.startsWith("@") &&
-                (atCount = StringUtils.countMatches(tok, "@")) <= 2 &&
-                Character.isLetterOrDigit(tok.charAt(1))
-            ) {
+            else if ( // Mention // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok +
+                      // "</span></a>"); // sb.append("<a class='mention hashtag' href='" + href + // //
+            tokLen > 1 &&
+                    tok.startsWith("@") &&
+                    (atCount = StringUtils.countMatches(tok, "@")) <= 2 &&
+                    Character.isLetterOrDigit(tok.charAt(1))) {
                 APObj tag = tags.get(tok);
                 if (tag instanceof APOMention) {
                     String href = (String) tag.get(APObj.href);
@@ -399,12 +395,11 @@ public class Convert extends ServiceBase {
                         // NOTE: h-card and u-url are part of 'microformats'
                         formatted = true;
                         sb.append( //
-                            "<span class='h-card'><a class='u-url mention' href='" +
-                            href +
-                            "' target='_blank'>@<span>" +
-                            shortTok +
-                            "</span></a></span>"
-                        );
+                                "<span class='h-card'><a class='u-url mention' href='" +
+                                        href +
+                                        "' target='_blank'>@<span>" +
+                                        shortTok +
+                                        "</span></a></span>");
                     }
                 }
             }
@@ -439,11 +434,10 @@ public class Convert extends ServiceBase {
     }
 
     public List<PropertyInfo> buildPropertyInfoList(
-        SessionContext sc,
-        SubNode node, //
-        boolean initNodeEdit,
-        boolean sigFail
-    ) {
+            SessionContext sc,
+            SubNode node, //
+            boolean initNodeEdit,
+            boolean sigFail) {
         List<PropertyInfo> props = null;
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {
@@ -469,7 +463,8 @@ public class Convert extends ServiceBase {
     public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
         List<AccessControlInfo> ret = null;
         HashMap<String, AccessControl> ac = node.getAc();
-        if (ac == null) return null;
+        if (ac == null)
+            return null;
 
         for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
             String principalId = entry.getKey();
@@ -484,7 +479,8 @@ public class Convert extends ServiceBase {
         return ret;
     }
 
-    public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId, AccessControl ac) {
+    public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId,
+            AccessControl ac) {
         AccessControlInfo acInfo = new AccessControlInfo();
         acInfo.setPrincipalNodeId(principalId);
         if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
@@ -513,12 +509,11 @@ public class Convert extends ServiceBase {
     }
 
     public PropertyInfo convertToPropertyInfo(
-        SessionContext sc,
-        SubNode node,
-        String propName,
-        Object prop,
-        boolean initNodeEdit
-    ) {
+            SessionContext sc,
+            SubNode node,
+            String propName,
+            Object prop,
+            boolean initNodeEdit) {
         try {
             Object value = null;
             if (prop instanceof Date) {

@@ -6,17 +6,15 @@ public enum NodeProp {
     NOSTR_RELAYS("sn:relays"),
 
     // NOTE: We store both npub and PubKey so that searching works MongoDB full text searching works.
-    NOSTR_USER_NPUB("sn:npub"),
-    NOSTR_USER_PUBKEY("sn:nopk"),
+    NOSTR_USER_NPUB("sn:npub"), NOSTR_USER_PUBKEY("sn:nopk"),
 
     NOSTR_TAGS("sn:ntags"),
-    NOSTR_NAME("sn:nosName"),
-    NOSTR_USER_NAME("sn:nosUserName"),
-    NOSTR_NIP05("sn:nosNip05"),
-    NOSTR_USER_WEBSITE("sn:nosWebsite"),
-    NOSTR_USER_TIMESTAMP("sn:nosTimestamp"),
 
-    // If this property is non-null on a node it means the node originated (was posted by) some other forgien server.
+    NOSTR_NAME("sn:nosName"), NOSTR_USER_NAME("sn:nosUserName"), NOSTR_NIP05(
+            "sn:nosNip05"), NOSTR_USER_WEBSITE("sn:nosWebsite"), NOSTR_USER_TIMESTAMP("sn:nosTimestamp"),
+
+    // If this property is non-null on a node it means the node originated (was posted by) some other
+    // forgien server.
     // If the value starts with "." that indicated "Nostr" and otherwise "ActPub" is assumed.
     OBJECT_ID("apid"),
 
@@ -77,8 +75,7 @@ public enum NodeProp {
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
      * the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc"),
-    AUDIO_URL("sn:audioUrl"),
+    RSS_FEED_SRC("sn:rssFeedSrc"), AUDIO_URL("sn:audioUrl"),
 
     USER_PREF_PUBLIC_KEY("sn:publicKey"), //
     USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey"), //
@@ -110,12 +107,14 @@ public enum NodeProp {
      */
     USER("sn:user"), //
     DISPLAY_NAME("sn:displayName"), //
-    MFS_ENABLE("sn:mfsEnable"), // Mutable File System enabled (user can set this, independend of their admin authorization)
+    MFS_ENABLE("sn:mfsEnable"), // Mutable File System enabled (user can set this, independend of their admin
+                                // authorization)
     USER_BIO("sn:userBio"), //
     USER_DID_IPNS("sn:didIPNS"), //
     USER_IPFS_KEY("sn:ipfsKey"), //
 
-    // This holds the user's defined tags they've defined in the Tags Editor Dlg, and is stored on their account node.
+    // This holds the user's defined tags they've defined in the Tags Editor Dlg, and is stored on their
+    // account node.
     USER_TAGS("sn:tags"), //
     USER_BLOCK_WORDS("sn:blockWords"), //
     USER_RECENT_TYPES("sn:recentTypes"), //
@@ -220,8 +219,7 @@ public enum NodeProp {
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
 
-    OPEN_GRAPH("sn:og"),
-    TRUNCATED("trunc");
+    OPEN_GRAPH("sn:og"), TRUNCATED("trunc");
 
     @JsonValue
     private final String value;

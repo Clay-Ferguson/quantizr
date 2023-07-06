@@ -82,20 +82,19 @@ public class NodeRenderService extends ServiceBase {
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
             res.setRssNode(true);
             NodeInfo nodeInfo = convert.convertToNodeInfo(
-                adminOnly,
-                ThreadLocals.getSC(),
-                ms,
-                node,
-                false,
-                Convert.LOGICAL_ORDINAL_IGNORE,
-                false,
-                false,
-                false,
-                true,
-                true,
-                null,
-                false
-            );
+                    adminOnly,
+                    ThreadLocals.getSC(),
+                    ms,
+                    node,
+                    false,
+                    Convert.LOGICAL_ORDINAL_IGNORE,
+                    false,
+                    false,
+                    false,
+                    true,
+                    true,
+                    null,
+                    false);
             res.setNode(nodeInfo);
             return res;
         }
@@ -118,20 +117,19 @@ public class NodeRenderService extends ServiceBase {
         if (req.isSingleNode()) {
             // that loads these all asynchronously.
             NodeInfo nodeInfo = convert.convertToNodeInfo(
-                adminOnly,
-                ThreadLocals.getSC(),
-                ms,
-                node,
-                false,
-                Convert.LOGICAL_ORDINAL_GENERATE,
-                false,
-                false,
-                false,
-                true,
-                true,
-                null,
-                false
-            );
+                    adminOnly,
+                    ThreadLocals.getSC(),
+                    ms,
+                    node,
+                    false,
+                    Convert.LOGICAL_ORDINAL_GENERATE,
+                    false,
+                    false,
+                    false,
+                    true,
+                    true,
+                    null,
+                    false);
             res.setNode(nodeInfo);
             return res;
         }
@@ -141,7 +139,8 @@ public class NodeRenderService extends ServiceBase {
          * end when the query returns, and the page root node will of course be the parent of scanToNode
          */
         SubNode scanToNode = null;
-        // we pass allowAuth=true because right here we DO care that the hasChildren is considering only based
+        // we pass allowAuth=true because right here we DO care that the hasChildren is considering only
+        // based
         // on what WE can access.
         if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node))) {
             req.setUpLevel(true);
@@ -195,7 +194,8 @@ public class NodeRenderService extends ServiceBase {
         LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
         res.setBreadcrumbs(breadcrumbs);
         render.getBreadcrumbs(ms, node, breadcrumbs);
-        NodeInfo nodeInfo = render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
+        NodeInfo nodeInfo =
+                render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
         if (nodeInfo != null) {
             res.setNode(nodeInfo);
         } else {
@@ -205,32 +205,30 @@ public class NodeRenderService extends ServiceBase {
     }
 
     public NodeInfo processRenderNode(
-        boolean adminOnly,
-        MongoSession ms,
-        RenderNodeRequest req,
-        RenderNodeResponse res,
-        SubNode node,
-        SubNode scanToNode,
-        long logicalOrdinal,
-        int level,
-        int limit,
-        boolean showReplies
-    ) {
+            boolean adminOnly,
+            MongoSession ms,
+            RenderNodeRequest req,
+            RenderNodeResponse res,
+            SubNode node,
+            SubNode scanToNode,
+            long logicalOrdinal,
+            int level,
+            int limit,
+            boolean showReplies) {
         NodeInfo nodeInfo = convert.convertToNodeInfo(
-            adminOnly,
-            ThreadLocals.getSC(),
-            ms,
-            node,
-            false,
-            logicalOrdinal,
-            level > 0,
-            false,
-            false,
-            true,
-            true,
-            null,
-            false
-        );
+                adminOnly,
+                ThreadLocals.getSC(),
+                ms,
+                node,
+                false,
+                logicalOrdinal,
+                level > 0,
+                false,
+                false,
+                true,
+                true,
+                null,
+                false);
         if (nodeInfo == null) {
             return null;
         }
@@ -360,25 +358,25 @@ public class NodeRenderService extends ServiceBase {
                                 SubNode sn = slidingWindow.get(i);
                                 relativeIdx--;
                                 ninfo =
-                                    render.processRenderNode(
-                                        adminOnly,
-                                        ms,
-                                        req,
-                                        res,
-                                        sn,
-                                        null,
-                                        relativeIdx,
-                                        level + 1,
-                                        limit,
-                                        showReplies
-                                    );
+                                        render.processRenderNode(
+                                                adminOnly,
+                                                ms,
+                                                req,
+                                                res,
+                                                sn,
+                                                null,
+                                                relativeIdx,
+                                                level + 1,
+                                                limit,
+                                                showReplies);
                                 nodeInfo.getChildren().add(0, ninfo);
                                 /*
-                                 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example would also
-                                 * work and would bring back the target node as close to the center of the results sent back to
-                                 * the brower as possible, but what we do instead is just set to ROWS_PER_PAGE which maximizes
-                                 * performance by iterating the smallese number of results in order to get a page that contains
-                                 * what we need (namely the target node as indiated by scanToNode item)
+                                 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example
+                                 * would also work and would bring back the target node as close to the center of the
+                                 * results sent back to the brower as possible, but what we do instead is just set to
+                                 * ROWS_PER_PAGE which maximizes performance by iterating the smallese number of results
+                                 * in order to get a page that contains what we need (namely the target node as indiated
+                                 * by scanToNode item)
                                  */
                                 if (nodeInfo.getChildren().size() >= limit - 1) {
                                     break;
@@ -390,9 +388,9 @@ public class NodeRenderService extends ServiceBase {
                         slidingWindow = null;
                     }
                 } else /*
-                 * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
-                 * iteration/node
-                 */{
+                        * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
+                        * iteration/node
+                        */ {
                     /* lazily create sliding window */
                     if (slidingWindow == null) {
                         slidingWindow = new LinkedList<>();
@@ -431,18 +429,17 @@ public class NodeRenderService extends ServiceBase {
                     SubNode sn = slidingWindow.get(i);
                     relativeIdx--;
                     ninfo =
-                        render.processRenderNode(
-                            adminOnly,
-                            ms,
-                            req,
-                            res,
-                            sn,
-                            null,
-                            (long) relativeIdx,
-                            level + 1,
-                            limit,
-                            showReplies
-                        );
+                            render.processRenderNode(
+                                    adminOnly,
+                                    ms,
+                                    req,
+                                    res,
+                                    sn,
+                                    null,
+                                    (long) relativeIdx,
+                                    level + 1,
+                                    limit,
+                                    showReplies);
                     nodeInfo.getChildren().add(0, ninfo);
                     // If we have enough records we're done
                     if (nodeInfo.getChildren().size() >= limit) {
@@ -480,7 +477,8 @@ public class NodeRenderService extends ServiceBase {
         if (spaceIdx != -1) {
             String orderByProp = orderBy.substring(0, spaceIdx);
             dir = orderBy.substring(spaceIdx + 1);
-            sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.PROPS + "." + orderByProp);
+            sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+                    SubNode.PROPS + "." + orderByProp);
             /*
              * when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes
              * appear at top. todo-2: probably would be better to to just make this orderBy parser handle
@@ -503,17 +501,18 @@ public class NodeRenderService extends ServiceBase {
         if (req.getEditMyFriendNode()) {
             String _nodeId = nodeId;
             nodeId =
-                arun.run(as -> {
-                    Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
-                    // we query as a list, but there should only be ONE result.
-                    List<SubNode> friendNodes = user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
-                    if (friendNodes != null) {
-                        for (SubNode friendNode : friendNodes) {
-                            return friendNode.getIdStr();
+                    arun.run(as -> {
+                        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
+                        // we query as a list, but there should only be ONE result.
+                        List<SubNode> friendNodes =
+                                user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
+                        if (friendNodes != null) {
+                            for (SubNode friendNode : friendNodes) {
+                                return friendNode.getIdStr();
+                            }
                         }
-                    }
-                    return null;
-                });
+                        return null;
+                    });
         }
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
@@ -522,20 +521,19 @@ public class NodeRenderService extends ServiceBase {
             return res;
         }
         NodeInfo nodeInfo = convert.convertToNodeInfo(
-            false,
-            ThreadLocals.getSC(),
-            ms,
-            node,
-            true,
-            Convert.LOGICAL_ORDINAL_IGNORE,
-            false,
-            false,
-            false,
-            false,
-            false,
-            null,
-            false
-        );
+                false,
+                ThreadLocals.getSC(),
+                ms,
+                node,
+                true,
+                Convert.LOGICAL_ORDINAL_IGNORE,
+                false,
+                false,
+                false,
+                false,
+                false,
+                null,
+                false);
         res.setNodeInfo(nodeInfo);
         return res;
     }
@@ -559,7 +557,8 @@ public class NodeRenderService extends ServiceBase {
     }
 
     public void populateSocialCardProps(SubNode node, Model model) {
-        if (node == null) return;
+        if (node == null)
+            return;
         NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
         model.addAttribute("ogTitle", metaInfo.getTitle());
         model.addAttribute("ogDescription", metaInfo.getDescription());
@@ -620,10 +619,8 @@ public class NodeRenderService extends ServiceBase {
                         content = "";
                     }
                 } //
-                else if (
-                    node.getType() == NodeType.NOSTR_ENC_DM.s() || //
-                    content.startsWith(Constant.ENC_TAG.s())
-                ) {
+                else if (node.getType() == NodeType.NOSTR_ENC_DM.s() || //
+                        content.startsWith(Constant.ENC_TAG.s())) {
                     content = "[encrypted]";
                 } else {
                     content = getFirstLineAbbreviation(content, 25);
@@ -634,7 +631,8 @@ public class NodeRenderService extends ServiceBase {
                 list.add(0, bci);
                 node = read.getParent(ms, node);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         /*
          * this is normal for users to wind up here because looking up the tree always ends at a place they
          * can't access, and whatever paths we accumulated until this access error is what we do want to
@@ -643,7 +641,8 @@ public class NodeRenderService extends ServiceBase {
     }
 
     public String stripRenderTags(String content) {
-        if (content == null) return null;
+        if (content == null)
+            return null;
         content = content.trim();
 
         while (content.startsWith("#")) {
@@ -654,7 +653,8 @@ public class NodeRenderService extends ServiceBase {
     }
 
     public String getFirstLineAbbreviation(String content, int maxLen) {
-        if (content == null) return null;
+        if (content == null)
+            return null;
         // if this is a node starting with hashtags or usernames then chop them all
         while (content.startsWith("@") || content.startsWith("#")) {
             int spaceIdx = content.indexOf(" ");

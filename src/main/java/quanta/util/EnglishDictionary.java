@@ -36,7 +36,8 @@ public class EnglishDictionary extends ServiceBase {
     }
 
     public void loadWords(String fileName, HashSet<String> words) {
-        if (words.size() > 0) return;
+        if (words.size() > 0)
+            return;
         try {
             /*
              * todo-1: Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes
@@ -84,7 +85,8 @@ public class EnglishDictionary extends ServiceBase {
     }
 
     public boolean isStopWord(String word) {
-        if (word == null) return true;
+        if (word == null)
+            return true;
         return stopWords.contains(word.toLowerCase());
     }
 
@@ -98,8 +100,10 @@ public class EnglishDictionary extends ServiceBase {
      * example threshold=0.60f -> 60% english)
      */
     public boolean isEnglish(String text) {
-        if (text == null) return true;
-        if (dictWords.size() == 0) throw new RuntimeException("called isEnglish before dictionary was loaded.");
+        if (text == null)
+            return true;
+        if (dictWords.size() == 0)
+            throw new RuntimeException("called isEnglish before dictionary was loaded.");
         int englishCount = 0;
         int unknownCount = 0;
         /*
@@ -134,14 +138,17 @@ public class EnglishDictionary extends ServiceBase {
                 unknownCount++;
             }
         }
-        if (englishCount == 0 && unknownCount == 0) return true;
+        if (englishCount == 0 && unknownCount == 0)
+            return true;
         float percent = (float) englishCount / (englishCount + unknownCount);
         return percent > 0.6F;
     }
 
     public boolean hasBadWords(String text) {
-        if (badWords.size() == 0) throw new RuntimeException("called isBadWord before dictionary was loaded.");
-        if (text == null) return false;
+        if (badWords.size() == 0)
+            throw new RuntimeException("called isBadWord before dictionary was loaded.");
+        if (text == null)
+            return false;
         StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#<>", false);
 
         while (tokens.hasMoreTokens()) {
