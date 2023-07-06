@@ -86,15 +86,12 @@ public class MongoUpdate extends ServiceBase {
             // we check the saving flag to ensure we don't go into circular recursion here.
             ThreadLocals.setSaving(true);
             synchronized (ms) {
-                ThreadLocals
-                        .getDirtyNodes()
-                        .forEach((key, value) -> {
-                            if (!key.toHexString().equals(value.getIdStr())) {
-                                throw new RuntimeException(
-                                        "Node originally cached as ID " + key.toHexString() + " now has key"
-                                                + value.getIdStr());
-                            }
-                        });
+                ThreadLocals.getDirtyNodes().forEach((key, value) -> {
+                    if (!key.toHexString().equals(value.getIdStr())) {
+                        throw new RuntimeException("Node originally cached as ID " + key.toHexString() + " now has key"
+                                + value.getIdStr());
+                    }
+                });
                 /*
                  * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
                  * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
@@ -109,12 +106,9 @@ public class MongoUpdate extends ServiceBase {
                         auth.ownerAuth(ms, node);
                     } catch (Exception e) {
                         log.debug( //
-                                "Dirty node save attempt failed: " +
-                                        XString.prettyPrint(node) +
-                                        "\bYour mongoSession has user: " +
-                                        ms.getUserName() +
-                                        " and your ThreadLocal session is: " +
-                                        ThreadLocals.getSC().getUserName());
+                                "Dirty node save attempt failed: " + XString.prettyPrint(node)
+                                        + "\bYour mongoSession has user: " + ms.getUserName()
+                                        + " and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
                     }
                     nodes.add(node);
                 }

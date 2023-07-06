@@ -18,8 +18,8 @@ export class NodeCompRowFooter extends Div {
         if (this.node.owner.indexOf("@") !== -1) {
             const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             if (inReplyTo) {
-                // if this is not our own host then show the Remote Parent link
-                if (inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
+                // if this is a URL and not our own host then show the Remote Parent link
+                if (inReplyTo.indexOf(":") !== -1 && inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
                     children.push(new Anchor(inReplyTo, "Parent", {
                         className: "footerLink",
                         target: "_blank",

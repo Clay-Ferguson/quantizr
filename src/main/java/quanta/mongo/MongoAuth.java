@@ -224,8 +224,8 @@ public class MongoAuth extends ServiceBase {
 
     public boolean isAllowedUserName(String userName) {
         userName = userName.trim();
-        return (!userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) &&
-                !userName.equalsIgnoreCase(PrincipalName.PUBLIC.s()) && //
+        return (!userName.equalsIgnoreCase(PrincipalName.ADMIN.s())
+                && !userName.equalsIgnoreCase(PrincipalName.PUBLIC.s()) && //
                 !userName.equalsIgnoreCase(PrincipalName.ANON.s()));
     }
 
@@ -341,9 +341,8 @@ public class MongoAuth extends ServiceBase {
             throw new RuntimeException("session has no userNode: " + XString.prettyPrint(ms));
         }
         if (!ms.getUserNodeId().equals(node.getOwner())) {
-            log.error(
-                    "Unable to save Node (expected ownerId " + ms.getUserNodeId().toHexString() + "): "
-                            + XString.prettyPrint(node));
+            log.error("Unable to save Node (expected ownerId " + ms.getUserNodeId().toHexString() + "): "
+                    + XString.prettyPrint(node));
             throw new ForbiddenException();
         }
     }
@@ -357,9 +356,8 @@ public class MongoAuth extends ServiceBase {
         try {
             auth(ms, node, PrivilegeType.WRITE);
         } catch (RuntimeException e) {
-            log.debug(
-                    "session: " + ms.getUserName() + " tried to create a node under nodeId " + node.getIdStr()
-                            + " and was refused.");
+            log.debug("session: " + ms.getUserName() + " tried to create a node under nodeId " + node.getIdStr()
+                    + " and was refused.");
             throw e;
         }
     }
@@ -420,18 +418,14 @@ public class MongoAuth extends ServiceBase {
             // if this session user is the owner of this node, then they have full power
             if (ms.getUserNodeId().equals(node.getOwner())) {
                 if (verbose)
-                    log.trace(
-                            "allow: user " + ms.getUserName() + " owns node. accountId: "
-                                    + node.getOwner().toHexString());
+                    log.trace("allow: user " + ms.getUserName() + " owns node. accountId: "
+                            + node.getOwner().toHexString());
                 return;
             }
             if (ms.getUserNodeId().equals(node.getTransferFrom())) {
                 if (verbose)
-                    log.trace(
-                            "allow: user " +
-                                    ms.getUserName() +
-                                    " is transferring node. accountId: " +
-                                    node.getTransferFrom().toHexString());
+                    log.trace("allow: user " + ms.getUserName() + " is transferring node. accountId: "
+                            + node.getTransferFrom().toHexString());
                 return;
             }
         }
@@ -536,15 +530,8 @@ public class MongoAuth extends ServiceBase {
                 avatarVer = att != null ? att.getBin() : null;
             }
         }
-        AccessControlInfo info = new AccessControlInfo(
-                displayName,
-                principalName,
-                principalId,
-                publicKey,
-                nostrNpub,
-                nostrRelays,
-                avatarVer,
-                foreignAvatarUrl);
+        AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, nostrNpub,
+                nostrRelays, avatarVer, foreignAvatarUrl);
         info.addPrivilege(new PrivilegeInfo(authType));
         return info;
     }
@@ -557,13 +544,8 @@ public class MongoAuth extends ServiceBase {
      * being shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public'
      * in sharedTo instead
      */
-    public Iterable<SubNode> searchSubGraphByAclUser(
-            MongoSession ms,
-            String pathToSearch,
-            List<String> sharedToAny,
-            Sort sort,
-            int limit,
-            ObjectId ownerIdMatch) {
+    public Iterable<SubNode> searchSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny,
+            Sort sort, int limit, ObjectId ownerIdMatch) {
         Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
         if (q == null)
             return null;
@@ -621,13 +603,8 @@ public class MongoAuth extends ServiceBase {
      * incorrect nodes to wrong users because ownerIdMatch forces only the owner running the query to
      * see their own nodes only
      */
-    public Iterable<SubNode> searchSubGraphByAcl(
-            MongoSession ms,
-            int skip,
-            String pathToSearch,
-            ObjectId ownerIdMatch,
-            Sort sort,
-            int limit) {
+    public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch,
+            Sort sort, int limit) {
         Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
         if (sort != null) {
             q.with(sort);

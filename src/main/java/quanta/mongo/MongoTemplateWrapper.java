@@ -32,11 +32,8 @@ public class MongoTemplateWrapper extends ServiceBase {
 
         DeleteResult res = ops.remove(query, entityClass);
         if (logging) {
-            log.debug(
-                    "removed=" +
-                            res.getDeletedCount() +
-                            "time=" +
-                            DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
+            log.debug("removed=" + res.getDeletedCount() + "time="
+                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
         return res;
     }
@@ -103,10 +100,8 @@ public class MongoTemplateWrapper extends ServiceBase {
 
         T obj = ops.findOne(query, entityClass);
         if (logging) {
-            log.debug(
-                    (obj != null ? "found " : "not found ") +
-                            "t=" +
-                            DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
+            log.debug((obj != null ? "found " : "not found ") + "t="
+                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
         return obj;
     }
@@ -120,11 +115,8 @@ public class MongoTemplateWrapper extends ServiceBase {
 
         DeleteResult res = ops.remove(query, SubNode.class);
         if (logging) {
-            log.debug(
-                    "removed: " +
-                            res.getDeletedCount() +
-                            "t=" +
-                            DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
+            log.debug("removed: " + res.getDeletedCount() + "t="
+                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
         return res;
     }
@@ -186,10 +178,8 @@ public class MongoTemplateWrapper extends ServiceBase {
 
         SubNode obj = ops.findOne(query, SubNode.class);
         if (logging) {
-            log.debug(
-                    (obj != null ? ("found: " + obj.getIdStr()) : "not found") +
-                            " t=" +
-                            DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
+            log.debug((obj != null ? ("found: " + obj.getIdStr()) : "not found") + " t="
+                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
         }
         return obj;
     }
@@ -205,17 +195,11 @@ public class MongoTemplateWrapper extends ServiceBase {
     }
 
     private void log(String name, MongoSession ms, Query query) {
-        log.debug(
-                "MQ: cmd:" + //
-                        (ThreadLocals.getSC() != null && ThreadLocals.getSC().getCommand() != null
-                                ? ThreadLocals.getSC().getCommand()
-                                : "?")
-                        +
-                        " u:" +
-                        (ms == null || ms.getUserName() == null ? "null" : ms.getUserName()) +
-                        " q:" +
-                        name +
-                        " " +
-                        query.toString());
+        log.debug("MQ: cmd:" + //
+                (ThreadLocals.getSC() != null && ThreadLocals.getSC().getCommand() != null
+                        ? ThreadLocals.getSC().getCommand()
+                        : "?")
+                + " u:" + (ms == null || ms.getUserName() == null ? "null" : ms.getUserName()) + " q:" + name + " "
+                + query.toString());
     }
 }

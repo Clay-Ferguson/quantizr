@@ -30,12 +30,7 @@ public class MongoCreate extends ServiceBase {
     // except for once every thousand times.
     private static long RESERVE_BLOCK_SIZE = 1000;
 
-    public SubNode createNode(
-            MongoSession ms,
-            SubNode parent,
-            String type,
-            Long ordinal,
-            CreateNodeLocation location,
+    public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
             boolean updateParentOrdinals) {
         return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals, true);
     }
@@ -62,16 +57,8 @@ public class MongoCreate extends ServiceBase {
      *
      * relPath can be null if no path is known
      */
-    public SubNode createNode(
-            MongoSession ms,
-            SubNode parent,
-            String relPath,
-            String type,
-            Long ordinal,
-            CreateNodeLocation location,
-            List<PropertyInfo> properties,
-            ObjectId ownerId,
-            boolean updateOrdinals,
+    public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
+            CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals,
             boolean updateParent) {
         if (relPath == null) {
             /*
@@ -95,10 +82,9 @@ public class MongoCreate extends ServiceBase {
                     ordinal = 0L;
                 }
                 Long _ordinal = ordinal;
-                ordinal =
-                        (Long) arun.run(as -> {
-                            return create.prepOrdinalForLocation(as, location, parent, _ordinal);
-                        });
+                ordinal = (Long) arun.run(as -> {
+                    return create.prepOrdinalForLocation(as, location, parent, _ordinal);
+                });
             }
         }
         SubNode node = new SubNode(ownerId, path, type, ordinal);

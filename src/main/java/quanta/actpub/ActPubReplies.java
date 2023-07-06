@@ -41,11 +41,6 @@ public class ActPubReplies extends ServiceBase {
         });
     }
 
-    /*
-     * Note: All replies to native-Quanta nodes (i.e. as opposed to cached foreign nodes) are stored as
-     * children under that node, so we don't need to consider any "inReplyTo" stuff when generating all
-     * the replies to any Quanta Node. They're just the children.
-     */
     public LinkedList<SubNode> getRepliesToNode(String nodeId) {
         return arun.<LinkedList<SubNode>>run(as -> {
             LinkedList<SubNode> nodes = new LinkedList<>();

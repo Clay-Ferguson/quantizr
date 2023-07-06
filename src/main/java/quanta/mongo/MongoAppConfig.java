@@ -144,8 +144,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                  * This codec registroy is what allows us to store objects that contain other POJOS, like for
                  * example the way we're storing AccessControl objects in a map inside SubNode
                  */
-                CodecRegistry pojoCodecRegistry = fromRegistries(
-                        MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                         fromProviders(PojoCodecProvider.builder().automatic(true).build()));
                 MongoClientSettings.Builder builder = MongoClientSettings.builder();
                 if (credential != null) {

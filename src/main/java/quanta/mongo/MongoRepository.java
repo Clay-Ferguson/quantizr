@@ -41,21 +41,17 @@ public class MongoRepository extends ServiceBase {
      * Use @PostConstruct instead for spring processing.
      */
     public MongoRepository() {
-        Runtime
-                .getRuntime()
-                .addShutdownHook(
-                        new Thread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        synchronized (lock) {
-                                            if (ServiceBase.mongoRepo != null) {
-                                                log.debug("********** runtime shutdownHook executing. **********");
-                                                ServiceBase.mongoRepo.close();
-                                            }
-                                        }
-                                    }
-                                }));
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (lock) {
+                    if (ServiceBase.mongoRepo != null) {
+                        log.debug("********** runtime shutdownHook executing. **********");
+                        ServiceBase.mongoRepo.close();
+                    }
+                }
+            }
+        }));
     }
 
     @PreDestroy

@@ -250,10 +250,14 @@ public class ActPubFactory extends ServiceBase {
                         return replyTo;
                     }
                 }
-            } else {
+            }
+            // todo-0: else inReplyTo is a URL? Is this still a legit case?
+            else {
                 return inReplyTo;
             }
-        } else { // If there's no reply to on the node treat the parent as the thing being replied to.
+        }
+        // If there's no reply to on the node treat the parent as the thing being replied to.
+        else {
             if (parent != null) {
                 return apUtil.buildUrlForReplyTo(as, parent);
             }

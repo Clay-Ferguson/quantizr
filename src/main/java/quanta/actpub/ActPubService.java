@@ -929,8 +929,7 @@ public class ActPubService extends ServiceBase {
         }
         Date published = apDate(obj, APObj.published);
         // NOTE: If this is an inbound reply to a local node, normally we can expect inReplyTo to be set
-        // here and
-        // it will be the nodeId of the node being replied to.
+        // here and it will be the nodeId of the node being replied to.
         if (inReplyTo == null) {
             inReplyTo = apStr(obj, APObj.inReplyTo);
         }
