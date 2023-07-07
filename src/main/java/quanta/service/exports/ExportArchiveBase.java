@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-// todo-0: fix this deprecation
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,21 +134,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private JupyterNB makeJupyterNotebook() {
-        return new JupyterNB(
-                jupyterCells, //
+        return new JupyterNB(jupyterCells, //
                 new JupyterMetadata( //
                         new JupyterKernelSpec("Python 3", "python", "python3"), //
                         new JupyterLangInfo( //
-                                new JupyterCodeMirrorMode("ipython", 3),
-                                ".py", //
-                                "text/x-python",
-                                "python",
-                                "python", //
-                                "ipython3",
-                                "3.10.6"),
+                                new JupyterCodeMirrorMode("ipython", 3), ".py", //
+                                "text/x-python", "python", "python", //
+                                "ipython3", "3.10.6"),
                         4), //
-                4,
-                2);
+                4, 2);
     }
 
     private void writeRootFiles() {
@@ -174,12 +167,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    private void recurseNode(
-            String rootPath,
-            String parentFolder,
-            TreeNode tn,
-            ArrayList<SubNode> nodeStack,
-            int level,
+    private void recurseNode(String rootPath, String parentFolder, TreeNode tn, ArrayList<SubNode> nodeStack, int level,
             String parentId) {
         SubNode node = tn.node;
         if (node == null)
@@ -232,15 +220,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * fileNameCont is an output parameter that has the complete filename minus the period and
      * extension.
      */
-    private void processNodeExport(
-            MongoSession ms,
-            String parentFolder,
-            String deeperPath,
-            SubNode node,
-            boolean writeFile,
-            Val<String> fileNameCont,
-            int level,
-            boolean isTopRow) {
+    private void processNodeExport(MongoSession ms, String parentFolder, String deeperPath, SubNode node,
+            boolean writeFile, Val<String> fileNameCont, int level, boolean isTopRow) {
         try {
             String nodeId = node.getIdStr();
             String fileName = nodeId;
@@ -275,17 +256,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (!"ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(
-                            true,
-                            null,
-                            mdContent,
-                            deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
-                            cell,
-                            writeFile,
-                            nodeId,
-                            fileName,
-                            att);
+                    handleAttachment(true, null, mdContent, deeperPath,
+                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), cell, writeFile, nodeId,
+                            fileName, att);
                 }
             }
             if (req.isIncludeHTML()) {
@@ -298,17 +271,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         if (!"ft".equals(att.getPosition())) {
                             continue;
                         }
-                        handleAttachment(
-                                true,
-                                htmlContent,
-                                null,
-                                deeperPath,
-                                req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
-                                null,
-                                writeFile,
-                                nodeId,
-                                fileName,
-                                att);
+                        handleAttachment(true, htmlContent, null, deeperPath,
+                                req.isAttOneFolder() ? "attachments" : ("." + parentFolder), null, writeFile, nodeId,
+                                fileName, att);
                     }
                 }
                 fullHtml.append(htmlContent.getVal());
@@ -322,17 +287,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if ("ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(
-                            false,
-                            null,
-                            null,
-                            deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder),
-                            cell,
-                            writeFile,
-                            nodeId,
-                            fileName,
-                            att);
+                    handleAttachment(false, null, null, deeperPath,
+                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), cell, writeFile, nodeId,
+                            fileName, att);
                 }
             }
             if (req.isIncludeHTML()) {
@@ -366,15 +323,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 markdownToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
                 String clazz = level == 0 ? "class='topLevelToc'" : "";
                 htmlToc.append(
-                        "<div " +
-                                clazz +
-                                " style='margin-left: " +
-                                (25 + level * 25) +
-                                "px'><a class='tocLink' href='#" +
-                                nodeId +
-                                "'>" +
-                                StringEscapeUtils.escapeHtml4(heading) +
-                                "</a></div>");
+                        "<div " + clazz + " style='margin-left: " + (25 + level * 25) + "px'><a class='tocLink' href='#"
+                                + nodeId + "'>" + StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
             }
         }
     }
@@ -404,14 +354,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return list;
     }
 
-    private void writeFilesForNode(
-            MongoSession ms,
-            String parentFolder,
-            SubNode node,
-            Val<String> fileNameCont,
-            String fileName,
-            String content,
-            List<Attachment> atts) {
+    private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, Val<String> fileNameCont,
+            String fileName, String content, List<Attachment> atts) {
         String fileNameBase = parentFolder + "/" + fileName + "/" + fileName;
         fileNameCont.setVal(fileNameBase);
         String json = getNodeJson(node);
@@ -463,8 +407,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     return;
                 BufferedInputStream bis = new BufferedInputStream(is);
                 long length = att != null ? att.getSize() : null;
-                String binFileName = req.isAttOneFolder()
-                        ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
+                String binFileName = req.isAttOneFolder() ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
                         : (parentFolder + "/" + fileName + "/" + att.getKey() + ext); //
                 if (length > 0) {
                     /* NOTE: the archive WILL fail if no length exists in this codepath */
@@ -489,16 +432,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * If 'content' is passes as non-null then the ONLY thing we do is inject any File Tags onto that
      * content and return the content
      */
-    private void handleAttachment(
-            boolean injectingTag,
-            Val<String> htmlContent,
-            Val<String> mdContent,
-            String deeperPath,
-            String parentFolder,
-            JupyterCell cell,
-            boolean writeFile,
-            String nodeId,
-            String fileName,
+    private void handleAttachment(boolean injectingTag, Val<String> htmlContent, Val<String> mdContent,
+            String deeperPath, String parentFolder, JupyterCell cell, boolean writeFile, String nodeId, String fileName,
             Attachment att) {
         String ext = null;
         String binFileNameProp = att.getFileName();
@@ -586,9 +521,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
             // This replacement is kind of tricky because we have to close out the markdown div
             // then inject our HTML, and then reopen a new div so keep the markdown separate from the
             // RAW html "imgLink" we're inserting here.
-            content =
-                    content.replace("{{" + att.getFileName() + "}}",
-                            "\n</div>" + imgLink + "<div class='markdown container'>\n");
+            content = content.replace("{{" + att.getFileName() + "}}",
+                    "\n</div>" + imgLink + "<div class='markdown container'>\n");
         }
         return content;
     }
@@ -601,15 +535,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private String appendImgLink(String nodeId, String binFileNameStr, String url) {
-        return ("<div class='attachment'><img title='" +
-                binFileNameStr +
-                "' id='img_" +
-                nodeId +
-                "' style='width:50%' onclick='document.getElementById(\"img_" +
-                nodeId +
-                "\").style.width=\"\"' src='" +
-                url +
-                "'/></div>");
+        return ("<div class='attachment'><img title='" + binFileNameStr + "' id='img_" + nodeId
+                + "' style='width:50%' onclick='document.getElementById(\"img_" + nodeId + "\").style.width=\"\"' src='"
+                + url + "'/></div>");
     }
 
     private String appendNonImgLink(String binFileNameStr, String url) {

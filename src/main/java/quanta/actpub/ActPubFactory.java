@@ -250,9 +250,7 @@ public class ActPubFactory extends ServiceBase {
                         return replyTo;
                     }
                 }
-            }
-            // todo-0: else inReplyTo is a URL? Is this still a legit case?
-            else {
+            } else {
                 return inReplyTo;
             }
         }

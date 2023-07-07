@@ -11,8 +11,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
-// todo-0: fix this deprecation
-import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -45,20 +44,8 @@ import quanta.util.XString;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({
-        SubNode.PATH,
-        SubNode.CONTENT,
-        SubNode.NAME,
-        SubNode.ID,
-        SubNode.ORDINAL,
-        SubNode.OWNER,
-        SubNode.XFR,
-        SubNode.CREATE_TIME,
-        SubNode.MODIFY_TIME,
-        SubNode.AC,
-        SubNode.PROPS,
-        SubNode.ATTACHMENTS,
-})
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER,
+        SubNode.XFR, SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS,})
 public class SubNode {
 
     private static Logger log = LoggerFactory.getLogger(SubNode.class);
@@ -234,14 +221,13 @@ public class SubNode {
             SubNode.PROPS, //
             SubNode.ATTACHMENTS, //
             SubNode.LINKS, //
-            SubNode.LIKES,
-    };
+            SubNode.LIKES,};
 
     @Transient
     @JsonIgnore
     private int contentLength;
 
-    @PersistenceConstructor
+    @PersistenceCreator
     public SubNode() {
         /*
          * WARNING: Do NOT initialize times (mod time or create time) in here. This constructor gets called
@@ -646,13 +632,12 @@ public class SubNode {
             if (getAttachments().size() == 0) {
                 setAttachments(null);
             } else {
-                getAttachments()
-                        .forEach((String key, Attachment att) -> {
-                            att.setOwnerNode(this);
-                            if ("blob".equals(att.getFileName())) {
-                                att.setFileName("file-" + key);
-                            }
-                        });
+                getAttachments().forEach((String key, Attachment att) -> {
+                    att.setOwnerNode(this);
+                    if ("blob".equals(att.getFileName())) {
+                        att.setFileName("file-" + key);
+                    }
+                });
             }
         }
     }
