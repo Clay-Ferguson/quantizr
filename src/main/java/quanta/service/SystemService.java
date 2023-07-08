@@ -184,17 +184,10 @@ public class SystemService extends ServiceBase {
     // metadata: <boolean> // Optional, added in MongoDB 5.0.4
     // })
     public String validateDb() {
-        String ret =
-                "validate: " +
-                        runMongoDbCommand(
-                                MongoAppConfig.databaseName, //
-                                //
-                                new Document("validate", "nodes").append("full", true));
-        ret +=
-                "\n\ndbStats: " +
-                        runMongoDbCommand(
-                                MongoAppConfig.databaseName, //
-                                new Document("dbStats", 1).append("scale", 1024));
+        String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
+                new Document("validate", "nodes").append("full", true));
+        ret += "\n\ndbStats: "
+                + runMongoDbCommand(MongoAppConfig.databaseName, new Document("dbStats", 1).append("scale", 1024));
         ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
         if (prop.ipfsEnabled()) {
             ret += ipfsRepo.verify();
@@ -367,10 +360,7 @@ public class SystemService extends ServiceBase {
         headers.setContentType(APConst.MTYPE_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
         String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
-        ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                requestEntity,
+        ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
                 new ParameterizedTypeReference<List<NostrEvent>>() {});
         IntVal saveCount = new IntVal(0);
         HashSet<String> accountNodeIds = new HashSet<>();
@@ -385,14 +375,8 @@ public class SystemService extends ServiceBase {
             }
             return null;
         });
-        return ("NostrQueryUpdate: relays=" +
-                relayList.size() +
-                " people=" +
-                authors.size() +
-                " eventCount=" +
-                eventCount +
-                " newCount=" +
-                saveCount.getVal());
+        return ("NostrQueryUpdate: relays=" + relayList.size() + " people=" + authors.size() + " eventCount="
+                + eventCount + " newCount=" + saveCount.getVal());
     }
 
     private static String runBashCommand(String title, String command) {

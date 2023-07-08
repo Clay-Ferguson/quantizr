@@ -159,11 +159,7 @@ public class AclService extends ServiceBase {
         return res;
     }
 
-    public boolean setCipherKey(
-            MongoSession ms,
-            SubNode node,
-            String principalNodeId,
-            String cipherKey,
+    public boolean setCipherKey(MongoSession ms, SubNode node, String principalNodeId, String cipherKey,
             SetCipherKeyResponse res) {
         boolean ret = false;
         HashMap<String, AccessControl> acl = node.getAc();
@@ -183,14 +179,8 @@ public class AclService extends ServiceBase {
      *
      * If BulkOperations is non-null we use it instead of a non-bulk operation.
      */
-    public boolean addPrivilege(
-            MongoSession ms,
-            BulkOperations bops,
-            SubNode node,
-            String principal,
-            SubNode principalNode,
-            List<String> privileges,
-            AddPrivilegeResponse res) {
+    public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal,
+            SubNode principalNode, List<String> privileges, AddPrivilegeResponse res) {
         if ((principal == null && principalNode == null) || node == null)
             return false;
         if (principal != null) {

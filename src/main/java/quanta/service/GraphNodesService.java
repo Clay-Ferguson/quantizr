@@ -41,34 +41,15 @@ public class GraphNodesService extends ServiceBase {
                 results = read.getSubGraph(ms, node, null, 0, false, true, null);
             } else { // If search text provided run subgraph search.
                 int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-                results =
-                        read.searchSubGraph(
-                                ms,
-                                node,
-                                null,
-                                req.getSearchText(),
-                                null,
-                                null,
-                                limit,
-                                0,
-                                true,
-                                false,
-                                null,
-                                true,
-                                false,
-                                false);
+                results = read.searchSubGraph(ms, node, null, req.getSearchText(), null, null, limit, 0, true, false,
+                        null, true, false, false);
             }
             // Construct the GraphNode object for each result and add to mapByPath
             for (SubNode n : results) {
                 try {
                     auth.auth(ms, node, PrivilegeType.READ);
-                    GraphNode gn = new GraphNode(
-                            n.getIdStr(),
-                            getNodeName(n),
-                            n.getPath(),
-                            StringUtils.countMatches(n.getPath(), "/") - rootLevel,
-                            searching,
-                            n.getLinks());
+                    GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(),
+                            StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
                     mapByPath.put(gn.getPath(), gn);
                 } catch (Exception e) {
                 }
@@ -148,14 +129,8 @@ public class GraphNodesService extends ServiceBase {
             // We only need guid on this name, to ensure D3 works, but the actual name on these
             // is queries for during mouseover because otherwise it could be a large number
             // of queries to populate them here now, when that's not needed.
-            parent =
-                    new GraphNode(
-                            parentPath,
-                            String.valueOf(guid++),
-                            parentPath,
-                            StringUtils.countMatches(parentPath, "/") - rootLevel,
-                            false,
-                            null);
+            parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,
+                    StringUtils.countMatches(parentPath, "/") - rootLevel, false, null);
             mapByPath.put(parentPath, parent);
             // keep creating parents until we know we made it to common root.
             ensureEnoughParents(rootPath, rootLevel, parentPath, mapByPath);

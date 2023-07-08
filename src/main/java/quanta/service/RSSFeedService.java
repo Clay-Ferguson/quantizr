@@ -103,14 +103,12 @@ public class RSSFeedService extends ServiceBase {
     private static int MAX_CACHE_SIZE = 500;
     private static final boolean debug = true;
 
-    public static final LinkedHashMap<String, byte[]> proxyCache = new LinkedHashMap<String, byte[]>(
-            MAX_CACHE_SIZE + 1,
-            0.75F,
-            false) {
-        protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
-            return size() > MAX_CACHE_SIZE;
-        }
-    };
+    public static final LinkedHashMap<String, byte[]> proxyCache =
+            new LinkedHashMap<String, byte[]>(MAX_CACHE_SIZE + 1, 0.75F, false) {
+                protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+                    return size() > MAX_CACHE_SIZE;
+                }
+            };
     private static final int FEED_ITEMS_PER_PAGE = 75;
     private static final int REFRESH_FREQUENCY_MINS = 360; // 6 hrs
     static boolean run = false;
@@ -277,12 +275,8 @@ public class RSSFeedService extends ServiceBase {
              * best theory for why is that my restTemplate is doing something special that fixes these issues.
              */
             if (USE_HTTP_READER) {
-                RequestConfig config = RequestConfig
-                        .custom()
-                        .setConnectTimeout(timeout * 1000)
-                        .setConnectionRequestTimeout(timeout * 1000)
-                        .setSocketTimeout(timeout * 1000)
-                        .build();
+                RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+                        .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
 
                 HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
                 HttpGet request = new HttpGet(url);
@@ -298,39 +292,27 @@ public class RSSFeedService extends ServiceBase {
 
             if (USE_SPRING_READER) {
                 if (ThreadLocals.getSC() != null) {
-                    push.sendServerPushInfo(
-                            ThreadLocals.getSC(),
-                            new PushPageMessage("Reading (" + index + " / " + maxIndex + ") " + url, false,
-                                    "rssProgressText"));
+                    push.sendServerPushInfo(ThreadLocals.getSC(), new PushPageMessage(
+                            "Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText"));
                 }
 
-                inFeed =
-                        restTemplate.execute(
-                                url,
-                                HttpMethod.GET,
-                                null,
-                                response -> {
-                                    SyndFeedInput input = new SyndFeedInput();
-                                    long start = System.currentTimeMillis();
-                                    try {
-                                        return input.build(
-                                                new XmlReader(new LimitedInputStreamEx(response.getBody(),
-                                                        100 * Const.ONE_MB)));
-                                    } catch (FeedException e) {
-                                        throw new IOException("Could not parse response for feed: " + url, e);
-                                    } finally {
-                                        long time = System.currentTimeMillis() - start;
-                                        if (time > 2000) {
-                                            log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true)
-                                                    + " url=" + url);
-                                        }
-                                        new PerfMonEvent(
-                                                System.currentTimeMillis() - start,
-                                                "readFeed",
-                                                ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName()
-                                                        : "admin");
-                                    }
-                                });
+                inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
+                    SyndFeedInput input = new SyndFeedInput();
+                    long start = System.currentTimeMillis();
+                    try {
+                        return input
+                                .build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB)));
+                    } catch (FeedException e) {
+                        throw new IOException("Could not parse response for feed: " + url, e);
+                    } finally {
+                        long time = System.currentTimeMillis() - start;
+                        if (time > 2000) {
+                            log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
+                        }
+                        new PerfMonEvent(System.currentTimeMillis() - start, "readFeed",
+                                ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin");
+                    }
+                });
             }
 
             // another example from online (that I've never tried):
@@ -401,10 +383,7 @@ public class RSSFeedService extends ServiceBase {
                  * as part of the feed formatting
                  */
                 policy = /* .and(Sanitizers.IMAGES) *///
-                        Sanitizers.FORMATTING
-                                .and(Sanitizers.BLOCKS)
-                                .and(Sanitizers.LINKS)
-                                .and(Sanitizers.STYLES)
+                        Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.LINKS).and(Sanitizers.STYLES)
                                 .and(Sanitizers.TABLES);
             }
         }
@@ -753,9 +732,8 @@ public class RSSFeedService extends ServiceBase {
                     }
                     SyndEntry entry = new SyndEntryImpl();
                     entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getIdStr());
-                    entry.setLink(
-                            metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl()
-                                    : prop.getProtocolHostAndPort());
+                    entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl()
+                            : prop.getProtocolHostAndPort());
                     /*
                      * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
                      * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an

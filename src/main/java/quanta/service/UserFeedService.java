@@ -249,20 +249,12 @@ public class UserFeedService extends ServiceBase {
             }
             if (myAcntNode != null) {
                 // sharing from us to the other user.where node is owned by us and the node has any sharing on it.
-                orCriteria.add(
-                        Criteria
-                                .where(SubNode.OWNER)
-                                .is(myAcntNode.getOwner())
-                                .and(SubNode.AC + "." + toUserNode.getId().toHexString())
-                                .ne(null));
+                orCriteria.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner())
+                        .and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null));
                 // sharing from the other user to us. where node is owned by us. and the node has any sharing on it.
                 if (bidirectional) {
-                    orCriteria.add(
-                            Criteria
-                                    .where(SubNode.OWNER)
-                                    .is(toUserNode.getOwner())
-                                    .and(SubNode.AC + "." + myAcntNode.getId().toHexString())
-                                    .ne(null));
+                    orCriteria.add(Criteria.where(SubNode.OWNER).is(toUserNode.getOwner())
+                            .and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
                 }
             }
         }
@@ -306,8 +298,8 @@ public class UserFeedService extends ServiceBase {
                         // since we're processing ALL friends we can go ahead and update friendIds here
                         // but also only do that if we're not filtering for tags, or the filter is a match
                         if (StringUtils.isEmpty(req.getFriendsTagSearch()) || //
-                                (StringUtils.isNotEmpty(friendNode.getTags()) &&
-                                        friendNode.getTags().contains(req.getFriendsTagSearch()))) {
+                                (StringUtils.isNotEmpty(friendNode.getTags())
+                                        && friendNode.getTags().contains(req.getFriendsTagSearch()))) {
                             String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
                             // if we have a userNodeId and they aren't in the blocked list.
                             if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
@@ -450,9 +442,8 @@ public class UserFeedService extends ServiceBase {
             // it's a boost! Be careful boosts also have no content, but we DO want to show boosts.
             if (Constant.FEED_PUB.s().equals(req.getName())) {
                 if ( //
-                (StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10) &&
-                        node.getAttachments() == null &&
-                        node.getStr(NodeProp.BOOST) == null) {
+                (StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10)
+                        && node.getAttachments() == null && node.getStr(NodeProp.BOOST) == null) {
                     skipped++;
                     continue;
                 }
@@ -488,20 +479,8 @@ public class UserFeedService extends ServiceBase {
             }
 
             try {
-                NodeInfo info = convert.convertToNodeInfo(
-                        false,
-                        sc,
-                        ms,
-                        node,
-                        false,
-                        counter + 1,
-                        false,
-                        false,
-                        false,
-                        true,
-                        true,
-                        boostedNodeVal,
-                        false);
+                NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false,
+                        true, true, boostedNodeVal, false);
                 if (info != null) {
                     searchResults.add(info);
                     if (searchResults.size() >= MAX_FEED_ITEMS) {

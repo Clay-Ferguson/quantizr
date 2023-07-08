@@ -296,15 +296,8 @@ public class UserManagerService extends ServiceBase {
         res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
         if (sc.getUserToken() != null) {
             MongoSession ms = ThreadLocals.getMongoSession();
-            processLogin(
-                    ms,
-                    res,
-                    userNodeVal.getVal(),
-                    sc.getUserName(),
-                    req.getAsymEncKey(),
-                    req.getSigKey(),
-                    req.getNostrNpub(),
-                    req.getNostrPubKey());
+            processLogin(ms, res, userNodeVal.getVal(), sc.getUserName(), req.getAsymEncKey(), req.getSigKey(),
+                    req.getNostrNpub(), req.getNostrPubKey());
             log.debug("login: user=" + sc.getUserName());
         } else {
             res.setUserPreferences(getDefaultUserPreferences());
@@ -355,9 +348,7 @@ public class UserManagerService extends ServiceBase {
                 throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
             }
         }
-        boolean verified = crypto.sigVerify(
-                sc.getPubSigKey(),
-                Util.hexStringToBytes(sig),
+        boolean verified = crypto.sigVerify(sc.getPubSigKey(), Util.hexStringToBytes(sig),
                 sc.getUserName().getBytes(StandardCharsets.UTF_8));
 
         if (!verified) {
@@ -390,15 +381,8 @@ public class UserManagerService extends ServiceBase {
      * caller can optionally pass userNode if it's already available, or else it will be looked up using
      * userName
      */
-    public void processLogin(
-            MongoSession ms,
-            LoginResponse res,
-            SubNode userNode,
-            String userName,
-            String asymEncKey,
-            String sigKey,
-            String nostrNpub,
-            String nostrPubKey) {
+    public void processLogin(MongoSession ms, LoginResponse res, SubNode userNode, String userName, String asymEncKey,
+            String sigKey, String nostrNpub, String nostrPubKey) {
         SessionContext sc = ThreadLocals.getSC();
         if (userNode == null) {
             userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
@@ -490,13 +474,11 @@ public class UserManagerService extends ServiceBase {
     public long getTotalAttachmentBytes(MongoSession ms, SubNode node) {
         LongVal totalBytes = new LongVal();
         if (node != null && node.getAttachments() != null) {
-            node
-                    .getAttachments()
-                    .forEach((String key, Attachment att) -> {
-                        if (att.getSize() > 0L) {
-                            totalBytes.add(att.getSize());
-                        }
-                    });
+            node.getAttachments().forEach((String key, Attachment att) -> {
+                if (att.getSize() > 0L) {
+                    totalBytes.add(att.getSize());
+                }
+            });
         }
         return totalBytes.getVal();
     }
@@ -646,13 +628,8 @@ public class UserManagerService extends ServiceBase {
         log.debug("Signup URL: " + signupLink);
         String brandingAppName = prop.getConfigText("brandingAppName");
         content = //
-                "Welcome to " +
-                        brandingAppName +
-                        ", " +
-                        userName +
-                        "!" +
-                        "<p>\nUse this link to complete the signup: <br>\n" +
-                        signupLink;
+                "Welcome to " + brandingAppName + ", " + userName + "!"
+                        + "<p>\nUse this link to complete the signup: <br>\n" + signupLink;
         if (!StringUtils.isEmpty(prop.getMailHost())) {
             outbox.queueEmail(email, brandingAppName + " - Account Signup", content);
         }
@@ -867,15 +844,8 @@ public class UserManagerService extends ServiceBase {
         String userName = ThreadLocals.getSC().getUserName();
         ObjectId accntIdDoingBlock = ThreadLocals.getSC().getUserNodeId();
         // get the node that holds all blocked users
-        SubNode blockedList = read.getUserNodeByType(
-                ms,
-                userName,
-                null,
-                null,
-                NodeType.BLOCKED_USERS.s(),
-                null,
-                NodeName.BLOCKED_USERS,
-                true);
+        SubNode blockedList = read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
+                NodeName.BLOCKED_USERS, true);
         SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, req.getUserName());
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !mongoUtil.isChildOf(blockedList, userNode)) {
@@ -888,9 +858,8 @@ public class UserManagerService extends ServiceBase {
                 throw new RuntimeException("User not found.");
             userNode = edit.createFriendNode(ms, blockedList, req.getUserName());
             if (userNode != null) {
-                res.setMessage(
-                        "Blocked user " + req.getUserName()
-                                + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
+                res.setMessage("Blocked user " + req.getUserName()
+                        + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
             } else {
                 res.setMessage("Unable to block user: " + req.getUserName());
             }
@@ -984,15 +953,8 @@ public class UserManagerService extends ServiceBase {
     /* The code pattern here is very similar to 'blockUser' */
     private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
             String userToFollow) {
-        SubNode followerFriendList = read.getUserNodeByType(
-                ms,
-                userDoingFollow,
-                null,
-                null,
-                NodeType.FRIEND_LIST.s(),
-                null,
-                NodeName.FRIENDS,
-                true);
+        SubNode followerFriendList = read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(),
+                null, NodeName.FRIENDS, true);
         if (followerFriendList == null) {
             log.debug("Can't access Friend list for: " + userDoingFollow);
             return;
@@ -1144,15 +1106,8 @@ public class UserManagerService extends ServiceBase {
 
     public boolean userIsFollowedByMe(MongoSession ms, SubNode inUserNode, String maybeFollowedUser) {
         String userName = ThreadLocals.getSC().getUserName();
-        SubNode friendsList = read.getUserNodeByType(
-                ms,
-                userName,
-                null,
-                null,
-                NodeType.FRIEND_LIST.s(),
-                null,
-                NodeName.BLOCKED_USERS,
-                false);
+        SubNode friendsList = read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null,
+                NodeName.BLOCKED_USERS, false);
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.
         // Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
@@ -1163,15 +1118,8 @@ public class UserManagerService extends ServiceBase {
 
     public boolean userIsBlockedByMe(MongoSession ms, SubNode inUserNode, String maybeBlockedUser) {
         String userName = ThreadLocals.getSC().getUserName();
-        SubNode blockedList = read.getUserNodeByType(
-                ms,
-                userName,
-                null,
-                null,
-                NodeType.BLOCKED_USERS.s(),
-                null,
-                NodeName.BLOCKED_USERS,
-                false);
+        SubNode blockedList = read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
+                NodeName.BLOCKED_USERS, false);
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.
         // Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
@@ -1320,12 +1268,8 @@ public class UserManagerService extends ServiceBase {
             String link = prop.getHostAndPort() + "?passCode=" + passCode;
             String brandingAppName = prop.getConfigText("brandingAppName");
             String content = //
-                    "Password reset was requested on " +
-                            brandingAppName +
-                            " account: " +
-                            user +
-                            "<p>\nGo to this link to reset your password: <br>\n" +
-                            link;
+                    "Password reset was requested on " + brandingAppName + " account: " + user
+                            + "<p>\nGo to this link to reset your password: <br>\n" + link;
             outbox.queueEmail(email, brandingAppName + " Password Reset", content);
             res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
             return null;
@@ -1349,12 +1293,10 @@ public class UserManagerService extends ServiceBase {
         }
         // if we have likes add them into 'tags', because that's what we feed thru the rest of the code.
         if (node.getLikes() != null) {
-            node
-                    .getLikes()
-                    .forEach(userName -> {
-                        String mention = "@" + userName;
-                        tags.put(mention, new APOMention(null, mention));
-                    });
+            node.getLikes().forEach(userName -> {
+                String mention = "@" + userName;
+                tags.put(mention, new APOMention(null, mention));
+            });
         }
         if (tags != null && tags.size() > 0) {
             String userDoingAction = ThreadLocals.getSC().getUserName();
@@ -1521,13 +1463,8 @@ public class UserManagerService extends ServiceBase {
      * Looks in the userName's account under their 'underType' type node and returns all the children.
      * If userName is passed as null, then we use the currently logged in user
      */
-    public List<SubNode> getSpecialNodesList(
-            MongoSession ms,
-            Val<SubNode> parentNodeVal,
-            String underType,
-            String userName,
-            boolean sort,
-            Criteria moreCriteria) {
+    public List<SubNode> getSpecialNodesList(MongoSession ms, Val<SubNode> parentNodeVal, String underType,
+            String userName, boolean sort, Criteria moreCriteria) {
         ms = ThreadLocals.ensure(ms);
         List<SubNode> nodeList = new LinkedList<>();
         SubNode userNode = read.getUserNodeByUserName(ms, userName);
@@ -1539,13 +1476,8 @@ public class UserManagerService extends ServiceBase {
         if (parentNodeVal != null) {
             parentNodeVal.setVal(parentNode);
         }
-        for (SubNode node : read.getChildren(
-                ms,
-                parentNode,
-                sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
-                null,
-                0,
-                moreCriteria)) {
+        for (SubNode node : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
+                null, 0, moreCriteria)) {
             nodeList.add(node);
         }
         return nodeList;

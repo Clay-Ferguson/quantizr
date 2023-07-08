@@ -65,13 +65,8 @@ public class PushService extends ServiceBase {
         });
     }
 
-    private void maybePushToBrowser(
-            MongoSession ms,
-            HashSet<String> sessionsPushed,
-            SubNode node,
-            HashSet<String> usersSharedToSet,
-            boolean isPublic,
-            SessionContext sc) {
+    private void maybePushToBrowser(MongoSession ms, HashSet<String> sessionsPushed, SubNode node,
+            HashSet<String> usersSharedToSet, boolean isPublic, SessionContext sc) {
         // if we know we already just pushed to this session, we can skip it in here.
         if (sessionsPushed != null && sessionsPushed.contains(sc.getUserToken())) {
             return;
@@ -111,20 +106,8 @@ public class PushService extends ServiceBase {
         }
 
         /* build our push message payload */
-        NodeInfo info = convert.convertToNodeInfo(
-                false,
-                sc,
-                ms,
-                node,
-                false,
-                Convert.LOGICAL_ORDINAL_IGNORE,
-                false,
-                false,
-                false,
-                true,
-                true,
-                null,
-                false);
+        NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
+                false, false, true, true, null, false);
 
         if (info != null) {
             FeedPushInfo pushInfo = new FeedPushInfo(info);
@@ -153,11 +136,8 @@ public class PushService extends ServiceBase {
              */
             synchronized (pushEmitter) {
                 try {
-                    SseEventBuilder event = SseEmitter
-                            .event()
-                            .data(info)
-                            .id(String.valueOf(info.hashCode()))
-                            .name(info.getType());
+                    SseEventBuilder event =
+                            SseEmitter.event().data(info).id(String.valueOf(info.hashCode())).name(info.getType());
                     pushEmitter.send(event);
                 } catch (
                 /*

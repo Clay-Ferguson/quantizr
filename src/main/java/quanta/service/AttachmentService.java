@@ -133,13 +133,8 @@ public class AttachmentService extends ServiceBase {
     /*
      * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
      */
-    public ResponseBase uploadMultipleFiles(
-            MongoSession ms,
-            String attName,
-            String nodeId,
-            MultipartFile[] uploadFiles,
-            boolean explodeZips,
-            boolean toIpfs) {
+    public ResponseBase uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] uploadFiles,
+            boolean explodeZips, boolean toIpfs) {
         if (toIpfs) {
             checkIpfs();
         }
@@ -161,18 +156,8 @@ public class AttachmentService extends ServiceBase {
                 if (parent == null) {
                     throw ExUtil.wrapEx("Node not found.");
                 }
-                node =
-                        create.createNode(
-                                ms,
-                                parent,
-                                null,
-                                NodeType.NONE.s(), //
-                                0L,
-                                CreateNodeLocation.FIRST,
-                                null,
-                                null,
-                                true,
-                                true);
+                node = create.createNode(ms, parent, null, NodeType.NONE.s(), //
+                        0L, CreateNodeLocation.FIRST, null, null, true, true);
                 nodeId = node.getIdStr();
             } else {
                 node = read.getNode(ms, nodeId, false, null);
@@ -219,25 +204,8 @@ public class AttachmentService extends ServiceBase {
                     log.debug("Uploading file: " + fileName + " contentType=" + contentType);
                     LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
                     // attaches AND closes the stream.
-                    attachBinaryFromStream(
-                            ms,
-                            false,
-                            attName,
-                            node,
-                            nodeId,
-                            fileName,
-                            size,
-                            limitedIs,
-                            contentType,
-                            -1,
-                            -1,
-                            explodeZips,
-                            toIpfs,
-                            true,
-                            true,
-                            true,
-                            null,
-                            allowEmailParse);
+                    attachBinaryFromStream(ms, false, attName, node, nodeId, fileName, size, limitedIs, contentType, -1,
+                            -1, explodeZips, toIpfs, true, true, true, null, allowEmailParse);
                 }
             }
             // if we have enough images to lay it out into a square of 3 cols switch to that
@@ -260,25 +228,10 @@ public class AttachmentService extends ServiceBase {
      * Gets the binary attachment from a supplied stream and loads it into the repository on the node
      * specified in 'nodeId'
      */
-    public void attachBinaryFromStream(
-            MongoSession ms,
-            boolean importMode,
-            String attName,
-            SubNode node,
-            String nodeId,
-            String fileName,
-            long size,
-            LimitedInputStreamEx is,
-            String mimeType,
-            int width,
-            int height,
-            boolean explodeZips,
-            boolean toIpfs,
-            boolean calcImageSize,
-            boolean closeStream,
-            boolean storeLocally,
-            String sourceUrl,
-            boolean allowEmailParse) {
+    public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
+            String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
+            boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
+            String sourceUrl, boolean allowEmailParse) {
         /*
          * If caller already has 'node' it can pass node, and avoid looking up node again
          */
@@ -303,78 +256,60 @@ public class AttachmentService extends ServiceBase {
             ImportZipService importZipStreamService = (ImportZipService) context.getBean(ImportZipService.class);
             importZipStreamService.importFromStream(ms, is, node, false);
         } else { //
-            saveBinaryStreamToNode(
-                    ms,
-                    importMode,
-                    attName,
-                    is,
-                    mimeType,
-                    fileName,
-                    size,
-                    width,
-                    height,
-                    node,
-                    toIpfs,
-                    calcImageSize,
-                    closeStream,
-                    storeLocally,
-                    sourceUrl);
+            saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
+                    calcImageSize, closeStream, storeLocally, sourceUrl);
         }
     }
 
     public void pinLocalIpfsAttachments(SubNode node) {
         if (node == null || node.getAttachments() == null)
             return;
-        node
-                .getAttachments()
-                .forEach((String key, Attachment att) -> {
+        node.getAttachments().forEach((String key, Attachment att) -> {
+            /*
+             * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
+             * (IPFS_REF means 'referenced' and external to our server).
+             */
+            if (att.getIpfsLink() != null) {
+                // if there's no 'ref' property this is not a foreign reference, which means we
+                // DO pin this.
+                if (att.getIpfsRef() == null) {
+                    arun.run(sess -> {
+                        // don't pass the actual node into here, because it runs in a separate thread and would
+                        // be
+                        // a concurrency problem.
+                        ipfsPin.ipfsAsyncPinNode(sess, node.getId());
+                        return null;
+                    });
+                } else { // otherwise we don't pin it.
                     /*
-                     * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
-                     * (IPFS_REF means 'referenced' and external to our server).
+                     * Don't do this removePin. Leave this comment here as a warning of what NOT to do! We can't simply
+                     * remove the CID from our IPFS database because some node stopped using it, because there may be
+                     * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
+                     * pins ever get removed, because that method does a safe and correct delete of all pins that are
+                     * truly no longer in use by anyone
                      */
-                    if (att.getIpfsLink() != null) {
-                        // if there's no 'ref' property this is not a foreign reference, which means we
-                        // DO pin this.
-                        if (att.getIpfsRef() == null) {
-                            arun.run(sess -> {
-                                // don't pass the actual node into here, because it runs in a separate thread and would
-                                // be
-                                // a concurrency problem.
-                                ipfsPin.ipfsAsyncPinNode(sess, node.getId());
-                                return null;
-                            });
-                        } else { // otherwise we don't pin it.
-                            /*
-                             * Don't do this removePin. Leave this comment here as a warning of what NOT to do! We can't
-                             * simply remove the CID from our IPFS database because some node stopped using it, because
-                             * there may be many other users/nodes potentially using it, so we let the
-                             * releaseOrphanIPFSPins be our only way pins ever get removed, because that method does a
-                             * safe and correct delete of all pins that are truly no longer in use by anyone
-                             */
-                            // ipfs.removePin(ipfsLink);
-                        }
-                    }
-                });
+                    // ipfs.removePin(ipfsLink);
+                }
+            }
+        });
     }
 
     public void fixAllAttachmentMimes(SubNode node) {
         if (node == null || node.getAttachments() == null)
             return;
-        node
-                .getAttachments()
-                .forEach((String key, Attachment att) -> {
-                    String mimeType = att.getMime();
-                    // ensure we have the best mimeType we can if not set in the data.
-                    if (StringUtils.isEmpty(mimeType)) {
-                        String binUrl = att.getUrl();
-                        if (!StringUtils.isEmpty(binUrl)) {
-                            mimeType = getMimeTypeFromUrl(binUrl);
-                            if (!StringUtils.isEmpty(mimeType)) {
-                                att.setMime(mimeType);
-                            }
-                        }
+        node.getAttachments().forEach((String key, Attachment att) -> {
+            String mimeType = att.getMime();
+            // ensure we have the best mimeType we can if not set in the data.
+            if (StringUtils.isEmpty(mimeType)) {
+                String binUrl = att.getUrl();
+                if (!StringUtils.isEmpty(binUrl)) {
+                    mimeType = getMimeTypeFromUrl(binUrl);
+                    if (!StringUtils.isEmpty(mimeType)) {
+                        att.setMime(mimeType);
                     }
-                });
+                }
+            }
+        });
     }
 
     public String getMimeTypeFromUrl(String url) {
@@ -416,21 +351,9 @@ public class AttachmentService extends ServiceBase {
         return mimeType;
     }
 
-    public void saveBinaryStreamToNode(
-            MongoSession ms,
-            boolean importMode,
-            String attName,
-            LimitedInputStreamEx inputStream,
-            String mimeType,
-            String fileName,
-            long size,
-            int width,
-            int height,
-            SubNode node,
-            boolean toIpfs,
-            boolean calcImageSize,
-            boolean closeStream,
-            boolean storeLocally,
+    public void saveBinaryStreamToNode(MongoSession ms, boolean importMode, String attName,
+            LimitedInputStreamEx inputStream, String mimeType, String fileName, long size, int width, int height,
+            SubNode node, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
             String sourceUrl) {
         /*
          * NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
@@ -601,13 +524,7 @@ public class AttachmentService extends ServiceBase {
      *
      * node can be passed in -or- nodeId. If node is passed nodeId can be null.
      */
-    public void getBinary(
-            MongoSession ms,
-            String attName,
-            SubNode node,
-            String nodeId,
-            String binId,
-            boolean download,
+    public void getBinary(MongoSession ms, String attName, SubNode node, String nodeId, String binId, boolean download,
             HttpServletResponse response) {
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
@@ -777,12 +694,9 @@ public class AttachmentService extends ServiceBase {
                 IOUtils.copy(acis, os);
                 os.flush();
             };
-            return ResponseEntity
-                    .ok()
-                    .contentLength(file.length())
+            return ResponseEntity.ok().contentLength(file.length())
                     .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + file.getName() + "\"")
-                    .contentType(MediaType.parseMediaType(mimeType))
-                    .body(stream);
+                    .contentType(MediaType.parseMediaType(mimeType)).body(stream);
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
         }
@@ -890,15 +804,8 @@ public class AttachmentService extends ServiceBase {
      *
      * NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
      */
-    public void readFromUrl(
-            MongoSession ms,
-            String sourceUrl,
-            SubNode node,
-            String nodeId,
-            String mimeHint,
-            String mimeType,
-            long maxFileSize,
-            boolean storeLocally) {
+    public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
+            String mimeType, long maxFileSize, boolean storeLocally) {
         if (mimeType == null) {
             mimeType = getMimeTypeFromUrl(sourceUrl);
             if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
@@ -929,12 +836,8 @@ public class AttachmentService extends ServiceBase {
         try {
             URL url = new URL(sourceUrl);
             int timeout = 20;
-            RequestConfig config = RequestConfig
-                    .custom()
-                    .setConnectTimeout(timeout * 1000)
-                    .setConnectionRequestTimeout(timeout * 1000)
-                    .setSocketTimeout(timeout * 1000)
-                    .build();
+            RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+                    .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
             /*
              * if this is an image extension, handle it in a special way, mainly to extract the width, height
              * from it
@@ -952,33 +855,13 @@ public class AttachmentService extends ServiceBase {
                 HttpGet request = new HttpGet(sourceUrl);
                 request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
                 HttpResponse response = client.execute(request);
-                log.debug(
-                        "Response Code: " +
-                                response.getStatusLine().getStatusCode() +
-                                " reason=" +
-                                response.getStatusLine().getReasonPhrase());
+                log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
+                        + response.getStatusLine().getReasonPhrase());
                 InputStream is = response.getEntity().getContent();
                 limitedIs = new LimitedInputStreamEx(is, maxFileSize);
                 // insert 0L for size now, because we don't know it yet
-                attachBinaryFromStream(
-                        ms,
-                        false,
-                        attKey,
-                        node,
-                        nodeId,
-                        sourceUrl,
-                        0L,
-                        limitedIs,
-                        mimeType,
-                        -1,
-                        -1,
-                        false,
-                        false,
-                        true,
-                        true,
-                        storeLocally,
-                        sourceUrl,
-                        false);
+                attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
+                        false, false, true, true, storeLocally, sourceUrl, false);
             } else /*
                     * if not an image extension, we can just stream directly into the database, but we want to try to
                     * get the mime type first, from calling detectImage so that if we do detect its an image we can
@@ -996,25 +879,8 @@ public class AttachmentService extends ServiceBase {
                     InputStream is = response.getEntity().getContent();
                     limitedIs = new LimitedInputStreamEx(is, maxFileSize);
                     // insert 0L for size now, because we don't know it yet
-                    attachBinaryFromStream(
-                            ms,
-                            false,
-                            attKey,
-                            node,
-                            nodeId,
-                            sourceUrl,
-                            0L,
-                            limitedIs,
-                            "",
-                            -1,
-                            -1,
-                            false,
-                            false,
-                            true,
-                            true,
-                            storeLocally,
-                            sourceUrl,
-                            false);
+                    attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
+                            false, true, true, storeLocally, sourceUrl, false);
                 }
             }
         } catch (Exception e) {
@@ -1031,12 +897,7 @@ public class AttachmentService extends ServiceBase {
     // String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
     //
     /* returns true if it was detected AND saved as an image */
-    private boolean detectAndSaveImage(
-            MongoSession ms,
-            String nodeId,
-            String attKey,
-            String sourceUrl,
-            URL url,
+    private boolean detectAndSaveImage(MongoSession ms, String nodeId, String attKey, String sourceUrl, URL url,
             boolean storeLocally) {
         ImageInputStream is = null;
         LimitedInputStreamEx is2 = null;
@@ -1057,25 +918,9 @@ public class AttachmentService extends ServiceBase {
                     ImageIO.write(bufImg, formatName, os);
                     byte[] bytes = os.toByteArray();
                     is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
-                    attachBinaryFromStream(
-                            ms,
-                            false,
-                            attKey,
-                            null,
-                            nodeId,
-                            sourceUrl,
-                            bytes.length,
-                            is2,
-                            mimeType,
-                            bufImg.getWidth(null),
-                            bufImg.getHeight(null),
-                            false,
-                            false,
-                            true,
-                            true,
-                            storeLocally,
-                            sourceUrl,
-                            false);
+                    attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType,
+                            bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally,
+                            sourceUrl, false);
                     return true;
                 }
             }
@@ -1087,15 +932,8 @@ public class AttachmentService extends ServiceBase {
         return false;
     }
 
-    public void writeStream(
-            MongoSession ms,
-            boolean importMode,
-            String attName,
-            SubNode node,
-            LimitedInputStreamEx stream,
-            String fileName,
-            String mimeType,
-            SubNode userNode) {
+    public void writeStream(MongoSession ms, boolean importMode, String attName, SubNode node,
+            LimitedInputStreamEx stream, String fileName, String mimeType, SubNode userNode) {
         // don't create attachment here, there shuold already be one, but we pass create=true anyway
         Attachment att = node.getAttachment(attName, !importMode, false);
         auth.ownerAuth(node);
@@ -1130,12 +968,7 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    public void writeStreamToIpfs(
-            MongoSession ms,
-            String attName,
-            SubNode node,
-            InputStream stream,
-            String mimeType,
+    public void writeStreamToIpfs(MongoSession ms, String attName, SubNode node, InputStream stream, String mimeType,
             SubNode userNode) {
         auth.ownerAuth(node);
         Attachment att = node.getAttachment(attName, true, false);

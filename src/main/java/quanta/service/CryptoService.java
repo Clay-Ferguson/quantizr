@@ -75,11 +75,8 @@ public class CryptoService extends ServiceBase {
                 String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
 
                 if (pubKeyJson == null) {
-                    log.debug(
-                            "User Account didn't have SIG KEY: accntNodeId=" +
-                                    ownerAccntNode.getIdStr() +
-                                    " They own nodeId=" +
-                                    node.getIdStr());
+                    log.debug("User Account didn't have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr()
+                            + " They own nodeId=" + node.getIdStr());
                     return false;
                 }
                 pubKey = parseJWK(pubKeyJson, ownerAccntNode);
@@ -212,11 +209,8 @@ public class CryptoService extends ServiceBase {
         }
 
         // query all nodes under the path that are owned by 'ms'
-        Criteria crit = Criteria
-                .where(SubNode.PATH)
-                .regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
-                .and(SubNode.OWNER)
-                .is(ms.getUserNodeId());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
+                .and(SubNode.OWNER).is(ms.getUserNodeId());
         Val<NodeSigPushInfo> pushInfo = new Val<>();
         Query query = new Query();
         crit = auth.addReadSecurity(ms, crit);
@@ -232,33 +226,31 @@ public class CryptoService extends ServiceBase {
         pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), sig));
         count.inc();
         BooleanVal failed = new BooleanVal();
-        ops
-                .stream(query, SubNode.class)
-                .forEachRemaining(node -> {
-                    // make sure session is still alive
-                    if (failed.getVal() || !sc.isLive())
-                        return;
-                    // create new push object lazily
-                    if (pushInfo.getVal() == null) {
-                        pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
-                        pushInfo.getVal().setListToSign(new LinkedList<>());
-                    }
-                    // add this node.
-                    String sig1 = getNodeSigData(node);
-                    pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sig1));
-                    if (debugSigning) {
-                        log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sig1);
-                    }
-                    count.inc();
-                    // if we have enough to send a block send it.
-                    if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
-                        if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
-                            failed.setVal(true);
-                        }
-                        // reset the push object.
-                        pushInfo.setVal(null);
-                    }
-                });
+        ops.stream(query, SubNode.class).forEachRemaining(node -> {
+            // make sure session is still alive
+            if (failed.getVal() || !sc.isLive())
+                return;
+            // create new push object lazily
+            if (pushInfo.getVal() == null) {
+                pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
+                pushInfo.getVal().setListToSign(new LinkedList<>());
+            }
+            // add this node.
+            String sig1 = getNodeSigData(node);
+            pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sig1));
+            if (debugSigning) {
+                log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sig1);
+            }
+            count.inc();
+            // if we have enough to send a block send it.
+            if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
+                if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+                    failed.setVal(true);
+                }
+                // reset the push object.
+                pushInfo.setVal(null);
+            }
+        });
         // make sure session is still alive
         if (failed.getVal() || !sc.isLive())
             return;
@@ -271,11 +263,9 @@ public class CryptoService extends ServiceBase {
             if (failed.getVal() || !sc.isLive())
                 return;
         }
-        push.sendServerPushInfo(
-                sc,
+        push.sendServerPushInfo(sc,
                 new PushPageMessage(
-                        "SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.",
-                        true,
+                        "SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.", true,
                         "note"));
     }
 
