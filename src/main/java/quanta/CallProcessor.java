@@ -31,12 +31,7 @@ public class CallProcessor extends ServiceBase {
      * Wraps the processing of any command by using whatever info is on the session and/or the request
      * to perform the login if the user is not logged in, and then call the function to be processed
      */
-    public Object run(
-            String command,
-            boolean authBearer,
-            boolean authSig,
-            RequestBase req,
-            HttpSession httpSession,
+    public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession,
             MongoRunnableEx<Object> runner) {
         if (AppServer.isShuttingDown()) {
             throw ExUtil.wrapEx("Server not available.");

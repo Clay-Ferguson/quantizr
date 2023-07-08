@@ -45,7 +45,7 @@ public class AppFilter extends GenericFilterBean {
     public static boolean audit = false;
 
     // turns on some logging (not too verbose)
-    public static boolean debug = true;
+    public static boolean debug = false;
     public static String BEARER_TOKEN = "token";
 
     @Override
@@ -154,9 +154,8 @@ public class AppFilter extends GenericFilterBean {
                 session.setAttribute(BEARER_TOKEN, sc.getUserToken());
 
                 if (isNewSession) {
-                    log.debug(
-                            "New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token="
-                                    + sc.getUserToken());
+                    log.debug("New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token="
+                            + sc.getUserToken());
                 }
             }
 
