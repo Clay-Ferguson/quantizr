@@ -254,7 +254,11 @@ public class MongoAuth extends ServiceBase {
     public Criteria addSecurity(MongoSession ms, boolean write, Criteria crit, List<Criteria> ands) {
         // admin can bypass all security
         if (ms != null && ms.isAdmin()) {
-            return crit;
+            if (ands != null && ands.size() > 0) {
+                return crit.andOperator(ands);
+            } else {
+                return crit;
+            }
         }
 
         SessionContext sc = ThreadLocals.getSC();
@@ -295,8 +299,7 @@ public class MongoAuth extends ServiceBase {
                 // if we have a person, set up conditions, for whatever they should be able to see
                 List<Criteria> ors = new LinkedList<>();
 
-                // if this is write access then equire a criteria of them owning the node or having it being
-                // transferred to them, but don't include public or 'shard to me' condition
+                // if not needing 'write' access then the criteria of "PUBLIC or Shared to Me" is added to OR set.
                 if (!write) {
                     ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
                     // or node is shared to me
