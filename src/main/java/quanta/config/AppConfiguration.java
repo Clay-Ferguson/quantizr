@@ -15,9 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -239,14 +236,5 @@ public class AppConfiguration implements WebMvcConfigurer {
         viewResolver.setTemplateEngine(templateEngine());
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
-    }
-
-    @Bean
-    public RedisTemplate<String, SessionContext> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, SessionContext> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        // template.setDefaultSerializer(new StringRedisSerializer());
-        template.setKeySerializer(new StringRedisSerializer());
-        return template;
     }
 }

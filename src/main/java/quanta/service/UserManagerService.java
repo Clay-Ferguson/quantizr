@@ -23,9 +23,12 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -121,7 +124,8 @@ public class UserManagerService extends ServiceBase {
         if (emitter == null) {
             emitter = new SseEmitter();
             pushEmitters.put(token, emitter);
-            log.debug("Assigned SseEmitter to user " + sc.getUserName() + " as token " + token);
+            log.debug("Assigned SseEmitter to user " + sc.getUserName() + " as token " + token + " on replica "
+                    + prop.getSwarmTaskSlot());
         }
         return emitter;
     }
@@ -226,11 +230,21 @@ public class UserManagerService extends ServiceBase {
         if (list.size() > 0) {
             int timeoutMillis = (int) (prop.getSessionTimeoutMinutes() * DateUtil.MINUTE_MILLIS);
             Date now = new Date();
-            for (SessionContext sc : list) {
-                if (sc.getLastActiveTime() < now.getTime() - timeoutMillis) {
-                    redisDelete(sc);
+
+            redisTemplate.execute(new SessionCallback<List<Object>>() {
+                public List<Object> execute(RedisOperations rops) throws DataAccessException {
+                    rops.multi();
+
+                    for (SessionContext sc : list) {
+                        if (sc.getLastActiveTime() < now.getTime() - timeoutMillis) {
+                            rops.delete(sc.getUserToken());
+                        }
+                    }
+
+                    // This will contain the results of all operations in the transaction
+                    return rops.exec();
                 }
-            }
+            });
         }
     }
 
