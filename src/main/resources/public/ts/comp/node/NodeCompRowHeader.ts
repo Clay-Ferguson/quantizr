@@ -218,9 +218,7 @@ export class NodeCompRowHeader extends Div {
                     className: "fa fa-bookmark fa-lg rowHeaderIcon",
                     title: "Bookmark this Node",
                     onClick: () => {
-                        const id = NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
-                        const elm = document.getElementById(id);
-                        let content = elm?.textContent;
+                        let content = this.getTextContent();
                         if (content && content.length > 50) {
                             content = content.substring(0, 50) + "...";
                         }
@@ -269,11 +267,9 @@ export class NodeCompRowHeader extends Div {
                             S.speech.stopSpeaking();
                         }
                         else {
-                            let id = NodeCompContent.PRE_PREFIX + this.prefix + (this.isBoost ? "-boost" : "") + this.node.id;
-                            // console.log("Speaking DOM ID: " + id);
-                            const elm = document.getElementById(id);
-                            if (elm?.textContent) {
-                                S.speech.speakText(elm.textContent, false);
+                            let content = this.getTextContent();
+                            if (content) {
+                                S.speech.speakText(content, false);
                             }
                         }
                     },
@@ -455,5 +451,15 @@ export class NodeCompRowHeader extends Div {
 
         this.setChildren(children);
         return true;
+    }
+
+    getTextContent = (): string => {
+        const id = this.getContentDomId();
+        const elm = document.getElementById(id);
+        return elm ? elm.textContent : null;
+    }
+
+    getContentDomId = () => {
+        return NodeCompContent.PRE_PREFIX + this.prefix + (this.isBoost ? "-boost" : "") + this.node.id;
     }
 }
