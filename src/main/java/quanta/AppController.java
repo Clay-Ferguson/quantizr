@@ -351,8 +351,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @PerfMon
     // todo-1: broken for now. Needs '/admin/' path and token
     @RequestMapping({"/demo/{file}"})
-    public String demo(
-            @PathVariable(value = "file", required = false) String file, //
+    public String demo(@PathVariable(value = "file", required = false) String file, //
             Model model) {
         model.addAllAttributes(getThymeleafAttribs());
         return "demo/" + file;
@@ -399,254 +398,171 @@ public class AppController extends ServiceBase implements ErrorController {
      * todo-2: need a 'useCache' url param option
      */
     @GetMapping({"/proxyGet"})
-    public void proxyGet(
-            @RequestParam(value = "url", required = true) String url, //
-            HttpSession session,
-            HttpServletResponse response) {
-        callProc.run(
-                "proxyGet",
-                true,
-                true,
-                null,
-                session,
-                ms -> {
-                    try {
-                        // try to get proxy info from cache.
-                        byte[] cacheBytes = null;
-                        synchronized (RSSFeedService.proxyCache) {
-                            cacheBytes = RSSFeedService.proxyCache.get(url);
-                        }
-                        if (cacheBytes != null) {
-                            // limiting the stream just because for now this is only used in feed
-                            // processing, and 5MB is plenty
-                            IOUtils.copy(
-                                    new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
-                                    response.getOutputStream());
-                        } else { // not in cache then read and update cache
-                            ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
-                            response.setStatus(HttpStatus.OK.value());
-                            byte[] body = resp.getBody();
-                            synchronized (RSSFeedService.proxyCache) {
-                                RSSFeedService.proxyCache.put(url, body);
-                            }
-                            IOUtils.copy(new ByteArrayInputStream(body), response.getOutputStream());
-                            // DO NOT DELETE (good example)
-                            // restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
-                            // -> {
-                            // }, responseExtractor -> {
-                            // IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
-                            // return null;
-                            // });
-                        }
-                    } catch (Exception e) {
+    public void proxyGet(@RequestParam(value = "url", required = true) String url, //
+            HttpSession session, HttpServletResponse response) {
+        callProc.run("proxyGet", true, true, null, session, ms -> {
+            try {
+                // try to get proxy info from cache.
+                byte[] cacheBytes = null;
+                synchronized (RSSFeedService.proxyCache) {
+                    cacheBytes = RSSFeedService.proxyCache.get(url);
+                }
+                if (cacheBytes != null) {
+                    // limiting the stream just because for now this is only used in feed
+                    // processing, and 5MB is plenty
+                    IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
+                            response.getOutputStream());
+                } else { // not in cache then read and update cache
+                    ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
+                    response.setStatus(HttpStatus.OK.value());
+                    byte[] body = resp.getBody();
+                    synchronized (RSSFeedService.proxyCache) {
+                        RSSFeedService.proxyCache.put(url, body);
                     }
-                    // throw new RuntimeException("internal server error");
-                    return null;
-                });
+                    IOUtils.copy(new ByteArrayInputStream(body), response.getOutputStream());
+                    // DO NOT DELETE (good example)
+                    // restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
+                    // -> {
+                    // }, responseExtractor -> {
+                    // IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
+                    // return null;
+                    // });
+                }
+            } catch (Exception e) {
+            }
+            // throw new RuntimeException("internal server error");
+            return null;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
-        return callProc.run(
-                "getMultiRssFeed",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return arun.run(as -> {
-                        return rssFeed.getMultiRssFeed(req);
-                    });
-                });
+        return callProc.run("getMultiRssFeed", false, false, req, session, ms -> {
+            return arun.run(as -> {
+                return rssFeed.getMultiRssFeed(req);
+            });
+        });
     }
 
     @RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
     @ResponseBody
     public Object signup(@RequestBody SignupRequest req, HttpSession session) {
-        return callProc.run(
-                "signup",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    // This automated flag will bypass the captcha check, and email confirmation, and just immediately
-                    // create the user.
-                    boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
-                    return user.signup(req, automated);
-                });
+        return callProc.run("signup", false, false, req, session, ms -> {
+            // This automated flag will bypass the captcha check, and email confirmation, and just immediately
+            // create the user.
+            boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
+            return user.signup(req, automated);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
     @ResponseBody
     public Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
-        return callProc.run(
-                "login",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return user.login(httpReq, req);
-                });
+        return callProc.run("login", false, false, req, session, ms -> {
+            return user.login(httpReq, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
     @ResponseBody
     public Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
-        return callProc.run(
-                "closeAccount",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    CloseAccountResponse res = user.closeAccount(req);
-                    session.invalidate();
-                    return res;
-                });
+        return callProc.run("closeAccount", true, true, req, session, ms -> {
+            CloseAccountResponse res = user.closeAccount(req);
+            session.invalidate();
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
     @ResponseBody
     public Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
             HttpSession session) {
-        return callProc.run(
-                "logout",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    user.redisDelete(ThreadLocals.getSC());
-                    ThreadLocals.getSC().forceAnonymous();
-                    session.invalidate();
-                    LogoutResponse res = new LogoutResponse();
-                    return res;
-                });
+        return callProc.run("logout", true, true, req, session, ms -> {
+            user.redisDelete(ThreadLocals.getSC());
+            ThreadLocals.getSC().forceAnonymous();
+            session.invalidate();
+            LogoutResponse res = new LogoutResponse();
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/renderCalendar", method = RequestMethod.POST)
     @ResponseBody
     public Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, HttpServletRequest httpReq,
             HttpSession session) {
-        return callProc.run(
-                "renderCalendar",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return render.renderCalendar(ms, req);
-                });
+        return callProc.run("renderCalendar", true, true, req, session, ms -> {
+            return render.renderCalendar(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/likeNode", method = RequestMethod.POST)
     @ResponseBody
-    public Object likeNode(
-            @RequestBody LikeNodeRequest req, //
-            HttpServletRequest httpReq,
-            HttpSession session) {
-        return callProc.run(
-                "likeNode",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return edit.likeNode(ms, req);
-                });
+    public Object likeNode(@RequestBody LikeNodeRequest req, //
+            HttpServletRequest httpReq, HttpSession session) {
+        return callProc.run("likeNode", false, false, req, session, ms -> {
+            return edit.likeNode(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/loadActPubObject", method = RequestMethod.POST)
     @ResponseBody
     public Object loadActPubObject(@RequestBody GetActPubObjectRequest req, HttpServletRequest httpReq,
             HttpSession session) {
-        return callProc.run(
-                "loadActPubObject",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
-                    GetActPubObjectResponse res = new GetActPubObjectResponse();
-                    res.setNode(node);
-                    return res;
-                });
+        return callProc.run("loadActPubObject", true, true, req, session, ms -> {
+            NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
+            GetActPubObjectResponse res = new GetActPubObjectResponse();
+            res.setNode(node);
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-        return callProc.run(
-                "getNodeThreadView",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
-                    return res;
-                });
+        return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
+            GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getNodeRepliesView", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeRepliesView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-        return callProc.run(
-                "getNodeRepliesView",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    GetThreadViewResponse res = apUtil.getNodeReplies(ms, req.getNodeId());
-                    return res;
-                });
+        return callProc.run("getNodeRepliesView", false, false, req, session, ms -> {
+            GetThreadViewResponse res = apUtil.getNodeReplies(ms, req.getNodeId());
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
     @ResponseBody
     public Object renderNode(@RequestBody RenderNodeRequest req, HttpServletRequest httpReq, HttpSession session) {
-        return callProc.run(
-                "renderNode",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return render.renderNode(ms, req);
-                });
+        return callProc.run("renderNode", false, false, req, session, ms -> {
+            return render.renderNode(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getIPFSFiles", method = RequestMethod.POST)
     @ResponseBody
     public Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, HttpServletRequest httpReq, HttpSession session) {
         checkIpfs();
-        return callProc.run(
-                "getIPFSFiles",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    Val<String> folder = new Val<>();
-                    Val<String> cid = new Val<>();
-                    List<MFSDirEntry> files = null;
-                    // Get files using MFS
-                    if (req.getFolder() == null || req.getFolder().startsWith("/")) {
-                        files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
-                    } else { // Get files using DAG
-                        files = ipfsDag.getIPFSFiles(ms, folder, cid, req);
-                    }
-                    GetIPFSFilesResponse res = new GetIPFSFilesResponse();
-                    res.setFiles(files);
-                    res.setCid(cid.getVal());
-                    res.setFolder(folder.getVal());
-                    return res;
-                });
+        return callProc.run("getIPFSFiles", false, false, req, session, ms -> {
+            Val<String> folder = new Val<>();
+            Val<String> cid = new Val<>();
+            List<MFSDirEntry> files = null;
+            // Get files using MFS
+            if (req.getFolder() == null || req.getFolder().startsWith("/")) {
+                files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
+            } else { // Get files using DAG
+                files = ipfsDag.getIPFSFiles(ms, folder, cid, req);
+            }
+            GetIPFSFilesResponse res = new GetIPFSFilesResponse();
+            res.setFiles(files);
+            res.setCid(cid.getVal());
+            res.setFolder(folder.getVal());
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/deleteMFSFile", method = RequestMethod.POST)
@@ -654,17 +570,11 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req, HttpServletRequest httpReq,
             HttpSession session) {
         checkIpfs();
-        return callProc.run(
-                "deleteMFSFile",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    ipfsFiles.deleteMFSFile(ms, req);
-                    GetIPFSFilesResponse res = new GetIPFSFilesResponse();
-                    return res;
-                });
+        return callProc.run("deleteMFSFile", false, false, req, session, ms -> {
+            ipfsFiles.deleteMFSFile(ms, req);
+            GetIPFSFilesResponse res = new GetIPFSFilesResponse();
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getIPFSContent", method = RequestMethod.POST)
@@ -672,32 +582,20 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object getIPFSContent(@RequestBody GetIPFSContentRequest req, HttpServletRequest httpReq,
             HttpSession session) {
         checkIpfs();
-        return callProc.run(
-                "getIPFSContent",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    String content = ipfsFiles.getIPFSContent(ms, req);
-                    GetIPFSContentResponse res = new GetIPFSContentResponse();
-                    res.setContent(content);
-                    return res;
-                });
+        return callProc.run("getIPFSContent", false, false, req, session, ms -> {
+            String content = ipfsFiles.getIPFSContent(ms, req);
+            GetIPFSContentResponse res = new GetIPFSContentResponse();
+            res.setContent(content);
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
     @ResponseBody
     public Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
-        return callProc.run(
-                "initNodeEdit",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return render.initNodeEdit(ms, req);
-                });
+        return callProc.run("initNodeEdit", true, true, req, session, ms -> {
+            return render.initNodeEdit(ms, req);
+        });
     }
 
     /*
@@ -708,15 +606,9 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
     @ResponseBody
     public Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
-        return callProc.run(
-                "appDrop",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.appDrop(ms, req);
-                });
+        return callProc.run("appDrop", true, true, req, session, ms -> {
+            return edit.appDrop(ms, req);
+        });
     }
 
     // todo-1: I think this should be a GET operation, not a post, in order to do CACHING (in
@@ -726,148 +618,88 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
-        return callProc.run(
-                "getOpenGraph",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return openGraph.getOpenGraph(req);
-                });
+        return callProc.run("getOpenGraph", false, false, req, session, ms -> {
+            return openGraph.getOpenGraph(req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getSchemaOrgTypes", method = RequestMethod.POST)
     @ResponseBody
     public Object getSchemaOrgTypes(@RequestBody GetSchemaOrgTypesRequest req, HttpSession session) {
-        return callProc.run(
-                "getSchemaOrgTypes",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return schema.getSchemaOrgTypes();
-                });
+        return callProc.run("getSchemaOrgTypes", false, false, req, session, ms -> {
+            return schema.getSchemaOrgTypes();
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
-        return callProc.run(
-                "getNodePrivileges",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return acl.getNodePrivileges(ms, req);
-                });
+        return callProc.run("getNodePrivileges", true, true, req, session, ms -> {
+            return acl.getNodePrivileges(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getPeople", method = RequestMethod.POST)
     @ResponseBody
     public Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
-        return callProc.run(
-                "getPeople",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    GetPeopleResponse ret = null;
-                    if (req.getNodeId() != null) {
-                        ret = user.getPeopleOnNode(ms, req.getNodeId());
-                    } else {
-                        ret = user.getPeople(ms, ThreadLocals.getSC().getUserName(), req.getType(), req.getSubType());
-                    }
-                    ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
-                    return ret;
-                });
+        return callProc.run("getPeople", false, false, req, session, ms -> {
+            GetPeopleResponse ret = null;
+            if (req.getNodeId() != null) {
+                ret = user.getPeopleOnNode(ms, req.getNodeId());
+            } else {
+                ret = user.getPeople(ms, ThreadLocals.getSC().getUserName(), req.getType(), req.getSubType());
+            }
+            ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
+            return ret;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/addPrivilege", method = RequestMethod.POST)
     @ResponseBody
     public Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
-        return callProc.run(
-                "addPrivilege",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return acl.addPrivilege(ms, req);
-                });
+        return callProc.run("addPrivilege", true, true, req, session, ms -> {
+            return acl.addPrivilege(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/setUnpublished", method = RequestMethod.POST)
     @ResponseBody
     public Object setUnpublished(@RequestBody SetUnpublishedRequest req, HttpSession session) {
-        return callProc.run(
-                "setUnpublished",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return acl.setUnpublished(ms, req);
-                });
+        return callProc.run("setUnpublished", true, true, req, session, ms -> {
+            return acl.setUnpublished(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/copySharing", method = RequestMethod.POST)
     @ResponseBody
     public Object copySharing(@RequestBody CopySharingRequest req, HttpSession session) {
-        return callProc.run(
-                "copySharing",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return acl.copySharing(ms, req);
-                });
+        return callProc.run("copySharing", true, true, req, session, ms -> {
+            return acl.copySharing(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/removePrivilege", method = RequestMethod.POST)
     @ResponseBody
     public Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
-        return callProc.run(
-                "removePrivilege",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return acl.removePrivilege(ms, req);
-                });
+        return callProc.run("removePrivilege", true, true, req, session, ms -> {
+            return acl.removePrivilege(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/savePublicKeys", method = RequestMethod.POST)
     @ResponseBody
     public Object savePublicKeys(@RequestBody SavePublicKeyRequest req, HttpSession session) {
-        return callProc.run(
-                "savePublicKeys",
-                true,
-                false,
-                req,
-                session,
-                ms -> {
-                    return user.savePublicKeys(req);
-                });
+        return callProc.run("savePublicKeys", true, false, req, session, ms -> {
+            return user.savePublicKeys(req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
     @ResponseBody
     public Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
-        return callProc.run(
-                "setCipherKey",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return acl.setCipherKey(ms, req);
-                });
+        return callProc.run("setCipherKey", true, true, req, session, ms -> {
+            return acl.setCipherKey(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/export", method = RequestMethod.POST)
@@ -876,194 +708,137 @@ public class AppController extends ServiceBase implements ErrorController {
         if (req.isToIpfs()) {
             checkIpfs();
         }
-        return callProc.run(
-                "export",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    ExportResponse res = new ExportResponse();
-                    /*
-                     * We require that the node being exported is OWNED BY (not just visible to) the person doing the
-                     * export, because this will potentially consume a lot of their storage quota and we don't want
-                     * users just clicking things like the War and Peace book and trying to export that.
-                     */
-                    arun.run(as -> {
-                        SubNode node = read.getNode(as, req.getNodeId());
-                        if (node == null)
-                            throw new RuntimeException("Node not found: " + req.getNodeId());
-                        if (!auth.ownedByThreadUser(node)) {
-                            throw new RuntimeException("You can only export nodes you own");
-                        }
-                        return null;
-                    });
-                    if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-                        ExportServiceFlexmark svc =
-                                (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
-                        svc.export(ms, "pdf", req, res);
-                    } else if ("zip".equalsIgnoreCase(req.getExportExt())) { // ================================================
-                                                                             // // } // // } // res.setSuccess(false);
-                                                                             // // res.setMessage("Export of Markdown to
-                                                                             // IPFS not yet available."); // if
-                                                                             // (req.isToIpfs()) { // else if
-                                                                             // ("md".equalsIgnoreCase(req.getExportExt()))
-                                                                             // { // } // // svc.export(ms, "html", req,
-                                                                             // res); // ExportServiceFlexmark svc =
-                                                                             // (ExportServiceFlexmark)
-                                                                             // context.getBean(ExportServiceFlexmark.class);
-                                                                             // // else if
-                                                                             // ("html".equalsIgnoreCase(req.getExportExt()))
-                                                                             // { // and we don't need these options,
-                                                                             // but I'm leaving the code in place for
-                                                                             // now. // I think the HTML and MARKDOWN
-                                                                             // export as ZIP/TAR formats can suffice
-                                                                             // for this // DO NOT DELETE (YET) //
-                                                                             // ================================================
-                                                                             // //
-                        if (req.isToIpfs()) {
-                            res.error("Export of ZIP to IPFS not yet available.");
-                        }
-                        ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
-                        svc.export(ms, req, res);
-                    } //
-                    else if ("tar".equalsIgnoreCase(req.getExportExt())) {
-                        if (req.isToIpfs()) {
-                            res.error("Export of TAR to IPFS not yet available.");
-                        }
-                        ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
-                        svc.export(ms, req, res);
-                    } //
-                    else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
-                        if (req.isToIpfs()) {
-                            res.error("Export of TAR.GZ to IPFS not yet available.");
-                        }
-                        ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
-                        svc.setUseGZip(true);
-                        svc.export(ms, req, res);
-                    } else {
-                        throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
-                    }
-                    return res;
-                });
+        return callProc.run("export", true, true, req, session, ms -> {
+            ExportResponse res = new ExportResponse();
+            /*
+             * We require that the node being exported is OWNED BY (not just visible to) the person doing the
+             * export, because this will potentially consume a lot of their storage quota and we don't want
+             * users just clicking things like the War and Peace book and trying to export that.
+             */
+            arun.run(as -> {
+                SubNode node = read.getNode(as, req.getNodeId());
+                if (node == null)
+                    throw new RuntimeException("Node not found: " + req.getNodeId());
+                if (!auth.ownedByThreadUser(node)) {
+                    throw new RuntimeException("You can only export nodes you own");
+                }
+                return null;
+            });
+            if ("pdf".equalsIgnoreCase(req.getExportExt())) {
+                ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
+                svc.export(ms, "pdf", req, res);
+            } else if ("zip".equalsIgnoreCase(req.getExportExt())) { // ================================================
+                                                                     // // } // // } // res.setSuccess(false);
+                                                                     // // res.setMessage("Export of Markdown to
+                                                                     // IPFS not yet available."); // if
+                                                                     // (req.isToIpfs()) { // else if
+                                                                     // ("md".equalsIgnoreCase(req.getExportExt()))
+                                                                     // { // } // // svc.export(ms, "html", req,
+                                                                     // res); // ExportServiceFlexmark svc =
+                                                                     // (ExportServiceFlexmark)
+                                                                     // context.getBean(ExportServiceFlexmark.class);
+                                                                     // // else if
+                                                                     // ("html".equalsIgnoreCase(req.getExportExt()))
+                                                                     // { // and we don't need these options,
+                                                                     // but I'm leaving the code in place for
+                                                                     // now. // I think the HTML and MARKDOWN
+                                                                     // export as ZIP/TAR formats can suffice
+                                                                     // for this // DO NOT DELETE (YET) //
+                                                                     // ================================================
+                                                                     // //
+                if (req.isToIpfs()) {
+                    res.error("Export of ZIP to IPFS not yet available.");
+                }
+                ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
+                svc.export(ms, req, res);
+            } //
+            else if ("tar".equalsIgnoreCase(req.getExportExt())) {
+                if (req.isToIpfs()) {
+                    res.error("Export of TAR to IPFS not yet available.");
+                }
+                ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
+                svc.export(ms, req, res);
+            } //
+            else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
+                if (req.isToIpfs()) {
+                    res.error("Export of TAR.GZ to IPFS not yet available.");
+                }
+                ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
+                svc.setUseGZip(true);
+                svc.export(ms, req, res);
+            } else {
+                throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
+            }
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/subGraphHash", method = RequestMethod.POST)
     @ResponseBody
     public Object subGraphHash(@RequestBody SubGraphHashRequest req, HttpSession session) {
-        return callProc.run(
-                "subGraphHash",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.subGraphHash(ms, req);
-                });
+        return callProc.run("subGraphHash", true, true, req, session, ms -> {
+            return edit.subGraphHash(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
     @ResponseBody
     public Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "export",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.transferNode(ms, req);
-                });
+        return callProc.run("export", true, true, req, session, ms -> {
+            return edit.transferNode(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/searchAndReplace", method = RequestMethod.POST)
     @ResponseBody
     public Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
-        return callProc.run(
-                "searchAndReplace",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.searchAndReplace(ms, req);
-                });
+        return callProc.run("searchAndReplace", true, true, req, session, ms -> {
+            return edit.searchAndReplace(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
     @ResponseBody
     public Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
         checkIpfs();
-        return callProc.run(
-                "publishNodeToIpfs",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return ipfs.publishNodeToIpfs(ms, req);
-                });
+        return callProc.run("publishNodeToIpfs", true, true, req, session, ms -> {
+            return ipfs.publishNodeToIpfs(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
     @ResponseBody
     public Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
         checkIpfs();
-        return callProc.run(
-                "loadNodeFromIpfs",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return ipfs.loadNodeFromIpfs(ms, req);
-                });
+        return callProc.run("loadNodeFromIpfs", true, true, req, session, ms -> {
+            return ipfs.loadNodeFromIpfs(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
     @ResponseBody
-    public Object streamImport(
-            @RequestParam(value = "nodeId", required = true) String nodeId,
-            @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,
-            HttpSession session) {
-        return callProc.run(
-                "streamImport",
-                true,
-                true,
-                null,
-                session,
-                ms -> {
-                    return importService.streamImport(ms, nodeId, uploadFiles);
-                });
+    public Object streamImport(@RequestParam(value = "nodeId", required = true) String nodeId,
+            @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
+        return callProc.run("streamImport", true, true, null, session, ms -> {
+            return importService.streamImport(ms, nodeId, uploadFiles);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/setNodePosition", method = RequestMethod.POST)
     @ResponseBody
     public Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
-        return callProc.run(
-                "setNodePosition",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return move.setNodePosition(ms, req);
-                });
+        return callProc.run("setNodePosition", true, true, req, session, ms -> {
+            return move.setNodePosition(ms, req);
+        });
     }
 
     /* Creates a new node as a child of the specified node */
     @RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
     @ResponseBody
     public Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "createSubNode",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.createSubNode(ms, req);
-                });
+        return callProc.run("createSubNode", true, true, req, session, ms -> {
+            return edit.createSubNode(ms, req);
+        });
     }
 
     /*
@@ -1072,220 +847,130 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
     @ResponseBody
     public Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "insertNode",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.insertNode(ms, req);
-                });
+        return callProc.run("insertNode", true, true, req, session, ms -> {
+            return edit.insertNode(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/insertBook", method = RequestMethod.POST)
     @ResponseBody
     public Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
-        return callProc.run(
-                "insertBook",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    ThreadLocals.requireAdmin();
-                    return importBookService.insertBook(ms, req);
-                });
+        return callProc.run("insertBook", true, true, req, session, ms -> {
+            ThreadLocals.requireAdmin();
+            return importBookService.insertBook(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/deleteNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "deleteNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    if (req.isBulkDelete()) {
-                        return delete.bulkDeleteNodes(ms);
-                    } else {
-                        return delete.deleteNodes(ms, req);
-                    }
-                });
+        return callProc.run("deleteNodes", true, true, req, session, ms -> {
+            if (req.isBulkDelete()) {
+                return delete.bulkDeleteNodes(ms);
+            } else {
+                return delete.deleteNodes(ms, req);
+            }
+        });
     }
 
     @RequestMapping(value = API_PATH + "/joinNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "joinNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return move.joinNodes(ms, req);
-                });
+        return callProc.run("joinNodes", true, true, req, session, ms -> {
+            return move.joinNodes(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/selectAllNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "selectAllNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return move.selectAllNodes(ms, req);
-                });
+        return callProc.run("selectAllNodes", true, true, req, session, ms -> {
+            return move.selectAllNodes(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/updateHeadings", method = RequestMethod.POST)
     @ResponseBody
     public Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
-        return callProc.run(
-                "updateHeadings",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    edit.updateHeadings(ms, req.getNodeId());
-                    UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-                    return res;
-                });
+        return callProc.run("updateHeadings", true, true, req, session, ms -> {
+            edit.updateHeadings(ms, req.getNodeId());
+            UpdateHeadingsResponse res = new UpdateHeadingsResponse();
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/moveNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "moveNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return move.moveNodes(ms, req);
-                });
+        return callProc.run("moveNodes", true, true, req, session, ms -> {
+            return move.moveNodes(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/linkNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object linkNodes(@RequestBody LinkNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "linkNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.linkNodes(ms, req);
-                });
+        return callProc.run("linkNodes", true, true, req, session, ms -> {
+            return edit.linkNodes(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/deleteProperties", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
-        return callProc.run(
-                "deleteProperties",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.deleteProperties(ms, req);
-                });
+        return callProc.run("deleteProperties", true, true, req, session, ms -> {
+            return edit.deleteProperties(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/updateFriendNode", method = RequestMethod.POST)
     @ResponseBody
     public Object updateFriendNode(@RequestBody UpdateFriendNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "updateFriendNode",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.updateFriendNode(ms, req);
-                });
+        return callProc.run("updateFriendNode", true, true, req, session, ms -> {
+            return edit.updateFriendNode(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/saveNostrSettings", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNostrSettings(@RequestBody SaveNostrSettingsRequest req, HttpSession session) {
         log.debug("saveNostrSettings()");
-        return callProc.run(
-                "saveNostrSettings",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return nostr.saveNostrSettings(req);
-                });
+        return callProc.run("saveNostrSettings", true, true, req, session, ms -> {
+            return nostr.saveNostrSettings(req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/saveNostrEvents", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNode(@RequestBody SaveNostrEventRequest req, HttpSession session) {
         log.debug("saveNostrEvents()");
-        return callProc.run(
-                "saveNostrEvents",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return nostr.saveNostrEvents(req);
-                });
+        return callProc.run("saveNostrEvents", true, true, req, session, ms -> {
+            return nostr.saveNostrEvents(req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "saveNode",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.saveNode(ms, req);
-                });
+        return callProc.run("saveNode", true, true, req, session, ms -> {
+            return edit.saveNode(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
     @ResponseBody
     public Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
-        return callProc.run(
-                "changePassword",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return user.changePassword(ms, req);
-                });
+        return callProc.run("changePassword", false, false, req, session, ms -> {
+            return user.changePassword(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
     @ResponseBody
     public Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
-        return callProc.run(
-                "resetPassword",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return user.resetPassword(req);
-                });
+        return callProc.run("resetPassword", false, false, req, session, ms -> {
+            return user.resetPassword(req);
+        });
     }
 
     /*
@@ -1308,9 +993,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "gid", required = false) String gid,
             // attachment name for retrieving from a multiple attachment node, and if omitted
             // defaults to "p" (primary)
-            @RequestParam(value = "att", required = false) String attName,
-            HttpSession session,
-            HttpServletRequest req,
+            @RequestParam(value = "att", required = false) String attName, HttpSession session, HttpServletRequest req,
             HttpServletResponse response) {
         try {
             if (StringUtils.isEmpty(attName)) {
@@ -1387,8 +1070,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
      */
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
-    public void getBinary(
-            @PathVariable("binId") String binId,
+    public void getBinary(@PathVariable("binId") String binId,
             @RequestParam(value = "nodeId", required = false) String nodeId,
             /*
              * In the file exports where this is appended, we could have appended just nodeId and it would also
@@ -1403,8 +1085,7 @@ public class AppController extends ServiceBase implements ErrorController {
              * other file so we use the token to auth the request
              */
             @RequestParam(value = "token", required = false) String token,
-            @RequestParam(value = "download", required = false) String download,
-            HttpSession session,
+            @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {
         if (token == null) {
             // Check if this is an 'avatar' request and if so bypass security
@@ -1423,20 +1104,14 @@ public class AppController extends ServiceBase implements ErrorController {
                     return null;
                 });
             } else /* Else if not an avatar request then do a secure acccess */ {
-                callProc.run(
-                        "bin",
-                        false,
-                        false,
-                        null,
-                        session,
-                        ms -> {
-                            if (ipfsCid != null) {
-                                ipfs.streamResponse(response, ms, ipfsCid, null);
-                            } else {
-                                attach.getBinary(null, null, null, nodeId, binId, download != null, response);
-                            }
-                            return null;
-                        });
+                callProc.run("bin", false, false, null, session, ms -> {
+                    if (ipfsCid != null) {
+                        ipfs.streamResponse(response, ms, ipfsCid, null);
+                    } else {
+                        attach.getBinary(null, null, null, nodeId, binId, download != null, response);
+                    }
+                    return null;
+                });
             }
         } else {
             if (user.validToken(token, null)) {
@@ -1456,27 +1131,19 @@ public class AppController extends ServiceBase implements ErrorController {
      * -is-getting-truncated
      */
     @RequestMapping(value = FILE_PATH + "/export/{fileName:.+}", method = RequestMethod.GET)
-    public void getFile(
-            @PathVariable("fileName") String fileName,
+    public void getFile(@PathVariable("fileName") String fileName,
             @RequestParam(name = "disp", required = false) String disposition,
-            @RequestParam(name = "token", required = true) String token,
-            HttpSession session,
+            @RequestParam(name = "token", required = true) String token, HttpSession session,
             HttpServletResponse response) {
         SessionContext sc = ServiceBase.user.redisGet(token);
         if (sc == null) {
             throw new RuntimeException("bad token in /f/export/ access: " + token);
         }
 
-        callProc.run(
-                "file",
-                false,
-                false,
-                null,
-                session,
-                ms -> {
-                    attach.getFile(ms, fileName, disposition, response);
-                    return null;
-                });
+        callProc.run("file", false, false, null, session, ms -> {
+            attach.getFile(ms, fileName, disposition, response);
+            return null;
+        });
     }
 
     /*
@@ -1502,21 +1169,13 @@ public class AppController extends ServiceBase implements ErrorController {
      */
     // todo-1: broken for now. Needs accepted path (by AppFilter) and token
     @RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
-    public Object getFileSystemResourceStream(
-            @PathVariable("nodeId") String nodeId,
-            @RequestParam(name = "disp", required = false) String disposition,
-            HttpSession session) {
-        return callProc.run(
-                "filesys",
-                false,
-                false,
-                null,
-                session,
-                ms -> {
-                    // return attachmentService.getFileSystemResourceStream(ms, nodeId,
-                    // disposition);
-                    return null;
-                });
+    public Object getFileSystemResourceStream(@PathVariable("nodeId") String nodeId,
+            @RequestParam(name = "disp", required = false) String disposition, HttpSession session) {
+        return callProc.run("filesys", false, false, null, session, ms -> {
+            // return attachmentService.getFileSystemResourceStream(ms, nodeId,
+            // disposition);
+            return null;
+        });
     }
 
     ///////////////////////////////////////////////
@@ -1530,23 +1189,13 @@ public class AppController extends ServiceBase implements ErrorController {
     // }
     @PerfMon
     @RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
-    public ResponseEntity<ResourceRegion> streamMultiPart(
-            @PathVariable("fileName") String fileName,
-            @RequestParam("nodeId") String nodeId,
-            @RequestParam(name = "disp", required = false) final String disp,
-            @RequestHeader HttpHeaders headers,
-            HttpServletRequest request,
-            HttpServletResponse response,
+    public ResponseEntity<ResourceRegion> streamMultiPart(@PathVariable("fileName") String fileName,
+            @RequestParam("nodeId") String nodeId, @RequestParam(name = "disp", required = false) final String disp,
+            @RequestHeader HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
             HttpSession session) {
-        return (ResponseEntity<ResourceRegion>) callProc.run(
-                "stream",
-                false,
-                false,
-                null,
-                session,
-                ms -> {
-                    return attach.getStreamResource(ms, headers, nodeId);
-                });
+        return (ResponseEntity<ResourceRegion>) callProc.run("stream", false, false, null, session, ms -> {
+            return attach.getStreamResource(ms, headers, nodeId);
+        });
     }
 
     // /* Used for displaying a file specified by a file url parameter (tbd) */
@@ -1567,140 +1216,79 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object parseFiles(@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,
             HttpSession session) {
-        return callProc.run(
-                "parseFiles",
-                true,
-                true,
-                null,
-                session,
-                ms -> {
-                    return attach.parseUploadFiles(ms, uploadFiles);
-                });
+        return callProc.run("parseFiles", true, true, null, session, ms -> {
+            return attach.parseUploadFiles(ms, uploadFiles);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
     @ResponseBody
-    public Object upload(
-            @RequestParam(value = "nodeId", required = true) String nodeId,
+    public Object upload(@RequestParam(value = "nodeId", required = true) String nodeId,
             @RequestParam(value = "attName", required = false) String attName,
             @RequestParam(value = "explodeZips", required = false) String explodeZips,
             @RequestParam(value = "ipfs", required = false) String ipfs,
-            @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,
-            HttpSession session) {
+            @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
         final String _attName = attName == null ? "" : attName;
-        return callProc.run(
-                "upload",
-                true,
-                true,
-                null,
-                session,
-                ms -> {
-                    return attach.uploadMultipleFiles(
-                            ms,
-                            _attName,
-                            nodeId,
-                            uploadFiles, //
-                            "true".equalsIgnoreCase(explodeZips),
-                            "true".equalsIgnoreCase(ipfs));
-                });
+        return callProc.run("upload", true, true, null, session, ms -> {
+            return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
+                    "true".equalsIgnoreCase(explodeZips), "true".equalsIgnoreCase(ipfs));
+        });
     }
 
     @RequestMapping(value = API_PATH + "/deleteAttachment", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
-        return callProc.run(
-                "deleteAttachment",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return attach.deleteAttachment(ms, req);
-                });
+        return callProc.run("deleteAttachment", true, true, req, session, ms -> {
+            return attach.deleteAttachment(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/uploadFromUrl", method = RequestMethod.POST)
     @ResponseBody
     public Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
-        return callProc.run(
-                "uploadFromUrl",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return attach.readFromUrl(ms, req);
-                });
+        return callProc.run("uploadFromUrl", true, true, req, session, ms -> {
+            return attach.readFromUrl(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/uploadFromIPFS", method = RequestMethod.POST)
     @ResponseBody
     public Object uploadFromIPFS(@RequestBody UploadFromIPFSRequest req, HttpSession session) {
-        return callProc.run(
-                "uploadFromIPFS",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return attach.attachFromIPFS(ms, req);
-                });
+        return callProc.run("uploadFromIPFS", true, true, req, session, ms -> {
+            return attach.attachFromIPFS(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
     @ResponseBody
     public Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "anonPageLoad",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return render.anonPageLoad(null, req);
-                });
+        return callProc.run("anonPageLoad", false, false, req, session, ms -> {
+            return render.anonPageLoad(null, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
     @ResponseBody
     public Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
-        return callProc.run(
-                "nodeSearch",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return search.search(ms, req);
-                });
+        return callProc.run("nodeSearch", false, false, req, session, ms -> {
+            return search.search(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/renderDocument", method = RequestMethod.POST)
     @ResponseBody
     public Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
-        return callProc.run(
-                "renderDocument",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return search.renderDocument(ms, req);
-                });
+        return callProc.run("renderDocument", false, false, req, session, ms -> {
+            return search.renderDocument(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
-        return callProc.run(
-                "getFollowers",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return apFollower.getFollowers(ms, req);
-                });
+        return callProc.run("getFollowers", false, false, req, session, ms -> {
+            return apFollower.getFollowers(ms, req);
+        });
     }
 
     /*
@@ -1711,175 +1299,103 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
-        return callProc.run(
-                "getFollowing",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return apFollowing.getFollowing(ms, req);
-                });
+        return callProc.run("getFollowing", false, false, req, session, ms -> {
+            return apFollowing.getFollowing(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
-        return callProc.run(
-                "nodeFeed",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return userFeed.generateFeed(ms, req);
-                });
+        return callProc.run("nodeFeed", false, false, req, session, ms -> {
+            return userFeed.generateFeed(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
     @ResponseBody
     public Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
-        return callProc.run(
-                "checkMessages",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return userFeed.checkMessages(ms, req);
-                });
+        return callProc.run("checkMessages", true, true, req, session, ms -> {
+            return userFeed.checkMessages(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "getSharedNodes",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return search.getSharedNodes(ms, req);
-                });
+        return callProc.run("getSharedNodes", false, false, req, session, ms -> {
+            return search.getSharedNodes(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
     @ResponseBody
     public Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
-        return callProc.run(
-                "saveUserPreferences",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return user.saveUserPreferences(req);
-                });
+        return callProc.run("saveUserPreferences", true, true, req, session, ms -> {
+            return user.saveUserPreferences(req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
-        return callProc.run(
-                "getUserProfile",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    GetUserProfileResponse res = new GetUserProfileResponse();
-                    UserProfile userProfile = user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false);
-                    if (userProfile != null) {
-                        res.setUserProfile(userProfile);
-                    }
-                    return res;
-                });
+        return callProc.run("getUserProfile", false, false, req, session, ms -> {
+            GetUserProfileResponse res = new GetUserProfileResponse();
+            UserProfile userProfile = user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false);
+            if (userProfile != null) {
+                res.setUserProfile(userProfile);
+            }
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
     @ResponseBody
     public Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
-        return callProc.run(
-                "saveUserProfile",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return user.saveUserProfile(req);
-                });
+        return callProc.run("saveUserProfile", true, true, req, session, ms -> {
+            return user.saveUserProfile(req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
     @ResponseBody
     public Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
-        return callProc.run(
-                "addFriend",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return user.addFriend(ms, req);
-                });
+        return callProc.run("addFriend", true, true, req, session, ms -> {
+            return user.addFriend(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
-        return callProc.run(
-                "deleteFriend",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return user.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
-                });
+        return callProc.run("deleteFriend", true, true, req, session, ms -> {
+            return user.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
+        });
     }
 
     @RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
     @ResponseBody
     public Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
         // SessionContext.authReq(true);
-        return callProc.run(
-                "blockUser",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return user.blockUser(ms, req);
-                });
+        return callProc.run("blockUser", true, true, req, session, ms -> {
+            return user.blockUser(ms, req);
+        });
     }
 
     @RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
     @ResponseBody
     public Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
-        return callProc.run(
-                "unblockUser",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return user.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
-                });
+        return callProc.run("unblockUser", true, true, req, session, ms -> {
+            return user.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
-        return callProc.run(
-                "getUserAcccountInfo",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    return user.getUserAccountInfo(req);
-                });
+        return callProc.run("getUserAcccountInfo", false, false, req, session, ms -> {
+            return user.getUserAccountInfo(req);
+        });
     }
 
     private void loadConfig(ClientConfig res) {
@@ -1907,238 +1423,182 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
     @ResponseBody
     public Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
-        return callProc.run(
-                "getBookmarks",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    GetBookmarksResponse res = new GetBookmarksResponse();
-                    search.getBookmarks(ms, req, res);
-                    return res;
-                });
+        return callProc.run("getBookmarks", true, true, req, session, ms -> {
+            GetBookmarksResponse res = new GetBookmarksResponse();
+            search.getBookmarks(ms, req, res);
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
-        return callProc.run(
-                "signNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    SignNodesResponse res = new SignNodesResponse();
-                    crypto.signNodes(ms, req, res);
-                    return res;
-                });
+        return callProc.run("signNodes", true, true, req, session, ms -> {
+            SignNodesResponse res = new SignNodesResponse();
+            crypto.signNodes(ms, req, res);
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/signSubGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object signSubGraph(@RequestBody SignSubGraphRequest req, HttpSession session) {
-        return callProc.run(
-                "signSubGraph",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    SignSubGraphResponse res = new SignSubGraphResponse();
-                    // run the signing in an async thread, so we can push messages back to browser from it without
-                    // any session mutexing getting in the way
-                    exec.run(() -> {
-                        crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
-                    });
-                    return res;
-                });
+        return callProc.run("signSubGraph", true, true, req, session, ms -> {
+            SignSubGraphResponse res = new SignSubGraphResponse();
+            // run the signing in an async thread, so we can push messages back to browser from it without
+            // any session mutexing getting in the way
+            exec.run(() -> {
+                crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
+            });
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
-        return callProc.run(
-                "getNodeStats",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    GetNodeStatsResponse res = new GetNodeStatsResponse();
-                    search.getNodeStats(ms, req, res);
-                    return res;
-                });
+        return callProc.run("getNodeStats", false, false, req, session, ms -> {
+            GetNodeStatsResponse res = new GetNodeStatsResponse();
+            search.getNodeStats(ms, req, res);
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)
     @ResponseBody
     public Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
-        return callProc.run(
-                "getServerInfo",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    GetServerInfoResponse res = new GetServerInfoResponse();
-                    res.setMessages(new LinkedList<>());
-                    if (req.getCommand().equalsIgnoreCase("getJson")) {
-                    } else { // allow this one if user owns node.
-                        ThreadLocals.requireAdmin();
-                    }
+        return callProc.run("getServerInfo", true, true, req, session, ms -> {
+            GetServerInfoResponse res = new GetServerInfoResponse();
+            res.setMessages(new LinkedList<>());
+            if (req.getCommand().equalsIgnoreCase("getJson")) {
+            } else { // allow this one if user owns node.
+                ThreadLocals.requireAdmin();
+            }
 
-                    log.debug("Command: " + req.getCommand());
-                    switch (req.getCommand()) {
-                        case "performanceReport":
-                            res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
-                            break;
-                        case "crawlUsers":
-                            res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
-                            break;
-                        case "actPubMaintenance":
-                            res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
-                            break;
-                        case "nostrMaintenance":
-                            res.getMessages().add(new InfoMessage(apub.maintainNostrUsers(), null));
-                            break;
-                        case "nostrQueryUpdate":
-                            res.getMessages().add(new InfoMessage(system.nostrQueryUpdate(), null));
-                            break;
-                        case "compactDb":
-                            res.getMessages().add(new InfoMessage(system.compactDb(), null));
-                            break;
-                        case "runConversion":
-                            res.getMessages().add(new InfoMessage(system.runConversion(), null));
-                            break;
-                        case "deleteLeavingOrphans":
-                            res.getMessages()
-                                    .add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
-                            break;
-                        case "validateDb":
-                            res.getMessages().add(new InfoMessage(system.validateDb(), null));
-                            break;
-                        case "cacheAdminContent":
-                            system.cacheAdminNodes();
-                            res.getMessages().add(new InfoMessage("Done", null));
-                            break;
-                        case "repairDb":
-                            res.getMessages().add(new InfoMessage(system.repairDb(), null));
-                            break;
-                        case "rebuildIndexes":
-                            res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
-                            break;
-                        case "refreshRssCache":
-                            res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
-                            break;
-                        case "refreshTrendingCache":
-                            res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
-                            break;
-                        case "refreshFediverseUsers":
-                            // apub.refreshForeignUsers();
-                            apub.refreshFollowedUsers();
-                            res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
-                            break;
-                        case "refreshAPAccounts":
-                            apub.refreshActorPropsForAllUsers();
-                            res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
-                            break;
-                        case "toggleAuditFilter":
-                            AppFilter.audit = !AppFilter.audit;
-                            res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                            break;
-                        case "toggleDaemons":
-                            prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
-                            res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                            break;
-                        case "ipfsPubSubTest":
-                            // currently unused (leaving hook in place)
-                            throw new RuntimeException("ipfsPubSubTest depricated");
-                        // res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
-                        // break;
-                        case "getServerInfo":
-                            res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                            break;
-                        case "getJson":
-                            res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
-                            break;
-                        case "getActPubJson":
-                            res.getMessages()
-                                    .add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
-                            break;
-                        case "readOutbox":
-                            res.getMessages().add(new InfoMessage(apub.readOutbox(req.getParameter()), null));
-                            break;
-                        default:
-                            throw new RuntimeEx("Invalid command: " + req.getCommand());
-                    }
-                    return res;
-                });
+            log.debug("Command: " + req.getCommand());
+            switch (req.getCommand()) {
+                case "performanceReport":
+                    res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
+                    break;
+                case "crawlUsers":
+                    res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
+                    break;
+                case "actPubMaintenance":
+                    res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
+                    break;
+                case "nostrMaintenance":
+                    res.getMessages().add(new InfoMessage(apub.maintainNostrUsers(), null));
+                    break;
+                case "nostrQueryUpdate":
+                    res.getMessages().add(new InfoMessage(system.nostrQueryUpdate(), null));
+                    break;
+                case "compactDb":
+                    res.getMessages().add(new InfoMessage(system.compactDb(), null));
+                    break;
+                case "runConversion":
+                    res.getMessages().add(new InfoMessage(system.runConversion(), null));
+                    break;
+                case "deleteLeavingOrphans":
+                    res.getMessages().add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
+                    break;
+                case "validateDb":
+                    res.getMessages().add(new InfoMessage(system.validateDb(), null));
+                    break;
+                case "cacheAdminContent":
+                    system.cacheAdminNodes();
+                    res.getMessages().add(new InfoMessage("Done", null));
+                    break;
+                case "repairDb":
+                    res.getMessages().add(new InfoMessage(system.repairDb(), null));
+                    break;
+                case "rebuildIndexes":
+                    res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
+                    break;
+                case "refreshRssCache":
+                    res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
+                    break;
+                case "refreshTrendingCache":
+                    res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
+                    break;
+                case "refreshFediverseUsers":
+                    // apub.refreshForeignUsers();
+                    apub.refreshFollowedUsers();
+                    res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
+                    break;
+                case "refreshAPAccounts":
+                    apub.refreshActorPropsForAllUsers();
+                    res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
+                    break;
+                case "toggleAuditFilter":
+                    AppFilter.audit = !AppFilter.audit;
+                    res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
+                    break;
+                case "toggleDaemons":
+                    prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
+                    res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
+                    break;
+                case "ipfsPubSubTest":
+                    // currently unused (leaving hook in place)
+                    throw new RuntimeException("ipfsPubSubTest depricated");
+                // res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
+                // break;
+                case "getServerInfo":
+                    res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
+                    break;
+                case "getJson":
+                    res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
+                    break;
+                case "getActPubJson":
+                    res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
+                    break;
+                case "readOutbox":
+                    res.getMessages().add(new InfoMessage(apub.readOutbox(req.getParameter()), null));
+                    break;
+                default:
+                    throw new RuntimeEx("Invalid command: " + req.getCommand());
+            }
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-        return callProc.run(
-                "graphNodes",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    GraphResponse res = graphNodes.graphNodes(ms, req);
-                    return res;
-                });
+        return callProc.run("graphNodes", true, true, req, session, ms -> {
+            GraphResponse res = graphNodes.graphNodes(ms, req);
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/luceneIndex", method = RequestMethod.POST)
     @ResponseBody
     public Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
-        return callProc.run(
-                "luceneIndex",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    ThreadLocals.requireAdmin();
-                    /*
-                     * We need to run this in a thread, and return control back to browser imediately, and then have the
-                     * "ServerInfo" request able to display the current state of this indexing process, or potentially
-                     * have a dedicated ServerInfo-like tab to display the state in
-                     */
-                    return lucene.reindex(ms, req.getNodeId(), req.getPath());
-                });
+        return callProc.run("luceneIndex", true, true, req, session, ms -> {
+            ThreadLocals.requireAdmin();
+            /*
+             * We need to run this in a thread, and return control back to browser imediately, and then have the
+             * "ServerInfo" request able to display the current state of this indexing process, or potentially
+             * have a dedicated ServerInfo-like tab to display the state in
+             */
+            return lucene.reindex(ms, req.getNodeId(), req.getPath());
+        });
     }
 
     @RequestMapping(value = API_PATH + "/luceneSearch", method = RequestMethod.POST)
     @ResponseBody
     public Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
-        return callProc.run(
-                "luceneSearch",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    ThreadLocals.requireAdmin();
-                    return lucene.search(ms, req.getNodeId(), req.getText());
-                });
+        return callProc.run("luceneSearch", true, true, req, session, ms -> {
+            ThreadLocals.requireAdmin();
+            return lucene.search(ms, req.getNodeId(), req.getText());
+        });
     }
 
     // todo-1: broken for now. Needs special treatment in AppFilter to allow
     @RequestMapping(value = "/health", method = RequestMethod.GET)
     @ResponseBody
     public String up() {
-        return ("Ver: " +
-                prop.getAppVersion() +
-                "Server: time=" +
-                System.currentTimeMillis() +
-                " SwarmTaskId=" +
-                prop.getSwarmTaskId() +
-                " slot=" +
-                prop.getSwarmTaskSlot());
+        return ("Ver: " + prop.getAppVersion() + "Server: time=" + System.currentTimeMillis() + " SwarmTaskId="
+                + prop.getSwarmTaskId() + " slot=" + prop.getSwarmTaskSlot());
     }
 
     /*
@@ -2148,87 +1608,57 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
     @ResponseBody
     public Object ping(@RequestBody PingRequest req, HttpSession session) {
-        return callProc.run(
-                "ping",
-                false,
-                false,
-                req,
-                session,
-                ms -> {
-                    PingResponse res = new PingResponse();
-                    res.setServerInfo(
-                            "Server: t=" + System.currentTimeMillis() + " SwarmTaskId=" + prop.getSwarmTaskId());
-                    return res;
-                });
+        return callProc.run("ping", false, false, req, session, ms -> {
+            PingResponse res = new PingResponse();
+            res.setServerInfo("Server: t=" + System.currentTimeMillis() + " SwarmTaskId=" + prop.getSwarmTaskId());
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/sendTestEmail", method = RequestMethod.POST)
     @ResponseBody
     public Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
-        return callProc.run(
-                "sendTestEmail",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    SendTestEmailResponse res = new SendTestEmailResponse();
-                    ThreadLocals.requireAdmin();
-                    log.debug("SendEmailTest detected on server.");
-                    String timeString = new Date().toString();
-                    synchronized (EmailSender.getLock()) {
-                        try {
-                            mail.init();
-                            mail.sendMail(
-                                    "wclayf@gmail.com",
-                                    null,
-                                    "<h1>Hello! Time=" +
-                                            timeString +
-                                            "</h1>This is the test email requested from the " +
-                                            prop.getConfigText("brandingAppName") +
-                                            " admin menu.",
-                                    "Test Subject");
-                        } finally {
-                            mail.close();
-                        }
-                    }
-                    return res;
-                });
+        return callProc.run("sendTestEmail", true, true, req, session, ms -> {
+            SendTestEmailResponse res = new SendTestEmailResponse();
+            ThreadLocals.requireAdmin();
+            log.debug("SendEmailTest detected on server.");
+            String timeString = new Date().toString();
+            synchronized (EmailSender.getLock()) {
+                try {
+                    mail.init();
+                    mail.sendMail("wclayf@gmail.com", null,
+                            "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
+                                    + prop.getConfigText("brandingAppName") + " admin menu.",
+                            "Test Subject");
+                } finally {
+                    mail.close();
+                }
+            }
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/sendLogText", method = RequestMethod.POST)
     @ResponseBody
     public Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
-        return callProc.run(
-                "sendLogText",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    ThreadLocals.requireAdmin();
-                    SendLogTextResponse res = new SendLogTextResponse();
-                    log.debug("DEBUG: " + req.getText());
-                    log.info("INFO: " + req.getText());
-                    log.trace("TRACE: " + req.getText());
-                    // log this one to get test ActPubLog log level
-                    apLog.trace("apLog TRACE: " + req.getText());
-                    return res;
-                });
+        return callProc.run("sendLogText", true, true, req, session, ms -> {
+            ThreadLocals.requireAdmin();
+            SendLogTextResponse res = new SendLogTextResponse();
+            log.debug("DEBUG: " + req.getText());
+            log.info("INFO: " + req.getText());
+            log.trace("TRACE: " + req.getText());
+            // log this one to get test ActPubLog log level
+            apLog.trace("apLog TRACE: " + req.getText());
+            return res;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
     @ResponseBody
     public Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
-        return callProc.run(
-                "splitNode",
-                true,
-                true,
-                req,
-                session,
-                ms -> {
-                    return edit.splitNode(ms, req);
-                });
+        return callProc.run("splitNode", true, true, req, session, ms -> {
+            return edit.splitNode(ms, req);
+        });
     }
 
     //
@@ -2244,8 +1674,7 @@ public class AppController extends ServiceBase implements ErrorController {
     // }
     // reference: https://www.baeldung.com/spring-server-sent-events
     @GetMapping(API_PATH + "/serverPush/{token}")
-    public SseEmitter serverPush(
-            @PathVariable(value = "token", required = true) String token, //
+    public SseEmitter serverPush(@PathVariable(value = "token", required = true) String token, //
             HttpSession session) {
         if (StringUtils.isEmpty(token)) {
             throw new RuntimeException("No token for serverPush");
@@ -2260,17 +1689,11 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] captcha(HttpSession session) {
-        return (byte[]) callProc.run(
-                "captcha",
-                false,
-                false,
-                null,
-                session,
-                ms -> {
-                    String captcha = CaptchaMaker.createCaptchaString();
-                    ThreadLocals.getHttpSession().setAttribute("captcha", captcha);
-                    return CaptchaMaker.makeCaptcha(captcha);
-                });
+        return (byte[]) callProc.run("captcha", false, false, null, session, ms -> {
+            String captcha = CaptchaMaker.createCaptchaString();
+            ThreadLocals.getHttpSession().setAttribute("captcha", captcha);
+            return CaptchaMaker.makeCaptcha(captcha);
+        });
     }
 
     /*
@@ -2283,17 +1706,11 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/shutdown", method = RequestMethod.GET)
     @ResponseBody
     public String shutdown(HttpSession session, @RequestParam(value = "password", required = true) String password) {
-        return (String) callProc.run(
-                "shutdown",
-                false,
-                false,
-                null,
-                session,
-                ms -> {
-                    if (prop.getAdminPassword().equals(password)) {
-                        gracefulShutdown.initiateShutdown(0);
-                    }
-                    return null;
-                });
+        return (String) callProc.run("shutdown", false, false, null, session, ms -> {
+            if (prop.getAdminPassword().equals(password)) {
+                gracefulShutdown.initiateShutdown(0);
+            }
+            return null;
+        });
     }
 }
