@@ -67,9 +67,11 @@ $tourPanelHeight: 6rem;
 
 @font-face {
     font-family: "QuantaCustomFont";
-    src: url('../fonts/Roboto-Light.ttf') format('truetype');
+    /* src: url('../fonts/Roboto-Light.ttf') format('truetype'); */
+    src: url('../fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @import '../node_modules/highlight.js/scss/dark.scss';

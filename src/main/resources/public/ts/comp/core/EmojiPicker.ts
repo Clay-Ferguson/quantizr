@@ -1,4 +1,4 @@
-import Picker from "emoji-picker-react";
+import Picker, { EmojiClickData } from "emoji-picker-react";
 import { ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
 import { Comp } from "../base/Comp";
@@ -8,9 +8,9 @@ export class EmojiPicker extends Comp {
     constructor(private selectionValueIntf: ValueIntf) {
         super();
         this.attribs.pickerStyle = { width: "100%", marginBottom: "16px" };
-        this.attribs.onEmojiClick = (event: any, emojiObject: any) => {
-            console.log("emoji: & #x" + emojiObject.unified + ";");
-            this.selectionValueIntf.setValue(emojiObject.emoji);
+        this.attribs.onEmojiClick = (emojiData: EmojiClickData, event: MouseEvent) => {
+            // console.log("emoji: & #x" + emojiData.unified + "; &#x" + emojiData.unified + "; ");
+            this.selectionValueIntf.setValue(emojiData.emoji);
         };
     }
 
