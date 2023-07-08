@@ -895,6 +895,10 @@ public class MongoRead extends ServiceBase {
             Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
             q.addCriteria(c);
 
+            if (textCriteria != null) {
+                q.addCriteria(textCriteria);
+            }
+
             if (sort != null) {
                 q.with(sort);
             }
