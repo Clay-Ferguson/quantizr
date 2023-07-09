@@ -407,7 +407,6 @@ export class EditNodeDlgUtil {
             nodeId: node.id,
             upLevel: false,
             siblingOffset: 0,
-            renderParentIfLeaf: false,
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,

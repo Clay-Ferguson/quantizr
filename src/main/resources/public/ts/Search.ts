@@ -713,7 +713,6 @@ export class Search {
         S.view.refreshTree({
             nodeId: null,
             zeroOffset: false,
-            renderParentIfLeaf: false,
             highlightId: null,
             forceIPFSRefresh: false,
             scrollToTop: false,

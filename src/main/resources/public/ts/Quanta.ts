@@ -82,7 +82,6 @@ export class Quanta {
         S.view.refreshTree({
             nodeId: null,
             zeroOffset: false,
-            renderParentIfLeaf: true,
             highlightId: null,
             forceIPFSRefresh: false,
             scrollToTop: true,
@@ -173,7 +172,6 @@ export class Quanta {
                     S.view.refreshTree({
                         nodeId: event.state.nodeId,
                         zeroOffset: true,
-                        renderParentIfLeaf: true,
                         highlightId: event.state.highlightId,
                         forceIPFSRefresh: false,
                         scrollToTop: false,
@@ -321,7 +319,6 @@ export class Quanta {
         /* set ID to be the page we want to show user right after login */
         let id: string = null;
         let childId: string = null;
-        let renderParentIfLeaf = true;
         const ast = getAs();
 
         // When user has perhaps requested a NostrId on the URL we'll end up here where we need to get the Nostr
@@ -372,10 +369,6 @@ export class Quanta {
             if (id == ":home" && lastNode != null) {
                 id = lastNode;
             }
-
-            if (id && id.startsWith("~")) {
-                renderParentIfLeaf = false;
-            }
         } //
         else {
             const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
@@ -391,7 +384,6 @@ export class Quanta {
         await S.view.refreshTree({
             nodeId: id,
             zeroOffset: true,
-            renderParentIfLeaf,
             highlightId: childId,
             forceIPFSRefresh: false,
             scrollToTop: false,

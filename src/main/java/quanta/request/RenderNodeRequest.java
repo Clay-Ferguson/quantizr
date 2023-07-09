@@ -19,7 +19,6 @@ public class RenderNodeRequest extends RequestBase {
 	 */
 	private int siblingOffset;
 	private boolean upLevel;
-	private boolean renderParentIfLeaf;
 	private boolean forceRenderParent;
 
 	// indicates that if the node pointed to is an 'RSS Type', then instead of rendering it we just
@@ -45,15 +44,10 @@ public class RenderNodeRequest extends RequestBase {
 		this.forceIPFSRefresh = forceIPFSRefresh;
 	}
 
-	@JsonProperty(required = false)
-	public boolean isRenderParentIfLeaf() {
-		return renderParentIfLeaf;
-	}
-	
 	public String getNodeId() {
 		return this.nodeId;
 	}
-	
+
 	public int getOffset() {
 		return this.offset;
 	}
@@ -62,35 +56,35 @@ public class RenderNodeRequest extends RequestBase {
 	 * If this is 0, it has no effect. If it's 1 that means try to jump to the next sibling of the
 	 * current page root node, and if -1 then it tries to go to previous sibling.
 	 */
-	
+
 	public int getSiblingOffset() {
 		return this.siblingOffset;
 	}
-	
+
 	public boolean isUpLevel() {
 		return this.upLevel;
 	}
-	
+
 	public boolean isForceRenderParent() {
 		return this.forceRenderParent;
 	}
-	
+
 	public boolean isJumpToRss() {
 		return this.jumpToRss;
 	}
-	
+
 	public boolean isGoToLastPage() {
 		return this.goToLastPage;
 	}
-	
+
 	public boolean isSingleNode() {
 		return this.singleNode;
 	}
-	
+
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-	
+
 	public void setOffset(final int offset) {
 		this.offset = offset;
 	}
@@ -99,35 +93,30 @@ public class RenderNodeRequest extends RequestBase {
 	 * If this is 0, it has no effect. If it's 1 that means try to jump to the next sibling of the
 	 * current page root node, and if -1 then it tries to go to previous sibling.
 	 */
-	
+
 	public void setSiblingOffset(final int siblingOffset) {
 		this.siblingOffset = siblingOffset;
 	}
-	
+
 	public void setUpLevel(final boolean upLevel) {
 		this.upLevel = upLevel;
 	}
-	
-	public void setRenderParentIfLeaf(final boolean renderParentIfLeaf) {
-		this.renderParentIfLeaf = renderParentIfLeaf;
-	}
-	
+
 	public void setForceRenderParent(final boolean forceRenderParent) {
 		this.forceRenderParent = forceRenderParent;
 	}
-	
+
 	public void setJumpToRss(final boolean jumpToRss) {
 		this.jumpToRss = jumpToRss;
 	}
-	
+
 	public void setGoToLastPage(final boolean goToLastPage) {
 		this.goToLastPage = goToLastPage;
 	}
-	
+
 	public void setSingleNode(final boolean singleNode) {
 		this.singleNode = singleNode;
 	}
 
-	public RenderNodeRequest() {
-	}
+	public RenderNodeRequest() {}
 }

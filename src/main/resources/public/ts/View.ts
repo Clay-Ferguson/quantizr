@@ -34,7 +34,6 @@ export class View {
         await this.refreshTree({
             nodeId: id,
             zeroOffset: true,
-            renderParentIfLeaf: true,
             highlightId: id,
             forceIPFSRefresh: false,
             scrollToTop: false,
@@ -65,18 +64,10 @@ export class View {
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
-        /* named nodes aren't persisting in url without this and i may decide to just get rid
-         of 'renderParentIfLeaf' altogether (todo-2) but for now i'm just fixing the case when we are
-         rendering a named node. */
-        if (a.nodeId.indexOf(":") !== -1) {
-            a.renderParentIfLeaf = false;
-        }
-
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: a.nodeId,
             upLevel: false,
             siblingOffset: 0,
-            renderParentIfLeaf: a.renderParentIfLeaf,
             forceRenderParent: a.forceRenderParent,
             offset,
             goToLastPage: false,
@@ -156,7 +147,6 @@ export class View {
             nodeId: ast.node.id,
             upLevel: false,
             siblingOffset: 0,
-            renderParentIfLeaf: true,
             forceRenderParent: false,
             offset,
             goToLastPage,
@@ -389,7 +379,6 @@ export class View {
 interface RefreshTreeArgs {
     nodeId: string;
     zeroOffset: boolean;
-    renderParentIfLeaf: boolean;
     highlightId: string;
     forceIPFSRefresh: boolean;
     scrollToTop: boolean;

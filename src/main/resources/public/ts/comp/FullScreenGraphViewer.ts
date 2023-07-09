@@ -262,7 +262,6 @@ export class FullScreenGraphViewer extends Main {
             nodeId: d.data.id,
             upLevel: false,
             siblingOffset: 0,
-            renderParentIfLeaf: false,
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,

@@ -890,7 +890,6 @@ export class Util {
                     nodeId: S.quanta.config.initialNodeId || ":home",
                     upLevel: false,
                     siblingOffset: 0,
-                    renderParentIfLeaf: false,
                     forceRenderParent: false,
                     offset: 0,
                     goToLastPage: false,

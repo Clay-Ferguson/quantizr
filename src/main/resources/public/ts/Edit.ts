@@ -58,7 +58,6 @@ export class Edit {
         S.view.refreshTree({
             nodeId: null,
             zeroOffset: true,
-            renderParentIfLeaf: false,
             highlightId: null,
             forceIPFSRefresh: false,
             scrollToTop: true,
@@ -77,7 +76,6 @@ export class Edit {
             S.view.refreshTree({
                 nodeId: ast.node.id,
                 zeroOffset: false,
-                renderParentIfLeaf: false,
                 highlightId: null,
                 forceIPFSRefresh: false,
                 scrollToTop: false,
@@ -167,7 +165,6 @@ export class Edit {
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: false,
-                    renderParentIfLeaf: false,
                     highlightId: nodeId,
                     forceIPFSRefresh: false,
                     scrollToTop: false,
@@ -430,7 +427,6 @@ export class Edit {
     //             nodeId,
     //             upLevel: false,
     //             siblingOffset: 0,
-    //             renderParentIfLeaf: false,
     //             forceRenderParent: false,
     //             offset: 0,
     //             goToLastPage: false,
@@ -1136,7 +1132,6 @@ export class Edit {
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
-                renderParentIfLeaf: false,
                 highlightId: null,
                 forceIPFSRefresh: false,
                 scrollToTop: false,
@@ -1309,7 +1304,6 @@ export class Edit {
             S.view.refreshTree({
                 nodeId: null,
                 zeroOffset: false,
-                renderParentIfLeaf: false,
                 highlightId: null,
                 forceIPFSRefresh: false,
                 scrollToTop: false,
@@ -1344,7 +1338,6 @@ export class Edit {
                 S.view.refreshTree({
                     nodeId: null,
                     zeroOffset: false,
-                    renderParentIfLeaf: false,
                     highlightId: null,
                     forceIPFSRefresh: false,
                     scrollToTop: false,

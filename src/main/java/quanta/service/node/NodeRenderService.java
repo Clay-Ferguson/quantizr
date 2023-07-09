@@ -81,20 +81,8 @@ public class NodeRenderService extends ServiceBase {
         // then here we indicate to the caller this happened and return immediately.
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
             res.setRssNode(true);
-            NodeInfo nodeInfo = convert.convertToNodeInfo(
-                    adminOnly,
-                    ThreadLocals.getSC(),
-                    ms,
-                    node,
-                    false,
-                    Convert.LOGICAL_ORDINAL_IGNORE,
-                    false,
-                    false,
-                    false,
-                    true,
-                    true,
-                    null,
-                    false);
+            NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false);
             res.setNode(nodeInfo);
             return res;
         }
@@ -116,20 +104,8 @@ public class NodeRenderService extends ServiceBase {
         /* If only the single node was requested return that */
         if (req.isSingleNode()) {
             // that loads these all asynchronously.
-            NodeInfo nodeInfo = convert.convertToNodeInfo(
-                    adminOnly,
-                    ThreadLocals.getSC(),
-                    ms,
-                    node,
-                    false,
-                    Convert.LOGICAL_ORDINAL_GENERATE,
-                    false,
-                    false,
-                    false,
-                    true,
-                    true,
-                    null,
-                    false);
+            NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, true, null, false);
             res.setNode(nodeInfo);
             return res;
         }
@@ -142,7 +118,7 @@ public class NodeRenderService extends ServiceBase {
         // we pass allowAuth=true because right here we DO care that the hasChildren is considering only
         // based
         // on what WE can access.
-        if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node))) {
+        if (req.isForceRenderParent()) {
             req.setUpLevel(true);
         }
         /*
@@ -204,31 +180,10 @@ public class NodeRenderService extends ServiceBase {
         return res;
     }
 
-    public NodeInfo processRenderNode(
-            boolean adminOnly,
-            MongoSession ms,
-            RenderNodeRequest req,
-            RenderNodeResponse res,
-            SubNode node,
-            SubNode scanToNode,
-            long logicalOrdinal,
-            int level,
-            int limit,
-            boolean showReplies) {
-        NodeInfo nodeInfo = convert.convertToNodeInfo(
-                adminOnly,
-                ThreadLocals.getSC(),
-                ms,
-                node,
-                false,
-                logicalOrdinal,
-                level > 0,
-                false,
-                false,
-                true,
-                true,
-                null,
-                false);
+    public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
+            SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
+        NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
+                level > 0, false, false, true, true, null, false);
         if (nodeInfo == null) {
             return null;
         }
@@ -357,18 +312,8 @@ public class NodeRenderService extends ServiceBase {
                             for (int i = count - 1; i >= 0; i--) {
                                 SubNode sn = slidingWindow.get(i);
                                 relativeIdx--;
-                                ninfo =
-                                        render.processRenderNode(
-                                                adminOnly,
-                                                ms,
-                                                req,
-                                                res,
-                                                sn,
-                                                null,
-                                                relativeIdx,
-                                                level + 1,
-                                                limit,
-                                                showReplies);
+                                ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, relativeIdx,
+                                        level + 1, limit, showReplies);
                                 nodeInfo.getChildren().add(0, ninfo);
                                 /*
                                  * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example
@@ -428,18 +373,8 @@ public class NodeRenderService extends ServiceBase {
                 for (int i = count - 1; i >= 0; i--) {
                     SubNode sn = slidingWindow.get(i);
                     relativeIdx--;
-                    ninfo =
-                            render.processRenderNode(
-                                    adminOnly,
-                                    ms,
-                                    req,
-                                    res,
-                                    sn,
-                                    null,
-                                    (long) relativeIdx,
-                                    level + 1,
-                                    limit,
-                                    showReplies);
+                    ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, (long) relativeIdx, level + 1,
+                            limit, showReplies);
                     nodeInfo.getChildren().add(0, ninfo);
                     // If we have enough records we're done
                     if (nodeInfo.getChildren().size() >= limit) {
@@ -500,19 +435,18 @@ public class NodeRenderService extends ServiceBase {
          */
         if (req.getEditMyFriendNode()) {
             String _nodeId = nodeId;
-            nodeId =
-                    arun.run(as -> {
-                        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
-                        // we query as a list, but there should only be ONE result.
-                        List<SubNode> friendNodes =
-                                user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
-                        if (friendNodes != null) {
-                            for (SubNode friendNode : friendNodes) {
-                                return friendNode.getIdStr();
-                            }
-                        }
-                        return null;
-                    });
+            nodeId = arun.run(as -> {
+                Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
+                // we query as a list, but there should only be ONE result.
+                List<SubNode> friendNodes =
+                        user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
+                if (friendNodes != null) {
+                    for (SubNode friendNode : friendNodes) {
+                        return friendNode.getIdStr();
+                    }
+                }
+                return null;
+            });
         }
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
@@ -520,20 +454,8 @@ public class NodeRenderService extends ServiceBase {
             res.error("Node not found.");
             return res;
         }
-        NodeInfo nodeInfo = convert.convertToNodeInfo(
-                false,
-                ThreadLocals.getSC(),
-                ms,
-                node,
-                true,
-                Convert.LOGICAL_ORDINAL_IGNORE,
-                false,
-                false,
-                false,
-                false,
-                false,
-                null,
-                false);
+        NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
+                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, null, false);
         res.setNodeInfo(nodeInfo);
         return res;
     }

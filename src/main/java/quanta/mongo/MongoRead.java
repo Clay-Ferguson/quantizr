@@ -556,10 +556,6 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
             Criteria moreCriteria) {
-        if (noChildren(node)) {
-            return Collections.<SubNode>emptyList();
-        }
-
         if (readFromAdminCache() && moreCriteria == null && sort != null && ordinalSort.equals(sort)) {
             TreeNode tn = null;
             synchronized (SystemService.adminNodesCacheLock) {
