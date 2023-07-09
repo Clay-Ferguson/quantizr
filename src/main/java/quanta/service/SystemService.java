@@ -20,6 +20,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.ParameterizedTypeReference;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import quanta.actpub.APConst;
 import quanta.config.AppSessionListener;
+import quanta.config.RedisMessage;
+import quanta.config.RedisMessagePublisher;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.UserStats;
@@ -81,6 +84,9 @@ public class SystemService extends ServiceBase {
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
+
+    @Autowired
+    private RedisMessagePublisher redisMessagePublisher;
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -302,6 +308,12 @@ public class SystemService extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         envList.forEach(v -> sb.append(v));
         return sb.toString();
+    }
+
+    public String redisPubSubTest() {
+        RedisMessage msg = new RedisMessage("This is a test.");
+        redisMessagePublisher.publish(msg);
+        return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }
 
     // tserver-tag

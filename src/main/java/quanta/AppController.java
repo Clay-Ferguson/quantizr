@@ -1477,6 +1477,9 @@ public class AppController extends ServiceBase implements ErrorController {
 
             log.debug("Command: " + req.getCommand());
             switch (req.getCommand()) {
+                case "redisPubSubTest":
+                    res.getMessages().add(new InfoMessage(system.redisPubSubTest(), null));
+                    break;
                 case "performanceReport":
                     res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
                     break;

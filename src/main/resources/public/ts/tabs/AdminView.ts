@@ -56,10 +56,11 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Divc({ className: "settingsCol" }, [
                         // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                         this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
+                        this.settingsLink("Redis PubSub Test", () => S.view.runServerCommand("redisPubSubTest", null, "Redis PubSub Test", null)), //
                     ]),
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Performance Report", () => S.view.runServerCommand("performanceReport", null, "Performance Report", null)), //
-                    ])
+                    ]),
                 ], horzClass),
 
                 this.sectionTitle("Utils"),

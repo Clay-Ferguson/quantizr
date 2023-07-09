@@ -2,10 +2,14 @@ package quanta.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -18,6 +22,9 @@ public class RedisConfiguration {
 
     private static Logger log = LoggerFactory.getLogger(RedisConfiguration.class);
 
+    @Autowired
+    private RedisMessageSubscriber redisMessageSubscriber;
+
     @Bean
     public RedisTemplate<String, SessionContext> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, SessionContext> template = new RedisTemplate<>();
@@ -25,6 +32,32 @@ public class RedisConfiguration {
         template.setConnectionFactory(connectionFactory);
         // template.setDefaultSerializer(new StringRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());
+
+        // template.setValueSerializer(new Jackson2JsonRedisSerializer<RedisMessage>(RedisMessage.class));
+
         return template;
+    }
+
+    @Bean
+    MessageListenerAdapter messageListener() {
+        return new MessageListenerAdapter(redisMessageSubscriber);
+    }
+
+    @Bean
+    RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(messageListener(), topic());
+        return container;
+    }
+
+    @Bean
+    MessagePublisher redisPublisher(RedisConnectionFactory connectionFactory) {
+        return new RedisMessagePublisher();
+    }
+
+    @Bean
+    ChannelTopic topic() {
+        return new ChannelTopic("messageQueue");
     }
 }
