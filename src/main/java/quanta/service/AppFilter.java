@@ -128,7 +128,7 @@ public class AppFilter extends GenericFilterBean {
             ThreadLocals.setReqSig(httpReq.getHeader("Sig"));
 
             if (!StringUtils.isEmpty(token)) {
-                sc = ServiceBase.user.redisGet(token);
+                sc = ServiceBase.redis.get(token);
                 if (sc == null) {
                     throw new UnauthorizedException();
                 } else {
@@ -160,7 +160,7 @@ public class AppFilter extends GenericFilterBean {
             }
 
             if (sc.getUserToken() != null) {
-                ServiceBase.user.redisSave(ThreadLocals.getSC());
+                ServiceBase.redis.save(ThreadLocals.getSC());
                 if (newSc) {
                     log.debug("First Save of RedisKey: " + sc.getUserToken());
                 }

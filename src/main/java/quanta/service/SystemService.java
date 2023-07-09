@@ -1,8 +1,5 @@
 package quanta.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.client.MongoDatabase;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
@@ -20,7 +17,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,10 +27,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.MongoDatabase;
 import quanta.actpub.APConst;
 import quanta.config.AppSessionListener;
 import quanta.config.RedisMessage;
-import quanta.config.RedisMessagePublisher;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.UserStats;
@@ -84,9 +82,6 @@ public class SystemService extends ServiceBase {
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-
-    @Autowired
-    private RedisMessagePublisher redisMessagePublisher;
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -288,7 +283,7 @@ public class SystemService extends ServiceBase {
     public String getRedisReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("User Sessions (Redis): \n");
-        List<SessionContext> list = user.redisQuery("*");
+        List<SessionContext> list = redis.query("*");
         for (SessionContext sc : list) {
             sb.append("    " + sc.getUserName() + " " + sc.getUserToken() + "\n");
         }
@@ -311,8 +306,8 @@ public class SystemService extends ServiceBase {
     }
 
     public String redisPubSubTest() {
-        RedisMessage msg = new RedisMessage("This is a test.");
-        redisMessagePublisher.publish(msg);
+        RedisMessage msg = new RedisMessage("This is a test, bro.");
+        redis.publish(msg);
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }
 

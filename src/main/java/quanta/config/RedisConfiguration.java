@@ -52,11 +52,6 @@ public class RedisConfiguration {
     }
 
     @Bean
-    MessagePublisher redisPublisher(RedisConnectionFactory connectionFactory) {
-        return new RedisMessagePublisher();
-    }
-
-    @Bean
     ChannelTopic topic() {
         return new ChannelTopic("messageQueue");
     }

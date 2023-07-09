@@ -263,7 +263,7 @@ public class CryptoService extends ServiceBase {
             if (failed.getVal() || !sc.isLive())
                 return;
         }
-        push.sendServerPushInfo(sc,
+        push.pushInfo(sc,
                 new PushPageMessage(
                         "SubGraph signatures complete. " + String.valueOf(count.getVal()) + " nodes were signed.", true,
                         "note"));
@@ -272,7 +272,7 @@ public class CryptoService extends ServiceBase {
     // This method pushes data down to the browser to be signed and waits for the reply here.
     private boolean waitForBrowserSentSigs(SessionContext sc, NodeSigPushInfo pushInfo) {
         sigPendingQueue.put(pushInfo.getWorkloadId(), pushInfo);
-        push.sendServerPushInfo(sc, pushInfo);
+        push.pushInfo(sc, pushInfo);
         Util.sleep(10);
         long totalTime = 0;
         long sleepTime = 100;

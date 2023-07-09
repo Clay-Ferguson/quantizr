@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +22,9 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import quanta.actpub.ActPubLog;
@@ -43,7 +37,6 @@ import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
-import quanta.instrument.PerfMonEvent;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
@@ -55,7 +48,6 @@ import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
@@ -103,9 +95,6 @@ public class UserManagerService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
     @Autowired
-    private RedisTemplate<String, SessionContext> redisTemplate;
-
-    @Autowired
     private ActPubLog apLog;
 
     private static final Random rand = new Random();
@@ -115,7 +104,7 @@ public class UserManagerService extends ServiceBase {
     public static final ConcurrentHashMap<String, SseEmitter> pushEmitters = new ConcurrentHashMap<>();
 
     public SseEmitter getPushEmitter(String token) {
-        SessionContext sc = redisGet(token);
+        SessionContext sc = redis.get(token);
         if (sc == null) {
             throw new RuntimeException("bad token for push emitter: " + token);
         }
@@ -131,8 +120,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     // todo-a: I think this function AND "reqBearerToken" (not bearerToken) can be factored out for a
-    // more consistent
-    // design letting all the logic be only in AppFilter
+    // more consistent design letting all the logic be only in AppFilter
     public void authBearer() {
         SessionContext sc = ThreadLocals.getSC();
         if (sc == null) {
@@ -155,97 +143,8 @@ public class UserManagerService extends ServiceBase {
         if (StringUtils.isEmpty(token))
             return false;
 
-        SessionContext sc = redisGet(token);
+        SessionContext sc = redis.get(token);
         return sc != null && (userName == null || sc.getUserName().equals(userName));
-    }
-
-    public void redisSave(SessionContext sc) {
-        if (sc.getUserToken() == null)
-            return;
-        long start = System.currentTimeMillis();
-        redisTemplate.opsForValue().set(sc.getUserToken(), sc);
-        new PerfMonEvent(System.currentTimeMillis() - start, "redisSave", sc.getUserName());
-    }
-
-    public void redisDelete(SessionContext sc) {
-        if (sc.getUserToken() == null)
-            return;
-        long start = System.currentTimeMillis();
-        if (redisTemplate.delete(sc.getUserToken())) {
-            log.debug("Redis Token Deleted: " + sc.getUserToken());
-        }
-        new PerfMonEvent(System.currentTimeMillis() - start, "redisDel", sc.getUserName());
-    }
-
-    public SessionContext redisGet(String token) {
-        if (StringUtils.isEmpty(token))
-            return null;
-        long start = System.currentTimeMillis();
-        SessionContext sc = redisTemplate.opsForValue().get(token);
-        if (sc != null) {
-            new PerfMonEvent(System.currentTimeMillis() - start, "redisGet", sc.getUserName());
-        } else {
-            log.debug("unknown redis token: " + token);
-        }
-        return sc;
-    }
-
-    public List<SessionContext> redisQuery(String pattern) {
-        long start = System.currentTimeMillis();
-        LinkedList<SessionContext> list = new LinkedList<>();
-        Set<String> keys = redisTemplate.keys(pattern);
-        if (keys != null) {
-            for (String key : keys) {
-                list.add(redisTemplate.opsForValue().get(key));
-            }
-        }
-        new PerfMonEvent(System.currentTimeMillis() - start, "redisQuery", "_sys_");
-
-        // DO NOT DELETE
-        // I found this pattern online and I'm not sure of it's purpose becuase it reads apparently only
-        // bytes,
-        // so I guess the expectation is that we setup some kind of deserializer.
-        // RedisConnection redisConnection = null;
-        // try {
-        // redisConnection = redisTemplate.getConnectionFactory().getConnection();
-        // ScanOptions options = ScanOptions.scanOptions().match("*").count(Integer.MAX_VALUE).build();
-        // Cursor c = redisConnection.scan(options);
-        // while (c.hasNext()) {
-        // Object obj = c.next();
-        // log.debug("REDIS SCAN: " + obj.getClass().getName());
-        // }
-        // } finally {
-        // redisConnection.close(); //Ensure closing this connection.
-        // }
-        return list;
-    }
-
-    // Note: This happens to be about the same as the session timeout, but doesn't need to be
-    @Scheduled(fixedDelay = 60 * DateUtil.MINUTE_MILLIS)
-    public void redisMaintenance() {
-        if (!MongoRepository.fullInit)
-            return;
-
-        List<SessionContext> list = user.redisQuery("*");
-        if (list.size() > 0) {
-            int timeoutMillis = (int) (prop.getSessionTimeoutMinutes() * DateUtil.MINUTE_MILLIS);
-            Date now = new Date();
-
-            redisTemplate.execute(new SessionCallback<List<Object>>() {
-                public List<Object> execute(RedisOperations rops) throws DataAccessException {
-                    rops.multi();
-
-                    for (SessionContext sc : list) {
-                        if (sc.getLastActiveTime() < now.getTime() - timeoutMillis) {
-                            rops.delete(sc.getUserToken());
-                        }
-                    }
-
-                    // This will contain the results of all operations in the transaction
-                    return rops.exec();
-                }
-            });
-        }
     }
 
     /*
@@ -833,8 +732,7 @@ public class UserManagerService extends ServiceBase {
                 // Now we have to read the file we just wrote to get it's CID so we can publish it.
                 IPFSDirStat pathStat = ipfsFiles.pathStat(folderName);
                 if (pathStat == null) {
-                    push.sendServerPushInfo(sc,
-                            new PushPageMessage("Decentralized Identity Publish FAILED", true, "note"));
+                    push.pushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED", true, "note"));
                     return null;
                 }
                 log.debug("Parent Folder PathStat " + folderName + ": " + XString.prettyPrint(pathStat));
@@ -845,8 +743,7 @@ public class UserManagerService extends ServiceBase {
                 log.debug("Publishing complete!");
                 userNode.set(NodeProp.USER_DID_IPNS, ret.get("Name"));
                 update.save(as, userNode);
-                push.sendServerPushInfo(sc,
-                        new PushPageMessage("Decentralized Identity Publish Complete.", false, "note"));
+                push.pushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete.", false, "note"));
                 return null;
             });
         });

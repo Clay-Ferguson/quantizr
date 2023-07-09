@@ -52,7 +52,7 @@ public class PushService extends ServiceBase {
 
             maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, ThreadLocals.getSC());
 
-            List<SessionContext> scList = user.redisQuery("*");
+            List<SessionContext> scList = redis.query("*");
             if (scList.size() > 0) {
                 for (SessionContext sc : scList) {
                     // skip our own session because we already considered it first, above.
@@ -88,14 +88,10 @@ public class PushService extends ServiceBase {
         // We don't include isPublic here, because we want don't want every message that comes into the
         // server to show up right away on the feed. We expect user to 'refresh' for that.
         // isPublic || // node is public
-
-        node.getOwner().toHexString().equals(sc.getRootId()) || // node belongs to me
-                (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) || // I'm watching
-                                                                                                     // path it's on
-                (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) || // my timeline
-                                                                                                     // includes it
-                (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // it's shared to me
-        ) {
+        node.getOwner().toHexString().equals(sc.getRootId())
+                || (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath()))
+                || (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath()))
+                || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName()))) {
             pushToBrowser(ms, sc, sessionsPushed, node);
         }
     }
@@ -112,7 +108,7 @@ public class PushService extends ServiceBase {
         if (info != null) {
             FeedPushInfo pushInfo = new FeedPushInfo(info);
             // push notification message to browser
-            push.sendServerPushInfo(sc, pushInfo);
+            push.pushInfo(sc, pushInfo);
 
             if (sessionsPushed != null) {
                 sessionsPushed.add(sc.getUserToken());
@@ -120,14 +116,20 @@ public class PushService extends ServiceBase {
         }
     }
 
-    public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
+    public void pushInfo(SessionContext sc, ServerPushInfo info) {
         // If user is currently logged in we have a session here.
         if (sc == null)
             return;
+
+        // todo-0: make this use Redis PubSub to route to correct broser instance.
+        pushInfo(sc.getUserToken(), info);
+    }
+
+    public void pushInfo(String token, ServerPushInfo info) {
         exec.run(() -> {
-            SseEmitter pushEmitter = user.getPushEmitter(sc.getUserToken());
+            SseEmitter pushEmitter = user.getPushEmitter(token);
             if (pushEmitter == null) {
-                log.debug("No PushEmitter for user: " + ThreadLocals.getSC().getUserName());
+                log.debug("No PushEmitter for token: " + token);
                 return;
             }
             /*
@@ -139,17 +141,8 @@ public class PushService extends ServiceBase {
                     SseEventBuilder event =
                             SseEmitter.event().data(info).id(String.valueOf(info.hashCode())).name(info.getType());
                     pushEmitter.send(event);
-                } catch (
-                /*
-                 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-                 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-                 * and let the 'name' in the builder route different objects to different event listeners on the
-                 * client. Not really sure if either approach has major advantages over the other.
-                 *
-                 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-                 */
-                Exception ex) {
-                    log.error("FAILED Pushing to Session User: " + sc.getUserName());
+                } catch (Exception ex) {
+                    log.error("FAILED Pushing to Session with token: " + token);
                     pushEmitter.completeWithError(ex);
                 }
             }

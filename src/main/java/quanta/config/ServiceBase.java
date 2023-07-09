@@ -39,6 +39,7 @@ import quanta.service.LuceneService;
 import quanta.service.OpenGraphService;
 import quanta.service.PushService;
 import quanta.service.RSSFeedService;
+import quanta.service.RedisService;
 import quanta.service.SchemaOrgService;
 import quanta.service.SystemService;
 import quanta.service.UserFeedService;
@@ -121,6 +122,7 @@ public class ServiceBase {
     public static SubNodeUtil snUtil;
     public static AclService acl;
     public static UserManagerService user;
+    public static RedisService redis;
     public static AdminRun arun;
     public static AttachmentService attach;
     public static ActPubService apub;
@@ -208,6 +210,7 @@ public class ServiceBase {
             snUtil = getBean(ctx, SubNodeUtil.class);
             acl = getBean(ctx, AclService.class);
             user = getBean(ctx, UserManagerService.class);
+            redis = getBean(ctx, RedisService.class);
             arun = getBean(ctx, AdminRun.class);
             attach = getBean(ctx, AttachmentService.class);
             apub = getBean(ctx, ActPubService.class);

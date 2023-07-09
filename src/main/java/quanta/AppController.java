@@ -479,7 +479,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
             HttpSession session) {
         return callProc.run("logout", true, true, req, session, ms -> {
-            user.redisDelete(ThreadLocals.getSC());
+            redis.delete(ThreadLocals.getSC());
             ThreadLocals.getSC().forceAnonymous();
             session.invalidate();
             LogoutResponse res = new LogoutResponse();
@@ -1135,7 +1135,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(name = "disp", required = false) String disposition,
             @RequestParam(name = "token", required = true) String token, HttpSession session,
             HttpServletResponse response) {
-        SessionContext sc = ServiceBase.user.redisGet(token);
+        SessionContext sc = ServiceBase.redis.get(token);
         if (sc == null) {
             throw new RuntimeException("bad token in /f/export/ access: " + token);
         }

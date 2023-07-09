@@ -127,12 +127,8 @@ public class NostrService extends ServiceBase {
         return res;
     }
 
-    public void saveEvent(
-            MongoSession as,
-            NostrEventWrapper event,
-            HashSet<String> accountNodeIds,
-            List<String> eventNodeIds,
-            IntVal saveCount) {
+    public void saveEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
+            List<String> eventNodeIds, IntVal saveCount) {
         switch (event.getEvent().getKind()) {
             case KIND_Metadata:
                 saveNostrMetadataEvent(as, event, accountNodeIds, saveCount);
@@ -164,20 +160,14 @@ public class NostrService extends ServiceBase {
         headers.setContentType(APConst.MTYPE_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
         String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-verify";
-        ResponseEntity<List<String>> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                requestEntity,
+        ResponseEntity<List<String>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
                 new ParameterizedTypeReference<List<String>>() {});
         // we get back a list of all IDs that failed to verify
         List<String> failedIds = response.getBody();
         return failedIds;
     }
 
-    private void saveNostrMetadataEvent(
-            MongoSession as,
-            NostrEventWrapper event,
-            HashSet<String> accountNodeIds,
+    private void saveNostrMetadataEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
             IntVal saveCount) {
         /*
          * Note: we can't do this verify async (in worker thread) like we do with events, because if the
@@ -273,20 +263,13 @@ public class NostrService extends ServiceBase {
         return nostrAccnt;
     }
 
-    private void saveNostrTextEvent(
-            MongoSession as,
-            NostrEventWrapper event,
-            HashSet<String> accountNodeIds,
-            List<String> eventNodeIds,
-            IntVal saveCount) {
+    private void saveNostrTextEvent(MongoSession as, NostrEventWrapper event, HashSet<String> accountNodeIds,
+            List<String> eventNodeIds, IntVal saveCount) {
         NostrEvent nevent = event.getEvent();
         SubNode nostrAccnt = getLocalUserByNostrPubKey(as, nevent.getPubkey());
         if (nostrAccnt != null) {
-            log.debug(
-                    "saveNostrTextEvent blocking attempt to save LOCAL data:" +
-                            XString.prettyPrint(event) +
-                            " \n: proof: nostrAccnt=" +
-                            XString.prettyPrint(nostrAccnt));
+            log.debug("saveNostrTextEvent blocking attempt to save LOCAL data:" + XString.prettyPrint(event)
+                    + " \n: proof: nostrAccnt=" + XString.prettyPrint(nostrAccnt));
             // if the npub is owned by a local user we're done, and no need to create the foreign holder account
             return;
         }
@@ -314,17 +297,9 @@ public class NostrService extends ServiceBase {
                 newType = NodeType.NONE.s();
                 break;
         }
-        SubNode newNode = create.createNode(
-                as,
-                postsNode.getVal(),
-                null, //
-                newType,
-                0L,
-                CreateNodeLocation.LAST,
-                null, //
-                nostrAccnt.getOwner(),
-                true,
-                true);
+        SubNode newNode = create.createNode(as, postsNode.getVal(), null, //
+                newType, 0L, CreateNodeLocation.LAST, null, //
+                nostrAccnt.getOwner(), true, true);
         if (nevent.getKind() != KIND_EncryptedDirectMessage) {
             acl.setKeylessPriv(as, newNode, PrincipalName.PUBLIC.s(), APConst.RDWR);
         }
@@ -368,7 +343,7 @@ public class NostrService extends ServiceBase {
             log.debug("Server Push Nostr Users" + XString.prettyPrint(users));
             if (users.size() > 0) {
                 exec.run(() -> {
-                    push.sendServerPushInfo(ThreadLocals.getSC(), new NewNostrUsersPushInfo(users));
+                    push.pushInfo(ThreadLocals.getSC(), new NewNostrUsersPushInfo(users));
                     ThreadLocals.getNewNostrUsers().clear();
                 });
             }
@@ -376,11 +351,7 @@ public class NostrService extends ServiceBase {
     }
 
     /* Gets the Quanta NostrAccount node for this userKey, and creates one if necessary */
-    public SubNode getOrCreateNostrAccount(
-            MongoSession as,
-            String userKey,
-            String relays,
-            Val<SubNode> postsNode,
+    public SubNode getOrCreateNostrAccount(MongoSession as, String userKey, String relays, Val<SubNode> postsNode,
             IntVal saveCount) {
         SubNode nostrAccnt = read.getUserNodeByUserName(as, "." + userKey);
 
@@ -402,15 +373,8 @@ public class NostrService extends ServiceBase {
             }
         }
         if (postsNode != null) {
-            SubNode postsNodeFound = read.getUserNodeByType(
-                    as,
-                    null,
-                    nostrAccnt,
-                    "### Posts",
-                    NodeType.POSTS.s(),
-                    Arrays.asList(PrivilegeType.READ.s()),
-                    NodeName.POSTS,
-                    true);
+            SubNode postsNodeFound = read.getUserNodeByType(as, null, nostrAccnt, "### Posts", NodeType.POSTS.s(),
+                    Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
             postsNode.setVal(postsNodeFound);
         }
         return nostrAccnt;

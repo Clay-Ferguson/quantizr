@@ -292,7 +292,7 @@ public class RSSFeedService extends ServiceBase {
 
             if (USE_SPRING_READER) {
                 if (ThreadLocals.getSC() != null) {
-                    push.sendServerPushInfo(ThreadLocals.getSC(), new PushPageMessage(
+                    push.pushInfo(ThreadLocals.getSC(), new PushPageMessage(
                             "Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText"));
                 }
 
