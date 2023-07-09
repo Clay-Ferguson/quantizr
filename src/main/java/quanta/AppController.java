@@ -1682,6 +1682,12 @@ public class AppController extends ServiceBase implements ErrorController {
         if (StringUtils.isEmpty(token)) {
             throw new RuntimeException("No token for serverPush");
         }
+
+        SessionContext sc = redis.get(token);
+        if (sc == null) {
+            throw new RuntimeException("bad token for push emitter: " + token);
+        }
+
         SseEmitter emitter = user.getPushEmitter(token);
         if (emitter == null) {
             throw new RuntimeException("Failed getting emitter for token: " + token);

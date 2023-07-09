@@ -104,17 +104,11 @@ public class UserManagerService extends ServiceBase {
     public static final ConcurrentHashMap<String, SseEmitter> pushEmitters = new ConcurrentHashMap<>();
 
     public SseEmitter getPushEmitter(String token) {
-        SessionContext sc = redis.get(token);
-        if (sc == null) {
-            throw new RuntimeException("bad token for push emitter: " + token);
-        }
-
         SseEmitter emitter = pushEmitters.get(token);
         if (emitter == null) {
             emitter = new SseEmitter();
             pushEmitters.put(token, emitter);
-            log.debug("Assigned SseEmitter to user " + sc.getUserName() + " as token " + token + " on replica "
-                    + prop.getSwarmTaskSlot());
+            log.debug("SseEmitter token " + token + " on replica " + prop.getSwarmTaskSlot());
         }
         return emitter;
     }

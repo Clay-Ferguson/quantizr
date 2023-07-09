@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
+import quanta.config.RedisBrowserPushInfo;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
@@ -18,6 +19,7 @@ import quanta.response.FeedPushInfo;
 import quanta.response.ServerPushInfo;
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
+import quanta.util.XString;
 
 @Component
 public class PushService extends ServiceBase {
@@ -121,12 +123,38 @@ public class PushService extends ServiceBase {
         if (sc == null)
             return;
 
-        // todo-0: make this use Redis PubSub to route to correct broser instance.
-        pushInfo(sc.getUserToken(), info);
+        // look for an SseEmitter on this replia, which may or may not exist. We might not be the replica
+        // that the browser is connected to for it's SseEmittre
+        SseEmitter emitter = UserManagerService.pushEmitters.get(sc.getUserToken());
+
+        // if we happened to be the right replica to push to browser, then push
+        if (emitter != null) {
+            pushInfo(sc.getUserToken(), info);
+        }
+        // else we post to Redis PubSub to let the correct replica push this to the browser for us
+        else {
+            // todo-0: work in progress. switching to JSON serializer
+            // RedisBrowserPushInfo msg = new RedisBrowserPushInfo(sc.getUserToken(), info);
+            // redis.publish(msg);
+        }
+    }
+
+    public void maybePushToBrowser(RedisBrowserPushInfo rinfo) {
+        SseEmitter emitter = UserManagerService.pushEmitters.get(rinfo.getToken());
+
+        // if we happened to be the right replica to push to browser, then push
+        if (emitter != null) {
+            log.debug("Message handled by replica " + prop.getSwarmTaskSlot() + ": " + XString.prettyPrint(rinfo));
+            pushInfo(rinfo.getToken(), rinfo.getInfo());
+        }
     }
 
     public void pushInfo(String token, ServerPushInfo info) {
         exec.run(() -> {
+            SessionContext sc = redis.get(token);
+            if (sc == null) {
+                throw new RuntimeException("bad token for push emitter: " + token);
+            }
             SseEmitter pushEmitter = user.getPushEmitter(token);
             if (pushEmitter == null) {
                 log.debug("No PushEmitter for token: " + token);
