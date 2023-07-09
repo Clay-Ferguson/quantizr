@@ -1,10 +1,6 @@
 package quanta.response;
 
-import java.io.Serializable;
-
-public class ServerPushInfo implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class ServerPushInfo {
     private String type;
 
     public ServerPushInfo() {}

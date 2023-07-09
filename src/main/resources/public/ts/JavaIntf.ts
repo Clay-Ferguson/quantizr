@@ -1042,6 +1042,7 @@ export interface SendTestEmailResponse extends ResponseBase {
 }
 
 export interface ServerPushInfo {
+    type: string;
 }
 
 export interface SetCipherKeyResponse extends ResponseBase {
@@ -1138,7 +1139,7 @@ export interface NodeInfo {
     boostedNode: NodeInfo;
 }
 
-export interface UserPreferences extends Serializable {
+export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
     nsfw: boolean;

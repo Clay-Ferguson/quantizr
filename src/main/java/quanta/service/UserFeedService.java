@@ -352,9 +352,9 @@ public class UserFeedService extends ServiceBase {
 
         TextCriteria textCriteria = null;
         // Add 'Blocked Words' criteria only if we're not doing a "From Me" or "From Friends" kind of feed.
-        if (!req.getFromMe() && !req.getFromFriends()) {
+        if (!req.getFromMe() && !req.getFromFriends() && ThreadLocals.getSC().getUserNodeId() != null) {
             // Filter USER_BLOCK_WORDS if user has defined any
-            SubNode userNode = opsw.findById(null, ThreadLocals.getSC().getUserNodeId());
+            SubNode userNode = opsw.findById(null, new ObjectId(ThreadLocals.getSC().getUserNodeId()));
             if (userNode != null) {
                 String blockedWords = userNode.getStr(NodeProp.USER_BLOCK_WORDS);
                 if (StringUtils.isNotEmpty(blockedWords)) {

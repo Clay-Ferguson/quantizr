@@ -1,8 +1,7 @@
 package quanta.config;
 
-import java.io.Serializable;
 import java.security.PublicKey;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import quanta.model.UserPreferences;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoUtil;
@@ -15,9 +14,8 @@ import quanta.mongo.MongoUtil;
  *
  * Serializable for saving to Redis
  */
-public class SessionContext implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class SessionContext {
 
     private String command;
     private String urlIdFailMsg;
@@ -38,7 +36,7 @@ public class SessionContext implements Serializable {
      */
     private String timelinePath;
     private String userName = PrincipalName.ANON.s();
-    private ObjectId userNodeId;
+    private String userNodeId;
     private String timezone;
     private String timeZoneAbbrev;
     private String allowedFeatures = "";
@@ -185,11 +183,11 @@ public class SessionContext implements Serializable {
         this.watchingPath = watchingPath;
     }
 
-    public ObjectId getUserNodeId() {
+    public String getUserNodeId() {
         return userNodeId;
     }
 
-    public void setUserNodeId(ObjectId userNodeId) {
+    public void setUserNodeId(String userNodeId) {
         this.userNodeId = userNodeId;
     }
 

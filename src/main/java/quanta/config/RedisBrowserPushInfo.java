@@ -1,11 +1,8 @@
 package quanta.config;
 
-import java.io.Serializable;
 import quanta.response.ServerPushInfo;
 
-public class RedisBrowserPushInfo implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class RedisBrowserPushInfo {
 
     // 'token' is login token for login session that is the recipient of 'info'
     private String token;

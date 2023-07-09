@@ -225,7 +225,7 @@ public class UserManagerService extends ServiceBase {
             log.debug("userToken: " + sc.getUserToken());
         }
         sc.setUserName(userName);
-        sc.setUserNodeId(userNodeId);
+        sc.setUserNodeId(userNodeId.toHexString());
     }
 
     public void authSig() {
@@ -694,7 +694,7 @@ public class UserManagerService extends ServiceBase {
             return;
         }
         // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
-        String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
+        String userNodeId = ThreadLocals.getSC().getUserNodeId();
         exec.run(() -> {
             arun.run(as -> {
                 SubNode userNode = read.getNode(as, userNodeId, false, null);
@@ -747,7 +747,7 @@ public class UserManagerService extends ServiceBase {
     public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
         BlockUserResponse res = new BlockUserResponse();
         String userName = ThreadLocals.getSC().getUserName();
-        ObjectId accntIdDoingBlock = ThreadLocals.getSC().getUserNodeId();
+        ObjectId accntIdDoingBlock = new ObjectId(ThreadLocals.getSC().getUserNodeId());
         // get the node that holds all blocked users
         SubNode blockedList = read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
                 NodeName.BLOCKED_USERS, true);

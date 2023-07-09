@@ -263,15 +263,13 @@ public class ThreadLocals {
             return;
         }
         log.debug("Dirty Nodes...");
-        getDirtyNodes()
-                .forEach((key, value) -> {
-                    if (!key.toHexString().equals(value.getIdStr())) {
-                        throw new RuntimeException(
-                                "Node originally cached as ID " + key.toHexString() + " now has key"
-                                        + value.getIdStr());
-                    }
-                    log.debug("    " + key.toHexString());
-                });
+        getDirtyNodes().forEach((key, value) -> {
+            if (!key.toHexString().equals(value.getIdStr())) {
+                throw new RuntimeException(
+                        "Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
+            }
+            log.debug("    " + key.toHexString());
+        });
     }
 
     /*

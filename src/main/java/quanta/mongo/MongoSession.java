@@ -18,6 +18,11 @@ public class MongoSession {
         userName = PrincipalName.ANON.s();
     }
 
+    public MongoSession(String userName, String id) {
+        this.userName = userName;
+        this.userNodeId = id != null ? new ObjectId(id) : null;
+    }
+
     public MongoSession(String userName, ObjectId userNodeId) {
         this.userName = userName;
         this.userNodeId = userNodeId;

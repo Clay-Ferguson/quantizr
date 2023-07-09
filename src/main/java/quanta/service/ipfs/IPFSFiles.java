@@ -69,19 +69,12 @@ public class IPFSFiles extends ServiceBase {
         ipfsFiles.addFileFromStream(ms, fileName, stream, mimeType, null);
     }
 
-    public MerkleLink addFileFromStream(
-            MongoSession ms,
-            String fileName,
-            InputStream stream,
-            String mimeType,
+    public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
             Val<Integer> streamSize) {
         checkIpfs();
         // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
-        return ipfs.writeFromStream(
-                ms,
-                API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true",
-                stream,
-                null,
+        return ipfs.writeFromStream(ms,
+                API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
                 streamSize);
     }
 
@@ -138,7 +131,7 @@ public class IPFSFiles extends ServiceBase {
             return;
         }
         // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
-        String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
+        String userNodeId = ThreadLocals.getSC().getUserNodeId();
         // make sure the user is deleting something ONLY in their own folder.
         if (!req.getItem().startsWith("/" + userNodeId)) {
             throw new RuntimeException("You do not own the path: " + req.getItem());
@@ -162,7 +155,7 @@ public class IPFSFiles extends ServiceBase {
             return null;
         }
         // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
-        String userNodeId = ThreadLocals.getSC().getUserNodeId().toHexString();
+        String userNodeId = ThreadLocals.getSC().getUserNodeId();
         String mfsPath = req.getFolder() == null ? ("/" + userNodeId) : req.getFolder();
         folder.setVal(mfsPath);
         // opps, not a path
