@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoDatabase;
 import quanta.actpub.APConst;
 import quanta.config.AppSessionListener;
-import quanta.config.RedisMessage;
+import quanta.config.RedisBrowserPushInfo;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.UserStats;
@@ -49,6 +49,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.FriendInfo;
 import quanta.response.GetPeopleResponse;
+import quanta.response.ServerPushInfo;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -306,7 +307,7 @@ public class SystemService extends ServiceBase {
     }
 
     public String redisPubSubTest() {
-        RedisMessage msg = new RedisMessage("This is a test, bro.");
+        RedisBrowserPushInfo msg = new RedisBrowserPushInfo("FAKE_TOKEN", new ServerPushInfo("DummyInfo"));
         redis.publish(msg);
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }

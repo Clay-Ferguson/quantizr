@@ -23,7 +23,7 @@ public class RedisConfiguration {
     private static Logger log = LoggerFactory.getLogger(RedisConfiguration.class);
 
     @Autowired
-    private RedisMessageSubscriber redisMessageSubscriber;
+    private RedisSubscriber subscriber;
 
     @Bean
     public RedisTemplate<String, SessionContext> redisTemplate(RedisConnectionFactory connectionFactory) {
@@ -40,7 +40,7 @@ public class RedisConfiguration {
 
     @Bean
     MessageListenerAdapter messageListener() {
-        return new MessageListenerAdapter(redisMessageSubscriber);
+        return new MessageListenerAdapter(subscriber);
     }
 
     @Bean
@@ -53,6 +53,6 @@ public class RedisConfiguration {
 
     @Bean
     ChannelTopic topic() {
-        return new ChannelTopic("messageQueue");
+        return new ChannelTopic("redisQueue");
     }
 }

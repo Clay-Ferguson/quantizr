@@ -7,21 +7,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.util.XString;
 
 @Component
-public class RedisMessageSubscriber implements MessageListener {
-
-    ObjectMapper objectMapper = new ObjectMapper();
+public class RedisSubscriber implements MessageListener {
 
     @Autowired
     private AppProp prop;
 
-    private static Logger log = LoggerFactory.getLogger(RedisMessageSubscriber.class);
+    private static Logger log = LoggerFactory.getLogger(RedisSubscriber.class);
 
     public void onMessage(Message message, byte[] pattern) {
-        RedisMessage msg = (RedisMessage) SerializationUtils.deserialize(message.getBody());
-        log.debug("Message received by replica " + prop.getSwarmTaskSlot() + ": " + XString.prettyPrint(msg));
+        Object msg = SerializationUtils.deserialize(message.getBody());
+        log.debug("Message received by replica " + prop.getSwarmTaskSlot() + ": [" + msg.getClass().getName() + "]"
+                + XString.prettyPrint(msg));
+
+        if (msg instanceof RedisBrowserPushInfo) {
+            // todo-0: push to browser IF we have connection to browser
+        }
     }
 }
