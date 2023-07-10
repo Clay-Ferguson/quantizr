@@ -69,7 +69,7 @@ public class MongoAuth extends ServiceBase {
         }
         synchronized (anonSessionLck) {
             if (anonSession == null) {
-                anonSession = new MongoSession(PrincipalName.ANON.s(), null);
+                anonSession = new MongoSession(PrincipalName.ANON.s(), (String) null);
             }
             return anonSession;
         }

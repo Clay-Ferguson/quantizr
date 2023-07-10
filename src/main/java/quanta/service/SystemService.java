@@ -307,7 +307,7 @@ public class SystemService extends ServiceBase {
     }
 
     public String redisPubSubTest() {
-        RedisBrowserPushInfo msg = new RedisBrowserPushInfo("FAKE_TOKEN", new ServerPushInfo("DummyInfo"));
+        RedisBrowserPushInfo msg = new RedisBrowserPushInfo("FAKE_TOKEN", new ServerPushInfo("DummyInfo JSON"));
         redis.publish(msg);
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }

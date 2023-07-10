@@ -1186,9 +1186,6 @@ export interface BreadcrumbInfo {
     type: string;
 }
 
-export interface Serializable {
-}
-
 export interface PrivilegeInfo {
     privilegeName: string;
 }

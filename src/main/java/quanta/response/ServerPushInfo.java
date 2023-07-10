@@ -1,5 +1,8 @@
 package quanta.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ServerPushInfo {
     private String type;
 

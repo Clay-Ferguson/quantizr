@@ -1,8 +1,10 @@
 package quanta.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import quanta.response.ServerPushInfo;
 
-public class RedisBrowserPushInfo {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RedisBrowserPushInfo extends RedisObj {
 
     // 'token' is login token for login session that is the recipient of 'info'
     private String token;
