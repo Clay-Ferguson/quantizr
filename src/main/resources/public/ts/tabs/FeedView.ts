@@ -4,7 +4,6 @@ import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
