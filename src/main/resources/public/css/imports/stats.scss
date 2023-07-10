@@ -6,10 +6,12 @@
     cursor: pointer;
     font-size: x-large;
     border-radius: $border-radius-small;
+    border: 1px solid transparent;
 }
 
 .statsWord:hover {
     background-color: $primary;
+    border: 1px solid gray;
 }
 
 .statsWordMobile {
