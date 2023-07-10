@@ -117,10 +117,12 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         title: "Bookmark this Chat Room",
                         onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode)
                     }) : null,
-                    new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
-                        setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
-                        getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
-                    })
+
+                    // DO NOT DELETE (this will likely be brought back, in future design)
+                    // new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
+                    //     setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
+                    //     getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
+                    // })
                 ], "flexRowAlignBottom")
             ]),
             new Clearfix(),
