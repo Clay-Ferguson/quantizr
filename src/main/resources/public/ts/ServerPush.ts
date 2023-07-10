@@ -176,13 +176,14 @@ export class ServerPush {
             FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
             const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;
+            const refresh = true; // s.userPrefs.autoRefreshFeed
 
             // if updates existing item we refresh it even if autoRefresh is off
             if (updatesExistingItem) {
                 S.render.fadeInId = nodeInfo.id;
                 FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
             }
-            else if (s.userPrefs.autoRefreshFeed) {
+            else if (refresh) {
                 // NOTE: It would be also possible to call delayedRefreshFeed() here instead, but for now
                 // I think we can just display any messages we get pushed in, and not try to query the server
                 // again just for performance reasons.

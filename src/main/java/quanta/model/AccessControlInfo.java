@@ -1,9 +1,9 @@
 package quanta.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.LinkedList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * Represents a certain principal and a set of privileges the principal has.
@@ -23,15 +23,8 @@ public class AccessControlInfo {
     private List<PrivilegeInfo> privileges;
     private String publicKey;
 
-    public AccessControlInfo(
-            String displayName,
-            String principalName,
-            String principalNodeId,
-            String publicKey,
-            String nostrNpub,
-            String nostrRelays,
-            String avatarVer,
-            String foreignAvatarUrl) {
+    public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey,
+            String nostrNpub, String nostrRelays, String avatarVer, String foreignAvatarUrl) {
         this.displayName = displayName;
         this.principalName = principalName;
         this.principalNodeId = principalNodeId;

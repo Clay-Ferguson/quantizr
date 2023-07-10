@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.RedisBrowserPushInfo;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -24,6 +25,8 @@ import quanta.util.XString;
 @Component
 public class PushService extends ServiceBase {
 
+    public static final ObjectMapper jsonMapper = new ObjectMapper();
+
     private static Logger log = LoggerFactory.getLogger(PushService.class);
     static final int MAX_FEED_ITEMS = 25;
 
@@ -38,15 +41,8 @@ public class PushService extends ServiceBase {
             // put user names in a hash set for faster performance
             HashSet<String> usersSharedToSet = new HashSet<>();
 
-            /* get list of userNames this node is shared to (one of them may be 'public') */
-            if (!isPublic) {
-                List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
-                // if node has no sharing we're done here
-                if (usersSharedTo == null) {
-                    return;
-                }
-                usersSharedToSet.addAll(usersSharedTo);
-            }
+            List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
+            usersSharedToSet.addAll(usersSharedTo);
 
             // if not public or shared to anyone we're done.
             if (!isPublic && usersSharedToSet.size() == 0)
@@ -61,6 +57,8 @@ public class PushService extends ServiceBase {
                     if (ThreadLocals.getSC() != null && sc.getUserToken().equals(ThreadLocals.getSC().getUserToken()))
                         continue;
 
+                    // log.debug("Maybe Pushing to user: " + sc.getUserName() + " sc.hashCode=" + sc.hashCode()
+                    // + " token: " + sc.getUserToken());
                     maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, sc);
                 }
             }
@@ -90,7 +88,7 @@ public class PushService extends ServiceBase {
         // We don't include isPublic here, because we want don't want every message that comes into the
         // server to show up right away on the feed. We expect user to 'refresh' for that.
         // isPublic || // node is public
-        node.getOwner().toHexString().equals(sc.getRootId())
+        node.getOwner().toHexString().equals(sc.getRootId()) // is my node
                 || (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath()))
                 || (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath()))
                 || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName()))) {
@@ -129,13 +127,15 @@ public class PushService extends ServiceBase {
 
         // if we happened to be the right replica to push to browser, then push
         if (emitter != null) {
+            // log.debug("PUSHING: we have the emitter in replica: " + prop.getSwarmTaskSlot());
             pushInfo(sc.getUserToken(), info);
         }
         // else we post to Redis PubSub to let the correct replica push this to the browser for us
         else {
-            // todo-0: work in progress. switching to JSON serializer
-            // RedisBrowserPushInfo msg = new RedisBrowserPushInfo(sc.getUserToken(), info);
-            // redis.publish(msg);
+            // log.debug("PUSH Queued via Redis PubSub");
+            RedisBrowserPushInfo msg =
+                    new RedisBrowserPushInfo(sc.getUserToken(), XString.compactPrint(info), info.getClass().getName());
+            redis.publish(msg);
         }
     }
 
@@ -144,8 +144,14 @@ public class PushService extends ServiceBase {
 
         // if we happened to be the right replica to push to browser, then push
         if (emitter != null) {
-            log.debug("Message handled by replica " + prop.getSwarmTaskSlot() + ": " + XString.prettyPrint(rinfo));
-            pushInfo(rinfo.getToken(), rinfo.getInfo());
+            // log.debug("Message handled by replica " + prop.getSwarmTaskSlot() + ": "
+            // + XString.prettyPrint(rinfo));
+            try {
+                FeedPushInfo info = jsonMapper.readValue(rinfo.getPayload(), FeedPushInfo.class);
+                pushInfo(rinfo.getToken(), info);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

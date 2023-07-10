@@ -71,7 +71,6 @@ public class SystemService extends ServiceBase {
 
     long lastNostrQueryTime = 0L;
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
-    public static final ObjectMapper mapper = new ObjectMapper();
 
     // These two cache collections are for the purpose of being sure that almost all browsing
     // of the admin content (landing page, website) can be done without any DB querying at all and
@@ -79,10 +78,6 @@ public class SystemService extends ServiceBase {
     public static final Object adminNodesCacheLock = new Object();
     public TreeNode adminNodesCache;
     public HashMap<String, TreeNode> adminNodesCacheMap;
-
-    {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
@@ -307,7 +302,9 @@ public class SystemService extends ServiceBase {
     }
 
     public String redisPubSubTest() {
-        RedisBrowserPushInfo msg = new RedisBrowserPushInfo("FAKE_TOKEN", new ServerPushInfo("DummyInfo JSON"));
+        ServerPushInfo info = new ServerPushInfo("DummyInfo JSON");
+        RedisBrowserPushInfo msg =
+                new RedisBrowserPushInfo("FAKE_TOKEN", XString.compactPrint(info), info.getClass().getName());
         redis.publish(msg);
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }

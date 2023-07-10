@@ -1,20 +1,21 @@
 package quanta.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import quanta.response.ServerPushInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RedisBrowserPushInfo extends RedisObj {
 
     // 'token' is login token for login session that is the recipient of 'info'
     private String token;
-    private ServerPushInfo info;
+    private String type; // payload type
+    private String payload;
 
     public RedisBrowserPushInfo() {}
 
-    public RedisBrowserPushInfo(String token, ServerPushInfo info) {
+    public RedisBrowserPushInfo(String token, String payload, String type) {
         this.token = token;
-        this.info = info;
+        this.payload = payload;
+        this.type = type;
     }
 
     public String getToken() {
@@ -25,11 +26,19 @@ public class RedisBrowserPushInfo extends RedisObj {
         this.token = token;
     }
 
-    public ServerPushInfo getInfo() {
-        return info;
+    public String getPayload() {
+        return payload;
     }
 
-    public void setInfo(ServerPushInfo info) {
-        this.info = info;
+    public void setPayload(String payload) {
+        this.payload = payload;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

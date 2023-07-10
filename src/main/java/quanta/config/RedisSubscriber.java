@@ -7,7 +7,9 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import quanta.response.FeedPushInfo;
 import quanta.service.PushService;
+import quanta.util.XString;
 
 @Component
 public class RedisSubscriber implements MessageListener {
@@ -20,12 +22,15 @@ public class RedisSubscriber implements MessageListener {
 
     public void onMessage(Message message, byte[] pattern) {
         try {
-            RedisObj obj = (RedisObj) objectMapper.readValue(message.toString(), RedisObj.class);
-            if (obj instanceof RedisBrowserPushInfo) {
-                push.maybePushToBrowser((RedisBrowserPushInfo) obj);
-            }
+            RedisBrowserPushInfo obj =
+                    (RedisBrowserPushInfo) objectMapper.readValue(message.toString(), RedisBrowserPushInfo.class);
 
-            // log.debug("onMessage: obj.class=" + obj.getClass().getName() + ": " + XString.prettyPrint(obj));
+            if (obj.getType().equals(FeedPushInfo.class.getName())) {
+                push.maybePushToBrowser(obj);
+            } else {
+                log.debug("RedisSubscriber (Unhandled): obj.class=" + obj.getClass().getName() + ": "
+                        + XString.prettyPrint(obj));
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
