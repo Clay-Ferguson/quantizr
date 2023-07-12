@@ -330,7 +330,6 @@ public class MongoRead extends ServiceBase {
      * 5) name of an admin-owned node formatted as ":nodeName"
      * 6) special named location, like '~sn:inbox', or '~sn:friendList' (starts with tilde)
      *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
-     * 7) starts with '.' indicates it's a nostrId
      * </pre>
      */
     public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth, Val<SubNode> accntNode) {
@@ -341,10 +340,7 @@ public class MongoRead extends ServiceBase {
                     "SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
         }
         SubNode ret = null;
-        if (identifier.startsWith(".")) {
-            ret = nostr.getNodeByNostrId(ms, identifier, allowAuth);
-        } //
-        else if (identifier.startsWith("~")) {
+        if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
@@ -1059,8 +1055,7 @@ public class MongoRead extends ServiceBase {
         // if user name ends with "@quanta.wiki" for example, truncate it after the '@'
         // character, so that ONLY foreign names will have any '@' in the string.
         user = convertIfLocalName(user);
-        String pathToQuery = user.contains("@") || nostr.isNostrUserName(user) ? NodePath.REMOTE_USERS_PATH
-                : NodePath.LOCAL_USERS_PATH;
+        String pathToQuery = user.contains("@") ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {

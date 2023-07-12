@@ -33,8 +33,6 @@ export class NodeCompRowHeader extends Div {
 
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
-        const isNostr = S.nostr.isNostrNode(this.node);
-        // const isActPub = S.nostr.isActPubNode(this.node);
 
         // if user has set their displayName
         if (this.node.displayName) {
@@ -76,11 +74,6 @@ export class NodeCompRowHeader extends Div {
                 displayName = "PENDING XFER -> " + displayName;
             }
 
-            // if display name is a nostr one...
-            if (displayName.startsWith(".")) {
-                displayName = S.nodeUtil.getDisplayName(this.node);
-            }
-
             children.push(new Span(displayName, {
                 className: (this.node.transferFromId ? "transferPending" : (isMine ? "createdByMe" : "createdByOther")),
                 title: "Show Profile:\n\n" + this.node.owner,
@@ -88,14 +81,6 @@ export class NodeCompRowHeader extends Div {
                     new UserProfileDlg(this.node.ownerId).open();
                 }
             }, null, true));
-
-            // do not delete...yet
-            // if (isNostr) {
-            //     children.push(new Span("Nostr", { className: "smallMarginRight" }));
-            // }
-            // else if (isActPub) {
-            //     children.push(new Span("AP", { className: "smallMarginRight" }));
-            // }
         }
 
         const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);
@@ -132,10 +117,7 @@ export class NodeCompRowHeader extends Div {
                         // when replying to a boost, we want to be able to additionally add to the sharing the person
                         // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
 
-                        // reply to a DM with another DM, else make it a COMMENT type.
-                        const replyType = this.node.type === NodeType.NOSTR_ENC_DM ? NodeType.NOSTR_ENC_DM : NodeType.COMMENT;
-
-                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, replyType,
+                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, NodeType.COMMENT,
                             true, null, null, this.node.id, null, true, false);
                     }
                 }
@@ -144,7 +126,7 @@ export class NodeCompRowHeader extends Div {
 
         if (showInfo) {
             // Don't allow boosting a node that is itself a boost. This would confuse Mastodon.
-            if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode && !isNostr) {
+            if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode) {
                 children.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg rowHeaderIcon",
@@ -174,7 +156,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
-            if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser && !isNostr) {
+            if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser) {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
                     className: "fa fa-star fa-lg rowHeaderIcon " + (youLiked ? "likedByMeIcon" : ""),
@@ -233,11 +215,10 @@ export class NodeCompRowHeader extends Div {
             // L = Local Users, then: [UserNode]/[PostsNode]/[ActualNode]
             // Also if we have 'inReplyTo' that will also enable the button.
             const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
-            const inReplToNostr: string[] = S.nostr.getRepliedToItemOfNode(this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
             const adminNode = this.node.owner === J.PrincipalName.ADMIN;
 
-            if (!adminNode && showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo || Array.isArray(inReplToNostr))) {
+            if (!adminNode && showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo)) {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",
@@ -388,7 +369,7 @@ export class NodeCompRowHeader extends Div {
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
-        if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode && !isNostr) {
+        if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode) {
             if (editingAllowed && editableNode) {
                 editButton = new Icon({
                     className: "fa fa-edit fa-lg buttonBarIcon ui-edit-node",

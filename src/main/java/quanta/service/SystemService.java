@@ -39,9 +39,6 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NostrEvent;
-import quanta.model.client.NostrEventWrapper;
-import quanta.model.client.NostrQuery;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoRepository;
@@ -68,9 +65,6 @@ public class SystemService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(SystemService.class);
     private static final Random rand = new Random();
     private static final int replicaId = rand.nextInt(Integer.MAX_VALUE);
-
-    long lastNostrQueryTime = 0L;
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 
     // These two cache collections are for the purpose of being sure that almost all browsing
     // of the admin content (landing page, website) can be done without any DB querying at all and
@@ -307,81 +301,6 @@ public class SystemService extends ServiceBase {
                 new RedisBrowserPushInfo("FAKE_TOKEN", XString.compactPrint(info), info.getClass().getName());
         redis.publish(msg);
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
-    }
-
-    // tserver-tag
-    @Scheduled(fixedDelay = 20 * DateUtil.MINUTE_MILLIS)
-    public String nostrQueryUpdate() {
-        if (!MongoRepository.fullInit)
-            return "App not yet ready";
-
-        if (!prop.isNostrDaemonEnabled()) {
-            return "nostrDaemon not enabled";
-        }
-        HashMap<String, Object> message = new HashMap<>();
-        SubNode root = read.getDbRoot();
-        String relays = root.getStr(NodeProp.NOSTR_RELAYS);
-        List<String> relayList = XString.tokenize(relays, "\n\r", true);
-        message.put("relays", relayList);
-        log.debug("nostrQueryUpdate: relays: " + XString.prettyPrint(relayList));
-        HashSet<String> authorsSet = new HashSet<>();
-        arun.run(as -> {
-            // For all nostr curation users gather their nostr friends' pubkeys into authorsSet
-            final List<String> curationUsers = XString.tokenize(prop.getNostrCurationAccounts(), ",", true);
-            log.debug("curationUsers=" + XString.prettyPrint(curationUsers));
-            if (curationUsers != null) {
-                for (String cuser : curationUsers) {
-                    GetPeopleResponse adminFriends = user.getPeople(as, cuser, "friends", Constant.NETWORK_NOSTR.s());
-                    if (adminFriends != null && adminFriends.getPeople() != null) {
-                        for (FriendInfo fi : adminFriends.getPeople()) {
-                            authorsSet.add(fi.getUserName().substring(1));
-                        }
-                    }
-                }
-            }
-            return null;
-        });
-        if (authorsSet.size() == 0) {
-            return "No friends on admin account to query for";
-        }
-        List<String> authors = new LinkedList<>(authorsSet);
-        message.put("authors", authors);
-        List<Integer> kinds = new LinkedList<>();
-        kinds.add(1);
-        NostrQuery query = new NostrQuery();
-        query.setAuthors(authors);
-        query.setKinds(kinds);
-        query.setLimit(100);
-        if (lastNostrQueryTime != 0L) {
-            query.setSince(lastNostrQueryTime / 1000);
-        }
-        lastNostrQueryTime = new Date().getTime();
-        message.put("query", query);
-        // tserver-tag (put TSERVER_API_KEY in secrets file)
-        message.put("apiKey", prop.getTServerApiKey());
-        String body = XString.prettyPrint(message);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(APConst.MTYPE_JSON));
-        headers.setContentType(APConst.MTYPE_JSON);
-        HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
-        String url = "http://tserver-host:" + prop.getTServerPort() + "/nostr-query";
-        ResponseEntity<List<NostrEvent>> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity,
-                new ParameterizedTypeReference<List<NostrEvent>>() {});
-        IntVal saveCount = new IntVal(0);
-        HashSet<String> accountNodeIds = new HashSet<>();
-        List<String> eventNodeIds = new ArrayList<>();
-        int eventCount = response.getBody().size();
-        arun.run(as -> {
-            for (NostrEvent event : response.getBody()) {
-                // log.debug("SAVE NostrEvent from TServer: " + XString.prettyPrint(event));
-                NostrEventWrapper ne = new NostrEventWrapper();
-                ne.setEvent(event);
-                nostr.saveEvent(as, ne, accountNodeIds, eventNodeIds, saveCount);
-            }
-            return null;
-        });
-        return ("NostrQueryUpdate: relays=" + relayList.size() + " people=" + authors.size() + " eventCount="
-                + eventCount + " newCount=" + saveCount.getVal());
     }
 
     private static String runBashCommand(String title, String command) {

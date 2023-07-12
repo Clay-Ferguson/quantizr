@@ -18,11 +18,6 @@ export WEBPACK_SCRIPT=build-dev
 export SASS_SCRIPT=sass-dev
 export DOCKER_IMAGE=quanta-dev
 
-# tserver-tag
-export TSERVER_IMAGE=tserver-dev
-export TSERVER_API_KEY=yourkey
-export nostrDaemonEnabled=false
-
 # Must be the folder where the Quantizr project is located. The root of the source folders.
 export SCRIPTS=${PRJROOT}/scripts
 
@@ -64,9 +59,6 @@ export XMX=2g
 # Configure MongoDB-specific variables
 export MONGO_HOST=mongo-host-dev
 export MONGO_PORT=27016
-
-# tserver-tag
-export TSERVER_PORT=4002
 
 # NOTE: This file gets *generated* by the build.
 export MONGOD_CONF=${PRJROOT}/mongod-dev.conf

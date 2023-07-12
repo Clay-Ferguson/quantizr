@@ -1,10 +1,15 @@
 import { dispatch, getAs } from "../AppContext";
-import { Comp, ScrollPos } from "../comp/base/Comp";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { NodeType } from "../JavaIntf";
+import { S } from "../Singletons";
+import { Validator } from "../Validator";
+import { ScrollPos } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
-import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Divc } from "../comp/core/Divc";
@@ -16,17 +21,10 @@ import { Label } from "../comp/core/Label";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { NodeType } from "../JavaIntf";
-import { S } from "../Singletons";
-import { Validator } from "../Validator";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-import { Constants as C } from "../Constants";
 
 interface LS { // Local State
     userProfile?: J.UserProfile;
-    showNostrInfo?: boolean;
 }
 
 export class UserProfileDlg extends DialogBase {
@@ -37,12 +35,12 @@ export class UserProfileDlg extends DialogBase {
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
-    constructor(private userNodeId: string, private lookupByNostrPubKey: string = null) {
+    constructor(private userNodeId: string) {
         super("User Profile", "appModalCont");
         const ast = getAs();
-        userNodeId = lookupByNostrPubKey ? null : (userNodeId || ast.userProfile.userNodeId);
-        this.readOnly = lookupByNostrPubKey ? true : (!ast.userProfile || ast.userProfile.userNodeId !== userNodeId);
-        this.mergeState<LS>({ userProfile: null, showNostrInfo: false });
+        userNodeId = userNodeId || ast.userProfile.userNodeId;
+        this.readOnly = !ast.userProfile || ast.userProfile.userNodeId !== userNodeId;
+        this.mergeState<LS>({ userProfile: null });
     }
 
     override getTitleText(): string {
@@ -53,10 +51,7 @@ export class UserProfileDlg extends DialogBase {
         const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
-        if (S.util.isNostrUserName(userName)) {
-            return "Nostr Account";
-        }
-        else if (S.util.isActPubUserName(userName)) {
+        if (S.util.isActPubUserName(userName)) {
             return "ActivityPub Account";
         }
         if (userName.indexOf("@") === -1) {
@@ -107,15 +102,6 @@ export class UserProfileDlg extends DialogBase {
             web3Div = new Diva(web3Comps);
         }
 
-        const isForeignNostr: boolean = S.util.isNostrUserName(state.userProfile.userName);
-        let nostrId: string = null;
-        if (isForeignNostr) {
-            nostrId = isForeignNostr ? S.nostr.encodeToNpub(state.userProfile.userName.substring(1)) : "";
-        }
-        else {
-            nostrId = state.userProfile.nostrNpub;
-        }
-
         const children = [
             new Diva([
                 profileHeaderImg ? new Diva([
@@ -144,7 +130,7 @@ export class UserProfileDlg extends DialogBase {
                                 title: "Click to Unfollow user"
                             }) : null,
 
-                            !nostrId && state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
+                            state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
                                 onClick: () => {
                                     if (state.userProfile.followerCount) {
                                         this.close();
@@ -159,7 +145,7 @@ export class UserProfileDlg extends DialogBase {
                                 className: "followCount"
                             }) : null,
 
-                            !nostrId && state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
+                            state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
                                 onClick: () => {
                                     if (state.userProfile.followingCount) {
                                         this.close();
@@ -187,7 +173,6 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
-                nostrId ? this.createNostrInfoDiv(nostrId) : null,
                 web3Div,
 
                 new ButtonBar([
@@ -202,15 +187,11 @@ export class UserProfileDlg extends DialogBase {
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", async () => {
                         if (this.currentlyEditingWarning()) return;
-                        await this.readNostrPosts();
                         this.openUserHomePage(state, "posts");
                     }), //
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
-
-                    !ast.isAnonUser && ast.protocolFilter === J.Constant.NETWORK_NOSTR && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Secure DM", this.sendSecureDM, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
@@ -242,48 +223,11 @@ export class UserProfileDlg extends DialogBase {
         return children;
     }
 
-    readNostrPosts = async (onlyDmsToMe: boolean = false) => {
-        const state = this.getState<LS>();
-        if (state.userProfile.nostrNpub) {
-            let relays = S.nostr.getMyRelays();
-            relays = S.nostr.addMyRelays(relays);
-            console.log("Reading Posts for User: " + state.userProfile.nostrNpub);
-
-            // getting more than 50 is currently just too slow
-            await S.nostr.readPosts([state.userProfile.nostrNpub], relays, -1, false, onlyDmsToMe, 50);
-        }
-    }
-
-    createNostrInfoDiv = (nostrId: string): Comp => {
-        const children = [
-            new Div("Nostr ID: "),
-            new Div(nostrId, { className: "marginLeft" })
-        ];
-
-        const state = this.getState<LS>();
-        if (state.userProfile.relays) {
-            children.push(new Div("Relays: "));
-            const relays = S.nostr.getMyRelays();
-            if (relays) {
-                relays.forEach(r => {
-                    children.push(new Div(r, { className: "marginLeft" }));
-                });
-            }
-        }
-
-        return new CollapsiblePanel("Nostr Info", "Hide Nostr Info", null, children, false, (exp: boolean) => {
-            this.mergeState<LS>({ showNostrInfo: exp })
-        }, this.getState<LS>().showNostrInfo, "marginTop marginBottom");
-    }
-
     deleteFriend = async () => {
         if (!this.userNodeId) return;
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
-        // todo-1: would be better to have a pubsub for this kind of event for decoupling.
-        // Set myFriends to null to force requery.
-        S.nostr.myFriends = null;
         this.reload();
     }
 
@@ -308,27 +252,11 @@ export class UserProfileDlg extends DialogBase {
 
     reload = async () => {
         let res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId: this.userNodeId,
-            nostrPubKey: this.lookupByNostrPubKey
+            userId: this.userNodeId
         });
         // console.log("First UserProfile Response: " + S.util.prettyPrint(res));
 
         if (res?.userProfile) {
-            // if we get back a userprofile that's a nostr one but with no nostrTimestamp we need load it from
-            // relay now because lack of a timestamp indicates we've never read from relay.
-            if (res.userProfile.nostrTimestamp === 0 && S.util.isNostrUserName(res.userProfile.userName)) {
-
-                // read this user using their relays or our own for.
-                await S.nostr.readUserMetadataEx(res.userProfile.userName.substring(1),
-                    res.userProfile.relays, true, null);
-
-                res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: this.userNodeId,
-                    nostrPubKey: this.lookupByNostrPubKey
-                });
-                // console.log("Second UserProfile Response: " + S.util.prettyPrint(res));
-            }
-
             if (res?.userProfile) {
                 this.userNodeId = res.userProfile.userNodeId;
                 this.bioState.setValue(res.userProfile.userBio);
@@ -384,13 +312,6 @@ export class UserProfileDlg extends DialogBase {
             this.mergeState<LS>({
                 userProfile: state.userProfile
             });
-
-            // We 'could' get their posts now, but this is unnecessary.
-            // this.readNostrPosts();
-
-            // todo-1: would be better to have a pubsub for this kind of event for decoupling.
-            // Set myFriends to null to force requery.
-            S.nostr.myFriends = null;
         }
     }
 
@@ -411,18 +332,8 @@ export class UserProfileDlg extends DialogBase {
         }, 10);
     }
 
-    sendSecureDM = () => {
-        if (this.currentlyEditingWarning()) return;
-        this.close();
-        setTimeout(() => {
-            S.edit.addNode(null, null, NodeType.NOSTR_ENC_DM, false, null, this.userNodeId, null, null, false, false);
-        }, 10);
-    }
-
     previousMessages = async () => {
         if (this.currentlyEditingWarning()) return;
-
-        await this.readNostrPosts(true);
 
         this.close();
         setTimeout(() => {
@@ -466,9 +377,6 @@ export class UserProfileDlg extends DialogBase {
             dispatch("SaveUserPerferences", s => {
                 s.displayName = this.displayNameState.getValue();
             });
-
-            // push any updated user profile info to the server.
-            setTimeout(S.nostr.publishUserMetadata, 1500);
         }
     }
 
@@ -490,8 +398,7 @@ export class UserProfileDlg extends DialogBase {
 
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_PRIMARY, false, null, false, false, async () => {
                 const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: state.userProfile.userNodeId,
-                    nostrPubKey: null
+                    userId: state.userProfile.userNodeId
                 });
 
                 if (res?.userProfile) {
@@ -549,8 +456,7 @@ export class UserProfileDlg extends DialogBase {
             const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_HEADER, false, null, false, false,
                 async () => {
                     const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                        userId: state.userProfile.userNodeId,
-                        nostrPubKey: null
+                        userId: state.userProfile.userNodeId
                     });
 
                     if (res?.userProfile) {

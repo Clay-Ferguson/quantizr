@@ -38,11 +38,7 @@ export class FriendsTableRow extends ListBoxRow {
         }
 
         let nameSuffix: string;
-        const isNostr = S.util.isNostrUserName(this.friend.userName);
-        if (isNostr) {
-            nameSuffix = " (Nostr)";
-        }
-        else if (S.util.isActPubUserName(this.friend.userName)) {
+        if (S.util.isActPubUserName(this.friend.userName)) {
             nameSuffix = " (ActivityPub)";
         }
         else {
@@ -79,7 +75,7 @@ export class FriendsTableRow extends ListBoxRow {
                 }, [
                     new Diva([
                         this.friend.displayName ? new Div(this.friend.displayName + nameSuffix, { className: "friendName" }) : null,
-                        this.friend.userName && !isNostr ? new Div("@" + this.friend.userName) : null
+                        this.friend.userName ? new Div("@" + this.friend.userName) : null
                     ]),
 
                     // Only if we know the friendNodeId here (set on server) do we have the ability to show friend-specific tags,

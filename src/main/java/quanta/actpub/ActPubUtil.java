@@ -798,9 +798,6 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
      * towards the root of the tree.
-     *
-     * NOTE: If nostrNodeIds is provided (non-null) we use it to completely determine the thread
-     * content, rather than looking at tree parents or IN_REPLY_TO.
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
         boolean debug = true;
@@ -898,20 +895,6 @@ public class ActPubUtil extends ServiceBase {
                             parent = apUtil.loadObject(ms, ThreadLocals.getSC().getUserName(), inReplyTo);
                         } else { // if inReplyTo not a URL, treat it as a nodeId
                             parent = read.getNode(ms, inReplyTo);
-                        }
-                    } else { // else try to get the node being replied to as if this is a NostrNode
-                        Val<Boolean> nodeMissing = new Val<Boolean>(false);
-                        parent = nostr.getNodeBeingRepliedTo(ms, node, nodeMissing);
-                        if (nodeMissing.getVal()) {
-                            res.setNostrDeadEnd(true);
-                        }
-                        if (debug) {
-                            if (parent != null) {
-                                log.debug(
-                                        "NOSTR REPLY PARENT of " + node.getIdStr() + "=" + XString.prettyPrint(parent));
-                            } else {
-                                log.debug("NOSTR couldn't find reply parent.");
-                            }
                         }
                     }
                 }

@@ -8,7 +8,6 @@ import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { ChangePasswordDlg } from "../dlg/ChangePasswordDlg";
-import { EditNostrKeyAndRelaysDlg } from "../dlg/EditNostrKeyAndRelaysDlg";
 import { ManageCryptoKeysDlg } from "../dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "../dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
@@ -104,18 +103,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
-
-                // -----------------------
-                this.sectionTitle("Nostr"),
-                new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
-                        this.settingsLink("Show Private Key", S.nostr.showPrivateKey),
-                        this.settingsLink("Change Private Key", S.nostr.editPrivateKey),
-                    ]),
-                    new Divc({ className: "settingsCol" }, [
-                        this.settingsLink("Relays", () => new EditNostrKeyAndRelaysDlg().open())
-                    ])
-                ], horzClass),
 
                 // -----------------------
                 this.sectionTitle("Tools"),

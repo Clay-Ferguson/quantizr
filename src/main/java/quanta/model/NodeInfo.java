@@ -69,7 +69,6 @@ public class NodeInfo {
     private String displayName;
     private String owner;
     private String ownerId;
-    private String nostrPubKey;
     private String transferFromId;
     private String avatarVer;
     private String apAvatar;
@@ -77,34 +76,11 @@ public class NodeInfo {
     // if this node is a boost we put in the target node (node being boosted here)
     private NodeInfo boostedNode;
 
-    public NodeInfo(
-        String id,
-        String path,
-        String name,
-        String content,
-        String renderContent,
-        String tags,
-        String displayName,
-        String owner,
-        String ownerId,
-        String nostrPubKey,
-        String transferFromId,
-        Long ordinal,
-        Date lastModified,
-        List<PropertyInfo> properties,
-        HashMap<String, Attachment> attachments,
-        HashMap<String, NodeLink> links,
-        List<AccessControlInfo> ac,
-        List<String> likes,
-        boolean hasChildren,
-        String type,
-        long logicalOrdinal,
-        boolean lastChild,
-        String cipherKey,
-        String avatarVer,
-        String apAvatar,
-        String apImage
-    ) {
+    public NodeInfo(String id, String path, String name, String content, String renderContent, String tags,
+            String displayName, String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified,
+            List<PropertyInfo> properties, HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links,
+            List<AccessControlInfo> ac, List<String> likes, boolean hasChildren, String type, long logicalOrdinal,
+            boolean lastChild, String cipherKey, String avatarVer, String apAvatar, String apImage) {
         this.id = id;
         this.path = path;
         this.name = name;
@@ -118,7 +94,6 @@ public class NodeInfo {
         this.displayName = displayName;
         this.owner = owner;
         this.ownerId = ownerId;
-        this.nostrPubKey = nostrPubKey;
         this.transferFromId = transferFromId;
         this.ordinal = ordinal;
         this.logicalOrdinal = logicalOrdinal;
@@ -140,7 +115,8 @@ public class NodeInfo {
     @Transient
     @JsonIgnore
     public Object getPropVal(String propName) {
-        if (properties == null) return null;
+        if (properties == null)
+            return null;
 
         for (PropertyInfo prop : properties) {
             if (prop.getName().equals(propName)) {
@@ -168,17 +144,20 @@ public class NodeInfo {
     }
 
     public List<NodeInfo> safeGetChildren() {
-        if (children != null) return children;
+        if (children != null)
+            return children;
         return children = new LinkedList<>();
     }
 
     public List<PropertyInfo> safeGetProperties() {
-        if (properties != null) return properties;
+        if (properties != null)
+            return properties;
         return properties = new LinkedList<>();
     }
 
     public List<PropertyInfo> safeGetClientProps() {
-        if (clientProps != null) return clientProps;
+        if (clientProps != null)
+            return clientProps;
         return clientProps = new LinkedList<>();
     }
 
@@ -284,10 +263,6 @@ public class NodeInfo {
 
     public String getOwnerId() {
         return this.ownerId;
-    }
-
-    public String getNostrPubKey() {
-        return this.nostrPubKey;
     }
 
     public String getTransferFromId() {
@@ -412,10 +387,6 @@ public class NodeInfo {
 
     public void setOwnerId(final String ownerId) {
         this.ownerId = ownerId;
-    }
-
-    public void setNostrPubKey(final String nostrPubKey) {
-        this.nostrPubKey = nostrPubKey;
     }
 
     public void setTransferFromId(final String transferFromId) {

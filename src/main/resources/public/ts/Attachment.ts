@@ -66,8 +66,6 @@ export class Attachment {
             if (ipfsLink) {
                 bin = "ipfs";
             }
-            // todo-1: to make nostr posts cleaner (when inspected as text) we should support a url in the
-            // form of /att/${nodeId}/${bin} here, and have a version of this 'getAttUrl()' just for Nostr.
             let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId;
 
             if (downloadLink) {

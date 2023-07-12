@@ -204,6 +204,7 @@ public class MongoUtil extends ServiceBase {
                  */
                 testAccountNames.add(userName);
             }
+            update.saveSession(as);
             return null;
         });
     }
@@ -480,18 +481,24 @@ public class MongoUtil extends ServiceBase {
 
     // DO NOT DELETE
     // Leave as an example for future DB Conversions
-    public void fixTypes(MongoSession ms) {
+    public void deleteNostrUsers(MongoSession ms) {
         IntVal batchSize = new IntVal();
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.TYPE).is("ap:posts"));
+        q.addCriteria(Criteria.where(SubNode.TYPE).is(NodeType.ACCOUNT.s()));
         BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+
         ops.stream(q, SubNode.class).forEachRemaining(node -> {
-            // log.debug("BULK FOUND: " + XString.prettyPrint(node));
+            String userName = node.getStr(NodeProp.USER);
+            if (!userName.startsWith("."))
+                return;
+
+            log.debug("NOSTR DEL: " + node.getIdStr());
 
             Criteria crit = new Criteria("id").is(node.getId());
             Query query = new Query().addCriteria(crit);
-            Update update = new Update().set(SubNode.TYPE, NodeType.POSTS.s());
-            bops.updateOne(query, update);
+            bops.remove(query);
+            // Update update = new Update().set(SubNode.TYPE, NodeType.POSTS.s());
+            // bops.updateOne(query, update);
             batchSize.inc();
 
             if (batchSize.getVal() > Const.MAX_BULK_OPS) {
@@ -912,10 +919,7 @@ public class MongoUtil extends ServiceBase {
         if (postsNodeVal != null) {
             postsNodeVal.setVal(postsNode);
         }
-        // if (!nostr.isNostrUserName(newUserName)) {
-        // user.ensureUserHomeNodeExists(ms, newUserName, "### " + newUserName + "'s Node",
-        // NodeType.NONE.s(), NodeName.HOME);
-        // }
+
         update.save(ms, userNode);
         return userNode;
     }

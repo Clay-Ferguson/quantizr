@@ -14,11 +14,6 @@ export WEBPACK_SCRIPT=build-prod
 export SASS_SCRIPT=sass-prod
 
 export DOCKER_IMAGE=quanta
-export TSERVER_IMAGE=tserver
-
-export TSERVER_API_KEY=yourkey
-export nostrDaemonEnabled=false
-
 export SCRIPTS=${PRJROOT}/scripts
 export DOCKER_NETWORK=bridge
 
@@ -57,9 +52,6 @@ export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
-
-# tserver-tag
-export TSERVER_PORT=4000
 
 export DOCKER_DOWN_DELAY=15s
 export DOCKER_UP_DELAY=15s

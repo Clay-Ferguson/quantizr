@@ -14,7 +14,6 @@ import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByFediUrlDlg } from "./dlg/SearchByFediUrlDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
-import { SearchByNostrDlg } from "./dlg/SearchByNostr";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
@@ -161,7 +160,6 @@ export class MenuPanel extends Div {
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
-    static searchByNostr = () => { new SearchByNostrDlg().open(); };
     static searchByFediUrl = () => { new SearchByFediUrlDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static multiFollow = () => { new MultiFollowDlg().open(); };
@@ -189,10 +187,6 @@ export class MenuPanel extends Div {
 
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
-    static queryNostrRelays = () => {
-        S.nostr.queryAndDisplayNodeInfo(S.nodeUtil.getHighlightedNode());
-    };
-
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
     static nodeStats = () => S.view.getNodeStats();
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
@@ -204,7 +198,6 @@ export class MenuPanel extends Div {
         const hltNode = S.nodeUtil.getHighlightedNode();
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
         const onMainTab: boolean = ast.activeTab == C.TAB_MAIN;
-        const nostrNodeHighlighted = !!hltNode && S.nostr.isNostrNode(hltNode);
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;
 
@@ -227,11 +220,6 @@ export class MenuPanel extends Div {
                 () => getAs().userPrefs.editMode, false, "ui-menu-options-editmode"),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
         ], null, null, "ui-menu-options"));
-
-        children.push(new Menu(C.PROTOCOL_MENU_TEXT, [
-            new MenuItem("Nostr", () => S.util.setProtocol(J.Constant.NETWORK_NOSTR), true, () => getAs().protocolFilter == J.Constant.NETWORK_NOSTR),
-            new MenuItem("ActivityPub", () => S.util.setProtocol(J.Constant.NETWORK_ACTPUB), true, () => getAs().protocolFilter == J.Constant.NETWORK_ACTPUB),
-        ]));
 
         const bookmarkItems = [];
         if (!ast.isAnonUser) {
@@ -365,10 +353,7 @@ export class MenuPanel extends Div {
                 new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
-
-                new MenuItemSeparator(), //
                 new MenuItem("By Fediverse URL", MenuPanel.searchByFediUrl), //
-                new MenuItem("By Nostr ID", MenuPanel.searchByNostr), //
 
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
@@ -445,7 +430,6 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
                 new MenuItem("Show Raw Data", MenuPanel.showRawData, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Query Nostr Relays", MenuPanel.queryNostrRelays, !ast.isAnonUser && nostrNodeHighlighted), //
                 ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson, onMainTab, null, true) : null, //
                 new MenuItemSeparator(), //
                 new MenuItem("Node Stats", onMainTab && MenuPanel.nodeStats) //

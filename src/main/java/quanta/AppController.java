@@ -48,7 +48,6 @@ import quanta.model.client.Attachment;
 import quanta.model.client.ClientConfig;
 import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
-import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.UserProfile;
 import quanta.mongo.model.SubNode;
@@ -107,8 +106,6 @@ import quanta.request.RenderDocumentRequest;
 import quanta.request.RenderNodeRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SaveNodeRequest;
-import quanta.request.SaveNostrEventRequest;
-import quanta.request.SaveNostrSettingsRequest;
 import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
@@ -239,7 +236,6 @@ public class AppController extends ServiceBase implements ErrorController {
             // =======================================================================================
             /* REQUEST PARAMS */
             @RequestParam(value = "id", required = false) String id, //
-            @RequestParam(value = "nostrId", required = false) String nostrId, //
             @RequestParam(value = "refNodeId", required = false) String refNodeId, //
             @RequestParam(value = "search", required = false) String search, //
             // be careful removing this, clicking on a node updates the browser history to
@@ -257,12 +253,9 @@ public class AppController extends ServiceBase implements ErrorController {
         SessionContext sc = ThreadLocals.getSC();
 
         boolean isHomeNodeRequest = false;
-        if (nostrId != null) {
-            id = "." + nostrId;
-        } //
-        else if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified
-                                                                                           // using a colon in front of
-                                                                                           // it, to make it detectable
+        if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified
+                                                                                      // using a colon in front of
+                                                                                      // it, to make it detectable
             if ("home".equalsIgnoreCase(nameOnUserNode)) {
                 isHomeNodeRequest = true;
             }
@@ -292,20 +285,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 Val<SubNode> accntNode = new Val<>();
                 node = read.getNode(as, _id, true, accntNode);
                 if (node == null) {
-                    // if we just tried to look in local DB for nostrId and didn't find it
-                    // we set the loadNostrId
-                    if (_id.startsWith(".")) {
-                        // set this var to signal to client it needs to load the nostrId from client.
-                        sc.setLoadNostrId(nostrId);
-                        // refNodeId is optional and tells us which nodeId is the account from which we should
-                        // try to get relays for looking up nostrId
-                        if (refNodeId != null) {
-                            SubNode nostrUserAccnt = read.getNode(as, refNodeId);
-                            if (nostrUserAccnt != null) {
-                                sc.setLoadNostrIdRelays(nostrUserAccnt.getStr(NodeProp.NOSTR_RELAYS));
-                            }
-                        }
-                    }
                     if (_isHomeNodeRequest && accntNode.hasVal()) {
                         sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
                     }
@@ -931,24 +910,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    @RequestMapping(value = API_PATH + "/saveNostrSettings", method = RequestMethod.POST)
-    @ResponseBody
-    public Object saveNostrSettings(@RequestBody SaveNostrSettingsRequest req, HttpSession session) {
-        log.debug("saveNostrSettings()");
-        return callProc.run("saveNostrSettings", true, true, req, session, ms -> {
-            return nostr.saveNostrSettings(req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/saveNostrEvents", method = RequestMethod.POST)
-    @ResponseBody
-    public Object saveNode(@RequestBody SaveNostrEventRequest req, HttpSession session) {
-        log.debug("saveNostrEvents()");
-        return callProc.run("saveNostrEvents", true, true, req, session, ms -> {
-            return nostr.saveNostrEvents(req);
-        });
-    }
-
     @RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
@@ -1341,7 +1302,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
         return callProc.run("getUserProfile", false, false, req, session, ms -> {
             GetUserProfileResponse res = new GetUserProfileResponse();
-            UserProfile userProfile = user.getUserProfile(req.getUserId(), req.getNostrPubKey(), null, false);
+            UserProfile userProfile = user.getUserProfile(req.getUserId(), null, false);
             if (userProfile != null) {
                 res.setUserProfile(userProfile);
             }
@@ -1409,15 +1370,11 @@ public class AppController extends ServiceBase implements ErrorController {
             res.setUserMsg(sc.getUserMsg());
             res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
             res.setInitialNodeId(sc.getInitialNodeId());
-            res.setLoadNostrId(sc.getLoadNostrId());
-            res.setLoadNostrIdRelays(sc.getLoadNostrIdRelays());
         }
         res.setConfig(prop.getConfig());
         res.setBrandingAppName(prop.getConfigText("brandingAppName"));
         res.setRequireCrypto(prop.isRequireCrypto());
         SubNode root = read.getDbRoot();
-        String relays = root.getStr(NodeProp.NOSTR_RELAYS);
-        res.setNostrRelays(relays);
     }
 
     @RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
@@ -1488,12 +1445,6 @@ public class AppController extends ServiceBase implements ErrorController {
                     break;
                 case "actPubMaintenance":
                     res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
-                    break;
-                case "nostrMaintenance":
-                    res.getMessages().add(new InfoMessage(apub.maintainNostrUsers(), null));
-                    break;
-                case "nostrQueryUpdate":
-                    res.getMessages().add(new InfoMessage(system.nostrQueryUpdate(), null));
                     break;
                 case "compactDb":
                     res.getMessages().add(new InfoMessage(system.compactDb(), null));

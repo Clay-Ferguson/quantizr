@@ -438,30 +438,6 @@ export class Nav {
             return;
         }
 
-        const ast = getAs();
-        if (ast.protocolFilter === J.Constant.NETWORK_NOSTR) {
-            switch (props.name) {
-                case J.Constant.FEED_MY_MENTIONS:
-                case J.Constant.FEED_TOFROMME:
-                case J.Constant.FEED_TOME:
-                    S.nostr.queryNetwork(true, true);
-                    break;
-
-                case J.Constant.FEED_FROMFRIENDS:
-                    // do not 'await' here. Let this run in background
-                    S.nostr.queryNetwork(true, false);
-                    break;
-
-                case J.Constant.FEED_PUB:
-                    // for public feed, do nothing. The TServer deamon will take care of making sure
-                    // a decent curated feed exists
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
         // we need to go ahead and boost the refresh counter to avoid it doing a double query.
         FeedTab.inst.props.refreshCounter++;
 

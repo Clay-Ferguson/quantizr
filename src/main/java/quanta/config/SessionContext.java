@@ -22,8 +22,6 @@ public class SessionContext {
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
-    private String loadNostrId;
-    private String loadNostrIdRelays;
     private PublicKey pubSigKey = null;
 
     private boolean live = true;
@@ -243,22 +241,6 @@ public class SessionContext {
 
     public void setInitialNodeId(String initialNodeId) {
         this.initialNodeId = initialNodeId;
-    }
-
-    public String getLoadNostrId() {
-        return loadNostrId;
-    }
-
-    public void setLoadNostrId(String loadNostrId) {
-        this.loadNostrId = loadNostrId;
-    }
-
-    public String getLoadNostrIdRelays() {
-        return loadNostrIdRelays;
-    }
-
-    public void setLoadNostrIdRelays(String loadNostrIdRelays) {
-        this.loadNostrIdRelays = loadNostrIdRelays;
     }
 
     public String getCommand() {

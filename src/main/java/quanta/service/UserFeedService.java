@@ -57,7 +57,7 @@ public class UserFeedService extends ServiceBase {
          * limit to just markdown types and comments, because we need to avoid everything else since we are
          * searching from the root of all user accounts.
          */
-        crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s());
+        crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
         // DO NOT DELETE (keep as example)
         // This pattern is what is required when you have multiple conditions added to a single field.
         // .andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
@@ -175,25 +175,14 @@ public class UserFeedService extends ServiceBase {
         // }
         // limit to just markdown types (no type), and comments
         // IMPORTANT: see long comment above where we have similar type filtering.
-        ands.add(Criteria.where(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s(), NodeType.NOSTR_ENC_DM.s()));
+        ands.add(Criteria.where(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s()));
 
-        // Nostr
-        if (req.getProtocol().equals(Constant.NETWORK_NOSTR.s())) {
-            List<Criteria> orCrit = new LinkedList<>();
-            // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
-            orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
-            // this regex simply is "Starts with a period"
-            orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).regex("^\\."));
-            ands.add(new Criteria().orOperator(orCrit));
-        } //
-        else if (req.getProtocol().equals(Constant.NETWORK_ACTPUB.s())) { // ActivityPub
-            List<Criteria> orCrit = new LinkedList<>();
-            // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
-            orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
-            // this regex simly is "Starts with a period"
-            orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
-            ands.add(new Criteria().orOperator(orCrit));
-        }
+        List<Criteria> orCrit = new LinkedList<>();
+        // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
+        orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
+        // this regex simly is "Starts with a period"
+        orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
+        ands.add(new Criteria().orOperator(orCrit));
 
         boolean allowBadWords = true;
         // add the criteria for sensitive flag

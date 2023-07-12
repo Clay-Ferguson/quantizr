@@ -33,8 +33,6 @@ public class UserProfile {
     private boolean following;
     private boolean blocked;
     private String relays;
-    private String nostrNpub;
-    private Long nostrTimestamp;
 
     public String getDisplayName() {
         return this.displayName;
@@ -120,14 +118,6 @@ public class UserProfile {
         return this.relays;
     }
 
-    public String getNostrNpub() {
-        return this.nostrNpub;
-    }
-
-    public Long getNostrTimestamp() {
-        return this.nostrTimestamp;
-    }
-
     public void setDisplayName(final String displayName) {
         this.displayName = displayName;
     }
@@ -210,14 +200,6 @@ public class UserProfile {
 
     public void setRelays(final String relays) {
         this.relays = relays;
-    }
-
-    public void setNostrNpub(final String nostrNpub) {
-        this.nostrNpub = nostrNpub;
-    }
-
-    public void setNostrTimestamp(final Long nostrTimestamp) {
-        this.nostrTimestamp = nostrTimestamp;
     }
 
     public UserProfile() {}

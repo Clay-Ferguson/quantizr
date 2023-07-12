@@ -39,8 +39,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             getWords: true,
             getTags: true,
             getMentions: true,
-            signatureVerify: false,
-            protocol: getAs().protocolFilter
+            signatureVerify: false
         });
 
         dispatch("RenderSearchResults", s => {
@@ -97,13 +96,6 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         }
 
         let heading = "Trending";
-        if (ast.protocolFilter == J.Constant.NETWORK_ACTPUB) {
-            heading += " on ActivityPub ";
-        }
-        else if (ast.protocolFilter == J.Constant.NETWORK_NOSTR) {
-            heading += " on Nostr ";
-        }
-
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div(heading, { className: "tabTitle" })

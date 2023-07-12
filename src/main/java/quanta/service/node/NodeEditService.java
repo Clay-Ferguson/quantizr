@@ -33,7 +33,6 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.NostrEvent;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.file.IPFSDirStat;
@@ -210,24 +209,6 @@ public class NodeEditService extends ServiceBase {
             }
         }
 
-        if (nostr.isNostrNode(nodeBeingRepliedTo)) {
-            ArrayList<ArrayList<String>> tags = new ArrayList<>();
-            ArrayList<String> element = new ArrayList<String>();
-            // I'm using old style of "e" for now, at proof this works, because I don't want to deal with
-            // having to put a relay in here yet.
-            element.add("e");
-            element.add(nodeBeingRepliedTo.getStr(NodeProp.OBJECT_ID).substring(1));
-            tags.add(element);
-            newNode.set(NodeProp.NOSTR_TAGS.s(), tags);
-            // if this is a reply to a nostr node and is not a DM, then it needs to be made public. If user
-            // tries to remove the public setting from and then save it, the system will reject that and tell
-            // the user
-            // that only DMs are able to be private in Nostr.
-            if (!newNode.getType().equals(NodeType.NOSTR_ENC_DM.s())) {
-                acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-            }
-        }
         if (!StringUtils.isEmpty(req.getBoostTarget())) {
             /* If the node being boosted is itself a boost then boost the original boost instead */
             SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
@@ -440,12 +421,6 @@ public class NodeEditService extends ServiceBase {
     }
 
     public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
-        if (req.getNostrEvent() != null) {
-            List<String> failedIds = nostr.nostrVerify(ms, Arrays.asList(req.getNostrEvent()));
-            if (failedIds != null && failedIds.size() > 0) {
-                throw new RuntimeException("Signature failed on event.");
-            }
-        }
         SaveNodeResponse res = new SaveNodeResponse();
         NodeInfo nodeInfo = req.getNode();
         String nodeId = nodeInfo.getId();
@@ -527,15 +502,7 @@ public class NodeEditService extends ServiceBase {
                 }
             }
         }
-        /*
-         * if client is saving what will be sent out as a nostr event we need to validate it and then assign
-         * it's TAGS and OBJECT_ID onto the node
-         */
-        if (req.getNostrEvent() != null) {
-            NostrEvent nevent = req.getNostrEvent().getEvent();
-            node.set(NodeProp.NOSTR_TAGS, nevent.getTags());
-            node.set(NodeProp.OBJECT_ID, "." + nevent.getId());
-        }
+
         // if not encrypted remove ENC_KEY too. It won't be doing anything in this case.
         if (nodeInfo.getContent() != null && !nodeInfo.getContent().startsWith(Constant.ENC_TAG.s())) {
             node.delete(NodeProp.ENC_KEY);

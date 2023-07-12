@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
 import quanta.instrument.PerfMonEvent;
-import quanta.model.client.NostrUserInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.base.ResponseBase;
@@ -35,7 +34,6 @@ public class ThreadLocals {
     private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
     private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
     private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
-    private static final ThreadLocal<HashMap<String, NostrUserInfo>> newNostrUsers = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
     /*
      * Each thread will set this when a root event is created and any other events that get created,
@@ -78,7 +76,6 @@ public class ThreadLocals {
         saving.remove();
         getDirtyNodes().clear();
         getCachedNodes().clear();
-        getNewNostrUsers().clear();
         setParentCheckEnabled(true);
         session.remove();
     }
@@ -210,17 +207,6 @@ public class ThreadLocals {
 
     public static void setDirtyNodes(HashMap<ObjectId, SubNode> dn) {
         dirtyNodes.set(dn);
-    }
-
-    public static HashMap<String, NostrUserInfo> getNewNostrUsers() {
-        if (newNostrUsers.get() == null) {
-            newNostrUsers.set(new HashMap<String, NostrUserInfo>());
-        }
-        return newNostrUsers.get();
-    }
-
-    public static void setNewNostrUsers(HashMap<String, NostrUserInfo> val) {
-        newNostrUsers.set(val);
     }
 
     public static void cacheNode(SubNode node) {

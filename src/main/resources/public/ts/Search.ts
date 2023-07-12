@@ -73,21 +73,6 @@ export class Search {
 
         // console.log("res=" + S.util.prettyPrint(res));
 
-        // if we dead-ended on a nostr item we didn't have on server...load the data, and then attempt 'getNodeThreadView' again.
-        if (res.nostrDeadEnd) {
-            // get the node we dead ended at to resume from, or else if nothing at all was gotten from server
-            // we resume from the actual 'node' we're trying to get Thread of.
-            const resumeFromNode = res.nodes?.length > 0 ? res.nodes[0] : node;
-            await S.nostr.loadReplyChain(resumeFromNode, 2);
-
-            console.log("Dead End Repaired: Calling Server again: getNodeThreadView");
-            res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-                nodeId: node.id,
-                loadOthers: true
-            });
-            S.nodeUtil.processInboundNodes(res.nodes);
-        }
-
         if (res.nodes?.length > 0) {
             dispatch("RenderThreadResults", s => {
                 s.highlightSearchNodeId = node.id;
@@ -113,7 +98,7 @@ export class Search {
                 data.props.results = res.nodes;
 
                 // if apReplies then we set endReached to 'true' always.
-                data.props.endReached = res.topReached && !res.nostrDeadEnd;
+                data.props.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id);
             });
         }
@@ -403,8 +388,6 @@ export class Search {
                     s.myNewMessageCount = 0;
                 }
 
-                s.nostrNewMessageCount = 0;
-
                 FeedTab.inst.props.feedResults = [res.node];
                 FeedTab.inst.props.feedEndReached = true;
                 FeedTab.inst.props.feedDirty = false;
@@ -442,8 +425,7 @@ export class Search {
             searchText,
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,
-            applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks,
-            protocol: ast.protocolFilter
+            applyAdminBlocks: FeedTab.inst.props.applyAdminBlocks
         }, true);
         // console.log("INBOUND NODE FEED: " + S.util.prettyPrint(res.searchResults));
         S.nodeUtil.processInboundNodes(res.searchResults);
@@ -455,7 +437,6 @@ export class Search {
             if (FeedTab.inst.props.feedFilterToMe) {
                 s.myNewMessageCount = 0;
             }
-            s.nostrNewMessageCount = 0;
 
             let scrollToTop = true;
 

@@ -130,7 +130,6 @@ export class AppState {
     userProfile: J.UserProfile = null;
 
     myNewMessageCount: number = 0;
-    nostrNewMessageCount: number = 0;
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
@@ -160,7 +159,6 @@ export class AppState {
     tour: Tour;
 
     editNode: J.NodeInfo;
-    protocolFilter: string = J.Constant.NETWORK_ACTPUB;
 
     editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'
     editNodeReplyToId: string;
@@ -201,8 +199,6 @@ export class AppState {
 
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: boolean;
-
-    nostrQueryRunning: boolean = false;
 
     expandedMenus: Set<string> = new Set<string>();
 

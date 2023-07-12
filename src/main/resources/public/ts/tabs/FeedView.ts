@@ -51,7 +51,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         const newItems: any = null;
 
-        // todo-1: this is giving false positives at least in Nostr feed view so for now I'll disable this.
         // if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
         //     newItems = new Icon({
         //         className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
@@ -293,7 +292,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
     }
 
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
-        const ast = getAs();
         let subHeading = null;
 
         if (data.props.feedFilterToDisplayName) {
@@ -330,12 +328,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
                 case J.Constant.FEED_PUB:
                     subHeading = "Fediverse";
-                    if (ast.protocolFilter == J.Constant.NETWORK_ACTPUB) {
-                        subHeading = "ActivityPub " + subHeading;
-                    }
-                    else if (ast.protocolFilter == J.Constant.NETWORK_NOSTR) {
-                        subHeading = "Nostr " + subHeading;
-                    }
                     break;
 
                 default: break;

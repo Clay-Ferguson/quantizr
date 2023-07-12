@@ -68,14 +68,14 @@ export class RightNavPanel extends Div {
             displayName = displayName || ast.node.owner;
         }
 
-        const clipboardPasteButton = ast.userPrefs.editMode ? new Icon({
+        const clipboardPasteButton = new Icon({
             className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
             },
             title: "Save clipboard"
-        }) : null;
+        });
 
         const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable",

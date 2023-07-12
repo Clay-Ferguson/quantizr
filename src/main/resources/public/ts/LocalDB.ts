@@ -9,9 +9,6 @@ export class LocalDB {
     debug: boolean = false;
     db: IDBDatabase = null;
 
-    STORE_NOSTR_MD = "nostr-md";
-    STORE_NOSTR_TXT = "nostr-txt";
-    STORE_NOSTR_PERSIST = "nostr-persist";
     STORE_DEFAULT = "store";
 
     /* Name of logged in user or 'null' if anonymous (user not logged in) */
@@ -41,9 +38,6 @@ export class LocalDB {
             }
 
             req.onupgradeneeded = () => {
-                this.createStore(req.result, this.STORE_NOSTR_MD);
-                this.createStore(req.result, this.STORE_NOSTR_TXT);
-                this.createStore(req.result, this.STORE_NOSTR_PERSIST);
                 this.createStore(req.result, this.STORE_DEFAULT);
             };
 
@@ -75,9 +69,6 @@ export class LocalDB {
 
     clearStores = (): Promise<void[]> => {
         return Promise.all([
-            this.clearStore(this.STORE_NOSTR_MD),
-            this.clearStore(this.STORE_NOSTR_TXT),
-            this.clearStore(this.STORE_NOSTR_PERSIST),
             this.clearStore(this.STORE_DEFAULT)
         ]);
     }
@@ -224,7 +215,6 @@ export class LocalDB {
         }
         this.userName = userName;
 
-        // we need a pubsub mechanism here so this nostr logic is decoupled
         S.quanta.invalidateKeys();
         await this.openDB();
         await S.quanta.initKeys(userName);

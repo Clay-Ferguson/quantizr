@@ -182,14 +182,6 @@ public class AppProp {
         return env.getProperty("server.port");
     }
 
-    public String getTServerPort() {
-        return env.getProperty("TSERVER_PORT");
-    }
-
-    public String getTServerApiKey() {
-        return env.getProperty("TSERVER_API_KEY");
-    }
-
     public String getProfileName() {
         return env.getProperty("profileName");
     }
@@ -200,10 +192,6 @@ public class AppProp {
 
     public boolean isActPubEnabled() {
         return APConst.TRUE.equals(env.getProperty("actPubEnabled"));
-    }
-
-    public boolean isNostrDaemonEnabled() {
-        return APConst.TRUE.equals(env.getProperty("nostrDaemonEnabled"));
     }
 
     public boolean ipfsEnabled() {
@@ -240,10 +228,6 @@ public class AppProp {
 
     public String getTestUserAccounts() {
         return env.getProperty("testUserAccounts");
-    }
-
-    public String getNostrCurationAccounts() {
-        return env.getProperty("nostrCurationAccounts");
     }
 
     public String getMongoAdminUserName() {

@@ -56,9 +56,6 @@ export class LeftNavPanel extends Div {
         let myMessages = ast.myNewMessageCount > 0
             ? (ast.myNewMessageCount + " new posts") : "";
 
-        const nostrMessages = ast.nostrNewMessageCount > 0
-            ? (ast.nostrNewMessageCount + " new posts") : "";
-
         // todo-2: this is a hack to keep the new incomming "chat" messages (Node Feed) from tricking
         // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
         // if feedFilterRoodNode is non-null which means user is in a node chat. I should consider having
@@ -109,18 +106,10 @@ export class LeftNavPanel extends Div {
                     // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
                     // which is in a different class.
                     new Span(null, { className: "float-end" }, [
-                        ast.nostrQueryRunning ? new Span("Waiting for Nostr...", {
-                            className: "nostrWaitNote"
-                        }) : null,
-                        myMessages && !nostrMessages ? new Span(myMessages, {
+                        myMessages ? new Span(myMessages, {
                             className: "newMessagesNote",
                             onClick: S.nav.showMyNewMessages,
                             title: "Show your new messages"
-                        }) : null,
-                        nostrMessages ? new Span(nostrMessages, {
-                            className: "newNostrMessagesNote",
-                            onClick: S.srch.refreshFeed,
-                            title: "Show new Nostr messages"
                         }) : null,
                         ast.userName && ast.isAnonUser ? new Icon({
                             className: "fa fa-bars fa-2x clickable",

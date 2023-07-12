@@ -91,12 +91,6 @@ export class ServerPush {
             await S.crypto.generateAndSendSigs(data);
         }, false);
 
-        this.eventSource.addEventListener("newNostrUsersPush", async (e: any) => {
-            const data: J.NewNostrUsersPushInfo = JSON.parse(e.data);
-            // console.log("got newNostrUsersPush: " + S.util.prettyPrint(data));
-            await S.nostr.loadUserMetadata(data);
-        }, false);
-
         this.eventSource.addEventListener("pushPageMessage", (e: any) => {
             const data: J.PushPageMessage = JSON.parse(e.data);
             if (data.subType == "rssProgressText") {

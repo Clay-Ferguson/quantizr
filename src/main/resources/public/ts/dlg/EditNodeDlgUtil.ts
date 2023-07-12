@@ -1,21 +1,20 @@
 import { dispatch, getAs, promiseDispatch } from "../AppContext";
-import { CompIntf } from "../comp/base/CompIntf";
-import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
-import { Span } from "../comp/core/Span";
+import { Constants as C } from "../Constants";
 import { SymKeyDataPackage } from "../Crypto";
 import { DialogMode } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/core/Div";
+import { Divc } from "../comp/core/Divc";
+import { Span } from "../comp/core/Span";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./EditNodeDlg";
 import { EditPropertyDlg, LS as EditPropertyDlgState } from "./EditPropertyDlg";
 import { EmojiPickerDlg, LS as EmojiPickerDlgState } from "./EmojiPickerDlg";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-import { Event } from "nostr-tools";
-import { Constants as C } from "../Constants";
 
 export class EditNodeDlgUtil {
     public countPropsShowing = (dlg: EditNodeDlg): number => {
@@ -47,13 +46,6 @@ export class EditNodeDlgUtil {
     public saveNode = async (dlg: EditNodeDlg): Promise<boolean> => {
         const ast = getAs();
         const editNode = ast.editNode;
-
-        // if trying to send non-public node over Nostr. Disallow it for now, unless a DM type (which we do allow). Until we have encryptio support.
-        if (editNode.type !== J.NodeType.NOSTR_ENC_DM && ast.protocolFilter === J.Constant.NETWORK_NOSTR && //
-            !S.props.isPublic(editNode) && S.props.hasNonPublicNostrShares(editNode)) {
-            S.util.showMessage("WARNING: Only Nostr DMs can be sent as private.", "Nostr Warning");
-            return false;
-        }
 
         // save these two values, because the S.quanta copy can get overwritten before we use them here.
         const newNodeTargetId = S.quanta.newNodeTargetId;
@@ -104,30 +96,15 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
-        let nostrEvent: Event = null;
-        const nostrRelays: string[] = [];
-
-        const sendToNostr = ast.protocolFilter === J.Constant.NETWORK_NOSTR && //
-            (editNode.type === J.NodeType.NOSTR_ENC_DM || S.props.isPublic(editNode));
-
-        if (sendToNostr) {
-            nostrEvent = await S.nostr.prepareOutboundEvent(editNode, clearText, nostrRelays);
-        }
-
         // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode,
-            saveToActPub: ast.protocolFilter === J.Constant.NETWORK_ACTPUB,
-            nostrEvent: S.nostr.makeNostrEventWrapper(nostrEvent, editNode.id)
+            saveToActPub: true, // todo-0: we can remove this now?
         });
         S.nodeUtil.processInboundNode(res.node);
 
         if (res?.code != C.RESPONSE_CODE_OK) {
             return false;
-        }
-
-        if (sendToNostr && nostrEvent) {
-            S.nostr.sendMessage(nostrEvent, nostrRelays);
         }
 
         dlg.resetAutoSaver();

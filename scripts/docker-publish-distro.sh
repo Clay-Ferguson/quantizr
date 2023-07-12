@@ -17,13 +17,4 @@ read -p "Tagged as ${DOCKER_IMAGE_T}"
 docker push ${DOCKER_IMAGE_T}
 echo "Docker push complete: ${DOCKER_IMAGE_T}"
 
-# -----------------------------------
-
-set TSERVER_IMAGE_T=subnode/${TSERVER_IMAGE}:${QUANTA_VER}
-docker tag ${TSERVER_IMAGE} ${TSERVER_IMAGE_T}
-read -p "Tagged as ${TSERVER_IMAGE_T}"
-
-docker push ${TSERVER_IMAGE_T}
-echo "Docker pushe complete: ${TSERVER_IMAGE_T}"
-
 read -p "done. press ENTER."

@@ -227,10 +227,6 @@ services:
                 cory:${testPassword}:${devEmail},
                 dan:${testPassword}:${devEmail},
                 eric:${testPassword}:${devEmail}
-
-            nostrCurationAccounts: >-
-                admin,
-                bob
     
             testPassword: "${testPassword}"
             throttleTime: "0"
@@ -245,18 +241,12 @@ services:
             allowFileSystemSearch: "false"
             actPubEnabled: "false"
 
-            # tserver-tag
-            nostrDaemonEnabled: "${nostrDaemonEnabled}"
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
-
-            # tserver-tag
-            TSERVER_PORT: "${TSERVER_PORT}"
-            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
             mail.port: ""
             mail.user: "postmaster@quantizr.com" 
@@ -269,33 +259,6 @@ services:
             ipfs.host: "http://ipfs-host-dev"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
-
-    # tserver-tag
-    tserver-dev:
-        image: ${TSERVER_IMAGE}
-        deploy:
-            restart_policy:
-                condition: on-failure
-                # delay is time between restart attempts
-                delay: 10s
-                max_attempts: 4
-                window: 120s
-            replicas: 1
-        build:
-            context: ${PRJROOT}/src/main/resources/server
-            dockerfile: ./dockerfile
-        hostname: tserver-host
-        networks:
-            bridge:
-                aliases:
-                    - tserver-host
-        volumes:
-            - '${QUANTA_BASE}/log:/home/node/app/log'
-        ports:
-            - "${TSERVER_PORT}:${TSERVER_PORT}"
-        environment:
-            TSERVER_PORT: "${TSERVER_PORT}"
-            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
 networks:
     bridge:

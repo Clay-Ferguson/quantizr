@@ -29,7 +29,6 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NostrUserInfo;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
@@ -58,19 +57,9 @@ public class Convert extends ServiceBase {
      * todo-1: make sure any saving that's triggered in here is done in an async thread that doesn't
      * block this method from returning fast
      */
-    public NodeInfo convertToNodeInfo(
-            boolean adminOnly,
-            SessionContext sc,
-            MongoSession ms,
-            SubNode node,
-            boolean initNodeEdit,
-            long logicalOrdinal,
-            boolean allowInlineChildren,
-            boolean lastChild,
-            boolean getFollowers,
-            boolean loadLikes,
-            boolean attachBoosted,
-            Val<SubNode> boostedNodeVal,
+    public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
+            boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild,
+            boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal,
             boolean attachLinkedNodes) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
         // if we have a signature, check it.
@@ -116,7 +105,6 @@ public class Convert extends ServiceBase {
         String avatarVer = null;
         String nameProp = null;
         String displayName = null;
-        String nostrPubKey = null;
         String apAvatar = null;
         String apImage = null;
         String owner = PrincipalName.ADMIN.s();
@@ -134,30 +122,9 @@ public class Convert extends ServiceBase {
                 avatarVer = userAtt.getBin();
             }
             displayName = user.getFriendlyNameFromNode(ownerAccnt);
-            nostrPubKey = ownerAccnt.getStr(NodeProp.NOSTR_USER_NPUB);
             apAvatar = ownerAccnt.getStr(NodeProp.USER_ICON_URL);
             apImage = ownerAccnt.getStr(NodeProp.USER_BANNER_URL);
             owner = nameProp;
-            if (nostr.isNostrNode(node) && nameProp.startsWith(".")) {
-                // nostrId will be the name wit the "." prefix removed
-                String nostrId = nameProp.substring(1);
-                String relays = ownerAccnt.getStr(NodeProp.NOSTR_RELAYS);
-                if (ownerAccnt.getInt(NodeProp.NOSTR_USER_TIMESTAMP) == 0L) {
-                    log.debug("Queueing client to update metadata for nostr user: " + nostrPubKey);
-                    /*
-                     * Queueing up these nostrIds causes them to be sent down to the browser to be queries and then the
-                     * info is saved to the server once known, however that happens in the background and initially when
-                     * the page renders there might be some "User Info" (username & avatar) that is missing on the page,
-                     * until it gets resolved. They way they get resolved on the browser page is by the fact that
-                     * nostr.ts has a metadataQueue which accumulates any 'unknown metadata users' and then querys for
-                     * them, and then simply re-renders the page. Any component that renders a nostr (username+avatar)
-                     * must be smart enough to notice the missing data, and then try to render it from the nostr
-                     * metadataCache immediately or else queue it into metadataQueue so that the page re-renders
-                     * correctly shortly thereafter.
-                     */
-                    ThreadLocals.getNewNostrUsers().put(nostrId, new NostrUserInfo(nostrId, null, relays));
-                }
-            }
         }
         /*
          * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
@@ -192,33 +159,13 @@ public class Convert extends ServiceBase {
             logicalOrdinal = read.generateLogicalOrdinal(ms, node);
         }
 
-        NodeInfo nodeInfo = new NodeInfo(
-                node.jsonId(),
-                node.getPath(),
-                node.getName(),
-                content,
-                renderContent, //
-                node.getTags(),
-                displayName, //
-                owner,
-                ownerId,
-                nostrPubKey, //
-                node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
+        NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
+                node.getTags(), displayName, //
+                owner, ownerId, node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
                 node.getOrdinal(), //
-                node.getModifyTime(),
-                propList,
-                node.getAttachments(),
-                node.getLinks(),
-                acList,
-                likes,
-                hasChildren, //
-                node.getType(),
-                logicalOrdinal,
-                lastChild,
-                cipherKey,
-                avatarVer,
-                apAvatar,
-                apImage);
+                node.getModifyTime(), //
+                propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, node.getType(), //
+                logicalOrdinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
         // if this node type has a plugin run it's converter to let it contribute
         TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
         if (plugin != null) {
@@ -244,20 +191,8 @@ public class Convert extends ServiceBase {
                     // NOTE: If this is set to false it then only would allow one level of depth in
                     // the 'inlineChildren' capability
                     boolean multiLevel = true;
-                    NodeInfo info = convertToNodeInfo(
-                            false,
-                            sc,
-                            ms,
-                            n,
-                            initNodeEdit,
-                            inlineOrdinal++,
-                            multiLevel,
-                            lastChild,
-                            false,
-                            loadLikes,
-                            false,
-                            null,
-                            false);
+                    NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel,
+                            lastChild, false, loadLikes, false, null, false);
                     if (info != null) {
                         nodeInfo.safeGetChildren().add(info);
                     }
@@ -304,20 +239,8 @@ public class Convert extends ServiceBase {
                 }
             }
             if (boostedNode != null) {
-                NodeInfo info = convertToNodeInfo(
-                        false,
-                        sc,
-                        ms,
-                        boostedNode,
-                        false,
-                        Convert.LOGICAL_ORDINAL_IGNORE,
-                        false,
-                        false,
-                        false,
-                        false,
-                        false,
-                        null,
-                        false);
+                NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE,
+                        false, false, false, false, false, null, false);
                 if (info != null) {
                     nodeInfo.setBoostedNode(info);
                 }
@@ -359,11 +282,8 @@ public class Convert extends ServiceBase {
             int atCount = 0;
             boolean formatted = false;
             // Hashtag
-            if (includeHashtags &&
-                    tokLen > 1 &&
-                    tok.startsWith("#") &&
-                    StringUtils.countMatches(tok, "#") == 1 &&
-                    Character.isLetter(tok.charAt(1))) {
+            if (includeHashtags && tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1
+                    && Character.isLetter(tok.charAt(1))) {
                 APObj tag = tags.get(tok);
                 if (tag instanceof APOHashtag) {
                     String href = (String) tag.get(APObj.href);
@@ -379,10 +299,8 @@ public class Convert extends ServiceBase {
             } //
             else if ( // Mention // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok +
                       // "</span></a>"); // sb.append("<a class='mention hashtag' href='" + href + // //
-            tokLen > 1 &&
-                    tok.startsWith("@") &&
-                    (atCount = StringUtils.countMatches(tok, "@")) <= 2 &&
-                    Character.isLetterOrDigit(tok.charAt(1))) {
+            tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2
+                    && Character.isLetterOrDigit(tok.charAt(1))) {
                 APObj tag = tags.get(tok);
                 if (tag instanceof APOMention) {
                     String href = (String) tag.get(APObj.href);
@@ -395,11 +313,8 @@ public class Convert extends ServiceBase {
                         // NOTE: h-card and u-url are part of 'microformats'
                         formatted = true;
                         sb.append( //
-                                "<span class='h-card'><a class='u-url mention' href='" +
-                                        href +
-                                        "' target='_blank'>@<span>" +
-                                        shortTok +
-                                        "</span></a></span>");
+                                "<span class='h-card'><a class='u-url mention' href='" + href
+                                        + "' target='_blank'>@<span>" + shortTok + "</span></a></span>");
                     }
                 }
             }
@@ -433,11 +348,8 @@ public class Convert extends ServiceBase {
         return imageSize;
     }
 
-    public List<PropertyInfo> buildPropertyInfoList(
-            SessionContext sc,
-            SubNode node, //
-            boolean initNodeEdit,
-            boolean sigFail) {
+    public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
+            boolean initNodeEdit, boolean sigFail) {
         List<PropertyInfo> props = null;
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {
@@ -499,8 +411,6 @@ public class Convert extends ServiceBase {
                 } else {
                     acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
                     acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
-                    acInfo.setNostrNpub(auth.getAccountPropById(s, principalId, NodeProp.NOSTR_USER_NPUB.s()));
-                    acInfo.setNostrRelays(auth.getAccountPropById(s, principalId, NodeProp.NOSTR_RELAYS.s()));
                 }
                 return null;
             });
@@ -508,11 +418,7 @@ public class Convert extends ServiceBase {
         return acInfo;
     }
 
-    public PropertyInfo convertToPropertyInfo(
-            SessionContext sc,
-            SubNode node,
-            String propName,
-            Object prop,
+    public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
             boolean initNodeEdit) {
         try {
             Object value = null;

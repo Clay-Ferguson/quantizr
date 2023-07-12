@@ -168,10 +168,6 @@ services:
                 cory:${testPassword}:${devEmail},
                 dan:${testPassword}:${devEmail},
                 eric:${testPassword}:${devEmail}
-
-            nostrCurationAccounts: >-
-                admin,
-                clay
     
             # throttleTime: "0"
             spring.config.location: "classpath:/application.properties" 
@@ -185,18 +181,12 @@ services:
             allowFileSystemSearch: "false"
             actPubEnabled: "false"
 
-            # tserver-tag
-            nostrDaemonEnabled: "${nostrDaemonEnabled}"
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
-
-            # tserver-tag
-            TSERVER_PORT: "${TSERVER_PORT}"
-            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
             # mail.port: ""
             # mail.user: "your mail user" 
@@ -210,34 +200,6 @@ services:
             ipfs.host: "http://ipfs-host-distro"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
-
-    # tserver-tag
-    tserver-distro:
-        image: ${TSERVER_IMAGE}
-        build:
-            context: ${PRJROOT}/src/main/resources/server
-            # NOTE: dockerfile path is RELATIVE to 'context' here.
-            dockerfile: ./dockerfile
-        deploy:
-            restart_policy:
-                condition: on-failure
-                # delay is time between restart attempts
-                delay: 10s
-                max_attempts: 4
-                window: 120s
-            replicas: 1
-        hostname: tserver-host
-        networks:
-            bridge:
-                aliases:
-                    - tserver-host
-        volumes:
-            - "${DEPLOY_TARGET}/log:/home/node/app/log"
-        ports:
-            - "${TSERVER_PORT}:${TSERVER_PORT}"
-        environment:
-            TSERVER_PORT: "${TSERVER_PORT}"
-            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
 networks:
     bridge:

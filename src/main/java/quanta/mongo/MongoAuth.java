@@ -154,36 +154,7 @@ public class MongoAuth extends ServiceBase {
                 */ {
             // add `parent.owner` to the ACL
             child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
-            if (nostr.isNostrNode(parent)) {
-                processNostrForNewNode(parent, child);
-            } else {
-                processActPubForNewNode(parent, child);
-            }
-        }
-    }
-
-    private void processNostrForNewNode(SubNode parent, SubNode child) {
-        ArrayList<ArrayList<String>> tags = (ArrayList) parent.getObj(NodeProp.NOSTR_TAGS.s(), ArrayList.class);
-        shareToAllNostrUsers(tags, child);
-    }
-
-    public void shareToAllNostrUsers(ArrayList<ArrayList<String>> tags, SubNode child) {
-        if (tags == null)
-            return;
-        // Scan all "p" (people) tags to include sharing for them.
-        for (ArrayList<String> itm : tags) {
-            if ("p".equals(itm.get(0))) {
-                // get pub key of the user
-                String pubKey = itm.get(1);
-                // lookup the SubNode for the account, and we might get back a Foreign account node or Local node,
-                // doesn't matter.
-                SubNode nostrAccnt = arun.run(as -> nostr.getAccountByNostrPubKey(as, pubKey));
-                // if we found the account with that key and it's not our own account
-                if (nostrAccnt != null && !nostrAccnt.getOwner().equals(child.getOwner())) {
-                    // add the ACL for this user
-                    child.putAc(nostrAccnt.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
-                }
-            }
+            processActPubForNewNode(parent, child);
         }
     }
 
@@ -511,8 +482,7 @@ public class MongoAuth extends ServiceBase {
         String publicKey = null;
         String avatarVer = null;
         String foreignAvatarUrl = null;
-        String nostrNpub = null;
-        String nostrRelays = null;
+
         /* If this is a share to public we don't need to lookup a user name */
         if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
             principalName = PrincipalName.PUBLIC.s();
@@ -524,8 +494,6 @@ public class MongoAuth extends ServiceBase {
             principalName = principalNode.getStr(NodeProp.USER);
             displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
             publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
-            nostrNpub = principalNode.getStr(NodeProp.NOSTR_USER_NPUB);
-            nostrRelays = principalNode.getStr(NodeProp.NOSTR_RELAYS);
             // This will be null if it's a local node, and this is fine
             foreignAvatarUrl = principalNode.getStr(NodeProp.USER_ICON_URL);
             if (foreignAvatarUrl == null) {
@@ -533,8 +501,8 @@ public class MongoAuth extends ServiceBase {
                 avatarVer = att != null ? att.getBin() : null;
             }
         }
-        AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, nostrNpub,
-                nostrRelays, avatarVer, foreignAvatarUrl);
+        AccessControlInfo info =
+                new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer, foreignAvatarUrl);
         info.addPrivilege(new PrivilegeInfo(authType));
         return info;
     }

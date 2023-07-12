@@ -9,7 +9,6 @@ import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
-import { utils } from "quanta-common";
 import { TrendingView } from "./tabs/TrendingView";
 
 export class Quanta {
@@ -93,7 +92,6 @@ export class Quanta {
     }
 
     invalidateKeys = () => {
-        S.nostr.invalidateKeys();
         S.crypto.invalidateKeys();
     }
 
@@ -101,12 +99,9 @@ export class Quanta {
         if (S.crypto.avail) {
             await S.crypto.initKeys(user, false, false, false, "all");
         }
-        await S.nostr.initKeys(user);
     }
 
     initApp = async () => {
-        // todo-1: eventually we can remove this call we do to verify package is working.
-        console.log("TEST: " + utils.testCall("abc"));
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
         }
@@ -221,12 +216,7 @@ export class Quanta {
             S.util.playAudioIfRequested();
 
             if (this.config.config) {
-                const network = await S.localDB.getVal(C.LOCALDB_NETWORK_SELECTION);
-
                 dispatch("configUpdates", s => {
-                    if (network) {
-                        s.protocolFilter = network;
-                    }
 
                     // we show the user message after the config is set, but there's no reason to do it here
                     // other than perhaps have the screen updated with the latest based on the config.
@@ -265,9 +255,8 @@ export class Quanta {
     }
 
     resetPageLoadConfigs = () => {
-        this.config.urlView = null
-        this.config.loadNostrId = null
-        this.config.initialNodeId = null
+        this.config.urlView = null;
+        this.config.initialNodeId = null;
     }
 
     initialRender = async () => {
@@ -321,44 +310,7 @@ export class Quanta {
         let childId: string = null;
         const ast = getAs();
 
-        // When user has perhaps requested a NostrId on the URL we'll end up here where we need to get the Nostr
-        // data and display it.
-        //
-        // todo-1: Currently we always try to pull loadNostrId immediately from a relay here, but we could
-        // do a lookup for it on the server for it during the initial URL request to load the page
-        // and if the node happened to be found for this event, we'd set initialNodeId or whatever's required to
-        // load that ID for the already-existing node.
-        if (S.quanta.config.loadNostrId) {
-            console.log("requested NostrId: " + S.quanta.config.loadNostrId);
-            // need client to be showing instant progress indicator underway.
-            let nostrId = S.quanta.config.loadNostrId;
-            S.quanta.config.loadNostrId = null;
-
-            if (nostrId.startsWith(".")) {
-                nostrId = nostrId.substring(1);
-            }
-
-            // load relays saved in config or else use ones defined by this user.
-            const relays: string[] = S.nostr.getRelays((S.nostr.getSessionRelaysStr() || "") + "\n" + (S.quanta.config.loadNostrIdRelays || ""));
-            S.quanta.config.loadNostrIdRelays = null;
-
-            if (!relays || relays.length === 0) {
-                console.log("No relays were available.");
-                return;
-            }
-
-            const event = await S.nostr.getEvent(nostrId, null, relays);
-            if (!event) {
-                console.warn("Unable to lookup nostrId=" + nostrId);
-                return;
-            }
-            else {
-                await S.nostr.persistEvents([event]);
-            }
-            id = "." + event.id;
-            console.log("nostr id loaded: " + event.id);
-        }
-        else if (S.quanta.config.initialNodeId) {
+        if (S.quanta.config.initialNodeId) {
             id = S.quanta.config.initialNodeId;
             S.quanta.config.initialNodeId = null;
 

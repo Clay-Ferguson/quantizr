@@ -5,7 +5,6 @@ import { FriendsDlg } from "./dlg/FriendsDlg";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
-import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -72,9 +71,7 @@ export class User {
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime,
                 sigKey: S.crypto.sigKey,
-                asymEncKey: S.crypto.asymEncKey,
-                nostrNpub: S.nostr.npub,
-                nostrPubKey: S.nostr.pk
+                asymEncKey: S.crypto.asymEncKey
             }, false, true);
             S.quanta.authToken = res.authToken;
 
@@ -132,11 +129,6 @@ export class User {
         window.location.href = window.location.origin;
     }
 
-    showUserProfileByNostrKey = (identity: string) => {
-        const dlg = new UserProfileDlg(null, identity);
-        dlg.open();
-    }
-
     loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean) => {
         if (S.util.checkSuccess("Login", res)) {
 
@@ -180,11 +172,6 @@ export class User {
                 await promiseDispatch("setAccessFailed", s => {
                     s.activeTab = C.TAB_MAIN;
                 });
-
-                // special case when we fail to access a nostr node we attempt to load it from the client side
-                if (!S.quanta.config.loadNostrId) {
-                    return;
-                }
             }
         } else {
             console.log("LocalDb login failed.");
@@ -220,8 +207,7 @@ export class User {
 
     queryUserProfile = async (userId: string) => {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId,
-            nostrPubKey: null
+            userId
         });
 
         if (res?.userProfile) {

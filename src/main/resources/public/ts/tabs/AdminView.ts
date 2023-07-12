@@ -108,16 +108,6 @@ export class AdminView extends AppTab<any, AdminView> {
                     ])
                 ], horzClass),
 
-                this.sectionTitle("Nostr"),
-                new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
-                        this.settingsLink("Nostr Maintenance", () => S.view.runServerCommand("nostrMaintenance", null, "Nostr Maintenance Response", null)), //
-                    ]),
-                    new Divc({ className: "settingsCol" }, [
-                        this.settingsLink("Nostr Update Feed", () => S.view.runServerCommand("nostrQueryUpdate", null, "Nostr Update Feed", null)),
-                    ])
-                ], horzClass),
-
                 this.sectionTitle("Testing"),
                 new FlexRowLayout([
                     new Divc({ className: "settingsCol" }, [

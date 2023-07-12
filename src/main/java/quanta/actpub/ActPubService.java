@@ -1744,16 +1744,6 @@ public class ActPubService extends ServiceBase {
         });
     }
 
-    public String maintainNostrUsers() {
-        return arun.run(as -> {
-            log.debug("Starting Nostr cleanup...");
-            long delCount = delete.deleteOldNostrPosts(4, as);
-            String message = "Nostr Maintenance Complete. Deleted " + String.valueOf(delCount) + " old posts.";
-            log.debug(message);
-            return message;
-        });
-    }
-
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");

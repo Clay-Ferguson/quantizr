@@ -56,7 +56,7 @@ export class Constants {
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";
     static OPTIONS_MENU_TEXT = "Options";
-    static PROTOCOL_MENU_TEXT = "Network";
+    static PROTOCOL_MENU_TEXT = "Network"; // todo-0: delete
 
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
@@ -95,7 +95,6 @@ export class Constants {
 
     static readonly LOCALDB_AUDIO_SOURCE: string = "audioSource";
     static readonly LOCALDB_VIDEO_SOURCE: string = "videoSource";
-    static readonly LOCALDB_NOSTR_PRIVATE_KEY: string = "nostrKey";
 
     static readonly STORE_EDITOR_DATA: string = "editObj"; // holds {nodeId: "xxxxx", content: "stuff that never got saved"}
 
@@ -106,6 +105,4 @@ export class Constants {
     static readonly LOCALDB_VOICE_INDEX: string = "voiceIndex";
     static readonly LOCALDB_VOICE2_INDEX: string = "voice2Index";
     static readonly LOCALDB_VOICE_RATE: string = "voiceRate";
-
-    static readonly LOCALDB_NETWORK_SELECTION: string = "networkProtocol";
 }

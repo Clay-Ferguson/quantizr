@@ -104,7 +104,6 @@ public class CallProcessor extends ServiceBase {
             if (duration > Instrument.CAPTURE_THRESHOLD) {
                 new PerfMonEvent(duration, "callProc." + command, userName);
             }
-            nostr.pushNostrInfoToClient();
         }
 
         if (ret instanceof ResponseBase) {

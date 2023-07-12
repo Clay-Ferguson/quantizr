@@ -36,10 +36,6 @@ cp ${PRJROOT}/dockerfile-distro                 ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint-distro.sh              ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 
-# tserver-tag
-# mkdir -p ${DEPLOY_TARGET}/src/main/resources/server
-# cp -R ${PRJROOT}/src/main/resources/server/ ${DEPLOY_TARGET}/src/main/resources/
-
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}

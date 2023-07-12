@@ -11,10 +11,6 @@ public class ClientConfig {
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
-    private String loadNostrId;
-    private String loadNostrIdRelays;
-    // these are the 'system defined' relays so that anonymous users can query for info.
-    private String nostrRelays;
     private String urlView;
     private String search;
     private String login;
@@ -71,18 +67,6 @@ public class ClientConfig {
         return this.initialNodeId;
     }
 
-    public String getLoadNostrId() {
-        return this.loadNostrId;
-    }
-
-    public String getLoadNostrIdRelays() {
-        return this.loadNostrIdRelays;
-    }
-
-    public String getNostrRelays() {
-        return this.nostrRelays;
-    }
-
     public void setConfig(final HashMap<String, Object> config) {
         this.config = config;
     }
@@ -109,18 +93,6 @@ public class ClientConfig {
 
     public void setInitialNodeId(final String initialNodeId) {
         this.initialNodeId = initialNodeId;
-    }
-
-    public void setLoadNostrId(final String loadNostrId) {
-        this.loadNostrId = loadNostrId;
-    }
-
-    public void setLoadNostrIdRelays(final String loadNostrIdRelays) {
-        this.loadNostrIdRelays = loadNostrIdRelays;
-    }
-
-    public void setNostrRelays(final String nostrRelays) {
-        this.nostrRelays = nostrRelays;
     }
 
     public ClientConfig() {}

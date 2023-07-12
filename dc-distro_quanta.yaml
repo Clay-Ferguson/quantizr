@@ -203,10 +203,6 @@ services:
                 cory:${testPassword}:${devEmail},
                 dan:${testPassword}:${devEmail},
                 eric:${testPassword}:${devEmail}
-
-            nostrCurationAccounts: >-
-                admin,
-                clay
     
             throttleTime: "0"
             spring.config.location: "classpath:/application.properties" 
@@ -223,19 +219,12 @@ services:
             allowFileSystemSearch: "false"
             actPubEnabled: "true"
 
-            # tserver-tag
-            nostrDaemonEnabled: "${nostrDaemonEnabled}"
-
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"
             spring.servlet.multipart.max-request-size: "200MB"
             adminDataFolder: "/tmp" 
-
-            # tserver-tag
-            TSERVER_PORT: "${TSERVER_PORT}"
-            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
@@ -255,33 +244,6 @@ services:
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
-
-    # tserver-tag
-    tserver-distro:
-        image: ${TSERVER_IMAGE}
-        build:
-            context: ${PRJROOT}/src/main/resources/server
-            dockerfile: ./dockerfile
-        deploy:
-            restart_policy:
-                condition: on-failure
-                # delay is time between restart attempts
-                delay: 10s
-                max_attempts: 4
-                window: 120s
-            replicas: 1
-        hostname: tserver-host
-        networks:
-            bridge:
-                aliases:
-                    - tserver-host
-        volumes:
-            - "${DATA_FOLDER}/log:/home/node/app/log"
-        ports:
-            - "${TSERVER_PORT}:${TSERVER_PORT}"
-        environment:
-            TSERVER_PORT: "${TSERVER_PORT}"
-            TSERVER_API_KEY: "${TSERVER_API_KEY}"
 
 networks:
     bridge:

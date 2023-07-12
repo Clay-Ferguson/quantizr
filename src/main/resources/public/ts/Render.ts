@@ -354,19 +354,6 @@ export class Render {
         const byIdUrlThreadView = byIdUrl + "&view=thread";
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
 
-        if (S.nostr.isNostrNode(node)) {
-            let nostrId = S.props.getPropStr(J.NodeProp.OBJECT_ID, node);
-            if (nostrId) {
-                nostrId = nostrId.substring(1);
-                children.push(new Heading(6, "Nostr ID"), //
-                    new Div(nostrId, {
-                        className: "linkDisplay",
-                        title: "Click -> Copy to clipboard",
-                        onClick: () => this.copyLinkToClipboard(nostrId)
-                    }));
-            }
-        }
-
         children.push(new Heading(6, "By ID"), //
             new Div(byIdUrl, {
                 className: "linkDisplay",

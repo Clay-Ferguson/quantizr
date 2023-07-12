@@ -14,7 +14,6 @@ import { Edit } from "./Edit";
 import { LocalDB } from "./LocalDB";
 import { Nav } from "./Nav";
 import { NodeUtil } from "./NodeUtil";
-import { Nostr } from "./Nostr";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
 import { Quanta } from "./Quanta";
@@ -61,7 +60,6 @@ export class Factory {
             S.view = new View();
             S.localDB = new LocalDB();
             S.speech = new SpeechEngine();
-            S.nostr = new Nostr();
 
             console.log("Factory.ts instances ready.");
         }

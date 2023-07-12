@@ -203,8 +203,7 @@ public class UserManagerService extends ServiceBase {
         res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
         if (sc.getUserToken() != null) {
             MongoSession ms = ThreadLocals.getMongoSession();
-            processLogin(ms, res, userNodeVal.getVal(), sc.getUserName(), req.getAsymEncKey(), req.getSigKey(),
-                    req.getNostrNpub(), req.getNostrPubKey());
+            processLogin(ms, res, userNodeVal.getVal(), sc.getUserName(), req.getAsymEncKey(), req.getSigKey());
             log.debug("login: user=" + sc.getUserName());
         } else {
             res.setUserPreferences(getDefaultUserPreferences());
@@ -289,7 +288,7 @@ public class UserManagerService extends ServiceBase {
      * userName
      */
     public void processLogin(MongoSession ms, LoginResponse res, SubNode userNode, String userName, String asymEncKey,
-            String sigKey, String nostrNpub, String nostrPubKey) {
+            String sigKey) {
         SessionContext sc = ThreadLocals.getSC();
         if (userNode == null) {
             userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
@@ -313,16 +312,12 @@ public class UserManagerService extends ServiceBase {
         Date now = new Date();
         sc.setLastLoginTime(now.getTime());
         userNode.set(NodeProp.LAST_LOGIN_TIME, now.getTime());
-        if (!StringUtils.isEmpty(nostrNpub))
-            userNode.setIfNotExist(NodeProp.NOSTR_USER_NPUB, nostrNpub);
-        if (!StringUtils.isEmpty(nostrPubKey))
-            userNode.setIfNotExist(NodeProp.NOSTR_USER_PUBKEY, nostrPubKey);
         if (!StringUtils.isEmpty(asymEncKey))
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
         if (!StringUtils.isEmpty(sigKey))
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
         ThreadLocals.getSC().setPubSigKey(null);
-        res.setUserProfile(user.getUserProfile(userNode.getIdStr(), null, userNode, true));
+        res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
         ensureValidCryptoKeys(userNode);
         update.save(ms, userNode);
     }
@@ -491,6 +486,7 @@ public class UserManagerService extends ServiceBase {
                 res.setEmailError(emailError);
                 res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
             }
+
             if (!automated) {
                 String captcha = (String) ThreadLocals.getHttpSession().getAttribute("captcha");
                 if (!captcha.equals(req.getCaptcha())) {
@@ -498,11 +494,10 @@ public class UserManagerService extends ServiceBase {
                     res.setCaptchaError("Wrong captcha. Try again.");
                     res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
                 }
-            }
-            if (res.getCode() == null || res.getCode() != 200) {
-                return res;
-            }
-            if (!automated) {
+
+                if (res.getCode() == null || res.getCode() != 200) {
+                    return res;
+                }
                 initiateSignup(as, userName, password, email);
             } else {
                 initNewUser(as, userName, password, email, automated);
@@ -560,10 +555,6 @@ public class UserManagerService extends ServiceBase {
                     // force pubSigKey to regenerate as needed by setting to null
                     ThreadLocals.getSC().setPubSigKey(null);
                     userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
-                }
-                if (!StringUtils.isEmpty(req.getNostrNpub()) && !StringUtils.isEmpty(req.getNostrPubKey())) {
-                    userNode.set(NodeProp.NOSTR_USER_NPUB, req.getNostrNpub());
-                    userNode.set(NodeProp.NOSTR_USER_PUBKEY, req.getNostrPubKey());
                 }
             } else {
                 log.debug("savePublicKey failed to find userName: " + userName);
@@ -910,16 +901,13 @@ public class UserManagerService extends ServiceBase {
      *
      * caller should pass in 'userNode' if it's available or else userId will be used to get it.
      */
-    public UserProfile getUserProfile(String userId, String nostrPubKey, SubNode _userNode, boolean abbreviated) {
+    public UserProfile getUserProfile(String userId, SubNode _userNode, boolean abbreviated) {
         String sessionUserName = ThreadLocals.getSC().getUserName();
         return (UserProfile) arun.run(as -> {
             UserProfile userProfile = null;
             SubNode userNode = null;
             if (_userNode == null) {
-                if (nostrPubKey != null) {
-                    userNode = read.getUserNodeByUserName(as, "." + nostrPubKey);
-                } //
-                else if (userId == null) {
+                if (userId == null) {
                     userNode = read.getUserNodeByUserName(as, sessionUserName);
                 } else {
                     userNode = read.getNode(as, userId, false, null);
@@ -941,18 +929,7 @@ public class UserManagerService extends ServiceBase {
                 userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
                 userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
                 userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
-                // get user's relays but default them to admin's relays if not existing.
-                String relays = userNode.getStr(NodeProp.NOSTR_RELAYS);
-                if (StringUtils.isEmpty(relays)) {
-                    SubNode root = read.getDbRoot();
-                    relays = root.getStr(NodeProp.NOSTR_RELAYS);
-                    if (!StringUtils.isEmpty(relays)) {
-                        userNode.set(NodeProp.NOSTR_RELAYS, nostr.removeDuplicateRelays(relays));
-                    }
-                }
-                userProfile.setRelays(relays);
-                userProfile.setNostrNpub(userNode.getStr(NodeProp.NOSTR_USER_NPUB));
-                userProfile.setNostrTimestamp(userNode.getInt(NodeProp.NOSTR_USER_TIMESTAMP));
+
                 Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
                 if (att != null) {
                     userProfile.setAvatarVer(att.getBin());
@@ -996,15 +973,9 @@ public class UserManagerService extends ServiceBase {
         String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
         if (StringUtils.isEmpty(displayName)) {
             String userName = userNode.getStr(NodeProp.USER);
-            if (userName != null && !userName.startsWith(".")) {
+            if (userName != null) {
                 displayName = userName;
             }
-        }
-        if (StringUtils.isEmpty(displayName)) {
-            displayName = userNode.getStr(NodeProp.NOSTR_NAME);
-        }
-        if (StringUtils.isEmpty(displayName)) {
-            displayName = userNode.getStr(NodeProp.NOSTR_USER_NAME);
         }
         return displayName;
     }
@@ -1294,17 +1265,13 @@ public class UserManagerService extends ServiceBase {
         return fi;
     }
 
-    // NOTE: subType = null | "nostr"
+    // todo-0: subType is now unused right?
     public GetPeopleResponse getPeople(MongoSession ms, String userName, String type, String subType) {
         GetPeopleResponse res = new GetPeopleResponse();
         String nodeType = null;
         Criteria moreCriteria = null;
         if ("friends".equals(type)) {
             nodeType = NodeType.FRIEND_LIST.s();
-            if (Constant.NETWORK_NOSTR.s().equals(subType)) {
-                // this regex simply is "Starts with a period"
-                moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.USER).regex("^\\.");
-            }
         } //
         else if ("blocks".equals(type)) { //
             nodeType = NodeType.BLOCKED_USERS.s();
@@ -1343,7 +1310,7 @@ public class UserManagerService extends ServiceBase {
             SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
             if (friendAccountNode != null) {
                 fi.setDisplayName(getFriendlyNameFromNode(friendAccountNode));
-                fi.setRelays(friendAccountNode.getStr(NodeProp.NOSTR_RELAYS));
+
                 // if a local user use BIN property on node (account node BIN property is the Avatar)
                 if (userName.indexOf("@") == -1) {
                     Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
@@ -1420,7 +1387,6 @@ public class UserManagerService extends ServiceBase {
     public String getUserAccountsReport(MongoSession ms) {
         ms = ThreadLocals.ensure(ms);
         int localUserCount = 0;
-        int foreignNostrCount = 0;
         int foreignApCount = 0;
         StringBuilder sb = new StringBuilder();
         Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, true, true);
@@ -1428,11 +1394,7 @@ public class UserManagerService extends ServiceBase {
         for (SubNode accountNode : accountNodes) {
             String userName = accountNode.getStr(NodeProp.USER);
             if (userName != null) {
-                // if account is a 'foreign server' one, then clean it up
-                if (userName.startsWith(".")) {
-                    foreignNostrCount++;
-                } //
-                else if (userName.contains("@")) {
+                if (userName.contains("@")) {
                     foreignApCount++;
                 } else {
                     localUserCount++;
@@ -1441,7 +1403,6 @@ public class UserManagerService extends ServiceBase {
         }
         sb.append("Local Users: " + localUserCount + "\n");
         sb.append("Foreign ActPub Users: " + foreignApCount + "\n");
-        sb.append("Foreign Nostr Users: " + foreignNostrCount + "\n");
         return sb.toString();
     }
 

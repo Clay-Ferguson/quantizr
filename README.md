@@ -6,7 +6,7 @@
  
 Welcome to the Fediverse!
 
-Quanta is a new kind of Social Media and Content Management platform, with uniquely powerful features for wikis, micro-blogging, document collaboration and publishing, secure messaging with (E2E Encryption), video/audio recording & sharing, file sharing, a podcatcher, and much more. Fediverse (Social Media) support includes both ActivityPub and Nostr Protocols.
+Quanta is a new kind of Social Media and Content Management platform, with uniquely powerful features for wikis, micro-blogging, document collaboration and publishing, secure messaging with (E2E Encryption), video/audio recording & sharing, file sharing, a podcatcher, and much more. 
 
 Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture where you always have complete control of your own data.
 
@@ -22,8 +22,8 @@ The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar wi
 
 ### To Run the Server
 
-Edit `/distro/setenv-run-distro.sh` to define your environment settings, and point the docker IMAGE name to Docker Hub. Then run `/distro/run-distro.sh`, which will startup a Docker Compose Swarm with one replica. All the defaults in the `setenv` file should probably work as is (port numbers, folder names, etc), but you do need to set the docker image names (`DOCKER_IMAGE` and `TSERVER_IMAGE`) to point to Docker Hub, unless you've already built locally and can just point to your local images.
+Edit `/distro/setenv-run-distro.sh` to define your environment settings, and point the docker IMAGE name to Docker Hub. Then run `/distro/run-distro.sh`, which will startup a Docker Compose Swarm with one replica. All the defaults in the `setenv` file should probably work as is (port numbers, folder names, etc), but you do need to set the docker image names `DOCKER_IMAGE` to point to Docker Hub, unless you've already built locally and can just point to your local images.
 
 ### Keywords
 
-Decentralized, Social Media, Fediverse, ActivityPub, Nostr, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
+Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene

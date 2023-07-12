@@ -18,7 +18,6 @@ import type { TabUtil } from "./TabUtil";
 import type { User } from "./User";
 import type { Util } from "./Util";
 import type { View } from "./View";
-import { Nostr } from "./Nostr";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
 to result in any circular-references during load time, because they instantiate only other interfaces 
@@ -46,7 +45,6 @@ export interface Singletons {
     view: View;
     localDB: LocalDB;
     speech: SpeechEngine;
-    nostr: Nostr;
 }
 
 const S: Singletons = {} as any;

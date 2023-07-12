@@ -80,10 +80,6 @@ export class EditNodeDlg extends DialogBase {
         super("[none]", (mode === DialogMode.EMBED ? "appEmbedContent" : "appModalCont") + " " + C.TAB_MAIN, false, mode);
         const ast = getAs();
 
-        if (ast.editNode.type === J.NodeType.NOSTR_ENC_DM) {
-            encrypt = true;
-        }
-
         // need a deterministic id here, that can be found across renders, for scrolling.
         this.setId("EditNodeDlg_" + ast.editNode.id);
         let signCheckboxVal = false;
@@ -409,13 +405,11 @@ export class EditNodeDlg extends DialogBase {
                 new Span("Shared to: ", {
                     title: "Node Sharing",
                     onClick: () => {
-                        if (ast.editNode.type !== J.NodeType.NOSTR_ENC_DM) {
-                            this.utl.share(this);
-                        }
+                        this.utl.share(this);
                     }
                 }),
                 ...shareComps,
-                ast.editNode.type !== J.NodeType.NOSTR_ENC_DM && !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
+                !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
@@ -647,8 +641,7 @@ export class EditNodeDlg extends DialogBase {
     makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {
         const ast = getAs();
 
-        // Note: We don't show encryption checkbox for Nostr DMs but the checkbox is implicitly set to 'true' (selected)
-        const encryptCheckBox = ast.editNode.type !== J.NodeType.NOSTR_ENC_DM && advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
+        const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.encKeyOk()) {
                     this.utl.setEncryption(this, checked);
@@ -715,10 +708,6 @@ export class EditNodeDlg extends DialogBase {
 
         const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode)) : true;
         let allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
-
-        if (ast.editNode.type === J.NodeType.NOSTR_ENC_DM) {
-            allowShare = false;
-        }
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);

@@ -1,5 +1,4 @@
 import { marked } from "marked";
-import { nip19 } from "nostr-tools";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
@@ -8,13 +7,12 @@ import { DialogBase } from "./DialogBase";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { DocumentRSInfo } from "./DocumentRSInfo";
 import * as I from "./Interfaces";
 import { ConfigProp } from "./Interfaces";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
-import { TrendingView } from "./tabs/TrendingView";
-import { TabIntf } from "./intf/TabIntf";
-import { DocumentRSInfo } from "./DocumentRSInfo";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -797,35 +795,8 @@ export class Util {
         }, 500);
     }
 
-    isNostrUserName = (userName: string) => {
-        return userName?.startsWith(".");
-    }
-
     isActPubUserName = (userName: string) => {
         return userName?.indexOf("@") !== -1;
-    }
-
-    setProtocol = (val: string) => {
-        if (getAs().protocolFilter === val) return;
-
-        dispatch("setProtocol", s => {
-            if (s.protocolFilter !== val) {
-                s.protocolFilter = val;
-                S.localDB.setVal(C.LOCALDB_NETWORK_SELECTION, val);
-
-                setTimeout(() => {
-                    switch (s.activeTab) {
-                        case C.TAB_FEED:
-                            S.srch.refreshFeed();
-                            break;
-                        case C.TAB_TRENDING:
-                            TrendingView.inst.refresh();
-                            break;
-                        default: break;
-                    }
-                }, 250);
-            }
-        });
     }
 
     loadBookmarks = async () => {
@@ -1030,24 +1001,9 @@ export class Util {
         }
     }
 
-    // Gets a name like "@user" (for AP names) or "12345678..." for nostr users
+    // todo-0: get rid of this function
     getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
-        let ret = null;
-        if (this.isNostrUserName(ac.principalName)) {
-            if (ac.displayName) {
-                return ac.displayName;
-            }
-            // I think this else branch may be 'dead' now? (never called)
-            else {
-                const pubKey = ac.principalName.substring(1);
-                const npub = nip19.npubEncode(pubKey);
-                ret = npub.substring(1, 13);
-            }
-        }
-        else {
-            ret = ac.principalName;
-        }
-        return ret;
+        return ac.principalName;
     }
 
     willRenderDocIndex = (ast: AppState = null): boolean => {

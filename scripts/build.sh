@@ -49,15 +49,7 @@ verifySuccess "Maven install commmon dev-vscode (typescript gen)"
 # mvn dependency:resolve -Dclassifier=javadoc
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
-cp src/main/resources/public/ts/JavaIntf.ts src/main/resources/quanta-common/JavaIntf.ts
-
-cd ${PRJROOT}/src/main/resources/quanta-common
-. ./build.sh
-
 cd ${PRJROOT}/src/main/resources/public
-. ./build.sh
-
-cd ${PRJROOT}/src/main/resources/server
 . ./build.sh
 
 cd ${PRJROOT}

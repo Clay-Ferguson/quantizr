@@ -34,8 +34,7 @@ export class EditBlockedWordsDlg extends DialogBase {
 
     reload = async () => {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-            userId: getAs().userProfile.userNodeId,
-            nostrPubKey: null
+            userId: getAs().userProfile.userNodeId
         });
 
         if (res?.userProfile) {

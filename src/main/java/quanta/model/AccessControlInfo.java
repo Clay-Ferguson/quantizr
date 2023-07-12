@@ -14,8 +14,7 @@ public class AccessControlInfo {
     private String displayName;
     private String principalName;
     private String principalNodeId;
-    private String nostrNpub;
-    private String nostrRelays;
+
     // used to build local user avatars
     private String avatarVer;
     // used to hold foreign user avatars (not always populated)
@@ -24,15 +23,13 @@ public class AccessControlInfo {
     private String publicKey;
 
     public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey,
-            String nostrNpub, String nostrRelays, String avatarVer, String foreignAvatarUrl) {
+            String avatarVer, String foreignAvatarUrl) {
         this.displayName = displayName;
         this.principalName = principalName;
         this.principalNodeId = principalNodeId;
         this.publicKey = publicKey;
         this.avatarVer = avatarVer;
         this.foreignAvatarUrl = foreignAvatarUrl;
-        this.nostrNpub = nostrNpub;
-        this.nostrRelays = nostrRelays;
     }
 
     public void addPrivilege(PrivilegeInfo priv) {
@@ -52,14 +49,6 @@ public class AccessControlInfo {
 
     public String getPrincipalNodeId() {
         return this.principalNodeId;
-    }
-
-    public String getNostrNpub() {
-        return this.nostrNpub;
-    }
-
-    public String getNostrRelays() {
-        return this.nostrRelays;
     }
 
     public String getAvatarVer() {
@@ -88,14 +77,6 @@ public class AccessControlInfo {
 
     public void setPrincipalNodeId(final String principalNodeId) {
         this.principalNodeId = principalNodeId;
-    }
-
-    public void setNostrNpub(final String nostrNpub) {
-        this.nostrNpub = nostrNpub;
-    }
-
-    public void setNostrRelays(final String nostrRelays) {
-        this.nostrRelays = nostrRelays;
     }
 
     public void setAvatarVer(final String avatarVer) {

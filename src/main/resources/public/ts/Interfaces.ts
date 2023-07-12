@@ -7,12 +7,6 @@ export class IndexedDBObj {
     v: any;
 }
 
-export class NostrMetadataDispInfo {
-    display: string;
-    title: string;
-    picture: string;
-}
-
 export enum FullScreenType {
     // eslint-disable-next-line no-unused-vars
     NONE, IMAGE, GRAPH, CALENDAR

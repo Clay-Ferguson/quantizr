@@ -541,8 +541,7 @@ public class NodeRenderService extends ServiceBase {
                         content = "";
                     }
                 } //
-                else if (node.getType() == NodeType.NOSTR_ENC_DM.s() || //
-                        content.startsWith(Constant.ENC_TAG.s())) {
+                else if (content.startsWith(Constant.ENC_TAG.s())) {
                     content = "[encrypted]";
                 } else {
                     content = getFirstLineAbbreviation(content, 25);

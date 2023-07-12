@@ -6,7 +6,6 @@ import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import quanta.config.SessionContext;
 import quanta.instrument.PerfMonEvent;
-import quanta.model.client.NostrUserInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.base.ResponseBase;
@@ -23,7 +22,6 @@ public class ThreadLocalsContext {
     private MongoSession session;
     private String reqBearerToken;
     private String reqSig;
-    private HashMap<String, NostrUserInfo> newNostrUsers;
     private Boolean saving;
     private PerfMonEvent rootEvent;
     private HashMap<ObjectId, SubNode> dirtyNodes;
@@ -38,7 +36,6 @@ public class ThreadLocalsContext {
         session = ThreadLocals.getMongoSession();
         reqBearerToken = ThreadLocals.getReqBearerToken();
         reqSig = ThreadLocals.getReqSig();
-        newNostrUsers = ThreadLocals.getNewNostrUsers();
         saving = ThreadLocals.getSaving();
         rootEvent = ThreadLocals.getRootEvent();
         dirtyNodes = ThreadLocals.getDirtyNodes();
@@ -54,7 +51,6 @@ public class ThreadLocalsContext {
         ThreadLocals.setMongoSession(session);
         ThreadLocals.setReqBearerToken(reqBearerToken);
         ThreadLocals.setReqSig(reqSig);
-        ThreadLocals.setNewNostrUsers(newNostrUsers);
         ThreadLocals.setSaving(saving);
         ThreadLocals.setRootEvent(rootEvent);
         ThreadLocals.setDirtyNodes(dirtyNodes);

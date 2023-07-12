@@ -13,9 +13,6 @@ export class NodeCompMarkdown extends Html {
     // detects URLs in a string (from Stack Overflow, not fully vetted yet)
     static urlRegex = /(https?:\/\/[^\s]+)/g;
 
-    // todo-1: see nips 21, 27, 19 (not currently used)
-    static nostrRegex = /(nostr:[^\s]+)/g;
-
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
     // but is ok named as 'cont'
     cont: string;
@@ -54,7 +51,7 @@ export class NodeCompMarkdown extends Html {
         };
 
         /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */
-        if (S.props.isEncrypted(node) || node.type === J.NodeType.NOSTR_ENC_DM) {
+        if (S.props.isEncrypted(node)) {
             att.content = "[Encrypted]";
 
             if (!ast.isAnonUser) {
@@ -89,7 +86,6 @@ export class NodeCompMarkdown extends Html {
         // #inline-image-rendering
         // val = this.replaceOgImgFileNames(val); // <-- DO NOT DELETE
 
-        val = S.nostr.replaceNostrRefs(node, val);
         val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
 
@@ -136,8 +132,7 @@ export class NodeCompMarkdown extends Html {
             trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */
             if (e.classList.contains("mention") ||
                 e.classList.contains("hashtag") ||
-                e.classList.contains("u-url") ||
-                e.classList.contains("nostr-note")) return;
+                e.classList.contains("u-url")) return;
 
             // Detect if this link is part of a Markdown Named link and if so then we don't generate the OpenGraph for that either
             if (content.indexOf("(" + href + ")") !== -1) return;
@@ -161,9 +156,6 @@ export class NodeCompMarkdown extends Html {
             let cipherText = null;
             if (state.pendingDecrypt.startsWith(J.Constant.ENC_TAG)) {
                 cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
-            }
-            else if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
-                cipherText = state.pendingDecrypt;
             }
 
             if (!cipherText) {
@@ -205,10 +197,6 @@ export class NodeCompMarkdown extends Html {
                 // console.log("CIPHERKEY " + cipherKey);
                 clearText = await S.crypto.decryptSharableString(null, { cipherKey, cipherText });
             }
-        }
-        else if (this.node.type === J.NodeType.NOSTR_ENC_DM) {
-            const pubKey = S.props.getClientPropStr(J.NodeProp.NOSTR_USER_PUBKEY, this.node);
-            clearText = await S.nostr.decrypt(pubKey, state.pendingDecrypt);
         }
 
         // console.log("Decrypted to " + clearText);

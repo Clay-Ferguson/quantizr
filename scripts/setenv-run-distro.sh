@@ -5,12 +5,8 @@ source ./define-functions.sh
 
 # To Run from DockerHub do this:
 # export DOCKER_IMAGE=subnode/quanta:2.20.12
-# export TSERVER_IMAGE=subnode/tserver:2.20.12
-export DOCKER_IMAGE=quanta
-export TSERVER_IMAGE=tserver
 
-export TSERVER_API_KEY=yourkey
-export nostrDaemonEnabled=false
+export DOCKER_IMAGE=quanta
 
 export DEPLOY_TARGET=$PWD
 
@@ -43,9 +39,6 @@ export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
-
-# tserver-tag
-export TSERVER_PORT=4002
 
 export DOCKER_DOWN_DELAY=15s
 export DOCKER_UP_DELAY=20s

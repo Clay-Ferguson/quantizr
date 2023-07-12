@@ -49,9 +49,6 @@ export interface ClientConfig {
     userMsg: string;
     displayUserProfileId: string;
     initialNodeId: string;
-    loadNostrId: string;
-    loadNostrIdRelays: string;
-    nostrRelays: string;
     urlView: string;
     search: string;
     login: string;
@@ -82,48 +79,6 @@ export interface NodeLink {
     o: number;
     i: string;
     n: string;
-}
-
-export interface NostrEvent {
-    id: string;
-    sig: string;
-    pubkey: string;
-    kind: number;
-    content: string;
-    tags: string[][];
-    createdAt: number;
-}
-
-export interface NostrEventWrapper {
-    event: NostrEvent;
-    nodeId: string;
-    npub: string;
-    relays: string;
-}
-
-export interface NostrMetadata {
-    name: string;
-    username: string;
-    about: string;
-    picture: string;
-    banner: string;
-    website: string;
-    nip05: string;
-    reactions: boolean;
-    display_name: string;
-}
-
-export interface NostrQuery {
-    authors: string[];
-    kinds: number[];
-    limit: number;
-    since: number;
-}
-
-export interface NostrUserInfo {
-    pk: string;
-    npub: string;
-    relays: string;
 }
 
 export interface OpenGraph {
@@ -208,8 +163,6 @@ export interface UserProfile {
     following: boolean;
     blocked: boolean;
     relays: string;
-    nostrNpub: string;
-    nostrTimestamp: number;
 }
 
 export interface AddFriendRequest extends RequestBase {
@@ -359,7 +312,6 @@ export interface GetNodeStatsRequest extends RequestBase {
     getWords: boolean;
     getMentions: boolean;
     getTags: boolean;
-    protocol: string;
 }
 
 export interface GetOpenGraphRequest extends RequestBase {
@@ -402,7 +354,6 @@ export interface GetUserAccountInfoRequest extends RequestBase {
 
 export interface GetUserProfileRequest extends RequestBase {
     userId: string;
-    nostrPubKey: string;
 }
 
 export interface GraphRequest extends RequestBase {
@@ -460,8 +411,6 @@ export interface LoginRequest extends RequestBase {
     password: string;
     asymEncKey: string;
     sigKey: string;
-    nostrNpub: string;
-    nostrPubKey: string;
     tzOffset?: number;
     dst?: boolean;
 }
@@ -501,7 +450,6 @@ export interface NodeFeedRequest extends RequestBase {
     loadFriendsTags: boolean;
     applyAdminBlocks: boolean;
     name: string;
-    protocol: string;
 }
 
 export interface NodeSearchRequest extends RequestBase {
@@ -568,26 +516,12 @@ export interface ResetPasswordRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
-    nostrEvent: NostrEventWrapper;
     saveToActPub: boolean;
-}
-
-export interface SaveNostrEventRequest extends RequestBase {
-    events: NostrEventWrapper[];
-    userInfo: NostrUserInfo[];
-}
-
-export interface SaveNostrSettingsRequest extends RequestBase {
-    target: string;
-    key: string;
-    relays: string;
 }
 
 export interface SavePublicKeyRequest extends RequestBase {
     asymEncKey: string;
     sigKey: string;
-    nostrNpub: string;
-    nostrPubKey: string;
 }
 
 export interface SaveUserPreferencesRequest extends RequestBase {
@@ -857,7 +791,6 @@ export interface GetSharedNodesResponse extends ResponseBase {
 export interface GetThreadViewResponse extends ResponseBase {
     nodes: NodeInfo[];
     topReached: boolean;
-    nostrDeadEnd: boolean;
 }
 
 export interface GetUserAccountInfoResponse extends ResponseBase {
@@ -932,10 +865,6 @@ export interface MoveNodesResponse extends ResponseBase {
     signaturesRemoved: boolean;
 }
 
-export interface NewNostrUsersPushInfo extends ServerPushInfo {
-    users: NostrUserInfo[];
-}
-
 export interface NodeEditedPushInfo extends ServerPushInfo {
     nodeInfo: NodeInfo;
 }
@@ -1008,15 +937,6 @@ export interface ResetPasswordResponse extends ResponseBase {
 export interface SaveNodeResponse extends ResponseBase {
     node: NodeInfo;
     aclEntries: AccessControlInfo[];
-}
-
-export interface SaveNostrEventResponse extends ResponseBase {
-    eventNodeIds: string[];
-    accntNodeIds: string[];
-    saveCount: number;
-}
-
-export interface SaveNostrSettingsResponse extends ResponseBase {
 }
 
 export interface SavePublicKeyResponse extends ResponseBase {
@@ -1131,7 +1051,6 @@ export interface NodeInfo {
     displayName: string;
     owner: string;
     ownerId: string;
-    nostrPubKey: string;
     transferFromId: string;
     avatarVer: string;
     apAvatar: string;
@@ -1156,8 +1075,6 @@ export interface AccessControlInfo {
     displayName: string;
     principalName: string;
     principalNodeId: string;
-    nostrNpub: string;
-    nostrRelays: string;
     avatarVer: string;
     foreignAvatarUrl: string;
     privileges: PrivilegeInfo[];
@@ -1191,12 +1108,9 @@ export interface PrivilegeInfo {
 }
 
 export const enum Constant {
-    NETWORK_NOSTR = "nostr",
-    NETWORK_ACTPUB = "ap",
     SEARCH_TYPE_USER_LOCAL = "userLocal",
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",
-    SEARCH_TYPE_USER_NOSTR = "userNostr",
     ENC_TAG = "<[ENC]>",
     FEED_NEW = "myNewMessages",
     FEED_PUB = "publicFediverse",
@@ -1217,15 +1131,6 @@ export const enum ConstantInt {
 }
 
 export const enum NodeProp {
-    NOSTR_RELAYS = "sn:relays",
-    NOSTR_USER_NPUB = "sn:npub",
-    NOSTR_USER_PUBKEY = "sn:nopk",
-    NOSTR_TAGS = "sn:ntags",
-    NOSTR_NAME = "sn:nosName",
-    NOSTR_USER_NAME = "sn:nosUserName",
-    NOSTR_NIP05 = "sn:nosNip05",
-    NOSTR_USER_WEBSITE = "sn:nosWebsite",
-    NOSTR_USER_TIMESTAMP = "sn:nosTimestamp",
     OBJECT_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
@@ -1339,7 +1244,6 @@ export const enum NodeType {
     FRIEND = "sn:friend",
     POSTS = "sn:posts",
     NONE = "u",
-    NOSTR_ENC_DM = "sn:ned",
     PLAIN_TEXT = "sn:txt",
     FS_FILE = "fs:file",
     FS_FOLDER = "fs:folder",

@@ -22,10 +22,6 @@ if [ -f "quanta-${QUANTA_VER}.tar" ]; then
     docker load -i quanta-${QUANTA_VER}.tar
 fi
 
-if [ -f "tserver-${QUANTA_VER}.tar" ]; then
-    docker load -i tserver-${QUANTA_VER}.tar
-fi
-
 # take ownership of this directory as current user
 sudo chown -R $USER .
 
@@ -47,9 +43,6 @@ dockerUp
 
 serviceCheck ${docker_stack}_quanta-distro
 serviceCheck ${docker_stack}_mongo-distro
-
-# tserver-tag
-serviceCheck ${docker_stack}_tserver-distro
 
 if [[ -z ${ipfsEnabled} ]]; then  
     echo "ipfs not in use"

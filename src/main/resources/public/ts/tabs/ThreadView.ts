@@ -95,8 +95,6 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     }
 
     moreHistory = () => {
-        // todo: this is slightly inefficient but just load the whole thread here, and the server will notice it
-        // it's dead ended on a nostr node and query for more of them
         S.srch.showThread(getAs().threadViewFromNodeId);
     }
 

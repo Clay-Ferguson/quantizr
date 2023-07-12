@@ -3,19 +3,8 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
-    NOSTR_RELAYS("sn:relays"),
-
-    // NOTE: We store both npub and PubKey so that searching works MongoDB full text searching works.
-    NOSTR_USER_NPUB("sn:npub"), NOSTR_USER_PUBKEY("sn:nopk"),
-
-    NOSTR_TAGS("sn:ntags"),
-
-    NOSTR_NAME("sn:nosName"), NOSTR_USER_NAME("sn:nosUserName"), NOSTR_NIP05(
-            "sn:nosNip05"), NOSTR_USER_WEBSITE("sn:nosWebsite"), NOSTR_USER_TIMESTAMP("sn:nosTimestamp"),
-
     // If this property is non-null on a node it means the node originated (was posted by) some other
     // forgien server.
-    // If the value starts with "." that indicated "Nostr" and otherwise "ActPub" is assumed.
     OBJECT_ID("apid"),
 
     ACT_PUB_OBJ_TYPE("ap:objType"), //
