@@ -87,22 +87,13 @@ public class SubNodeUtil extends ServiceBase {
     }
 
     /*
-     * Currently there's a bug in the client code where it sends nulls for some nonsavable types, so
+     * Currently there's a bug in the client code where it sends nulls for some non-savable types, so
      * before even fixing the client I decided to just make the server side block those. This is more
      * secure to always have the server allow misbehaving javascript for security reasons.
      */
     public static boolean isReadonlyProp(String propName) {
-        // we don't allow users to modify directly ActPub properties, because we rely on looking up nodes by
-        // these values
-        // and this would allow someone to hijack or masquerade stuff, maily by setting objectID values or
-        // ActorIDs.
-        if (propName.startsWith("ap:")) {
-            return false;
-        }
-        if ( //
-             //
-        propName.equals(NodeProp.OBJECT_ID.s()) ||
-                propName.equals(NodeProp.BIN.s()) ||
+        if (propName.equals(NodeProp.OBJECT_ID.s()) || //
+                propName.equals(NodeProp.BIN.s()) || //
                 propName.equals(NodeProp.BIN_TOTAL.s()) || //
                 propName.equals(NodeProp.BIN_QUOTA.s())) {
             return false;
@@ -136,15 +127,8 @@ public class SubNodeUtil extends ServiceBase {
      * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
      * provides), by creating said node if not already existing or leaving it as is if it does exist.
      */
-    public SubNode ensureNodeExists(
-            MongoSession ms,
-            String parentPath,
-            String pathName,
-            String nodeName,
-            String defaultContent,
-            String primaryTypeName,
-            boolean saveImmediate,
-            HashMap<String, Object> props,
+    public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName,
+            String defaultContent, String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props,
             Val<Boolean> created) {
         if (nodeName != null) {
             SubNode nodeByName = read.getNodeByName(ms, nodeName);
@@ -189,18 +173,8 @@ public class SubNodeUtil extends ServiceBase {
                 parent = node;
             } else {
                 /* Note if parent PARAMETER here is null we are adding a root node */
-                parent =
-                        create.createNode(
-                                ms,
-                                parent,
-                                nameToken,
-                                primaryTypeName,
-                                0L,
-                                CreateNodeLocation.LAST,
-                                null,
-                                null,
-                                true,
-                                true);
+                parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null,
+                        null, true, true);
                 if (parent == null) {
                     throw ExUtil.wrapEx("unable to create " + nameToken);
                 }
