@@ -32,8 +32,8 @@ export ipfs_container=ipfs-distro
 export HOST_PORT=80
 export PORT=80
 export PORT_DEBUG=8000
-export XMS=1000m
-export XMX=2500m
+export XMS=1g
+export XMX=2g
 
 export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf

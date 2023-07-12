@@ -321,7 +321,6 @@ export interface GetOpenGraphRequest extends RequestBase {
 export interface GetPeopleRequest extends RequestBase {
     nodeId: string;
     type: string;
-    subType: string;
 }
 
 export interface GetRepliesViewRequest extends RequestBase {
@@ -516,7 +515,6 @@ export interface ResetPasswordRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
-    saveToActPub: boolean;
 }
 
 export interface SavePublicKeyRequest extends RequestBase {

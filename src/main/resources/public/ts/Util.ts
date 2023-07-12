@@ -1001,7 +1001,6 @@ export class Util {
         }
     }
 
-    // todo-0: get rid of this function
     getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
         return ac.principalName;
     }

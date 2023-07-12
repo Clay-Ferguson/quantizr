@@ -21,26 +21,8 @@ import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { TTSTab } from "./tabs/data/TTSTab";
-
-PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
-    // These menu options are too important to have the user just "maybe" happen to find them
-    // when needed so we actively set the expansion state based on context of what user is doing.
-    if (tabId === C.TAB_FEED || tabId == C.TAB_TRENDING) {
-        asyncDispatch("menuExpandChanged", s => {
-            S.nav.changeMenuExpansion(s, "expand", C.PROTOCOL_MENU_TEXT);
-            S.nav.changeMenuExpansion(s, "collapse", C.OPTIONS_MENU_TEXT);
-        });
-    }
-    else if (tabId === C.TAB_MAIN || tabId === C.TAB_DOCUMENT) {
-        asyncDispatch("menuExpandChanged", s => {
-            S.nav.changeMenuExpansion(s, "expand", C.OPTIONS_MENU_TEXT);
-            S.nav.changeMenuExpansion(s, "collapse", C.PROTOCOL_MENU_TEXT);
-        });
-    }
-});
 
 export class MenuPanel extends Div {
     static initialized: boolean = false;

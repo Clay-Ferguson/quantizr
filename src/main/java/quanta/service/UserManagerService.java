@@ -658,7 +658,7 @@ public class UserManagerService extends ServiceBase {
                 if (req.isPublish()) {
                     writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
                 }
-                edit.processAfterSave(as, userNode, null, true);
+                edit.processAfterSave(as, userNode, null);
             }
             return null;
         });
@@ -1265,8 +1265,7 @@ public class UserManagerService extends ServiceBase {
         return fi;
     }
 
-    // todo-0: subType is now unused right?
-    public GetPeopleResponse getPeople(MongoSession ms, String userName, String type, String subType) {
+    public GetPeopleResponse getPeople(MongoSession ms, String userName, String type) {
         GetPeopleResponse res = new GetPeopleResponse();
         String nodeType = null;
         Criteria moreCriteria = null;

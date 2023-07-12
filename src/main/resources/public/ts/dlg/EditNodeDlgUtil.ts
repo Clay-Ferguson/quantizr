@@ -99,7 +99,6 @@ export class EditNodeDlgUtil {
         // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: editNode,
-            saveToActPub: true, // todo-0: we can remove this now?
         });
         S.nodeUtil.processInboundNode(res.node);
 

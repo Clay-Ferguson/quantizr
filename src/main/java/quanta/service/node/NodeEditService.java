@@ -226,7 +226,7 @@ public class NodeEditService extends ServiceBase {
          * publish out to foreign servers
          */
         if (!req.isPendingEdit() && req.getBoostTarget() != null) {
-            processAfterSave(ms, newNode, parentNode, true);
+            processAfterSave(ms, newNode, parentNode);
         }
         res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null,
@@ -542,7 +542,7 @@ public class NodeEditService extends ServiceBase {
          * Send notification to local server or to remote server when a node is added (and not by admin)
          */
         if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
-            processAfterSave(ms, node, parent, req.isSaveToActPub());
+            processAfterSave(ms, node, parent);
         }
         NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
                 Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, true, null, false);
@@ -580,7 +580,7 @@ public class NodeEditService extends ServiceBase {
 
     // 'parent' (of 'node') can be passed in if already known, or else null can be passed for
     // parent and we get the parent automatically in here
-    public void processAfterSave(MongoSession ms, SubNode node, SubNode parent, boolean allowPublishToActPub) {
+    public void processAfterSave(MongoSession ms, SubNode node, SubNode parent) {
         // never do any of this logic if this is an admin-owned node being saved.
         if (acl.isAdminOwned(node)) {
             return;
@@ -609,8 +609,7 @@ public class NodeEditService extends ServiceBase {
             boolean forceSendToPublic = isAccnt;
             if (forceSendToPublic || node.getAc() != null) {
                 // We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-                if (allowPublishToActPub && !node.getBool(NodeProp.UNPUBLISHED)
-                        && node.getType().equals(NodeType.COMMENT.s())) {
+                if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
                     SubNode _parent = parent;
                     if (_parent == null) {
                         _parent = read.getParent(ms, node, false);
