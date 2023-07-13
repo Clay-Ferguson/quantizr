@@ -129,8 +129,13 @@ public class AppFilter extends GenericFilterBean {
 
             if (!StringUtils.isEmpty(token)) {
                 sc = ServiceBase.redis.get(token);
+
+                // if bad or unknown token.
                 if (sc == null) {
-                    throw new UnauthorizedException();
+                    // Don't throw exception here, because we need to just recover this session but with a fresh
+                    // SessionContext, and so leaving sc==null will do this.
+                    // throw new UnauthorizedException();
+                    session.removeAttribute(BEARER_TOKEN);
                 } else {
                     // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
                     ThreadLocals.setReqBearerToken(token);
@@ -149,7 +154,7 @@ public class AppFilter extends GenericFilterBean {
             ThreadLocals.setSC(sc);
             chain.doFilter(req, res);
 
-            // if we did a login we can create the session right away.
+            // detect if we did a login just now and set token on session.
             if (token == null && sc.getUserToken() != null) {
                 session.setAttribute(BEARER_TOKEN, sc.getUserToken());
 
@@ -166,12 +171,12 @@ public class AppFilter extends GenericFilterBean {
                 }
             }
         } catch (RuntimeEx e) {
-            // NOTE: Normal flow for this exception case is NOT thru here by by a successful code=200 with the
-            // error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able
-            // to
-            // still respond to this error even in the case where no ResponseBase is being returned which is
-            // rare but
-            // is still possible
+            /*
+             * NOTE: Normal flow for this exception case is NOT thru here by by a successful code=200 with the
+             * error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able
+             * to still respond to this error even in the case where no ResponseBase is being returned which is
+             * rare but is still possible
+             */
             sendError(httpRes, httpReq.getRequestURI(), e.getCode(), e);
         } catch (Exception e) {
             // ditto comment above
