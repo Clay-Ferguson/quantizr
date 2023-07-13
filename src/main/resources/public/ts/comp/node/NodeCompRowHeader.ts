@@ -43,11 +43,15 @@ export class NodeCompRowHeader extends Div {
         // so we DO need to check for displayName here rather than putting this in an else block.
         if (!displayName) {
             displayName = this.node.owner;
+        }
+
+        if (displayName) {
             const atIdx = displayName.indexOf("@");
             if (atIdx !== -1) {
                 displayName = displayName.substring(0, atIdx);
             }
         }
+
         const isMine = S.props.isMine(this.node);
         const children = [];
         let avatarImg: Img = null;
