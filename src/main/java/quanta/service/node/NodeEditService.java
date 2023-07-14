@@ -755,10 +755,9 @@ public class NodeEditService extends ServiceBase {
                     });
                 }
                 Val<SubNode> userNode = new Val<SubNode>();
-                arun.run(s -> {
-                    userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
-                    return null;
-                });
+
+                userNode.setVal(read.getUserNodeByUserName(null, friendUserName, false));
+
                 if (userNode.getVal() != null) {
                     userNodeId = userNode.getVal().getIdStr();
                     node.set(NodeProp.USER_NODE_ID, userNodeId);
@@ -951,7 +950,7 @@ public class NodeEditService extends ServiceBase {
         // get user node of person being transfered to
         SubNode toUserNode = null;
         if (req.getOperation().equals("transfer")) {
-            toUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getToUser()));
+            toUserNode = read.getUserNodeByUserName(null, req.getToUser(), false);
             if (toUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getToUser());
             }
@@ -959,7 +958,7 @@ public class NodeEditService extends ServiceBase {
         // get account node of person doing the transfer
         SubNode fromUserNode = null;
         if (!StringUtils.isEmpty(req.getFromUser())) {
-            fromUserNode = arun.run(as -> read.getUserNodeByUserName(as, req.getFromUser()));
+            fromUserNode = read.getUserNodeByUserName(null, req.getFromUser(), false);
             if (fromUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getFromUser());
             }

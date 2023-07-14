@@ -63,7 +63,7 @@ public class ImportZipService extends ImportArchiveBase {
             throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
         }
         used = true;
-        SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, sc.getUserName()));
+        SubNode userNode = read.getUserNodeByUserName(null, sc.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeEx("UserNode not found: " + sc.getUserName());
         }

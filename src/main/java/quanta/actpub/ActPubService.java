@@ -560,7 +560,7 @@ public class ActPubService extends ServiceBase {
             apLog.trace("importing Actor: " + apUserName);
             saveFediverseName(apUserName);
             // Try to get the userNode for this actor
-            userNode = read.getUserNodeByUserName(ms, apUserName);
+            userNode = read.getUserNodeByUserName(ms, apUserName, false);
             /*
              * If we don't have this user in our system, create them.
              */
@@ -1273,7 +1273,7 @@ public class ActPubService extends ServiceBase {
             SubNode acctNode = null;
             if (apUtil.isLocalActorUrl(actorUrl)) {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(ms, userDoingAction, actorUrl);
-                acctNode = read.getUserNodeByUserName(ms, longUserName);
+                acctNode = read.getUserNodeByUserName(ms, longUserName, false);
             } else {
                 /*
                  * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.

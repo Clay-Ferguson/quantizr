@@ -70,7 +70,7 @@ public class ActPubOutbox extends ServiceBase {
                 return false;
             }
             if (userNode == null) {
-                userNode = read.getUserNodeByUserName(ms, apUserName);
+                userNode = read.getUserNodeByUserName(ms, apUserName, false);
             }
             SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS, true);
@@ -127,6 +127,7 @@ public class ActPubOutbox extends ServiceBase {
                             if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
+
                                     apub.saveInboundForeignObj(ms, userDoingAction, _userNode, outboxNode, object,
                                             APType.Create, null, null, true, null);
                                     count.setVal(count.getVal() + 1);
@@ -179,7 +180,7 @@ public class ActPubOutbox extends ServiceBase {
     public Long getOutboxItemCount(String userName, String sharedTo) {
         Long totalItems = arun.run(as -> {
             long count = 0;
-            SubNode userNode = read.getUserNodeByUserName(null, userName);
+            SubNode userNode = read.getUserNodeByUserName(null, userName, false);
             if (userNode != null) {
                 List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
@@ -270,7 +271,7 @@ public class ActPubOutbox extends ServiceBase {
             }
         }
         try {
-            SubNode userNode = read.getUserNodeByUserName(null, userName);
+            SubNode userNode = read.getUserNodeByUserName(null, userName, false);
             if (userNode == null) {
                 return null;
             }

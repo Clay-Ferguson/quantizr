@@ -286,7 +286,7 @@ public class MongoRead extends ServiceBase {
              * pass a null session here to cause adminSession to be used which is required to get a user node,
              * but it always safe to get this node this way here.
              */
-            userNode = getUserNodeByUserName(null, userName);
+            userNode = getUserNodeByUserName(null, userName, false);
             if (userNode == null) {
                 log.debug("Unable to find node by: " + name);
                 return null;
@@ -953,7 +953,7 @@ public class MongoRead extends ServiceBase {
             if (userName == null) {
                 userName = ThreadLocals.getSC().getUserName();
             }
-            userNode = getUserNodeByUserName(ms, userName);
+            userNode = getUserNodeByUserName(ms, userName, false);
         }
         if (userNode == null) {
             log.warn("userNode not found for user name: " + userName);
@@ -1021,10 +1021,6 @@ public class MongoRead extends ServiceBase {
         if (atIdx == -1)
             return userName;
         return userName.substring(0, atIdx);
-    }
-
-    public SubNode getUserNodeByUserName(MongoSession ms, String user) {
-        return getUserNodeByUserName(ms, user, true);
     }
 
     public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal) {

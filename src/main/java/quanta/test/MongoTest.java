@@ -91,19 +91,11 @@ public class MongoTest extends ServiceBase implements TestIntf {
         MongoSession as = asUser(PrincipalName.ADMIN.s());
         SubNode node = opsw.findById(null, new ObjectId(nodeId));
         // APObj payload = new APObj().put("tag", new APList().val(new APObj().put("propname", "propval")));
-        node.set(
-                NodeProp.ACT_PUB_TAG,
-                new APList()
-                        .val( //
-                              //
-                                new APObj()
-                                        .put("name", ":catjam:")
-                                        .put(
-                                                "icon", //
-                                                new APObj()
-                                                        .put(
-                                                                "url",
-                                                                "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"))));
+        node.set(NodeProp.ACT_PUB_TAG, new APList().val( //
+                                                         //
+                new APObj().put("name", ":catjam:").put("icon", //
+                        new APObj().put("url",
+                                "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"))));
         log.debug("Complex Object: " + XString.prettyPrint(node));
         update.saveSession(as);
     }
@@ -122,7 +114,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
     public void authTest() {
         MongoSession as = asUser(PrincipalName.ADMIN.s());
-        SubNode adminNode = read.getUserNodeByUserName(as, PrincipalName.ADMIN.s());
+        SubNode adminNode = read.getUserNodeByUserName(as, PrincipalName.ADMIN.s(), true);
         if (adminNode == null) {
             throw new RuntimeEx("Unable to find admin user node.");
         }
@@ -175,7 +167,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         }
         // adam successfully inserts node in his root
         SubNode adamsNode = null;
-        SubNode adamsRootNode = read.getUserNodeByUserName(adamSession, "adam");
+        SubNode adamsRootNode = read.getUserNodeByUserName(adamSession, "adam", false);
         if (adamsRootNode != null) {
             adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
             adamsNode.setContent("adam's test node " + System.currentTimeMillis());
@@ -242,15 +234,9 @@ public class MongoTest extends ServiceBase implements TestIntf {
             SubNode node = create.createNode(ms, "/binaries");
             update.save(ms, node);
             long maxFileSize = user.getUserStorageRemaining(ms);
-            attach.writeStream(
-                    ms,
-                    false,
-                    "",
-                    node,
-                    new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize),
-                    null,
-                    "image/png",
-                    null);
+            attach.writeStream(ms, false, "", node,
+                    new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null,
+                    "image/png", null);
             update.save(ms, node);
             log.debug("inserted root for binary testing.", null, "image/png", null);
             InputStream inStream = attach.getStream(ms, "", node, true);
@@ -262,7 +248,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
     }
 
     private MongoSession asUser(String userName) {
-        SubNode userNode = arun.run(as -> read.getUserNodeByUserName(as, userName));
+        SubNode userNode = read.getUserNodeByUserName(null, userName, false);
         if (userNode == null) {
             throw new RuntimeException("UserNode not found for userName " + userName);
         }

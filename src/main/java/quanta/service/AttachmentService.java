@@ -176,7 +176,7 @@ public class AttachmentService extends ServiceBase {
              * Also we only do this check if not admin. Admin can upload unlimited amounts.
              */
             if (!ms.isAdmin() && uploadFiles.length > 1) {
-                SubNode userNode = read.getUserNodeByUserName(null, null);
+                SubNode userNode = read.getUserNodeByUserName(null, null, false);
                 // get how many bytes of storage the user currently holds
                 Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
                 if (binTotal == null) {
@@ -940,7 +940,7 @@ public class AttachmentService extends ServiceBase {
         DBObject metaData = new BasicDBObject();
         metaData.put("nodeId", node.getId());
         if (userNode == null) {
-            userNode = read.getUserNodeByUserName(null, null);
+            userNode = read.getUserNodeByUserName(null, null, false);
         }
         // if we're importing we should leave any binary alone
         if (!importMode) {

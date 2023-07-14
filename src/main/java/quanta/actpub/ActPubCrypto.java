@@ -53,7 +53,7 @@ public class ActPubCrypto extends ServiceBase {
             return privateKey;
         }
         /* get the userNode for the current user who edited a node */
-        SubNode userNode = read.getUserNodeByUserName(ms, userName);
+        SubNode userNode = read.getUserNodeByUserName(ms, userName, false);
         if (userNode == null) {
             return null;
         }
