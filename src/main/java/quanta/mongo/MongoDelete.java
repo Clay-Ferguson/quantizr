@@ -632,10 +632,10 @@ public class MongoDelete extends ServiceBase {
         }
         Query q = new Query();
         // criteria finds all nodes where we are the owner but they're not decendants under our own tree
-        // root.
-        Criteria crit = Criteria.where(SubNode.OWNER).is(userNode.getOwner()).and(SubNode.PATH).not()
-                .regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
-        crit = auth.addWriteSecurity(ms, crit);
+        // root of our account
+        Criteria crit = Criteria.where(SubNode.OWNER).is(userNode.getOwner())//
+                .and(SubNode.PATH).not().regex(mongoUtil.regexRecursiveChildrenOfPathIncludeRoot(userNode.getPath()));
+
         q.addCriteria(crit);
         // we'll be deleting every node in 'q' so we need to set the parents of all those to
         // hasChildren=null (unknown)
