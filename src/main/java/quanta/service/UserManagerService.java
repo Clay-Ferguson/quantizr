@@ -984,6 +984,8 @@ public class UserManagerService extends ServiceBase {
         String userName = ThreadLocals.getSC().getUserName();
         SubNode friendsList = read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null,
                 NodeName.BLOCKED_USERS, false);
+        if (friendsList == null)
+            return false;
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.
         // Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
@@ -996,6 +998,8 @@ public class UserManagerService extends ServiceBase {
         String userName = ThreadLocals.getSC().getUserName();
         SubNode blockedList = read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
                 NodeName.BLOCKED_USERS, false);
+        if (blockedList == null)
+            return false;
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.
         // Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
