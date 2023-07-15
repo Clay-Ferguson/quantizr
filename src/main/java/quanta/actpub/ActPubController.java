@@ -36,9 +36,6 @@ public class ActPubController extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubController.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     /**
      * WebFinger GET
      */
@@ -47,7 +44,7 @@ public class ActPubController extends ServiceBase {
     @ResponseBody
     public Object webFinger(@RequestParam(value = "resource", required = true) String resource, //
             HttpServletRequest req) {
-        apLog.trace("getWebFinger: " + resource);
+        log.trace("getWebFinger: " + resource);
         APObj ret = apUtil.generateWebFinger(resource);
         if (ret != null) {
             HttpHeaders hdr = new HttpHeaders();
@@ -77,7 +74,7 @@ public class ActPubController extends ServiceBase {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return;
         String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
-        apLog.trace("Redirecting to: " + url);
+        log.trace("Redirecting to: " + url);
         res.sendRedirect(url);
     }
 
@@ -91,7 +88,7 @@ public class ActPubController extends ServiceBase {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return;
         String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
-        apLog.trace("Redirecting to: " + url);
+        log.trace("Redirecting to: " + url);
         res.sendRedirect(url);
     }
 
@@ -104,7 +101,7 @@ public class ActPubController extends ServiceBase {
     public Object actor(@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return null;
-        apLog.trace("getActor: " + userName);
+        log.trace("getActor: " + userName);
         APOPerson ret = apub.generatePersonObj(userName);
         if (ret != null) {
             HttpHeaders hdr = new HttpHeaders();
@@ -205,7 +202,7 @@ public class ActPubController extends ServiceBase {
             ret = apOutbox.generateOutbox(userName);
         }
         if (ret != null) {
-            apLog.trace("Reply with Outbox: " + XString.prettyPrint(ret));
+            log.trace("Reply with Outbox: " + XString.prettyPrint(ret));
             HttpHeaders hdr = new HttpHeaders();
             setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
             return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -232,7 +229,7 @@ public class ActPubController extends ServiceBase {
             ret = apFollower.generateFollowers(null, userName);
         }
         if (ret != null) {
-            apLog.trace("Reply with Followers: " + XString.prettyPrint(ret));
+            log.trace("Reply with Followers: " + XString.prettyPrint(ret));
             HttpHeaders hdr = new HttpHeaders();
             setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
             return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -260,7 +257,7 @@ public class ActPubController extends ServiceBase {
             ret = apFollowing.generateFollowing(null, userName);
         }
         if (ret != null) {
-            apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
+            log.trace("Reply with Following: " + XString.prettyPrint(ret));
             HttpHeaders hdr = new HttpHeaders();
             setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
             return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);

@@ -19,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
-import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
@@ -83,9 +82,6 @@ import quanta.util.val.Val;
 public class NodeEditService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-    @Autowired
-    private ActPubLog apLog;
 
     /*
      * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -728,7 +724,7 @@ public class NodeEditService extends ServiceBase {
         if (friendUserName != null) {
             // if a foreign user, update thru ActivityPub.
             if (friendUserName.contains("@")) {
-                apLog.trace("calling setFollowing=true, to post follow to foreign server.");
+                log.trace("calling setFollowing=true, to post follow to foreign server.");
                 apFollowing.setFollowing(userDoingAction, friendUserName, true);
             }
             /*

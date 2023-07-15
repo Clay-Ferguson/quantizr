@@ -27,7 +27,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
@@ -93,9 +92,6 @@ import quanta.util.val.Val;
 public class UserManagerService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
-
-    @Autowired
-    private ActPubLog apLog;
 
     private static final Random rand = new Random();
     /* Private keys of each user by user name as key */
@@ -881,7 +877,7 @@ public class UserManagerService extends ServiceBase {
             // the DB enforcing this.
             deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
         }
-        apLog.trace("Creating friendNode for " + userToFollow);
+        log.trace("Creating friendNode for " + userToFollow);
         friendNode = edit.createFriendNode(ms, followerFriendList, userToFollow);
         if (friendNode != null) {
             friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());

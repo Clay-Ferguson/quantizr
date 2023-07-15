@@ -24,9 +24,6 @@ public class ActPubReplies extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubReplies.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     /**
      * Generates outbound replies collection data
      */

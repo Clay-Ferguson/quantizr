@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import quanta.actpub.ActPubLog;
 import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -167,9 +166,6 @@ import quanta.util.val.Val;
 public class AppController extends ServiceBase implements ErrorController {
 
     private static Logger log = LoggerFactory.getLogger(AppController.class);
-
-    @Autowired
-    private ActPubLog apLog;
 
     @Autowired
     private GracefulShutdown gracefulShutdown;
@@ -1601,8 +1597,6 @@ public class AppController extends ServiceBase implements ErrorController {
             log.debug("DEBUG: " + req.getText());
             log.info("INFO: " + req.getText());
             log.trace("TRACE: " + req.getText());
-            // log this one to get test ActPubLog log level
-            apLog.trace("apLog TRACE: " + req.getText());
             return res;
         });
     }

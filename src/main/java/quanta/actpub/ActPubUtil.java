@@ -66,9 +66,6 @@ public class ActPubUtil extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     private static final int MAX_THREAD_NODES = 200;
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -279,16 +276,16 @@ public class ActPubUtil extends ServiceBase {
             } catch (
             // catch error from any server, and ignore, go to next server to send to.
             Exception e) {
-                apLog.trace("failed to post to: " + inbox);
+                log.trace("failed to post to: " + inbox);
             }
         }
     }
 
     public void securePostEx(String url, String privateKey, String actor, APObj message, MediaType postType) {
         try {
-            apLog.trace("Secure post to " + url);
+            log.trace("Secure post to " + url);
             String body = XString.prettyPrint(message);
-            apLog.trace("Posting Object:\n" + body);
+            log.trace("Posting Object:\n" + body);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
             HttpHeaders headers = new HttpHeaders();
             apCrypto.loadSignatureHeaderVals(headers, privateKey, url, actor, bodyBytes, "post");

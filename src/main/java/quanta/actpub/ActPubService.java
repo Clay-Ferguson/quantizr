@@ -77,9 +77,6 @@ public class ActPubService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubService.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
@@ -392,7 +389,7 @@ public class ActPubService extends ServiceBase {
             }
             APObj webFinger = apUtil.getWebFinger(ms, userDoingAction, userName);
             if (webFinger == null) {
-                apLog.trace("Unable to get webfinger for " + userName);
+                log.trace("Unable to get webfinger for " + userName);
                 throw new RuntimeException("unable to get webFinger");
             }
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
@@ -557,7 +554,7 @@ public class ActPubService extends ServiceBase {
                 log.debug("Can't import a user that's not from a foreign server.");
                 return null;
             }
-            apLog.trace("importing Actor: " + apUserName);
+            log.trace("importing Actor: " + apUserName);
             saveFediverseName(apUserName);
             // Try to get the userNode for this actor
             userNode = read.getUserNodeByUserName(ms, apUserName, false);
@@ -583,7 +580,7 @@ public class ActPubService extends ServiceBase {
      */
     public void processInboxPost(HttpServletRequest httpReq, byte[] body) {
         APObj payload = apUtil.buildObj(body);
-        apLog.trace("INBOX: " + XString.prettyPrint(payload));
+        log.trace("INBOX: " + XString.prettyPrint(payload));
         if (payload.getType() == null)
             return;
         /*
@@ -635,7 +632,7 @@ public class ActPubService extends ServiceBase {
     /* Process inbound undo actions (coming from foreign servers) */
     public void processUndoActivity(HttpServletRequest httpReq, APOUndo activity, byte[] bodyBytes) {
         APObj obj = apAPObj(activity, APObj.object);
-        apLog.trace("Undo Type: " + obj.getType());
+        log.trace("Undo Type: " + obj.getType());
         switch (obj.getType()) {
             case APType.Follow:
                 apFollowing.processFollowActivity(activity);
@@ -654,10 +651,10 @@ public class ActPubService extends ServiceBase {
 
     public void processAcceptActivity(APOAccept activity) {
         APObj obj = activity.getAPObj();
-        apLog.trace("Accept Type: " + obj.getType());
+        log.trace("Accept Type: " + obj.getType());
         switch (obj.getType()) {
             case APType.Follow:
-                apLog.trace("Nothing to do for Follow Acceptance. no op.");
+                log.trace("Nothing to do for Follow Acceptance. no op.");
                 break;
             default:
                 log.debug("Unsupported payload object type:" + XString.prettyPrint(obj));
@@ -669,9 +666,9 @@ public class ActPubService extends ServiceBase {
     public void processCreateOrUpdateActivity(HttpServletRequest httpReq, APOActivity activity, byte[] bodyBytes,
             Val<String> keyEncoded) {
         arun.run(as -> {
-            apLog.trace("processCreateOrUpdateAction");
+            log.trace("processCreateOrUpdateAction");
             APObj object = activity.getAPObj();
-            apLog.trace("create type: " + object.getType());
+            log.trace("create type: " + object.getType());
             switch (object.getType()) {
                 case APType.Video:
                 case APType.Note:
@@ -697,7 +694,7 @@ public class ActPubService extends ServiceBase {
     public void processLikeActivity(HttpServletRequest httpReq, APOActivity activity, byte[] bodyBytes) {
         boolean unlike = activity instanceof APOUndo;
         arun.<Object>run(as -> {
-            apLog.trace("process " + (unlike ? "unlike" : "like"));
+            log.trace("process " + (unlike ? "unlike" : "like"));
             String objectIdUrl = apStr(activity, APObj.object);
             if (objectIdUrl == null) {
                 log.debug("Unable to get object from payload: " + XString.prettyPrint(activity));
@@ -736,7 +733,7 @@ public class ActPubService extends ServiceBase {
     public void processAnnounceActivity(APOActivity activity, byte[] bodyBytes) {
         boolean undo = activity instanceof APOUndo;
         arun.<Object>run(as -> {
-            apLog.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(activity));
+            log.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(activity));
             // if this is an undo operation we just delete the node and we're done.
             if (undo) {
                 delete.deleteByPropVal(as, NodeProp.OBJECT_ID.s(), activity.getId());
@@ -771,7 +768,7 @@ public class ActPubService extends ServiceBase {
     public void processDeleteActivity(HttpServletRequest httpReq, APODelete activity, byte[] bodyBytes,
             Val<String> keyEncoded) {
         arun.<Object>run(as -> {
-            apLog.trace("processDeleteAction");
+            log.trace("processDeleteAction");
             Object object = activity.getObject();
             String id = null;
             // if the object to be deleted is specified as a string, assume it's the ID.
@@ -804,7 +801,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public void processUpdatePerson(MongoSession as, APOActor actor, String encodedKey) {
-        apLog.trace("processUpdatePerson");
+        log.trace("processUpdatePerson");
         if (!as.isAdmin())
             throw new ForbiddenException();
         SubNode actorAccnt = read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actor.getId());
@@ -833,7 +830,7 @@ public class ActPubService extends ServiceBase {
     public void createOrUpdateObj(MongoSession as, APOActivity activity, String encodedKey) {
         if (!as.isAdmin())
             throw new ForbiddenException();
-        apLog.trace("createOrUpdateObj");
+        log.trace("createOrUpdateObj");
         // obj is the 'Note' or 'Video' object, or other payload type.
         APObj obj = activity.getAPObj();
         /*
@@ -871,7 +868,7 @@ public class ActPubService extends ServiceBase {
          * nodeBeingRepliedTo above (see note above: do not delete this dead block of code)
          */
         if (nodeBeingRepliedTo != null) {
-            apLog.trace("foreign actor replying to a quanta node.");
+            log.trace("foreign actor replying to a quanta node.");
             saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey, true,
                     replyToId);
         } else /*
@@ -879,7 +876,7 @@ public class ActPubService extends ServiceBase {
                 * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that this new
                 * node will show up in those people's FEEDs
                 */ {
-            apLog.trace("not reply to existing Quanta node.");
+            log.trace("not reply to existing Quanta node.");
             // get actor's account node from their actorUrl
             SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
             if (actorAccountNode != null) {
@@ -907,7 +904,7 @@ public class ActPubService extends ServiceBase {
     public SubNode saveInboundForeignObj(MongoSession ms, String userDoingAction, SubNode toAccountNode,
             SubNode parentNode, APObj obj, String action, String boostTargetId, String encodedKey,
             boolean allowFiltering, String inReplyTo) {
-        apLog.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
+        log.trace("saveObject [" + action + "]" + XString.prettyPrint(obj));
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
          *
@@ -917,7 +914,7 @@ public class ActPubService extends ServiceBase {
         if (dupNode != null) {
             // If we found this node by ID and we aren't going to be updating it, return it as is.
             if (!action.equals(APType.Update)) {
-                apLog.trace("duplicate post ignored: ActPubId: " + obj.getId() + " nodeId=" + dupNode.getIdStr());
+                log.trace("duplicate post ignored: ActPubId: " + obj.getId() + " nodeId=" + dupNode.getIdStr());
                 return dupNode;
             } else { // if we're updating the node, need to validate they encodedKey owns it.
                 if (!apCrypto.ownerHasKey(ms, dupNode, encodedKey)) {
@@ -1038,7 +1035,7 @@ public class ActPubService extends ServiceBase {
             newNode.set(NodeProp.ACT_PUB_OBJ_URL, objUrl);
         } //
         else if (objUrls != null) {
-            apLog.trace("Got muli urls: " + XString.prettyPrint(objUrls));
+            log.trace("Got muli urls: " + XString.prettyPrint(objUrls));
             newNode.set(NodeProp.ACT_PUB_OBJ_URLS, objUrls);
         }
         if (icons != null) {
@@ -1075,7 +1072,7 @@ public class ActPubService extends ServiceBase {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
 
-        apLog.trace("newAPNode: " + XString.prettyPrint(newNode));
+        log.trace("newAPNode: " + XString.prettyPrint(newNode));
         return newNode;
     }
 
@@ -1091,7 +1088,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             } //
             else if (val.getVal() instanceof String) { // if we have a plain string prop return it.
-                apLog.trace("attributed to found as string: " + (String) val.getVal());
+                log.trace("attributed to found as string: " + (String) val.getVal());
                 return (String) val.getVal();
             } //
             else if (val.getVal() instanceof List) { // else if this is a list we scan it.
@@ -1104,7 +1101,7 @@ public class ActPubService extends ServiceBase {
                     // and return that.
                     if (attribItem instanceof APOPerson) {
                         String ret = apStr(attribItem, APObj.id);
-                        apLog.trace("attributed to found as id on Person: " + ret);
+                        log.trace("attributed to found as id on Person: " + ret);
                         return ret;
                     }
                 }
@@ -1193,11 +1190,11 @@ public class ActPubService extends ServiceBase {
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
                     shareToUsersForUrl(ms, userDoingAction, node, (String) to);
                 } else {
-                    apLog.trace("to list entry not supported: " + to.getClass().getName());
+                    log.trace("to list entry not supported: " + to.getClass().getName());
                 }
             }
         } else {
-            apLog.trace("No addressing to " + propName);
+            log.trace("No addressing to " + propName);
         }
     }
 
@@ -1206,7 +1203,7 @@ public class ActPubService extends ServiceBase {
      * shares the node to either all the followers or the specific actor
      */
     private void shareToUsersForUrl(MongoSession ms, String userDoingAction, SubNode node, String url) {
-        apLog.trace("shareToUsersForUrl: " + url);
+        log.trace("shareToUsersForUrl: " + url);
         if (apUtil.isPublicAddressed(url)) {
             acl.makePublicAppendable(ms, node);
             return;
@@ -1255,7 +1252,7 @@ public class ActPubService extends ServiceBase {
      * actorUrl points to a local user
      */
     private void shareNodeToActorByUrl(MongoSession ms, String userDoingAction, SubNode node, String actorUrl) {
-        apLog.trace("Sharing node to actorUrl: " + actorUrl);
+        log.trace("Sharing node to actorUrl: " + actorUrl);
         /*
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
@@ -1289,10 +1286,10 @@ public class ActPubService extends ServiceBase {
             }
         }
         if (acctId != null) {
-            apLog.trace("node shared to UserNodeId: " + acctId);
+            log.trace("node shared to UserNodeId: " + acctId);
             acl.setKeylessPriv(ms, node, acctId, APConst.RDWR);
         } else {
-            apLog.trace("not sharing to this user.");
+            log.trace("not sharing to this user.");
         }
     }
 

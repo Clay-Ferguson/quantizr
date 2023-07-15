@@ -46,9 +46,6 @@ public class ActPubFollowing extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     /**
      * Send outbound message to foreign servers to follow/unfollow users
      *
@@ -56,7 +53,7 @@ public class ActPubFollowing extends ServiceBase {
      */
     public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
-            apLog.trace("Local Follower User (person doing the following): " + followerUserName + " setFollowing: "
+            log.trace("Local Follower User (person doing the following): " + followerUserName + " setFollowing: "
                     + apUserName + "following=" + following);
             // admin doesn't follow/unfollow
             if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
@@ -100,7 +97,7 @@ public class ActPubFollowing extends ServiceBase {
                     apUtil.securePostEx(apStr(toActor, APObj.inbox), privateKey, sessionActorUrl, action,
                             APConst.MTYPE_LD_JSON_PROF);
                 } else {
-                    apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
+                    log.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
                 return null;
             });
@@ -128,7 +125,7 @@ public class ActPubFollowing extends ServiceBase {
                     // #todo-optimization: we can call apub.getUserProperty() to get followerUserName right?
                     APOActor followerActor = apUtil.getActorByUrl(as, null, activity.getActor());
                     if (followerActor == null) {
-                        apLog.trace("no followerActor object gettable from actor: " + activity.getActor());
+                        log.trace("no followerActor object gettable from actor: " + activity.getActor());
                         return null;
                     }
                     log.debug("getLongUserNameFromActorUrl: " + activity.getActor());
@@ -137,7 +134,7 @@ public class ActPubFollowing extends ServiceBase {
                     SubNode followerAccountNode =
                             apub.getAcctNodeByForeignUserName(as, null, followerUserName, false, true);
                     if (followerAccountNode == null) {
-                        apLog.trace("unable to import user " + followerUserName);
+                        log.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
                     apub.userEncountered(followerUserName, false);
@@ -182,7 +179,7 @@ public class ActPubFollowing extends ServiceBase {
                     }
                     if (friendNode == null) {
                         if (!unFollow) {
-                            apLog.trace("unable to find user node by name: " + followerUserName + " so creating.");
+                            log.trace("unable to find user node by name: " + followerUserName + " so creating.");
                             friendNode = edit.createFriendNode(as, followerFriendList, userToFollow);
                         }
                     } else { // new NotificationMessage("apReply", null, contentHtml, toUserName)); //
@@ -195,7 +192,7 @@ public class ActPubFollowing extends ServiceBase {
                     String _actorBeingFollowedUrl = actorBeingFollowedUrl;
                     // Now we send back to the server the Accept response, asynchronously
                     exec.run(() -> {
-                        apLog.trace("Sending Follow Accepted.");
+                        log.trace("Sending Follow Accepted.");
                         String privateKey = apCrypto.getPrivateKey(as, userToFollow);
                         // Try to give the server a bit of time, before sending back the accept/reject
                         Util.sleep(2000);
@@ -285,7 +282,7 @@ public class ActPubFollowing extends ServiceBase {
         if (url == null)
             return null;
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
-        apLog.trace("Following: " + XString.prettyPrint(outbox));
+        log.trace("Following: " + XString.prettyPrint(outbox));
         return outbox;
     }
 

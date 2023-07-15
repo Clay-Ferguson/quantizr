@@ -45,9 +45,6 @@ public class ActPubOutbox extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     // For actual WEB CRAWLER we'd set this larger but for now
     // we just collest some from each outbox, to update the feed
     static final int MAX_OUTBOX_READ = 10;
@@ -161,7 +158,7 @@ public class ActPubOutbox extends ServiceBase {
         APObj outbox = apUtil.getRemoteAP(ms, userDoingAction, url);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
-        apLog.trace("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));
+        log.trace("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));
         return outbox;
     }
 
@@ -413,7 +410,7 @@ public class ActPubOutbox extends ServiceBase {
              */
             APObj ret = apFactory.makeAPONote(as, node, null);
             if (ret != null) {
-                apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
+                log.trace("Reply with Object: " + XString.prettyPrint(ret));
             }
             return ret;
         });

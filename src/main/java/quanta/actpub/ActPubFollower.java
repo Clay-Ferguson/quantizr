@@ -35,9 +35,6 @@ public class ActPubFollower extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
-    @Autowired
-    private ActPubLog apLog;
-
     /**
      * Generates outbound followers data
      */
@@ -80,7 +77,7 @@ public class ActPubFollower extends ServiceBase {
         if (url == null)
             return null;
         APObj outbox = apUtil.getRemoteAP(ms, userMakingRequest, url);
-        apLog.trace("Followers: " + XString.prettyPrint(outbox));
+        log.trace("Followers: " + XString.prettyPrint(outbox));
         return outbox;
     }
 

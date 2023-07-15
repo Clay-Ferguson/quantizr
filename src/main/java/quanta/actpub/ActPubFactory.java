@@ -350,7 +350,7 @@ public class ActPubFactory extends ServiceBase {
                                             "-----BEGIN PUBLIC KEY-----\n" + publicKey
                                                     + "\n-----END PUBLIC KEY-----\n"))
                     .put(APObj.supportsFriendRequests, true);
-            // apLog.trace("Reply with Actor: " + XString.prettyPrint(actor));
+            // log.trace("Reply with Actor: " + XString.prettyPrint(actor));
             return actor;
         } catch (Exception e) {
             log.error("actor query failed", e);
