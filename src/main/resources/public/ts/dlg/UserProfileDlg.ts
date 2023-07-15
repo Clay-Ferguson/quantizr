@@ -44,16 +44,14 @@ export class UserProfileDlg extends DialogBase {
     }
 
     override getTitleText(): string {
-        return this.getUserName(true);
+        return this.getUserName();
     }
 
-    getUserName = (displayOnly: boolean): string => {
+    getUserName = (): string => {
         const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
-        if (S.util.isActPubUserName(userName)) {
-            return "ActivityPub Account";
-        }
+
         if (userName.indexOf("@") === -1) {
             userName = userName + "@" + window.location.hostname;
         }
@@ -197,7 +195,7 @@ export class UserProfileDlg extends DialogBase {
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser
-                        ? new Button("Mentions", () => this.searchMentions(this.getUserName(false)), { title: "Find all Public Mentions of this person" }) : null,
+                        ? new Button("Mentions", () => this.searchMentions(this.getUserName()), { title: "Find all Public Mentions of this person" }) : null,
 
                     !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Follow", this.addFriend) : null,
