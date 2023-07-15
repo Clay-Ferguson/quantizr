@@ -753,8 +753,7 @@ public class ActPubService extends ServiceBase {
                 if (actorAccountNode != null) {
                     String userName = actorAccountNode.getStr(NodeProp.USER);
                     // get posts node which will be parent we save boost into
-                    SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
-                            NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
+                    SubNode postsNode = user.getPostsNode(as, userName, actorAccountNode);
                     saveInboundForeignObj(as, null, actorAccountNode, postsNode, activity, APType.Announce,
                             boostedNode.getIdStr(), null, true, null);
                 }
@@ -881,8 +880,7 @@ public class ActPubService extends ServiceBase {
             SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStr(NodeProp.USER);
-                SubNode postsNode = read.getUserNodeByType(as, userName, actorAccountNode, "### Posts",
-                        NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
+                SubNode postsNode = user.getPostsNode(as, userName, actorAccountNode);
                 saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey,
                         true, replyToId);
             }

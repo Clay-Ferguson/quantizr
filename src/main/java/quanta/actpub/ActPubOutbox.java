@@ -69,8 +69,7 @@ public class ActPubOutbox extends ServiceBase {
             if (userNode == null) {
                 userNode = read.getUserNodeByUserName(ms, apUserName, false);
             }
-            SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.POSTS.s(),
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS, true);
+            SubNode outboxNode = user.getPostsNode(ms, apUserName, userNode);
             if (outboxNode == null) {
                 log.debug("no posts node for user: " + apUserName);
                 return false;

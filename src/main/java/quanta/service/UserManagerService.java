@@ -279,6 +279,11 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
+    public SubNode getPostsNode(MongoSession ms, String userName, SubNode userNode) {
+        return read.getUserNodeByType(ms, userName, userNode, "### Posts", NodeType.POSTS.s(),
+                Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
+    }
+
     /*
      * caller can optionally pass userNode if it's already available, or else it will be looked up using
      * userName

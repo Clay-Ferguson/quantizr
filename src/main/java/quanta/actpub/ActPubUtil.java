@@ -1000,9 +1000,7 @@ public class ActPubUtil extends ServiceBase {
                         SubNode accountNode = apub.getAcctNodeByActorUrl(as, userDoingAction, ownerActorUrl);
                         if (accountNode != null) {
                             String apUserName = accountNode.getStr(NodeProp.USER);
-                            SubNode outboxNode = read.getUserNodeByType(as, apUserName, accountNode, "### Posts",
-                                    NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()),
-                                    NodeName.POSTS, true);
+                            SubNode outboxNode = user.getPostsNode(as, apUserName, accountNode);
                             if (outboxNode == null) {
                                 log.debug("no outbox for user: " + apUserName);
                                 return null;

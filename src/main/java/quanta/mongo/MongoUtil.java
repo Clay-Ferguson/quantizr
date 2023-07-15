@@ -914,8 +914,7 @@ public class MongoUtil extends ServiceBase {
         }
         update.save(ms, userNode);
         // ensure we've pre-created this node.
-        SubNode postsNode = read.getUserNodeByType(ms, null, userNode, "### Posts", NodeType.POSTS.s(),
-                Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
+        SubNode postsNode = user.getPostsNode(ms, null, userNode);
         if (postsNodeVal != null) {
             postsNodeVal.setVal(postsNode);
         }
