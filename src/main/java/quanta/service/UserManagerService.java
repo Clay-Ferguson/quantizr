@@ -284,6 +284,16 @@ public class UserManagerService extends ServiceBase {
                 Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
     }
 
+    public SubNode getFriendsList(MongoSession ms, String userName, boolean create) {
+        return read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS,
+                create);
+    }
+
+    public SubNode getBlockedUsers(MongoSession ms, String userName, boolean create) {
+        return read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
+                NodeName.BLOCKED_USERS, create);
+    }
+
     /*
      * caller can optionally pass userNode if it's already available, or else it will be looked up using
      * userName
@@ -741,8 +751,7 @@ public class UserManagerService extends ServiceBase {
         String userName = ThreadLocals.getSC().getUserName();
         ObjectId accntIdDoingBlock = new ObjectId(ThreadLocals.getSC().getUserNodeId());
         // get the node that holds all blocked users
-        SubNode blockedList = read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
-                NodeName.BLOCKED_USERS, true);
+        SubNode blockedList = user.getBlockedUsers(ms, userName, true);
         SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, req.getUserName());
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !mongoUtil.isChildOf(blockedList, userNode)) {
@@ -997,8 +1006,7 @@ public class UserManagerService extends ServiceBase {
 
     public boolean userIsBlockedByMe(MongoSession ms, SubNode inUserNode, String maybeBlockedUser) {
         String userName = ThreadLocals.getSC().getUserName();
-        SubNode blockedList = read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null,
-                NodeName.BLOCKED_USERS, false);
+        SubNode blockedList = user.getBlockedUsers(ms, userName, false);
         if (blockedList == null)
             return false;
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or

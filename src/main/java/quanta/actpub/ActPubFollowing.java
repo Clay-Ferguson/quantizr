@@ -166,8 +166,7 @@ public class ActPubFollowing extends ServiceBase {
                         return null;
                     }
                     // get the Friend List of the follower
-                    SubNode followerFriendList = read.getUserNodeByType(as, followerUserName, null, null,
-                            NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS, true);
+                    SubNode followerFriendList = user.getFriendsList(as, followerUserName, true);
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
@@ -398,8 +397,7 @@ public class ActPubFollowing extends ServiceBase {
     private Query findFollowingOfUser_query(MongoSession ms, String userName) {
         Query q = new Query();
         // get friends list node
-        SubNode friendsListNode = read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null,
-                NodeName.FRIENDS, false);
+        SubNode friendsListNode = user.getFriendsList(ms, userName, false);
         if (friendsListNode == null)
             return null;
         /*
