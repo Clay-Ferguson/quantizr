@@ -237,7 +237,7 @@ export class EditNodeDlgUtil {
         const ast = getAs();
 
         const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", state.toIpfs, file, false, true, async () => {
-            await this.refreshFromServer(ast.editNode);
+            await S.edit.refreshFromServer(ast.editNode);
             S.edit.updateNode(ast.editNode);
             dlg.binaryDirty = true;
         });
@@ -374,27 +374,6 @@ export class EditNodeDlgUtil {
                 });
             }
             dlg.binaryDirty = true;
-        }
-    }
-
-    /* WARNING: despite the name this only refreshes attachments and links */
-    refreshFromServer = async (node: J.NodeInfo) => {
-        const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: node.id,
-            upLevel: false,
-            siblingOffset: 0,
-            forceRenderParent: false,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: true,
-            jumpToRss: false
-        });
-        S.nodeUtil.processInboundNode(res.node);
-
-        if (res.node) {
-            node.attachments = res.node.attachments;
-            node.links = res.node.links;
         }
     }
 

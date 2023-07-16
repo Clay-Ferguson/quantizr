@@ -260,6 +260,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Edit", [
+                ast.isAdminUser ? new MenuItem("Direct Edit JSON", () => S.edit.setUsingJson(hltNode.id), onMainTab, null, true) : null,
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
 

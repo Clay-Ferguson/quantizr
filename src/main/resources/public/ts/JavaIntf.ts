@@ -300,6 +300,10 @@ export interface GetMultiRssRequest extends RequestBase {
     page: number;
 }
 
+export interface GetNodeJsonRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface GetNodePrivilegesRequest extends RequestBase {
     nodeId: string;
 }
@@ -511,6 +515,10 @@ export interface RenderNodeRequest extends RequestBase {
 export interface ResetPasswordRequest extends RequestBase {
     user: string;
     email: string;
+}
+
+export interface SaveNodeJsonRequest extends RequestBase {
+    json: string;
 }
 
 export interface SaveNodeRequest extends RequestBase {
@@ -744,6 +752,10 @@ export interface GetMultiRssResponse extends ResponseBase {
     feed: RssFeed;
 }
 
+export interface GetNodeJsonResponse extends ResponseBase {
+    json: string;
+}
+
 export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
 }
@@ -930,6 +942,9 @@ export interface RenderNodeResponse extends ResponseBase {
 }
 
 export interface ResetPasswordResponse extends ResponseBase {
+}
+
+export interface SaveNodeJsonResponse extends ResponseBase {
 }
 
 export interface SaveNodeResponse extends ResponseBase {

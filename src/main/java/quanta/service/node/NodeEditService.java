@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.APConst;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
@@ -42,9 +45,11 @@ import quanta.mongo.model.SubNode;
 import quanta.request.AppDropRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeletePropertyRequest;
+import quanta.request.GetNodeJsonRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
+import quanta.request.SaveNodeJsonRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SplitNodeRequest;
@@ -54,9 +59,11 @@ import quanta.request.UpdateFriendNodeRequest;
 import quanta.response.AppDropResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.response.DeletePropertyResponse;
+import quanta.response.GetNodeJsonResponse;
 import quanta.response.InsertNodeResponse;
 import quanta.response.LikeNodeResponse;
 import quanta.response.LinkNodesResponse;
+import quanta.response.SaveNodeJsonResponse;
 import quanta.response.SaveNodeResponse;
 import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SplitNodeResponse;
@@ -82,6 +89,8 @@ import quanta.util.val.Val;
 public class NodeEditService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
+
+    public static final ObjectMapper jsonMapper = new ObjectMapper();
 
     /*
      * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -1223,5 +1232,28 @@ public class NodeEditService extends ServiceBase {
             return true;
         }
         return false;
+    }
+
+    public GetNodeJsonResponse getNodeJson(MongoSession ms, GetNodeJsonRequest req) {
+        GetNodeJsonResponse res = new GetNodeJsonResponse();
+        ThreadLocals.requireAdmin();
+        SubNode node = read.getNode(ms, req.getNodeId(), false, null);
+        if (node != null) {
+            res.setJson(XString.prettyPrint(node));
+        }
+        return res;
+    }
+
+    public SaveNodeJsonResponse saveNodeJson(MongoSession ms, SaveNodeJsonRequest req) {
+        SaveNodeJsonResponse res = new SaveNodeJsonResponse();
+        ThreadLocals.requireAdmin();
+
+        try {
+            SubNode n = jsonMapper.readValue(req.getJson(), SubNode.class);
+            update.save(ms, n, false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return res;
     }
 }

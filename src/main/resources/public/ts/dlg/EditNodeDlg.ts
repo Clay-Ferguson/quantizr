@@ -155,7 +155,7 @@ export class EditNodeDlg extends DialogBase {
     immediateUploadFiles = async (files: File[]) => {
         const ast = getAs();
         await S.domUtil.uploadFilesToNode(files, ast.editNode.id, false);
-        await this.utl.refreshFromServer(ast.editNode);
+        await S.edit.refreshFromServer(ast.editNode);
         S.edit.updateNode(ast.editNode);
         this.binaryDirty = true;
     }

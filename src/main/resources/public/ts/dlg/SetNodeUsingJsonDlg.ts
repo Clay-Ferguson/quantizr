@@ -1,0 +1,53 @@
+import { DialogBase } from "../DialogBase";
+import { Validator } from "../Validator";
+import { ScrollPos } from "../comp/base/Comp";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Div } from "../comp/core/Div";
+import { Diva } from "../comp/core/Diva";
+import { TextArea } from "../comp/core/TextArea";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
+
+export class SetNodeUsingJsonDlg extends DialogBase {
+    textState: Validator = new Validator();
+    textScrollPos = new ScrollPos();
+
+    constructor(private nodeId: string) {
+        super("Set Node JSON");
+    }
+
+    renderDlg(): CompIntf[] {
+        return [
+            new Diva([
+                new Div("Enter the new JSON for the Node"),
+                new TextArea(null, { rows: 15 }, this.textState, null, false, 3, this.textScrollPos),
+                new ButtonBar([
+                    new Button("Save", this.save, null, "btn-primary"),
+                    new Button("Close", this.close, null, "btn-secondary float-end")
+                ], "marginTop")
+            ])
+        ];
+    }
+
+    reload = async () => {
+        const res = await S.rpcUtil.rpc<J.GetNodeJsonRequest, J.GetNodeJsonResponse>("getNodeJson", {
+            nodeId: this.nodeId
+        });
+
+        this.textState.setValue(res.json);
+    }
+
+    save = async () => {
+        const json = this.textState.getValue();
+        await S.rpcUtil.rpc<J.SaveNodeJsonRequest, J.SaveNodeJsonResponse>("saveNodeJson", {
+            json
+        });
+        this.close();
+    }
+
+    override async preLoad(): Promise<void> {
+        await this.reload();
+    }
+}

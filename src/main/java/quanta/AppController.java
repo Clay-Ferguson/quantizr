@@ -72,6 +72,7 @@ import quanta.request.GetFollowingRequest;
 import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
+import quanta.request.GetNodeJsonRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetOpenGraphRequest;
@@ -104,6 +105,7 @@ import quanta.request.RenderCalendarRequest;
 import quanta.request.RenderDocumentRequest;
 import quanta.request.RenderNodeRequest;
 import quanta.request.ResetPasswordRequest;
+import quanta.request.SaveNodeJsonRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
@@ -1414,6 +1416,22 @@ public class AppController extends ServiceBase implements ErrorController {
             GetNodeStatsResponse res = new GetNodeStatsResponse();
             search.getNodeStats(ms, req, res);
             return res;
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/getNodeJson", method = RequestMethod.POST)
+    @ResponseBody
+    public Object getNodeJson(@RequestBody GetNodeJsonRequest req, HttpSession session) {
+        return callProc.run("getNodeJson", false, false, req, session, ms -> {
+            return edit.getNodeJson(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/saveNodeJson", method = RequestMethod.POST)
+    @ResponseBody
+    public Object saveNodeJson(@RequestBody SaveNodeJsonRequest req, HttpSession session) {
+        return callProc.run("SaveNodeJson", false, false, req, session, ms -> {
+            return edit.saveNodeJson(ms, req);
         });
     }
 
