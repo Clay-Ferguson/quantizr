@@ -9,6 +9,7 @@ public class APType {
     public static final String Note = "Note";
     public static final String Video = "Video";
     public static final String Update = "Update";
+    public static final String Question = "Question";
     public static final String Link = "Link";
     public static final String Like = "Like";
     public static final String Announce = "Announce";

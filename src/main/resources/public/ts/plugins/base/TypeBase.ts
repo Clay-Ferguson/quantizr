@@ -2,7 +2,9 @@ import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
+import { Div } from "../../comp/core/Div";
 import { Diva } from "../../comp/core/Diva";
+import { Divc } from "../../comp/core/Divc";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import * as I from "../../Interfaces";
@@ -204,13 +206,25 @@ export class TypeBase implements TypeIntf {
         const ast = getAs();
         const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
 
+        // Format ActivityPub Question/Poll Options here
+        // todo-1: This is a hack for now until we have polymorphic type handling for ActPub types
+        let choices: Div = null
+        const oneOf: any[] = S.props.getPropObj("oneOf", node);
+        if (oneOf) {
+            const children: Comp[] = [];
+            for (const o of oneOf) {
+                children.push(new Div("*  " + o.name + ` (${o.replies?.totalItems} votes)`, { className: "bigMarginLeft marginBottom" }));
+            }
+            choices = new Divc({ className: "marginTop" }, children);
+        }
+
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
         // This OpenGraph logic should maybe be just built into the Markdown component itself?
         if (comp?.urls) {
-            const children: CompIntf[] = [comp];
+            const children: CompIntf[] = [comp, choices];
             let count = 0;
             comp.urls.forEach((url: string) => {
                 // allow max of 50 urls.
@@ -234,13 +248,14 @@ export class TypeBase implements TypeIntf {
             if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
                 return new Diva([
                     comp,
+                    choices,
                     S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
                     new Clearfix()
                 ])
             }
             // otherwise just return the content component itself.
             else {
-                return comp;
+                return new Diva([comp, choices]);
             }
         }
     }

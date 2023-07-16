@@ -7,13 +7,10 @@ import static quanta.actpub.model.AP.apList;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apParseList;
 import static quanta.actpub.model.AP.apStr;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URL;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -27,11 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOAccept;
@@ -46,15 +43,14 @@ import quanta.actpub.model.APOPerson;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
-import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
+import quanta.model.PropertyInfo;
 import quanta.model.client.APTag;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
@@ -575,8 +571,7 @@ public class ActPubService extends ServiceBase {
     }
 
     /*
-     * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
-     * follow a user on this server
+     * Processes incoming INBOX posts to be called by foreign servers to follow a user on this server
      */
     public void processInboxPost(HttpServletRequest httpReq, byte[] body) {
         APObj payload = apUtil.buildObj(body);
@@ -672,6 +667,7 @@ public class ActPubService extends ServiceBase {
             switch (object.getType()) {
                 case APType.Video:
                 case APType.Note:
+                case APType.Question:
                     createOrUpdateObj(as, activity, keyEncoded.getVal());
                     break;
                 case APType.Person:
@@ -830,8 +826,10 @@ public class ActPubService extends ServiceBase {
         if (!as.isAdmin())
             throw new ForbiddenException();
         log.trace("createOrUpdateObj");
+
         // obj is the 'Note' or 'Video' object, or other payload type.
         APObj obj = activity.getAPObj();
+
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
          * then insert the reply under that, instead of the default without this id which is to put in
@@ -858,8 +856,9 @@ public class ActPubService extends ServiceBase {
          * by removing this line, we change the design to where inbound replies always go into user's POSTS
          * node, rather than underneath the node they're replying to. I'm leaving this line here in case
          * there are scenarios in the future where we might want this old functionality back where replies
-         * go in to subnodes under the thing bring replied to,. nodeBeingRepliedTo = read.getNode(as,
-         * replyToId, false, null);
+         * go in to subnodes under the thing bring replied to,.
+         * 
+         * nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
          *
          * If a foreign user is replying to a specific node, we put the reply under that node
          *
@@ -914,7 +913,8 @@ public class ActPubService extends ServiceBase {
             if (!action.equals(APType.Update)) {
                 log.trace("duplicate post ignored: ActPubId: " + obj.getId() + " nodeId=" + dupNode.getIdStr());
                 return dupNode;
-            } else { // if we're updating the node, need to validate they encodedKey owns it.
+            } else {
+                // if we're updating the node, need to validate they encodedKey owns it.
                 if (!apCrypto.ownerHasKey(ms, dupNode, encodedKey)) {
                     log.warn("unauthorized key [" + encodedKey + "] tried action " + action + " on node "
                             + dupNode.getIdStr() + " with object " + XString.prettyPrint(obj));
@@ -929,6 +929,7 @@ public class ActPubService extends ServiceBase {
             inReplyTo = apStr(obj, APObj.inReplyTo);
         }
         String contentHtml = APType.Announce.equals(action) ? "" : apStr(obj, APObj.content);
+
         String objUrl = apStr(obj, APObj.url);
         List<?> objUrls = null;
         if (objUrl == null) {
@@ -983,8 +984,15 @@ public class ActPubService extends ServiceBase {
         if (toAccountNode == null) {
             toAccountNode = getAcctNodeByActorUrl(ms, userDoingAction, objAttributedTo);
         }
+
+        List<PropertyInfo> properties = null;
+        if (APType.Question.equals(obj.getType())) {
+            properties = new LinkedList<>();
+            properties.add(new PropertyInfo("oneOf", obj.get("oneOf")));
+        }
+
         SubNode newNode = create.createNode(ms, parentNode, null, NodeType.COMMENT.s(), 0L, CreateNodeLocation.LAST,
-                null, toAccountNode.getId(), true, true);
+                properties, toAccountNode.getId(), true, true);
 
         // If we're updating a node, find what the ID should be and we can just put that ID value into
         // newNode
@@ -1054,11 +1062,6 @@ public class ActPubService extends ServiceBase {
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.to);
-        // note: I was temporarily think this was doing too much sharing, but
-        // I now think we do need it, especially because sometimes the only place
-        // some posts put their 'public' designation is in the CC, so let's process
-        // all ccs. The risk (I thought I had was that a 'reply to node', will cause these CCs
-        // to be included when they shouldn't). We'll see.
         shareToAllObjectRecipients(ms, userDoingAction, newNode, obj, APObj.cc);
         addAttachments(ms, newNode, obj);
         openGraph.parseNode(newNode, true);
