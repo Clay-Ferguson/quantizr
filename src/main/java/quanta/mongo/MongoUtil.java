@@ -152,16 +152,16 @@ public class MongoUtil extends ServiceBase {
     }
 
     public boolean pathIsAvailable(String path) {
-        Criteria orCriteria = new Criteria();
+        Criteria crit = new Criteria();
         /*
          * Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
          * as an orphan (which can definitely happen) then this path it not available. So even orphaned
          * nodes can keep us from being able to consider a path 'available for use'
          */
-        orCriteria.orOperator( //
+        crit = crit.orOperator( //
                 Criteria.where(SubNode.PATH).is(path), //
                 Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
-        Query q = new Query(orCriteria);
+        Query q = new Query(crit);
         return !ops.exists(q, SubNode.class);
     }
 

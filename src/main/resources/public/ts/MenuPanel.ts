@@ -234,7 +234,6 @@ export class MenuPanel extends Div {
                 new MenuItem("My Posts", MenuPanel.openPostsNode),
                 ast.isAdminUser ? new MenuItem("All Users", MenuPanel.openUsersNode) : null,
                 new MenuItemSeparator(),
-                new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),
                 new MenuItem("Notes", MenuPanel.openNotesNode),
                 new MenuItem("Exports", MenuPanel.openExportsNode),
@@ -388,6 +387,8 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
+                new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
+                new MenuItemSeparator(), //
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
                 new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
