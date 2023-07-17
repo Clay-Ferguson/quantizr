@@ -846,7 +846,7 @@ public class ActPubUtil extends ServiceBase {
                         }
                         // REGEX path expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
                         // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
-                        iter = read.findNodesByProp(ms, //
+                        iter = read.findNodesByProp(ms,
                                 NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
                                 NodeProp.INREPLYTO.s(), replyTargetId);
                         for (SubNode child : iter) {
@@ -1023,7 +1023,7 @@ public class ActPubUtil extends ServiceBase {
         Object icon = apObj(actor, APObj.icon);
         // todo-1: need to also support icon being an array here, to be compatable with spec:
         // "icon": [
-        // "https://kenzoishii.example.com/image/165987aklre4"
+        // "https://some.url"
         // ]
         if (icon != null) {
             String iconUrl = apStr(icon, APObj.url);

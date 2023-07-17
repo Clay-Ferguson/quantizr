@@ -3,7 +3,6 @@ package quanta.actpub;
 import static quanta.actpub.model.AP.apInt;
 import static quanta.actpub.model.AP.apObj;
 import static quanta.actpub.model.AP.apStr;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,7 +10,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -23,7 +21,6 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
-import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
@@ -71,8 +68,7 @@ public class ActPubFollowing extends ServiceBase {
                         // are there othere places we can take advantage and load this cache, by chance?
                         // #todo-optimization
                         // (yes I looked, there's about 20ish other places we can take advantage of having both these
-                        // and
-                        // just cram into cache)
+                        // and just cram into cache)
                         apCache.actorUrlsByUserName.put(apUserName, actorUrlOfUserBeingFollowed);
                     }
                 }

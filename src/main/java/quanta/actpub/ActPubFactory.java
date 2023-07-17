@@ -1,7 +1,6 @@
 package quanta.actpub;
 
 import static quanta.actpub.model.AP.apStr;
-
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +26,6 @@ import quanta.actpub.model.APOUpdate;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
-import quanta.instrument.PerfMon;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
@@ -308,15 +306,12 @@ public class ActPubFactory extends ServiceBase {
             String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                     + userNode.getIdStr() + "&v=" + avatarVer;
             APOPerson actor =
-                    /*
-                     * // Note: this is a self-reference, and must be identical to the URL that returns this object
-                     */new APOPerson().put(APObj.id, apUtil.makeActorUrlForUserName(userName)).put(APObj.did, did)
+                    // Note: this is a self-reference, and must be identical to the URL that returns this object
+                    new APOPerson().put(APObj.id, apUtil.makeActorUrlForUserName(userName)).put(APObj.did, did)
                             .put(APObj.preferredUsername, userName).put(APObj.name, displayName)
-                            .put(APObj.published, DateUtil.isoStringFromDate(userNode.getCreateTime())).put(APObj.icon, //
-                                    //
-                                    //
-                                    new APObj().put(APObj.type, APType.Image).put(APObj.mediaType, avatarMime)
-                                            .put(APObj.url, avatarUrl));
+                            .put(APObj.published, DateUtil.isoStringFromDate(userNode.getCreateTime()))
+                            .put(APObj.icon, new APObj().put(APObj.type, APType.Image).put(APObj.mediaType, avatarMime)
+                                    .put(APObj.url, avatarUrl));
             Attachment headerAtt = userNode.getAttachment(Constant.ATTACHMENT_HEADER.s(), false, false);
             if (headerAtt != null) {
                 String headerImageMime = headerAtt.getMime();
@@ -325,11 +320,8 @@ public class ActPubFactory extends ServiceBase {
                     if (headerImageVer != null) {
                         String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH
                                 + "/bin/profileHeader" + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
-                        actor.put(APObj.image, //
-                                //
-                                //
-                                new APObj().put(APObj.type, APType.Image).put(APObj.mediaType, headerImageMime)
-                                        .put(APObj.url, headerImageUrl));
+                        actor.put(APObj.image, new APObj().put(APObj.type, APType.Image)
+                                .put(APObj.mediaType, headerImageMime).put(APObj.url, headerImageUrl));
                     }
                 }
             }
