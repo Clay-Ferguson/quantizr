@@ -3,9 +3,6 @@ package quanta.actpub.model;
 import java.util.Map;
 import quanta.actpub.APConst;
 
-/**
- * Update object.
- */
 public class APOUpdate extends APOActivity {
 
     public APOUpdate(Map<?, ?> obj) {

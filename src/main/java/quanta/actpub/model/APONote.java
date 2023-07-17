@@ -3,9 +3,6 @@ package quanta.actpub.model;
 import org.apache.commons.lang3.StringUtils;
 import quanta.actpub.APConst;
 
-/**
- * Note object
- */
 public class APONote extends APObj {
 
     // Constructor to use when injesting from a foreign source, an objec that's KNOWN to be a "note"

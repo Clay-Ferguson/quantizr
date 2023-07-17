@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * The objects in the ActivityPub Spec are so highly dynamic that we cannot determine ahead of time
- * what the property typoes of any reply will be so we just use a map, which can successfully
+ * what the property types of any reply will be so we just use a map, which can successfully
  * unmarshall any format of JSON thrown at us, and then we can let out getter methods be smart
  * enough to extract what we need out of these objects.
  *
@@ -20,9 +20,7 @@ public class APObj extends HashMap<String, Object> {
     public static final String context = "@context";
     public static final String type = "type";
     public static final String did = "did";
-    public static final String language = "@language"; // NOTE: I had this as "language" for a long time, which I guess
-                                                       // was
-    // getting ignored
+    public static final String language = "@language";
     public static final String object = "object";
     public static final String actor = "actor";
     public static final String published = "published";

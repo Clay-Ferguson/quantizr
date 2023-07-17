@@ -17,7 +17,6 @@ public class APOFollow extends APOActivity {
 
         // NOTE: Pleroma uses an array similar to this.
         // put(context, new APList().val(APConst.CONTEXT_STREAMS).val(new APObj().put("@language", "und")));
-
         put(type, APType.Follow);
     }
 
@@ -28,9 +27,6 @@ public class APOFollow extends APOActivity {
             put(APObj.id, id);
         }
         put(APObj.actor, actor);
-
-        // Pleroma hacking (nothing with pleroma has ever worked)
-        // put("state", "pending");
 
         // NOTE: I saw on a Pleroma forum that they DO need these cc and to as LISTS
         // even though the AP SPEC allows for strings.

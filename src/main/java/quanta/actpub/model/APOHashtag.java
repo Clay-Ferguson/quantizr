@@ -1,9 +1,5 @@
 package quanta.actpub.model;
 
-// "type" : "Hashtag",
-// "href" : "https://...",
-// "name" : "#kittens"
-
 public class APOHashtag extends APObj {
 
     APOHashtag() {

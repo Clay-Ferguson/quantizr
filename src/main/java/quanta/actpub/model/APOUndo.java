@@ -3,9 +3,6 @@ package quanta.actpub.model;
 import java.util.Map;
 import quanta.actpub.APConst;
 
-/**
- * Undo object
- */
 public class APOUndo extends APOActivity {
 
     public APOUndo(Map<?, ?> obj) {

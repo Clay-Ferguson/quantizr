@@ -2,9 +2,6 @@ package quanta.actpub.model;
 
 import quanta.actpub.APConst;
 
-/**
- * WebFingerObject object.
- */
 public class APOWebFinger extends APObj {
 
     public APOWebFinger(String fullName, String url) {
