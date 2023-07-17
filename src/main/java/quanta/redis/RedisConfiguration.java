@@ -1,4 +1,4 @@
-package quanta.config;
+package quanta.redis;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +12,8 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import quanta.config.SessionContext;
 
-/**
- * https://www.baeldung.com/spring-data-redis-pub-sub
- * https://docs.spring.io/spring-data/data-redis/docs/current/reference/html/#tx.spring
- * https://github.com/spring-projects/spring-data-redis/blob/main/src/main/asciidoc/reference/redis-transactions.adoc
- */
 @Configuration
 public class RedisConfiguration {
 
@@ -31,7 +27,6 @@ public class RedisConfiguration {
         RedisTemplate<String, SessionContext> template = new RedisTemplate<>();
         template.setEnableTransactionSupport(true);
         template.setConnectionFactory(connectionFactory);
-        // template.setDefaultSerializer(new StringRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;

@@ -1,4 +1,4 @@
-package quanta.config;
+package quanta.redis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
