@@ -1249,10 +1249,14 @@ public class MongoRead extends ServiceBase {
         }
         Criteria crit = null;
         Query q = new Query();
-        if (remote) {
+
+        if (remote && local) {
+            crit = new Criteria().orOperator(
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH)),
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH)));
+        } else if (remote) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH));
-        }
-        if (local) {
+        } else if (local) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH));
         }
 
