@@ -21,12 +21,6 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.jupyter.JupyterCell;
-import quanta.model.jupyter.JupyterCodeMirrorMode;
-import quanta.model.jupyter.JupyterKernelSpec;
-import quanta.model.jupyter.JupyterLangInfo;
-import quanta.model.jupyter.JupyterMetadata;
-import quanta.model.jupyter.JupyterNB;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -65,7 +59,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private StringBuilder fullMd = new StringBuilder();
     private StringBuilder markdownToc = new StringBuilder();
     private StringBuilder htmlToc = new StringBuilder();
-    private List<JupyterCell> jupyterCells = new LinkedList<>();
 
     public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
         ms = ThreadLocals.ensure(ms);
@@ -117,10 +110,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 out.append(fullMd);
                 addFileEntry("content.md", out.toString().getBytes(StandardCharsets.UTF_8));
             }
-            if (req.isIncludeJypyter()) {
-                addFileEntry("content.ipynb",
-                        XString.prettyPrint(makeJupyterNotebook()).getBytes(StandardCharsets.UTF_8));
-            }
+
             res.setFileName(shortFileName);
             success = true;
         } catch (Exception ex) {
@@ -131,18 +121,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 FileUtils.deleteFile(fullFileName);
             }
         }
-    }
-
-    private JupyterNB makeJupyterNotebook() {
-        return new JupyterNB(jupyterCells, //
-                new JupyterMetadata( //
-                        new JupyterKernelSpec("Python 3", "python", "python3"), //
-                        new JupyterLangInfo( //
-                                new JupyterCodeMirrorMode("ipython", 3), ".py", //
-                                "text/x-python", "python", "python", //
-                                "ipython3", "3.10.6"),
-                        4), //
-                4, 2);
     }
 
     private void writeRootFiles() {
@@ -242,13 +220,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             // attachments inserted into it for the special case of inserting HTML attachments
             Val<String> htmlContent = new Val<>(content);
             Val<String> mdContent = new Val<>(content);
-            JupyterCell cell = null;
-            if (req.isIncludeJypyter()) {
-                cell = new JupyterCell();
-                cell.setCellType("markdown");
-                cell.setSource(makeJupyterSource(mdContent.getVal()));
-                jupyterCells.add(cell);
-            }
+
             // Process all attachments just to insert File Tags into content
             if (atts != null) {
                 for (Attachment att : atts) {
@@ -257,8 +229,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         continue;
                     }
                     handleAttachment(true, null, mdContent, deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), cell, writeFile, nodeId,
-                            fileName, att);
+                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), writeFile, nodeId, fileName,
+                            att);
                 }
             }
             if (req.isIncludeHTML()) {
@@ -272,7 +244,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                             continue;
                         }
                         handleAttachment(true, htmlContent, null, deeperPath,
-                                req.isAttOneFolder() ? "attachments" : ("." + parentFolder), null, writeFile, nodeId,
+                                req.isAttOneFolder() ? "attachments" : ("." + parentFolder), writeFile, nodeId,
                                 fileName, att);
                     }
                 }
@@ -288,8 +260,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         continue;
                     }
                     handleAttachment(false, null, null, deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), cell, writeFile, nodeId,
-                            fileName, att);
+                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), writeFile, nodeId, fileName,
+                            att);
                 }
             }
             if (req.isIncludeHTML()) {
@@ -327,31 +299,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                                 + nodeId + "'>" + StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
             }
         }
-    }
-
-    /* Breaks up content into a Jupyter source array */
-    private List<String> makeJupyterSource(String content) {
-        StringTokenizer t = new StringTokenizer(content, "\n", true);
-        List<String> list = new LinkedList<>();
-        String curLine = "";
-
-        while (t.hasMoreTokens()) {
-            String tok = t.nextToken();
-            if ("\n".equals(tok)) {
-                if (curLine.length() > 0) {
-                    curLine += "\n";
-                }
-            } else {
-                if (curLine.length() > 0) {
-                    list.add(curLine);
-                }
-                curLine = tok;
-            }
-        }
-        if (curLine.trim().length() > 0) {
-            list.add(curLine);
-        }
-        return list;
     }
 
     private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, Val<String> fileNameCont,
@@ -433,8 +380,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * content and return the content
      */
     private void handleAttachment(boolean injectingTag, Val<String> htmlContent, Val<String> mdContent,
-            String deeperPath, String parentFolder, JupyterCell cell, boolean writeFile, String nodeId, String fileName,
-            Attachment att) {
+            String deeperPath, String parentFolder, boolean writeFile, String nodeId, String fileName, Attachment att) {
         String ext = null;
         String binFileNameProp = att.getFileName();
         if (binFileNameProp != null) {
@@ -461,18 +407,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 String htmlLink = appendImgLink(nodeId, binFileNameStr, fullUrl);
                 processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
             }
-            if (req.isIncludeMD() || cell != null) {
+            if (req.isIncludeMD()) {
                 String mdLink = "\n![" + binFileNameStr + "](" + fullUrl + ")\n";
-                processMdAtt(injectingTag, mdContent, cell, att, mdLink);
+                processMdAtt(injectingTag, mdContent, att, mdLink);
             }
         } else {
             if (req.isIncludeHTML()) {
                 String htmlLink = appendNonImgLink(binFileNameStr, fullUrl);
                 processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
             }
-            if (req.isIncludeMD() || cell != null) {
+            if (req.isIncludeMD()) {
                 String mdLink = "\n[" + binFileNameStr + "](" + fullUrl + ")\n";
-                processMdAtt(injectingTag, mdContent, cell, att, mdLink);
+                processMdAtt(injectingTag, mdContent, att, mdLink);
             }
         }
     }
@@ -487,8 +433,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    private void processMdAtt(boolean injectingTag, Val<String> mdContent, JupyterCell cell, Attachment att,
-            String mdLink) {
+    private void processMdAtt(boolean injectingTag, Val<String> mdContent, Attachment att, String mdLink) {
         if (injectingTag) {
             if (mdContent != null) {
                 mdContent.setVal(insertMdLink(mdContent.getVal(), att, mdLink));
@@ -497,22 +442,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (req.isIncludeMD()) {
                 fullMd.append(mdLink);
             }
-        }
-        if (cell != null) {
-            processAttachmentInCell(injectingTag, cell, att, mdLink);
-        }
-    }
-
-    private void processAttachmentInCell(boolean injectingTag, JupyterCell cell, Attachment att, String mdLink) {
-        if (injectingTag) {
-            List<String> newSource = new LinkedList<>();
-
-            for (String val : cell.getSource()) {
-                newSource.add(insertMdLink(val, att, mdLink));
-            }
-            cell.setSource(newSource);
-        } else {
-            cell.getSource().add(mdLink);
         }
     }
 

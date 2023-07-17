@@ -73,10 +73,6 @@ export class ExportDlg extends DialogBase {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeMD = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeMD
             }),
-            new Checkbox("Jupyter", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeJypyter = checked; }),
-                getValue: (): boolean => getAs().exportSettings.includeJypyter
-            }),
             new Checkbox("JSON", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => {
                     s.exportSettings.includeJSON = checked;
