@@ -87,10 +87,12 @@ public class MongoCreate extends ServiceBase {
                 });
             }
         }
+
         SubNode node = new SubNode(ownerId, path, type, ordinal);
-        if (updateParent) {
+        if (updateParent && parent != null) {
             parent.setHasChildren(true);
         }
+
         if (properties != null) {
             for (PropertyInfo propInfo : properties) {
                 node.set(propInfo.getName(), propInfo.getValue());
