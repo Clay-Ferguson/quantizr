@@ -501,17 +501,10 @@ public class MongoDelete extends ServiceBase {
             if (node == null)
                 continue;
             auth.ownerAuth(ms, node);
+
             // get the parent of the node and add it's id to parentIds
             SubNode parent = read.getParent(ms, node, false);
-            if (parent == null) {
-                /*
-                 * if node has no parent it's an orphan, so we should act like it doesn't even exist, and it's
-                 * essentially already deleted. todo-1: Could we have a background queue mow thru "Known Orphans"
-                 * like this one, because any subnodes of it can be blown away once you identify an orphan by
-                 * whatever means it was.
-                 */
-                continue;
-            }
+
             // back out the number of bytes it was using
             if (!ms.isAdmin()) {
                 /*
@@ -525,16 +518,15 @@ public class MongoDelete extends ServiceBase {
                 long totalBytes = user.getTotalAttachmentBytes(ms, node);
                 user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
             }
-            // really need a 'hasForeignShares' here to ignore if there aren't any (todo-2)
-            if (node.getAc() != null) {
-                nodes.add(node);
-            }
+
+            nodes.add(node);
+
             /*
              * if 'add' returns true that means this IS the first encounter and so we add to the operations the
              * call to set it's hasChildren to null. Note setting HAS_CHILDREN to null doesn't indicate we think
              * there's no chilren it indicates we don't KNOW if it still has children or not.
              */
-            if (parentIds.add(parent.getId())) {
+            if (parent != null && parentIds.add(parent.getId())) {
                 bops = update.bulkOpSetPropVal(ms, bops, parent.getId(), SubNode.HAS_CHILDREN, null);
             }
             /*
@@ -549,10 +541,18 @@ public class MongoDelete extends ServiceBase {
                 bops = null;
             }
         }
-        // in async thread send out all the deletes to the foreign servers.
+
+        // in async thread send out all the deletes to the foreign servers, and then delete the subgraphs
+        // under the deleted nodes so there should be no orphans left
         exec.run(() -> {
             nodes.forEach(n -> {
+                // if node not shared no need to try to send outbound delete
+                if (n.getAc() == null)
+                    return;
                 apub.sendNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n));
+            });
+
+            nodes.forEach(n -> {
                 deleteSubGraphChildren(ms, n, false);
             });
         });
