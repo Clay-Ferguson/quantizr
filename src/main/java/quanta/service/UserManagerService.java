@@ -1398,23 +1398,13 @@ public class UserManagerService extends ServiceBase {
 
     public String getUserAccountsReport(MongoSession ms) {
         ms = ThreadLocals.ensure(ms);
-        int localUserCount = 0;
-        int foreignApCount = 0;
-        StringBuilder sb = new StringBuilder();
-        Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, true, true);
 
-        for (SubNode accountNode : accountNodes) {
-            String userName = accountNode.getStr(NodeProp.USER);
-            if (userName != null) {
-                if (userName.contains("@")) {
-                    foreignApCount++;
-                } else {
-                    localUserCount++;
-                }
-            }
-        }
+        StringBuilder sb = new StringBuilder();
+        long localUserCount = read.getAccountNodeCount(ms, null, false, true);
+        long foreignUserCount = read.getAccountNodeCount(ms, null, true, false);
+
         sb.append("Local Users: " + localUserCount + "\n");
-        sb.append("Foreign ActPub Users: " + foreignApCount + "\n");
+        sb.append("Foreign ActPub Users: " + foreignUserCount + "\n");
         return sb.toString();
     }
 

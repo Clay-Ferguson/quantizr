@@ -1279,6 +1279,33 @@ public class MongoRead extends ServiceBase {
         return opsw.find(ms, q);
     }
 
+    public long getAccountNodeCount(MongoSession ms, CriteriaDefinition textCriteria, boolean remote, boolean local) {
+        if (!remote && !local) {
+            throw new RuntimeException("Accont query needs local and/or remote specified.");
+        }
+        Criteria crit = null;
+        Query q = new Query();
+
+        if (remote && local) {
+            crit = new Criteria().orOperator(
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH)),
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH)));
+        } else if (remote) {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH));
+        } else if (local) {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH));
+        }
+
+        q.addCriteria(crit);
+
+        if (textCriteria != null) {
+            q.addCriteria(textCriteria);
+        }
+
+        return opsw.count(ms, q, SubNode.class);
+    }
+
+
     // (not currently used)
     public SubNode findByCID(MongoSession ms, String cid) {
         Query q = new Query();
