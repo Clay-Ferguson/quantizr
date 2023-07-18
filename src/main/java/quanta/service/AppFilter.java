@@ -22,7 +22,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.Const;
 import quanta.util.ExUtil;

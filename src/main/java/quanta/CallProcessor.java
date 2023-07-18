@@ -113,8 +113,7 @@ public class CallProcessor extends ServiceBase {
             log.trace("RES=" + XString.prettyPrint(ret));
 
             // make sure whatever ResponseBase we ended up with here (may change during processing) is set in
-            // the
-            // thread to the AppFilter can pick it up, although it currently not used.
+            // the thread to the AppFilter can pick it up, although it currently not used.
             ThreadLocals.setResponse((ResponseBase) ret);
         }
         return ret;

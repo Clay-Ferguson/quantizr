@@ -77,9 +77,10 @@ public class AppConfiguration implements WebMvcConfigurer {
         FilterRegistrationBean<UtilFilter> reg = new FilterRegistrationBean<>();
         reg.setFilter(utilFilter);
         reg.setOrder(1);
+        reg.addUrlPatterns("/images/*");
         reg.addUrlPatterns("/fonts/*");
         reg.addUrlPatterns("/dist/*");
-        reg.addUrlPatterns("/images/*");
+        reg.addUrlPatterns(AppController.API_PATH + "/getOpenGraph");
         reg.addUrlPatterns(APConst.PATH_WEBFINGER + "/*");
         reg.addUrlPatterns(APConst.PATH_AP + "/*");
         return reg;
