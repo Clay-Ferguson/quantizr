@@ -85,7 +85,6 @@ import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.GraphRequest;
 import quanta.request.InitNodeEditRequest;
-import quanta.request.InsertBookRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.JoinNodesRequest;
 import quanta.request.LikeNodeRequest;
@@ -684,11 +683,7 @@ public class AppController extends ServiceBase implements ErrorController {
         }
         return callProc.run("export", true, true, req, session, ms -> {
             ExportResponse res = new ExportResponse();
-            /*
-             * We require that the node being exported is OWNED BY (not just visible to) the person doing the
-             * export, because this will potentially consume a lot of their storage quota and we don't want
-             * users just clicking things like the War and Peace book and trying to export that.
-             */
+
             arun.run(as -> {
                 SubNode node = read.getNode(as, req.getNodeId());
                 if (node == null)
@@ -823,15 +818,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
         return callProc.run("insertNode", true, true, req, session, ms -> {
             return edit.insertNode(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/insertBook", method = RequestMethod.POST)
-    @ResponseBody
-    public Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
-        return callProc.run("insertBook", true, true, req, session, ms -> {
-            ThreadLocals.requireAdmin();
-            return importBookService.insertBook(ms, req);
         });
     }
 

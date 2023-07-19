@@ -44,7 +44,6 @@ import quanta.service.SchemaOrgService;
 import quanta.service.SystemService;
 import quanta.service.UserFeedService;
 import quanta.service.UserManagerService;
-import quanta.service.imports.ImportBookService;
 import quanta.service.imports.ImportService;
 import quanta.service.ipfs.IPFSCat;
 import quanta.service.ipfs.IPFSConfig;
@@ -143,7 +142,6 @@ public class ServiceBase {
     public static NodeSearchService search;
     public static CallProcessor callProc;
     public static NodeMoveService move;
-    public static ImportBookService importBookService;
     public static ActPubCrypto apCrypto;
     public static ImportService importService;
     public static LuceneService lucene;
@@ -229,7 +227,6 @@ public class ServiceBase {
             search = getBean(ctx, NodeSearchService.class);
             callProc = getBean(ctx, CallProcessor.class);
             move = getBean(ctx, NodeMoveService.class);
-            importBookService = getBean(ctx, ImportBookService.class);
             apCrypto = getBean(ctx, ActPubCrypto.class);
             importService = getBean(ctx, ImportService.class);
             lucene = getBean(ctx, LuceneService.class);

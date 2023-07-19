@@ -53,23 +53,6 @@ export class Edit {
         }
     }
 
-    private insertBookResponse = (res: J.InsertBookResponse): any => {
-        S.util.checkSuccess("Insert Book", res);
-
-        S.view.refreshTree({
-            nodeId: null,
-            zeroOffset: true,
-            highlightId: null,
-            forceIPFSRefresh: false,
-            scrollToTop: true,
-            allowScroll: true,
-            setTab: true,
-            forceRenderParent: false,
-            jumpToRss: false
-        });
-        S.view.scrollToNode();
-    }
-
     private joinNodesResponse = (res: J.JoinNodesResponse): any => {
         const ast = getAs();
         if (S.util.checkSuccess("Join node", res)) {
@@ -1045,27 +1028,6 @@ export class Edit {
     pasteSelNodes_Inline = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         this.pasteSelNodes(id, "inline");
-    }
-
-    insertBookWarAndPeace = async () => {
-        const dlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
-            "Confirm");
-        await dlg.open();
-        if (dlg.yes) {
-            /* inserting under whatever node user has focused */
-            const node = S.nodeUtil.getHighlightedNode();
-
-            if (!node) {
-                S.util.showMessage("No node is selected.", "Warning");
-            } else {
-                const res = await S.rpcUtil.rpc<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
-                    nodeId: node.id,
-                    bookName: "War and Peace",
-                    truncated: S.user.isTestUserAccount()
-                });
-                this.insertBookResponse(res);
-            }
-        }
     }
 
     saveClipboardToChildNode = async (parentId: string) => {

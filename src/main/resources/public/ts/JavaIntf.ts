@@ -374,12 +374,6 @@ export interface InitNodeEditRequest extends RequestBase {
     editMyFriendNode: boolean;
 }
 
-export interface InsertBookRequest extends RequestBase {
-    nodeId: string;
-    bookName: string;
-    truncated: boolean;
-}
-
 export interface InsertNodeRequest extends RequestBase {
     pendingEdit: boolean;
     parentId: string;
@@ -830,10 +824,6 @@ export interface InfoMessage {
 
 export interface InitNodeEditResponse extends ResponseBase {
     nodeInfo: NodeInfo;
-}
-
-export interface InsertBookResponse extends ResponseBase {
-    newNode: NodeInfo;
 }
 
 export interface InsertNodeResponse extends ResponseBase {
