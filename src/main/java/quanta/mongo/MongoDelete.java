@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import com.mongodb.bulk.BulkWriteResult;
-import com.mongodb.client.result.DeleteResult;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -21,6 +19,8 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.client.result.DeleteResult;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -569,45 +569,18 @@ public class MongoDelete extends ServiceBase {
      * authorization to delete 'node' (owns the node)
      */
     public void deleteSubGraphChildren(MongoSession ms, SubNode node, boolean includeRoot) {
-        BulkOperations bops = null;
-        // if deleting root do it first because the getSubGraph query doesn't include root.
         if (includeRoot) {
-            // if deleting children AND root then the parent of this root is the one we need to update the
-            // hasChildren for
-            SubNode parent = read.getParent(ms, node, false);
-            if (parent != null) {
-                bops = update.bulkOpSetPropVal(ms, bops, parent.getId(), SubNode.HAS_CHILDREN, null);
-            }
-            bops = bulkOpRemoveNode(ms, bops, node.getId());
-        } else { // if deleting all children and NOT root we know we can just update the node hasChildren to false
-            bops = update.bulkOpSetPropVal(ms, bops, node.getId(), SubNode.HAS_CHILDREN, null);
+            // it's ok to call ops and not opsw here
+            ops.remove(node);
         }
-        int opCount = 0;
-        /*
-         * Now Query the entire subgraph of this deleted 'node'
-         *
-         * todo-0: Actually we can do even better here, and just run a single command 'delete' op on the
-         * underlying query that this getSubGraph ends up using, and not even need a bulk op.
-         */
-        for (SubNode child : read.getSubGraph(ms, node, null, 0, false, false, null)) {
-            /*
-             * NOTE: Disabling this ability to recursively delete from foreign servers because I'm not sure they
-             * won't interpret that as a DDOS attack if this happens to be a large delete underway. This will
-             * take some thought, to engineer where perhaps we limit to just 10, and do them over a period of 10
-             * minutes even, and that kind of thing, but for now we can just get by without this capability
-             */
-            // apub.sendActPubForNodeDelete(ms, snUtil.getIdBasedUrl(child), snUtil.cloneAcl(child));
-            bops = bulkOpRemoveNode(ms, bops, child.getId());
-            if (++opCount > Const.MAX_BULK_OPS) {
-                bops.execute();
-                bops = null;
-                opCount = 0;
-            }
-        }
-        // deletes all nodes in this subgraph branch
-        if (bops != null) {
-            bops.execute();
-        }
+
+        Query q = new Query();
+        log.debug("DEL SUBGRAPH: " + node.getPath());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        q.addCriteria(crit);
+
+        // it's ok to call ops and not opsw here
+        ops.remove(q, SubNode.class);
     }
 
     // returns a new BulkOps if one not yet existing

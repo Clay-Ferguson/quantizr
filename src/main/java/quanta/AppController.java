@@ -1558,8 +1558,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    // todo-0: broken for now. Needs special treatment in web filters to allow, and also need to put in
-    // docker compose yaml
     @RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String health() {
