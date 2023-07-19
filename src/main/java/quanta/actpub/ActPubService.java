@@ -63,6 +63,7 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.IntVal;
 import quanta.util.val.Val;
 
 /**
@@ -1760,17 +1761,16 @@ public class ActPubService extends ServiceBase {
     }
 
     public String dumpFediverseUsers() {
-        ThreadLocals.requireAdmin();
         StringBuilder sb = new StringBuilder();
-        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
-        int count = 0;
+        IntVal count = new IntVal();
 
-        for (FediverseName fName : recs) {
-            sb.append(fName.getName());
+        ops.stream(new Query(), FediverseName.class).forEachRemaining(obj -> {
+            sb.append(obj.getName());
             sb.append("\n");
-            count++;
-        }
-        return "Fediverse Users: " + String.valueOf(count) + "\n\n" + sb.toString();
+            count.inc();
+        });
+
+        return "Fediverse Users: " + String.valueOf(count.getVal()) + "\n\n" + sb.toString();
     }
 
     public List<String> getUserNamesFromNodeAcl(MongoSession ms, SubNode node) {
