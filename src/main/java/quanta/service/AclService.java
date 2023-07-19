@@ -262,44 +262,8 @@ public class AclService extends ServiceBase {
         if (authAdded) {
             ac.setPrvs(prvs);
             acl.put(mapKey, ac);
-            // Bulk ops is not currently being used and if/when we add it back it needs to be consistent
-            // with the immediateSave, which may be tricky.
-            // if bulk operation
-            // if (ok(bops)) {
-            // /*
-            // * todo-1: this needs testing because the other place I'm doing similar code elsewhere refuses to
-            // * work somehow. Seems like updating collections might not work in batching. Currently there are
-            // no
-            // * places we call this method with bops passed in, so this bops branch is not currently being used
-            // * for that reason.
-            // */
-            // Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
-            // Update update = new Update().set(SubNode.AC, acl);
-            // bops.updateOne(query, update);
-            // }
-            // else non-bulk
-            // else {
             node.setAc(acl);
         }
-        // }
-        // if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
-        // SubNode fromUserNode = read.getNode(session, node.getOwner());
-        // String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
-        // SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
-        // /*
-        // * todo-2: Although I am disabling these for now both of these lines of code do work perfectly: we
-        // * can send an email notification here about node edits (first line), and the line below that
-        // works
-        // * fine and adds a node to the user's inbox that links to this newly shared node.
-        // *
-        // * I just want to think more about when exactly to trigger these notifictions. For example I may
-        // * make these two buttons on the editor users must click called "Email Notification to Shares",
-        // and
-        // * "Send to Inboxes of Shares"
-        // */
-        // // outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
-        // // outboxMgr.addInboxNotification(principal, toOwnerNode, node, "New node shared to you.");
-        // }
         return true;
     }
 

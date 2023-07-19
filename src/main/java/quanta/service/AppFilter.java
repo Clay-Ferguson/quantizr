@@ -76,10 +76,8 @@ public class AppFilter extends GenericFilterBean {
             session = httpReq.getSession(true);
             ThreadLocals.setHttpSession(session);
 
-            // bypass locking for these two
+            // bypass locking for these
             switch (httpReq.getRequestURI()) {
-                // todo-1: need to add everything else we can that we KNOW can run concurrently to any user's
-                // session
                 case AppController.API_PATH + "/serverPush":
                 case AppController.API_PATH + "/signNodes":
                 case AppController.API_PATH + "/getOpenGraph":

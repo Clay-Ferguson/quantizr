@@ -1,10 +1,5 @@
 package quanta.service;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.GridFSFindIterable;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -16,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,6 +48,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -102,9 +100,6 @@ public class AttachmentService extends ServiceBase {
 
     @Autowired
     public GridFsTemplate grid;
-
-    @Autowired
-    public GridFSBucket gridBucket;
 
     public UploadResponse parseUploadFiles(MongoSession ms, MultipartFile[] uploadFiles) {
         UploadResponse resp = new UploadResponse();
@@ -1058,12 +1053,9 @@ public class AttachmentService extends ServiceBase {
             log.debug("gridfs ID not found");
             return null;
         }
-        // long duration = System.currentTimeMillis() - startTime;
-        // startTime = System.currentTimeMillis();
-        GridFsResource gridFsResource =
-                new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
-        // duration = System.currentTimeMillis() - startTime;
-        // startTime = System.currentTimeMillis();
+
+        GridFsResource gridFsResource = grid.getResource(gridFile);
+
         try {
             InputStream is = gridFsResource.getInputStream();
             if (is == null) {
@@ -1076,47 +1068,10 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    public String getStringByNode(MongoSession ms, SubNode node) {
-        String ret = null;
-        if (node != null) {
-            auth.auth(ms, node, PrivilegeType.READ);
-            ret = getStringByNodeEx(node);
-        }
-        return ret;
-    }
-
-    /* Gets the content of the grid resource by reading it into a string */
-    public String getStringByNodeEx(SubNode node) {
-        if (node == null)
-            return null;
-        log.debug("getStringByNode: " + node.getIdStr());
-        Attachment att = node.getFirstAttachment();
-        if (att == null || att.getBin() == null)
-            return null;
-        com.mongodb.client.gridfs.model.GridFSFile gridFile =
-                grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
-        if (gridFile == null) {
-            log.debug("gridfs ID not found");
-            return null;
-        }
-        GridFsResource gridFsResource =
-                new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
-        try {
-            InputStream is = gridFsResource.getInputStream();
-            if (is == null) {
-                throw new RuntimeEx("Unable to get inputStream");
-            }
-            String result = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeEx("unable to readStream", e);
-        }
-    }
-
     public int getGridItemCount() {
         return arun.run(as -> {
             int count = 0;
-            GridFSFindIterable files = gridBucket.find();
+            GridFSFindIterable files = grid.find(new Query());
             /* Scan all files in the grid */
             if (files != null) {
                 /*
@@ -1144,9 +1099,8 @@ public class AttachmentService extends ServiceBase {
     public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
         arun.run(as -> {
             int delCount = 0;
-            // todo-1: do we need to replace this with a 'stream' of some kind to ensure we won't run out of
-            // memory?
-            GridFSFindIterable files = gridBucket.find();
+
+            GridFSFindIterable files = grid.find(new Query());
             /* Scan all files in the grid */
             if (files != null) {
                 for (GridFSFile file : files) {
@@ -1186,6 +1140,7 @@ public class AttachmentService extends ServiceBase {
                     }
                 }
             }
+
             Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
             /*
              * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct

@@ -2,15 +2,6 @@ package quanta.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoCredential;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.GridFSBuckets;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
@@ -28,6 +19,11 @@ import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -47,7 +43,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     public static final String databaseName = "database";
     private MongoTemplate ops;
     private MongoClient mongoClient;
-    private GridFSBucket gridFsBucket;
     private GridFsTemplate grid;
     private SimpleMongoClientDatabaseFactory factory;
     /**
@@ -87,21 +82,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         }
         ServiceBase.mdbf = factory;
         return factory;
-    }
-
-    @Bean
-    public GridFSBucket gridFsBucket() {
-        if (connectionFailed)
-            return null;
-        if (gridFsBucket == null) {
-            log.debug("create gridFdBucket");
-            MongoDatabaseFactory mdbf = mongoDbFactory();
-            if (mdbf != null) {
-                MongoDatabase db = mdbf.getMongoDatabase();
-                gridFsBucket = GridFSBuckets.create(db);
-            }
-        }
-        return gridFsBucket;
     }
 
     // DO NOT REMOVE THIS. IT IS REQUIRED FOR THIS BEAN TO WORK.
