@@ -571,7 +571,8 @@ public class MongoUtil extends ServiceBase {
         log.debug("Creating FediverseName unique index.");
 
         try {
-            // todo-0: this is failing because duplicates exist
+            delete.removeDupFediNames();
+            log.debug("Indexing FediverseName collection");
             ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
         } catch (Exception e) {
             ExUtil.error(log, "FediverseName index failed", e);

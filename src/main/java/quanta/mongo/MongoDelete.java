@@ -27,6 +27,7 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
@@ -725,5 +726,17 @@ public class MongoDelete extends ServiceBase {
         }
 
         opsw.remove(ms, q);
+    }
+
+    public void removeDupFediNames() {
+        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+
+        HashSet<String> names = new HashSet<>();
+        for (FediverseName fName : recs) {
+            if (!names.add(fName.getName())) {
+                ops.remove(fName);
+                log.debug("Removed Dup FediName: " + fName.getName());
+            }
+        }
     }
 }
