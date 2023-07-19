@@ -18,8 +18,6 @@ cd ${PRJROOT}
 QUANTA_SERVICE_ID=$(docker service ls --filter name=quanta-stack-dev_quanta-dev --quiet)
 docker service update --force ${QUANTA_SERVICE_ID}
 
-echo "Waiting 15s for Server startup" 
-sleep 15s
 echo "done!"
 
 
