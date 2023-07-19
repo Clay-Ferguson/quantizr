@@ -589,9 +589,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    /*
-     * todo-1: I think this should be a GET operation
-     */
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {

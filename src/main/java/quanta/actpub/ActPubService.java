@@ -595,10 +595,6 @@ public class ActPubService extends ServiceBase {
         switch (payload.getType()) {
             case APType.Create:
             case APType.Update:
-                /*
-                 * todo-1: I'm waiting for a way to test what the inbound call looks like for an Update, before
-                 * coding the outbound call but don't know of any live instances that support it yet.
-                 */
                 processCreateOrUpdateActivity(httpReq, (APOActivity) payload, body, keyEncoded);
                 break;
             case APType.Follow:
@@ -676,12 +672,8 @@ public class ActPubService extends ServiceBase {
                     processUpdatePerson(as, (APOActor) object, keyEncoded.getVal());
                     break;
                 default:
-                    // this captures videos? and other things (todo-1: add more support)
-                    // not showing quesitons. they eat up too much log space.
-                    if (!"Question".equals(object.getType())) {
-                        log.debug("Unhandled Action: " + activity.getType() + "  type=" + object.getType() + "\n"
-                                + XString.prettyPrint(activity));
-                    }
+                    log.debug("Unhandled Action: " + activity.getType() + "  type=" + object.getType() + "\n"
+                            + XString.prettyPrint(activity));
                     break;
             }
             return null;
@@ -1274,13 +1266,6 @@ public class ActPubService extends ServiceBase {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(ms, userDoingAction, actorUrl);
                 acctNode = read.getUserNodeByUserName(ms, longUserName, false);
             } else {
-                /*
-                 * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.
-                 * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
-                 * else have some property on the node that designates if we need to read the actual outbox or if
-                 * you DO want to add a user and not load their outbox.
-                 */
-                // acctNode = loadForeignUserByActorUrl(ms, actorUrl);
                 saveFediverseName(actorUrl);
             }
             if (acctNode != null) {
@@ -1539,12 +1524,11 @@ public class ActPubService extends ServiceBase {
                 if (!apOutbox.loadForeignOutbox(as, userMakingRequest, actor, userNode, userName)) {
                     return null;
                 }
-            } else/*
-                   * I was going to load followerCounts into userNode, but I decided to just query them live when
-                   * needed on the UserPreferences dialog
-                   */ // todo-1: need a flag to enable these to allow for agressive collection of usernames, but for now
-            // we have more than enough users
-            // so I'm disabling this.
+            } else /*
+                    * I was going to load followerCounts into userNode, but I decided to just query them live when
+                    * needed on the UserPreferences dialog todo-1: need a flag to enable these to allow for agressive
+                    * collection of usernames, but for now we have more than enough users so I'm disabling this.
+                    */
             // int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
             // int followingCount = apFollowing.loadRemoteFollowing(ms, userMakingRequest, actor);
             {

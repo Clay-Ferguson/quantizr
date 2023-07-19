@@ -100,9 +100,6 @@ public class ActPubUtil extends ServiceBase {
      * input: clay@server.com
      *
      * output: clay
-     *
-     * todo-1: make this still work even if input is (@clay@server.com) and also make sure this fix
-     * won't simultaneously break something else.
      */
     public String stripHostFromUserName(String userName) {
         int atIdx = userName.indexOf("@");
@@ -730,7 +727,6 @@ public class ActPubUtil extends ServiceBase {
         deleteNodeNotify((ObjectId) event.getSource());
     }
 
-    // todo-1: method is part of a work in progress and is not complete
     public void readForeignReplies(MongoSession ms, SubNode node, LinkedList<NodeInfo> replyNodes) {
         String apId = node.getStr(NodeProp.OBJECT_ID);
         if (apId == null) {
