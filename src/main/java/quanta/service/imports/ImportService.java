@@ -34,9 +34,8 @@ public class ImportService extends ServiceBase {
         // This is critical to be correct so we run the actual query based determination of 'hasChildren'
         boolean hasChildren = read.hasChildrenByQuery(ms, node.getPath());
         if (hasChildren) {
-            throw ExUtil.wrapEx(
-                    "You can only import into an empty node. There are direct children under path(a): "
-                            + node.getPath());
+            throw ExUtil.wrapEx("You can only import into an empty node. There are direct children under path(a): "
+                    + node.getPath());
         }
         /*
          * It's important to be sure there are absolutely no orphans at any level under this branch of the

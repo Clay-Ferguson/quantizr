@@ -292,12 +292,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {
                     // console.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
-                    if (resp.code != C.RESPONSE_CODE_OK) {
+                    if (!dlg.importMode && resp.code != C.RESPONSE_CODE_OK) {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
 
-                            let msg = "Uplaod Failed."
+                            let msg = "Upload Failed."
                             if (resp.code == C.RESPONSE_CODE_OUTOFSPACE) {
                                 msg += " You're out of storage space.";
                             }
@@ -336,9 +336,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.dropzone.addFile(this.autoAddFile);
 
                 // let's click the upload button too, automatically
-                setTimeout(() => {
-                    this.upload();
-                }, 250);
+                setTimeout(this.upload, 250);
             }
         }
     }
