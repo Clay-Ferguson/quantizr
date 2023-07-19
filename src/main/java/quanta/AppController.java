@@ -251,9 +251,8 @@ public class AppController extends ServiceBase implements ErrorController {
         SessionContext sc = ThreadLocals.getSC();
 
         boolean isHomeNodeRequest = false;
-        if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) { // Node Names are identified
-                                                                                      // using a colon in front of
-                                                                                      // it, to make it detectable
+        // Node Names are identified using a colon in front of it, to make it detectable
+        if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
             if ("home".equalsIgnoreCase(nameOnUserNode)) {
                 isHomeNodeRequest = true;
             }
@@ -265,6 +264,7 @@ public class AppController extends ServiceBase implements ErrorController {
         else if (!StringUtils.isEmpty(name)) {
             id = ":" + name;
         }
+
         boolean hasUrlId = false;
         // if we have an ID, try to look it up, to put it in the session and load the Social Card properties
         // for this request.
@@ -274,6 +274,7 @@ public class AppController extends ServiceBase implements ErrorController {
         } else {
             id = ":home";
         }
+
         String _id = id;
         boolean _hasUrlId = hasUrlId;
         boolean _isHomeNodeRequest = isHomeNodeRequest;
@@ -588,10 +589,9 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    // todo-1: I think this should be a GET operation, not a post, in order to do CACHING (in
-    // UtilFilter.java?), but
-    // I want to require an authToken in the header and I've never done that in a POST. I assume it's
-    // possible?
+    /*
+     * todo-1: I think this should be a GET operation
+     */
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
@@ -1561,12 +1561,16 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    // todo-1: broken for now. Needs special treatment in AppFilter to allow
-    @RequestMapping(value = "/health", method = RequestMethod.GET)
+    // todo-0: broken for now. Needs special treatment in web filters to allow, and also need to put in
+    // docker compose yaml
+    @RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String up() {
-        return ("Ver: " + prop.getAppVersion() + "Server: time=" + System.currentTimeMillis() + " SwarmTaskId="
-                + prop.getSwarmTaskId() + " slot=" + prop.getSwarmTaskSlot());
+    public String health() {
+        return "Health Check\n\n" + //
+                "Ver: " + prop.getAppVersion() + "\n" + //
+                "Server Time: " + System.currentTimeMillis() + "\n" + //
+                "Swarm Task Id: " + prop.getSwarmTaskId() + "\n" + //
+                "slot: " + prop.getSwarmTaskSlot();
     }
 
     /*

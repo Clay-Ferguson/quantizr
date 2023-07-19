@@ -86,7 +86,7 @@ public class SchemaOrgService extends ServiceBase {
                             break;
                     }
                 } else {
-                    log.debug("unknown type: " + XString.prettyPrint(item));
+                    // log.debug("unknown type: " + XString.prettyPrint(item));
                 }
             }
         }
@@ -105,7 +105,7 @@ public class SchemaOrgService extends ServiceBase {
                             break;
                     }
                 } else {
-                    log.debug("unknown type: " + XString.prettyPrint(item));
+                    // log.debug("unknown type: " + XString.prettyPrint(item));
                 }
             }
         }

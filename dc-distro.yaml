@@ -115,6 +115,12 @@ services:
                 max_attempts: 4
                 window: 120s
             replicas: 1
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://quanta-host:${PORT}/health"]
+            interval: 10m
+            timeout: 10s
+            retries: 3
+            start_period: 60s
         hostname: quanta-host
         networks:
             bridge:

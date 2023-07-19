@@ -83,6 +83,7 @@ public class AppFilter extends GenericFilterBean {
                 case AppController.API_PATH + "/serverPush":
                 case AppController.API_PATH + "/signNodes":
                 case AppController.API_PATH + "/getOpenGraph":
+                case AppController.API_PATH + "/health":
                     useLock = false;
                     break;
                 default:
