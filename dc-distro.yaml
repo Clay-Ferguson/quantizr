@@ -32,6 +32,7 @@ services:
         #     - cache:/data
 
     mongo-distro: 
+        image: mongo:6.0.8
         deploy:
             restart_policy:
                 condition: on-failure
@@ -49,7 +50,8 @@ services:
         volumes:
             - '${MONGO_DATA}:/data/db'
             - '${MONGOD_CONF}:/etc/mongod.conf'
-            - '${DEPLOY_TARGET}/dumps:/dumps'
+            - '${MONGO_BACKUP}:/backup'
+
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         # don't publish to outside world
@@ -62,10 +64,6 @@ services:
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
-
-        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
-        # and we don't want that happening unexpectedly
-        image: mongo:4.0
 
     # ipfs-distro: 
     #     # https://hub.docker.com/r/ipfs/kubo/

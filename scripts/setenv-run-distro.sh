@@ -37,6 +37,8 @@ export XMX=2g
 
 export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
+export MONGO_BACKUP=${DEPLOY_TARGET}/backup
+
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
 

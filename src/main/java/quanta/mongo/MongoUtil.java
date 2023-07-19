@@ -569,7 +569,14 @@ public class MongoUtil extends ServiceBase {
         // DO NOT DELETE. This is able to check contstraint volations.
         // read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
         log.debug("Creating FediverseName unique index.");
-        ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
+
+        try {
+            // todo-0: this is failing because duplicates exist
+            ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
+        } catch (Exception e) {
+            ExUtil.error(log, "FediverseName index failed", e);
+        }
+
         createUniqueIndex(ms, SubNode.class, SubNode.PATH);
         // Other indexes that *could* be added but we don't, just as a performance enhancer is
         // Unique node names: Key = node.owner+node.name (or just node.name for admin)

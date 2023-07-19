@@ -25,7 +25,7 @@ fi
 # take ownership of this directory as current user
 sudo chown -R $USER .
 
-mkdir -p ./dumps
+mkdir -p ./backup
 mkdir -p ./tmp
 mkdir -p ./log
 mkdir -p ./config

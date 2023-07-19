@@ -6,12 +6,12 @@ exit
 
 #The BEST way to export something that can be reimported easy to recreate the actual DB again.
 mongodump --username=root --password=${mongoPassword} --authenticationDatabase=admin \
-    --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive="/dumps/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose
+    --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive="/backup/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose
 
 #https://docs.mongodb.com/manual/reference/program/mongoexport
 #The best way to export human-readable text of the entire DB
 #mongoexport -v --pretty --username=root --password=??? --authenticationDatabase=admin \
-#    --host=${MONGO_HOST} --port=${MONGO_PORT} --collection=nodes --db=database --out="/dumps/nodes-"`eval date +%Y-%m-%d-%s`".json"
+#    --host=${MONGO_HOST} --port=${MONGO_PORT} --collection=nodes --db=database --out="/backup/nodes-"`eval date +%Y-%m-%d-%s`".json"
 
 # todo: check return code here!
 echo "mongodump complete!"

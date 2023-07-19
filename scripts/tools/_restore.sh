@@ -5,7 +5,7 @@ source ./setenv-run-distro.sh
 
 mongorestore --username=root --password=${adminPassword} --authenticationDatabase=admin \
     --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --drop --stopOnError --objcheck --verbose \
-    --archive="/dumps/dump-to-restore.gz"
+    --archive="/backup/dump-to-restore.gz"
 
 # todo: check return code here!
 echo "mongorestore complete!"

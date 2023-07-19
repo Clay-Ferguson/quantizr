@@ -65,6 +65,7 @@ export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
 
 # Sets a base location for MongoDB
 export MONGO_BASE=${PRJPARENT}
+export MONGO_BACKUP=/home/clay/mongodb-dev-backup
 
 # This tells our scripts where we are actually running from 
 # (The Distro Folder on this machine. The folder containing the runtime and configs)

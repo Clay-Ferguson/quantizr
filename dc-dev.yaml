@@ -49,7 +49,7 @@ services:
         #      --or--
         #   test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
 
-        image: mongo:4.0
+        image: mongo:6.0.8
         deploy:
             restart_policy:
                 condition: on-failure
@@ -67,6 +67,7 @@ services:
         volumes:
             - '${MONGO_BASE}/mongodb-data-dev:/data/db'
             - '${MONGOD_CONF}:/etc/mongod.conf'
+            - '${MONGO_BACKUP}:/backup'
 
         command: mongod --config /etc/mongod.conf
 

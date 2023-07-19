@@ -33,6 +33,7 @@ services:
 
     mongo-distro: 
         hostname: mongo-host-distro
+        image: mongo:6.0.8
         deploy:
             restart_policy:
                 condition: on-failure
@@ -50,16 +51,13 @@ services:
         volumes:
             - '${MONGO_DATA}:/data/db'
             - '${MONGOD_CONF}:/etc/mongod.conf'
+            - '${MONGO_BACKUP}:/backup'
 
         command: mongod --config /etc/mongod.conf
 
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
-
-        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
-        # and we don't want that happening unexpectedly
-        image: mongo:4.0
 
     # I'm Disabling IPFS for now, because it always just runs for a while and then just mysteriously terminates.
     # Need to investigate asap (todo-1)

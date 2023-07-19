@@ -45,7 +45,7 @@ cp ${SCRIPTS}/set-version.sh                ${DEPLOY_TARGET}
 
 # Note: this 'dumps' folder is mapped onto a volume in 'dc-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
-mkdir -p ${DEPLOY_TARGET}/dumps
+mkdir -p ${DEPLOY_TARGET}/backup
 mkdir -p ${DEPLOY_TARGET}/tmp
 mkdir -p ${DEPLOY_TARGET}/log
 mkdir -p ${DEPLOY_TARGET}/config
@@ -79,8 +79,8 @@ fi
 imageCheck ${DOCKER_IMAGE}
 
 # Copy over the Backup/Restore scripts
-cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/dumps
-cp ${SCRIPTS}/tools/_restore.sh         ${DEPLOY_TARGET}/dumps
+cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/backup
+cp ${SCRIPTS}/tools/_restore.sh         ${DEPLOY_TARGET}/backup
 cp ${SCRIPTS}/tools/backup.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/tools/restore.sh          ${DEPLOY_TARGET}
 
