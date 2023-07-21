@@ -523,7 +523,7 @@ export class DomUtil {
                     //     return;
                     // }
 
-                    // todo-1: this is an ugly solution because it displays the upload dialog
+                    // todo-2: this is an ugly solution because it displays the upload dialog
                     // and takes the user to the node that got uploade onto. I'd like to NOT do that,
                     // but just make it behind the scenes automatic.
                     S.attachment.openUploadFromFileDlg(false, id, file);
@@ -585,7 +585,7 @@ export class DomUtil {
     }
 
     public escapeRegEx = (text: string): string => {
-        // todo-1: from StackOverflow (not yet fully vetted)
+        // todo-2: from StackOverflow (not yet fully vetted)
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     }
 

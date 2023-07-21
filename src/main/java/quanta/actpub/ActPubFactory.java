@@ -160,8 +160,10 @@ public class ActPubFactory extends ServiceBase {
                     && !userDoingAction.equals(PrincipalName.ANON.s())) {
                 String followersUrl = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userDoingAction;
                 ccActors.add(followersUrl);
-            } else { // otherwise this is a foreign user? I'm pretty sure this is dead code here. Need to verify
-                     // (todo-1)
+            }
+            // otherwise this is a foreign user? I'm pretty sure this is dead code here. Need to verify
+            // (todo-2)
+            else {
                 /*
                  * public posts should always cc the followers of the person doing the post (the actor pointed to by
                  * attributedTo)

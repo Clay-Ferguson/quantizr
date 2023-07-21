@@ -20,7 +20,7 @@ public class IPFSConfig extends ServiceBase {
         API_CONFIG = prop.getIPFSApiBase() + "/config";
     }
 
-    // todo-1:
+    // todo-2:
     // add call to support CORS by calling this endpoint:
     // https://docs.ipfs.tech/reference/kubo/rpc/#api-v0-config
     // example:

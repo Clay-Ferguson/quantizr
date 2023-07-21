@@ -47,7 +47,7 @@ export class Crypto {
 
     SIG_ALGO = "RSASSA-PKCS1-v1_5";
 
-    // todo-1: need to vet these parameters
+    // todo-2: need to vet these parameters
     SIG_ALGO_OBJ: any = {
         name: this.SIG_ALGO,
         modulusLength: 2048,
@@ -278,7 +278,7 @@ export class Crypto {
         return true;
     }
 
-    // todo-1: need to make this require the password and username to be more secure.
+    // todo-2: need to make this require the password and username to be more secure.
     initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
         console.log("Crypto.initKeys");
         if (user === J.PrincipalName.ANON) {
@@ -315,7 +315,7 @@ export class Crypto {
         if (republish && (newAsymEncKey || newSigKey)) {
             // console.log("Pushing PublicKeys");
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
-                // todo-1: I'm not sure I want to keep these as escaped JSON or convert to hex
+                // todo-2: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,
                 sigKey: newSigKey
             });

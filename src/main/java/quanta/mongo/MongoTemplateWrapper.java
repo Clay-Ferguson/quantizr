@@ -19,7 +19,7 @@ import quanta.util.ThreadLocals;
 @Component
 public class MongoTemplateWrapper extends ServiceBase {
 
-    // todo-1: make this able to be enabled by Admin panel button
+    // todo-2: make this able to be enabled by Admin panel button
     private static boolean logging = false;
     private static Logger log = LoggerFactory.getLogger(MongoTemplateWrapper.class);
 

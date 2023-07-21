@@ -157,7 +157,7 @@ export class User {
                     S.util.loadBookmarks();
                 }, 500);
 
-                // todo-1: technically this delay is a bit of a hack because we really need a way to be SURE
+                // todo-2: technically this delay is a bit of a hack because we really need a way to be SURE
                 // the main app layout has already loaded before we even try to resume editing.
                 setTimeout(S.util.resumeEditingOfAbandoned, 1500);
             }

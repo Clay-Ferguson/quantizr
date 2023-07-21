@@ -652,7 +652,6 @@ export class Search {
         };
 
         if (extraStyle) {
-            // I have a feeling this code is dead. check it. todo-1
             attrs.style = extraStyle;
         }
 

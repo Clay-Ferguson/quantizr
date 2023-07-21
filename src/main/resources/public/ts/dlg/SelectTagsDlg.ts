@@ -150,7 +150,7 @@ export class SelectTagsDlg extends DialogBase {
     parseTags = (): Tag[] => {
         if (!getAs().userProfile?.userTags) return null;
         const tags: Tag[] = [];
-        // todo-1: in the TTS engine we have something like this done differently. Research which is best
+        // todo-2: in the TTS engine we have something like this done differently. Research which is best
         const lines: string[] = getAs().userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
             if (line?.startsWith("#")) {

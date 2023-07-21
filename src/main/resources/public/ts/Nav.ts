@@ -303,7 +303,7 @@ export class Nav {
                 });
                 S.nodeUtil.processInboundNode(res.node);
                 if (!res.node) {
-                    // todo-1: in this code path we should show an error message ON the Document Tab.
+                    S.util.showMessage("Failed to render node: " + id, "Warning");
                     return;
                 }
                 node = res.node;

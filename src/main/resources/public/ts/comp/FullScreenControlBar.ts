@@ -8,7 +8,7 @@ import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
 
-// todo-1: This really needs to be part of the fullscreen viewer classes themselves since each one
+// todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
 export class FullScreenControlBar extends Div {
 

@@ -601,6 +601,7 @@ public class NodeEditService extends ServiceBase {
 
             if (!isAccnt) {
                 HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, true);
+
                 if (tags != null && tags.size() > 0) {
                     String userDoingAction = ThreadLocals.getSC().getUserName();
                     apub.importUsers(ms, tags, userDoingAction);
@@ -970,7 +971,7 @@ public class NodeEditService extends ServiceBase {
         }
         transferNode(ms, req.getOperation(), node, fromUserNode, toUserNode, ops);
         if (req.isRecursive()) {
-            // todo-1: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
+            // todo-2: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
             // but leave as ALL node for the admin who might specify the 'from'?
             for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
                 transferNode(ms, req.getOperation(), n, fromUserNode, toUserNode, ops);
@@ -990,7 +991,7 @@ public class NodeEditService extends ServiceBase {
             IntVal ops) {
         if (node.getContent() != null && node.getContent().startsWith(Constant.ENC_TAG.s())) {
             // for now we silently ignore encrypted nodes during transfers. This needs some more thought
-            // (todo-1)
+            // (todo-2)
             return;
         }
         /*
@@ -1190,7 +1191,10 @@ public class NodeEditService extends ServiceBase {
         return ret.toString().trim();
     }
 
-    /* todo-1: we should be using a bulk update in here */
+    /*
+     * todo-2: we should be using a bulk update in here and using a streaming resultset instead of
+     * holding it all in memory
+     */
     public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
         SearchAndReplaceResponse res = new SearchAndReplaceResponse();
         int replacements = 0;

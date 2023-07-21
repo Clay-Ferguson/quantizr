@@ -12,21 +12,17 @@ public class Validator extends ServiceBase {
      *
      * Note that part of our requirement is that it must also be a valid substring inside node path
      * names, that are used or looking up things about this user.
-     *
-     * todo-1: fix inconsistency here. Either always return an error string or always throw when error
+     * 
+     * Returns error text if fails, or null if successful.
      */
     public String checkUserName(String userName) {
-        if (!auth.isAllowedUserName(userName)) {
+        if (!auth.isAllowedUserName(userName) || userName.contains("--")) {
             return "Invalid or illegal user name.";
-        }
-
-        if (userName.contains("--")) {
-            throw ExUtil.wrapEx("Username cannot contain '--'");
         }
 
         int len = userName.length();
         if (len < 3 || len > 100)
-            throw ExUtil.wrapEx("Username must be between 3 and 100 characters long.");
+            return "Username must be between 3 and 100 characters long.";
 
         for (int i = 0; i < len; i++) {
             char c = userName.charAt(i);

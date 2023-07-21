@@ -433,7 +433,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Reject", MenuPanel.rejectTransfer, onMainTab && selNodeIsMine && transferring, null, true), //
                 new MenuItem("Reclaim", MenuPanel.reclaimTransfer, onMainTab && transferFromMe, null, true) //
 
-                // todo-1: need "Show Incomming" transfers menu option
+                // todo-2: need a "Show Incomming" transfers menu option
             ], null));
 
             children.push(new Menu("Account", [

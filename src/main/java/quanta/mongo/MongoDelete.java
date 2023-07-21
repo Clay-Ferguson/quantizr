@@ -513,7 +513,7 @@ public class MongoDelete extends ServiceBase {
                  * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
                  * deducted from.
                  *
-                 * todo-1: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
+                 * todo-2: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
                  * grant them back the space, so this would rob users of some space. Need to fix that.
                  */
                 long totalBytes = user.getTotalAttachmentBytes(ms, node);
@@ -664,7 +664,7 @@ public class MongoDelete extends ServiceBase {
                     criterias.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
-                // todo-1: take another look at these to see if any can be useful for more powerful searching.
+                // todo-2: take another look at these to see if any can be useful for more powerful searching.
                 // .matchingAny("search term1", "search term2")
                 // .matching("search term") // matches any that contain "search" OR "term"
                 // .matchingPhrase("search term")

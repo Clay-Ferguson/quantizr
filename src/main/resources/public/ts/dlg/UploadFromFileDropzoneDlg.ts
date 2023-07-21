@@ -373,13 +373,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     hasAnyZipFiles = (): boolean => {
-        // todo-1: use the some() funcion here instead.
-        for (const file of this.fileList) {
-            if (file.name?.toLowerCase().endsWith(".zip")) {
-                return true;
-            }
-        }
-        return false;
+        return this.fileList.some(file => file.name?.toLowerCase().endsWith(".zip"));
     }
 
     runButtonEnablement = () => {

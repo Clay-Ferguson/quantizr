@@ -32,31 +32,30 @@ public class AsyncExec extends ServiceBase {
         run(new ThreadLocalsContext(), runnable);
     }
 
-    /*
-     * todo-1: when something throws an exception in this method we can't tell WHERE it truly came from
-     * so we need to pass a callstack thread into this or a name or something that lets us know what
-     * operation it's running.
-     */
     private void run(ThreadLocalsContext tlc, Runnable runnable) {
-        executor.execute(
-                new Runnable() {
-                    public void run() {
-                        try {
-                            execCounter++;
-                            if (execCounter > maxExecCounter) {
-                                maxExecCounter = execCounter;
-                            }
-                            if (tlc != null) {
-                                tlc.setValsIntoThread();
-                            }
-                            runnable.run();
-                        } catch (Exception e) {
-                            ExUtil.error(log, "exception in AsyncExec", e);
-                        } finally {
-                            ThreadLocals.removeAll();
-                            execCounter--;
-                        }
+        // We have to get the stackTrace ahead of time, so that if the async thread fails we can log
+        // what was actually happening that launched the executor/thread that failed.
+        String stackTrace = ExUtil.getStackTrace(null);
+
+        executor.execute(new Runnable() {
+            public void run() {
+                try {
+                    execCounter++;
+                    if (execCounter > maxExecCounter) {
+                        maxExecCounter = execCounter;
                     }
-                });
+                    if (tlc != null) {
+                        tlc.setValsIntoThread();
+                    }
+                    runnable.run();
+                } catch (Exception e) {
+                    ExUtil.error(log, "exception in AsyncExec", e);
+                    log.error("AsyncExec that failed was started by: " + stackTrace);
+                } finally {
+                    ThreadLocals.removeAll();
+                    execCounter--;
+                }
+            }
+        });
     }
 }

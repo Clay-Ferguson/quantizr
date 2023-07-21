@@ -773,7 +773,7 @@ public class AttachmentService extends ServiceBase {
         if (node == null) {
             throw new RuntimeException("node not found: id=" + req.getNodeId());
         }
-        // todo-1: make this handle multiple attachments, and all calls to it
+        // todo-2: make this handle multiple attachments, and all calls to it
         Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, true);
         auth.ownerAuth(node);
         att.setIpfsLink(req.getCid().trim());

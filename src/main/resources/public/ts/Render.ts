@@ -173,7 +173,7 @@ export class Render {
             // console.log(`marked.link [${href}][${title}][${text}]`);
 
             if (href.indexOf("mailto:") === 0) {
-                // todo-1: markdown thinks a fediverse username is a 'mailto' because the syntax looks like that.
+                // todo-2: markdown thinks a fediverse username is a 'mailto' because the syntax looks like that.
                 return `<span class="userNameInContent">${text}</span>`;
             }
 

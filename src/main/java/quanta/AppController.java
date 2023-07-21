@@ -171,7 +171,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @Autowired
     private GracefulShutdown gracefulShutdown;
 
-    // todo-1: put in const file so they're available on client
     public static final String API_PATH = "/api";
     public static final String ADMIN_PATH = "/admin";
     public static final String FILE_PATH = "/f";
@@ -293,7 +292,7 @@ public class AppController extends ServiceBase implements ErrorController {
             }
             if (node != null) {
                 if (_hasUrlId) {
-                    // todo-1: should this always be set even when we used ":home" above?
+                    // todo-2: should this always be set even when we used ":home" above?
                     sc.setInitialNodeId(_id);
                 }
                 if (AclService.isPublic(node)) {
@@ -326,7 +325,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * Renders files in './src/main/resources/templates/demo' folder.
      */
     @PerfMon
-    // todo-1: broken for now. Needs '/admin/' path and token
+    // todo-2: broken for now. Needs '/admin/' path and token
     @RequestMapping({"/demo/{file}"})
     public String demo(@PathVariable(value = "file", required = false) String file, //
             Model model) {
@@ -1109,7 +1108,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * https://stackoverflow.com/questions/38957245/spring-mvc-streamingresponsebody
      * -return-chunked-file </pre>
      */
-    // todo-1: broken for now. Needs accepted path (by AppFilter) and token
+    // todo-2: broken for now. Needs accepted path (by AppFilter) and token
     @RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
     public Object getFileSystemResourceStream(@PathVariable("nodeId") String nodeId,
             @RequestParam(name = "disp", required = false) String disposition, HttpSession session) {

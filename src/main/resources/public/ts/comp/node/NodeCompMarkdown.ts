@@ -100,7 +100,7 @@ export class NodeCompMarkdown extends Html {
     //     // be rendered as plain Images when OpenGraph rendering is complete.
     //     return val.replace(NodeCompMarkdown.urlRegex, (url: string) => {
     //         if (S.quanta.imageUrls.has(url)) {
-    //             // todo-1: we can add 'click to expand' functionality here.
+    //             // todo-2: we can add 'click to expand' functionality here.
     //             // It's probably better to render the image but LEAVE the 'url' in front of it
     //             // because that's addative to the page, and the scrollbars will behave much better
     //             // in cases where the page is only growing and nothing ever shifts UP.

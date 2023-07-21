@@ -98,7 +98,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
             if (this.level <= 1) {
                 let insertButton: Button = null;
-                // todo-1: this button should have same enablement as "new" button, on the page root
+                // 2: this button should have same enablement as "new" button, on the page root
                 // Note: this is the very last "+" button at the bottom, to insert below last child
                 comps.push(new Divc({ className: (ast.userPrefs.editMode ? "nodeTableRowEdit" : "nodeTableRow") }, [
                     insertButton = new Button(null, () => {

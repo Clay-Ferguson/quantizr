@@ -62,7 +62,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
                 ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
                 ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
                 ast.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
-                // todo-1: eventually we will make available to all users
+                // todo-2: eventually we will make available to all users
                 ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
                 new AppNavLink("Fediverse", S.nav.messagesFediverse),
                 ...S.render.buildCustomLinks(S.quanta.cfg.rhsFeedLinks)

@@ -267,7 +267,7 @@ export class NodeUtil {
         let numShares = 0;
         for (const ac of node.ac) {
             const suffix = this.getPublicPrivilegsSuffix(ac.principalName, node);
-            // todo-1: will come back to this. I think this happens when there's a share to a user whose
+            // todo-2: will come back to this. I think this happens when there's a share to a user whose
             // account no longer exists?
             // if (!ac.principalName) {
             //     console.log("missing principalName on acl: " + S.util.prettyPrint(node));
@@ -295,7 +295,7 @@ export class NodeUtil {
                         title
                     }
                 }
-                // todo-1: Else this is a foreign user, so is there a way to set a link
+                // todo-2: Else this is a foreign user, so is there a way to set a link
                 // here to a foreign account, or should we basically run the equivalent
                 // of a user search here, probably best done with a modifiction to the
                 // UserPreferences server call and dialog
