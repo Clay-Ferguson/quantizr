@@ -504,7 +504,7 @@ public class MongoRead extends ServiceBase {
      * There is no actual NODE that is root node.
      */
     public Iterable<SubNode> getChildren(MongoSession ms, String path, Sort sort, Integer limit, int skip,
-            TextCriteria textCriteria, Criteria moreCriteria, boolean preCheck) {
+            TextCriteria textCriteria, Criteria moreCriteria, boolean preCheck, boolean allowAuth) {
         if (preCheck && noChildren(ms, path)) {
             return Collections.<SubNode>emptyList();
         }
@@ -537,13 +537,16 @@ public class MongoRead extends ServiceBase {
             q.with(sort);
         }
 
-        crit = auth.addReadSecurity(ms, crit);
+        if (allowAuth) {
+            crit = auth.addReadSecurity(ms, crit);
+        }
         q.addCriteria(crit);
         return opsw.find(ms, q);
     }
 
-    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
-        return getChildren(ms, node, sort, limit, skip, null);
+    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
+            boolean allowAuth) {
+        return getChildren(ms, node, sort, limit, skip, null, allowAuth);
     }
 
     /*
@@ -551,7 +554,7 @@ public class MongoRead extends ServiceBase {
      * There is no actual NODE that is root node
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
-            Criteria moreCriteria) {
+            Criteria moreCriteria, boolean allowAuth) {
         if (readFromAdminCache() && moreCriteria == null && sort != null && ordinalSort.equals(sort)) {
             TreeNode tn = null;
             synchronized (SystemService.adminNodesCacheLock) {
@@ -581,12 +584,14 @@ public class MongoRead extends ServiceBase {
             }
         }
 
-        auth.auth(ms, node, PrivilegeType.READ);
-        return getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria, false);
+        if (allowAuth) {
+            auth.auth(ms, node, PrivilegeType.READ);
+        }
+        return getChildren(ms, node.getPath(), sort, limit, skip, null, moreCriteria, false, allowAuth);
     }
 
-    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
-        return getChildren(ms, node, null, null, 0);
+    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, boolean allowAuth) {
+        return getChildren(ms, node, null, null, 0, allowAuth);
     }
 
     /*
@@ -724,7 +729,8 @@ public class MongoRead extends ServiceBase {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
         }
 
-        if (allowAuth) {
+        // Note if publicOnly we don't need any more security conditions. Anyone can see 'public stuff'
+        if (allowAuth && !publicOnly) {
             crit = auth.addReadSecurity(ms, crit);
         }
         q.addCriteria(crit);

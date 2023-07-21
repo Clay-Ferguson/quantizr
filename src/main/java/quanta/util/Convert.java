@@ -176,7 +176,7 @@ public class Convert extends ServiceBase {
             boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
             if (hasInlineChildren) {
                 Iterable<SubNode> nodeIter =
-                        read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0);
+                        read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0, true);
                 Iterator<SubNode> iterator = nodeIter.iterator();
                 long inlineOrdinal = 0;
 

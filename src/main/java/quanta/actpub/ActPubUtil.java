@@ -817,8 +817,8 @@ public class ActPubUtil extends ServiceBase {
                             Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, true);
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
-                        Iterable<SubNode> iter =
-                                read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0);
+                        Iterable<SubNode> iter = read.getChildren(ms, node,
+                                Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0, true);
                         HashSet<String> childIds = new HashSet<>();
                         List<NodeInfo> children = new LinkedList<>();
                         for (SubNode child : iter) {

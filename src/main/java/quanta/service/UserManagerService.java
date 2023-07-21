@@ -1361,7 +1361,7 @@ public class UserManagerService extends ServiceBase {
             parentNodeVal.setVal(parentNode);
         }
         for (SubNode node : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
-                null, 0, moreCriteria)) {
+                null, 0, moreCriteria, true)) {
             nodeList.add(node);
         }
         return nodeList;

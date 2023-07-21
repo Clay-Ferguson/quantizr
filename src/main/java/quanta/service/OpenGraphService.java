@@ -107,8 +107,9 @@ public class OpenGraphService extends ServiceBase {
     // Parses the content for any HTML links and attempts to get the OpenGraph from the network
     // and puts the opengraph object into node properties.
     //
-    // todo-1: for now this method is 'cumulative' and never removes unused OG entries like if a node
-    // is edited, but we will take care of that when we are calling this during SAVEs.
+    // todo-3: for now this method is 'cumulative' and never removes unused OG entries like if a node
+    // is edited (unless all HTTPs text is removed), but we will take care of that when we are calling
+    // this during SAVEs.
     public void parseNode(SubNode node, boolean reset) {
         if (StringUtils.isEmpty(node.getContent())) {
             if (reset) {
@@ -127,16 +128,17 @@ public class OpenGraphService extends ServiceBase {
         ArrayList<String> ogList =
                 reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
 
-        // Adding the " " to the end is a hack because my regex isn't perfect (todo-1: fix the regex)
+        // Adding the " " to the end is a hack because my regex isn't perfect (todo-3: fix the regex)
         Matcher matcher = urlPattern.matcher(node.getContent() + " ");
 
+        // scan/parse all the URLs in node content
         while (matcher.find()) {
             if (ogList == null) {
                 ogList = new ArrayList<>();
             }
             String url = node.getContent().substring(matcher.start(0), matcher.end(0));
 
-            // Stripping slashes is a hack because my regex isn't perfect (todo-1: fix the regex)
+            // Stripping trailing slashes is a hack because my regex isn't perfect (todo-3: fix the regex)
             url = XString.stripIfEndsWith(url, "/");
             url = XString.stripIfEndsWith(url, "\\");
 
@@ -156,8 +158,8 @@ public class OpenGraphService extends ServiceBase {
             OpenGraph og = getOpenGraph(url);
             ogList.add(XString.compactPrint(og));
 
-            // if more than 50 links in content then ignore the rest
-            if (ogList.size() > 50) {
+            // if more than 10 links in content then ignore the rest
+            if (ogList.size() > 10) {
                 break;
             }
         }

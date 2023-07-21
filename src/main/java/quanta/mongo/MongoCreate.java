@@ -167,7 +167,8 @@ public class MongoCreate extends ServiceBase {
         BulkOperations bops = null;
         int batchSize = 0;
 
-        for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit)) {
+        for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit,
+                false)) {
             // lazy create bulkOps
             if (bops == null) {
                 bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);

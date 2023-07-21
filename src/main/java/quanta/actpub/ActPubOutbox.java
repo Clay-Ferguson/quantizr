@@ -78,7 +78,7 @@ public class ActPubOutbox extends ServiceBase {
              * Query all existing known outbox items we have already saved for this foreign user
              */
             Iterable<SubNode> outboxItems = read.getChildren(ms, outboxNode,
-                    Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), MAX_OUTBOX_READ, 0);
+                    Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), MAX_OUTBOX_READ, 0, false);
             /*
              * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
              * foreign server

@@ -716,10 +716,14 @@ public class RSSFeedService extends ServiceBase {
         feed.setDescription(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
         List<SyndEntry> entries = new LinkedList<>();
         feed.setEntries(entries);
+
         if (AclService.isPublic(node)) {
             Criteria crit = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+
+            // pass allowAuth=false, becasue we already included PUBLIC and everyone can see public.
             Iterable<SubNode> iter =
-                    read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
+                    read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit, false);
+
             if (iter != null) {
                 for (SubNode n : iter) {
                     if (!AclService.isPublic(n))

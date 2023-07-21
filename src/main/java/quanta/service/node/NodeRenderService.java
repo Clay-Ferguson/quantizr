@@ -231,7 +231,7 @@ public class NodeRenderService extends ServiceBase {
         // if (!showReplies) {
         // moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
         // }
-        Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria);
+        Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria, true);
         Iterator<SubNode> iterator = nodeIter.iterator();
         int idx = offset;
         // this should only get set to true if we run out of records, because we reached

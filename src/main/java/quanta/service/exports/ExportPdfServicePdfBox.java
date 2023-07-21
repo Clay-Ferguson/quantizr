@@ -136,7 +136,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
         processNode(node);
         Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 
-        for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
+        for (SubNode n : read.getChildren(session, node, sort, null, 0, true)) {
             recurseNode(n, level + 1);
         }
     }
