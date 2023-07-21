@@ -207,7 +207,7 @@ export class TypeBase implements TypeIntf {
         const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
 
         // Format ActivityPub Question/Poll Options here
-        // todo-0: This is a hack for now until we have polymorphic type handling for ActPub types
+        // todo-2: This is a hack for now until we have polymorphic type handling for ActPub types
         let choices: Div = null
         const oneOf: any[] = S.props.getPropObj("oneOf", node);
         if (oneOf) {

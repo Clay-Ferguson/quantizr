@@ -972,7 +972,6 @@ export class Edit {
         dispatch("UpdateCalendarData", s => {
             selNodesArray.forEach(id => {
                 if (!s.calendarData) return;
-                // todo-0: can we put typesafety back on this 'item' here?
                 s.calendarData = s.calendarData.filter((item: any) => item.id !== id);
             });
         });

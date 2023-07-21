@@ -80,9 +80,7 @@ export class AppState {
 
     graphSearchText: string = null;
     highlightText: string = null;
-
-    // todo-1: put typesafety back on this array
-    calendarData: any[];
+    calendarData: J.CalendarItem[];
     calendarShowWeekends: boolean = false;
 
     fullScreenImageSize: string = C.FULL_SCREEN_MAX_WIDTH;

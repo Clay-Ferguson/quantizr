@@ -52,10 +52,8 @@ export class FullScreenCalendar extends Main {
                 weekends: state.calendarShowWeekends,
                 initialEvents: state.calendarData,
                 dateClick: this.dateClick,
-                // select: this.handleDateSelect,
                 eventContent: renderEventContent,
                 eventClick: this.handleEventClick,
-                // eventsSet: {this.handleEvents}
 
                 customButtons: {
                     addEventButton: {

@@ -323,9 +323,9 @@ export class Render {
         const res = await S.rpcUtil.rpc<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         });
+
         dispatch("ShowCalendar", s => {
             s.fullScreenConfig = { type: FullScreenType.CALENDAR, nodeId };
-
             if (res) console.log("has res");
             s.calendarData = S.util.buildCalendarData(res.items);
         });

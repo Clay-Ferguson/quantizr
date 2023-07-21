@@ -656,7 +656,6 @@ export class Util {
         console.log(message + " Time=" + (endTime - startTime));
     }
 
-    // todo-0: put typesafety back on this return value array
     buildCalendarData = (items: J.CalendarItem[]): any[] => {
         if (!items) return [];
         const ret: any[] = [];
