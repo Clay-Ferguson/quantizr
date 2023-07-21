@@ -311,7 +311,7 @@ export class Search {
             searchProp: null,
             fuzzy: false,
             caseSensitive: false,
-            searchDefinition: "timeline",
+            searchDefinition: J.Constant.SEARCH_DEF_TIMELINE,
             searchType: null,
             timeRangeType,
             recursive,

@@ -1,4 +1,8 @@
 import { dispatch, getAs } from "../AppContext";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
+import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
@@ -10,10 +14,6 @@ import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
-import { Validator } from "../Validator";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 
@@ -124,8 +124,8 @@ export class SearchContentDlg extends DialogBase {
 
                 new FlexRowLayout([
                     new Selection(null, "Search in", [
-                        { key: "curNode", val: "Current Node" },
-                        { key: "allNodes", val: "My Account" }
+                        { key: J.Constant.SEARCH_CUR_NODE, val: "Current Node" },
+                        { key: J.Constant.SEARCH_ALL_NODES, val: "My Account" }
                     ], null, "searchDlgSearchRoot", {
                         setValue: (val: string) => {
                             SearchContentDlg.dlgState.searchRoot = val;
@@ -246,7 +246,7 @@ export class SearchContentDlg extends DialogBase {
     }
 
     search = async (deleteMatches: boolean) => {
-        const node =  this.searchRoot || S.nodeUtil.getHighlightedNode();
+        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

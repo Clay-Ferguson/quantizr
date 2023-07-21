@@ -170,16 +170,18 @@ public class NodeSearchService extends ServiceBase {
                 userSearch(ms, null, req, searchResults);
             } else { // else we're doing a normal subgraph search for the text
                 SubNode searchRoot = null;
-                // todo-1: make this 'allNodes' a constant
-                if ("allNodes".equals(req.getSearchRoot())) {
+
+                if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRoot())) {
                     searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
                 } else {
                     searchRoot = read.getNode(ms, req.getNodeId());
                 }
+
                 boolean adminOnly = acl.isAdminOwned(searchRoot);
-                if ("timeline".equals(req.getSearchDefinition())) {
+                if (Constant.SEARCH_DEF_TIMELINE.equals(req.getSearchDefinition())) {
                     ThreadLocals.getSC().setTimelinePath(searchRoot.getPath());
                 }
+
                 if (req.isDeleteMatches()) {
                     delete.deleteMatches(ms, searchRoot, req.getSearchProp(), searchText, req.isFuzzy(),
                             req.isCaseSensitive(), req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority());

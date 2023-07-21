@@ -3,6 +3,9 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Constant {
+    SEARCH_ALL_NODES("allNodes"), //
+    SEARCH_CUR_NODE("curNode"), //
+    SEARCH_DEF_TIMELINE("timeline"), //
     SEARCH_TYPE_USER_LOCAL("userLocal"), //
     SEARCH_TYPE_USER_ALL("userAll"), //
     SEARCH_TYPE_USER_FOREIGN("userForeign"), //
