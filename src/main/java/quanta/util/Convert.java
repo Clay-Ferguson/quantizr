@@ -53,9 +53,6 @@ public class Convert extends ServiceBase {
      * Generates a NodeInfo object, which is the primary data type that is also used on the
      * browser/client to encapsulate the data for a given node which is used by the browser to render
      * the node.
-     *
-     * todo-1: make sure any saving that's triggered in here is done in an async thread that doesn't
-     * block this method from returning fast
      */
     public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
             boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild,

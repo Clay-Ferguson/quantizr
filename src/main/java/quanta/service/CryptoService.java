@@ -168,11 +168,8 @@ public class CryptoService extends ServiceBase {
 
             for (NodeSigData data : req.getListToSign()) {
                 ObjectId id = new ObjectId(data.getNodeId());
-                /*
-                 * todo-1: we could optimize this and be faster by using an 'in clause' to lookup all the nodes in a
-                 * single query instead of doing this 'getNode' on each one.
-                 */
                 SubNode node = read.getNode(ms, id);
+
                 // if we found the node and this setter DID change it's value, then we save.
                 if (node != null && node.set(NodeProp.CRYPTO_SIG, data.getData())) {
                     // clean so we won't let this node get persisted, because we're doing the persist in this bulk op

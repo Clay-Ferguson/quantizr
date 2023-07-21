@@ -159,9 +159,7 @@ export class User {
 
                 // todo-1: technically this delay is a bit of a hack because we really need a way to be SURE
                 // the main app layout has already loaded before we even try to resume editing.
-                setTimeout(() => {
-                    S.util.resumeEditingOfAbandoned();
-                }, 1500);
+                setTimeout(S.util.resumeEditingOfAbandoned, 1500);
             }
 
             await S.util.setInitialStateVars(res);

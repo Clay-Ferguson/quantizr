@@ -302,8 +302,6 @@ export class DomUtil {
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
     setDropHandler = (attribs: any, func: (elm: any) => void) => {
         attribs.onDragEnter = function (event: any) {
-            // todo-1: should this also do the same thing onDragOver does? and then
-            // maybe we wouldn't need onDragOver in that case?
             event.stopPropagation();
             event.preventDefault();
             event.currentTarget.classList.add("dragTarget");

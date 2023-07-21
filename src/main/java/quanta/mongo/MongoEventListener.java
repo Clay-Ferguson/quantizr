@@ -88,7 +88,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
      */
     @Override
     public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
-        // super.onBeforeSave(event); todo-1: this needed?
         SubNode node = event.getSource();
         log.trace("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
         Document dbObj = event.getDocument();
@@ -225,7 +224,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
     @Override
     public void onAfterSave(AfterSaveEvent<SubNode> event) {
-        // super.onAfterSave(event); todo-1: this needed?
         SubNode node = event.getSource();
         // update cache during save
         if (node != null) {
@@ -239,14 +237,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
     @Override
     public void onAfterLoad(AfterLoadEvent<SubNode> event) {
-        // super.onAfterLoad(event); todo-1: this needed?
         // Document dbObj = event.getDocument();
         // String id = dbObj.getObjectId(SubNode.ID).toHexString();
     }
 
     @Override
     public void onAfterConvert(AfterConvertEvent<SubNode> event) {
-        // super.onAfterConvert(event); todo-1: this needed?
         SubNode node = event.getSource();
         if (node.getOwner() == null) {
             if (auth.getAdminSession() != null) {
@@ -271,7 +267,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
     @Override
     public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
-        // super.onBeforeDelete(event); todo-1: this needed?
         if (!MongoRepository.fullInit)
             return;
         Document doc = event.getDocument();

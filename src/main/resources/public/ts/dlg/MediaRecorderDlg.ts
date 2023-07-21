@@ -255,9 +255,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         // todo-1: need code to enforce the call to clear this timer, no matter when or how this dialog vanishes.
         // probably needs to be a react hook
-        this.recordingTimer = setInterval(() => {
-            this.recordingTimeslice();
-        }, 1000);
+        this.recordingTimer = setInterval(this.recordingTimeslice, 1000);
     }
 
     displayStream = () => {

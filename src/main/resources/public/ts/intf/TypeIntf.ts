@@ -36,9 +36,6 @@ export interface TypeIntf {
     // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
     subOrdinal(): number;
     renderEditorSubPanel(node: J.NodeInfo): Comp;
-
-    // todo-1: now that we have EditorOptions, many of the fixed values can be subsumed into it to simplify
-    // this interface
     getEditorOptions(): EditorOptions;
     getType(prop: string): string;
 

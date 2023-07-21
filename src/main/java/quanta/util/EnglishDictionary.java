@@ -40,8 +40,8 @@ public class EnglishDictionary extends ServiceBase {
             return;
         try {
             /*
-             * todo-1: Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes
-             * it into unique sorted list in 'words-unique.txt'
+             * Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes it into
+             * unique sorted list in 'words-unique.txt'
              */
             // sed 's/[[:blank:]]//g' words.txt > cleaned.txt
             // awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt

@@ -355,7 +355,7 @@ export class SpeechEngine {
                         this.ttsSpeakingTime = 0;
 
                         // todo-1: need to research this "fix" even more, because it appears even
-                        // pausing vor 10 seconds makes the TTS engine break, and if the only fix
+                        // pausing for 10 seconds makes the TTS engine break, and if the only fix
                         // to that breaking is a resume again, that means we simply CANNOT use pause.
                         // Must stop and restart to simulate a pause
                         this.tts.pause();

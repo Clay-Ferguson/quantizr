@@ -81,8 +81,9 @@ export class EditNodeDlgUtil {
         this.saveAttFileNamesToNode(editNode, dlg);
 
         /*
-        Note: if this is an encrypted node we will be signing the cipher text (encrypted string), because content has already
-        been encrypted just above.
+        Note: if this is an encrypted node we will be signing the cipher text (encrypted string), 
+        because content has already  been encrypted just above.
+        
         todo-1: Note: We only sign if admin for now, by design */
 
         if (dlg.getState<EditNodeDlgState>().signCheckboxVal) {

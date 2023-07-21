@@ -783,7 +783,7 @@ public class MongoRead extends ServiceBase {
                     ands.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
-                // todo-1: take another look at these to see if any can be useful for more powerful searching.
+                // examples:
                 // .matchingAny("search term1", "search term2")
                 // .matching("search term") // matches any that contain "search" OR "term"
                 // .matchingPhrase("search term")

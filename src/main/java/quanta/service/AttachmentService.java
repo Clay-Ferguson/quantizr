@@ -1121,7 +1121,6 @@ public class AttachmentService extends ServiceBase {
                                 // Note: It's not a bug that we don't call this here:
                                 // usrMgr.addNodeBytesToUserNodeBytes(session, node, null, -1);
                                 // Because all the userstats are updated at the end of this scan.
-                                // todo-1: does grid support bulkOp deleting?
                                 grid.delete(q);
                                 delCount++;
                             } else /*
