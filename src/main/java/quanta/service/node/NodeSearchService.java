@@ -409,7 +409,9 @@ public class NodeSearchService extends ServiceBase {
                 ands.add(Criteria.where(SubNode.OWNER).nin(blockedUserIds));
             }
 
-            crit = auth.addReadSecurity(ms, crit, ands);
+            // NO! Don't do security check here. We're querying for ONLY PUBLIC (see above)
+            // crit = auth.addReadSecurity(ms, crit, ands);
+
             q.addCriteria(crit);
             q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
             q.limit(TRENDING_LIMIT);
@@ -417,11 +419,11 @@ public class NodeSearchService extends ServiceBase {
             // pass null session here to bypass security. We quey for only PUBLIC to this is fine
             iter = opsw.find(null, q);
         }
-        //
-        else /*
-              * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
-              * running a stats request under the 'Node Info' main menu
-              */ {
+        /*
+         * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
+         * running a stats request under the 'Node Info' main menu
+         */
+        else {
             ms = ThreadLocals.ensure(ms);
             SubNode searchRoot = read.getNode(ms, req.getNodeId());
             if (req.isSignatureVerify()) {
