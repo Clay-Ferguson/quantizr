@@ -74,11 +74,10 @@ public class SchemaOrgService extends ServiceBase {
         log.debug("Scanning Schema.org Classes.");
 
         for (Object item : graph) {
-            if (item instanceof HashMap) {
-                HashMap mitem = (HashMap) item;
+            if (item instanceof HashMap mitem) {
                 Object type = mitem.get("@type");
-                if (type instanceof String) {
-                    switch ((String) type) {
+                if (type instanceof String o) {
+                    switch (o) {
                         case "rdfs:Class":
                             setupClass(mitem);
                             break;
@@ -93,11 +92,9 @@ public class SchemaOrgService extends ServiceBase {
         log.debug("Scanning Schema.org Properties.");
         // next we scan again to distribute the properties into all the classes
         for (Object item : graph) {
-            if (item instanceof HashMap) {
-                HashMap mitem = (HashMap) item;
+            if (item instanceof HashMap mitem) {
                 Object type = mitem.get("@type");
-                if (type instanceof String) {
-                    String stype = (String) type;
+                if (type instanceof String stype) {
                     switch (stype) {
                         case "rdf:Property":
                             setupProperty(mitem);
@@ -121,8 +118,7 @@ public class SchemaOrgService extends ServiceBase {
 
     private void setupClass(HashMap mitem) {
         Object id = mitem.get("@id");
-        if (id instanceof String) {
-            String sid = (String) id;
+        if (id instanceof String sid) {
             SchemaOrgClass soc = new SchemaOrgClass();
             Object label = mitem.get("rdfs:label");
             String slabel = getStringValue(label);
@@ -142,14 +138,13 @@ public class SchemaOrgService extends ServiceBase {
     private String getStringValue(Object label) {
         String slabel = null;
         // handle if string
-        if (label instanceof String) {
-            slabel = (String) label;
+        if (label instanceof String o) {
+            slabel = o;
         } //
-        else if (label instanceof HashMap) { // else try to get @value out of object
-            HashMap mlabel = (HashMap) label;
+        else if (label instanceof HashMap mlabel) { // else try to get @value out of object
             Object val = mlabel.get("@value");
-            if (val instanceof String) {
-                slabel = (String) val;
+            if (val instanceof String o) {
+                slabel = o;
             }
         }
         return slabel;
@@ -173,9 +168,7 @@ public class SchemaOrgService extends ServiceBase {
         if (domains instanceof HashMap) {
             setupDomainObj(sop, prop, domains);
         } //
-        else if (domains instanceof List) { // handle of list
-            List ldomains = (List) domains;
-
+        else if (domains instanceof List ldomains) { // handle of list
             for (Object domain : ldomains) {
                 if (domain instanceof HashMap) {
                     setupDomainObj(sop, prop, domain);
@@ -194,9 +187,7 @@ public class SchemaOrgService extends ServiceBase {
         if (ranges instanceof HashMap) {
             setupRangeObj(sop, prop, ranges);
         } //
-        else if (ranges instanceof List) { // handle of list
-            List lranges = (List) ranges;
-
+        else if (ranges instanceof List lranges) { // handle of list
             for (Object range : lranges) {
                 if (range instanceof HashMap) {
                     setupRangeObj(sop, prop, range);
@@ -212,8 +203,7 @@ public class SchemaOrgService extends ServiceBase {
     private void setupDomainObj(SchemaOrgProp sop, HashMap prop, Object domain) {
         HashMap mdomain = (HashMap) domain;
         Object domainId = mdomain.get("@id");
-        if (domainId instanceof String) {
-            String sdomainId = (String) domainId;
+        if (domainId instanceof String sdomainId) {
             SchemaOrgClass soc = classMap.get(sdomainId);
             if (soc != null) {
                 Object propLabel = prop.get("rdfs:label");
@@ -231,8 +221,7 @@ public class SchemaOrgService extends ServiceBase {
     private void setupRangeObj(SchemaOrgProp sop, HashMap prop, Object range) {
         HashMap mrange = (HashMap) range;
         Object rangeId = mrange.get("@id");
-        if (rangeId instanceof String) {
-            String srangeId = (String) rangeId;
+        if (rangeId instanceof String srangeId) {
             sop.getRanges().add(new SchemaOrgRange(srangeId.replace("schema:", "")));
         }
     }

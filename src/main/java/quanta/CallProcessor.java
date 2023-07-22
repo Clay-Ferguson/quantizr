@@ -75,8 +75,8 @@ public class CallProcessor extends ServiceBase {
                 update.saveSession(ms);
             }
 
-            if (ret instanceof ResponseBase) {
-                orb = (ResponseBase) ret;
+            if (ret instanceof ResponseBase _ret) {
+                orb = _ret;
 
                 if (orb.getCode() == null) {
                     orb.setCode(HttpServletResponse.SC_OK);
@@ -106,10 +106,9 @@ public class CallProcessor extends ServiceBase {
             }
         }
 
-        if (ret instanceof ResponseBase) {
+        if (ret instanceof ResponseBase _ret) {
             String callId = ThreadLocals.getServletRequest().getHeader("callId");
-            ((ResponseBase) ret).setReplica(
-                    "callId=" + callId + " Slot=" + prop.getSwarmTaskSlot() + " ID=" + prop.getSwarmTaskId());
+            _ret.setReplica("callId=" + callId + " Slot=" + prop.getSwarmTaskSlot() + " ID=" + prop.getSwarmTaskId());
             log.trace("RES=" + XString.prettyPrint(ret));
 
             // make sure whatever ResponseBase we ended up with here (may change during processing) is set in

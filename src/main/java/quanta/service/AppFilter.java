@@ -187,8 +187,7 @@ public class AppFilter extends GenericFilterBean {
             ThreadLocals.removeAll();
 
             if (audit) {
-                if (res instanceof HttpServletResponse) {
-                    HttpServletResponse sres = (HttpServletResponse) res;
+                if (res instanceof HttpServletResponse sres) {
                     postProcess(httpReq, sres);
                 }
             }
@@ -339,8 +338,7 @@ public class AppFilter extends GenericFilterBean {
     private String getAttributeInfo(HttpServletRequest sreq) {
         StringBuilder sb = new StringBuilder();
         Object reqAttrs = sreq.getAttributeNames();
-        if (reqAttrs != null && reqAttrs instanceof Enumeration<?>) {
-            Enumeration<?> attrs = (Enumeration<?>) reqAttrs;
+        if (reqAttrs != null && reqAttrs instanceof Enumeration<?> attrs) {
             sb.append("Req Attrs:\n");
 
             while (attrs.hasMoreElements()) {
@@ -368,8 +366,7 @@ public class AppFilter extends GenericFilterBean {
         }
         StringBuilder sb = new StringBuilder();
         Object sessionAattrs = session.getAttributeNames();
-        if (sessionAattrs != null && sessionAattrs instanceof Enumeration<?>) {
-            Enumeration<?> attrs = (Enumeration<?>) sessionAattrs;
+        if (sessionAattrs != null && sessionAattrs instanceof Enumeration<?> attrs) {
             sb.append("Sess Attrs:\n");
 
             while (attrs.hasMoreElements()) {

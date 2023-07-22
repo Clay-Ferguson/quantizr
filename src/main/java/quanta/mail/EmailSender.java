@@ -172,9 +172,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
             cont.append("From: " + message.getFrom()[0]);
             cont.append("\n\n");
             Object obj = message.getContent();
-            if (obj instanceof MimeMultipart) {
-                MimeMultipart mm = (MimeMultipart) obj;
-
+            if (obj instanceof MimeMultipart mm) {
                 for (int i = 0; i < mm.getCount(); i++) {
                     BodyPart part = mm.getBodyPart(i);
                     if (part.getContentType().startsWith("text/plain;")) {

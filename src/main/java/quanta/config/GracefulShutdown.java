@@ -48,9 +48,9 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
         log.debug("GracefulShudown: ContextClosedEvent");
         this.connector.pause();
         Executor executor = this.connector.getProtocolHandler().getExecutor();
-        if (executor instanceof ThreadPoolExecutor) {
+        if (executor instanceof ThreadPoolExecutor o) {
             try {
-                ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+                ThreadPoolExecutor threadPoolExecutor = o;
                 log.debug("GracefulShutdown closing executor with hashCode=" + executor.hashCode() + " class="
                         + executor.getClass().getName());
                 threadPoolExecutor.shutdown();

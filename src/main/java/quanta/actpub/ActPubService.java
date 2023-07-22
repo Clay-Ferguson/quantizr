@@ -579,10 +579,7 @@ public class ActPubService extends ServiceBase {
         log.trace("INBOX: " + XString.prettyPrint(payload));
         if (payload.getType() == null)
             return;
-        /*
-         * todo-1: verify that for follow types the actorUrl can be obtained also from payload, rather than
-         * only payload.actor===payload.obj.actor, but I think they should be the SAME for a follow action
-         */
+
         if (payload.getActor() == null) {
             log.error("no 'actor' found on payload: " + XString.prettyPrint(payload));
             throw new RuntimeException("No actor on payload");
@@ -760,8 +757,8 @@ public class ActPubService extends ServiceBase {
             Object object = activity.getObject();
             String id = null;
             // if the object to be deleted is specified as a string, assume it's the ID.
-            if (object instanceof String) {
-                id = (String) object;
+            if (object instanceof String o) {
+                id = o;
             } else { // otherwise we assume it's an object, with an ID in it.
                 id = apStr(object, APObj.id);
             }
@@ -940,10 +937,10 @@ public class ActPubService extends ServiceBase {
         if (context != null) {
             String language = null;
             // if context is a list we try to dig the language out of one of it's objects
-            if (context instanceof List) {
-                Object langObj = apParseList((List) context, APObj.language);
-                if (langObj instanceof String) {
-                    language = (String) langObj;
+            if (context instanceof List o) {
+                Object langObj = apParseList(o, APObj.language);
+                if (langObj instanceof String o2) {
+                    language = o2;
                 }
             }
             // if we didn't get a language that way try the simpler way
@@ -1081,20 +1078,20 @@ public class ActPubService extends ServiceBase {
             if (val.getVal() == null) {
                 return null;
             } //
-            else if (val.getVal() instanceof String) { // if we have a plain string prop return it.
-                log.trace("attributed to found as string: " + (String) val.getVal());
+            else if (val.getVal() instanceof String o) { // if we have a plain string prop return it.
+                log.trace("attributed to found as string: " + o);
                 return (String) val.getVal();
             } //
-            else if (val.getVal() instanceof List) { // else if this is a list we scan it.
-                List<?> attribsList = (List<?>) val.getVal();
+            else if (val.getVal() instanceof List o) { // else if this is a list we scan it.
+                List<?> attribsList = o;
 
                 for (Object attribItem : attribsList) {
                     // get a concrete class instance from the factory for 'attribItem'
                     attribItem = AP.typeFromFactory(attribItem);
                     // once we find a person in the obj, we consider that out attributedTo string
                     // and return that.
-                    if (attribItem instanceof APOPerson) {
-                        String ret = apStr(attribItem, APObj.id);
+                    if (attribItem instanceof APOPerson ai) {
+                        String ret = apStr(ai, APObj.id);
                         log.trace("attributed to found as id on Person: " + ret);
                         return ret;
                     }
@@ -1180,9 +1177,9 @@ public class ActPubService extends ServiceBase {
         if (list != null) {
             /* Build up all the access controls */
             for (Object to : list) {
-                if (to instanceof String) {
+                if (to instanceof String o) {
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
-                    shareToUsersForUrl(ms, userDoingAction, node, (String) to);
+                    shareToUsersForUrl(ms, userDoingAction, node, o);
                 } else {
                     log.trace("to list entry not supported: " + to.getClass().getName());
                 }
@@ -1230,8 +1227,8 @@ public class ActPubService extends ServiceBase {
                          * Mastodon seems to have the followers items as strings, which are the actor urls of the
                          * followers.
                          */
-                        if (obj instanceof String) {
-                            String followerActorUrl = (String) obj;
+                        if (obj instanceof String o) {
+                            String followerActorUrl = o;
                             shareNodeToActorByUrl(ms, userDoingAction, node, followerActorUrl);
                         }
                         return true;
@@ -1338,7 +1335,6 @@ public class ActPubService extends ServiceBase {
     }
 
     public void queueUserForRefresh(String apUserName, boolean force) {
-        // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
         if (!prop.isActPubEnabled()) {
             return;
         }

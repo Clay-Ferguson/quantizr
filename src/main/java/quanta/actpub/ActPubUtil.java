@@ -589,8 +589,8 @@ public class ActPubUtil extends ServiceBase {
                 return;
             Object ocPage = null;
             // if firstPage contained a String consider it a URL to the page and get it.
-            if (firstPage instanceof String) {
-                ocPage = getRemoteAP(ms, userDoingAction, (String) firstPage);
+            if (firstPage instanceof String o) {
+                ocPage = getRemoteAP(ms, userDoingAction, o);
             } else { // else consider firstPage to be the ACTUAL first page object
                 ocPage = firstPage;
             }
@@ -627,8 +627,8 @@ public class ActPubUtil extends ServiceBase {
                     if (++pageQueries > maxPageQueries)
                         return;
                     // if nextPage is a string consider that a reference to the URL of the page and get it
-                    if (nextPage instanceof String) {
-                        ocPage = getRemoteAP(ms, userDoingAction, (String) nextPage);
+                    if (nextPage instanceof String o) {
+                        ocPage = getRemoteAP(ms, userDoingAction, o);
                     } else {
                         ocPage = nextPage;
                     }
@@ -643,8 +643,8 @@ public class ActPubUtil extends ServiceBase {
                 return;
             Object ocPage = null;
             // if lastPage is a string it's the url
-            if (lastPage instanceof String) {
-                ocPage = getRemoteAP(ms, userDoingAction, (String) lastPage);
+            if (lastPage instanceof String o) {
+                ocPage = getRemoteAP(ms, userDoingAction, o);
             } else { // else it's the page object
                 ocPage = lastPage;
             }
@@ -743,14 +743,14 @@ public class ActPubUtil extends ServiceBase {
         String userDoingAction = ThreadLocals.getSC().getUserName();
         apUtil.iterateCollection(ms, userDoingAction, repliesObj, 100, obj -> {
             // If a reply is the string assume that's the URL to the object
-            if (obj instanceof String) {
-                NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, (String) obj);
+            if (obj instanceof String o) {
+                NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfo(ms, userDoingAction, o);
                 if (replyNodeInfo != null) {
                     replyNodes.add(replyNodeInfo);
                 }
             } //
-            else if (obj instanceof Map) { // else we try as a data object
-                APObj apObj = new APObj((Map) obj);
+            else if (obj instanceof Map o) { // else we try as a data object
+                APObj apObj = new APObj(o);
                 NodeInfo replyNodeInfo = apUtil.loadObjectNodeInfoFromObj(ms, userDoingAction, apObj);
                 if (replyNodeInfo != null) {
                     replyNodes.add(replyNodeInfo);
@@ -797,7 +797,7 @@ public class ActPubUtil extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         boolean topReached = false;
         ObjectId lastNodeId = null;
-        // todo-1: This is an unfinished work in progress. I was unable to find any foreign posts
+        // todo-2: This is an unfinished work in progress. I was unable to find any foreign posts
         // that put any messages in their 'replies' collection, or at least when I query collections
         // I get back an empty array of items for whatever reason.
         // if (ok(node)) {
@@ -976,12 +976,10 @@ public class ActPubUtil extends ServiceBase {
             log.debug("loadObjectFromObj(): Node found by ID: " + id);
             return nodeFound;
         }
-        // todo-1: we only support "Note" for now.
+
         String type = apStr(obj, APObj.type);
         switch (type) {
-            // todo-1: I know we don't support type "Question" or type "Video" yet so I need to at least
-            // send back a visible message to the user saying that this type of node is not yet supported by
-            // Quanta and so the history cannot be displayed.
+            // todo-1: we only support "Note" for now.
             case APType.Note:
                 String ownerActorUrl = apStr(obj, APObj.attributedTo);
                 if (ownerActorUrl != null) {

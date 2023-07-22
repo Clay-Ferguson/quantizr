@@ -101,25 +101,7 @@ public class ActPubOutbox extends ServiceBase {
                         APObj object = apAPObj(obj, APObj.object);
                         if (object != null) {
                             String type = apStr(object, APObj.type);
-                            // if (object instanceof String) {
-                            // // todo-1: handle boosts.
-                            // //
-                            // // + XString.prettyPrint(obj));
-                            // // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
-                            // // {
-                            // // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                            // // AP.type : "Announce",
-                            // // AP.actor : "https://dobbs.town/users/onan",
-                            // // AP.published : "2021-01-25T01:20:30Z",
-                            // // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
-                            // // "cc" : [ "https://mastodon.sdf.org/users/stunder",
-                            // "https://dobbs.town/users/onan/followers"
-                            // ],
-                            // // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
-                            // // }
-                            // }
-                            // // todo-1: need to handle "Boosts" and other types here too.
-                            // else
+                            // todo-1: need to handle "Boosts" and other types here too.
                             if (APType.Note.equals(type)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
@@ -133,8 +115,6 @@ public class ActPubOutbox extends ServiceBase {
                                     // log and ignore.
                                     log.error("error in saveNode()", e);
                                 }
-                            } else {
-                                // this captures videos? and other things (todo-1: add more support)
                             }
                         }
                     }
@@ -404,8 +384,7 @@ public class ActPubOutbox extends ServiceBase {
                 throw new ForbiddenException();
             }
             /*
-             * todo-1: We should be able to get an object as whatever actual type it is based on the type (not
-             * the Quanta Type, but the ActPub type if there is one), rather than always returning a note here.
+             * todo-1: We should be able to get an object as whatever actual type it is, and not just a Note
              */
             APObj ret = apFactory.makeAPONote(as, node, null);
             if (ret != null) {

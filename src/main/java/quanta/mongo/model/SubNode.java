@@ -784,13 +784,13 @@ public class SubNode {
                 Object v = props().get(key);
                 if (v == null)
                     return 0L;
-                if (v instanceof Integer) {
-                    return Long.valueOf((Integer) v);
+                if (v instanceof Integer o) {
+                    return Long.valueOf(o);
                 }
                 // todo-2: When saving from client the values are always sent as strings, and
                 // this is a workaround until that changes.
-                if (v instanceof String) {
-                    if (((String) v).length() == 0) {
+                if (v instanceof String o) {
+                    if (o.length() == 0) {
                         return 0L;
                     }
                     return Long.parseLong((String) v);
@@ -900,8 +900,8 @@ public class SubNode {
                  * Our current property editor only knows how to save strings, so we just cope with that here, but
                  * eventually we will have type-safety and types even in the editor.
                  */
-                if (v instanceof String) {
-                    String s = ((String) v).toLowerCase();
+                if (v instanceof String o) {
+                    String s = o.toLowerCase();
                     // detect true or 1.
                     return s.contains("t") || s.contains("1");
                 }

@@ -55,8 +55,8 @@ public class ActPubFollower extends ServiceBase {
         int ret = apInt(followers, APObj.totalItems);
         apUtil.iterateCollection(ms, userMakingRequest, followers, Integer.MAX_VALUE, obj -> {
             try {
-                if (obj instanceof String) {
-                    String followerActorUrl = (String) obj;
+                if (obj instanceof String _obj) {
+                    String followerActorUrl = _obj;
                     apub.saveFediverseName(followerActorUrl);
                 } else {
                     log.debug("Unexpected follower item class: " + obj.getClass().getName());

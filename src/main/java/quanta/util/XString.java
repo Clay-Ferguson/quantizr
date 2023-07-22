@@ -40,8 +40,8 @@ public class XString {
     public static String prettyPrint(Object obj) {
         if (obj == null)
             return "null";
-        if (obj instanceof String) {
-            return (String) obj;
+        if (obj instanceof String o) {
+            return o;
         }
         try {
             return jsonPrettyWriter.writeValueAsString(obj);
@@ -53,8 +53,8 @@ public class XString {
     public static String compactPrint(Object obj) {
         if (obj == null)
             return "null";
-        if (obj instanceof String) {
-            return (String) obj;
+        if (obj instanceof String o) {
+            return o;
         }
         try {
             return jsonCompactWriter.writeValueAsString(obj);

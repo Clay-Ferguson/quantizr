@@ -55,8 +55,8 @@ public class AP {
             if (val.getVal() == null) {
                 return null;
             } //
-            else if (val.getVal() instanceof String) {
-                return (String) val.getVal();
+            else if (val.getVal() instanceof String o) {
+                return o;
             } //
             else if (val.getVal() instanceof List) {
                 // this can happen in normal flow now so I need a 'silent' argument to hide this when we need to.
@@ -86,11 +86,11 @@ public class AP {
             if (val.getVal() == null) {
                 return false;
             } //
-            else if (val.getVal() instanceof String) {
-                return ((String) val.getVal()).equalsIgnoreCase(APConst.TRUE);
+            else if (val.getVal() instanceof String o) {
+                return o.equalsIgnoreCase(APConst.TRUE);
             } //
-            else if (val.getVal() instanceof Boolean) {
-                return ((Boolean) val.getVal()).booleanValue();
+            else if (val.getVal() instanceof Boolean o) {
+                return o.booleanValue();
             }
         }
         ExUtil.warn("unhandled type on apBool(): " + (obj != null ? obj.getClass().getName() : "null")
@@ -101,17 +101,18 @@ public class AP {
     public static Integer apInt(Object obj, String prop) {
         Val<Object> val = null;
         if ((val = getFromMap(obj, prop)) != null) {
-            if (val.getVal() == null) {
+            Object v = val.getVal();
+            if (v == null) {
                 return 0;
             } //
-            else if (val.getVal() instanceof Integer) {
-                return ((Integer) val.getVal()).intValue();
+            else if (v instanceof Integer o) {
+                return o.intValue();
             } //
-            else if (val.getVal() instanceof Long) {
-                return ((Long) val.getVal()).intValue();
+            else if (v instanceof Long o) {
+                return o.intValue();
             } //
-            else if (val.getVal() instanceof String) {
-                return Integer.valueOf((String) val.getVal());
+            else if (v instanceof String o) {
+                return Integer.valueOf(o);
             }
         }
         ExUtil.warn("unhandled type on apInt(): " + (obj != null ? obj.getClass().getName() : "null")
@@ -122,11 +123,12 @@ public class AP {
     public static Date apDate(Object obj, String prop) {
         Val<Object> val = null;
         if ((val = getFromMap(obj, prop)) != null) {
-            if (val.getVal() == null) {
+            Object v = val.getVal();
+            if (v == null) {
                 return null;
             } //
-            else if (val.getVal() instanceof String) {
-                return DateUtil.parseISOTime((String) val.getVal());
+            else if (v instanceof String o) {
+                return DateUtil.parseISOTime(o);
             }
         }
         ExUtil.warn("unhandled type on apDate(): " + (obj != null ? obj.getClass().getName() : "null")
@@ -137,17 +139,19 @@ public class AP {
     public static List<?> apList(Object obj, String prop, boolean allowConvertString) {
         Val<Object> val = null;
         if ((val = getFromMap(obj, prop)) != null) {
-            if (val.getVal() == null) {
+            Object v = val.getVal();
+            if (v == null) {
                 return null;
             } //
-            else if (val.getVal() instanceof List<?>) { // if we got an instance of a list return it
-                return (List<?>) val.getVal();
-            } //
-            else if (allowConvertString && val.getVal() instanceof String) { // the address 'to' and 'cc' properties can
-                                                                             // have this happen often. // if we
-                                                                             // expected a list and found a String,
-                                                                             // that's ok, return a list with one entry
-                return Arrays.asList(val.getVal());
+            else if (v instanceof List<?> o) { // if we got an instance of a list return it
+                return o;
+            }
+            /*
+             * the address 'to' and 'cc' properties can have this happen often. // if we expected a list and
+             * found a String, that's ok, return a list with one entry
+             */
+            else if (allowConvertString && v instanceof String o) {
+                return Arrays.asList(o);
             }
         }
         // todo-1: make this warning be triggered only by flag param
@@ -161,8 +165,8 @@ public class AP {
      * Gets an Object from 'prop' entry of map 'obj'
      */
     public static Object apObj(Object obj, String prop) {
-        if (obj instanceof Map<?, ?>) {
-            return ((Map<?, ?>) obj).get(prop);
+        if (obj instanceof Map<?, ?> o) {
+            return o.get(prop);
         } else {
             ExUtil.warn("[1]getting prop " + prop + " from unsupported container type: "
                     + (obj != null ? obj.getClass().getName() : "null") + "Unable to get property " + prop
@@ -176,8 +180,8 @@ public class AP {
      */
     public static APObj apAPObj(Object obj, String prop) {
         Object o = apObj(obj, prop);
-        if (o instanceof Map<?, ?>) {
-            return typeFromFactory(new APObj((Map<?, ?>) o));
+        if (o instanceof Map<?, ?> m) {
+            return typeFromFactory(new APObj(m));
         } else {
             // this is not an indication of a problem when we check for a property and don't find it.
             // ExUtil.warn("[2]getting prop " + prop + " from unsupported container type: "
@@ -188,8 +192,8 @@ public class AP {
     }
 
     public static Val<Object> getFromMap(Object obj, String prop) {
-        if (obj instanceof Map<?, ?>) {
-            return new Val<Object>(((Map<?, ?>) obj).get(prop));
+        if (obj instanceof Map<?, ?> o) {
+            return new Val<Object>(o.get(prop));
         }
         return null;
     }
@@ -202,11 +206,11 @@ public class AP {
         if (obj == null)
             return null;
         APObj ret = null;
-        if (obj instanceof APObj) {
-            ret = (APObj) obj;
+        if (obj instanceof APObj o) {
+            ret = o;
         } //
-        else if (obj instanceof Map<?, ?>) {
-            ret = new APObj((Map<?, ?>) obj);
+        else if (obj instanceof Map<?, ?> o) {
+            ret = new APObj(o);
         } else {
             throw new RuntimeException("Unable to convert type: " + obj.getClass().getName() + " to an APObj");
         }

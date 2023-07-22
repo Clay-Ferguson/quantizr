@@ -40,9 +40,9 @@ public class Util {
             sleep(5000);
         }
         if (!MongoRepository.fullInit) {
-            if (res instanceof HttpServletResponse) {
+            if (res instanceof HttpServletResponse o) {
                 try {
-                    ((HttpServletResponse) res).sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                    o.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                 } catch (Exception e) {
                 }
             } else { // silently ignore this exception.
@@ -161,21 +161,14 @@ public class Util {
             RequestConfig config = //
                     //
                     //
-                    RequestConfig
-                            .custom()
-                            .setConnectTimeout(timeout * 1000)
-                            .setConnectionRequestTimeout(timeout * 1000)
-                            .setSocketTimeout(timeout * 1000)
-                            .build();
+                    RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
+                            .setSocketTimeout(timeout * 1000).build();
             HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
             HttpGet request = new HttpGet(url);
             request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
             HttpResponse response = client.execute(request);
-            log.debug(
-                    "Response Code: " +
-                            response.getStatusLine().getStatusCode() +
-                            " reason=" +
-                            response.getStatusLine().getReasonPhrase());
+            log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
+                    + response.getStatusLine().getReasonPhrase());
             scanner = new Scanner(response.getEntity().getContent());
             String responseBody = scanner.useDelimiter("\\A").next();
             title = responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>"));

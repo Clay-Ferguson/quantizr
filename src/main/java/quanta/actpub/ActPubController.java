@@ -61,10 +61,6 @@ public class ActPubController extends ServiceBase {
      *
      * simple redirect from /ap/user/[userName] to /u/[userName]/home
      *
-     * todo-1: is this documented in the user guide about user being able to have a node named 'home'
-     * and what it means if they do? Also need to ensure this ALWAYS works especially in the AP
-     * scenarios and when user has done nothing themselves to create a 'home' node.
-     *
      * NOTE: This is returning the HTML of the HOME, not a JSON value
      */
     @RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)

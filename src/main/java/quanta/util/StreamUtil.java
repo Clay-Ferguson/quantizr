@@ -13,16 +13,16 @@ public class StreamUtil {
 
     public static void close(Object... objects) {
         for (Object obj : objects) {
-            if (obj instanceof Closeable) {
+            if (obj instanceof Closeable o) {
                 try {
-                    ((Closeable) obj).close();
+                    o.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } //
-            else if (obj instanceof ImageReader) {
+            else if (obj instanceof ImageReader o) {
                 try {
-                    ((ImageReader) obj).dispose();
+                    o.dispose();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -36,10 +36,8 @@ public class StreamUtil {
 
     public static boolean streamsIdentical(InputStream a, InputStream b) {
         /* wrap in Buffered streams only if not currently buffered */
-        BufferedInputStream aBuffered =
-                (a instanceof BufferedInputStream) ? (BufferedInputStream) a : new BufferedInputStream(a);
-        BufferedInputStream bBuffered =
-                (b instanceof BufferedInputStream) ? (BufferedInputStream) b : new BufferedInputStream(b);
+        BufferedInputStream aBuffered = (a instanceof BufferedInputStream o) ? o : new BufferedInputStream(a);
+        BufferedInputStream bBuffered = (b instanceof BufferedInputStream o) ? o : new BufferedInputStream(b);
         try {
             int aByte;
             int bByte;

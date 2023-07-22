@@ -31,8 +31,8 @@ public class ExUtil {
     }
 
     public static RuntimeException wrapEx(Throwable ex) {
-        if (ex instanceof RuntimeException) {
-            return (RuntimeException) ex;
+        if (ex instanceof RuntimeException o) {
+            return o;
         }
         return new RuntimeEx(ex);
     }

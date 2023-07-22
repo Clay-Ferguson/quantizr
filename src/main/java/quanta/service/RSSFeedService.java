@@ -511,8 +511,7 @@ public class RSSFeedService extends ServiceBase {
     private void processModules(SyndFeed entry, RssFeed e) {
         if (entry.getModules() != null) {
             for (Module m : entry.getModules()) {
-                if (m instanceof MediaEntryModuleImpl) {
-                    MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
+                if (m instanceof MediaEntryModuleImpl mm) {
                     if (mm.getMediaContents() != null) {
                         // put new list on return object
                         List<RssFeedMediaContent> mediaContent = new LinkedList<>();
@@ -552,8 +551,7 @@ public class RSSFeedService extends ServiceBase {
                 } //
                 else if (m instanceof ContentModuleImpl) {
                     //
-                } else if (m instanceof EntryInformationImpl) {
-                    EntryInformationImpl itunesMod = (EntryInformationImpl) m;
+                } else if (m instanceof EntryInformationImpl itunesMod) {
                     if (itunesMod.getImage() != null) {
                         try {
                             e.setImage(itunesMod.getImage().toURI().toString());
@@ -584,8 +582,7 @@ public class RSSFeedService extends ServiceBase {
         if (entry.getModules() != null) {
             for (Module m : entry.getModules()) {
                 // log.debug("Module: " + m.getClass().getName());
-                if (m instanceof MediaEntryModuleImpl) {
-                    MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
+                if (m instanceof MediaEntryModuleImpl mm) {
                     if (mm.getMediaContents() != null) {
                         // put new list on return object
                         List<RssFeedMediaContent> mediaContent = new LinkedList<>();
@@ -634,18 +631,17 @@ public class RSSFeedService extends ServiceBase {
                     }
                 } //
                 else if (m instanceof ContentModuleImpl) {
-                } else if (m instanceof EntryInformationImpl) { // } // } // log.debug("CI.url: " +
-                                                                // ci.getContentResource()); // log.debug("CI.value: " +
-                                                                // ci.getContentValue()); // log.debug("CI.format: " +
-                                                                // ci.getContentFormat()); // log.debug("CI.encoding: "
-                                                                // + ci.getContentEncoding()); // for (ContentItem ci :
-                                                                // contentMod.getContentItems()) { // if
-                                                                // (ok(contentMod.getContentItems() )) { // } // } //
-                                                                // log.debug("CI.contents: " + contents); // for (String
-                                                                // contents : contentMod.getContents()) { // if
-                                                                // (ok(contentMod.getContents() )) { //
-                                                                // ContentModuleImpl contentMod = (ContentModuleImpl) m;
-                    EntryInformationImpl itunesMod = (EntryInformationImpl) m;
+                } else if (m instanceof EntryInformationImpl itunesMod) { // } // } // log.debug("CI.url: " +
+                    // ci.getContentResource()); // log.debug("CI.value: " +
+                    // ci.getContentValue()); // log.debug("CI.format: " +
+                    // ci.getContentFormat()); // log.debug("CI.encoding: "
+                    // + ci.getContentEncoding()); // for (ContentItem ci :
+                    // contentMod.getContentItems()) { // if
+                    // (ok(contentMod.getContentItems() )) { // } // } //
+                    // log.debug("CI.contents: " + contents); // for (String
+                    // contents : contentMod.getContents()) { // if
+                    // (ok(contentMod.getContents() )) { //
+                    // ContentModuleImpl contentMod = (ContentModuleImpl) m;
                     if (itunesMod.getImage() != null) {
                         try {
                             e.setImage(itunesMod.getImage().toURI().toString());

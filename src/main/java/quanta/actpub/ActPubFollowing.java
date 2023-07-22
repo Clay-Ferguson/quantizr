@@ -143,8 +143,8 @@ public class ActPubFollowing extends ServiceBase {
                         throw new RuntimeException("no followObj");
                     }
                     log.debug("followObj.type=" + followObj.getClass().getName());
-                    if (followObj instanceof String) {
-                        actorBeingFollowedUrl = (String) followObj;
+                    if (followObj instanceof String o) {
+                        actorBeingFollowedUrl = o;
                         log.debug("Got actorBeingFollowedUrl from direct object being a string.");
                     } else {
                         actorBeingFollowedUrl = apStr(followObj, APObj.id);
@@ -258,8 +258,8 @@ public class ActPubFollowing extends ServiceBase {
         int ret = apInt(followings, APObj.totalItems);
         apUtil.iterateCollection(ms, userDoingAction, followings, Integer.MAX_VALUE, obj -> {
             try {
-                if (obj instanceof String) {
-                    String followingActorUrl = (String) obj;
+                if (obj instanceof String o) {
+                    String followingActorUrl = o;
                     apub.saveFediverseName(followingActorUrl);
                 } else {
                     log.debug("Unexpected following item class: " + obj.getClass().getName());
@@ -287,7 +287,7 @@ public class ActPubFollowing extends ServiceBase {
      *
      * Returns a list of all the 'actor urls' for all the users that 'userName' is following.
      *
-     * todo-1: do paging. Implement minId.
+     * todo-2: do paging. Implement minId.
      */
     public List<String> getFollowing(String userName, boolean foreignUsers, boolean localUsers, String minId,
             boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {

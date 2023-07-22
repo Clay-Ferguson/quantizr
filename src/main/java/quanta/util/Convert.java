@@ -418,8 +418,8 @@ public class Convert extends ServiceBase {
             boolean initNodeEdit) {
         try {
             Object value = null;
-            if (prop instanceof Date) {
-                value = DateUtil.formatTimeForUserTimezone((Date) prop, sc.getTimezone(), sc.getTimeZoneAbbrev());
+            if (prop instanceof Date o) {
+                value = DateUtil.formatTimeForUserTimezone(o, sc.getTimezone(), sc.getTimeZoneAbbrev());
             } //
             else if (prop instanceof Collection) {
                 value = prop;
