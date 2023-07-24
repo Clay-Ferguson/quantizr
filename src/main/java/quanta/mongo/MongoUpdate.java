@@ -45,7 +45,7 @@ public class MongoUpdate extends ServiceBase {
         save(ms, node, true);
     }
 
-    public void setParentHasChildren(SubNode node) {
+    public void updateParentHasChildren(SubNode node) {
         if (node == null)
             return;
         arun.run(as -> {
@@ -68,8 +68,10 @@ public class MongoUpdate extends ServiceBase {
                 ops.save(node);
                 return null;
             });
-        } else { // thread. // otherwise leave same/current threadlocals as is and MongoEventListener will auth based
-                 // on this
+        }
+        // otherwise leave same/current threadlocals as is and MongoEventListener will auth based
+        // on this
+        else {
             ops.save(node);
         }
         ThreadLocals.clean(node);

@@ -189,11 +189,7 @@ public class NodeMoveService extends ServiceBase {
      * we are inserting, and the inserted nodes will be pasted in directly below that ordinal (i.e. new
      * siblings posted in below it)
      */
-    private void moveNodesInternal(
-            MongoSession ms,
-            String location,
-            String targetId,
-            List<String> nodeIds,
+    private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
             MoveNodesResponse res) {
         // log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
         // get targetNode which is node we're pasting at or into.
@@ -297,11 +293,7 @@ public class NodeMoveService extends ServiceBase {
      * WARNING: This does NOT affect the path of 'graphRoot' itself, but only changes the location of
      * all the children under it
      */
-    public void changePathOfSubGraph(
-            MongoSession ms,
-            SubNode graphRoot,
-            String oldPathPrefix,
-            String newPathPrefix,
+    public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String oldPathPrefix, String newPathPrefix,
             MoveNodesResponse res) {
         String originalPath = graphRoot.getPath();
         // log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" +

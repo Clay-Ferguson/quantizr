@@ -146,7 +146,7 @@ public class NodeEditService extends ServiceBase {
             throw new RuntimeException("unable to locate parent for insert");
         }
 
-        auth.authForChildNodeCreate(ms, parentNode);
+        auth.writeAuth(ms, parentNode);
         parentNode.adminUpdate = true;
         // note: redundant security
         if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
@@ -252,7 +252,7 @@ public class NodeEditService extends ServiceBase {
         if (parentNode == null) {
             throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
         }
-        auth.authForChildNodeCreate(ms, parentNode);
+        auth.writeAuth(ms, parentNode);
         parentNode.adminUpdate = true;
         // note: redundant security
         if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {

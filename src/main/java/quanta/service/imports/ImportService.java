@@ -32,7 +32,7 @@ public class ImportService extends ServiceBase {
         }
         auth.ownerAuth(ms, node);
         // This is critical to be correct so we run the actual query based determination of 'hasChildren'
-        boolean hasChildren = read.hasChildrenByQuery(ms, node.getPath());
+        boolean hasChildren = read.directChildrenExist(ms, node.getPath());
         if (hasChildren) {
             throw ExUtil.wrapEx("You can only import into an empty node. There are direct children under path(a): "
                     + node.getPath());
@@ -60,14 +60,18 @@ public class ImportService extends ServiceBase {
                     impSvc.importFromStream(ms, in, node, false);
                     node.setHasChildren(true);
                     update.saveSession(ms);
-                } else if (fileName.toLowerCase().endsWith(".tar")) { // Import TAR files (non GZipped)
+                }
+                // Import TAR files (non GZipped)
+                else if (fileName.toLowerCase().endsWith(".tar")) {
                     log.debug("Import TAR to Node: " + node.getPath());
                     in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
                     ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);
                     impSvc.importFromStream(ms, in, node, false);
                     node.setHasChildren(true);
                     update.saveSession(ms);
-                } else if (fileName.toLowerCase().endsWith(".tar.gz")) { // Import TAR.GZ (GZipped TAR)
+                }
+                // Import TAR.GZ (GZipped TAR)
+                else if (fileName.toLowerCase().endsWith(".tar.gz")) {
                     log.debug("Import TAR.GZ to Node: " + node.getPath());
                     in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
                     ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);

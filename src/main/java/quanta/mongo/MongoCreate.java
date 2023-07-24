@@ -37,7 +37,7 @@ public class MongoCreate extends ServiceBase {
 
     public SubNode createNode(MongoSession ms, String path) {
         SubNode node = new SubNode(ms.getUserNodeId(), path, NodeType.NONE.s(), null);
-        update.setParentHasChildren(node);
+        update.updateParentHasChildren(node);
         return node;
     }
 
@@ -46,7 +46,7 @@ public class MongoCreate extends ServiceBase {
             type = NodeType.NONE.s();
         }
         SubNode node = new SubNode(ms.getUserNodeId(), path, type, null);
-        update.setParentHasChildren(node);
+        update.updateParentHasChildren(node);
         return node;
     }
 

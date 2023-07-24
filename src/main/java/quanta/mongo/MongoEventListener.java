@@ -305,7 +305,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                 SubNode parent = read.getParent(ms, node);
                 if (parent == null)
                     throw new RuntimeException("unable to get node parent: " + node.getParentPath());
-                auth.authForChildNodeCreate(ms, parent);
+                auth.writeAuth(ms, parent);
                 if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
                     throw new ForbiddenException();
                 }

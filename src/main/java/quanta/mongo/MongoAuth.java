@@ -326,7 +326,7 @@ public class MongoAuth extends ServiceBase {
             throw new RuntimeEx("auth fail");
     }
 
-    public void authForChildNodeCreate(MongoSession ms, SubNode node) {
+    public void writeAuth(MongoSession ms, SubNode node) {
         try {
             auth(ms, node, PrivilegeType.WRITE);
         } catch (RuntimeException e) {

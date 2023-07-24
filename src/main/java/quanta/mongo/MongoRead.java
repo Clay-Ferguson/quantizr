@@ -66,6 +66,10 @@ public class MongoRead extends ServiceBase {
         }
     }
 
+    /*
+     * todo-0: Everywhere we call this make sure we don't have all the logic INSIDE the non-admin-cache
+     * method. Make it separate
+     */
     public boolean readFromAdminCache() {
         return system.adminNodesCacheMap != null && ThreadLocals.getSC() != null && !ThreadLocals.getSC().isAdmin();
     }
@@ -164,12 +168,12 @@ public class MongoRead extends ServiceBase {
             // calling booleanValue for clarity
             return node.getHasChildren().booleanValue();
         }
-        boolean ret = hasChildrenByQuery(ms, node.getPath());
+        boolean ret = directChildrenExist(ms, node.getPath());
         node.setHasChildren(ret);
         return ret;
     }
 
-    public boolean hasChildrenByQuery(MongoSession ms, String path) {
+    public boolean directChildrenExist(MongoSession ms, String path) {
         // WARNING: Leave this as a note to NOT call this optimization here. It is definitely
         // counter-productive.
         // if (noChildren(ms, path)) return false;
@@ -195,7 +199,7 @@ public class MongoRead extends ServiceBase {
         return false;
     }
 
-    /* Checks ALL parent paths to make sure they all exist. Returns true of some parent doesn't exist */
+    /* Checks ALL parent paths to make sure they all exist. Returns true if some parent doesn't exist */
     public boolean isOrphan(String path) {
         int sanityCheck = 0;
         // if this is a path we KNOW exists, return false
@@ -223,32 +227,34 @@ public class MongoRead extends ServiceBase {
         boolean isRootPath = mongoUtil.isRootPath(path);
         if (isRootPath)
             return;
-        String parentPath = XString.truncAfterLast(path, "/");
-        if (parentPath == null || parentPath.equals("") || parentPath.equals("/")
-                || parentPath.equals(NodePath.ROOT_PATH) || parentPath.equals(NodePath.PENDING_PATH)
-                || parentPath.equals(NodePath.PENDING_PATH + "/"))
+        String parPath = XString.truncAfterLast(path, "/");
+
+        // ignore any paths we don't need to check
+        if (parPath == null || parPath.equals("") || parPath.equals("/") || parPath.equals(NodePath.ROOT_PATH)
+                || parPath.equals(NodePath.PENDING_PATH) || parPath.equals(NodePath.PENDING_PATH + "/"))
             return;
-        if (parentPath.startsWith(NodePath.PENDING_PATH + "/")) {
-            parentPath = parentPath.replace(NodePath.PENDING_PATH + "/", NodePath.ROOT_PATH + "/");
+
+        if (parPath.startsWith(NodePath.PENDING_PATH + "/")) {
+            parPath = parPath.replace(NodePath.PENDING_PATH + "/", NodePath.ROOT_PATH + "/");
         }
         // no need to check root.
-        if (parentPath.equals(NodePath.ROOT_PATH) || parentPath.equals(NodePath.ROOT_PATH + "/")) {
+        if (parPath.equals(NodePath.ROOT_PATH) || parPath.equals(NodePath.ROOT_PATH + "/")) {
             return;
         }
         // no need to check USERS
-        if (parentPath.equals(NodePath.USERS_PATH) || parentPath.equals(NodePath.USERS_PATH + "/")) {
+        if (parPath.equals(NodePath.USERS_PATH) || parPath.equals(NodePath.USERS_PATH + "/")) {
             return;
         }
         // no need to check REMOTE USERS
-        if (parentPath.equals(NodePath.REMOTE_USERS_PATH) || parentPath.equals(NodePath.REMOTE_USERS_PATH + "/")) {
+        if (parPath.equals(NodePath.REMOTE_USERS_PATH) || parPath.equals(NodePath.REMOTE_USERS_PATH + "/")) {
             return;
         }
         // no need to check LOCAL USERS
-        if (parentPath.equals(NodePath.LOCAL_USERS_PATH) || parentPath.equals(NodePath.LOCAL_USERS_PATH + "/")) {
+        if (parPath.equals(NodePath.LOCAL_USERS_PATH) || parPath.equals(NodePath.LOCAL_USERS_PATH + "/")) {
             return;
         }
-        if (!pathExists(parentPath)) {
-            throw new RuntimeEx("Attempted to add a node before its parent exists:" + parentPath);
+        if (!pathExists(parPath)) {
+            throw new RuntimeEx("Attempted to add a node before its parent exists:" + parPath);
         }
     }
 
@@ -340,6 +346,7 @@ public class MongoRead extends ServiceBase {
                     "SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
         }
         SubNode ret = null;
+
         if (identifier.startsWith("~")) {
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
@@ -349,9 +356,9 @@ public class MongoRead extends ServiceBase {
         } //
         else if (identifier.startsWith(":")) { // Node name lookups are done by prefixing the search with a colon (:)
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
-        } //
-        else if (!identifier.startsWith("/")) { // else if search doesn't start with a slash then it's a nodeId and not
-                                                // a path
+        }
+        // else if search doesn't start with a slash then it's a nodeId and not a path
+        else if (!identifier.startsWith("/")) {
             if (readFromAdminCache()) {
                 synchronized (SystemService.adminNodesCacheLock) {
                     TreeNode tn = system.adminNodesCacheMap.get(identifier);
@@ -364,7 +371,9 @@ public class MongoRead extends ServiceBase {
             if (ret == null) {
                 ret = opsw.findById(allowAuth ? ms : null, new ObjectId(identifier));
             }
-        } else { // otherwise this is a path lookup
+        }
+        // otherwise this is a path lookup
+        else {
             ret = findNodeByPath(ms, identifier, allowAuth);
         }
         return ret;
@@ -374,7 +383,6 @@ public class MongoRead extends ServiceBase {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).is(path);
-
         if (allowAuth) {
             crit = auth.addReadSecurity(ms, crit);
         }
@@ -453,6 +461,7 @@ public class MongoRead extends ServiceBase {
         String parentPath = XString.truncAfterLast(path, "/");
         if (StringUtils.isEmpty(parentPath))
             return null;
+
         String pendingPath = NodePath.PENDING_PATH + "/";
         String rootPath = NodePath.ROOT_PATH + "/";
         /*
@@ -555,6 +564,7 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
             Criteria moreCriteria, boolean allowAuth) {
+
         if (readFromAdminCache() && moreCriteria == null && sort != null && ordinalSort.equals(sort)) {
             TreeNode tn = null;
             synchronized (SystemService.adminNodesCacheLock) {
@@ -602,28 +612,9 @@ public class MongoRead extends ServiceBase {
      * approach. Who knows.
      */
     public Long getMaxChildOrdinal(MongoSession ms, SubNode node) {
-        // Do not delete this commented stuff. Can be helpful to get aggregates
-        // working.
-        // MatchOperation match = new
-        // MatchOperation(Criteria.where("quantity").gt(quantity));
-        // GroupOperation group =
-        // Aggregation.group("giftCard").sum("giftCard").as("count");
-        // Aggregation aggregate = Aggregation.newAggregation(match, group);
-        // Order is deprecated
-        // AggregationResults<Order> orderAggregate = ops.aggregate(aggregate, "order",
-        // Order.class);
-        // Aggregation agg = Aggregation.newAggregation(//
-        // Aggregation.match(Criteria.where("quantity").gt(1)), //
-        // Aggregation.group(SubNode.FIELD_ORDINAL).max().as("count"));
-        //
-        // AggregationResults<SubNode> results = ops.aggregate(agg, "order",
-        // SubNode.class);
-        // List<SubNode> orderCount = results.getMappedResults();
         if (noChildren(node))
             return 0L;
         auth.auth(ms, node, PrivilegeType.READ);
-        // todo-2: research if there's a way to query for just one, rather than simply
-        // calling findOne at the end? What's best practice here?
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
@@ -636,7 +627,6 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
-    // this is NOT returning the first node with the least ordinal!!!
     public Long getMinChildOrdinal(MongoSession ms, SubNode node) {
         if (noChildren(node))
             return 0L;
@@ -670,7 +660,6 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
-
         q.addCriteria(crit);
 
         // leave this example. you can do a RANGE like this.
@@ -708,6 +697,8 @@ public class MongoRead extends ServiceBase {
 
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
+     * 
+     * todo-1: look for ways to use the 'stream' way of querying this data
      */
     public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean publicOnly,
             boolean allowAuth, Criteria moreCriteria) {

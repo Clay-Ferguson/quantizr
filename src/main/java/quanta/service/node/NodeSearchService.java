@@ -163,8 +163,7 @@ public class NodeSearchService extends ServiceBase {
             }
         } else { // othwerwise we're searching all node properties
             /* USER Search */
-            if ( //
-            Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
+            if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
                     || Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
                     Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
                 userSearch(ms, null, req, searchResults);
