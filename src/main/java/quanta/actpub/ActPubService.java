@@ -87,7 +87,6 @@ public class ActPubService extends ServiceBase {
     public static int inboxCount = 0;
     public static boolean userRefresh = false;
     public static boolean refreshingForeignUsers = false;
-    public static boolean scanningForeignUsers = false;
     public static int NUM_CURATED_ACCOUNTS = 1500;
 
     public void sendLikeMessage(MongoSession ms, String userDoingLike, SubNode node) {
@@ -1356,7 +1355,6 @@ public class ActPubService extends ServiceBase {
         if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
         // refreshForeignUsers();
-        // refreshFollowedUsers();
     }
 
     /*
@@ -1567,56 +1565,6 @@ public class ActPubService extends ServiceBase {
             }
         }
         return count;
-    }
-
-    /*
-     * Generates the list of all users being followed into 'apCache.followedUsers'
-     */
-    public void identifyFollowedAccounts(boolean queueForRefresh, HashSet<ObjectId> blockedUserIds) {
-        if (!prop.isDaemonsEnabled() || !prop.isActPubEnabled() || scanningForeignUsers)
-            return;
-        arun.run(as -> {
-            if (scanningForeignUsers)
-                return null;
-            try {
-                scanningForeignUsers = true;
-                Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
-
-                for (SubNode node : accountNodes) {
-                    if (!prop.isDaemonsEnabled())
-                        break;
-                    String userName = node.getStr(NodeProp.USER);
-                    // if a foreign account we skip it.
-                    if (userName == null || userName.contains("@"))
-                        continue;
-                    // we query for only the foreign users this local user is following
-                    List<String> following =
-                            apFollowing.getFollowing(userName, true, false, null, queueForRefresh, blockedUserIds);
-                    synchronized (apCache.followedUsers) {
-                        apCache.followedUsers.addAll(following);
-                    }
-                }
-                StringBuilder sb = new StringBuilder();
-                synchronized (apCache.followedUsers) {
-                    apCache.followedUsers.forEach(user -> {
-                        sb.append(user + "\n");
-                    });
-                }
-            } finally {
-                // need a 'server info' query that can dump these out for the admin user to see in browser.
-                scanningForeignUsers = false;
-            }
-            return null;
-        });
-    }
-
-    public void refreshFollowedUsers() {
-        log.debug("refreshFollowedUsers()");
-        // get list of admin blocked users
-        HashSet<ObjectId> blockedUserIds = new HashSet<>();
-        userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-        // queue all followed users for refresh
-        identifyFollowedAccounts(true, blockedUserIds);
     }
 
     /*

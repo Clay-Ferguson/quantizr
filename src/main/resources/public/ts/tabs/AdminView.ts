@@ -96,9 +96,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 new FlexRowLayout([
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
-                        this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL), //
-                        this.settingsLink("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", null, "Refresh Fediverse Users", null)), //
-
+                        this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL)
                     ]),
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null)), //

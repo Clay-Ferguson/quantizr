@@ -897,10 +897,6 @@ public class UserManagerService extends ServiceBase {
             friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());
             // updates AND sends the friend request out to the foreign server.
             edit.updateSavedFriendNode(userDoingFollow, friendNode);
-            // Update our cache, because we now have a new followed user.
-            synchronized (apCache.followedUsers) {
-                apCache.followedUsers.add(userToFollow);
-            }
         }
     }
 

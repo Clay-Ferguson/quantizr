@@ -1470,11 +1470,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 case "refreshTrendingCache":
                     res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
                     break;
-                case "refreshFediverseUsers":
-                    // apub.refreshForeignUsers();
-                    apub.refreshFollowedUsers();
-                    res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
-                    break;
                 case "refreshAPAccounts":
                     apub.refreshActorPropsForAllUsers();
                     res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));

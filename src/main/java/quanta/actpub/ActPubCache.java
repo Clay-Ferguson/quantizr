@@ -53,19 +53,6 @@ public class ActPubCache extends ServiceBase {
     public final ConcurrentHashMap<String, PrivateKey> privateKeys = new ConcurrentHashMap<>();
     /* Cache WebFinger fails, so we don't try them again */
     public final Set<String> webFingerFailsByUserName = Collections.synchronizedSet(new HashSet<String>());
-    /*
-     * This holds the set of all users followed by any user in Quanta (which we might need to change to
-     * just the users that are followed by FollowBot?) so that when we're doing the WebCrawl to pull
-     * down outbox content we can potentially skip this these users with the assumption they will be
-     * SENDING inbound posts live as they're created, meaning we don't need to CRAWL (pull) them.
-     *
-     * BUT we need to keep track of WHICH users are sending inbound to us these posts and ONLY THEN
-     * would we assume we don't want to actually try to CRAWL their outbox to get their data (in the
-     * theoretically possible case where their instance for some reason isn't *honoring* our follow, or
-     * the user rejected the follow, or for whatever other reason it could be the case that the *follow*
-     * isn't getting us the data but a "crawl" (outbox pull) might work to get the user's data.
-     */
-    public final HashSet<String> followedUsers = new HashSet<>();
 
     @Scheduled(fixedDelay = 180 * DateUtil.MINUTE_MILLIS)
     public void cacheClean() {
