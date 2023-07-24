@@ -59,8 +59,6 @@ services:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
-    # I'm Disabling IPFS for now, because it always just runs for a while and then just mysteriously terminates.
-    # Need to investigate asap (todo-1)
     # ipfs-distro: 
     #     # https://hub.docker.com/r/ipfs/kubo/
     #     image: ipfs/kubo:release

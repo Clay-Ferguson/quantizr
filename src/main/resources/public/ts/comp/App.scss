@@ -193,19 +193,11 @@ body {
     margin-bottom: 20px;
 }
 
-// todo-1: once I'm certain about it I can remove these
-.contentNarrow {}
-
-.contentMedium {}
-
-.contentWide {}
-
 .mousePointer {
     cursor: pointer;
 }
 
 .resultsNode {
-    // why relative here ? todo-1
     position: relative;
     cursor: pointer;
 }

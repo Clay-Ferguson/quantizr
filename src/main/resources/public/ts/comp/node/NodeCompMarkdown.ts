@@ -33,13 +33,7 @@ export class NodeCompMarkdown extends Html {
         // so that admin nodes can inject scripted content (like buttons with an onClick on them)
         this.purifyHtml = node.owner !== J.PrincipalName.ADMIN;
 
-        if (!ast.mobileMode) {
-            const widthStyle = this.cont && this.cont.indexOf("```") !== -1 ? "contentWide" : "contentNarrow";
-            this.attribs.className = "mkCont " + widthStyle;
-        }
-        else {
-            this.attribs.className = "mkCont";
-        }
+        this.attribs.className = "mkCont";
 
         if (extraContainerClass) {
             this.attribs.className += " " + extraContainerClass;

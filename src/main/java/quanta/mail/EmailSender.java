@@ -165,8 +165,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
     public String convertEmailToMarkdown(LimitedInputStream is) {
         StringBuilder cont = new StringBuilder();
         try {
-            MimeMessage message = new MimeMessage(null/* mail.getMailSession() */, is);
-            // todo-1: would be better to have a 'type' for emails.
+            MimeMessage message = new MimeMessage(null, is);
             cont.append("#### " + message.getSubject());
             cont.append("\n");
             cont.append("From: " + message.getFrom()[0]);
