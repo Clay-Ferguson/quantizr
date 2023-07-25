@@ -386,8 +386,7 @@ public class MongoUtil extends ServiceBase {
         ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
             String path = node.getPath();
             String newPath = null;
-            if ( //
-            !path.startsWith(NodePath.USERS_PATH + "/") || path.startsWith(NodePath.LOCAL_USERS_PATH + "/")
+            if (!path.startsWith(NodePath.USERS_PATH + "/") || path.startsWith(NodePath.LOCAL_USERS_PATH + "/")
                     || path.startsWith(NodePath.REMOTE_USERS_PATH + "/"))
                 return;
             String shortPart = XString.stripIfStartsWith(path, NodePath.USERS_PATH + "/");
@@ -395,8 +394,7 @@ public class MongoUtil extends ServiceBase {
             // if this is a local node
             if (localPathPart.contains(shortPiece)) {
                 newPath = NodePath.LOCAL_USERS_PATH + "/" + shortPart;
-            } //
-            else if (remotePathPart.contains(shortPiece)) {
+            } else if (remotePathPart.contains(shortPiece)) {
                 newPath = NodePath.REMOTE_USERS_PATH + "/" + shortPart;
             } else {
                 return;

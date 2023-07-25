@@ -251,16 +251,13 @@ public class MongoDelete extends ServiceBase {
         IntVal batchSize = new IntVal();
         // this hash set just makes sure we only submit each val set once! No replicated work.
         HashSet<ObjectId> parentIds = new HashSet<>();
-        long threadId = Thread.currentThread().getId();
+
         ops.stream(q, SubNode.class).forEachRemaining(node -> {
             // lazy create bops
             if (!bops.hasVal()) {
                 bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
             }
-            // since I'm new to ops.stream, I don't trust it to be threadsafe yet.
-            if (threadId != Thread.currentThread().getId()) {
-                throw new RuntimeException("ops.stream unexpected concurrency");
-            }
+
             SubNode parent = read.getParent(ms, node, false);
             if (parent != null && parentIds.add(parent.getId())) {
                 // we have a known 'bops' in this one and don't lazy create so we don't care about the
@@ -329,6 +326,7 @@ public class MongoDelete extends ServiceBase {
             // starting a new pass, so zero deletes so far in this pass
             deletesInPass.setVal(0L);
             // scan the entire DB
+
             ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
                 // if this node is root node, ignore
                 if (NodePath.ROOT_PATH.equals(node.getPath()))
