@@ -131,12 +131,6 @@ export class EditAttachmentsPanel extends Div {
         const topBinRow = new FlexRowLayout([
             attCheckbox,
             new NodeCompBinary(ast.editNode, key, true, false, true),
-
-            new Diva([
-                ipfsLink ? new Div("IPFS", {
-                    className: "smallHeading"
-                }) : null
-            ]),
             imgSizeSelection,
             imgPositionSelection,
             fileNameField,
@@ -160,8 +154,8 @@ export class EditAttachmentsPanel extends Div {
 
         let bottomBinRow = null;
         if (ipfsLink) {
-            bottomBinRow = new Divc({ className: "marginLeft marginBottom" }, [
-                ipfsLink ? new Div(`CID: ${ipfsLink}`, {
+            bottomBinRow = new Divc({ className: "smallMarginTop marginBottom" }, [
+                ipfsLink ? new Div(`IPFS CID: ${ipfsLink}`, {
                     className: "clickable",
                     title: "Click -> Copy to clipboard",
                     onClick: () => {

@@ -141,7 +141,7 @@ export class NodeCompBinary extends Div {
                         }
                     }, "btn-primary marginRight"),
                     new Span("", {
-                        className: "downloadLink marginRight" 
+                        className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
             ]);
@@ -183,10 +183,10 @@ export class NodeCompBinary extends Div {
                 className: "binary-link"
             }, [
                 new Icon({
-                    className: "fa fa-file fa-lg"
+                    className: "fa fa-file fa-lg smallMarginRight"
                 }),
                 new Span(null, null, [
-                    new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName, {
+                    new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {
                         className: "downloadLink marginRight",
                         title: "Click to download attachment\n\n" + titleSuffix
                     }),
