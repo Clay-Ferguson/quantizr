@@ -451,7 +451,8 @@ export class MenuPanel extends Div {
                 }, true, null));
             });
             if (tourItems.length > 0) {
-                children.push(new Menu("Guided Tours", tourItems, null));
+                // Temporarily Disabling: I want to rename this and move it somewhere not on the main menu
+                // children.push(new Menu("Guided Tours", tourItems, null));
             }
         }
 

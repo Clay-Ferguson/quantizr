@@ -66,10 +66,6 @@ public class MongoRead extends ServiceBase {
         }
     }
 
-    /*
-     * todo-0: Everywhere we call this make sure we don't have all the logic INSIDE the non-admin-cache
-     * method. Make it separate
-     */
     public boolean readFromAdminCache() {
         return system.adminNodesCacheMap != null && ThreadLocals.getSC() != null && !ThreadLocals.getSC().isAdmin();
     }

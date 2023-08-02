@@ -67,8 +67,8 @@ export interface IPSMMessage {
 }
 
 export interface MFSDirEntry {
-    file: boolean;
     dir: boolean;
+    file: boolean;
     Name: string;
     Type: number;
     Size: number;
