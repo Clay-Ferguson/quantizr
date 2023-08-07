@@ -1,9 +1,10 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
+import { CompIntf } from "../base/CompIntf";
 
 export class Ul extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}, children: Comp[] = null) {
+    constructor(public content: string = "", attribs: Object = {}, children: CompIntf[] = null) {
         super(attribs);
         this.setChildren(children);
     }

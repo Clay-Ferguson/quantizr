@@ -11,8 +11,11 @@ import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { CompIntf } from "../base/CompIntf";
 import { Button } from "../core/Button";
 import { Divc } from "../core/Divc";
+import { DropdownMenu } from "../core/DropdownMenu";
+import { Li } from "../core/Li";
 import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompRowHeader extends Div {
@@ -30,6 +33,7 @@ export class NodeCompRowHeader extends Div {
 
     override preRender(): boolean {
         const ast = getAs();
+        const ddItems: CompIntf[] = [];
 
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
@@ -183,35 +187,39 @@ export class NodeCompRowHeader extends Div {
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
             and we need to have a user identity for all the HTTP sigs for that. */
             if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
-                children.push(new Icon({
-                    title: "People mentioned or shared related to this node",
-                    className: "fa fa-users fa-lg rowHeaderIcon",
-                    onClick: () => S.user.showUsersList(this.node)
-                }));
+                ddItems.push(new Li(null, null, [
+                    new Span("People Referenced by Node", {
+                        className: "dropdown-item",
+                        onClick: () => S.user.showUsersList(this.node)
+                    })
+                ]));
             }
 
             if (showInfo && allowWideViewIcons) {
-                children.push(new Icon({
-                    className: "fa fa-link fa-lg rowHeaderIcon",
-                    title: "Show URLs for this node",
-                    onClick: () => S.render.showNodeUrl(this.node)
-                }));
+                ddItems.push(new Li(null, null, [
+                    new Span("Links", {
+                        className: "dropdown-item",
+                        title: "Show URLs for this node",
+                        onClick: () => S.render.showNodeUrl(this.node)
+                    })
+                ]));
             }
 
             // Allow bookmarking any kind of node other than bookmark nodes.
             if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
-                children.push(new Icon({
-                    className: "fa fa-bookmark fa-lg rowHeaderIcon",
-                    title: "Bookmark this Node",
-                    onClick: () => {
-                        let content = this.getTextContent();
-                        if (content && content.length > 50) {
-                            content = content.substring(0, 50) + "...";
-                        }
+                ddItems.push(new Li(null, null, [
+                    new Span("Bookmark", {
+                        className: "dropdown-item",
+                        onClick: () => {
+                            let content = this.getTextContent();
+                            if (content && content.length > 50) {
+                                content = content.substring(0, 50) + "...";
+                            }
 
-                        S.edit.addBookmark(this.node, content);
-                    }
-                }));
+                            S.edit.addBookmark(this.node, content);
+                        }
+                    })
+                ]));
             }
 
             // Because the POSTS node will be at a depth like this: "/r/usr/L/b/q", we require
@@ -232,36 +240,49 @@ export class NodeCompRowHeader extends Div {
 
             const repliesProp: string = S.props.getPropStr(J.NodeProp.ACT_PUB_REPLIES, this.node);
             if (showInfo && ast.allowedFeatures?.indexOf("ap:replies") !== -1 && repliesProp) {
-                children.push(new Icon({
-                    className: "fa fa-commenting fa-lg rowHeaderIcon",
-                    title: "Show Replies",
-                    onClick: () => S.srch.showReplies(this.node)
-                }));
+                ddItems.push(new Li(null, null, [
+                    new Span("Show Replies", {
+                        className: "dropdown-item",
+                        onClick: () => S.srch.showReplies(this.node)
+                    })
+                ]));
             }
 
             // Don't try to read Foreign server content (by checking actPubId to detect remote)
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
             if (!ast.isAnonUser && allowWideViewIcons) {
-                children.push(new Icon({
-                    className: "fa fa-lg fa-volume-up rowHeaderIcon",
-                    onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-                    onMouseOut: () => { S.quanta.selectedForTts = null; },
-                    onClick: async () => {
-                        if (getAs().speechSpeaking) {
-                            S.speech.stopSpeaking();
-                        }
-                        else {
-                            let content = this.getTextContent();
-                            if (content) {
-                                S.speech.speakText(content, false);
+                ddItems.push(new Li(null, null, [
+                    new Span("Text-to-Speech", {
+                        className: "dropdown-item",
+                        onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+                        onMouseOut: () => { S.quanta.selectedForTts = null; },
+                        onClick: async () => {
+                            if (getAs().speechSpeaking) {
+                                S.speech.stopSpeaking();
                             }
-                        }
-                    },
-                    title: "Text-to-Speech: Read this Node"
-                }));
+                            else {
+                                let content = this.getTextContent();
+                                if (content) {
+                                    S.speech.speakText(content, false);
+                                }
+                            }
+                        },
+                    })
+                ]));
             }
         }
+
+        if (this.jumpButton && !this.isMainTree) {
+            ddItems.push(new Li(null, null, [
+                new Span("Jump to Node", {
+                    className: "dropdown-item",
+                    onClick: () => S.srch.clickSearchNode(this.node.id)
+                })
+            ]));
+        }
+
+        children.push(new DropdownMenu(ddItems));
 
         if (showInfo && priority) {
             children.push(new Span(priority, {
@@ -399,29 +420,18 @@ export class NodeCompRowHeader extends Div {
                 S.edit.pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton")
         }
 
-        let jumpButtonAdded = false;
         /* If we're not on a search result display (or timeline) and there's a TARGET_ID on the node
         then we need to show the jump button point to it.
         */
         if (this.isMainTree) {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
-                jumpButtonAdded = true;
                 jumpButton = new Icon({
                     className: "fa fa-arrow-right fa-lg buttonBarIcon",
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to Tree"
                 });
             }
-        }
-
-        /* Only need this Jump button if admin. Would work fine for ordinary users, but isn't really needed. */
-        if (this.jumpButton && !jumpButtonAdded) {
-            jumpButton = new Icon({
-                className: "fa fa-arrow-right fa-lg buttonBarIcon",
-                onClick: () => S.srch.clickSearchNode(this.node.id),
-                title: "Jump to Tree"
-            });
         }
 
         if (editButton || jumpButton) {
