@@ -56,7 +56,7 @@ export abstract class Comp implements CompIntf {
         this.attribs = attribs || {};
 
         if (this.attribs.title && !this.attribs.title.startsWith("*\n")) {
-            this.attribs.title = "Tip:\n" + this.attribs.title;
+            this.attribs.title = "Tip:\n\n" + this.attribs.title;
         }
 
         // for debugging, shows classname in every dom element as an attribute.

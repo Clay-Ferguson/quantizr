@@ -301,7 +301,8 @@ export class UserProfileDlg extends DialogBase {
     addFriend = async () => {
         const state: any = this.getState<LS>();
         const res = await S.rpcUtil.rpc<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
-            userName: state.userProfile.userName
+            userName: state.userProfile.userName,
+            tags: null
         });
 
         if (res.code == C.RESPONSE_CODE_OK) {

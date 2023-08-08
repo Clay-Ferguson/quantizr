@@ -451,7 +451,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         const tagsEditRow = editorOpts.tags ? new Divc({ className: "editorTagsSection" }, [
-            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), this.removeTag, this.selectTags) : null,
+            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this.removeTag, this.selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
 

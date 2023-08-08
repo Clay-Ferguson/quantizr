@@ -36,7 +36,7 @@ export class SelectTagsDlg extends DialogBase {
 
     /* modeOption = search | edit */
     constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean) {
-        super("Select Hashtags", "appModalContMediumWidth");
+        super("Set Hashtags", "appModalContMediumWidth");
 
         this.mergeState<LS>({
             selectedTags: this.makeDefaultSelectedTags(),
@@ -80,7 +80,7 @@ export class SelectTagsDlg extends DialogBase {
                     break;
                 case "edit":
                     buttons = [
-                        new Button("Select", () => this.select(), null, "btn-primary"),
+                        new Button("Ok", () => this.select(), null, "btn-primary"),
                         new Button("Clear", () => this.clear())
                     ];
                     break;

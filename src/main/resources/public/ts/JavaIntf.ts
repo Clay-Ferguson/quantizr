@@ -167,6 +167,7 @@ export interface UserProfile {
 
 export interface AddFriendRequest extends RequestBase {
     userName: string;
+    tags: string;
 }
 
 export interface AddPrivilegeRequest extends RequestBase {

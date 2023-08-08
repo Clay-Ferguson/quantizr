@@ -762,7 +762,7 @@ public class UserManagerService extends ServiceBase {
             SubNode accntNode = read.getUserNodeByUserName(null, req.getUserName(), false);
             if (accntNode == null)
                 throw new RuntimeException("User not found.");
-            userNode = edit.createFriendNode(ms, blockedList, req.getUserName());
+            userNode = edit.createFriendNode(ms, blockedList, req.getUserName(), null);
             if (userNode != null) {
                 res.setMessage("Blocked user " + req.getUserName()
                         + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
@@ -806,21 +806,17 @@ public class UserManagerService extends ServiceBase {
         final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
         // If just following one user do it synchronously and send back the response
         if (users.size() == 1) {
-            String ret = addFriend(ms, userDoingAction, null, users.get(0));
+            String ret = addFriend(ms, userDoingAction, null, users.get(0), req.getTags());
             res.setMessage(ret);
         } //
         else if (users.size() > 1) { // else if following multiple users run in an async exector thread
-            // For now we only allow FollowBot to do multiple-user follows
-            if (!userDoingAction.equals(PrincipalName.FOLLOW_BOT.s())) {
-                throw new RuntimeException("Account not authorized for multi-follows.");
-            }
             res.setMessage("Following users is in progress.");
             exec.run(() -> {
                 Val<Integer> counter = new Val<>(0);
                 users.forEach(u -> {
                     counter.setVal(counter.getVal() + 1);
                     log.debug("BATCH FOLLOW: " + u + ", " + String.valueOf(counter.getVal()) + "/" + users.size());
-                    addFriend(ms, userDoingAction, null, u);
+                    addFriend(ms, userDoingAction, null, u, req.getTags());
                     // sleep so the foreign server doesn't start throttling us if these users are
                     // very many onthe same server.
                     Util.sleep(4000);
@@ -836,7 +832,7 @@ public class UserManagerService extends ServiceBase {
      * if the user wasn't already a friend
      */
     public String addFriend(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
-            String userBeingFollowed) {
+            String userBeingFollowed, String tags) {
         String _userToFollow = userBeingFollowed;
         _userToFollow = XString.stripIfStartsWith(_userToFollow, "@");
         // duplicate variable because of lambdas below
@@ -852,13 +848,13 @@ public class UserManagerService extends ServiceBase {
             }
             accntIdDoingFollow = followerAcctNode.getId();
         }
-        addFriendInternal(ThreadLocals.getMongoSession(), userDoingFollow, accntIdDoingFollow, userToFollow);
+        addFriendInternal(ThreadLocals.getMongoSession(), userDoingFollow, accntIdDoingFollow, userToFollow, tags);
         return "Added Friend: " + userToFollow;
     }
 
     /* The code pattern here is very similar to 'blockUser' */
     private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
-            String userToFollow) {
+            String userToFollow, String tags) {
         SubNode followerFriendList = read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(),
                 null, NodeName.FRIENDS, true);
         if (followerFriendList == null) {
@@ -885,6 +881,7 @@ public class UserManagerService extends ServiceBase {
         SubNode userNode = arun.run(s -> read.getUserNodeByUserName(s, userToFollow, false));
         if (userNode == null)
             return;
+
         // follower bot never blocks people, so we can avoid calling that if follower bot.
         if (!userDoingFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
             // We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
@@ -892,7 +889,7 @@ public class UserManagerService extends ServiceBase {
             deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
         }
         log.trace("Creating friendNode for " + userToFollow);
-        friendNode = edit.createFriendNode(ms, followerFriendList, userToFollow);
+        friendNode = edit.createFriendNode(ms, followerFriendList, userToFollow, tags);
         if (friendNode != null) {
             friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());
             // updates AND sends the friend request out to the foreign server.

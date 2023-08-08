@@ -965,7 +965,7 @@ export class Render {
         return items;
     }
 
-    renderTagsStrDiv = (tagsStr: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div => {
+    renderTagsStrDiv = (tagsStr: string, classes: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div => {
         if (!tagsStr) tagsStr = "";
         const tags = tagsStr.split(" ");
         const spans: Span[] = tags.map(tag => {
@@ -980,7 +980,8 @@ export class Render {
             })
         });
 
-        return new Diva([
+        const attrs = classes ? { className: classes } : null;
+        return new Div(null, attrs, [
             new IconButton("fa-tag", "", {
                 onClick: (evt: Event) => {
                     evt.stopPropagation();

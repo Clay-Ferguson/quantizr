@@ -316,7 +316,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow) {
+    public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
         SubNode userNode = read.getUserNodeByUserName(ms, userToFollow, false);
         if (userNode != null) {
@@ -327,19 +327,24 @@ public class NodeEditService extends ServiceBase {
             if (!StringUtils.isEmpty(userImgUrl)) {
                 properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
             }
-            SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+            SubNode friendNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
                     CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true);
-            newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+            friendNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+
+            if (tags != null) {
+                friendNode.setTags(tags);
+            }
+
             String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
             if (userToFollowActorId != null) {
-                newNode.set(NodeProp.ACT_PUB_ACTOR_ID, userToFollowActorId);
+                friendNode.set(NodeProp.ACT_PUB_ACTOR_ID, userToFollowActorId);
             }
             String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
             if (userToFollowActorUrl != null) {
-                newNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
+                friendNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
             }
-            update.save(ms, newNode);
-            return newNode;
+            update.save(ms, friendNode);
+            return friendNode;
         } else {
             throw new RuntimeException("User not found: " + userToFollow);
         }

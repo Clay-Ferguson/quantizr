@@ -1,9 +1,8 @@
 import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
 import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
-import { LS as SelectTagsDlgLS, SelectTagsDlg } from "../dlg/SelectTagsDlg";
+import { SelectTagsDlg, LS as SelectTagsDlgLS } from "../dlg/SelectTagsDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { FriendInfo } from "../JavaIntf";
@@ -11,6 +10,7 @@ import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./core/Checkbox";
 import { Divc } from "./core/Divc";
+import { FlexLayout } from "./core/FlexLayout";
 import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
 
@@ -46,7 +46,7 @@ export class FriendsTableRow extends ListBoxRow {
         }
 
         this.setChildren([
-            new Diva([
+            new FlexLayout([
                 this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
                         const state: FriendsDlgState = this.dlg.getState();
@@ -60,28 +60,33 @@ export class FriendsTableRow extends ListBoxRow {
                     },
                     getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
                 }) : null,
+
                 new Divc({ className: "friendListImgDivCont" }, [
-                    new Divc({ className: "friendListImgDiv centerChild" }, [
+                    new Divc({
+                        className: "friendListImgDiv centerChild",
+                        onClick: () => new UserProfileDlg(this.friend.userNodeId).open(),
+                        title: "Click for Profile"
+                    }, [
                         src ? new Img({
                             className: "friendListImage",
                             src,
-                            onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
                         }) : null
                     ])
                 ]),
-                new Divc({
-                    className: "friendListText",
-                    onClick: () => new UserProfileDlg(this.friend.userNodeId).open()
-                }, [
-                    new Diva([
-                        this.friend.displayName ? new Div(this.friend.displayName + nameSuffix, { className: "friendName" }) : null,
-                        this.friend.userName ? new Div("@" + this.friend.userName) : null
-                    ]),
 
-                    // Only if we know the friendNodeId here (set on server) do we have the ability to show friend-specific tags,
-                    // because if friendNodeId is null it just means this is a user independent of anything to do with Friends.
-                    this.friend.friendNodeId ? S.render.renderTagsStrDiv(this.friend.tags, this.removeTag, this.editTags) : null
+                new Div(null, {
+                    className: "marginLeft marginTop",
+                    onClick: () => new UserProfileDlg(this.friend.userNodeId).open(),
+                    title: "Click for Profile"
+                }, [
+                    this.friend.displayName ? new Div(this.friend.displayName + nameSuffix, { className: "friendName" }) : null,
+                    this.friend.userName ? new Div("@" + this.friend.userName) : null
                 ]),
+
+                // Only if we know the friendNodeId here (set on server) do we have the ability to show friend-specific tags,
+                // because if friendNodeId is null it just means this is a user independent of anything to do with Friends.
+                this.friend.friendNodeId ? S.render.renderTagsStrDiv(this.friend.tags, "bigMarginLeft marginTop", this.removeTag, this.editTags) : null,
+
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
                     className: "fa fa-star fa-lg marginTop marginRight float-end " +
