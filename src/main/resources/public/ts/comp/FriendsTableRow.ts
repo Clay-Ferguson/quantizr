@@ -37,14 +37,6 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
-        let nameSuffix: string;
-        if (S.util.isActPubUserName(this.friend.userName)) {
-            nameSuffix = " (ActivityPub)";
-        }
-        else {
-            nameSuffix = "";
-        }
-
         this.setChildren([
             new FlexLayout([
                 this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
@@ -79,7 +71,7 @@ export class FriendsTableRow extends ListBoxRow {
                     onClick: () => new UserProfileDlg(this.friend.userNodeId).open(),
                     title: "Click for Profile"
                 }, [
-                    this.friend.displayName ? new Div(this.friend.displayName + nameSuffix, { className: "friendName" }) : null,
+                    this.friend.displayName ? new Div(this.friend.displayName, { className: "friendName" }) : null,
                     this.friend.userName ? new Div("@" + this.friend.userName) : null
                 ]),
 
