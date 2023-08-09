@@ -804,6 +804,7 @@ public class UserManagerService extends ServiceBase {
         AddFriendResponse res = new AddFriendResponse();
         String userDoingAction = ThreadLocals.getSC().getUserName();
         final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
+
         // If just following one user do it synchronously and send back the response
         if (users.size() == 1) {
             String ret = addFriend(ms, userDoingAction, null, users.get(0), req.getTags());
@@ -811,18 +812,13 @@ public class UserManagerService extends ServiceBase {
         } //
         else if (users.size() > 1) { // else if following multiple users run in an async exector thread
             res.setMessage("Following users is in progress.");
-            exec.run(() -> {
-                Val<Integer> counter = new Val<>(0);
-                users.forEach(u -> {
-                    counter.setVal(counter.getVal() + 1);
-                    log.debug("BATCH FOLLOW: " + u + ", " + String.valueOf(counter.getVal()) + "/" + users.size());
-                    addFriend(ms, userDoingAction, null, u, req.getTags());
-                    // sleep so the foreign server doesn't start throttling us if these users are
-                    // very many onthe same server.
-                    Util.sleep(4000);
-                });
-                log.debug("BATCH FOLLOW complete.");
+            Val<Integer> counter = new Val<>(0);
+            users.forEach(u -> {
+                counter.setVal(counter.getVal() + 1);
+                log.debug("BATCH FOLLOW: " + u + ", " + String.valueOf(counter.getVal()) + "/" + users.size());
+                addFriend(ms, userDoingAction, null, u, req.getTags());
             });
+            log.debug("BATCH FOLLOW complete.");
         }
         return res;
     }

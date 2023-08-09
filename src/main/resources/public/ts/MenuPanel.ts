@@ -8,7 +8,6 @@ import { Constants as C } from "./Constants";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
-import { MultiFollowDlg } from "./dlg/MultiFollowDlg";
 import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByFediUrlDlg } from "./dlg/SearchByFediUrlDlg";
@@ -144,7 +143,6 @@ export class MenuPanel extends Div {
     static searchById = () => { new SearchByIDDlg().open(); };
     static searchByFediUrl = () => { new SearchByFediUrlDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
-    static multiFollow = () => { new MultiFollowDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time", 0, true);
     static timelineByModified = () => S.srch.timeline(null, "mtm", null, "Rev-chron by Modify Time", 0, true);
@@ -248,8 +246,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Followers", MenuPanel.showFollowers),
                 new MenuItem("Blocked", MenuPanel.showBlockedUsers),
                 new MenuItemSeparator(),
-                new MenuItem("Find People", MenuPanel.findUsers), //
-                new MenuItem("Multi-Follow", MenuPanel.multiFollow) //
+                new MenuItem("Find People", MenuPanel.findUsers)
             ], null));
         }
 

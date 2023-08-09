@@ -12,8 +12,11 @@ import { TextField } from "../comp/core/TextField";
 import { FriendsTable } from "../comp/FriendsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { MultiFollowDlg } from "./MultiFollowDlg";
+import { Constants as C } from "../Constants";
 
 export interface LS { // Local State
     nodeId?: string;
@@ -58,6 +61,11 @@ export class FriendsDlg extends DialogBase {
     }
 
     override preLoad = async () => {
+        this.mergeState<LS>({
+            selections: new Set<string>(),
+            loading: true
+        });
+
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: this.nodeId,
             type: "friends"
@@ -165,12 +173,19 @@ export class FriendsDlg extends DialogBase {
                 !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
                     !this.displayOnly && !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
+                    new Button("Add Friends", this.addFriends),
                     new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
         return ret;
+    }
+
+    addFriends = async () => {
+        const dlg = new MultiFollowDlg();
+        await dlg.open();
+        this.preLoad();
     }
 
     setSelectAllPersons = (state: LS, selectAll: boolean) => {
@@ -227,3 +242,10 @@ export class FriendsDlg extends DialogBase {
         this.close();
     }
 }
+
+PubSub.sub(C.PUBSUB_friendsChanged, (payload: string) => {
+    if (FriendsDlg.inst) {
+        FriendsDlg.inst.preLoad();
+    }
+});
+

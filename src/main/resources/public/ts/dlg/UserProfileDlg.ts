@@ -3,6 +3,7 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { NodeType } from "../JavaIntf";
+import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ScrollPos } from "../comp/base/Comp";
@@ -226,6 +227,7 @@ export class UserProfileDlg extends DialogBase {
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
         });
+        PubSub.pub(C.PUBSUB_friendsChanged, this.userNodeId);
         this.reload();
     }
 
@@ -304,6 +306,8 @@ export class UserProfileDlg extends DialogBase {
             userName: state.userProfile.userName,
             tags: null
         });
+
+        PubSub.pub(C.PUBSUB_friendsChanged, state.userProfile.userName);
 
         if (res.code == C.RESPONSE_CODE_OK) {
             state.userProfile.following = true;
