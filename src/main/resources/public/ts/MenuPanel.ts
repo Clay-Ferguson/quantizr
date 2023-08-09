@@ -246,7 +246,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Followers", MenuPanel.showFollowers),
                 new MenuItem("Blocked", MenuPanel.showBlockedUsers),
                 new MenuItemSeparator(),
-                new MenuItem("Find People", MenuPanel.findUsers)
+                new MenuItem("Search", MenuPanel.findUsers)
             ], null));
         }
 

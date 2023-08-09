@@ -17,6 +17,9 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { MultiFollowDlg } from "./MultiFollowDlg";
 import { Constants as C } from "../Constants";
+import { MessageDlg } from "./MessageDlg";
+import { VerticalLayout } from "../comp/core/VerticalLayout";
+import { Anchor } from "../comp/core/Anchor";
 
 export interface LS { // Local State
     nodeId?: string;
@@ -174,6 +177,7 @@ export class FriendsDlg extends DialogBase {
                 new ButtonBar([
                     !this.displayOnly && !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
                     new Button("Add Friends", this.addFriends),
+                    new Button("Export", this.export),
                     new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
@@ -181,6 +185,27 @@ export class FriendsDlg extends DialogBase {
         ];
         return ret;
     }
+
+    export = () => {
+        const hostAndPort: string = S.util.getHostAndPort();
+        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
+        the plan is to have the export return the actual md5 of the export for use here */
+
+        // disp=inline (is the other)
+        // todo-1: Need more secure way to access file than this token=url, possibly by just creating a temporary token that 
+        // can timeout faster than the user token times out.
+        const downloadLink = hostAndPort + "/f/export-friends?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+
+        new MessageDlg(
+            "Use the download link below to get the text file.",
+            "Export Friends",
+            null,
+            new VerticalLayout([
+                new Anchor(downloadLink, "Download Friends List", { target: "_blank" }),
+            ]), false, 0, null
+        ).open();
+    }
+
 
     addFriends = async () => {
         const dlg = new MultiFollowDlg();

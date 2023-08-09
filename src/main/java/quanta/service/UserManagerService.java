@@ -746,39 +746,35 @@ public class UserManagerService extends ServiceBase {
     }
 
     /* The code pattern here is very similar to addFriendInternal */
-    public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
+    public BlockUserResponse blockUsers(MongoSession ms, BlockUserRequest req) {
         BlockUserResponse res = new BlockUserResponse();
         String userName = ThreadLocals.getSC().getUserName();
         ObjectId accntIdDoingBlock = new ObjectId(ThreadLocals.getSC().getUserNodeId());
         // get the node that holds all blocked users
         SubNode blockedList = user.getBlockedUsers(ms, userName, true);
-        SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, req.getUserName());
+        blockUser(ms, req.getUserName(), accntIdDoingBlock, blockedList);
+        return res;
+    }
+
+    private void blockUser(MongoSession ms, String userName, ObjectId accntIdDoingBlock, SubNode blockedList) {
+        SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, userName);
+
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !mongoUtil.isChildOf(blockedList, userNode)) {
             delete.delete(ms, userNode);
             userNode = null;
         }
+
         if (userNode == null) {
-            SubNode accntNode = read.getUserNodeByUserName(null, req.getUserName(), false);
+            SubNode accntNode = read.getUserNodeByUserName(null, userName, false);
             if (accntNode == null)
                 throw new RuntimeException("User not found.");
-            userNode = edit.createFriendNode(ms, blockedList, req.getUserName(), null);
+
+            userNode = edit.createFriendNode(ms, blockedList, userName, null);
             if (userNode != null) {
-                res.setMessage("Blocked user " + req.getUserName()
-                        + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
-            } else {
-                res.setMessage("Unable to block user: " + req.getUserName());
+                log.debug("Blocked user " + userName);
             }
-        } else {
-            /*
-             * todo-2: for this AND the friend request (similar places), we need to make it where the user can
-             * never get here or click a button if this is redundant. also we don't yet have in the GUI the
-             * indication of "Follows You" and "[You're] Following" when someone views a user, which is part of
-             * what's needed for this.
-             */
-            res.setMessage("You already blocked " + req.getUserName());
         }
-        return res;
     }
 
     public DeleteFriendResponse deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
@@ -794,6 +790,39 @@ public class UserManagerService extends ServiceBase {
             }
         }
         return res;
+    }
+
+    public void exportFriends(MongoSession ms, HttpServletResponse response, String disposition) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            Criteria moreCriteria = null;
+
+            List<SubNode> friendNodes =
+                    getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), ms.getUserName(), true, moreCriteria);
+
+            if (friendNodes != null) {
+                for (SubNode friendNode : friendNodes) {
+                    String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
+                    SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
+                    if (friendAccountNode != null) {
+                        String userName = friendNode.getStr(NodeProp.USER);
+                        sb.append(userName);
+                        sb.append("\n");
+                    }
+                }
+            }
+
+            if (disposition == null) {
+                disposition = "inline";
+            }
+
+            response.setContentType("text/plain");
+            response.setContentLength((int) sb.length());
+            response.setHeader("Content-Disposition", disposition + "; filename=\"friends.txt\"");
+            response.getWriter().write(sb.toString());
+        } catch (Exception ex) {
+            throw ExUtil.wrapEx(ex);
+        }
     }
 
     /*

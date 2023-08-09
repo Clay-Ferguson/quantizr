@@ -695,25 +695,27 @@ public class AppController extends ServiceBase implements ErrorController {
             if ("pdf".equalsIgnoreCase(req.getExportExt())) {
                 ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
                 svc.export(ms, "pdf", req, res);
-            } else if ("zip".equalsIgnoreCase(req.getExportExt())) { // ================================================
-                                                                     // // } // // } // res.setSuccess(false);
-                                                                     // // res.setMessage("Export of Markdown to
-                                                                     // IPFS not yet available."); // if
-                                                                     // (req.isToIpfs()) { // else if
-                                                                     // ("md".equalsIgnoreCase(req.getExportExt()))
-                                                                     // { // } // // svc.export(ms, "html", req,
-                                                                     // res); // ExportServiceFlexmark svc =
-                                                                     // (ExportServiceFlexmark)
-                                                                     // context.getBean(ExportServiceFlexmark.class);
-                                                                     // // else if
-                                                                     // ("html".equalsIgnoreCase(req.getExportExt()))
-                                                                     // { // and we don't need these options,
-                                                                     // but I'm leaving the code in place for
-                                                                     // now. // I think the HTML and MARKDOWN
-                                                                     // export as ZIP/TAR formats can suffice
-                                                                     // for this // DO NOT DELETE (YET) //
-                                                                     // ================================================
-                                                                     // //
+            }
+            // ================================================
+            // // } // // } // res.setSuccess(false);
+            // // res.setMessage("Export of Markdown to
+            // IPFS not yet available."); // if
+            // (req.isToIpfs()) { // else if
+            // ("md".equalsIgnoreCase(req.getExportExt()))
+            // { // } // // svc.export(ms, "html", req,
+            // res); // ExportServiceFlexmark svc =
+            // (ExportServiceFlexmark)
+            // context.getBean(ExportServiceFlexmark.class);
+            // // else if
+            // ("html".equalsIgnoreCase(req.getExportExt()))
+            // { // and we don't need these options,
+            // but I'm leaving the code in place for
+            // now. // I think the HTML and MARKDOWN
+            // export as ZIP/TAR formats can suffice
+            // for this // DO NOT DELETE (YET) //
+            // ================================================
+            // //
+            else if ("zip".equalsIgnoreCase(req.getExportExt())) {
                 if (req.isToIpfs()) {
                     res.error("Export of ZIP to IPFS not yet available.");
                 }
@@ -1088,6 +1090,24 @@ public class AppController extends ServiceBase implements ErrorController {
     }
 
     /*
+     * todo-3: we should return proper HTTP codes when file not found, etc.
+     */
+    @RequestMapping(value = FILE_PATH + "/export-friends", method = RequestMethod.GET)
+    public void exportFriends(@RequestParam(name = "disp", required = false) String disposition,
+            @RequestParam(name = "token", required = true) String token, HttpSession session,
+            HttpServletResponse response) {
+        SessionContext sc = ServiceBase.redis.get(token);
+        if (sc == null) {
+            throw new RuntimeException("bad token in /f/export-friends/ access: " + token);
+        }
+
+        callProc.run("exportFriends", false, false, null, session, ms -> {
+            user.exportFriends(ms, response, disposition);
+            return null;
+        });
+    }
+
+    /*
      * NOTE: this rest endpoint has -xxx appended so it never gets called, however for efficient
      * streaming of content for 'non-seekable' media, this works perfectly, but i'm using the
      * getFileSystemResourceStreamMultiPart call below instead which DOES support seeking, which means
@@ -1319,7 +1339,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
         // SessionContext.authReq(true);
         return callProc.run("blockUser", true, true, req, session, ms -> {
-            return user.blockUser(ms, req);
+            return user.blockUsers(ms, req);
         });
     }
 

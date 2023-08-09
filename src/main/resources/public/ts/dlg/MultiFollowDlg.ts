@@ -26,7 +26,7 @@ export class MultiFollowDlg extends DialogBase {
             new Diva([
                 new TextContent("Enter Fediverse Usernames (one per line)"),
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
-                new TextField({ label: "Name", val: this.tagState }),
+                new TextField({ label: "Tags (optional)", val: this.tagState }),
                 new ButtonBar([
                     new Button("Follow All", this.follow, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
