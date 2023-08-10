@@ -1420,7 +1420,7 @@ public class ActPubService extends ServiceBase {
                 lastServer = server;
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
-                loadForeignUser(null, userName);
+                loadForeignUser(null, userName, true);
             } catch (Exception e) {
                 log.debug("Unable to load user: " + userName);
             }
@@ -1498,11 +1498,11 @@ public class ActPubService extends ServiceBase {
     }
 
     public String readOutbox(String userName) {
-        loadForeignUser("FollowBot", userName);
+        loadForeignUser("FollowBot", userName, true);
         return "Outbox requested";
     }
 
-    public void loadForeignUser(String userMakingRequest, String userName) {
+    public void loadForeignUser(String userMakingRequest, String userName, boolean readOutbox) {
         arun.run(as -> {
             log.debug("Reading outbox: " + userName);
             SubNode userNode = getAcctNodeByForeignUserName(as, userMakingRequest, userName, false, true);
@@ -1510,23 +1510,19 @@ public class ActPubService extends ServiceBase {
                 log.debug("Unable to getAccount Node for userName: " + userName);
                 return null;
             }
-            String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-            APOActor actor = apUtil.getActorByUrl(as, userMakingRequest, actorUrl);
-            if (actor != null) {
-                // if their outbox fails just, stop processing and don't bother trying to get followers or
-                // following,.
-                if (!apOutbox.loadForeignOutbox(as, userMakingRequest, actor, userNode, userName)) {
-                    return null;
+
+            if (readOutbox) {
+                String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
+                APOActor actor = apUtil.getActorByUrl(as, userMakingRequest, actorUrl);
+                if (actor != null) {
+                    // if their outbox fails just, stop processing and don't bother trying to get followers or
+                    // following,.
+                    if (!apOutbox.loadForeignOutbox(as, userMakingRequest, actor, userNode, userName)) {
+                        return null;
+                    }
+                } else {
+                    log.debug("Unable to get actor from url: " + actorUrl);
                 }
-            } else /*
-                    * I was going to load followerCounts into userNode, but I decided to just query them live when
-                    * needed on the UserPreferences dialog todo-1: need a flag to enable these to allow for agressive
-                    * collection of usernames, but for now we have more than enough users so I'm disabling this.
-                    */
-            // int followerCount = apFollower.loadRemoteFollowers(ms, userMakingRequest, actor);
-            // int followingCount = apFollowing.loadRemoteFollowing(ms, userMakingRequest, actor);
-            {
-                log.debug("Unable to get actor from url: " + actorUrl);
             }
             return null;
         });

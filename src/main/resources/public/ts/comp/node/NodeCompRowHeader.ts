@@ -188,7 +188,7 @@ export class NodeCompRowHeader extends Div {
             and we need to have a user identity for all the HTTP sigs for that. */
             if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
                 ddItems.push(new Li(null, null, [
-                    new Span("People Referenced by Node", {
+                    new Span("People", {
                         className: "dropdown-item",
                         onClick: () => S.user.showUsersList(this.node)
                     })

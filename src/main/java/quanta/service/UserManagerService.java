@@ -899,7 +899,7 @@ public class UserManagerService extends ServiceBase {
         if (friendNode != null)
             return;
         if (userToFollow.contains("@")) {
-            apub.loadForeignUser(userDoingFollow, userToFollow);
+            apub.loadForeignUser(userDoingFollow, userToFollow, false);
         }
         // the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
         // must use arun.
