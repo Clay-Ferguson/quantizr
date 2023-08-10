@@ -807,6 +807,8 @@ public class UserManagerService extends ServiceBase {
                     if (friendAccountNode != null) {
                         String userName = friendNode.getStr(NodeProp.USER);
                         sb.append(userName);
+                        sb.append(",");
+                        sb.append(friendNode.getTags());
                         sb.append("\n");
                     }
                 }
@@ -834,22 +836,28 @@ public class UserManagerService extends ServiceBase {
         String userDoingAction = ThreadLocals.getSC().getUserName();
         final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
 
-        // If just following one user do it synchronously and send back the response
-        if (users.size() == 1) {
-            String ret = addFriend(ms, userDoingAction, null, users.get(0), req.getTags());
-            res.setMessage(ret);
-        } //
-        else if (users.size() > 1) { // else if following multiple users run in an async exector thread
-            res.setMessage("Following users is in progress.");
-            Val<Integer> counter = new Val<>(0);
-            users.forEach(u -> {
-                counter.setVal(counter.getVal() + 1);
-                log.debug("BATCH FOLLOW: " + u + ", " + String.valueOf(counter.getVal()) + "/" + users.size());
-                addFriend(ms, userDoingAction, null, u, req.getTags());
-            });
-            log.debug("BATCH FOLLOW complete.");
-        }
+        users.forEach(u -> {
+            Val<String> userVal = new Val<>();
+            Val<String> tagsVal = new Val<>();
+
+            parseImportUser(u, userVal, tagsVal);
+            String tags = tagsVal.getVal() != null ? tagsVal.getVal() : req.getTags();
+            addFriend(ms, userDoingAction, null, userVal.getVal(), tags);
+        });
+
         return res;
+    }
+
+    // parses a comma-delimited 'user' string like "clay, #tag1 #tag2", and sends back the two parts
+    // in userVal and tagsVal
+    public void parseImportUser(String user, Val<String> userVal, Val<String> tagsVal) {
+        final List<String> parts = XString.tokenize(user, ",", true);
+        if (parts.size() > 0) {
+            userVal.setVal(parts.get(0));
+        }
+        if (parts.size() > 1) {
+            tagsVal.setVal(parts.get(1));
+        }
     }
 
     /*

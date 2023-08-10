@@ -36,7 +36,7 @@ export class SelectTagsDlg extends DialogBase {
 
     /* modeOption = search | edit */
     constructor(private modeOption: string, private curTags: string, private allowSuggestTags: boolean) {
-        super("Set Hashtags", "appModalContMediumWidth");
+        super("Add Hashtags", "appModalContMediumWidth");
 
         this.mergeState<LS>({
             selectedTags: this.makeDefaultSelectedTags(),
@@ -62,29 +62,25 @@ export class SelectTagsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let buttons: Button[] = [];
-        const state = this.getState<LS>();
-
-        if (state.tags?.length > 0) {
-            switch (this.modeOption) {
-                case "search":
-                    buttons = [
-                        new Button("Match All", () => {
-                            this.matchAll = true;
-                            this.select();
-                        }, null, "btn-primary"),
-                        new Button("Match Any", () => {
-                            this.matchAny = true;
-                            this.select();
-                        })
-                    ];
-                    break;
-                case "edit":
-                    buttons = [
-                        new Button("Ok", () => this.select(), null, "btn-primary"),
-                        new Button("Clear", () => this.clear())
-                    ];
-                    break;
-            }
+        switch (this.modeOption) {
+            case "search":
+                buttons = [
+                    new Button("Match All", () => {
+                        this.matchAll = true;
+                        this.select();
+                    }, null, "btn-primary"),
+                    new Button("Match Any", () => {
+                        this.matchAny = true;
+                        this.select();
+                    })
+                ];
+                break;
+            case "edit":
+                buttons = [
+                    new Button("Ok", () => this.select(), null, "btn-primary"),
+                    new Button("Clear", () => this.clear())
+                ];
+                break;
         }
 
         return [

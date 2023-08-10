@@ -236,6 +236,7 @@ export class UserProfileDlg extends DialogBase {
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
+        PubSub.pub(C.PUBSUB_friendsChanged, this.userNodeId);
         this.reload();
     }
 
@@ -356,6 +357,7 @@ export class UserProfileDlg extends DialogBase {
         const res = await S.rpcUtil.rpc<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         });
+        PubSub.pub(C.PUBSUB_friendsChanged, this.userNodeId);
 
         if (res.code == C.RESPONSE_CODE_OK) {
             state.userProfile.blocked = true;
