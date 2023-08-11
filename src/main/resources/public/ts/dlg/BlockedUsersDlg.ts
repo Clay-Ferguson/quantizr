@@ -34,6 +34,12 @@ export class BlockedUsersDlg extends DialogBase {
         });
     }
 
+    override getTitleText = (): string => {
+        const state: LS = this.getState();
+        const count = state.friends?.length > 0 ? state.friends?.length : 0;
+        return `${this.title} (${count})`;
+    }
+
     override preLoad = async () => {
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: null,

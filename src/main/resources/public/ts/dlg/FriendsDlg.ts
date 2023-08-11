@@ -63,6 +63,12 @@ export class FriendsDlg extends DialogBase {
         };
     }
 
+    override getTitleText = (): string => {
+        const state: LS = this.getState();
+        const count = state.friends?.length > 0 ? state.friends?.length : 0;
+        return `${this.title} (${count})`;
+    }
+
     override preLoad = async () => {
         this.mergeState<LS>({
             selections: new Set<string>(),

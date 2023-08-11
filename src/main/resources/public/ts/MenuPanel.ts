@@ -106,8 +106,7 @@ export class MenuPanel extends Div {
     // which can be slow in JS.
 
     static showBlockedUsers = () => {
-        // S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
-        const dlg = new BlockedUsersDlg("Blocked Users");
+        const dlg = new BlockedUsersDlg("Blocked");
         dlg.open();
     }
 
