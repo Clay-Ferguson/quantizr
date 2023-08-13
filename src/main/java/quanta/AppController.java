@@ -1102,7 +1102,25 @@ public class AppController extends ServiceBase implements ErrorController {
         }
 
         callProc.run("exportFriends", false, false, null, session, ms -> {
-            user.exportFriends(ms, response, disposition);
+            user.exportPeople(ms, response, disposition, NodeType.FRIEND_LIST.s());
+            return null;
+        });
+    }
+
+    /*
+     * todo-3: we should return proper HTTP codes when file not found, etc.
+     */
+    @RequestMapping(value = FILE_PATH + "/export-blocks", method = RequestMethod.GET)
+    public void exportBlocks(@RequestParam(name = "disp", required = false) String disposition,
+            @RequestParam(name = "token", required = true) String token, HttpSession session,
+            HttpServletResponse response) {
+        SessionContext sc = ServiceBase.redis.get(token);
+        if (sc == null) {
+            throw new RuntimeException("bad token in /f/export-blocks/ access: " + token);
+        }
+
+        callProc.run("exportBlocks", false, false, null, session, ms -> {
+            user.exportPeople(ms, response, disposition, NodeType.BLOCKED_USERS.s());
             return null;
         });
     }

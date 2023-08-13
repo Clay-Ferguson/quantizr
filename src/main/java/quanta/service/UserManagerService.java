@@ -752,12 +752,16 @@ public class UserManagerService extends ServiceBase {
         ObjectId accntIdDoingBlock = new ObjectId(ThreadLocals.getSC().getUserNodeId());
         // get the node that holds all blocked users
         SubNode blockedList = user.getBlockedUsers(ms, userName, true);
-        blockUser(ms, req.getUserName(), accntIdDoingBlock, blockedList);
+        List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
+
+        users.forEach(u -> {
+            blockUser(ms, u, accntIdDoingBlock, blockedList);
+        });
         return res;
     }
 
-    private void blockUser(MongoSession ms, String userName, ObjectId accntIdDoingBlock, SubNode blockedList) {
-        SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, userName);
+    private void blockUser(MongoSession ms, String userToBlock, ObjectId accntIdDoingBlock, SubNode blockedList) {
+        SubNode userNode = read.findFriendNode(ms, accntIdDoingBlock, null, userToBlock);
 
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !mongoUtil.isChildOf(blockedList, userNode)) {
@@ -766,13 +770,9 @@ public class UserManagerService extends ServiceBase {
         }
 
         if (userNode == null) {
-            SubNode accntNode = read.getUserNodeByUserName(null, userName, false);
-            if (accntNode == null)
-                throw new RuntimeException("User not found.");
-
-            userNode = edit.createFriendNode(ms, blockedList, userName, null);
+            userNode = edit.createFriendNode(ms, blockedList, userToBlock, null);
             if (userNode != null) {
-                log.debug("Blocked user " + userName);
+                log.debug("Blocked user " + userToBlock);
             }
         }
     }
@@ -792,13 +792,13 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public void exportFriends(MongoSession ms, HttpServletResponse response, String disposition) {
+    public void exportPeople(MongoSession ms, HttpServletResponse response, String disposition, String listType) {
         try {
             StringBuilder sb = new StringBuilder();
             Criteria moreCriteria = null;
+            String fileName = listType.equals(NodeType.FRIEND_LIST.s()) ? "friends.txt" : "blocks.txt";
 
-            List<SubNode> friendNodes =
-                    getSpecialNodesList(ms, null, NodeType.FRIEND_LIST.s(), ms.getUserName(), true, moreCriteria);
+            List<SubNode> friendNodes = getSpecialNodesList(ms, null, listType, ms.getUserName(), true, moreCriteria);
 
             if (friendNodes != null) {
                 for (SubNode friendNode : friendNodes) {
@@ -807,8 +807,11 @@ public class UserManagerService extends ServiceBase {
                     if (friendAccountNode != null) {
                         String userName = friendNode.getStr(NodeProp.USER);
                         sb.append(userName);
-                        sb.append(",");
-                        sb.append(friendNode.getTags());
+
+                        if (listType.equals(NodeType.FRIEND_LIST.s())) {
+                            sb.append(",");
+                            sb.append(friendNode.getTags());
+                        }
                         sb.append("\n");
                     }
                 }
@@ -820,7 +823,7 @@ public class UserManagerService extends ServiceBase {
 
             response.setContentType("text/plain");
             response.setContentLength((int) sb.length());
-            response.setHeader("Content-Disposition", disposition + "; filename=\"friends.txt\"");
+            response.setHeader("Content-Disposition", disposition + "; filename=\"" + fileName + "\"");
             response.getWriter().write(sb.toString());
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);

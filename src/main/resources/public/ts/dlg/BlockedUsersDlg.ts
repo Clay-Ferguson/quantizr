@@ -1,5 +1,13 @@
 import { getAs } from "../AppContext";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { S } from "../Singletons";
+import { Validator } from "../Validator";
+import { FriendsTable } from "../comp/FriendsTable";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -10,11 +18,9 @@ import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
-import { FriendsTable } from "../comp/FriendsTable";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
-import { Validator } from "../Validator";
+import { VerticalLayout } from "../comp/core/VerticalLayout";
+import { MessageDlg } from "./MessageDlg";
+import { MultiBlockDlg } from "./MultiBlockDlg";
 
 export interface LS { // Local State
     loading?: boolean;
@@ -22,12 +28,14 @@ export interface LS { // Local State
 }
 
 export class BlockedUsersDlg extends DialogBase {
+    static inst: BlockedUsersDlg = null;
     searchTextState: Validator = new Validator();
     friendsTagSearch: string;
     searchTextField: TextField;
 
     constructor(title: string) {
         super(title);
+        BlockedUsersDlg.inst = this;
 
         this.mergeState<LS>({
             loading: true
@@ -137,11 +145,39 @@ export class BlockedUsersDlg extends DialogBase {
                     : new FriendsTable(filteredFriends, false, this),
                 state.friends?.length > 1 ? new Clearfix() : null,
                 new ButtonBar([
+                    new Button("Import", this.import),
+                    state.friends?.length > 0 ? new Button("Export", this.export) : null,
                     new Button("Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
+    }
+
+    export = () => {
+        const hostAndPort: string = S.util.getHostAndPort();
+        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
+        the plan is to have the export return the actual md5 of the export for use here */
+
+        // disp=inline (is the other)
+        // todo-1: Need more secure way to access file than this token=url, possibly by just creating a temporary token that 
+        // can timeout faster than the user token times out.
+        const downloadLink = hostAndPort + "/f/export-blocks?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+
+        new MessageDlg(
+            "Use the download link below to get the text file.",
+            "Export Blocks",
+            null,
+            new VerticalLayout([
+                new Anchor(downloadLink, "Download Blocked List", { target: "_blank" }),
+            ]), false, 0, null
+        ).open();
+    }
+
+    import = async () => {
+        const dlg = new MultiBlockDlg();
+        await dlg.open();
+        this.preLoad();
     }
 
     userSearch = () => {
@@ -161,3 +197,9 @@ export class BlockedUsersDlg extends DialogBase {
         return ret;
     }
 }
+
+PubSub.sub(C.PUBSUB_friendsChanged, (payload: string) => {
+    if (BlockedUsersDlg.inst) {
+        BlockedUsersDlg.inst.preLoad();
+    }
+});
