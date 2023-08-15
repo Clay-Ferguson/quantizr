@@ -477,11 +477,13 @@ public class UserManagerService extends ServiceBase {
      */
     public SignupResponse signup(SignupRequest req, boolean automated) {
         SignupResponse res = new SignupResponse();
+        res.setCode(HttpServletResponse.SC_OK);
         arun.run(as -> {
             String userName = req.getUserName().trim();
             String password = req.getPassword().trim();
             String email = req.getEmail();
             log.debug("Signup: userName=" + userName + " email=" + email);
+
             String userError = validator.checkUserName(userName);
             if (userError != null) {
                 res.setUserError(userError);
@@ -506,7 +508,7 @@ public class UserManagerService extends ServiceBase {
                     res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
                 }
 
-                if (res.getCode() == null || res.getCode() != 200) {
+                if (res.getCode() == null || res.getCode() != HttpServletResponse.SC_OK) {
                     return res;
                 }
                 initiateSignup(as, userName, password, email);
