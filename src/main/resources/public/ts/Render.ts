@@ -36,6 +36,7 @@ import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 import { RSSView } from "./tabs/RSSView";
+import { Button } from "./comp/core/Button";
 
 export class Render {
     private debug: boolean = false;
@@ -693,9 +694,8 @@ export class Render {
 
     newUserAccountTips = (): Div => {
         return new Div(null, { className: "bigMargin alert alert-info" }, [
-            new Div("You haven't created any content here", { className: "bigMarginBottom" }),
-            new Div("Tip #1: Click `Menu -> Guided Tours -> Create a New Node` to learn how."),
-            new Div("Tip #2: Click `Menu -> Account -> Profile` to upload your Avatar image, add a bio, etc.")
+            new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "bigMarginBottom" }),
+            new Button("View User Guide", () => S.nav.openContentNode(":user-guide", false))
         ]);
     }
 
