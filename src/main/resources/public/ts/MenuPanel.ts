@@ -123,6 +123,7 @@ export class MenuPanel extends Div {
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
     static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home", false);
+    static openUserGuide = () => S.nav.openContentNode(":" + getAs().userName + ":user-guide", false);
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, false);
     static openUsersNode = () => S.nav.openContentNode("/r/usr", false);
 
@@ -434,20 +435,6 @@ export class MenuPanel extends Div {
             ]));
         }
 
-        if (!ast.mobileMode && S.tourUtils) {
-            S.tourUtils.init();
-            const tourItems = [];
-            S.tourUtils.tours.forEach(tour => {
-                tourItems.push(new MenuItem(tour.name, () => {
-                    dispatch("SetTour", s => s.tour = tour);
-                }, true, null));
-            });
-            if (tourItems.length > 0) {
-                // Temporarily Disabling: I want to rename this and move it somewhere not on the main menu
-                // children.push(new Menu("Guided Tours", tourItems, null));
-            }
-        }
-
         // //need to make export safe for end users to use (regarding file sizes)
         // if (state.isAdminUser) {
         //     children.push(new Menu(localState, "Admin Tools", [
@@ -482,22 +469,13 @@ export class MenuPanel extends Div {
             // ]));
         }
 
+        children.push(new Menu("Help", [
+            new MenuItem("User Guide", MenuPanel.openUserGuide), //
+        ], null));
+
         this.setChildren(children);
         return true;
     }
-
-    // These are defined externally in config-text.yaml
-    // helpMenuItems = (): Div[] => {
-    //     const ast = getAs();
-    //     const items: Div[] = [];
-    //     if (ast.config.menu?.help) {
-    //         for (const menuItem of ast.config.menu.help) {
-    //             this.appendMenuItemFromConfig(menuItem, items);
-    //         }
-    //     }
-    // }
-    //     return items;
-    // }
 
     getSystemFolderLinks = (): MenuItem[] => {
         const ret: MenuItem[] = [];

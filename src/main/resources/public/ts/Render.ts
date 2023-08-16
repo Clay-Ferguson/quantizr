@@ -139,7 +139,20 @@ export class Render {
     injectCustomButtons = (val: string): string => {
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse");
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_TRENDING, "Trending");
+        val = this.injectGuidedTours(val, C.ADMIN_COMMAND_GUIDEDTOURS);
         return val;
+    }
+
+    injectGuidedTours = (val: string, cmd: string) => {
+        let links = "";
+        if (!getAs().mobileMode && S.tourUtils) {
+            S.tourUtils.init();
+            S.tourUtils.tours.forEach(tour => {
+                const script = "S.util.startTour('" + tour.name + "');";
+                links += `<div class="tourLinkDiv"><span class="tourLink" onClick="${script}">${tour.name}</span></div>`
+            });
+        }
+        return val.replace("{{" + cmd + "}}", links);
     }
 
     injectAdminLink = (val: string, cmd: string, buttonText: string) => {

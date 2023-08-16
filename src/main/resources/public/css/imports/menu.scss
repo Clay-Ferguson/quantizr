@@ -102,6 +102,25 @@
     border: 1px solid gray;
 }
 
+.subMenuHeading {
+    cursor: pointer;
+    background-color: transparent;
+    padding: 5px 5px 5px 5px;
+    border: 1px 1px 1px 1px solid transparent;
+}
+
+.subMenuHeading:hover {
+    background-color: $primary; // $menuItemHoverBackgroundColor;
+    border: 1px 1px 1px 5px solid gray;
+}
+
+.subMenuHeadingExpanded {
+    @extend .subMenuHeading;
+    background-color: $secondary;
+    padding: 5px 5px 5px 15px;
+    border: 1px 1px 1px 5px solid gray;
+}
+
 .mobileMenuText {
     padding: 12px 12px 12px 15px !important;
 }

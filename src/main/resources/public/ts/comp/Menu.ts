@@ -7,17 +7,18 @@ import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
 
 export class Menu extends Comp {
-    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null, private moreClasses: string = "") {
+    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null, private moreClasses: string = "", private subMenu: boolean = false) {
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 
     override compRender = (): ReactNode => {
         const ast = getAs();
         const expanded = getAs().expandedMenus.has(this.name);
+        const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");
 
         this.setChildren([
             new Div(this.name, {
-                className: (expanded ? "menuHeadingExpanded" : "menuHeading") + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
+                className: clazz + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
                 id: this.getId("heading"),
                 onClick: () => {
                     asyncDispatch("ToggleExpansion", s => S.nav.changeMenuExpansion(s, "toggle", this.name));

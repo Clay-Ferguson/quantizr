@@ -11,8 +11,6 @@ rhsAnonLinks:
     link: ":home"
   - name: "Explore Features"
     link: ":features"
-  - name: "User Guide"
-    link: ":user-guide"
 
 # These links will show up under MAIN section
 # rhsLinks:
@@ -22,8 +20,6 @@ rhsAnonLinks:
 #     link: ":quanta-news"
 
 systemFolderLinks:
-  - name: "User Guide"
-    link: ":user-guide"
   - name: "Portal Home"
     link: ":home"
 
@@ -32,13 +28,6 @@ rhsFeedLinks:
     link: ""
   - name: "News"
     link: ":quanta-news"
-
-menu:
-  help:
-    - name: "About Quanta"
-      link: ":home"
-    - name: "User Guide"
-      link: ":user-guide"
 
 # NOTE: These entries have an interface in the typescript called 'ConfigProp' in 'interfaces.ts'
 props:

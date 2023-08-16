@@ -7,6 +7,17 @@
     cursor: pointer;
 }
 
+.tourLinkDiv {
+    margin-bottom: $smallGap;
+}
+
+.tourLink {
+    font-weight: bold;
+    color: var(--bs-green);
+    border-bottom: 2px solid var(--bs-green);
+    cursor: pointer;
+}
+
 .hrefLink {
     font-weight: bold;
     color: var(--bs-green);

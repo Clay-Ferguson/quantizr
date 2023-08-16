@@ -987,6 +987,13 @@ export class Util {
         }
     }
 
+    startTour = (name: string) => {
+        const tour = S.tourUtils.tours.find(t => t.name == name);
+        if (tour) {
+            dispatch("SetTour", s => s.tour = tour);
+        }
+    }
+
     adminScriptCommand = (cmd: string) => {
         switch (cmd) {
             case C.ADMIN_COMMAND_FEDIVERSE:
