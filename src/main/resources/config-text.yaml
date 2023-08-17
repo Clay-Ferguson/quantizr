@@ -1,5 +1,5 @@
 brandingAppName: Quanta
-brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediverse!"
+brandingMetaContent: "Quanta: Content Manager and Social Media Micro-blogging Platform!"
 
 # Tip: This 'menu' property is seen in TypeScript JSON as an array of objects in 
 # variable 'S.quanta.config'
@@ -22,12 +22,6 @@ rhsAnonLinks:
 systemFolderLinks:
   - name: "Portal Home"
     link: ":home"
-
-rhsFeedLinks:
-  - name: "separator"
-    link: ""
-  - name: "News"
-    link: ":quanta-news"
 
 # NOTE: These entries have an interface in the typescript called 'ConfigProp' in 'interfaces.ts'
 props:
