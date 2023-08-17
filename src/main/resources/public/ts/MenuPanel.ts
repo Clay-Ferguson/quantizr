@@ -123,7 +123,7 @@ export class MenuPanel extends Div {
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
     static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home", false);
-    static openUserGuide = () => S.nav.openContentNode(":" + getAs().userName + ":user-guide", false);
+    static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, false);
     static openUsersNode = () => S.nav.openContentNode("/r/usr", false);
 
