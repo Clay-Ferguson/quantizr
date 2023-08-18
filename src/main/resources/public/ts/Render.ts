@@ -139,6 +139,7 @@ export class Render {
     injectCustomButtons = (val: string): string => {
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse");
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_TRENDING, "Trending");
+        val = this.injectAdminLink(val, C.ADMIN_COMMAND_NEWS, "News");
         val = this.injectGuidedTours(val, C.ADMIN_COMMAND_GUIDEDTOURS);
         return val;
     }

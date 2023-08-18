@@ -29,6 +29,7 @@ export class Constants {
 
     static ADMIN_COMMAND_FEDIVERSE = "fediverse";
     static ADMIN_COMMAND_TRENDING = "trending";
+    static ADMIN_COMMAND_NEWS = "news";
     static ADMIN_COMMAND_GUIDEDTOURS = "guided-tours";
 
     // WARNING: These must be able to be prefixes on class names.

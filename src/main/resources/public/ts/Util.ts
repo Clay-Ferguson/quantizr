@@ -1002,6 +1002,9 @@ export class Util {
             case C.ADMIN_COMMAND_TRENDING:
                 S.nav.showTrendingHashtags();
                 break;
+            case C.ADMIN_COMMAND_NEWS:
+                S.nav.openContentNode(":news", true);
+                break;
             default:
                 break;
         }
