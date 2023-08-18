@@ -228,26 +228,18 @@ export class NodeCompButtonBar extends Div {
                 }, "btn-primary");
             }
 
-            // -----------------------
-            // DO NOT DELETE!!
-            // This code works perfecly but I realized I never use it AND more importantly a "Next Sibling on Tree" (and Prev)
-            // is going to be too confusing to users, because they're too accustomed to "vertical" rather than "horizontal"
-            // navigation so to speak...and next-sibiliong is definitely sort of "horizontal[ish]"
-            // There are TWO places in the code I've removed this.
-            //
-            // const pageRootType = S.plugin.getType(ast.node.type);
-            // if (!(pageRootType && pageRootType.isSpecialAccountNode()) && !S.nav.displayingRepositoryRoot(ast)) {
-            //     prevButton = new Button(null, S.nav.navToPrev, {
-            //         className: "fa fa-chevron-circle-left",
-            //         title: "Prev"
-            //     });
+            const pageRootType = S.plugin.getType(ast.node.type);
+            if (!(pageRootType && pageRootType.isSpecialAccountNode())) {
+                prevButton = new Button(null, S.nav.navToPrev, {
+                    className: "fa fa-chevron-circle-left",
+                    title: "Previous Sibling Node"
+                });
 
-            //     nextButton = new Button(null, S.nav.navToNext, {
-            //         className: "fa fa-chevron-circle-right",
-            //         title: "Next"
-            //     });
-            // }
-            // -----------------------
+                nextButton = new Button(null, S.nav.navToNext, {
+                    className: "fa fa-chevron-circle-right",
+                    title: "Next Sibling Node"
+                });
+            }
         }
 
         // ---------------------------

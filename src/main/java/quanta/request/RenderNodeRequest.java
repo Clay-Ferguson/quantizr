@@ -18,6 +18,7 @@ public class RenderNodeRequest extends RequestBase {
 	 * current page root node, and if -1 then it tries to go to previous sibling.
 	 */
 	private int siblingOffset;
+
 	private boolean upLevel;
 	private boolean forceRenderParent;
 
