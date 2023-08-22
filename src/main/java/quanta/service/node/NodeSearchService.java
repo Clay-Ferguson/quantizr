@@ -362,12 +362,14 @@ public class NodeSearchService extends ServiceBase {
         HashMap<String, WordStats> tagMap = req.isGetTags() ? new HashMap<>() : null;
         HashMap<String, WordStats> mentionMap = req.isGetMentions() ? new HashMap<>() : null;
         HashMap<String, WordStats> voteMap = countVotes ? new HashMap<>() : null;
+
         long nodeCount = 0;
         long totalWords = 0;
         Iterable<SubNode> iter = null;
         boolean strictFiltering = false;
         int publicCount = 0;
         int publicWriteCount = 0;
+        int nonPublicCount = 0;
         int adminOwnedCount = 0;
         int userShareCount = 0;
         int signedNodeCount = 0;
@@ -468,9 +470,12 @@ public class NodeSearchService extends ServiceBase {
             // PART 1: Process sharing info
             HashMap<String, AccessControl> aclEntry = node.getAc();
             if (aclEntry != null) {
+                boolean isPublic = false;
+
                 for (String key : aclEntry.keySet()) {
                     AccessControl ac = aclEntry.get(key);
                     if (PrincipalName.PUBLIC.s().equals(key)) {
+                        isPublic = true;
                         publicCount++;
                         if (ac != null && ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
                             publicWriteCount++;
@@ -479,6 +484,9 @@ public class NodeSearchService extends ServiceBase {
                         userShareCount++;
                         uniqueUsersSharedTo.add(key);
                     }
+                }
+                if (!isPublic) {
+                    nonPublicCount++;
                 }
             }
             if (acl.isAdminOwned(node)) {
@@ -600,7 +608,8 @@ public class NodeSearchService extends ServiceBase {
             voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Node count: " + nodeCount + ", Total Words: " + totalWords + "\n");
+        sb.append("Node count: " + nodeCount + "\n");
+        sb.append("Total Words: " + totalWords + "\n");
         if (wordList != null) {
             sb.append("Unique Words: " + wordList.size() + "\n");
         }
@@ -608,7 +617,8 @@ public class NodeSearchService extends ServiceBase {
             sb.append("Unique Votes: " + voteList.size() + "\n");
         }
 
-        sb.append("Public: " + publicCount + ", ");
+        sb.append("Non-Public: " + nonPublicCount + "\n");
+        sb.append("Public: " + publicCount + "\n");
         sb.append("Public Writable: " + publicWriteCount + "\n");
         sb.append("Admin Owned: " + adminOwnedCount + "\n");
         sb.append("User Shares: " + userShareCount + "\n");
