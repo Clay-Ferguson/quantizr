@@ -37,8 +37,6 @@ export class NodeCompMainList extends Div {
         let firstButton: IconButton;
         let prevButton: IconButton;
         let moreButton: IconButton;
-        let prevNodeButton: IconButton;
-        let nextNodeButton: IconButton;
         const firstChild = S.edit.getFirstChildNode();
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
@@ -100,27 +98,9 @@ export class NodeCompMainList extends Div {
                 });
             }
         }
-        else {
-            const pageRootType = S.plugin.getType(getAs().node.type);
-            if (!pageTop && !(pageRootType && pageRootType.isSpecialAccountNode())) {
-                prevNodeButton = new IconButton("fa-chevron-circle-left", "Prev", {
-                    onClick: S.nav.navToPrev,
-                    title: "Previous Sibling Node"
-                });
-
-                nextNodeButton = new IconButton("fa-chevron-circle-right", "Next", {
-                    onClick: S.nav.navToNext,
-                    title: "Next Sibling Node"
-                });
-            }
-        }
 
         if (firstButton || prevButton || moreButton) {
             children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginBottom text-center " + moreClasses));
-        }
-
-        if (prevNodeButton || nextNodeButton) {
-            children.push(new ButtonBar([prevNodeButton, nextNodeButton], "marginBottom text-center " + moreClasses));
         }
     }
 }

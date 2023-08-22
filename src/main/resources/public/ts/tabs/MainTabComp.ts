@@ -79,7 +79,20 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         title: "View Timeline (by Mod Time)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.runTimeline
-                    }) : null
+                    }) : null,
+
+                    new Icon({
+                        className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
+                        title: "Previous Sibling Node",
+                        onClick: S.nav.navToPrev
+                    }),
+
+                    new Icon({
+                        className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
+                        title: "Next Sibling Node",
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav.navToNext
+                    }),
                 ]),
                 header = new Div(S.quanta.config.brandingAppName, {
                     className: "tabTitle headerUploadPanel",

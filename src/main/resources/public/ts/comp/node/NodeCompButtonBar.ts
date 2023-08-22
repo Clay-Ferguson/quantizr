@@ -210,8 +210,6 @@ export class NodeCompButtonBar extends Div {
         }
 
         let upLevelButton: IconButton;
-        let prevButton: Button;
-        let nextButton: Button;
         const isMine = S.props.isMine(this.node);
 
         // Note we only allow 'Up Level' on home node if we're the admin.
@@ -226,19 +224,6 @@ export class NodeCompButtonBar extends Div {
                     onClick: S.nav.navUpLevelClick,
                     title: "Go to Parent Node"
                 }, "btn-primary");
-            }
-
-            const pageRootType = S.plugin.getType(ast.node.type);
-            if (!(pageRootType && pageRootType.isSpecialAccountNode())) {
-                prevButton = new Button(null, S.nav.navToPrev, {
-                    className: "fa fa-chevron-circle-left",
-                    title: "Previous Sibling Node"
-                });
-
-                nextButton = new Button(null, S.nav.navToNext, {
-                    className: "fa fa-chevron-circle-right",
-                    title: "Next Sibling Node"
-                });
             }
         }
 
@@ -280,8 +265,7 @@ export class NodeCompButtonBar extends Div {
             floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
         }
 
-        let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, //
-            prevButton, nextButton, floatEndSpan
+        let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, floatEndSpan
         ];
 
         btnArray = btnArray.concat(this.extraButtons);
