@@ -507,6 +507,8 @@ export abstract class Comp implements CompIntf {
      (or it could be static var on the component if there's always only one such component to ever exist, as is
      the case for example with the LHS panel (menu) or RHS panels of the main app layout)
      Returning null from getScrollPos (the default behavior of this base class) indicates to NOT do any scroll persistence.
+
+     WARNING: Be sure to actually have these methods on the same DOM Element that has the scrollbar itself (normally customScrollBar class), or else it won't work!
      */
     getScrollPos = (): number => {
         return null;

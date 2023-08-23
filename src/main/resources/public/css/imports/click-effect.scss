@@ -11,6 +11,7 @@ div.annotationBox {
     
     min-width: 50px;
     max-width: 600px;
+    border-radius: 6px;
 
     /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
        but arguably we can to with any super large z-index here to enxure always on top.

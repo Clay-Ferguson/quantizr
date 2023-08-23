@@ -32,14 +32,6 @@ export class RightNavPanel extends Div {
         RightNavPanel.inst = this;
     }
 
-    override getScrollPos = (): number => {
-        return RightNavPanel.scrollPos;
-    }
-
-    override setScrollPos = (pos: number): void => {
-        RightNavPanel.scrollPos = pos;
-    }
-
     override preRender(): boolean {
         const ast = getAs();
 
@@ -153,8 +145,9 @@ export class RightNavPanel extends Div {
             })
         ]) : null;
 
+        let scrollDiv = null;
         this.setChildren([
-            new Div(null, { className: "rightNavPanel customScrollbar" }, [
+            scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
                 new Divc({ className: "float-left" }, [
                     new FlexRowLayout([
                         avatarImg,
@@ -192,6 +185,13 @@ export class RightNavPanel extends Div {
                 ])
             ])
         ]);
+        scrollDiv.getScrollPos = (): number => {
+            return RightNavPanel.scrollPos;
+        }
+
+        scrollDiv.setScrollPos = (pos: number): void => {
+            RightNavPanel.scrollPos = pos;
+        }
         return true;
     }
 

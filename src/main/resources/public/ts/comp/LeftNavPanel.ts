@@ -42,14 +42,6 @@ export class LeftNavPanel extends Div {
         LeftNavPanel.inst = this;
     }
 
-    override getScrollPos = (): number => {
-        return LeftNavPanel.scrollPos;
-    }
-
-    override setScrollPos = (pos: number): void => {
-        LeftNavPanel.scrollPos = pos;
-    }
-
     override preRender(): boolean {
         const ast = getAs();
 
@@ -93,8 +85,9 @@ export class LeftNavPanel extends Div {
             showDocIndex = ast.menuIndexToggle == "index";
         }
 
+        let scrollDiv = null;
         this.setChildren([
-            new Div(null, { className: "leftNavPanel customScrollbar" }, [
+            scrollDiv = new Div(null, { className: "leftNavPanel customScrollbar" }, [
                 new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
                     new Img({
                         className: "leftNavLogoImg",
@@ -128,6 +121,15 @@ export class LeftNavPanel extends Div {
                 showDocIndex ? null : new MenuPanel()
             ])
         ]);
+
+        scrollDiv.getScrollPos = (): number => {
+            return LeftNavPanel.scrollPos;
+        }
+
+        scrollDiv.setScrollPos = (pos: number): void => {
+            LeftNavPanel.scrollPos = pos;
+        }
+
         return true;
     }
 }
