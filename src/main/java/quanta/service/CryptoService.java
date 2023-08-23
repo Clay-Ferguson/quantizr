@@ -1,7 +1,5 @@
 package quanta.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -21,6 +19,8 @@ import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -79,7 +79,7 @@ public class CryptoService extends ServiceBase {
                             + " They own nodeId=" + node.getIdStr());
                     return false;
                 }
-                pubKey = parseJWK(pubKeyJson, ownerAccntNode);
+                pubKey = parseJWK(pubKeyJson);
                 if (pubKey == null) {
                     log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + ownerAccntNode.getIdStr());
                     return false;
@@ -123,21 +123,17 @@ public class CryptoService extends ServiceBase {
      * some day we need to find a cleaner way to parse JWK, but this seems to be the best solution
      * everyone is using based on my google searches.
      */
-    public PublicKey parseJWK(String jwkJson, SubNode accntNode) {
+    public PublicKey parseJWK(String jwkJson) {
         PublicKey pubKey = null;
         try {
             Jwk keyObj = mapper.readValue(jwkJson.getBytes(StandardCharsets.UTF_8), Jwk.class);
             if (keyObj == null) {
-                log.error("Unable to parse USER_PREF_PUBLIC_SIG_KEY from accnt " + accntNode.getIdStr());
+                log.error("Unable to parse USER_PREF_PUBLIC_SIG_KEY from accnt");
                 return null;
             }
             BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(keyObj.getN()));
             BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(keyObj.getE()));
             pubKey = KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, exponent));
-            if (keyObj == null) {
-                log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + accntNode.getIdStr());
-                return null;
-            }
         } catch (Exception e) {
             ExUtil.error(log, "parseJWK failed", e);
         }

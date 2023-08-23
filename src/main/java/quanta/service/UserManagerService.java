@@ -236,7 +236,7 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeException("Request failed. No signature.");
         }
         // if pubSigKey not yet saved in SessionContext then generate it
-        if (sc.getPubSigKey() == null) {
+        if (sc.getPubSigKeyJson() == null) {
             SubNode userNode = read.getUserNodeByUserName(null, sc.getUserName(), false);
             if (userNode == null) {
                 throw new RuntimeException("Unknown user: " + sc.getUserName());
@@ -245,12 +245,9 @@ public class UserManagerService extends ServiceBase {
             if (pubKeyJson == null) {
                 throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
             }
-            sc.setPubSigKey(crypto.parseJWK(pubKeyJson, userNode));
-            if (sc.getPubSigKey() == null) {
-                throw new RuntimeException("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + userNode.getIdStr());
-            }
+            sc.setPubSigKeyJson(pubKeyJson);
         }
-        boolean verified = crypto.sigVerify(sc.getPubSigKey(), Util.hexStringToBytes(sig),
+        boolean verified = crypto.sigVerify(crypto.parseJWK(sc.getPubSigKeyJson()), Util.hexStringToBytes(sig),
                 sc.getUserName().getBytes(StandardCharsets.UTF_8));
 
         if (!verified) {
@@ -327,7 +324,7 @@ public class UserManagerService extends ServiceBase {
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_KEY, asymEncKey);
         if (!StringUtils.isEmpty(sigKey))
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
-        ThreadLocals.getSC().setPubSigKey(null);
+        ThreadLocals.getSC().setPubSigKeyJson(null);
         res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
         ensureValidCryptoKeys(userNode);
         update.save(ms, userNode);
@@ -566,7 +563,7 @@ public class UserManagerService extends ServiceBase {
                 }
                 if (!StringUtils.isEmpty(req.getSigKey())) {
                     // force pubSigKey to regenerate as needed by setting to null
-                    ThreadLocals.getSC().setPubSigKey(null);
+                    ThreadLocals.getSC().setPubSigKeyJson(null);
                     userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
                 }
             } else {

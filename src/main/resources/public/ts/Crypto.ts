@@ -818,8 +818,11 @@ export class Crypto {
         }
 
         // then we can send this same object right back up with all signatures.
-        await S.rpcUtil.rpc<J.SignNodesRequest, J.SignNodesResponse>("signNodes", dataToSign);
-        // console.log("Sent Signatures: "+S.util.prettyPrint(dataToSign));
+        await S.rpcUtil.rpc<J.SignNodesRequest, J.SignNodesResponse>("signNodes", {
+            workloadId: dataToSign.workloadId,
+            listToSign: dataToSign.listToSign
+        });
+        console.log("Sent Signatures: " + S.util.prettyPrint(dataToSign));
         return null;
     }
 

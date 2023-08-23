@@ -22,7 +22,7 @@ public class SessionContext {
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
-    private PublicKey pubSigKey = null;
+    private String pubSigKeyJson;
 
     private boolean live = true;
     private String rootId;
@@ -55,12 +55,12 @@ public class SessionContext {
 
     public SessionContext() {}
 
-    public PublicKey getPubSigKey() {
-        return pubSigKey;
+    public String getPubSigKeyJson() {
+        return pubSigKeyJson;
     }
 
-    public void setPubSigKey(PublicKey pubSigKey) {
-        this.pubSigKey = pubSigKey;
+    public void setPubSigKeyJson(String pubSigKeyJson) {
+        this.pubSigKeyJson = pubSigKeyJson;
     }
 
     public boolean isEnableIPSM() {
