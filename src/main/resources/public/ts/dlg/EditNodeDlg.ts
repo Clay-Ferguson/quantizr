@@ -347,11 +347,11 @@ export class EditNodeDlg extends DialogBase {
             let rows = "1";
 
             // only take some number of default rows greater than 1 if this is a non-schemaOrg type
-            if (!type.schemaOrg) {
+            if (!type?.schemaOrg) {
                 rows = getAs().mobileMode ? "8" : "10";
             }
 
-            mainPropsTable.addChild(this.makeContentEditor(rows, type.schemaOrg ? 1 : 3));
+            mainPropsTable.addChild(this.makeContentEditor(rows, type?.schemaOrg ? 1 : 3));
             this.contentEditor.setWordWrap(isWordWrap);
             propsVisible = true;
         }
@@ -781,7 +781,8 @@ export class EditNodeDlg extends DialogBase {
     super_close = this.close;
     override close = () => {
         this.super_close();
-        S.speech.stopListening();
+
+        setTimeout(() => S.speech.stopListening(), 2000);
 
         EditNodeDlg.embedInstance = null;
         dispatch("endEditing", s => {
