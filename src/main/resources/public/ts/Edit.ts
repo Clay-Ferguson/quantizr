@@ -677,7 +677,10 @@ export class Edit {
     }
 
     runEditNodeByClick = (evt: Event, id: string) => {
-        if (this.checkEditPending()) return;
+        // This is a hindrance when going down thru a page and editing all the content, so just for this case
+        // I'll allow the abandoment of any content being edited, and start editing a new node editing without
+        // asking user to confirm.
+        // if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
 
