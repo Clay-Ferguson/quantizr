@@ -676,12 +676,21 @@ export class Edit {
         return false;
     }
 
-    runEditNodeByClick = (evt: Event, id: string) => {
+    runEditNodeByClick = async (evt: Event, id: string) => {
         // This is a hindrance when going down thru a page and editing all the content, so just for this case
         // I'll allow the abandoment of any content being edited, and start editing a new node editing without
         // asking user to confirm.
         // if (this.checkEditPending()) return;
+        if (getAs().editNode) {
+            EditNodeDlg.currentInst.utl.cancelEdit(EditNodeDlg.currentInst);
+            setTimeout(() => this.runEditNodeByClickImmediate(evt, id), 500);
+        }
+        else {
+            this.runEditNodeByClickImmediate(evt, id);
+        }
+    }
 
+    runEditNodeByClickImmediate = async (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
 
         // we set noScrollToId just to block the future attempt (one time) to
