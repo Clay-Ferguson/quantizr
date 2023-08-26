@@ -18,6 +18,7 @@ import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.mongo.model.SubNode;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
 @Component
@@ -34,7 +35,13 @@ public class OpenAiService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
 
-    public String getOpenAiAnswer(SubNode node) {
+    /**
+     * Queries OpenAI using the 'node.content' as the question to ask.
+     */
+    public ChatCompletionResponse getOpenAiAnswer(SubNode node) {
+        // todo-0: need a business plan for how end users can access OpenAI
+        ThreadLocals.requireAdmin();
+
         // todo-0: make this configurable
         String url = "https://api.openai.com/v1/chat/completions";
 
@@ -56,10 +63,10 @@ public class OpenAiService extends ServiceBase {
                 restTemplate.exchange(url, HttpMethod.POST, entity, ChatCompletionResponse.class);
 
         ChatCompletionResponse ccr = response.getBody();
-        return formatAnswer(ccr);
+        return ccr;
     }
 
-    public static String formatAnswer(ChatCompletionResponse ccr) {
+    public String formatAnswer(ChatCompletionResponse ccr) {
         StringBuilder sb = new StringBuilder();
         int counter = 0;
         for (Choice choice : ccr.getChoices()) {
