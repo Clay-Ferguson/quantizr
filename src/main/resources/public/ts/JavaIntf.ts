@@ -165,6 +165,38 @@ export interface UserProfile {
     relays: string;
 }
 
+export interface ChatCompletionResponse {
+    id: string;
+    object: string;
+    created: number;
+    model: string;
+    choices: Choice[];
+    usage: Usage;
+}
+
+export interface ChatGPTRequest {
+    model: string;
+    messages: ChatMessage[];
+    temperature: number;
+}
+
+export interface ChatMessage {
+    role: string;
+    content: string;
+}
+
+export interface Choice {
+    message: ChatMessage;
+    finishProbability: number;
+    index: number;
+}
+
+export interface Usage {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+}
+
 export interface AddFriendRequest extends RequestBase {
     userName: string;
     tags: string;
@@ -212,6 +244,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeName: string;
     createAtTop: boolean;
     directMessage: boolean;
+    openAiQuestion: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
@@ -1244,6 +1277,7 @@ export const enum NodeType {
     CALCULATOR = "sn:calculator",
     CALENDAR = "sn:calendar",
     COMMENT = "sn:comment",
+    OPENAI_ANSWER = "sn:oaiAns",
     RSS_FEED = "sn:rssfeed",
     RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",

@@ -16,6 +16,10 @@ public class CreateSubNodeRequest extends RequestBase {
     private boolean createAtTop;
     private boolean directMessage;
 
+    // If this is true it means we're asking a question on the parent, and the answer will come in as a
+    // child.
+    private boolean openAiQuestion;
+
     /* Adds TYPE_LOCK property which prevents user from being able to change the type on the node */
     private boolean typeLock;
 
@@ -73,6 +77,14 @@ public class CreateSubNodeRequest extends RequestBase {
 
     public void setDirectMessage(boolean directMessage) {
         this.directMessage = directMessage;
+    }
+
+    public boolean isOpenAiQuestion() {
+        return openAiQuestion;
+    }
+
+    public void setOpenAiQuestion(boolean openAiQuestion) {
+        this.openAiQuestion = openAiQuestion;
     }
 
     public boolean isTypeLock() {

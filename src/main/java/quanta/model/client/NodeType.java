@@ -16,6 +16,7 @@ public enum NodeType {
     CALCULATOR("sn:calculator"), //
     CALENDAR("sn:calendar"), //
     COMMENT("sn:comment"), //
+    OPENAI_ANSWER("sn:oaiAns"), //
 
     RSS_FEED("sn:rssfeed"), //
     RSS_FEEDS("sn:rssfeeds"), //

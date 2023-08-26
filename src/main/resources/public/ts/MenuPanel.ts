@@ -165,6 +165,13 @@ export class MenuPanel extends Div {
         S.tabUtil.selectTab(C.TAB_TTS);
     };
 
+    static openAiAsk = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.edit.askOpenAiQuestion(node.id);
+        }
+    };
+
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
@@ -397,6 +404,12 @@ export class MenuPanel extends Div {
 
                 // DO NOT DELETE
                 // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
+            ], null));
+        }
+
+        if (!ast.isAnonUser) {
+            children.push(new Menu("Intelligence", [
+                new MenuItem("Submit Question", MenuPanel.openAiAsk, onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

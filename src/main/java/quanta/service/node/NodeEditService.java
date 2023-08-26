@@ -2,24 +2,20 @@ package quanta.service.node;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.APConst;
 import quanta.actpub.model.APList;
@@ -146,6 +142,13 @@ public class NodeEditService extends ServiceBase {
             throw new RuntimeException("unable to locate parent for insert");
         }
 
+        String aiAnswer = null;
+        String typeToCreate = req.getTypeName();
+        if (req.isOpenAiQuestion()) {
+            aiAnswer = oai.getOpenAiAnswer(parentNode);
+            typeToCreate = NodeType.OPENAI_ANSWER.s();
+        }
+
         auth.writeAuth(ms, parentNode);
         parentNode.adminUpdate = true;
         // note: redundant security
@@ -153,12 +156,17 @@ public class NodeEditService extends ServiceBase {
             throw new ForbiddenException();
         }
         CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-        SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), 0L, createLoc, req.getProperties(),
+        SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
                 null, true, false);
         if (req.isPendingEdit()) {
             mongoUtil.setPendingPath(newNode, true);
         }
-        newNode.setContent(req.getContent() != null ? req.getContent() : "");
+
+        if (aiAnswer != null) {
+            newNode.setContent(aiAnswer);
+        } else {
+            newNode.setContent(req.getContent() != null ? req.getContent() : "");
+        }
         newNode.touch();
 
         // NOTE: Be sure to get nodeId off 'req' here, instead of the var

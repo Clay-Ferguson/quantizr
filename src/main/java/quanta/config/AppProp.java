@@ -243,6 +243,11 @@ public class AppProp {
         return env.getProperty("mongoPassword");
     }
 
+    public String getOpenAiKey() {
+        return env.getProperty("OPENAI_API_KEY");
+    }
+
+
     public String getAdminPassword() {
         return env.getProperty("adminPassword");
     }

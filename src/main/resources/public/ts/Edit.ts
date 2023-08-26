@@ -220,6 +220,7 @@ export class Edit {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
                     nodeId: parentNode.id,
+                    openAiQuestion: false,
                     newNodeName: "",
                     typeName: typeName || J.NodeType.NONE,
                     createAtTop,
@@ -257,6 +258,7 @@ export class Edit {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
                     nodeId: parentNode.id,
+                    openAiQuestion: false,
                     newNodeName: "",
                     typeName: typeName || J.NodeType.NONE,
                     createAtTop,
@@ -1041,6 +1043,30 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
+    askOpenAiQuestion = async (parentId: string) => {
+        const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            pendingEdit: false,
+            nodeId: parentId,
+            openAiQuestion: true,
+            newNodeName: "",
+            typeName: J.NodeType.NONE,
+            createAtTop: true,
+            content: "",
+            typeLock: false,
+            properties: null,
+            shareToUserId: null,
+            boostTarget: null,
+            fediSend: false,
+            boosterUserId: null,
+            reply: false,
+            directMessage: false
+        });
+
+        if (res.code == C.RESPONSE_CODE_OK) {
+            S.quanta.refresh();
+        }
+    }
+
     saveClipboardToChildNode = async (parentId: string) => {
         let clipText: string = await (navigator as any)?.clipboard?.readText();
         if (clipText) {
@@ -1063,6 +1089,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
+            openAiQuestion: false,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1130,6 +1157,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
+            openAiQuestion: false,
             newNodeName: "",
             typeName: J.NodeType.BOOKMARK,
             createAtTop: true,
@@ -1182,6 +1210,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: !boostTarget,
             nodeId,
+            openAiQuestion: false,
             newNodeName: "",
             typeName: typeName || J.NodeType.NONE,
             createAtTop: true,
@@ -1219,6 +1248,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
+            openAiQuestion: false,
             newNodeName: "",
             typeName,
             createAtTop: true,
@@ -1250,6 +1280,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: getAs().fullScreenConfig.nodeId,
+            openAiQuestion: false,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,

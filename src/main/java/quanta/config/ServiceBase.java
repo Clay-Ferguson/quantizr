@@ -61,6 +61,7 @@ import quanta.service.node.NodeEditService;
 import quanta.service.node.NodeMoveService;
 import quanta.service.node.NodeRenderService;
 import quanta.service.node.NodeSearchService;
+import quanta.service.node.OpenAiService;
 import quanta.types.BookmarkType;
 import quanta.types.FriendType;
 import quanta.types.RoomType;
@@ -163,6 +164,7 @@ public class ServiceBase {
     public static SimpleMongoClientDatabaseFactory mdbf;
     public static CryptoService crypto;
     public static SchemaOrgService schema;
+    public static OpenAiService oai;
     public static IPFSService ipfs;
     public static IPFSCat ipfsCat;
     public static IPFSFiles ipfsFiles;
@@ -245,6 +247,7 @@ public class ServiceBase {
             opsw = getBean(ctx, MongoTemplateWrapper.class);
             crypto = getBean(ctx, CryptoService.class);
             schema = getBean(ctx, SchemaOrgService.class);
+            oai = getBean(ctx, OpenAiService.class);
             ipfs = getBean(ctx, IPFSService.class);
             ipfsCat = getBean(ctx, IPFSCat.class);
             ipfsFiles = getBean(ctx, IPFSFiles.class);

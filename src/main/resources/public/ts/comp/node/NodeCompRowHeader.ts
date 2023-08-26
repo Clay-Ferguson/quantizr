@@ -270,6 +270,16 @@ export class NodeCompRowHeader extends Div {
                         },
                     })
                 ]));
+
+                // Leaving in case I change my mind, but for now this option is under the Intelligence menu only
+                // ddItems.push(new Li(null, null, [
+                //     new Span("Ask AI", {
+                //         className: "dropdown-item",
+                //         onClick: async () => {
+                //             S.edit.askOpenAiQuestion(this.node.id);
+                //         }
+                //     })
+                // ]));
             }
         }
 
