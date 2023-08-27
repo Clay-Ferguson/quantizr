@@ -148,7 +148,6 @@ public class NodeEditService extends ServiceBase {
         ChatCompletionResponse aiAnswer = null;
         String typeToCreate = req.getTypeName();
         if (req.isOpenAiQuestion()) {
-
             // if this is a regular node and not an openai reply node, then we are asking the text on this
             // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
@@ -175,7 +174,7 @@ public class NodeEditService extends ServiceBase {
 
         if (aiAnswer != null) {
             // todo-0: will eventually be removing this 'content' value, and leaving content null, so that
-            // client can take care of renderingwhatever it wants
+            // client can take care of rendering whatever it wants
             newNode.setContent(oai.formatAnswer(aiAnswer));
             newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
         } else {

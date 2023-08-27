@@ -421,12 +421,10 @@ export class MenuPanel extends Div {
             ], null));
         }
 
-        // todo-0: for now only admin user can consume OpenAi
-        // if (!ast.isAnonUser) {
-        if (ast.isAdminUser) {
-            children.push(new Menu("Intelligence", [
-                new MenuItem("Ask Content as Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Ask Another Question", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
+        if (!ast.isAnonUser) {
+            children.push(new Menu("GPT-AI", [
+                new MenuItem("Ask Node Content", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask New Content", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

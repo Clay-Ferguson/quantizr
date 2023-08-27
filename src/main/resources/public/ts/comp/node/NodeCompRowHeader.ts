@@ -230,7 +230,7 @@ export class NodeCompRowHeader extends Div {
             const slashCount = S.util.countChars(this.node.path, "/");
             const adminNode = this.node.owner === J.PrincipalName.ADMIN;
 
-            if (!adminNode && showInfo && this.showThreadButton && (slashCount > 6 || !!inReplyTo)) {
+            if (!adminNode && showInfo && this.showThreadButton && (slashCount > 4 || !!inReplyTo)) {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",
@@ -252,6 +252,7 @@ export class NodeCompRowHeader extends Div {
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
             if (!ast.isAnonUser && allowWideViewIcons) {
+
                 ddItems.push(new Li(null, null, [
                     new Span("Text-to-Speech", {
                         className: "dropdown-item",

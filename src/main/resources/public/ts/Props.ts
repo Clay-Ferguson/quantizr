@@ -276,8 +276,9 @@ export class Props {
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
             J.NodeProp.TYPE_LOCK, //
-            J.NodeProp.BOOST,
-            J.NodeProp.NO_EXPORT
+            J.NodeProp.BOOST, //
+            J.NodeProp.NO_EXPORT, //
+            J.NodeProp.OPENAI_RESPONSE
         ]);
     }
 

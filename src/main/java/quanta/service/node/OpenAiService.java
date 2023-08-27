@@ -21,7 +21,6 @@ import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 
@@ -43,9 +42,6 @@ public class OpenAiService extends ServiceBase {
      * Queries OpenAI using the 'node.content' as the question to ask.
      */
     public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node) {
-        // todo-0: need a business plan for how end users can access OpenAI
-        ThreadLocals.requireAdmin();
-
         // todo-0: make this configurable
         String url = "https://api.openai.com/v1/chat/completions";
 

@@ -30,7 +30,7 @@ export class AppState {
     tabPanelVisible: boolean = true;
     stateId: number = 0;
     displayFeedSearch: boolean = false;
-    docIndent: boolean = true;
+    docIndent: boolean = false;
 
     mobileMode: boolean = clientInfo.isMobileOrTablet;
 
