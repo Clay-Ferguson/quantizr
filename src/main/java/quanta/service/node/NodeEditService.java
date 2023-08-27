@@ -33,6 +33,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
@@ -142,10 +143,10 @@ public class NodeEditService extends ServiceBase {
             throw new RuntimeException("unable to locate parent for insert");
         }
 
-        String aiAnswer = null;
+        ChatCompletionResponse aiAnswer = null;
         String typeToCreate = req.getTypeName();
         if (req.isOpenAiQuestion()) {
-            aiAnswer = oai.getOpenAiAnswer(parentNode);
+            aiAnswer = oai.getOpenAiAnswer(ms, parentNode);
             typeToCreate = NodeType.OPENAI_ANSWER.s();
         }
 
@@ -156,14 +157,20 @@ public class NodeEditService extends ServiceBase {
             throw new ForbiddenException();
         }
         CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
+
+        // todo-0: there was a bug where (updateParent was passed as 'false' in here and that was a bug.
+        // check for other similar places we might have that bug)
         SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
-                null, true, false);
+                null, true, true);
         if (req.isPendingEdit()) {
             mongoUtil.setPendingPath(newNode, true);
         }
 
         if (aiAnswer != null) {
-            newNode.setContent(aiAnswer);
+            // todo-0: will eventually be removing this 'content' value, and leaving content null, so that
+            // client can take care of renderingwhatever it wants
+            newNode.setContent(oai.formatAnswer(aiAnswer));
+            newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
         } else {
             newNode.setContent(req.getContent() != null ? req.getContent() : "");
         }

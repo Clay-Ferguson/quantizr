@@ -1262,6 +1262,7 @@ export const enum NodeProp {
     IN_PENDING_PATH = "pendingPath",
     OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
+    OPENAI_RESPONSE = "sn:oaiRes",
 }
 
 export const enum NodeType {

@@ -407,7 +407,9 @@ export class MenuPanel extends Div {
             ], null));
         }
 
-        if (!ast.isAnonUser) {
+        // todo-0: for now only admin user can consume OpenAi
+        // if (!ast.isAnonUser) {
+        if (ast.isAdminUser) {
             children.push(new Menu("Intelligence", [
                 new MenuItem("Submit Question", MenuPanel.openAiAsk, onMainTab && selNodeIsMine, null, true),
             ], null));

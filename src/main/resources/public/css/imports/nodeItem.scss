@@ -424,3 +424,11 @@ i'm backing out for now
 .sharingName:first-child {
     margin-left: 0;
 }
+
+.openAiAnswer {
+    border: 2px solid cyan;
+    border-radius: 6px;
+    padding-bottom: $tinyGap;
+    margin-bottom: $tinyGap;
+    margin-left: $tinyGap;
+}

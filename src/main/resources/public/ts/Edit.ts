@@ -1043,10 +1043,10 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
-    askOpenAiQuestion = async (parentId: string) => {
+    askOpenAiQuestion = async (nodeId: string) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
-            nodeId: parentId,
+            nodeId,
             openAiQuestion: true,
             newNodeName: "",
             typeName: J.NodeType.NONE,
@@ -1063,7 +1063,7 @@ export class Edit {
         });
 
         if (res.code == C.RESPONSE_CODE_OK) {
-            S.quanta.refresh();
+            S.view.jumpToId(nodeId);
         }
     }
 
