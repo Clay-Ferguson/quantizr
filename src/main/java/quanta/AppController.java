@@ -1392,6 +1392,7 @@ public class AppController extends ServiceBase implements ErrorController {
         res.setConfig(prop.getConfig());
         res.setBrandingAppName(prop.getConfigText("brandingAppName"));
         res.setRequireCrypto(prop.isRequireCrypto());
+        res.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
         SubNode root = read.getDbRoot();
     }
 

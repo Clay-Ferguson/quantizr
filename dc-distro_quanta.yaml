@@ -184,6 +184,7 @@ services:
 
             adminPassword: "${adminPassword}"
             mongoPassword: "${mongoPassword}"
+            OPENAI_API_KEY: "${OPENAI_API_KEY}"
             mongoSecurity: "true"
 
             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS

@@ -4,7 +4,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class OpenAiAnswerType extends TypeBase {
     constructor() {
-        super(J.NodeType.OPENAI_ANSWER, "AI Answer", "fa-android", true);
+        super(J.NodeType.OPENAI_ANSWER, "AI Answer", "fa-android", false);
     }
 
     // For now i'm not sure how we should indicate visibly that a

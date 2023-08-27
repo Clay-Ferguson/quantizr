@@ -45,6 +45,7 @@ export interface ClientConfig {
     config: { [index: string]: any };
     brandingAppName: string;
     requireCrypto: boolean;
+    useOpenAi: boolean;
     urlIdFailMsg: string;
     userMsg: string;
     displayUserProfileId: string;

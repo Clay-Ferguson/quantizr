@@ -7,6 +7,7 @@ public class ClientConfig {
     private HashMap<String, Object> config;
     private String brandingAppName;
     private boolean requireCrypto;
+    private boolean useOpenAi;
     private String urlIdFailMsg;
     private String userMsg;
     private String displayUserProfileId;
@@ -49,6 +50,14 @@ public class ClientConfig {
 
     public boolean isRequireCrypto() {
         return this.requireCrypto;
+    }
+
+    public boolean isUseOpenAi() {
+        return useOpenAi;
+    }
+
+    public void setUseOpenAi(boolean useOpenAi) {
+        this.useOpenAi = useOpenAi;
     }
 
     public String getUrlIdFailMsg() {

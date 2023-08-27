@@ -421,7 +421,7 @@ export class MenuPanel extends Div {
             ], null));
         }
 
-        if (!ast.isAnonUser) {
+        if (!ast.isAnonUser && S.quanta.config.useOpenAi) {
             children.push(new Menu("GPT-AI", [
                 new MenuItem("Ask Content as Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask Another Question", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
