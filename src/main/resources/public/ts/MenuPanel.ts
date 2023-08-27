@@ -423,8 +423,8 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("GPT-AI", [
-                new MenuItem("Ask Node Content", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Ask New Content", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask Content as Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask Another Question", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

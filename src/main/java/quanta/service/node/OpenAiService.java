@@ -2,6 +2,8 @@ package quanta.service.node;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -22,7 +24,7 @@ import quanta.model.client.openai.Choice;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
-import quanta.util.XString;
+import quanta.util.val.Val;
 
 @Component
 public class OpenAiService extends ServiceBase {
@@ -53,14 +55,15 @@ public class OpenAiService extends ServiceBase {
         String model = "gpt-3.5-turbo";
 
         List<ChatMessage> messages = new ArrayList<>();
-        buildChatHistory(ms, node, messages);
+        Val<String> system = new Val<>();
+        buildChatHistory(ms, node, messages, system);
 
-        messages.add(0, new ChatMessage("system", "You are a helpful assistant."));
+        if (StringUtils.isEmpty(system.getVal())) {
+            system.setVal("You are a helpful assistant.");
+        }
+        messages.add(0, new ChatMessage("system", system.getVal()));
         messages.add(new ChatMessage("user", node.getContent()));
-
-        log.debug("Chat Query: " + XString.prettyPrint(messages));
-
-        double temperature = 0.7;
+        double temperature = 0.7; // todo-0: make this user configurable
 
         ChatGPTRequest request = new ChatGPTRequest(model, messages, temperature);
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
@@ -70,9 +73,14 @@ public class OpenAiService extends ServiceBase {
         return response.getBody();
     }
 
-    // we walk up the tree, to build as much chat history as we have so we can create the full
-    // conversation context
-    private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages) {
+    /**
+     * we walk up the tree, to build as much chat history as we have so we can create the full
+     * conversation context, If any of the nodes contain a "system: ..." line of text that will be used
+     * as the system we return, so users will always be able to embed the system instructions into a
+     * question.
+     */
+    private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, Val<String> system) {
+        parseAISystemFromContent(node.getContent(), system);
         SubNode parent = read.getParent(ms, node);
         boolean lastWasUser = NodeType.OPENAI_ANSWER.s().equals(node.getType());
 
@@ -90,10 +98,25 @@ public class OpenAiService extends ServiceBase {
                 }
                 lastWasUser = true;
                 messages.add(0, new ChatMessage("user", parent.getContent()));
+                parseAISystemFromContent(parent.getContent(), system);
             }
 
             // walk up the tree. get parent of parent.
             parent = read.getParent(ms, parent);
+        }
+    }
+
+    public void parseAISystemFromContent(String content, Val<String> system) {
+        if (content == null)
+            return;
+        StringTokenizer t = new StringTokenizer(content, "\n\r", false);
+
+        while (t.hasMoreTokens()) {
+            String tok = t.nextToken();
+            if (tok.toLowerCase().startsWith("ai:")) {
+                system.setVal(tok.substring(3).trim());
+                return;
+            }
         }
     }
 
