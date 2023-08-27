@@ -172,6 +172,13 @@ export class MenuPanel extends Div {
         }
     };
 
+    static openAiAskAnother = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.edit.askOpenAiAnotherQuestion(node.id);
+        }
+    };
+
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
@@ -183,6 +190,13 @@ export class MenuPanel extends Div {
         const ast = getAs();
 
         const hltNode = S.nodeUtil.getHighlightedNode();
+        let hltType = null;
+        if (hltNode) {
+            const type: TypeIntf = S.plugin.getType(hltNode.type);
+            if (type) {
+                hltType = type.getTypeName();
+            }
+        }
         const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
         const onMainTab: boolean = ast.activeTab == C.TAB_MAIN;
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
@@ -411,7 +425,8 @@ export class MenuPanel extends Div {
         // if (!ast.isAnonUser) {
         if (ast.isAdminUser) {
             children.push(new Menu("Intelligence", [
-                new MenuItem("Submit Question", MenuPanel.openAiAsk, onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask Content as Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask Another Question", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

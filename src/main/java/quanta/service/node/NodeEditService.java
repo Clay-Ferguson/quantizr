@@ -123,6 +123,7 @@ public class NodeEditService extends ServiceBase {
                 makePublicWritable = true;
             }
         }
+
         /* Node still null, then try other ways of getting it */
         if (parentNode == null && !linkBookmark) {
             if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
@@ -132,6 +133,7 @@ public class NodeEditService extends ServiceBase {
                 parentNode = read.getNode(ms, nodeId);
             }
         }
+
         // lets the type override the location where the node is created.
         TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
         if (plugin != null) {
@@ -146,8 +148,13 @@ public class NodeEditService extends ServiceBase {
         ChatCompletionResponse aiAnswer = null;
         String typeToCreate = req.getTypeName();
         if (req.isOpenAiQuestion()) {
-            aiAnswer = oai.getOpenAiAnswer(ms, parentNode);
-            typeToCreate = NodeType.OPENAI_ANSWER.s();
+
+            // if this is a regular node and not an openai reply node, then we are asking the text on this
+            // existing node as a new question.
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                aiAnswer = oai.getOpenAiAnswer(ms, parentNode);
+                typeToCreate = NodeType.OPENAI_ANSWER.s();
+            }
         }
 
         auth.writeAuth(ms, parentNode);
@@ -239,6 +246,11 @@ public class NodeEditService extends ServiceBase {
         }
         openGraph.parseNode(newNode, true);
         update.save(ms, newNode);
+
+        if (req.isOpenAiQuestion() && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
+            insertAnswerToQuestion(ms, newNode);
+        }
+
         /*
          * if this is a boost node being saved, then immediately run processAfterSave, because we won't be
          * expecting any final 'saveNode' to ever get called (like when user clicks "Save" in node editor),
@@ -252,6 +264,21 @@ public class NodeEditService extends ServiceBase {
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null,
                 false));
         return res;
+    }
+
+    // Assumes node is a question, and inserts the answer to is under it as a subnode
+    public void insertAnswerToQuestion(MongoSession ms, SubNode node) {
+        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node);
+
+        SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
+                null, null, true, true);
+
+        newNode.setContent(oai.formatAnswer(aiAnswer));
+        newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+
+        newNode.touch();
+        newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+        update.save(ms, newNode);
     }
 
     /*

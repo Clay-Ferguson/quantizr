@@ -3,6 +3,7 @@ import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
+import { AskAnotherQuestionDlg } from "./dlg/AskAnotherQuestionDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
@@ -1065,6 +1066,11 @@ export class Edit {
         if (res.code == C.RESPONSE_CODE_OK) {
             S.view.jumpToId(nodeId);
         }
+    }
+
+    askOpenAiAnotherQuestion = async (nodeId: string) => {
+        const dlg = new AskAnotherQuestionDlg(nodeId);
+        await dlg.open();
     }
 
     saveClipboardToChildNode = async (parentId: string) => {
