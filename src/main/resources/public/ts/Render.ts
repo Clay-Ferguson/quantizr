@@ -73,7 +73,9 @@ export class Render {
 
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
         val = this.injectCustomButtons(val);
-        val = this.injectLaTex(val);
+
+        // #mathjax-disabled-pending-refactor
+        // val = this.injectLaTex(val);
 
         /* These allow us to enter into the markdown things like this:
         [My Link Test]({{url}}?id=:my-test-name)
@@ -137,11 +139,15 @@ export class Render {
         return val;
     }
 
-    injectLaTex = (val: string): string => {
-        val = S.util.replaceAll(val, "\\[", "<div>\\[");
-        val = S.util.replaceAll(val, "\\]", "\\]</div>");
-        return val;
-    }
+    // #mathjax-disabled-pending-refactor
+    // injectLaTex = (val: string): string => {
+    //     // todo-0: these styles in here will not be the final way this is done. 
+    //     val = S.util.replaceAll(val, "\\[", "<div class='displayLatex'>\\[");
+    //     val = S.util.replaceAll(val, "\\]", "\\]</div>");
+    //     val = S.util.replaceAll(val, "\\(", "<div class='inlineLatex'>\\(");
+    //     val = S.util.replaceAll(val, "\\)", "\\)</div>");
+    //     return val;
+    // }
 
     injectCustomButtons = (val: string): string => {
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse");

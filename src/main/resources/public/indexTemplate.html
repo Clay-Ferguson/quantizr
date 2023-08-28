@@ -40,7 +40,8 @@
         alert("This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
     </script>
 
-    <script>MathJax = {
+    <!-- #mathjax-disabled-pending-refactor (latex)
+        <script>MathJax = {
       tex: {
         // WARNING  don't let [[ appear together. It breaks thymeleaf so badly you get a blank page
         inlineMath: [ //              
@@ -52,7 +53,7 @@
       }
     };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-chtml.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.0/es5/tex-chtml.js"></script> -->
 
     <script th:inline="javascript">
         /*<![CDATA[*/

@@ -1,3 +1,16 @@
+// todo-0: the latex stuff can be deleted now.
+// see #mathjax-disabled-pending-refactor
+.inlineLatex {
+    display: inline-block;
+    font-size: 120%;
+    color: cyan;
+}
+
+.displayLatex {
+    font-size: 120%;
+    color: cyan;
+}
+
 .mention {
     margin-right: 3px;
     margin-left: 3px;
