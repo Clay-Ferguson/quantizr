@@ -73,6 +73,7 @@ export class Render {
 
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
         val = this.injectCustomButtons(val);
+        val = this.injectLaTex(val);
 
         /* These allow us to enter into the markdown things like this:
         [My Link Test]({{url}}?id=:my-test-name)
@@ -133,6 +134,12 @@ export class Render {
             }
         }
 
+        return val;
+    }
+
+    injectLaTex = (val: string): string => {
+        val = S.util.replaceAll(val, "\\[", "<div>\\[");
+        val = S.util.replaceAll(val, "\\]", "\\]</div>");
         return val;
     }
 

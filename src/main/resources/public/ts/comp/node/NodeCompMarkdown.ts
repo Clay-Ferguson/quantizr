@@ -60,6 +60,25 @@ export class NodeCompMarkdown extends Html {
         this.mergeState<LS>(att);
     }
 
+    // DO NOT DELETE (YET)
+    // This was a bunch of expermenting to try to get the typeset() to run only in the components
+    // it needs to, and this never worked. Typeset callback never gets run. But I decided the approach
+    // of putting in AppContext to run only once per refresh is probably more efficient anyway.
+    // override domAddEvent = () => {
+    //     console.log("domAddEvent:" + this.node.content);
+    //     // console.log("   MathJax Ok =" + (MathJax ? "yes" : "no"));
+    //     // console.log("   $$ idx =" + this.node?.content?.indexOf("$$"));
+    //     if (MathJax && this.node?.content?.indexOf("$$") != -1) {
+    //         console.log("Calling typeset: " + this.attribs.id);
+    //         MathJax.typeset(() => {
+    //             console.log("ran MathJax: " + this.attribs.id);
+    //             const math = document.getElementById(this.attribs.id);
+    //             // math.innerHTML = '$$\\frac{a}{1-a^2}$$';
+    //             return [math];
+    //         });
+    //     }
+    // }
+
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
     renderRawMarkdown(node: J.NodeInfo, content: string = null): string {

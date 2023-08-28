@@ -2,6 +2,8 @@ import { createContext, useReducer } from "react";
 import { AppState } from "./AppState";
 import { S } from "./Singletons";
 
+declare let MathJax;
+
 /* Redux Replacement!!
 
 We are dropping Redux and using useReducer+useContext instead,
@@ -134,5 +136,12 @@ export function promiseDispatch(type: string, func: StateModFunc): Promise<void>
 }
 
 function afterDispatch() {
-    S.tourUtils.afterDispatch()
+    S.tourUtils.afterDispatch();
+    if (MathJax) {
+        console.log("MathJax typeset.");
+        // Note: this works currently but ONLY if the LaTex is wrapped in a <div> right in the editor markdown, by user.
+        setTimeout(() => {
+            MathJax.typeset();
+        }, 700);
+    }
 }
