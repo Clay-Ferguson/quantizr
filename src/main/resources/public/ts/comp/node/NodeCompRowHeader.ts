@@ -284,13 +284,24 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        if (this.jumpButton && !this.isMainTree) {
-            ddItems.push(new Li(null, null, [
-                new Span("Jump to Node", {
-                    className: "dropdown-item",
+        if (this.jumpButton) {
+            // if not on main tab or feed tab show a jump to node icon
+            if (this.tabData.id !== C.TAB_MAIN && this.tabData.id !== C.TAB_FEED) {
+                children.push(new Icon({
+                    title: "Jump To Node",
+                    className: "fa fa-hand-o-right fa-lg rowHeaderIcon",
                     onClick: () => S.srch.clickSearchNode(this.node.id)
-                })
-            ]));
+                }));
+            }
+            // for all other tabs bury the Jump to Node in the dropdown menu
+            else {
+                ddItems.push(new Li(null, null, [
+                    new Span("Jump to Node", {
+                        className: "dropdown-item",
+                        onClick: () => S.srch.clickSearchNode(this.node.id)
+                    })
+                ]));
+            }
         }
 
         children.push(new DropdownMenu(ddItems));
