@@ -1243,6 +1243,7 @@ export const enum NodeProp {
     BIN = "bin",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
+    OPENAI_QUERY_COUNT = "sn:oaiCount",
     ALLOWED_FEATURES = "sn:features",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_ACTIVE_TIME = "sn:lastActive",

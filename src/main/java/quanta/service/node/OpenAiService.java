@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
+import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.ChatGPTRequest;
@@ -23,6 +24,7 @@ import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.val.Val;
 
@@ -44,6 +46,14 @@ public class OpenAiService extends ServiceBase {
      * Queries OpenAI using the 'node.content' as the question to ask.
      */
     public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node) {
+        SubNode userNode = read.getUserNodeByUserName(ms, ms.getUserName(), true);
+        if (userNode == null) {
+            throw new RuntimeException("Unknown user.");
+        }
+
+        Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
+        userNode.set(NodeProp.OPENAI_QUERY_COUNT, userQuota + 1);
+
         // todo-0: make this configurable
         String url = "https://api.openai.com/v1/chat/completions";
 
@@ -129,6 +139,26 @@ public class OpenAiService extends ServiceBase {
             }
             sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getContent());
             counter++;
+        }
+        return sb.toString();
+    }
+
+    public String getOpenAiStats(MongoSession ms) {
+        ms = ThreadLocals.ensure(ms);
+        Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, false, true);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nOpenAI Queries\n");
+        /*
+         * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+         * amount).
+         */
+        for (SubNode usrNode : accountNodes) {
+            Long count = usrNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
+            if (count > 0) {
+                sb.append("    " + usrNode.getStr(NodeProp.USER) + ": " + String.valueOf(count) + "\n");
+            }
+
         }
         return sb.toString();
     }

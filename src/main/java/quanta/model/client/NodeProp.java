@@ -164,10 +164,11 @@ public enum NodeProp {
     BIN("bin"),
 
     // get how many bytes of storage the user currently holds
-    BIN_TOTAL("sn:binTot"), // see isSavableProperty
+    BIN_TOTAL("sn:binTot"),
 
     // amount of bytes the user is ALLOWED to save.
-    BIN_QUOTA("sn:binQuota"), // see isSavableProperty
+    BIN_QUOTA("sn:binQuota"), //
+    OPENAI_QUERY_COUNT("sn:oaiCount"), //
 
     // if this contains web3, then web3 active, etc.
     ALLOWED_FEATURES("sn:features"), //
