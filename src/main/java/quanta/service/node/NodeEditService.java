@@ -99,6 +99,8 @@ public class NodeEditService extends ServiceBase {
         String nodeId = req.getNodeId();
         boolean makePublicWritable = false;
         boolean allowSharing = true;
+        boolean forceInheritSharing = false;
+
         /*
          * note: parentNode and nodeBeingReplied to are not necessarily the same. 'parentNode' is the node
          * that will HOLD the reply, but may not always be WHAT is being replied to.
@@ -177,6 +179,7 @@ public class NodeEditService extends ServiceBase {
             // client can take care of rendering whatever it wants
             newNode.setContent(oai.formatAnswer(aiAnswer));
             newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+            forceInheritSharing = true;
         } else {
             newNode.setContent(req.getContent() != null ? req.getContent() : "");
         }
@@ -208,22 +211,8 @@ public class NodeEditService extends ServiceBase {
                 HashMap<String, AccessControl> ac = new HashMap<>();
                 ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
                 newNode.setAc(ac);
-            } else if (req.isReply()) {
-                // else add default sharing
-                // we always determine the access controls from the parent for any new nodes
-                auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
-                if (req.getBoosterUserId() != null) {
-                    newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
-                }
-                // inherit UNPUBLISHED prop from parent, if we own the parent
-                if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
-                        && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
-                    newNode.set(NodeProp.UNPUBLISHED, true);
-                }
-                String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
-                if (cipherKey != null) {
-                    res.setEncrypt(true);
-                }
+            } else if (req.isReply() || forceInheritSharing) {
+                inheritSharingFromParent(ms, req, res, nodeBeingRepliedTo, newNode);
             }
 
             /* Always make public if we're replying to public node or posting under our POSTs node */
@@ -247,7 +236,7 @@ public class NodeEditService extends ServiceBase {
         update.save(ms, newNode);
 
         if (req.isOpenAiQuestion() && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
-            insertAnswerToQuestion(ms, newNode);
+            insertAnswerToQuestion(ms, newNode, req, res);
         }
 
         /*
@@ -265,8 +254,34 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    private void inheritSharingFromParent(MongoSession ms, CreateSubNodeRequest req, CreateSubNodeResponse res,
+            SubNode nodeBeingRepliedTo, SubNode newNode) {
+        // else add default sharing
+        // we always determine the access controls from the parent for any new nodes
+        auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
+
+        if (AclService.isPublic(nodeBeingRepliedTo)) {
+            acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+        }
+
+        if (req.getBoosterUserId() != null) {
+            newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
+        }
+        // inherit UNPUBLISHED prop from parent, if we own the parent
+        if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
+                && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
+            newNode.set(NodeProp.UNPUBLISHED, true);
+        }
+        String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
+        if (cipherKey != null) {
+            res.setEncrypt(true);
+        }
+    }
+
     // Assumes node is a question, and inserts the answer to is under it as a subnode
-    public void insertAnswerToQuestion(MongoSession ms, SubNode node) {
+    public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
+            CreateSubNodeResponse res) {
         ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
@@ -277,6 +292,7 @@ public class NodeEditService extends ServiceBase {
 
         newNode.touch();
         newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+        inheritSharingFromParent(ms, req, res, node, newNode);
         update.save(ms, newNode);
     }
 
