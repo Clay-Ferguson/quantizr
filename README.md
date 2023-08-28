@@ -2,23 +2,45 @@
 
 # Quanta Web Platform
 
-### A new Kind of Content Management, with Social Media support
- 
-Welcome to the Fediverse!
+### A new Kind of CMS with ChatGPT and Social Media features
 
-Quanta is a new kind of Social Media and Content Management platform, with uniquely powerful features for wikis, micro-blogging, document collaboration and publishing, secure messaging with (E2E Encryption), video/audio recording & sharing, file sharing, a podcatcher, and much more. 
+Quanta is a new kind of [Social Media](https://quanta.wiki/?view=feed) and Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
 
-Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture where you always have complete control of your own data.
+* wikis & micro-blogging
+* [ChatGPT Question Answering](https://quanta.wiki/n/gpt-ai)
+* document collaboration and publishing
+* PDF Generation
+* secure messaging with (E2E Encryption)
+* video/audio recording & sharing
+* file sharing
+* podcatcher (RSS Reader)
+* plus about 100 more features!
 
-Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content into tree nodes. These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, etc.
+### Hierarchical Content
 
-The following test instance is open to the public, so anyone can sign up and browse the Fediverse:
+Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture.
 
-https://quanta.wiki
+Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content into tree nodes. 
 
-Quanta is a browser-based SPA (Single Page App), that works on both mobile and desktop browsers. 
+These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, ChatGPT conversations, etc.
 
-The languages and tech stack is as follows: Java Language, SpringBoot FAT Jar with embedded Tomcat on back end, TypeScript & Bootstrap (CSS), ReactJS front end. Deployed and installed via docker (docker compose), MongoDB as the primary data store, and an option for running an IPFS Gateway.
+### Take it for a Test Drive
+
+The [Quanta Dev Instance](https://quanta.wiki) is open to the public, so anyone can try it out. If you're interested in [Social Media](https://quanta.wiki/?view=feed) you might like the [Trending Tab](https://quanta.wiki/?view=trending) as well.
+
+Quanta is a browser-based app that works on both mobile and desktop browsers, although it's optimized for desktop.
+
+### Technology Stack
+
+* Java Language (back end) 
+* SpringBoot FAT Jar with embedded Tomcat (back end)
+* TypeScript & ReactJS (front end)
+* Bootstrap & SCSS
+* Deployer: Docker (docker compose)
+* MongoDB as the primary data store
+* Redis for Session Data
+* IPFS Gateway
+* ChatGPT (via OpenAI API)
 
 ### To Run the Server
 
@@ -26,4 +48,4 @@ Edit `/distro/setenv-run-distro.sh` to define your environment settings, and poi
 
 ### Keywords
 
-Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
+ChatGPT, GPT-4, AI, Machine Learning, LLM, Large Language Model, OpenAI, Meta, Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
