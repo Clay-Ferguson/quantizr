@@ -191,6 +191,10 @@ public class CryptoService extends ServiceBase {
         }
     }
 
+    public void signNodesById(List<String> ids) {
+        // todo-0: wip, implement this just like (signSubGrah, below), but make it use the list, not a query
+    }
+
     public void signSubGraph(MongoSession ms, SessionContext sc, SignSubGraphRequest req) {
         if (debugSigning) {
             log.debug("signSubGraph of nodeId: " + req.getNodeId());

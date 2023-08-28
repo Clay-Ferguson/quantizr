@@ -909,6 +909,8 @@ public class NodeEditService extends ServiceBase {
                 newNode.setContent(part);
                 newNode.setAc(node.getAc());
                 newNode.touch();
+
+                // todo-0: collect all IDs here to send to signNodesById, once that method is implelmented
                 update.save(ms, newNode);
             }
             idx++;
