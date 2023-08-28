@@ -75,7 +75,7 @@ export class SharingDlg extends DialogBase {
                         }
                     }, null, "btn-primary"),
                     isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(J.PrincipalName.PUBLIC, false), null, "btn-secondary ui-share-make-public"),
-                    new Button("Apply", () => this.close(), null, "btn-secondary float-end ui-sharing-done")
+                    new Button("Done", () => this.close(), null, "btn-secondary float-end ui-sharing-done")
                 ], "marginTop")
             ])
         ];
