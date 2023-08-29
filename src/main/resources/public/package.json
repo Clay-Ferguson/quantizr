@@ -35,7 +35,10 @@
     "node-polyfill-webpack-plugin": "^2.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-emoji-render": "^2.0.1"
+    "react-emoji-render": "^2.0.1",
+    "react-markdown": "^8.0.7",
+    "react-syntax-highlighter": "^15.5.0",
+    "rehype-raw": "^7.0.0"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.1.6",

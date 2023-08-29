@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
@@ -5,7 +6,7 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { Diva } from "../../comp/core/Diva";
 import { Divc } from "../../comp/core/Divc";
-import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
+import { NodeCompMarkdown2 } from "../../comp/node/NodeCompMarkdown2";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import * as I from "../../Interfaces";
 import { ConfigProp, EditorOptions } from "../../Interfaces";
@@ -204,7 +205,21 @@ export class TypeBase implements TypeIntf {
         //     ]);
         // }
         const ast = getAs();
-        const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
+
+        // offset is the location of the URL in the actual markdown content, and we use it as a unique
+        // identifier for react IDs to optimize it's rendering
+        const ogFactory = (url: string, offset: number): ReactNode => {
+            // console.log("OG: id=" + node.id + " url=" + url + " offset: " + offset);
+            const og = new OpenGraphPanel(tabData, comp.getId("og" + offset + "_"), url,
+                isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
+
+            if (tabData) {
+                tabData.openGraphComps.push(og);
+            }
+            return og.render();
+        }
+
+        const comp: NodeCompMarkdown2 = (node.renderContent || node.content) ? new NodeCompMarkdown2(node, this.getExtraMarkdownClass(), tabData, ogFactory) : null;
 
         // Format ActivityPub Question/Poll Options here
         // todo-2: This is a hack for now until we have polymorphic type handling for ActPub types

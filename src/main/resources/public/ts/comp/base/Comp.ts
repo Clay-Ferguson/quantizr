@@ -1,5 +1,5 @@
 import DOMPurify from "dompurify";
-import { createElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { createElement, ReactNode, useEffect, useLayoutEffect, useRef, forwardRef, createRef } from "react";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
@@ -356,7 +356,10 @@ export abstract class Comp implements CompIntf {
         return this.stateMgr.state;
     }
 
+    // todo-0: need to document why our render doesn't take any args, and why we don't use the 'props' arg, because
+    // basically we have a different pattern here than the normal React pattern.
     // Core 'render' function used by react. This is THE function for the functional component this object represents
+    // todo-0: will become renderCore
     render = (): any => {
         this.rendered = true;
 
@@ -407,6 +410,7 @@ export abstract class Comp implements CompIntf {
             // a ton of testing that all went fine sometimes React will just start complaining with the error that
             // we should be using forwardRef, which I haven't yet found a way to do that's compatable with the rest
             // of our framework (i.e. this Comp class)
+            // todo-0: will be removing this
             this.attribs.ref = useRef();
 
             if (!this.preRender()) {
@@ -414,6 +418,10 @@ export abstract class Comp implements CompIntf {
                 return null;
             }
             const ret = this.compRender();
+
+            // this.attribs.ref = forwardRef((props, ref) => {
+            //     return ret as ReactNode;
+            // });
 
             if (this.debug) {
                 // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
@@ -427,6 +435,11 @@ export abstract class Comp implements CompIntf {
             return null;
         }
     }
+
+    // todo-0: work in progress
+    // render = forwardRef((props, ref) => {
+    //     return this.renderCore();
+    // });
 
     /* Get a printable string that contains the parentage of the component as far as we know it back to the root level */
     getAncestry() {
