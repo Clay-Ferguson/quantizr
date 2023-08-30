@@ -761,11 +761,6 @@ export class EditNodeDlg extends DialogBase {
                 title: "Select Hashtags"
             }) : null,
 
-            new IconButton("fa-android fa-lg", "", {
-                onClick: this.askChatGpt,
-                title: "Ask ChatGPT Question"
-            }),
-
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive()
                 ? new Button("Delete", () => {
@@ -778,7 +773,12 @@ export class EditNodeDlg extends DialogBase {
             advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar", null, {
                 title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
                 onClick: () => this.utl.addDateProperty(this)
-            }) : null
+            }) : null,
+
+            new IconButton("fa-android fa-lg", "", {
+                onClick: this.askChatGpt,
+                title: "Ask ChatGPT Question"
+            }),
         ]);
     }
 

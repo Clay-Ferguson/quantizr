@@ -428,8 +428,7 @@ i'm backing out for now
 .openAiAnswer {
     border: 2px solid cyan;
     border-radius: 6px;
-    padding-bottom: $tinyGap;
-    margin-bottom: $tinyGap;
+    padding: 16px;
     margin-left: $tinyGap;
 }
 
@@ -438,7 +437,7 @@ i'm backing out for now
     position: absolute;
     color: cyan;
     margin-right: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     bottom: 0;
     right: 0;
   }
