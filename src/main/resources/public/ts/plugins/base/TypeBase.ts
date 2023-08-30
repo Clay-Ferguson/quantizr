@@ -10,6 +10,7 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { Diva } from "../../comp/core/Diva";
 import { Divc } from "../../comp/core/Divc";
+import { Html } from "../../comp/core/Html";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
@@ -206,8 +207,6 @@ export class TypeBase implements TypeIntf {
         // }
         const ast = getAs();
 
-        const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
-
         // Format ActivityPub Question/Poll Options here
         // todo-2: This is a hack for now until we have polymorphic type handling for ActPub types
         let choices: Div = null
@@ -220,13 +219,32 @@ export class TypeBase implements TypeIntf {
             choices = new Divc({ className: "marginTop" }, children);
         }
 
+        let cont = node.renderContent || node.content;
+        if (cont) {
+            cont = cont.trim();
+        }
+
+        let comp = null;
+        let isMarkdown = false;
+
+        // tricky hack to detect if this is all HTML
+        if (cont?.startsWith("<")) {
+            comp = new Html(cont, { className: "marginLeft marginTop" });
+        }
+        else {
+            comp = cont ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
+            isMarkdown = !!comp;
+        }
+
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
-        if (comp?.urls) {
+        if (isMarkdown && comp?.urls) {
             const children: CompIntf[] = [comp, choices];
             let count = 0;
+
+            // todo-1: add this limit of 50 into where we do the parsing also.
             comp.urls.forEach((url: string) => {
                 // allow max of 50 urls.
                 if (count++ < 50) {

@@ -164,38 +164,42 @@ export class NodeCompMarkdown extends Comp {
         return true;
     }
 
+    static code = ({ node, inline, className, children, ...props }) => {
+        let match = /language-(\w+)/.exec(className || "");
+        const language = match ? match[1] : "txt";
+        return !inline ? (
+            createElement("div", null, [
+                createElement("span", {
+                    className: "markdownLanguage"
+                }, language === "txt" ? "" : language),
+                createElement("i", {
+                    className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon",
+                    onClick: () => {
+                        S.util.copyToClipboard(children[0]);
+                        // todo-0: move flashMessage into copyToClipboard
+                        S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
+                    }
+                }),
+                createElement("div", { className: "clearfix" }),
+                createElement(SyntaxHighlighterComp as any, {
+                    ...props,
+                    style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
+                    language,
+                    PreTag: "div"
+                }, String(children).replace(/\n$/, ""))
+            ])
+        ) : (
+            createElement("code", { ...props, className }, children)
+        );
+    }
+
+    static rehypePluginsArray = [rehypeRaw];
+
     override compRender = (): ReactNode => {
         const state = this.getState<LS>();
 
         this.attribs.components = {
-            code: ({ node, inline, className, children, ...props }) => {
-                let match = /language-(\w+)/.exec(className || "");
-                const language = match ? match[1] : "txt";
-                return !inline ? (
-                    createElement("div", null, [
-                        createElement("span", {
-                            className: "markdownLanguage"
-                        }, language === "txt" ? "" : language),
-                        createElement("i", {
-                            className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon",
-                            onClick: () => {
-                                S.util.copyToClipboard(children[0]);
-                                // todo-0: move flashMessage into copyToClipboard
-                                S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
-                            }
-                        }),
-                        createElement("div", { className: "clearfix" }),
-                        createElement(SyntaxHighlighterComp as any, {
-                            ...props,
-                            style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
-                            language,
-                            PreTag: "div"
-                        }, String(children).replace(/\n$/, ""))
-                    ])
-                ) : (
-                    createElement("code", { ...props, className }, children)
-                );
-            }
+            code: NodeCompMarkdown.code
         }
 
         // not needed but keep as an example        
@@ -204,7 +208,7 @@ export class NodeCompMarkdown extends Comp {
         // }
 
         // rehypeRaw is what allows HTML to be embedded in the markdown
-        this.attribs.rehypePlugins = [rehypeRaw];
+        this.attribs.rehypePlugins = NodeCompMarkdown.rehypePluginsArray;
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
