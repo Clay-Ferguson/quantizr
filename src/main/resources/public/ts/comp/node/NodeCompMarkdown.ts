@@ -26,9 +26,6 @@ export class NodeCompMarkdown extends Comp {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
-    // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
-    urls: Set<String>;
-
     constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
@@ -57,36 +54,7 @@ export class NodeCompMarkdown extends Comp {
             state.content = this.preprocessMarkdown(node);
         }
 
-        this.parseUrls(state.content);
         this.mergeState<LS>(state);
-    }
-
-    parseUrls = (content: string) => {
-        this.urls = null;
-        if (!content) return;
-        const regex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
-
-        // (?:https?): Matches either "http", "https".
-        // :\/\/: Matches "://" literally.
-        // [^\s/$.?#]: Matches any character that is not whitespace, "/", "$", ".", "?", or "#".
-        // .[^\s]*: Matches any character that is not whitespace zero or more times.
-        // |: Alternation, allowing for the "www" format.
-        // www\.[^\s\/$?#].[^\s]*: Matches URLs starting with "www".
-        // gi: Flags for global and case-insensitive matching.
-
-        const urls = content.match(regex);
-
-        if (urls) {
-            urls.forEach(url => {
-                url = S.util.stripIfEndsWith(url, ")"); // todo-0: this is a hack until I fix my regex
-
-                // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
-                // and avoid doing OpenGraph rendering on them
-                if (content.indexOf("* " + url) !== -1 || content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
-                this.urls = this.urls || new Set<String>();
-                this.urls.add(url);
-            });
-        }
     }
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
@@ -164,15 +132,17 @@ export class NodeCompMarkdown extends Comp {
         return true;
     }
 
-    static code = ({ node, inline, className, children, ...props }) => {
+    code = ({ node, inline, className, children, ...props }) => {
         let match = /language-(\w+)/.exec(className || "");
         const language = match ? match[1] : "txt";
         return !inline ? (
             createElement("div", null, [
                 createElement("span", {
+                    key: "code-div-" + this.getId(),
                     className: "markdownLanguage"
                 }, language === "txt" ? "" : language),
                 createElement("i", {
+                    key: "code-i-" + this.getId(),
                     className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon",
                     onClick: () => {
                         S.util.copyToClipboard(children[0]);
@@ -180,8 +150,12 @@ export class NodeCompMarkdown extends Comp {
                         S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
                     }
                 }),
-                createElement("div", { className: "clearfix" }),
+                createElement("div", {
+                    key: "code-fix-" + this.getId(),
+                    className: "clearfix"
+                }),
                 createElement(SyntaxHighlighterComp as any, {
+                    key: "code-mk-" + this.getId(),
                     ...props,
                     style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
                     language,
@@ -199,7 +173,7 @@ export class NodeCompMarkdown extends Comp {
         const state = this.getState<LS>();
 
         this.attribs.components = {
-            code: NodeCompMarkdown.code
+            code: this.code
         }
 
         // not needed but keep as an example        

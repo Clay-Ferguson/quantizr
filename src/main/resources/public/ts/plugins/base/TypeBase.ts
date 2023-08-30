@@ -19,6 +19,7 @@ import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 export class TypeBase implements TypeIntf {
     public ordinal: number;
     public schemaOrg: J.SchemaOrgClass;
+    static findUrlsRegex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
     }
@@ -185,6 +186,35 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
+    parseUrls = (content: string): Set<String> => {
+        // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
+        let ret: Set<String> = null
+        if (!content) return;
+
+        // (?:https?): Matches either "http", "https".
+        // :\/\/: Matches "://" literally.
+        // [^\s/$.?#]: Matches any character that is not whitespace, "/", "$", ".", "?", or "#".
+        // .[^\s]*: Matches any character that is not whitespace zero or more times.
+        // |: Alternation, allowing for the "www" format.
+        // www\.[^\s\/$?#].[^\s]*: Matches URLs starting with "www".
+        // gi: Flags for global and case-insensitive matching.
+
+        const urls = content.match(TypeBase.findUrlsRegex);
+
+        if (urls) {
+            urls.forEach(url => {
+                url = S.util.stripIfEndsWith(url, ")"); // todo-0: this is a hack until I fix my regex
+
+                // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
+                // and avoid doing OpenGraph rendering on them
+                if (content.indexOf("* " + url) !== -1 || content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
+                ret = ret || new Set<String>();
+                ret.add(url);
+            });
+        }
+        return ret;
+    }
+
     // todo-1: need to rename this because it's easy to confuse with CompIntf render
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
@@ -224,28 +254,28 @@ export class TypeBase implements TypeIntf {
             cont = cont.trim();
         }
 
-        let comp = null;
-        let isMarkdown = false;
+        let comp: CompIntf = null;
 
         // tricky hack to detect if this is all HTML
         if (cont?.startsWith("<")) {
             comp = new Html(cont, { className: "marginLeft marginTop" });
         }
+        // else render as markdown
         else {
             comp = cont ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
-            isMarkdown = !!comp;
         }
 
-        /* if we notice we have URLs, then render them if available, but note they render asynchronously
+        let urls = this.parseUrls(cont);
+        /* if we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
-        if (isMarkdown && comp?.urls) {
+        if (urls) {
             const children: CompIntf[] = [comp, choices];
             let count = 0;
 
             // todo-1: add this limit of 50 into where we do the parsing also.
-            comp.urls.forEach((url: string) => {
+            urls.forEach((url: string) => {
                 // allow max of 50 urls.
                 if (count++ < 50) {
                     // console.log("OG: id=" + node.id + " url=" + url);
