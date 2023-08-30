@@ -186,7 +186,41 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
-    parseUrls = (content: string): Set<String> => {
+    parseUrlsFromHtml = (node: J.NodeInfo) => {
+        let val = node.content;
+        if (val.indexOf("<") === -1 ||
+            val.indexOf(">") === -1) return;
+
+        const elm = document.createElement("html");
+        elm.innerHTML = val;
+        let ret: Set<String> = null
+
+        // BEWARE: The elements we scan here are NOT part of the DOM, we are just extracting out
+        // the urls here.
+        elm.querySelectorAll("a").forEach((e: HTMLAnchorElement) => {
+            if (!e.href) return;
+            let href = e.href.trim();
+            href = S.util.stripIfEndsWith(href, "/");
+            href = S.util.stripIfEndsWith(href, "\\");
+
+            /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
+            trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */
+            if (e.classList.contains("mention") ||
+                e.classList.contains("hashtag") ||
+                e.classList.contains("u-url")) return;
+
+            // Only add to 'urls' if we do NOT have an attachment pointing to the same href, because this
+            // would make it render it twice because we already know the attachments will rendering.
+            if (!S.props.getAttachmentByUrl(node, href)) {
+                // lazy instantiate
+                ret = ret || new Set<String>();
+                ret.add(href);
+            }
+        });
+        return ret;
+    }
+
+    parseUrlsFromText = (content: string): Set<String> => {
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
         let ret: Set<String> = null
         if (!content) return;
@@ -255,17 +289,19 @@ export class TypeBase implements TypeIntf {
         }
 
         let comp: CompIntf = null;
+        let urls: Set<String> = null;
 
         // tricky hack to detect if this is all HTML
         if (cont?.startsWith("<")) {
+            urls = this.parseUrlsFromHtml(node);
             comp = new Html(cont, { className: "marginLeft marginTop" });
         }
         // else render as markdown
         else {
+            urls = this.parseUrlsFromText(cont);
             comp = cont ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
         }
 
-        let urls = this.parseUrls(cont);
         /* if we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
