@@ -693,6 +693,17 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
+    askChatGpt = async () => {
+        // it's important to call saveNode before close, because close destroys some of our state, what we need
+        // to complete the updating and page refresh.
+        const savedOk: boolean = await this.utl.saveNode(this);
+        if (savedOk) {
+            this.close();
+        }
+
+        S.edit.askOpenAiQuestion(getAs().editNode.id);
+    }
+
     renderButtons(): CompIntf {
         const ast = getAs();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
@@ -749,6 +760,11 @@ export class EditNodeDlg extends DialogBase {
                 onClick: this.selectTags,
                 title: "Select Hashtags"
             }) : null,
+
+            new IconButton("fa-android fa-lg", "", {
+                onClick: this.askChatGpt,
+                title: "Ask ChatGPT Question"
+            }),
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive()

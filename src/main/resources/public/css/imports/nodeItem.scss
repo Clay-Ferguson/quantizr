@@ -432,3 +432,13 @@ i'm backing out for now
     margin-bottom: $tinyGap;
     margin-left: $tinyGap;
 }
+
+.openAiAnswer::after {
+    content: "by GPT";
+    position: absolute;
+    color: cyan;
+    margin-right: 8px;
+    margin-bottom: 10px;
+    bottom: 0;
+    right: 0;
+  }

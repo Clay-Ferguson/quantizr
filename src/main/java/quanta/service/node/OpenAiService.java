@@ -101,6 +101,7 @@ public class OpenAiService extends ServiceBase {
                 lastWasUser = false;
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
+                parseAISystemFromContent(parent.getContent(), system);
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
                 if (lastWasUser) {
@@ -108,7 +109,6 @@ public class OpenAiService extends ServiceBase {
                 }
                 lastWasUser = true;
                 messages.add(0, new ChatMessage("user", parent.getContent()));
-                parseAISystemFromContent(parent.getContent(), system);
             }
 
             // walk up the tree. get parent of parent.

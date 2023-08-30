@@ -13,8 +13,7 @@ export class Markdown extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        const state = this.getState<LS>();
-        delete this.attribs.ref;
-        return createElement(ReactMarkdownComp as any, this.attribs, state.content);
+        delete this.attribs.ref; //todo-0: move this into ReactMarkdownComp
+        return createElement(ReactMarkdownComp as any, this.attribs, this.getState<LS>().content);
     }
 }

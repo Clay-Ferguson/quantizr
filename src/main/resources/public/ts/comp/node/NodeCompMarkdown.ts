@@ -99,6 +99,15 @@ export class NodeCompMarkdown extends Comp {
         // val = this.replaceOgImgFileNames(val); // <-- DO NOT DELETE
 
         val = S.util.insertActPubTags(val, node);
+        val = this.translateLaTex(val);
+        return val;
+    }
+
+    translateLaTex = (val: string): string => {
+        val = S.util.replaceAll(val, "\\(", "$");
+        val = S.util.replaceAll(val, "\\)", "$");
+        val = S.util.replaceAll(val, "\\[", "$$");
+        val = S.util.replaceAll(val, "\\]", "$$");
         return val;
     }
 
@@ -185,8 +194,7 @@ export class NodeCompMarkdown extends Comp {
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 
-        let ret = createElement(ReactMarkdownComp as any, this.attribs, state.content);
-        return ret;
+        return createElement(ReactMarkdownComp as any, this.attribs, state.content);
     }
 
     decrypt = async () => {
