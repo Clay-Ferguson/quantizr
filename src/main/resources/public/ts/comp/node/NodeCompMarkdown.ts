@@ -79,9 +79,10 @@ export class NodeCompMarkdown extends Comp {
         if (urls) {
             urls.forEach(url => {
                 url = S.util.stripIfEndsWith(url, ")"); // todo-0: this is a hack until I fix my regex
+
                 // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
                 // and avoid doing OpenGraph rendering on them
-                if (content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
+                if (content.indexOf("* " + url) !== -1 || content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
                 this.urls = this.urls || new Set<String>();
                 this.urls.add(url);
             });
@@ -171,12 +172,26 @@ export class NodeCompMarkdown extends Comp {
                 let match = /language-(\w+)/.exec(className || "");
                 const language = match ? match[1] : "txt";
                 return !inline ? (
-                    createElement(SyntaxHighlighterComp as any, {
-                        ...props,
-                        style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
-                        language,
-                        PreTag: "div"
-                    }, String(children).replace(/\n$/, ""))
+                    createElement("div", null, [
+                        createElement("span", {
+                            className: "markdownLanguage"
+                        }, language === "txt" ? "" : language),
+                        createElement("i", {
+                            className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon",
+                            onClick: () => {
+                                S.util.copyToClipboard(children[0]);
+                                // todo-0: move flashMessage into copyToClipboard
+                                S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
+                            }
+                        }),
+                        createElement("div", { className: "clearfix" }),
+                        createElement(SyntaxHighlighterComp as any, {
+                            ...props,
+                            style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
+                            language,
+                            PreTag: "div"
+                        }, String(children).replace(/\n$/, ""))
+                    ])
                 ) : (
                     createElement("code", { ...props, className }, children)
                 );

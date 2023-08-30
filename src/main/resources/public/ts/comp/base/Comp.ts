@@ -357,8 +357,6 @@ export abstract class Comp implements CompIntf {
         return this.stateMgr.state;
     }
 
-    // todo-0: need to document why our render doesn't take any args, and why we don't use the 'props' arg, because
-    // basically we have a different pattern here than the normal React pattern.
     // Core 'render' function used by react. This is THE function for the functional component this object represents
     renderCore = (props, ref): any => {
         this.rendered = true;
