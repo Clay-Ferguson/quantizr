@@ -28,10 +28,6 @@
     "emoji-picker-react": "^4.4.9",
     "font-awesome": "^4.7.0",
     "fullcalendar": "^6.1.8",
-    "highlight.js": "^11.3.1",
-    "html-loader": "^4.2.0",
-    "marked": "^5.0.3",
-    "marked-highlight": "^2.0.1",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -41,6 +37,7 @@
     "rehype-raw": "^7.0.0"
   },
   "devDependencies": {
+    "html-loader": "^4.2.0",
     "@types/bootstrap": "^5.1.6",
     "@types/d3": "^7.4.0",
     "@types/dompurify": "^3.0.2",

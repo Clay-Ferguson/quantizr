@@ -28,8 +28,7 @@ export class OpenGraphPanel extends Div {
             key
         });
 
-        /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed
-         pull of the open graph data should result in og being an empty object and not null. */
+        /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed pull of the open graph data should result in og being an empty object and not null. */
         const og: J.OpenGraph = S.quanta.openGraphData.get(url);
         if (og) {
             this.mergeState<LS>({ og });
@@ -162,6 +161,8 @@ export class OpenGraphPanel extends Div {
         const state = this.getState<LS>();
         const ast = getAs();
         if (state.loading || !state.og) {
+            // be sure to return true to let this render or else we won't get the observer callback, because
+            // the observer callback is only called when the element is rendered.
             this.setChildren(null);
             return true;
         }

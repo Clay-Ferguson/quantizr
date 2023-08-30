@@ -1,5 +1,5 @@
 import DOMPurify from "dompurify";
-import { createElement, ReactNode, useEffect, useLayoutEffect, useRef, forwardRef, createRef } from "react";
+import { createElement, ReactNode, useEffect, useLayoutEffect, forwardRef, createRef } from "react";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
@@ -54,6 +54,7 @@ export abstract class Comp implements CompIntf {
             console.log("construct: " + this.constructor.name);
         }
         this.attribs = attribs || {};
+        this.attribs.ref = createRef();
 
         if (this.attribs.title && !this.attribs.title.startsWith("*\n")) {
             this.attribs.title = "Tip:\n\n" + this.attribs.title;
@@ -124,7 +125,7 @@ export abstract class Comp implements CompIntf {
             }
         }
 
-        if (!ret && warn) {
+        if (!ret && warn && this.mounted) {
             console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted +
                 "\nELEMENTS Stack: " + this.getAncestry());
         }
@@ -359,8 +360,7 @@ export abstract class Comp implements CompIntf {
     // todo-0: need to document why our render doesn't take any args, and why we don't use the 'props' arg, because
     // basically we have a different pattern here than the normal React pattern.
     // Core 'render' function used by react. This is THE function for the functional component this object represents
-    // todo-0: will become renderCore
-    render = (): any => {
+    renderCore = (props, ref): any => {
         this.rendered = true;
 
         try {
@@ -406,22 +406,11 @@ export abstract class Comp implements CompIntf {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
-            // React intermittently has a problem where it say use forwardRef. Even after
-            // a ton of testing that all went fine sometimes React will just start complaining with the error that
-            // we should be using forwardRef, which I haven't yet found a way to do that's compatable with the rest
-            // of our framework (i.e. this Comp class)
-            // todo-0: will be removing this
-            this.attribs.ref = useRef();
-
             if (!this.preRender()) {
                 this.preRenderRejected = true;
                 return null;
             }
             const ret = this.compRender();
-
-            // this.attribs.ref = forwardRef((props, ref) => {
-            //     return ret as ReactNode;
-            // });
 
             if (this.debug) {
                 // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
@@ -436,10 +425,12 @@ export abstract class Comp implements CompIntf {
         }
     }
 
-    // todo-0: work in progress
-    // render = forwardRef((props, ref) => {
-    //     return this.renderCore();
-    // });
+    // Note: forwardRef is a wrapper around the render method, so we can have 'ref' in the attribs.
+    // If we didn't need 'ref' we could have just use the render core method directly.
+    // eslint-disable-next-line react/display-name
+    render = forwardRef((props, ref) => {
+        return this.renderCore(props, ref);
+    });
 
     /* Get a printable string that contains the parentage of the component as far as we know it back to the root level */
     getAncestry() {

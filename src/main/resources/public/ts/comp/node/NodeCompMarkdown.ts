@@ -1,15 +1,20 @@
+import { ReactNode, createElement } from "react";
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import rehypeRaw from "rehype-raw";
 import { getAs } from "../../AppContext";
-import { Html } from "../../comp/core/Html";
-import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { TabIntf } from "../../intf/TabIntf";
+import { Comp } from "../base/Comp";
+import ReactMarkdownComp from "../core/ReactMarkdownComp";
+import SyntaxHighlighterComp from "../core/SyntaxHighlighterComp";
 
 interface LS {
     content: string;
     pendingDecrypt?: string;
 }
 
-export class NodeCompMarkdown extends Html {
+export class NodeCompMarkdown extends Comp {
     // detects URLs in a string (from Stack Overflow, not fully vetted yet)
     static urlRegex = /(https?:\/\/[^\s]+)/g;
 
@@ -25,14 +30,9 @@ export class NodeCompMarkdown extends Html {
     urls: Set<String>;
 
     constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>) {
-        super(null, { key: "ncmkd_" + node.id });
+        super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
-
-        // if this is admin owned node we set the prop on this object to trigger base class to render without DOMPurifier
-        // so that admin nodes can inject scripted content (like buttons with an onClick on them)
-        this.purifyHtml = node.owner !== J.PrincipalName.ADMIN;
-
         this.attribs.className = "mkCont";
 
         if (extraContainerClass) {
@@ -40,70 +40,65 @@ export class NodeCompMarkdown extends Html {
         }
 
         const content = this.cont || "";
-        const att: LS = {
+        const state: LS = {
             content: null
         };
 
         /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */
         if (S.props.isEncrypted(node)) {
-            att.content = "[Encrypted]";
+            state.content = "[Encrypted]";
 
             if (!ast.isAnonUser) {
-                att.pendingDecrypt = content;
+                state.pendingDecrypt = content;
             }
         }
         /* otherwise it's not encrypted and we display the normal way */
         else {
-            att.content = this.renderRawMarkdown(node);
+            state.content = this.preprocessMarkdown(node);
         }
 
-        this.mergeState<LS>(att);
+        this.parseUrls(state.content);
+        this.mergeState<LS>(state);
     }
 
-    // DO NOT DELETE (YET)
-    // This was a bunch of expermenting to try to get the typeset() to run only in the components
-    // it needs to, and this never worked. Typeset callback never gets run. But I decided the approach
-    // of putting in AppContext to run only once per refresh is probably more efficient anyway.
-    // override domAddEvent = () => {
-    //     console.log("domAddEvent:" + this.node.content);
-    //     // console.log("   MathJax Ok =" + (MathJax ? "yes" : "no"));
-    //     // console.log("   $$ idx =" + this.node?.content?.indexOf("$$"));
-    //     if (MathJax && this.node?.content?.indexOf("$$") != -1) {
-    //         console.log("Calling typeset: " + this.attribs.id);
-    //         MathJax.typeset(() => {
-    //             console.log("ran MathJax: " + this.attribs.id);
-    //             const math = document.getElementById(this.attribs.id);
-    //             // math.innerHTML = '$$\\frac{a}{1-a^2}$$';
-    //             return [math];
-    //         });
-    //     }
-    // }
+    parseUrls = (content: string) => {
+        this.urls = null;
+        if (!content) return;
+        const regex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
+
+        // (?:https?): Matches either "http", "https".
+        // :\/\/: Matches "://" literally.
+        // [^\s/$.?#]: Matches any character that is not whitespace, "/", "$", ".", "?", or "#".
+        // .[^\s]*: Matches any character that is not whitespace zero or more times.
+        // |: Alternation, allowing for the "www" format.
+        // www\.[^\s\/$?#].[^\s]*: Matches URLs starting with "www".
+        // gi: Flags for global and case-insensitive matching.
+
+        const urls = content.match(regex);
+
+        if (urls) {
+            urls.forEach(url => {
+                url = S.util.stripIfEndsWith(url, ")"); // todo-0: this is a hack until I fix my regex
+                // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
+                // and avoid doing OpenGraph rendering on them
+                if (content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
+                this.urls = this.urls || new Set<String>();
+                this.urls.add(url);
+            });
+        }
+    }
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
-    renderRawMarkdown(node: J.NodeInfo, content: string = null): string {
+    preprocessMarkdown(node: J.NodeInfo, content: string = null): string {
         content = content || this.cont || "";
         let val = "";
-        this.urls = null;
-
-        // todo-2: put some more thought into this...
-        // turning this off because when it appears in a url, blows up the link. Need to find some better way.
-        // if (S.srch.searchText) {
-        //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each
-        //     search term so it's easy to see them highlighted on the page */
-        //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
-        // }
-
         val = S.render.injectSubstitutions(node, content);
 
         // #inline-image-rendering
         // val = this.replaceOgImgFileNames(val); // <-- DO NOT DELETE
 
-        val = S.util.markdown(val);
         val = S.util.insertActPubTags(val, node);
-
-        /* parse tags, to build OpenGraph */
-        this.parseAnchorTags(val, content);
         return val;
     }
 
@@ -125,43 +120,6 @@ export class NodeCompMarkdown extends Html {
     //     });
     // }
 
-    parseAnchorTags = (val: string, content: string) => {
-        if (val.indexOf("<") === -1 ||
-            val.indexOf(">") === -1) return;
-
-        const elm = document.createElement("html");
-        elm.innerHTML = val;
-
-        // BEWARE: The elements we scan here are NOT part of the DOM, we are just extracting out
-        // the urls here.
-        elm.querySelectorAll("a").forEach((e: HTMLAnchorElement) => {
-            if (!e.href) return;
-            let href = e.href.trim();
-            href = S.util.stripIfEndsWith(href, "/");
-            href = S.util.stripIfEndsWith(href, "\\");
-            const hrefWithSlash = href;
-
-            /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
-            trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */
-            if (e.classList.contains("mention") ||
-                e.classList.contains("hashtag") ||
-                e.classList.contains("u-url")) return;
-
-            // Detect if this link is part of a Markdown Named link and if so then we don't generate the OpenGraph for that either
-            if (content.indexOf("(" + href + ")") !== -1) return;
-            if (content.indexOf("* " + href) !== -1) return;
-            if (content.indexOf("* " + hrefWithSlash) !== -1) return;
-
-            // Only add to 'urls' if we do NOT have an attachment pointing to the same href, because this
-            // would make it render it twice because we already know the attachments will rendering.
-            if (!S.props.getAttachmentByUrl(this.node, href)) {
-                // lazy instantiate
-                this.urls = this.urls || new Set<String>();
-                this.urls.add(href);
-            }
-        });
-    }
-
     override preRender(): boolean {
         const state: LS = this.getState<LS>();
 
@@ -180,7 +138,7 @@ export class NodeCompMarkdown extends Html {
             let clearText = S.quanta.decryptCache.get(cipherHash);
             // if we have already decrypted this data use the result.
             if (clearText) {
-                clearText = this.renderRawMarkdown(this.node, clearText);
+                clearText = this.preprocessMarkdown(this.node, clearText);
 
                 this.mergeState<LS>({
                     content: clearText,
@@ -194,6 +152,41 @@ export class NodeCompMarkdown extends Html {
             }
         }
         return true;
+    }
+
+    override compRender = (): ReactNode => {
+        const state = this.getState<LS>();
+
+        this.attribs.components = {
+            code: ({ node, inline, className, children, ...props }) => {
+                let match = /language-(\w+)/.exec(className || "");
+                const language = match ? match[1] : "txt";
+                return !inline ? (
+                    createElement(SyntaxHighlighterComp as any, {
+                        ...props,
+                        style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
+                        language,
+                        PreTag: "div"
+                    }, String(children).replace(/\n$/, ""))
+                ) : (
+                    createElement("code", { ...props, className }, children)
+                );
+            }
+        }
+
+        // not needed but keep as an example        
+        // this.attribs.components.a = (props: any) => {
+        //     return createElement("a", { href: props.href }, props.children);
+        // }
+
+        // rehypeRaw is what allows HTML to be embedded in the markdown
+        this.attribs.rehypePlugins = [rehypeRaw];
+
+        // ReactMarkdown can't have this 'ref' and would throw a warning if we did
+        delete this.attribs.ref;
+
+        let ret = createElement(ReactMarkdownComp as any, this.attribs, state.content);
+        return ret;
     }
 
     decrypt = async () => {
@@ -215,7 +208,7 @@ export class NodeCompMarkdown extends Html {
         // console.log("Decrypted to " + clearText);
         // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
         clearText = clearText !== null ? clearText : "[Decrypt Failed]";
-        clearText = this.renderRawMarkdown(this.node, clearText);
+        clearText = this.preprocessMarkdown(this.node, clearText);
 
         this.mergeState<LS>({
             content: clearText,

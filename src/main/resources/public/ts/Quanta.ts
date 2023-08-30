@@ -128,8 +128,9 @@ export class Quanta {
                 history.scrollRestoration = "manual";
             }
 
-            console.log("initMarkdown");
-            S.render.initMarkdown();
+            // #marked-removed
+            // console.log("initMarkdown");
+            // S.render.initMarkdown();
 
             console.log("createTabs");
             await S.tabUtil.createAppTabs();

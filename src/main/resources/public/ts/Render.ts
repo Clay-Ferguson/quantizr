@@ -1,10 +1,10 @@
-import highlightjs from "highlight.js";
-
 // DO NOT DELETE (I want to keep the capability to go back to this if needed)
 // (see also: #css-imports-disabled)
-// import "highlight.js/styles/dark.css";
-import { marked } from "marked";
-import { markedHighlight } from "marked-highlight";
+// /////// import "highlight.js/styles/dark.css";
+// #marked-removed
+// import { marked } from "marked";
+// import { markedHighlight } from "marked-highlight";
+// import highlightjs from "highlight.js";
 import { toArray } from "react-emoji-render";
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
@@ -40,7 +40,9 @@ import { Button } from "./comp/core/Button";
 
 export class Render {
     private debug: boolean = false;
-    private markedRenderer: any = null;
+
+    // #marked-removed
+    // private markedRenderer: any = null;
 
     // After adding the breadcrumb query it's a real challenge to get this fading to work right, so for now
     // I'm disabling it entirely with this flag.
@@ -63,7 +65,7 @@ export class Render {
 
     constructor() {
         // https://github.com/highlightjs/highlight.js
-        highlightjs.highlightAll();
+        // highlightjs.highlightAll();
     }
 
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
@@ -73,9 +75,6 @@ export class Render {
 
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
         val = this.injectCustomButtons(val);
-
-        // #mathjax-disabled-pending-refactor
-        // val = this.injectLaTex(val);
 
         /* These allow us to enter into the markdown things like this:
         [My Link Test]({{url}}?id=:my-test-name)
@@ -139,16 +138,6 @@ export class Render {
         return val;
     }
 
-    // #mathjax-disabled-pending-refactor
-    // injectLaTex = (val: string): string => {
-    //     // todo-0: these styles in here will not be the final way this is done. 
-    //     val = S.util.replaceAll(val, "\\[", "<div class='displayLatex'>\\[");
-    //     val = S.util.replaceAll(val, "\\]", "\\]</div>");
-    //     val = S.util.replaceAll(val, "\\(", "<div class='inlineLatex'>\\(");
-    //     val = S.util.replaceAll(val, "\\)", "\\)</div>");
-    //     return val;
-    // }
-
     injectCustomButtons = (val: string): string => {
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse");
         val = this.injectAdminLink(val, C.ADMIN_COMMAND_TRENDING, "Trending");
@@ -175,96 +164,97 @@ export class Render {
         return val.replace("{{" + cmd + "}}", `<span class="adminButton" onClick="${script}">${buttonText}</span>`);
     }
 
-    /**
-     * See: https://github.com/highlightjs/highlight.js
-     *      https://marked.js.org/using_pro#renderer
-     */
-    initMarkdown = () => {
-        if (this.markedRenderer) return;
-        if (!marked) {
-            throw new Error("failed to import 'marked' in Render.ts");
-        }
-        this.markedRenderer = new marked.Renderer();
+    // #marked-removed (do not delete)
+    // /**
+    //  * See: https://github.com/highlightjs/highlight.js
+    //  *      https://marked.js.org/using_pro#renderer
+    //  */
+    // initMarkdown = () => {
+    //     if (this.markedRenderer) return;
+    //     if (!marked) {
+    //         throw new Error("failed to import 'marked' in Render.ts");
+    //     }
+    //     this.markedRenderer = new marked.Renderer();
 
-        // DO NOT DELETE:
-        // For now I like the default formatter better than this custom stuff, but I want to keep this code
-        // in case we need to go back to it.
-        // NOTE: This gets called only for 'single backtick' delimited content not code fences with three backticks
-        // this.markedRenderer.codespan = (code: string) => {
-        //     // return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
-        //     return `<span class='mkDownCodespan'">${code}</span>`;
-        // }
+    //     // DO NOT DELETE:
+    //     // For now I like the default formatter better than this custom stuff, but I want to keep this code
+    //     // in case we need to go back to it.
+    //     // NOTE: This gets called only for 'single backtick' delimited content not code fences with three backticks
+    //     // this.markedRenderer.codespan = (code: string) => {
+    //     //     // return `<span class='mkDownCodespan' onclick="S.domUtil.codeSpanClick(this)">${code}</span>`;
+    //     //     return `<span class='mkDownCodespan'">${code}</span>`;
+    //     // }
 
-        // From Stack Overflow
-        // https://github.com/markedjs/marked/issues/882
-        this.markedRenderer.link = (href: string, title: string, text: string) => {
-            // console.log(`marked.link [${href}][${title}][${text}]`);
+    //     // From Stack Overflow
+    //     // https://github.com/markedjs/marked/issues/882
+    //     this.markedRenderer.link = (href: string, title: string, text: string) => {
+    //         // console.log(`marked.link [${href}][${title}][${text}]`);
 
-            if (href.indexOf("mailto:") === 0) {
-                // todo-2: markdown thinks a fediverse username is a 'mailto' because the syntax looks like that.
-                return `<span class="userNameInContent">${text}</span>`;
-            }
+    //         if (href.indexOf("mailto:") === 0) {
+    //             // todo-2: markdown thinks a fediverse username is a 'mailto' because the syntax looks like that.
+    //             return `<span class="userNameInContent">${text}</span>`;
+    //         }
 
-            if (href.toLowerCase().startsWith("http")) {
-                if (title) {
-                    return `<a class="hrefLink" href="${href}" title="${title}" target="_blank">${text}</a>`;
-                }
-                else {
-                    return `<a class="hrefLink" href="${href}" target="_blank">${text}</a>`;
-                }
-            }
-            else {
-                if (title) {
-                    return `<a class="hrefLink" href="${href}" title="${title}">${text}</a>`;
-                }
-                else {
-                    return `<a class="hrefLink" href="${href}">${text}</a>`;
-                }
-            }
-        };
+    //         if (href.toLowerCase().startsWith("http")) {
+    //             if (title) {
+    //                 return `<a class="hrefLink" href="${href}" title="${title}" target="_blank">${text}</a>`;
+    //             }
+    //             else {
+    //                 return `<a class="hrefLink" href="${href}" target="_blank">${text}</a>`;
+    //             }
+    //         }
+    //         else {
+    //             if (title) {
+    //                 return `<a class="hrefLink" href="${href}" title="${title}">${text}</a>`;
+    //             }
+    //             else {
+    //                 return `<a class="hrefLink" href="${href}">${text}</a>`;
+    //             }
+    //         }
+    //     };
 
-        // https://marked.js.org/using_advanced#highlight
-        marked.setOptions({
-            renderer: this.markedRenderer,
-            gfm: true,
-            breaks: false,
-            pedantic: false,
-            smartypants: false,
+    //     // https://marked.js.org/using_advanced#highlight
+    //     marked.setOptions({
+    //         renderer: this.markedRenderer,
+    //         gfm: true,
+    //         breaks: false,
+    //         pedantic: false,
+    //         smartypants: false,
 
-            // this stops the markdown from trying to make strings that look like an email address from having
-            // any mailto assumptions about them which is good becasue most of the time they're gonna be
-            // ActivityPub users and not email
-            mangle: false,
-            headerIds: false
+    //         // this stops the markdown from trying to make strings that look like an email address from having
+    //         // any mailto assumptions about them which is good becasue most of the time they're gonna be
+    //         // ActivityPub users and not email
+    //         mangle: false,
+    //         headerIds: false
 
-            // SANITIZE PARAM IS DEPRECATED (LEAVE THIS NOTE HERE)
-            // Search for 'DOMPurify.sanitize' to see how we do it currently.
-            // sanitize: true
-        });
+    //         // SANITIZE PARAM IS DEPRECATED (LEAVE THIS NOTE HERE)
+    //         // Search for 'DOMPurify.sanitize' to see how we do it currently.
+    //         // sanitize: true
+    //     });
 
-        marked.use(markedHighlight({
-            langPrefix: "hljs language-",
-            highlight(code, language) {
-                if (!language) language = "plaintext";
-                const lang = highlightjs.getLanguage(language);
+    //     marked.use(markedHighlight({
+    //         langPrefix: "hljs language-",
+    //         highlight(code, language) {
+    //             if (!language) language = "plaintext";
+    //             const lang = highlightjs.getLanguage(language);
 
-                // Highlight only if the language is valid.
-                if (lang) {
-                    // NOTE: This 'hljs-copy' is picked up by the Html components and that's where the magic is done,
-                    // to make this 'copy text to clipboard' icon work.
-                    return `<i class='hljs-copy fa fa-clipboard fa-lg float-end clickable' title='Copy to Clipboard (${lang.name})'></i>` +
-                        highlightjs.highlight(code, { language, ignoreIllegals: true }).value;
-                }
-                else {
-                    return code;
-                }
-            }
-        }));
+    //             // Highlight only if the language is valid.
+    //             if (lang) {
+    //                 // NOTE: This 'hljs-copy' is picked up by the Html components and that's where the magic is done,
+    //                 // to make this 'copy text to clipboard' icon work.
+    //                 return `<i class='hljs-copy fa fa-clipboard fa-lg float-end clickable' title='Copy to Clipboard (${lang.name})'></i>` +
+    //                     highlightjs.highlight(code, { language, ignoreIllegals: true }).value;
+    //             }
+    //             else {
+    //                 return code;
+    //             }
+    //         }
+    //     }));
 
-        // DO NOT DELETE: this works.
-        // const langs = highlightjs.listLanguages();
-        // console.log("highlightJs Languages: " + langs);
-    }
+    //     // DO NOT DELETE: this works.
+    //     // const langs = highlightjs.listLanguages();
+    //     // console.log("highlightJs Languages: " + langs);
+    // }
 
     renderLinkLabel = (id: string) => {
         const ast = getAs();

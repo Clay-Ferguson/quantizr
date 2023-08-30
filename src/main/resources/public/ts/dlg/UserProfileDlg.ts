@@ -16,9 +16,9 @@ import { Diva } from "../comp/core/Diva";
 import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { Html } from "../comp/core/Html";
 import { Img } from "../comp/core/Img";
 import { Label } from "../comp/core/Label";
+import { Markdown } from "../comp/core/Markdown";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
@@ -169,7 +169,9 @@ export class UserProfileDlg extends DialogBase {
                 ], "avatarAndNamePanel"),
 
                 this.readOnly
-                    ? new Html(S.util.markdown(state.userProfile.userBio) || "", { className: "bioPanel" })
+                    // #marked-removed
+                    // ? new Html(S.util.markdown(state.userProfile.userBio) || "", { className: "bioPanel" })
+                    ? new Markdown(state.userProfile.userBio || "", { className: "bioPanel" })
                     : new TextArea("About Me", {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),

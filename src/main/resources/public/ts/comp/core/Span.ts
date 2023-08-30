@@ -1,11 +1,16 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
+interface LS { // Local State
+    content?: string;
+}
+
 export class Span extends Comp {
 
     constructor(public content: string = "", attribs: Object = {}, children: Comp[] = null, private rawHtml: boolean = false) {
         super(attribs);
         this.setChildren(children);
+        this.mergeState<LS>({ content });
     }
 
     override compRender = (): ReactNode => {

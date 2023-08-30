@@ -19,7 +19,7 @@ import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
 import { TabHeading } from "../comp/core/TabHeading";
-import { NodeCompMarkdown2 } from "../comp/node/NodeCompMarkdown2";
+import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
@@ -41,7 +41,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
     override preRender(): boolean {
         const ast = getAs();
-        let comp: NodeCompMarkdown2 = null;
+        let comp: NodeCompMarkdown = null;
         let feedContent: Comp = null;
 
         const feedSrc: string = ast.rssNode ? S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, ast.rssNode) : null;
@@ -97,7 +97,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 console.error("unknown state in feed runner");
             }
 
-            comp = ast.rssNode ? new NodeCompMarkdown2(ast.rssNode, null, this.data, null) : null;
+            comp = ast.rssNode ? new NodeCompMarkdown(ast.rssNode, null, this.data) : null;
         }
 
         this.setChildren([

@@ -1,19 +1,18 @@
-import { ReactNode } from "react";
 import { getAs } from "../../AppContext";
+import * as I from "../../Interfaces";
+import { ConfigProp, EditorOptions } from "../../Interfaces";
+import * as J from "../../JavaIntf";
+import { S } from "../../Singletons";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { Diva } from "../../comp/core/Diva";
 import { Divc } from "../../comp/core/Divc";
-import { NodeCompMarkdown2 } from "../../comp/node/NodeCompMarkdown2";
-import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
-import * as I from "../../Interfaces";
-import { ConfigProp, EditorOptions } from "../../Interfaces";
+import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
-import * as J from "../../JavaIntf";
-import { S } from "../../Singletons";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeIntf {
@@ -185,6 +184,7 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
+    // todo-1: need to rename this because it's easy to confuse with CompIntf render
     render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
@@ -206,20 +206,7 @@ export class TypeBase implements TypeIntf {
         // }
         const ast = getAs();
 
-        // offset is the location of the URL in the actual markdown content, and we use it as a unique
-        // identifier for react IDs to optimize it's rendering
-        const ogFactory = (url: string, offset: number): ReactNode => {
-            // console.log("OG: id=" + node.id + " url=" + url + " offset: " + offset);
-            const og = new OpenGraphPanel(tabData, comp.getId("og" + offset + "_"), url,
-                isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
-
-            if (tabData) {
-                tabData.openGraphComps.push(og);
-            }
-            return og.render();
-        }
-
-        const comp: NodeCompMarkdown2 = (node.renderContent || node.content) ? new NodeCompMarkdown2(node, this.getExtraMarkdownClass(), tabData, ogFactory) : null;
+        const comp: NodeCompMarkdown = (node.renderContent || node.content) ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
 
         // Format ActivityPub Question/Poll Options here
         // todo-2: This is a hack for now until we have polymorphic type handling for ActPub types
@@ -237,7 +224,6 @@ export class TypeBase implements TypeIntf {
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
-        // This OpenGraph logic should maybe be just built into the Markdown component itself?
         if (comp?.urls) {
             const children: CompIntf[] = [comp, choices];
             let count = 0;

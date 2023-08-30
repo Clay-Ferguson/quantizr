@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { Diva } from "../comp/core/Diva";
-import { NodeCompMarkdown2 } from "../comp/node/NodeCompMarkdown2";
+import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -20,7 +20,7 @@ export class BookmarkType extends TypeBase {
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Diva([
-            new NodeCompMarkdown2(node, null, tabData, null),
+            new NodeCompMarkdown(node, null, tabData),
             audioUrl ? new Button("Play Audio", () => {
                 new AudioPlayerDlg("", "Audio: " + audioUrl, null, audioUrl, 0).open();
             }, null, "btn-primary marginLeft") : null
