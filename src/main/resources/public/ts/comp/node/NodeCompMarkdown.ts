@@ -1,6 +1,5 @@
 import { ReactNode, createElement } from "react";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import rehypeRaw from "rehype-raw";
 import { getAs } from "../../AppContext";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -167,8 +166,6 @@ export class NodeCompMarkdown extends Comp {
         );
     }
 
-    static rehypePluginsArray = [rehypeRaw];
-
     override compRender = (): ReactNode => {
         const state = this.getState<LS>();
 
@@ -180,9 +177,6 @@ export class NodeCompMarkdown extends Comp {
         // this.attribs.components.a = (props: any) => {
         //     return createElement("a", { href: props.href }, props.children);
         // }
-
-        // rehypeRaw is what allows HTML to be embedded in the markdown
-        this.attribs.rehypePlugins = NodeCompMarkdown.rehypePluginsArray;
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;

@@ -291,8 +291,8 @@ export class TypeBase implements TypeIntf {
         let comp: CompIntf = null;
         let urls: Set<String> = null;
 
-        // tricky hack to detect if this is all HTML
-        if (cont?.startsWith("<")) {
+        // todo-1: tricky hack to detect if this is all HTML
+        if (cont?.startsWith("<") && cont?.endsWith(">")) {
             urls = this.parseUrlsFromHtml(node);
             comp = new Html(cont, { className: "marginLeft marginTop" });
         }
