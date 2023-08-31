@@ -151,8 +151,7 @@ export class Render {
         if (!getAs().mobileMode && S.tourUtils) {
             S.tourUtils.init();
             S.tourUtils.tours.forEach(tour => {
-                const script = "S.util.startTour('" + tour.name + "');";
-                links += `<div class="tourLinkDiv"><span class="tourLink" onClick="${script}">${tour.name}</span></div>`
+                links += `<div class="tourLinkDiv"><span class="tourLink ui-run-cmd" data-cmd="tour:${tour.name}">${tour.name}</span></div>`
             });
         }
         return val.replace("{{" + cmd + "}}", links);
@@ -160,8 +159,7 @@ export class Render {
 
     injectAdminLink = (val: string, cmd: string, buttonText: string) => {
         // NOTE: Our Singleton class puts a global copy of S on the browser 'window object', so that's why this script works.
-        const script = "S.util.adminScriptCommand('" + cmd + "');";
-        return val.replace("{{" + cmd + "}}", `<span class="adminButton" onClick="${script}">${buttonText}</span>`);
+        return val.replace("{{" + cmd + "}}", `<span class="adminButton ui-run-cmd" data-cmd="${cmd}">${buttonText}</span>`);
     }
 
     // #marked-removed (do not delete)

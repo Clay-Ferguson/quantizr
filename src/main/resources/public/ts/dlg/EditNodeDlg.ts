@@ -729,7 +729,6 @@ export class EditNodeDlg extends DialogBase {
 
         return new ButtonBar([
             new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
-            new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
             allowUpload ? new IconButton("fa-upload", "File", {
                 onClick: () => this.utl.upload(null, this),
@@ -775,10 +774,12 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
-            new IconButton("fa-android fa-lg", "", {
+            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask GPT", {
                 onClick: this.askChatGpt,
-                title: "Ask ChatGPT Question"
-            }),
+                title: "Ask ChatGPT this Question"
+            }) : null,
+
+            new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary"),
         ]);
     }
 
