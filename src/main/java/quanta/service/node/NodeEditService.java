@@ -153,7 +153,7 @@ public class NodeEditService extends ServiceBase {
             // if this is a regular node and not an openai reply node, then we are asking the text on this
             // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
-                aiAnswer = oai.getOpenAiAnswer(ms, parentNode);
+                aiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
                 typeToCreate = NodeType.OPENAI_ANSWER.s();
             }
         }
@@ -282,7 +282,7 @@ public class NodeEditService extends ServiceBase {
     // Assumes node is a question, and inserts the answer to is under it as a subnode
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
-        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node);
+        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
                 null, null, true, true);

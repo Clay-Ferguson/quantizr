@@ -1068,8 +1068,13 @@ export class Edit {
         }
     }
 
+    askQuestionAboutSubGraph = async (nodeId: string) => {
+        const dlg = new AskAnotherQuestionDlg(nodeId, true);
+        await dlg.open();
+    }
+
     askOpenAiAnotherQuestion = async (nodeId: string) => {
-        const dlg = new AskAnotherQuestionDlg(nodeId);
+        const dlg = new AskAnotherQuestionDlg(nodeId, false);
         await dlg.open();
     }
 

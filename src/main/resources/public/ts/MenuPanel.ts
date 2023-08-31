@@ -172,6 +172,13 @@ export class MenuPanel extends Div {
         }
     };
 
+    static openAiAskDoc = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.edit.askQuestionAboutSubGraph(node.id);
+        }
+    };
+
     static openAiAskAnother = () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
@@ -425,6 +432,7 @@ export class MenuPanel extends Div {
             children.push(new Menu("GPT-AI", [
                 new MenuItem("Ask Content as Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask Another Question", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask about SubNodes", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

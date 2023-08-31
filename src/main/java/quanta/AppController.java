@@ -53,6 +53,7 @@ import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
 import quanta.request.AppDropRequest;
+import quanta.request.AskSubGraphRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CheckMessagesRequest;
@@ -1259,6 +1260,14 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
         return callProc.run("renderDocument", false, false, req, session, ms -> {
             return search.renderDocument(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/askSubGraph", method = RequestMethod.POST)
+    @ResponseBody
+    public Object askSubGraph(@RequestBody AskSubGraphRequest req, HttpSession session) {
+        return callProc.run("askSubGraph", false, false, req, session, ms -> {
+            return oai.askSubGraph(ms, req);
         });
     }
 

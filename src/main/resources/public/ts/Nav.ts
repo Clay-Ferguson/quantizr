@@ -284,7 +284,10 @@ export class Nav {
 
     openDocumentView = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
+        this.openDocumentViewById(id);
+    }
 
+    openDocumentViewById = (id: string) => {
         setTimeout(async () => {
             let node = MainTab.inst?.findNode(id);
 

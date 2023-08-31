@@ -213,6 +213,11 @@ export interface AppDropRequest extends RequestBase {
     data: string;
 }
 
+export interface AskSubGraphRequest extends RequestBase {
+    nodeId: string;
+    question: string;
+}
+
 export interface BlockUserRequest extends RequestBase {
     userName: string;
 }
@@ -678,6 +683,10 @@ export interface AddPrivilegeResponse extends ResponseBase {
 }
 
 export interface AppDropResponse extends ResponseBase {
+}
+
+export interface AskSubGraphResponse extends ResponseBase {
+    answer: string;
 }
 
 export interface BlockUserResponse extends ResponseBase {

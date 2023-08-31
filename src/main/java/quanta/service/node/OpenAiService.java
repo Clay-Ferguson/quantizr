@@ -24,12 +24,17 @@ import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.request.AskSubGraphRequest;
+import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.XString;
 import quanta.util.val.Val;
 
 @Component
 public class OpenAiService extends ServiceBase {
+    String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(60000));
     public static final ObjectMapper mapper = new ObjectMapper();
 
@@ -44,8 +49,10 @@ public class OpenAiService extends ServiceBase {
 
     /**
      * Queries OpenAI using the 'node.content' as the question to ask.
+     * 
+     * You can pass a node, or else 'text' to query about.
      */
-    public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node) {
+    public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question) {
         SubNode userNode = read.getUserNodeByUserName(ms, ms.getUserName(), true);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
@@ -53,9 +60,6 @@ public class OpenAiService extends ServiceBase {
 
         Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
         userNode.set(NodeProp.OPENAI_QUERY_COUNT, userQuota + 1);
-
-        // todo-0: make this configurable
-        String url = "https://api.openai.com/v1/chat/completions";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -66,19 +70,25 @@ public class OpenAiService extends ServiceBase {
 
         List<ChatMessage> messages = new ArrayList<>();
         Val<String> system = new Val<>();
-        buildChatHistory(ms, node, messages, system);
+
+        if (node != null) {
+            buildChatHistory(ms, node, messages, system);
+        }
 
         if (StringUtils.isEmpty(system.getVal())) {
-            system.setVal("You are a helpful assistant.");
+            system.setVal("You are a helpful assistant, who will answer questions about the following information:");
         }
         messages.add(0, new ChatMessage("system", system.getVal()));
-        messages.add(new ChatMessage("user", node.getContent()));
+        messages.add(new ChatMessage("user", node != null ? node.getContent() : question));
+
+        // log.debug(XString.prettyPrint(messages));
+
         double temperature = 0.7; // todo-0: make this user configurable
 
         ChatGPTRequest request = new ChatGPTRequest(model, messages, temperature);
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
         ResponseEntity<ChatCompletionResponse> response =
-                restTemplate.exchange(url, HttpMethod.POST, entity, ChatCompletionResponse.class);
+                restTemplate.exchange(OPENAI_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
 
         return response.getBody();
     }
@@ -158,8 +168,38 @@ public class OpenAiService extends ServiceBase {
             if (count > 0) {
                 sb.append("    " + usrNode.getStr(NodeProp.USER) + ": " + String.valueOf(count) + "\n");
             }
-
         }
         return sb.toString();
+    }
+
+    public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
+        AskSubGraphResponse resp = new AskSubGraphResponse();
+
+        // todo-0: in future use cases we'd want to allow includeComments
+        List<SubNode> nodes = read.getFlatSubGraph(ms, req.getNodeId(), false);
+        int counter = 0;
+
+        StringBuilder sb = new StringBuilder();
+        SubNode node = read.getNode(ms, req.getNodeId());
+        sb.append(node.getContent() + "\n\n");
+
+        for (SubNode n : nodes) {
+            sb.append(n.getContent() + "\n\n");
+            counter++;
+
+            // we can remove these limitations once we have user quotas in place.
+            if (counter > 100) {
+                throw new RuntimeException("Too many nodes in subgraph.");
+            }
+            if (sb.length() > 10000) {
+                throw new RuntimeException("Too many characters in subgraph.");
+            }
+        }
+
+        sb.append(req.getQuestion());
+
+        ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString());
+        resp.setAnswer(formatAnswer(answer));
+        return resp;
     }
 }
