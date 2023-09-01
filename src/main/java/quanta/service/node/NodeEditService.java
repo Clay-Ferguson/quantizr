@@ -147,6 +147,11 @@ public class NodeEditService extends ServiceBase {
             throw new RuntimeException("unable to locate parent for insert");
         }
 
+        // if user is adding a node under one of their parent nodes then we inherit the sharing
+        if (parentNode.getOwner().equals(ms.getUserNodeId())) {
+            forceInheritSharing = true;
+        }
+
         ChatCompletionResponse aiAnswer = null;
         String typeToCreate = req.getTypeName();
         if (req.isOpenAiQuestion()) {
