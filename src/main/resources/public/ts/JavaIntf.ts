@@ -1270,6 +1270,7 @@ export const enum NodeProp {
     BIN = "bin",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
+    OPENAI_USER_CREDIT = "sn:oaiCredit",
     OPENAI_QUERY_COUNT = "sn:oaiCount",
     OPENAI_IN_TOKEN_COUNT = "sn:oaiIc",
     OPENAI_OUT_TOKEN_COUNT = "sn:oaiOc",
