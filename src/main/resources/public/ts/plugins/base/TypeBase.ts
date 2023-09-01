@@ -186,14 +186,14 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
-    parseUrlsFromHtml = (node: J.NodeInfo) => {
+    parseUrlsFromHtml = (node: J.NodeInfo): Set<string> => {
         let val = node.content;
         if (val.indexOf("<") === -1 ||
             val.indexOf(">") === -1) return;
 
         const elm = document.createElement("html");
         elm.innerHTML = val;
-        let ret: Set<String> = null
+        let ret: Set<string> = null
 
         // BEWARE: The elements we scan here are NOT part of the DOM, we are just extracting out
         // the urls here.
@@ -213,16 +213,16 @@ export class TypeBase implements TypeIntf {
             // would make it render it twice because we already know the attachments will rendering.
             if (!S.props.getAttachmentByUrl(node, href)) {
                 // lazy instantiate
-                ret = ret || new Set<String>();
+                ret = ret || new Set<string>();
                 ret.add(href);
             }
         });
         return ret;
     }
 
-    parseUrlsFromText = (content: string): Set<String> => {
+    parseUrlsFromText = (content: string): Set<string> => {
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
-        let ret: Set<String> = null
+        let ret: Set<string> = null
         if (!content) return;
 
         // (?:https?): Matches either "http", "https".
@@ -242,7 +242,7 @@ export class TypeBase implements TypeIntf {
                 // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
                 // and avoid doing OpenGraph rendering on them
                 if (content.indexOf("* " + url) !== -1 || content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
-                ret = ret || new Set<String>();
+                ret = ret || new Set<string>();
                 ret.add(url);
             });
         }
@@ -289,7 +289,7 @@ export class TypeBase implements TypeIntf {
         }
 
         let comp: CompIntf = null;
-        let urls: Set<String> = null;
+        let urls: Set<string> = null;
 
         // todo-1: tricky hack to detect if this is all HTML
         if (cont?.startsWith("<") && cont?.endsWith(">")) {
@@ -299,7 +299,7 @@ export class TypeBase implements TypeIntf {
         // else render as markdown
         else {
             urls = this.parseUrlsFromText(cont);
-            comp = cont ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData) : null;
+            comp = cont ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData, urls) : null;
         }
 
         /* if we have URLs, then render them if available, but note they render asynchronously

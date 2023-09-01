@@ -25,7 +25,7 @@ export class NodeCompMarkdown extends Comp {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>, urls: Set<string>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
@@ -50,7 +50,7 @@ export class NodeCompMarkdown extends Comp {
         }
         /* otherwise it's not encrypted and we display the normal way */
         else {
-            state.content = this.preprocessMarkdown(node);
+            state.content = this.preprocessMarkdown(node, null, urls);
         }
 
         this.mergeState<LS>(state);
@@ -58,7 +58,7 @@ export class NodeCompMarkdown extends Comp {
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
-    preprocessMarkdown(node: J.NodeInfo, content: string = null): string {
+    preprocessMarkdown(node: J.NodeInfo, content: string = null, urls: Set<string>): string {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);
@@ -68,6 +68,17 @@ export class NodeCompMarkdown extends Comp {
 
         val = S.util.insertActPubTags(val, node);
         val = this.translateLaTex(val);
+        val = this.insertMarkdownLinks(urls, val);
+        return val;
+    }
+
+    insertMarkdownLinks = (urls: Set<String>, val: string): string => {
+        if (!urls || !val) return val;
+        urls.forEach((url: string) => {
+            if (val.indexOf("(" + url) == -1) {
+                val = val.replace(url, `[${url}](${url})`);
+            }
+        });
         return val;
     }
 
@@ -115,7 +126,7 @@ export class NodeCompMarkdown extends Comp {
             let clearText = S.quanta.decryptCache.get(cipherHash);
             // if we have already decrypted this data use the result.
             if (clearText) {
-                clearText = this.preprocessMarkdown(this.node, clearText);
+                clearText = this.preprocessMarkdown(this.node, clearText, null);
 
                 this.mergeState<LS>({
                     content: clearText,
@@ -203,7 +214,7 @@ export class NodeCompMarkdown extends Comp {
         // console.log("Decrypted to " + clearText);
         // Warning clearText can be "" (which is a 'falsy' value and a valid decrypted string!)
         clearText = clearText !== null ? clearText : "[Decrypt Failed]";
-        clearText = this.preprocessMarkdown(this.node, clearText);
+        clearText = this.preprocessMarkdown(this.node, clearText, null);
 
         this.mergeState<LS>({
             content: clearText,
