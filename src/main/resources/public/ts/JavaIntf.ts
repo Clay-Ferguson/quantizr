@@ -175,10 +175,26 @@ export interface ChatCompletionResponse {
     usage: Usage;
 }
 
+export interface ChatGPTModerationRequest {
+    input: string;
+}
+
+export interface ChatGPTModerationResponse {
+    id: string;
+    model: string;
+    results: ChatGPTTextModerationItem[];
+}
+
 export interface ChatGPTRequest {
     model: string;
     messages: ChatMessage[];
     temperature: number;
+}
+
+export interface ChatGPTTextModerationItem {
+    flagged: boolean;
+    categories: { [index: string]: boolean };
+    categoryScores: { [index: string]: number };
 }
 
 export interface ChatMessage {

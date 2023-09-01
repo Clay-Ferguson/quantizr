@@ -19,7 +19,10 @@ import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
+import quanta.model.client.openai.ChatGPTModerationRequest;
+import quanta.model.client.openai.ChatGPTModerationResponse;
 import quanta.model.client.openai.ChatGPTRequest;
+import quanta.model.client.openai.ChatGPTTextModerationItem;
 import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.mongo.MongoSession;
@@ -28,12 +31,12 @@ import quanta.request.AskSubGraphRequest;
 import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
-import quanta.util.XString;
 import quanta.util.val.Val;
 
 @Component
 public class OpenAiService extends ServiceBase {
-    String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    String OPENAI_MOD_URL = "https://api.openai.com/v1/moderations";
+    String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
 
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(60000));
     public static final ObjectMapper mapper = new ObjectMapper();
@@ -53,6 +56,7 @@ public class OpenAiService extends ServiceBase {
      * You can pass a node, or else 'text' to query about.
      */
     public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question) {
+
         SubNode userNode = read.getUserNodeByUserName(ms, ms.getUserName(), true);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
@@ -78,19 +82,55 @@ public class OpenAiService extends ServiceBase {
         if (StringUtils.isEmpty(system.getVal())) {
             system.setVal("You are a helpful assistant, who will answer questions about the following information:");
         }
+        String input = node != null ? node.getContent() : question;
         messages.add(0, new ChatMessage("system", system.getVal()));
-        messages.add(new ChatMessage("user", node != null ? node.getContent() : question));
-
-        // log.debug(XString.prettyPrint(messages));
+        messages.add(new ChatMessage("user", input));
 
         double temperature = 0.7; // todo-0: make this user configurable
+
+        /* Moderate Call before submitting */
+        String contentToModerate = concatenateContent(messages);
+        ChatGPTModerationRequest modRequest = new ChatGPTModerationRequest(contentToModerate);
+        HttpEntity<ChatGPTModerationRequest> modEntity = new HttpEntity<>(modRequest, headers);
+        ResponseEntity<ChatGPTModerationResponse> modResponse =
+                restTemplate.exchange(OPENAI_MOD_URL, HttpMethod.POST, modEntity, ChatGPTModerationResponse.class);
+
+        if (moderationFailed(modResponse.getBody())) {
+            throw new RuntimeException("Sorry, the AI would reject that question.");
+        }
 
         ChatGPTRequest request = new ChatGPTRequest(model, messages, temperature);
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
         ResponseEntity<ChatCompletionResponse> response =
-                restTemplate.exchange(OPENAI_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
+                restTemplate.exchange(OPENAI_COMP_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
 
         return response.getBody();
+    }
+
+    private boolean moderationFailed(ChatGPTModerationResponse modResponse) {
+        if (modResponse == null || modResponse.getResults() == null || modResponse.getResults().length == 0) {
+            return false;
+        }
+
+        for (ChatGPTTextModerationItem result : modResponse.getResults()) {
+            if (result.isFlagged()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String concatenateContent(List<ChatMessage> messages) {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < messages.size(); i++) {
+            if (i > 0) {
+                result.append(", ");
+            }
+            result.append(messages.get(i).getContent());
+        }
+
+        return result.toString();
     }
 
     /**
@@ -101,8 +141,8 @@ public class OpenAiService extends ServiceBase {
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, Val<String> system) {
         parseAISystemFromContent(node.getContent(), system);
+        boolean lastWasUser = !NodeType.OPENAI_ANSWER.s().equals(node.getType());
         SubNode parent = read.getParent(ms, node);
-        boolean lastWasUser = NodeType.OPENAI_ANSWER.s().equals(node.getType());
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
@@ -111,12 +151,12 @@ public class OpenAiService extends ServiceBase {
                 lastWasUser = false;
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
-                parseAISystemFromContent(parent.getContent(), system);
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
                 if (lastWasUser) {
                     break;
                 }
+                parseAISystemFromContent(parent.getContent(), system);
                 lastWasUser = true;
                 messages.add(0, new ChatMessage("user", parent.getContent()));
             }
