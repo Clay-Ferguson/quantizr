@@ -1,33 +1,40 @@
 package quanta.model.client.openai;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Usage {
-    private int promptTokens;
-    private int completionTokens;
-    private int totalTokens;
+    @JsonProperty("prompt_tokens")
+    private Integer promptTokens;
+
+    @JsonProperty("completion_tokens")
+    private Integer completionTokens;
+
+    @JsonProperty("text_generation")
+    private Integer totalTokens;
 
     public Usage() {}
 
-    public int getPromptTokens() {
+    public Integer getPromptTokens() {
         return promptTokens;
     }
 
-    public void setPromptTokens(int promptTokens) {
+    public void setPromptTokens(Integer promptTokens) {
         this.promptTokens = promptTokens;
     }
 
-    public int getCompletionTokens() {
+    public Integer getCompletionTokens() {
         return completionTokens;
     }
 
-    public void setCompletionTokens(int completionTokens) {
+    public void setCompletionTokens(Integer completionTokens) {
         this.completionTokens = completionTokens;
     }
 
-    public int getTotalTokens() {
+    public Integer getTotalTokens() {
         return totalTokens;
     }
 
-    public void setTotalTokens(int totalTokens) {
+    public void setTotalTokens(Integer totalTokens) {
         this.totalTokens = totalTokens;
     }
 }

@@ -186,9 +186,11 @@ export interface ChatGPTModerationResponse {
 }
 
 export interface ChatGPTRequest {
+    user: string;
     model: string;
     messages: ChatMessage[];
     temperature: number;
+    max_tokens: number;
 }
 
 export interface ChatGPTTextModerationItem {
@@ -209,9 +211,9 @@ export interface Choice {
 }
 
 export interface Usage {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
+    prompt_tokens: number;
+    completion_tokens: number;
+    text_generation: number;
 }
 
 export interface AddFriendRequest extends RequestBase {
@@ -1269,6 +1271,8 @@ export const enum NodeProp {
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
     OPENAI_QUERY_COUNT = "sn:oaiCount",
+    OPENAI_IN_TOKEN_COUNT = "sn:oaiIc",
+    OPENAI_OUT_TOKEN_COUNT = "sn:oaiOc",
     ALLOWED_FEATURES = "sn:features",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_ACTIVE_TIME = "sn:lastActive",

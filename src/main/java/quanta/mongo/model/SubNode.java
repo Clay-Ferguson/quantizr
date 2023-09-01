@@ -926,6 +926,12 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
+    public boolean hasProp(String name) {
+        return props().containsKey(name);
+    }
+
+    @Transient
+    @JsonIgnore
     public boolean isType(NodeType type) {
         return type.s().equals(this.type);
     }

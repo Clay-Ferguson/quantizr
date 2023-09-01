@@ -1,5 +1,6 @@
 package quanta.service.node;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -31,12 +32,15 @@ import quanta.request.AskSubGraphRequest;
 import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
+import quanta.util.XString;
 import quanta.util.val.Val;
 
 @Component
 public class OpenAiService extends ServiceBase {
     String OPENAI_MOD_URL = "https://api.openai.com/v1/moderations";
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
+
+    DecimalFormat formatter = new DecimalFormat("0.##########");
 
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(60000));
     public static final ObjectMapper mapper = new ObjectMapper();
@@ -57,13 +61,20 @@ public class OpenAiService extends ServiceBase {
      */
     public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question) {
 
-        SubNode userNode = read.getUserNodeByUserName(ms, ms.getUserName(), true);
+        SubNode userNode = read.getUserNodeByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
 
-        Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
-        userNode.set(NodeProp.OPENAI_QUERY_COUNT, userQuota + 1);
+        // grant unpaid users a whopping nickle to play with
+        if (!userNode.hasProp(NodeProp.OPENAI_USER_CREDIT.s())) {
+            userNode.set(NodeProp.OPENAI_USER_CREDIT, 0.05);
+        }
+
+        Double userCredit = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
+        if (userCredit < 0) {
+            throw new RuntimeException("Sorry, you have no more credits.");
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -99,12 +110,34 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Sorry, the AI would reject that question.");
         }
 
-        ChatGPTRequest request = new ChatGPTRequest(model, messages, temperature);
+        ChatGPTRequest request = new ChatGPTRequest(model, messages, temperature, ms.getUserNodeId().toHexString());
+        // log.debug("GPT Req: " + XString.prettyPrint(request));
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
         ResponseEntity<ChatCompletionResponse> response =
                 restTemplate.exchange(OPENAI_COMP_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
 
-        return response.getBody();
+        ChatCompletionResponse res = response.getBody();
+        // log.debug("GPT Res: " + XString.prettyPrint(res));
+
+        arun.run(as -> {
+            // update user consumption
+            Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
+            userNode.set(NodeProp.OPENAI_QUERY_COUNT, userQuota + 1);
+
+            Long inputCount = userNode.getInt(NodeProp.OPENAI_IN_TOKEN_COUNT);
+            userNode.set(NodeProp.OPENAI_IN_TOKEN_COUNT, inputCount + res.getUsage().getPromptTokens());
+
+            Long outputCount = userNode.getInt(NodeProp.OPENAI_OUT_TOKEN_COUNT);
+            userNode.set(NodeProp.OPENAI_OUT_TOKEN_COUNT, outputCount + res.getUsage().getCompletionTokens());
+
+            Double cost = calculateCost(inputCount, outputCount);
+            userNode.set(NodeProp.OPENAI_USER_CREDIT, userCredit - cost);
+
+            update.save(as, userNode);
+            return null;
+        });
+
+        return res;
     }
 
     private boolean moderationFailed(ChatGPTModerationResponse modResponse) {
@@ -199,17 +232,43 @@ public class OpenAiService extends ServiceBase {
 
         StringBuilder sb = new StringBuilder();
         sb.append("\nOpenAI Queries\n");
+
+        // add in admin account
+        appendUserStats(sb, read.getDbRoot());
+
         /*
          * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
          * amount).
          */
         for (SubNode usrNode : accountNodes) {
-            Long count = usrNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
-            if (count > 0) {
-                sb.append("    " + usrNode.getStr(NodeProp.USER) + ": " + String.valueOf(count) + "\n");
-            }
+            appendUserStats(sb, usrNode);
         }
         return sb.toString();
+    }
+
+    private void appendUserStats(StringBuilder sb, SubNode usrNode) {
+        log.debug("usrNode: " + XString.prettyPrint(usrNode));
+        Long count = usrNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
+        if (count > 0) {
+            Long inTokenCount = usrNode.getInt(NodeProp.OPENAI_IN_TOKEN_COUNT);
+            Long outTokenCount = usrNode.getInt(NodeProp.OPENAI_OUT_TOKEN_COUNT);
+            Double userCredit =
+                    usrNode.hasProp(NodeProp.OPENAI_USER_CREDIT.s()) ? usrNode.getFloat(NodeProp.OPENAI_USER_CREDIT)
+                            : 0.0;
+
+            // todo-0: need to dump token usage here, and total up to dollar amount too.
+            // $0.003/1KToken input, $0.004/KToken output
+            sb.append("    " + usrNode.getStr(NodeProp.USER) + //
+                    "Queries: " + String.valueOf(count) + " Tokens In/Out: (" //
+                    + String.valueOf(inTokenCount) + "/" //
+                    + String.valueOf(outTokenCount) + ")" + //
+                    " Charges: $" + formatter.format(calculateCost(inTokenCount, outTokenCount)) + //
+                    " Credit: $" + formatter.format(userCredit) + "\n");
+        }
+    }
+
+    private double calculateCost(Long inTokenCount, Long outTokenCount) {
+        return (inTokenCount * 0.003 / 1000) + (outTokenCount * 0.004 / 1000);
     }
 
     public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
@@ -227,12 +286,14 @@ public class OpenAiService extends ServiceBase {
             sb.append(n.getContent() + "\n\n");
             counter++;
 
-            // we can remove these limitations once we have user quotas in place.
-            if (counter > 100) {
-                throw new RuntimeException("Too many nodes in subgraph.");
-            }
-            if (sb.length() > 10000) {
-                throw new RuntimeException("Too many characters in subgraph.");
+            if (!ms.isAdmin()) {
+                // we can remove these limitations once we have user quotas in place.
+                if (counter > 100) {
+                    throw new RuntimeException("Too many nodes in subgraph.");
+                }
+                if (sb.length() > 10000) {
+                    throw new RuntimeException("Too many characters in subgraph.");
+                }
             }
         }
 
