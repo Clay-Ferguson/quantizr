@@ -8,6 +8,7 @@ import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
+import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
@@ -59,13 +60,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
             !ast.node ? null : (this.headingBar = new TabHeading([
-                new Divc({ className: "tinyMarginTop float-end" }, [
-                    new Icon({
-                        className: "fa fa-book fa-lg buttonBarIcon",
-                        title: "Show Document View\n\n(All content on a single page)",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.openDocumentView
-                    }),
+                new Divc({ className: "float-end" }, [
 
                     new Icon({
                         className: "fa fa-search fa-lg buttonBarIcon",
@@ -73,13 +68,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.runSearch
                     }),
-
-                    !ast.isAnonUser ? new Icon({
-                        className: "fa fa-clock-o fa-lg buttonBarIcon",
-                        title: "View Timeline (by Mod Time)",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.runTimeline
-                    }) : null,
 
                     new Icon({
                         className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
@@ -92,6 +80,18 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         title: "Next Sibling Node",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.navToNext
+                    }),
+
+                    new IconButton("fa-clock-o", "Rev-Chron", {
+                        title: "View Timeline (by Mod Time)",
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav.runTimeline
+                    }, "marginRight"),
+
+                    new IconButton("fa-book", "Doc View", {
+                        title: "Show Document View\n\n(All content on a single page)",
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav.openDocumentView
                     }),
                 ]),
                 header = new Div(S.quanta.config.brandingAppName, {
