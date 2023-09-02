@@ -73,13 +73,15 @@ export class NodeCompBinary extends Div {
 
         const imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
         const className = this.isFullScreenEmbed ? "fullScreenImg" : (this.isEditorEmbed ? "imgInEditor" : "imgInRow")
+        const img = new Img();
         const imgAttrs: any = {
+            ...img.attribs, // need to keep because of 'id' etc.
             src,
             className,
             title: this.isEditorEmbed ? "Attached image" + imgTitleSuffix : "Click image to enlarge/reduce" + imgTitleSuffix,
             onClick: (evt: MouseEvent) => {
                 // we have CTRL-CLICK already doing a zoom on images, so we don't want to do that here.
-                NodeCompBinary.clickOnImage(this.getRef() as HTMLImageElement, evt, node.id, (att as any).key, this.isEditorEmbed, this.isFullScreenEmbed);
+                NodeCompBinary.clickOnImage(img.getRef() as HTMLImageElement, evt, node.id, (att as any).key, this.isEditorEmbed, this.isFullScreenEmbed);
             }
         };
 
@@ -93,7 +95,8 @@ export class NodeCompBinary extends Div {
             }
         }
 
-        return new Img(imgAttrs);
+        img.attribs = imgAttrs;
+        return img;
     }
 
     /* This method needs to be called statically and we cannot use 'this' in it,
@@ -157,8 +160,7 @@ export class NodeCompBinary extends Div {
             // Remove the zoomed class after the animation is complete
             setTimeout(() => {
                 elm.classList.remove("zoomed");
-                S.util.sharpenImage(elm);
-            }, 1500); // 1.5 seconds (1500 milliseconds)
+            }, 1500); // 1.5 seconds 
         }
     }
 
