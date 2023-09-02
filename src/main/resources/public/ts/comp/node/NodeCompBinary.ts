@@ -77,7 +77,10 @@ export class NodeCompBinary extends Div {
             src,
             className,
             title: this.isEditorEmbed ? "Attached image" + imgTitleSuffix : "Click image to enlarge/reduce" + imgTitleSuffix,
-            onClick: () => NodeCompBinary.clickOnImage(node.id, (att as any).key, this.isEditorEmbed, this.isFullScreenEmbed)
+            onClick: (evt: MouseEvent) => {
+                // we have CTRL-CLICK already doing a zoom on images, so we don't want to do that here.
+                NodeCompBinary.clickOnImage(this.getRef() as HTMLImageElement, evt, node.id, (att as any).key, this.isEditorEmbed, this.isFullScreenEmbed);
+            }
         };
 
         if (this.isFullScreenEmbed) {
@@ -95,7 +98,11 @@ export class NodeCompBinary extends Div {
 
     /* This method needs to be called statically and we cannot use 'this' in it,
     because it's referenced by the plain HTML text that's used when positioned images are inserted in the content */
-    static clickOnImage = (id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) => {
+    static clickOnImage = (elm: HTMLImageElement, evt: MouseEvent, id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) => {
+        if (evt.ctrlKey) {
+            NodeCompBinary.toggleZoom(elm, evt);
+            return;
+        }
         const node = S.nodeUtil.findNode(id);
         const att = S.props.getAttachment(attName, node);
 
@@ -119,6 +126,40 @@ export class NodeCompBinary extends Div {
             }
             s.fullScreenConfig.nodeId = id;
         });
+    }
+
+    static toggleZoom = (elm: HTMLImageElement, evt: MouseEvent) => {
+        // Get the current zoom state from the attribute
+        const isZoomedIn = elm.getAttribute("data-zoomed") === "true";
+
+        // Get the position of the image relative to the viewport
+        const rect = elm.getBoundingClientRect();
+
+        // Calculate the click coordinates relative to the image
+        const x = (evt.clientX - rect.left) / elm.clientWidth;
+        const y = (evt.clientY - rect.top) / elm.clientHeight;
+
+        if (isZoomedIn) {
+            // Zoom out (restore to the original size)
+            elm.style.transformOrigin = "center center";
+            elm.style.transform = "scale(1)";
+            elm.setAttribute("data-zoomed", "false");
+        } else {
+            // zoom in where user clicked
+            const scale = 4;
+            elm.style.transformOrigin = `${x * 100}% ${y * 100}%`;
+            elm.style.transform = `scale(${scale})`;
+            elm.setAttribute("data-zoomed", "true");
+
+            // Add the zoomed class to enable the transition animation
+            elm.classList.add("zoomed");
+
+            // Remove the zoomed class after the animation is complete
+            setTimeout(() => {
+                elm.classList.remove("zoomed");
+                S.util.sharpenImage(elm);
+            }, 1500); // 1.5 seconds (1500 milliseconds)
+        }
     }
 
     override preRender(): boolean {

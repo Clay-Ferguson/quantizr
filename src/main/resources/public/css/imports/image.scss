@@ -1,3 +1,7 @@
+.zoomed {
+    transition: transform 1.5s ease; /* Add a 1.5-second smooth transition for the transform property */
+}  
+      
 .leftNavLogoImg {
     border: 2px solid purple;
     cursor: pointer;
