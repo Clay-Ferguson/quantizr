@@ -304,7 +304,9 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        children.push(new DropdownMenu(ddItems));
+        if (ddItems.length > 0) {
+            children.push(new DropdownMenu(ddItems));
+        }
 
         if (showInfo && priority) {
             children.push(new Span(priority, {

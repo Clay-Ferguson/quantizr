@@ -86,13 +86,13 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         title: "View Timeline (by Mod Time)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.runTimeline
-                    }, "marginRight"),
+                    }, "marginRight btn-primary"),
 
                     new IconButton("fa-book", "Doc View", {
                         title: "Show Document View\n\n(All content on a single page)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
-                    }),
+                    }, "btn-primary"),
                 ]),
                 header = new Div(S.quanta.config.brandingAppName, {
                     className: "tabTitle headerUploadPanel",

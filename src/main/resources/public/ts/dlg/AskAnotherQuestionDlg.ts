@@ -17,17 +17,19 @@ export class AskAnotherQuestionDlg extends DialogBase {
         { name: ValidatorRuleName.MINLEN, payload: 10 }
     ]);
     textScrollPos = new ScrollPos();
+    textArea: TextArea;
 
     constructor(public nodeId: string, private subGraphQuery: boolean) {
         super(subGraphQuery ? "Question about SubGraph" : "Ask Another Question", "appModalContMediumWidth");
+        this.onMount(() => { this.textArea?.focus(); });
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Diva([
-                new TextArea("Ask away...", { rows: 15 }, this.questionState, null, false, 3, this.textScrollPos),
+                this.textArea = new TextArea("Ask a Question...", { rows: 15 }, this.questionState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Submit Question", this.askQuestion, null, "btn-primary"),
+                    new Button("Submit", this.askQuestion, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary")
                 ], "marginTop")
             ])
