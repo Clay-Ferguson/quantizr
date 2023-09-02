@@ -184,10 +184,9 @@ export class NodeCompMarkdown extends Comp {
             code: this.code
         }
 
-        // not needed but keep as an example        
-        // this.attribs.components.a = (props: any) => {
-        //     return createElement("a", { href: props.href }, props.children);
-        // }
+        this.attribs.components.a = (props: any) => {
+            return createElement("a", { href: props.href, target: "blank" }, props.children);
+        }
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
