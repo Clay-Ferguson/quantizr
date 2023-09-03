@@ -19,7 +19,6 @@ import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 export class TypeBase implements TypeIntf {
     public ordinal: number;
     public schemaOrg: J.SchemaOrgClass;
-    static findUrlsRegex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
 
     constructor(public readonly typeName: string, public readonly displayName: string, private iconStyle: string, private allowUserSelect: boolean) {
     }
@@ -188,7 +187,9 @@ export class TypeBase implements TypeIntf {
 
     parseUrlsFromHtml = (node: J.NodeInfo): Set<string> => {
         let val = node.content;
-        if (val.indexOf("<") === -1 ||
+
+        // this is just a performance optimization to bypass the function if we know we can 
+        if (val.indexOf("<a ") === -1 ||
             val.indexOf(">") === -1) return;
 
         const elm = document.createElement("html");
@@ -220,18 +221,20 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
+    // (?:https?): Matches either "http", "https".
+    // :\/\/: Matches "://" literally.
+    // [^\s/$.?#]: Matches any character that is not whitespace, "/", "$", ".", "?", or "#".
+    // .[^\s]*: Matches any character that is not whitespace zero or more times.
+    // |: Alternation, allowing for the "www" format.
+    // www\.[^\s\/$?#].[^\s]*: Matches URLs starting with "www".
+    // gi: Flags for global and case-insensitive matching.
+    static findUrlsRegex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
+
     parseUrlsFromText = (content: string): Set<string> => {
+        if (!content || content.toLowerCase().indexOf("http") === -1) return null;
+
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
         let ret: Set<string> = null
-        if (!content) return;
-
-        // (?:https?): Matches either "http", "https".
-        // :\/\/: Matches "://" literally.
-        // [^\s/$.?#]: Matches any character that is not whitespace, "/", "$", ".", "?", or "#".
-        // .[^\s]*: Matches any character that is not whitespace zero or more times.
-        // |: Alternation, allowing for the "www" format.
-        // www\.[^\s\/$?#].[^\s]*: Matches URLs starting with "www".
-        // gi: Flags for global and case-insensitive matching.
 
         const urls = content.match(TypeBase.findUrlsRegex);
 
