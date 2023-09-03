@@ -80,8 +80,8 @@ public class OpenAiService extends ServiceBase {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + prop.getOpenAiKey());
 
-        // todo-0: make this configurable
-        String model = "gpt-3.5-turbo";
+        // todo-0: make this configurable, and make it assignable like the "ai:" prefix, but with "model:"
+        String model = "gpt-4"; // "gpt-3.5-turbo";
 
         List<ChatMessage> messages = new ArrayList<>();
         Val<String> system = new Val<>();
@@ -94,6 +94,7 @@ public class OpenAiService extends ServiceBase {
             system.setVal("You are a helpful assistant, who will answer questions about the following information:");
         }
         String input = node != null ? node.getContent() : question;
+        // log.debug("SystemPrompt: " + system.getVal());
         messages.add(0, new ChatMessage("system", system.getVal()));
         messages.add(new ChatMessage("user", input));
 
@@ -168,12 +169,16 @@ public class OpenAiService extends ServiceBase {
 
     /**
      * we walk up the tree, to build as much chat history as we have so we can create the full
+     * 
      * conversation context, If any of the nodes contain a "system: ..." line of text that will be used
      * as the system we return, so users will always be able to embed the system instructions into a
      * question.
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, Val<String> system) {
-        parseAISystemFromContent(node.getContent(), system);
+        if (StringUtils.isEmpty(system.getVal())) {
+            parseAISystemFromContent(node.getContent(), system);
+        }
+
         boolean lastWasUser = !NodeType.OPENAI_ANSWER.s().equals(node.getType());
         SubNode parent = read.getParent(ms, node);
 
@@ -184,18 +189,35 @@ public class OpenAiService extends ServiceBase {
                 lastWasUser = false;
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
+                if (StringUtils.isEmpty(system.getVal())) {
+                    parseAISystemFromContent(parent.getContent(), system);
+                }
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
                 if (lastWasUser) {
                     break;
                 }
-                parseAISystemFromContent(parent.getContent(), system);
                 lastWasUser = true;
                 messages.add(0, new ChatMessage("user", parent.getContent()));
             }
 
             // walk up the tree. get parent of parent.
             parent = read.getParent(ms, parent);
+        }
+
+        // if we still don't have a system prompt check all ancestor nodes
+        if (StringUtils.isEmpty(system.getVal())) {
+            getSystemPromptFromAncestorNodes(ms, parent, system);
+        }
+    }
+
+    public void getSystemPromptFromAncestorNodes(MongoSession ms, SubNode node, Val<String> system) {
+        while (node != null) {
+            parseAISystemFromContent(node.getContent(), system);
+            if (!StringUtils.isEmpty(system.getVal())) {
+                return;
+            }
+            node = read.getParent(ms, node);
         }
     }
 
