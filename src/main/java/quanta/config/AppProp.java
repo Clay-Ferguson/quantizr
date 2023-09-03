@@ -195,7 +195,9 @@ public class AppProp {
     }
 
     public boolean ipfsEnabled() {
-        return APConst.TRUE.equals(env.getProperty("ipfsEnabled"));
+        // hardcoding disablement for now
+        return false;
+        // return APConst.TRUE.equals(env.getProperty("ipfsEnabled"));
     }
 
     public String getIPFSApiHostAndPort() {

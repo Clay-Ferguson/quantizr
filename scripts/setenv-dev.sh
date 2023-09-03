@@ -39,7 +39,7 @@ export ipfs_staging=/home/clay/ipfs/staging
 
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts
-export ipfsEnabled=true
+export ipfsEnabled=
 export ipfs_container=ipfs-dev
 
 export DOCKER_ENV=dev
