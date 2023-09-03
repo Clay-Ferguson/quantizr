@@ -270,8 +270,7 @@ public class AttachmentService extends ServiceBase {
                 if (att.getIpfsRef() == null) {
                     arun.run(sess -> {
                         // don't pass the actual node into here, because it runs in a separate thread and would
-                        // be
-                        // a concurrency problem.
+                        // be a concurrency problem.
                         ipfsPin.ipfsAsyncPinNode(sess, node.getId());
                         return null;
                     });

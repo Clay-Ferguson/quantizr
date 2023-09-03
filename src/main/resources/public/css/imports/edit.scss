@@ -5,6 +5,10 @@
     background-color: #17202A;
 }
 
+code {
+    font-size: unset;
+}
+
 .preWordWrap {
     // overflow-x: auto; //<--- highly upvoted stack overflow didn't have this.
     white-space: pre-wrap;

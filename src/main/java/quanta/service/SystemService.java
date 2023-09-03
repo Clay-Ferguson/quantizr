@@ -142,8 +142,10 @@ public class SystemService extends ServiceBase {
              */
             final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
             attach.gridMaintenanceScan(statsMap);
+
             if (prop.ipfsEnabled()) {
-                ret = ipfsGarbageCollect(statsMap);
+                // todo-0: temporarily disabled due to refactoring.
+                // ret += ipfsGarbageCollect(statsMap);
             }
             arun.run(as -> {
                 user.writeUserStats(as, statsMap);

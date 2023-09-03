@@ -40,7 +40,7 @@ public class OpenAiService extends ServiceBase {
     String OPENAI_MOD_URL = "https://api.openai.com/v1/moderations";
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
 
-    DecimalFormat formatter = new DecimalFormat("0.##########");
+    DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
 
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(60000));
     public static final ObjectMapper mapper = new ObjectMapper();
@@ -259,11 +259,11 @@ public class OpenAiService extends ServiceBase {
             // todo-0: need to dump token usage here, and total up to dollar amount too.
             // $0.003/1KToken input, $0.004/KToken output
             sb.append("    " + usrNode.getStr(NodeProp.USER) + //
-                    "Queries: " + String.valueOf(count) + " Tokens In/Out: (" //
+                    " -> Queries: " + String.valueOf(count) + " Tokens In/Out: (" //
                     + String.valueOf(inTokenCount) + "/" //
                     + String.valueOf(outTokenCount) + ")" + //
-                    " Charges: $" + formatter.format(calculateCost(inTokenCount, outTokenCount)) + //
-                    " Credit: $" + formatter.format(userCredit) + "\n");
+                    " Charges: $" + decimalFormatter.format(calculateCost(inTokenCount, outTokenCount)) + //
+                    " Credit: $" + decimalFormatter.format(userCredit) + "\n");
         }
     }
 
