@@ -1,6 +1,7 @@
 import { createElement, forwardRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
+import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeRaw from "rehype-raw";
@@ -32,7 +33,7 @@ const ReactMarkdownComp = forwardRef((props, ref) => {
     return createElement(ReactMarkdown as any, {
         ...props,
         ref,
-        remarkPlugins: [remarkMath],
+        remarkPlugins: [remarkMath, remarkGfm],
         // rehypePlugins: [rehypeKatex, rehypeRaw, [rehypeSanitize, { allowedTags, allowedAttributes }]]
         rehypePlugins: [rehypeKatex, rehypeRaw],
         rehypeTransform: [rehypeSanitize /*, MySanitizeFunction*/]
