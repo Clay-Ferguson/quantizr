@@ -240,7 +240,7 @@ export class TypeBase implements TypeIntf {
 
         if (urls) {
             urls.forEach(url => {
-                url = S.util.stripIfEndsWith(url, ")"); // todo-0: this is a hack until I fix my regex
+                url = S.util.stripIfEndsWith(url, ")"); // todo-1: this is a hack until I fix my regex
 
                 // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
                 // and avoid doing OpenGraph rendering on them

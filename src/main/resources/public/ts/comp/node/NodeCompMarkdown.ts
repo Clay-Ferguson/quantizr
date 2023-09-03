@@ -156,7 +156,7 @@ export class NodeCompMarkdown extends Comp {
                     className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon",
                     onClick: () => {
                         S.util.copyToClipboard(children[0]);
-                        // todo-0: move flashMessage into copyToClipboard
+                        // todo-1: move flashMessage into copyToClipboard
                         S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
                     }
                 }),
