@@ -210,6 +210,13 @@ export interface Choice {
     index: number;
 }
 
+export interface SystemConfig {
+    prompt: string;
+    model: string;
+    temperature: number;
+    configured: boolean;
+}
+
 export interface Usage {
     prompt_tokens: number;
     completion_tokens: number;
@@ -1289,6 +1296,8 @@ export const enum NodeProp {
     DATE = "date",
     DATE_FULL = "p.date",
     UNPUBLISHED = "unpub",
+    AI = "ai",
+    AI_MODEL = "ai-model",
     BOOST = "boost",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",

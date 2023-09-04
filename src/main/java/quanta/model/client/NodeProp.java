@@ -207,6 +207,8 @@ public enum NodeProp {
     // nodes that contain this property are not published to ActPub servers and not allowed to show up
     // in feeds.
     UNPUBLISHED("unpub"), //
+    AI("ai"), //
+    AI_MODEL("ai-model"), //
 
     // holds the NodeId of the node this node is boosting, and also serves as the indicator THAT the
     // node is s boost.

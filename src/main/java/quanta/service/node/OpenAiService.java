@@ -26,6 +26,7 @@ import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatGPTTextModerationItem;
 import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
+import quanta.model.client.openai.SystemConfig;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AskSubGraphRequest;
@@ -33,7 +34,6 @@ import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import quanta.util.val.Val;
 
 @Component
 public class OpenAiService extends ServiceBase {
@@ -80,25 +80,25 @@ public class OpenAiService extends ServiceBase {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + prop.getOpenAiKey());
 
-        // todo-0: make this configurable, and make it assignable like the "ai:" prefix, but with "model:"
-        String model = "gpt-4"; // "gpt-3.5-turbo";
-
         List<ChatMessage> messages = new ArrayList<>();
-        Val<String> system = new Val<>();
+        SystemConfig system = new SystemConfig();
 
         if (node != null) {
             buildChatHistory(ms, node, messages, system);
         }
 
-        if (StringUtils.isEmpty(system.getVal())) {
-            system.setVal("You are a helpful assistant, who will answer questions about the following information:");
+        if (StringUtils.isEmpty(system.getPrompt())) {
+            system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
-        String input = node != null ? node.getContent() : question;
-        // log.debug("SystemPrompt: " + system.getVal());
-        messages.add(0, new ChatMessage("system", system.getVal()));
-        messages.add(new ChatMessage("user", input));
 
-        double temperature = 0.7; // todo-0: make this user configurable
+        if (StringUtils.isEmpty(system.getModel())) {
+            system.setModel("gpt-3.5-turbo"); // or gpt-4, or others...
+        }
+
+        String input = node != null ? node.getContent() : question;
+        // log.debug("SystemPrompt: " + XString.prettyPrint(system));
+        messages.add(0, new ChatMessage("system", system.getPrompt()));
+        messages.add(new ChatMessage("user", input));
 
         /* Moderate Call before submitting */
         String contentToModerate = concatenateContent(messages);
@@ -111,8 +111,9 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Sorry, the AI would reject that question.");
         }
 
-        ChatGPTRequest request = new ChatGPTRequest(model, messages, temperature, ms.getUserNodeId().toHexString());
-        // log.debug("GPT Req: " + XString.prettyPrint(request));
+        ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
+                ms.getUserNodeId().toHexString());
+        log.debug("GPT Req: " + XString.prettyPrint(request));
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
         ResponseEntity<ChatCompletionResponse> response =
                 restTemplate.exchange(OPENAI_COMP_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
@@ -174,10 +175,9 @@ public class OpenAiService extends ServiceBase {
      * as the system we return, so users will always be able to embed the system instructions into a
      * question.
      */
-    private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, Val<String> system) {
-        if (StringUtils.isEmpty(system.getVal())) {
-            parseAISystemFromContent(node.getContent(), system);
-        }
+    private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
+        parseAISystemFromContent(node, system);
+
 
         boolean lastWasUser = !NodeType.OPENAI_ANSWER.s().equals(node.getType());
         SubNode parent = read.getParent(ms, node);
@@ -189,9 +189,8 @@ public class OpenAiService extends ServiceBase {
                 lastWasUser = false;
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
-                if (StringUtils.isEmpty(system.getVal())) {
-                    parseAISystemFromContent(parent.getContent(), system);
-                }
+                parseAISystemFromContent(parent, system);
+
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
                 if (lastWasUser) {
@@ -206,31 +205,45 @@ public class OpenAiService extends ServiceBase {
         }
 
         // if we still don't have a system prompt check all ancestor nodes
-        if (StringUtils.isEmpty(system.getVal())) {
-            getSystemPromptFromAncestorNodes(ms, parent, system);
-        }
+        getSystemPromptFromAncestorNodes(ms, parent, system);
     }
 
-    public void getSystemPromptFromAncestorNodes(MongoSession ms, SubNode node, Val<String> system) {
+    public void getSystemPromptFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
         while (node != null) {
-            parseAISystemFromContent(node.getContent(), system);
-            if (!StringUtils.isEmpty(system.getVal())) {
+            parseAISystemFromContent(node, system);
+            if (system.isConfigured()) {
                 return;
             }
             node = read.getParent(ms, node);
         }
     }
 
-    public void parseAISystemFromContent(String content, Val<String> system) {
-        if (content == null)
+    public void parseAISystemFromContent(SubNode node, SystemConfig system) {
+        if (system.isConfigured())
             return;
-        StringTokenizer t = new StringTokenizer(content, "\n\r", false);
+
+        if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI.s())) {
+            system.setPrompt(node.getStr(NodeProp.AI.s()));
+        }
+
+        if (StringUtils.isEmpty(system.getModel()) && node.hasProp(NodeProp.AI_MODEL.s())) {
+            system.setModel(node.getStr(NodeProp.AI.s()));
+        }
+
+        // are we now configured from props?
+        if (system.isConfigured())
+            return;
+
+        StringTokenizer t = new StringTokenizer(node.getContent(), "\n\r", false);
 
         while (t.hasMoreTokens()) {
             String tok = t.nextToken();
-            if (tok.toLowerCase().startsWith("ai:")) {
-                system.setVal(tok.substring(3).trim());
-                return;
+            if (StringUtils.isEmpty(system.getPrompt()) && tok.toLowerCase().startsWith(NodeProp.AI.s() + ":")) {
+                system.setPrompt(tok.substring(3).trim());
+            }
+
+            if (StringUtils.isEmpty(system.getModel()) && tok.toLowerCase().startsWith(NodeProp.AI_MODEL.s() + ":")) {
+                system.setModel(tok.substring(9).trim());
             }
         }
     }

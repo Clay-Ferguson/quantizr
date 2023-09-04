@@ -413,7 +413,7 @@ export class EditNodeDlgUtil {
     toggleRecognition = (dlg: EditNodeDlg) => {
         S.speech.setListenerCallback((transcript: string) => {
             if (dlg.contentEditor && transcript) {
-                dlg.contentEditor.insertTextAtCursor(transcript + ". ");
+                dlg.contentEditor.insertTextAtCursor(transcript + " ");
             }
         });
 
