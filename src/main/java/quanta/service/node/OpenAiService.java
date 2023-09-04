@@ -227,7 +227,7 @@ public class OpenAiService extends ServiceBase {
         }
 
         if (StringUtils.isEmpty(system.getModel()) && node.hasProp(NodeProp.AI_MODEL.s())) {
-            system.setModel(node.getStr(NodeProp.AI.s()));
+            system.setModel(node.getStr(NodeProp.AI_MODEL.s()));
         }
 
         // are we now configured from props?

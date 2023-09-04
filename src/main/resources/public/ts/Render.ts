@@ -843,10 +843,6 @@ export class Render {
         const tags = node.tags.split(" ");
         const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
 
-        if (S.props.getPropStr(J.NodeProp.AI, node) || S.props.getPropStr(J.NodeProp.AI_MODEL, node)) {
-            spans.push(new Span("AI Config", { className: "nodeTags aiTags" }));
-        }
-
         return new Divc({
             title: "Click to copy to clipboard",
             onClick: () => {

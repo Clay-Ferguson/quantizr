@@ -331,19 +331,26 @@ export class TypeBase implements TypeIntf {
         }
         else {
             const isRoot = node.id === ast.node?.id;
+
+            let aiConfigDiv: Div = null;
+            if (S.props.getPropStr(J.NodeProp.AI, node) || S.props.getPropStr(J.NodeProp.AI_MODEL, node)) {
+                aiConfigDiv = new Div("AI Config", { className: "nodeTags aiTags microMarginBottom float-end" });
+            }
+
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
                 return new Diva([
                     comp,
                     choices,
+                    aiConfigDiv,
                     S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
                     new Clearfix()
                 ])
             }
             // otherwise just return the content component itself.
             else {
-                return new Diva([comp, choices]);
+                return new Diva([comp, aiConfigDiv, choices]);
             }
         }
     }
