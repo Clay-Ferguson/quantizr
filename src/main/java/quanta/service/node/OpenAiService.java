@@ -92,7 +92,7 @@ public class OpenAiService extends ServiceBase {
         }
 
         if (StringUtils.isEmpty(system.getModel())) {
-            system.setModel("gpt-3.5-turbo"); // or gpt-4, or others...
+            system.setModel("gpt-4");
         }
 
         String input = node != null ? node.getContent() : question;
