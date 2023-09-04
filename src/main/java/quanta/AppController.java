@@ -830,7 +830,7 @@ public class AppController extends ServiceBase implements ErrorController {
             if (req.isBulkDelete()) {
                 return delete.bulkDeleteNodes(ms);
             } else {
-                return delete.deleteNodes(ms, req);
+                return delete.deleteNodes(ms, req.getNodeIds());
             }
         });
     }

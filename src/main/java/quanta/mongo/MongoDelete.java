@@ -482,7 +482,7 @@ public class MongoDelete extends ServiceBase {
     /*
      * Deletes the set of nodes specified in the request
      */
-    public DeleteNodesResponse deleteNodes(MongoSession ms, DeleteNodesRequest req) {
+    public DeleteNodesResponse deleteNodes(MongoSession ms, List<String> nodeIds) {
         DeleteNodesResponse res = new DeleteNodesResponse();
         SubNode userNode = read.getUserNodeByUserName(null, null, false);
         if (userNode == null) {
@@ -493,7 +493,7 @@ public class MongoDelete extends ServiceBase {
         HashSet<ObjectId> parentIds = new HashSet<>();
         int batchSize = 0;
 
-        for (String nodeId : req.getNodeIds()) {
+        for (String nodeId : nodeIds) {
             // lookup the node we're going to delete, we call with allowAuth, becasuse it would be redundant
             // since the next thing we do is an 'ownerAuth', which is even more restrictive
             SubNode node = read.getNode(ms, nodeId, false, null);

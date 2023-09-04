@@ -852,7 +852,7 @@ export class Edit {
         S.util.showMessage("Request sumitted. Check the node for property " + J.NodeProp.SUBGRAPH_HASH);
     }
 
-    joinNodes = async () => {
+    joinNodes = async (joinToParent: boolean = false) => {
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray();
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to join.", "Warning");
@@ -864,7 +864,8 @@ export class Edit {
         await dlg.open();
         if (dlg.yes) {
             const res = await S.rpcUtil.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
-                nodeIds: selNodesArray
+                nodeIds: selNodesArray,
+                joinToParent
             });
             this.joinNodesResponse(res);
         }

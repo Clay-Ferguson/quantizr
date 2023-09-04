@@ -1,6 +1,7 @@
 package quanta.service.node;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -119,12 +120,16 @@ public class NodeMoveService extends ServiceBase {
     /*
      * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
      * one we keep and join to.
+     * 
+     * If join to parent is true, that means we merge all the NodeIds onto their parent.
      */
     public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
         JoinNodesResponse res = new JoinNodesResponse();
+        LinkedList<String> delIds = new LinkedList<>();
         // add to list because we will sort
         ArrayList<SubNode> nodes = new ArrayList<SubNode>();
         String parentPath = null;
+
         // scan all nodes to verify we own them all, and they're all under same parent, and load all into
         // 'nodes'
         for (String nodeId : req.getNodeIds()) {
@@ -132,7 +137,7 @@ public class NodeMoveService extends ServiceBase {
             if (parentPath == null) {
                 parentPath = node.getParentPath();
             } //
-            else if (!parentPath.equals(node.getParentPath())) {
+            else if (!req.isJoinToParent() && !parentPath.equals(node.getParentPath())) {
                 res.error("Failed: All nodes must be under the same parent node.");
                 return res;
             }
@@ -145,12 +150,19 @@ public class NodeMoveService extends ServiceBase {
         }
         nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
         StringBuilder sb = new StringBuilder();
-        SubNode firstNode = null;
+        SubNode targetNode = null;
         int counter = 0;
 
         for (SubNode n : nodes) {
-            if (firstNode == null) {
-                firstNode = n;
+            if (targetNode == null) {
+                if (req.isJoinToParent()) {
+                    targetNode = read.getParent(ms, n, true);
+                    if (targetNode == null) {
+                        throw new RuntimeException("Failed to find parent of node: " + n.getIdStr());
+                    }
+                } else {
+                    targetNode = n;
+                }
             }
             if (counter > 0) {
                 sb.append("\n");
@@ -161,15 +173,21 @@ public class NodeMoveService extends ServiceBase {
                 sb.append("\n");
             }
             // counter > 0 means we have a firstNode but are NOT now processing first node.
-            if (counter > 0) {
-                attach.mergeAttachments(n, firstNode);
-                delete.deleteNode(ms, n, false, false);
+            if (counter > 0 || req.isJoinToParent()) {
+                attach.mergeAttachments(n, targetNode);
+                delIds.add(n.getIdStr());
             }
             counter++;
         }
-        firstNode.setContent(sb.toString());
-        firstNode.touch();
+
+        if (req.isJoinToParent()) {
+            targetNode.setContent(targetNode.getContent() + "\n\n" + sb.toString());
+        } else {
+            targetNode.setContent(sb.toString());
+        }
+        targetNode.touch();
         update.saveSession(ms);
+        delete.deleteNodes(ms, delIds);
         return res;
     }
 

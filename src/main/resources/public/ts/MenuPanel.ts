@@ -134,7 +134,8 @@ export class MenuPanel extends Div {
     static subgraphHash = () => { S.edit.subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
-    static joinNodes = () => { S.edit.joinNodes(); }
+    static joinNodes = () => { S.edit.joinNodes(false); }
+    static joinNodesToParent = () => { S.edit.joinNodes(true); }
     static showPublicWritableShares = () => { S.srch.findShares(J.PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(J.PrincipalName.PUBLIC, J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null); }
@@ -295,6 +296,7 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Split Node", MenuPanel.splitNode, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Join Nodes", MenuPanel.joinNodes, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Append to Parent", MenuPanel.joinNodesToParent, onMainTab && selNodeIsMine, null, true), //
 
                 new MenuItemSeparator(), //
 
