@@ -4,6 +4,7 @@ import { Comp } from "./comp/base/Comp";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { AskAnotherQuestionDlg } from "./dlg/AskAnotherQuestionDlg";
+import { ConfigureGptPromptDlg } from "./dlg/ConfigureGptPromptDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
@@ -1073,6 +1074,11 @@ export class Edit {
         const dlg = new AskAnotherQuestionDlg(nodeId, true);
         await dlg.open();
     }
+
+    configureGpt = async (node: J.NodeInfo) => {
+        const dlg = new ConfigureGptPromptDlg(node);
+        await dlg.open();
+    };
 
     askOpenAiAnotherQuestion = async (nodeId: string) => {
         const dlg = new AskAnotherQuestionDlg(nodeId, false);

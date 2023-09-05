@@ -271,14 +271,18 @@ export class Props {
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.ACT_PUB_OBJ_URLS, //
             J.NodeProp.ACT_PUB_OBJ_ICONS, //
-            J.NodeProp.ACT_PUB_TAG
+            J.NodeProp.ACT_PUB_TAG,
+            J.NodeProp.AI, //
+            J.NodeProp.AI_MODEL
         ]);
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
             J.NodeProp.TYPE_LOCK, //
             J.NodeProp.BOOST, //
             J.NodeProp.NO_EXPORT, //
-            J.NodeProp.OPENAI_RESPONSE
+            J.NodeProp.OPENAI_RESPONSE, //
+            J.NodeProp.AI, //
+            J.NodeProp.AI_MODEL
         ]);
     }
 

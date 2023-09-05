@@ -334,7 +334,11 @@ export class TypeBase implements TypeIntf {
 
             let aiConfigDiv: Div = null;
             if (S.props.getPropStr(J.NodeProp.AI, node) || S.props.getPropStr(J.NodeProp.AI_MODEL, node)) {
-                aiConfigDiv = new Div("AI Config", { className: "nodeTags aiTags microMarginBottom float-end" });
+                aiConfigDiv = new Div("AI Config", {
+                    onClick: () => S.edit.configureGpt(node),
+                    className: "nodeTags aiTags microMarginBottom float-end",
+                    title: "Configure GPT Prompting"
+                });
             }
 
             // console.log("node [" + node.content + "] tags=" + node.tags)
