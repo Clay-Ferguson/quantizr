@@ -48,7 +48,6 @@ export class SpeechEngine {
     // --------------------------------------------------------------
     // Speech Recognition
     // --------------------------------------------------------------
-
     initRecognition = () => {
         // already initialized, then return
         if (this.recognition) return;
@@ -101,6 +100,7 @@ export class SpeechEngine {
         // if never initialized just return
         if (!this.recognition) return;
         this.initRecognition();
+        this.callback = null;
         this.recognition.stop();
         this.speechActive = false;
     }
