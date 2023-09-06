@@ -304,6 +304,29 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
+        if (ast.node) {
+            ddItems.push(new Li(null, null, [
+                new Span("Search", {
+                    className: "dropdown-item",
+                    onClick: () => S.nav.runSearchByNodeId(this.node.id)
+                })
+            ]));
+
+            ddItems.push(new Li(null, null, [
+                new Span("Timeline", {
+                    className: "dropdown-item",
+                    onClick: () => S.nav.runTimelineByNodeId(this.node.id)
+                })
+            ]));
+
+            ddItems.push(new Li(null, null, [
+                new Span("Doc View", {
+                    className: "dropdown-item",
+                    onClick: () => S.nav.openDocumentViewById(this.node.id)
+                })
+            ]));
+        }
+
         if (ddItems.length > 0) {
             children.push(new DropdownMenu(ddItems));
         }

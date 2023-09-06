@@ -275,6 +275,10 @@ export class Nav {
     runSearch = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         if (!id) return;
+        this.runSearchByNodeId(id);
+    }
+
+    runSearchByNodeId = (id: string) => {
         const node = S.nodeUtil.findNode(id);
         if (!node) return;
         setTimeout(() => {
@@ -318,6 +322,10 @@ export class Nav {
     runTimeline = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         if (!id) return;
+        this.runTimelineByNodeId(id);
+    }
+
+    runTimelineByNodeId = (id: string) => {
         const node = S.nodeUtil.findNode(id);
         if (!node) return;
 

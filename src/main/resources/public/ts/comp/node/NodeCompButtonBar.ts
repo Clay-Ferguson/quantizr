@@ -209,7 +209,7 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let upLevelButton: IconButton;
+        // let upLevelButton: IconButton;
         const isMine = S.props.isMine(this.node);
 
         // Note we only allow 'Up Level' on home node if we're the admin.
@@ -219,11 +219,13 @@ export class NodeCompButtonBar extends Div {
                 ast.isAdminUser
             )) {
             if (S.nav.parentVisibleToUser()) {
-                upLevelButton = new IconButton("fa-folder", "Up", {
-                    [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.navUpLevelClick,
-                    title: "Go to Parent Node"
-                }, "btn-primary");
+
+                // todo-1: leaving this here until I'm sure I like it on top of page instead
+                // upLevelButton = new IconButton("fa-folder", "Up", {
+                //     [C.NODE_ID_ATTR]: this.node.id,
+                //     onClick: S.nav.navUpLevelClick,
+                //     title: "Go to Parent Node"
+                // }, "btn-primary");
             }
         }
 
@@ -265,7 +267,7 @@ export class NodeCompButtonBar extends Div {
             floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
         }
 
-        let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, floatEndSpan
+        let btnArray: Comp[] = [openButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan
         ];
 
         btnArray = btnArray.concat(this.extraButtons);

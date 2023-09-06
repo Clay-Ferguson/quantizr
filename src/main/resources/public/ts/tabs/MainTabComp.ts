@@ -82,7 +82,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         onClick: S.nav.navToNext
                     }),
 
-                    new IconButton("fa-clock-o", "Rev-Chron", {
+                    new IconButton("fa-clock-o", "Timeline", {
                         title: "View Timeline (by Mod Time)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.runTimeline
@@ -92,7 +92,13 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         title: "Show Document View\n\n(All content on a single page)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
-                    }, "btn-primary"),
+                    }, "marginRight btn-primary"),
+
+                    new IconButton("fa-folder", "Up", {
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav.navUpLevelClick,
+                        title: "Go to Parent Node"
+                    }, "btn-primary")
                 ]),
                 header = new Div(S.quanta.config.brandingAppName, {
                     className: "tabTitle headerUploadPanel",
