@@ -29,4 +29,9 @@ public abstract class TypeBase extends ServiceBase {
     public void preCreateNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
 
     public void beforeSaveNode(MongoSession ms, SubNode node) {}
+
+    // export type will be something like "PDF, ZIP, HTML, etc."
+    public String formatExportText(String exportType, String content) {
+        return content;
+    }
 }

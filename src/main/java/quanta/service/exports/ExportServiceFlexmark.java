@@ -33,6 +33,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
 import quanta.response.ExportResponse;
+import quanta.types.TypeBase;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.ImageUtil;
@@ -251,6 +252,11 @@ public class ExportServiceFlexmark extends ServiceBase {
     private void processNode(SubNode node) {
         markdown.append("\n");
         String content = node.getContent();
+        TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
+        if (plugin != null) {
+            content = plugin.formatExportText(format, content);
+        }
+
         if (content != null && req.isUpdateHeadings()) {
             content = content.trim();
             int slashCount = StringUtils.countMatches(node.getPath(), "/");

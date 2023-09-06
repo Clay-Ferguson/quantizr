@@ -22,6 +22,7 @@ public class TypePluginMgr extends ServiceBase {
         friendType.postContruct();
         roomType.postContruct();
         rssType.postContruct();
+        aiAnswerType.postContruct();
     }
 
     public static void addType(TypeBase type) {
