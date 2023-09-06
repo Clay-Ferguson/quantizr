@@ -117,13 +117,11 @@ public class ExportServiceFlexmark extends ServiceBase {
             // uncomment to convert soft-breaks to hard breaks
             // options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
             MutableDataSet options = new MutableDataSet();
-            options.set(
-                    Parser.EXTENSIONS,
-                    Arrays.asList( //
-                            TablesExtension.create(), //
-                            TocExtension.create(), //
-                            AnchorLinkExtension.create(), //
-                            AutolinkExtension.create()));
+            options.set(Parser.EXTENSIONS, Arrays.asList( //
+                    TablesExtension.create(), //
+                    TocExtension.create(), //
+                    AnchorLinkExtension.create(), //
+                    AutolinkExtension.create()));
             options.set(TocExtension.LEVELS, TocOptions.getLevels(1, 2, 3, 4, 5, 6));
             // This numbering works in the TOC but I haven't figured out how to number the
             // actual headings in the body of the document itself.
@@ -323,14 +321,8 @@ public class ExportServiceFlexmark extends ServiceBase {
                     * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
                     * eventually put out on IPFS or simply provided to the user as a downloadable link.
                     */if (bin != null) {
-                String path =
-                        AppController.API_PATH +
-                                "/bin/" +
-                                bin +
-                                "?nodeId=" +
-                                node.getIdStr() +
-                                "&token=" +
-                                URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
+                String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
+                        + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
                 src = prop.getProtocolHostAndPort() + path;
             } //
             else if (url != null) {
