@@ -469,9 +469,8 @@ public class NodeSearchService extends ServiceBase {
 
             // PART 1: Process sharing info
             HashMap<String, AccessControl> aclEntry = node.getAc();
+            boolean isPublic = false;
             if (aclEntry != null) {
-                boolean isPublic = false;
-
                 for (String key : aclEntry.keySet()) {
                     AccessControl ac = aclEntry.get(key);
                     if (PrincipalName.PUBLIC.s().equals(key)) {
@@ -485,10 +484,12 @@ public class NodeSearchService extends ServiceBase {
                         uniqueUsersSharedTo.add(key);
                     }
                 }
-                if (!isPublic) {
-                    nonPublicCount++;
-                }
             }
+
+            if (!isPublic) {
+                nonPublicCount++;
+            }
+
             if (acl.isAdminOwned(node)) {
                 adminOwnedCount++;
             }
