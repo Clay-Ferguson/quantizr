@@ -20,10 +20,10 @@ export class ServerPush {
     }
 
     init = (authToken: string): any => {
-        // if already inititlized do nothing
+        // if already initialized do nothing
         if (this.eventSource || !authToken) return;
 
-        // console.log("ServerPush.init: " + authToken);
+        console.log("ServerPush.init: " + authToken);
         this.eventSource = new EventSource(S.rpcUtil.getRpcPath() + "serverPush/" + authToken);
 
         // DO NOT DELETE.
@@ -31,11 +31,17 @@ export class ServerPush {
         // };
 
         this.eventSource.onopen = (e: any) => {
-            // onsole.log("ServerPush.onopen" + e);
+            console.log("ServerPush.onopen" + e);
         };
 
         this.eventSource.onerror = (e: any) => {
-            // console.log("ServerPush.onerror:" + e);
+            console.log("ServerPush.onerror:" + e);
+            // if server push is failing try to recover in 5 seconds by creating new instance, we wait 5 secs
+            // just because my paranoia tells me to fear endless loops
+            this.eventSource = null;
+            setTimeout(() => {
+                this.init(S.quanta.authToken);
+            }, 5000)
         };
 
         this.eventSource.addEventListener("sessionTimeout", async (e: any) => {

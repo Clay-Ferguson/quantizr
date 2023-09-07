@@ -53,6 +53,9 @@ public class AppSessionListener implements HttpSessionListener {
         if (debug) {
             log.debug("Session Destroyed: " + session.getId() + " count=" + sessionCounter);
         }
+
+        // This was experimental. Not using it.
+        // UserManagerService.sessionDestroyed(session);
     }
 
     public static int getSessionCounter() {

@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
@@ -102,12 +101,46 @@ public class UserManagerService extends ServiceBase {
     public SseEmitter getPushEmitter(String token) {
         SseEmitter emitter = pushEmitters.get(token);
         if (emitter == null) {
-            emitter = new SseEmitter();
+            // big number here so we never timeout
+            emitter = new SseEmitter(Long.MAX_VALUE);
+
+            // emitter.onCompletion(() -> log.debug("SseEmitter is completed"));
+            emitter.onTimeout(() -> log.debug("SseEmitter is timed out"));
+            emitter.onError((ex) -> log.debug("SseEmitter got error:", ex));
+
             pushEmitters.put(token, emitter);
             log.debug("SseEmitter token " + token + " on replica " + prop.getSwarmTaskSlot());
         }
         return emitter;
     }
+
+    // DO NOT DELETE
+    // I was planning to call this from the SessionListener destroyed callback but...
+    // For now I'm thinking an infinite timeout on the push emitter makes this
+    // unnecessary, but when I did try this code it also causes the PushEmitter to start
+    // getting executed in some kind of infinite loop whever, the
+    // emitter.complete() is called below.
+    //
+    // public static void sessionDestroyed(HttpSession session) {
+    // // todo-0: where is the place where the redis record gets deleted?
+    // String token = (String) session.getAttribute(Const.BEARER_TOKEN);
+    // if (token != null) {
+    // removePushEmitter(token);
+    // }
+    // }
+
+    // public static void removePushEmitter(String token) {
+    // SseEmitter emitter = UserManagerService.pushEmitters.get(token);
+
+    // // if we happened to be the right replica to push to browser, then push
+    // if (emitter != null) {
+    // log.debug("removePushEmitter doing nothing.");
+    // // log.debug("Closing Emitter for UserToken " + token);
+    // emitter.complete();
+    // log.debug("called emitter.complete");
+    // // UserManagerService.pushEmitters.remove(token);
+    // }
+    // }
 
     // todo-a: I think this function AND "reqBearerToken" (not bearerToken) can be factored out for a
     // more consistent design letting all the logic be only in AppFilter

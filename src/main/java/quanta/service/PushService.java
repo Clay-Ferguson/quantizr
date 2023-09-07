@@ -121,7 +121,7 @@ public class PushService extends ServiceBase {
         if (sc == null)
             return;
 
-        // look for an SseEmitter on this replia, which may or may not exist. We might not be the replica
+        // look for an SseEmitter on this replica, which may or may not exist. We might not be the replica
         // that the browser is connected to for it's SseEmittre
         SseEmitter emitter = UserManagerService.pushEmitters.get(sc.getUserToken());
 

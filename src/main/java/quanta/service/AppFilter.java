@@ -45,7 +45,6 @@ public class AppFilter extends GenericFilterBean {
 
     // turns on some logging (not too verbose)
     public static boolean debug = false;
-    public static String BEARER_TOKEN = "token";
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -116,11 +115,11 @@ public class AppFilter extends GenericFilterBean {
 
             // allow token to be specified in URL as well
             if (StringUtils.isEmpty(token)) {
-                token = httpReq.getParameter(BEARER_TOKEN);
+                token = httpReq.getParameter(Const.BEARER_TOKEN);
             }
 
             if (StringUtils.isEmpty(token) && session != null) {
-                token = (String) session.getAttribute(BEARER_TOKEN);
+                token = (String) session.getAttribute(Const.BEARER_TOKEN);
             }
 
             ThreadLocals.setReqSig(httpReq.getHeader("Sig"));
@@ -133,7 +132,7 @@ public class AppFilter extends GenericFilterBean {
                     // Don't throw exception here, because we need to just recover this session but with a fresh
                     // SessionContext, and so leaving sc==null will do this.
                     // throw new UnauthorizedException();
-                    session.removeAttribute(BEARER_TOKEN);
+                    session.removeAttribute(Const.BEARER_TOKEN);
                 } else {
                     // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
                     ThreadLocals.setReqBearerToken(token);
@@ -154,7 +153,7 @@ public class AppFilter extends GenericFilterBean {
 
             // detect if we did a login just now and set token on session.
             if (token == null && sc.getUserToken() != null) {
-                session.setAttribute(BEARER_TOKEN, sc.getUserToken());
+                session.setAttribute(Const.BEARER_TOKEN, sc.getUserToken());
 
                 if (isNewSession) {
                     log.debug("New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token="

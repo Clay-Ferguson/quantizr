@@ -13,5 +13,7 @@ public class Const {
     // "Mozilla/5.0";
 
     public static final boolean adminDebugStreaming = true;
-    public static final boolean debugFilterEntry = false;
+    public static final boolean debugFilterEntry = true;
+
+    public static String BEARER_TOKEN = "token";
 }
