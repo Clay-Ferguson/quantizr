@@ -320,7 +320,7 @@ export class NodeCompRowHeader extends Div {
             ]));
 
             ddItems.push(new Li(null, null, [
-                new Span("Doc View", {
+                new Span("Document", {
                     className: "dropdown-item",
                     onClick: () => S.nav.openDocumentViewById(this.node.id)
                 })

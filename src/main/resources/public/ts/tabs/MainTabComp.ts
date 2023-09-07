@@ -88,7 +88,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         onClick: S.nav.runTimeline
                     }, "marginRight btn-primary"),
 
-                    new IconButton("fa-book", "Doc View", {
+                    new IconButton("fa-book", "Document", {
                         title: "Show Document View\n\n(All content on a single page)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
