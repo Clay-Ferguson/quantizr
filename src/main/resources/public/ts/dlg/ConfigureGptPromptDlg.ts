@@ -35,6 +35,7 @@ export class ConfigureGptPromptDlg extends DialogBase {
                 new Span("Example Models: gpt-4, gpt-3.5-turbo, etc."),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
+                    new Button("Reset", this.reset, null, "btn-secondary"),
                     new Button("Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -54,6 +55,11 @@ export class ConfigureGptPromptDlg extends DialogBase {
             node: this.node,
         });
         this.close();
+    }
+
+    reset = async () => {
+        this.promptState.setValue("");
+        this.modelState.setValue("");
     }
 
     override async preLoad(): Promise<void> {
