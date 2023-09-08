@@ -10,6 +10,9 @@ public class ChatCompletionResponse {
     private List<Choice> choices;
     private Usage usage;
 
+    // transient, part of pojo
+    public Double userCredit;
+
     public ChatCompletionResponse() {}
 
     public String getId() {

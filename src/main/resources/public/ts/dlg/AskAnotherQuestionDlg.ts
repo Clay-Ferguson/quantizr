@@ -10,6 +10,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
 import { TextArea } from "../comp/core/TextArea";
 import { GptAnswerDlg } from "./GptAnswerDlg";
+import { dispatch } from "../AppContext";
 
 export class AskAnotherQuestionDlg extends DialogBase {
     questionState: Validator = new Validator("", [
@@ -75,6 +76,10 @@ export class AskAnotherQuestionDlg extends DialogBase {
             this.close();
 
             if (res.code == C.RESPONSE_CODE_OK) {
+                dispatch("setShowGptCredit", s => {
+                    s.showGptCredit = true;
+                    s.gptCredit = res.gptCredit || 0.0;
+                });
                 S.view.jumpToId(res.newNode.id);
             }
         }

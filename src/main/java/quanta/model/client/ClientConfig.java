@@ -15,6 +15,7 @@ public class ClientConfig {
     private String urlView;
     private String search;
     private String login;
+    private Double gptCredit;
 
     public String getLogin() {
         return login;
@@ -102,6 +103,14 @@ public class ClientConfig {
 
     public void setInitialNodeId(final String initialNodeId) {
         this.initialNodeId = initialNodeId;
+    }
+
+    public Double getGptCredit() {
+        return gptCredit;
+    }
+
+    public void setGptCredit(Double gptCredit) {
+        this.gptCredit = gptCredit;
     }
 
     public ClientConfig() {}

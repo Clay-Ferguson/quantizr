@@ -872,6 +872,9 @@ public class SubNode {
                 Object v = props().get(key);
                 if (v == null)
                     return 0.0;
+                if (v instanceof Float) {
+                    return ((Float) v).doubleValue();
+                }
                 return (Double) v;
             }
         } catch (Exception e) {

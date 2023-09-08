@@ -159,6 +159,7 @@ public class NodeEditService extends ServiceBase {
             // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
                 aiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
+                res.setGptCredit(aiAnswer.userCredit);
                 typeToCreate = NodeType.OPENAI_ANSWER.s();
             }
         }
@@ -288,6 +289,7 @@ public class NodeEditService extends ServiceBase {
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
         ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
+        res.setGptCredit(aiAnswer.userCredit);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
                 null, null, true, true);

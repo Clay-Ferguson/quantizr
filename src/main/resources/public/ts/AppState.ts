@@ -201,4 +201,6 @@ export class AppState {
     expandedMenus: Set<string> = new Set<string>();
 
     menuIndexToggle: string = "menu";
+    showGptCredit: boolean = false;
+    gptCredit: number = 0;
 }

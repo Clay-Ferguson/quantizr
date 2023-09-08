@@ -47,6 +47,7 @@ import quanta.model.client.Attachment;
 import quanta.model.client.ClientConfig;
 import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
+import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.UserProfile;
 import quanta.mongo.model.SubNode;
@@ -1401,6 +1402,18 @@ public class AppController extends ServiceBase implements ErrorController {
         res.setConfig(prop.getConfig());
         res.setBrandingAppName(prop.getConfigText("brandingAppName"));
         res.setRequireCrypto(prop.isRequireCrypto());
+
+        arun.run(as -> {
+            SubNode userNode = read.getUserNodeByUserName(as, sc.getUserName(), false);
+            if (userNode != null) {
+                Double val = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
+                if (val != null) {
+                    res.setGptCredit(val);
+                }
+            }
+            return null;
+        });
+
         res.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
         SubNode root = read.getDbRoot();
     }

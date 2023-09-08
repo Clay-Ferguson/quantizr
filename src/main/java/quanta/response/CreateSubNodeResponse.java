@@ -13,23 +13,31 @@ public class CreateSubNodeResponse extends ResponseBase {
 	 * Mainly used in a 'reply' to an encrypted node.
 	 */
 	private boolean encrypt;
-	
+	private Double gptCredit; // user credit remaining
+
 	public NodeInfo getNewNode() {
 		return this.newNode;
 	}
-	
+
 	public boolean isEncrypt() {
 		return this.encrypt;
 	}
-	
+
 	public void setNewNode(final NodeInfo newNode) {
 		this.newNode = newNode;
 	}
-	
+
 	public void setEncrypt(final boolean encrypt) {
 		this.encrypt = encrypt;
 	}
 
-	public CreateSubNodeResponse() {
+	public Double getGptCredit() {
+		return gptCredit;
 	}
+
+	public void setGptCredit(Double gptCredit) {
+		this.gptCredit = gptCredit;
+	}
+
+	public CreateSubNodeResponse() {}
 }

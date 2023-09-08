@@ -146,6 +146,8 @@ export class RightNavPanel extends Div {
         ]) : null;
 
         let scrollDiv = null;
+        let gptCreditDiv = ast.showGptCredit ? S.render.buildGptCretitDiv() : null;
+
         this.setChildren([
             scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
                 new Divc({ className: "float-left" }, [
@@ -169,6 +171,7 @@ export class RightNavPanel extends Div {
                             addNoteButton
                         ]),
                     ], "fullWidth"),
+                    gptCreditDiv,
                     // new Divc({ className: "marginBottom" }, [
                     //     new ButtonBar([
                     //         clipboardPasteButton,

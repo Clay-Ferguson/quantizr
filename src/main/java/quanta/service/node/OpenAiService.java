@@ -34,6 +34,7 @@ import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 @Component
 public class OpenAiService extends ServiceBase {
@@ -71,9 +72,14 @@ public class OpenAiService extends ServiceBase {
             userNode.set(NodeProp.OPENAI_USER_CREDIT, 0.05);
         }
 
-        Double userCredit = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
-        if (userCredit < 0) {
-            throw new RuntimeException("Sorry, you have no more credits.");
+        Double val = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
+        if (val == null) {
+            throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+        }
+
+        Val<Double> userCredit = new Val<>(val);
+        if (userCredit.getVal() < 0) {
+            throw new RuntimeException("Sorry, you have no more OpenAI credit.");
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -133,12 +139,14 @@ public class OpenAiService extends ServiceBase {
             userNode.set(NodeProp.OPENAI_OUT_TOKEN_COUNT, outputCount + res.getUsage().getCompletionTokens());
 
             Double cost = calculateCost(inputCount, outputCount);
-            userNode.set(NodeProp.OPENAI_USER_CREDIT, userCredit - cost);
+            userCredit.setVal(userCredit.getVal() - cost);
+            userNode.set(NodeProp.OPENAI_USER_CREDIT, userCredit.getVal());
 
             update.save(as, userNode);
             return null;
         });
 
+        res.userCredit = userCredit.getVal();
         return res;
     }
 
@@ -307,7 +315,7 @@ public class OpenAiService extends ServiceBase {
     }
 
     public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
-        AskSubGraphResponse resp = new AskSubGraphResponse();
+        AskSubGraphResponse res = new AskSubGraphResponse();
 
         // todo-0: in future use cases we'd want to allow includeComments
         List<SubNode> nodes = read.getFlatSubGraph(ms, req.getNodeId(), false);
@@ -331,11 +339,11 @@ public class OpenAiService extends ServiceBase {
                 }
             }
         }
-
         sb.append(req.getQuestion());
 
         ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString());
-        resp.setAnswer(formatAnswer(answer));
-        return resp;
+        res.setGptCredit(answer.userCredit);
+        res.setAnswer(formatAnswer(answer));
+        return res;
     }
 }

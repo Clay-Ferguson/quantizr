@@ -53,6 +53,7 @@ export interface ClientConfig {
     urlView: string;
     search: string;
     login: string;
+    gptCredit: number;
 }
 
 export interface IPSMData {
@@ -173,6 +174,7 @@ export interface ChatCompletionResponse {
     model: string;
     choices: Choice[];
     usage: Usage;
+    userCredit: number;
 }
 
 export interface ChatGPTModerationRequest {
@@ -713,6 +715,7 @@ export interface AppDropResponse extends ResponseBase {
 
 export interface AskSubGraphResponse extends ResponseBase {
     answer: string;
+    gptCredit: number;
 }
 
 export interface BlockUserResponse extends ResponseBase {
@@ -739,6 +742,7 @@ export interface CopySharingResponse extends ResponseBase {
 export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
     encrypt: boolean;
+    gptCredit: number;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {

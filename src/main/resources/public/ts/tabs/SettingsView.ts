@@ -44,6 +44,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
+                        this.settingsLink("ChatGPT Credit: $" + (S.quanta.config.gptCredit ? S.quanta.config.gptCredit.toFixed(6) : "0"), () => { }),
                     ]),
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("Clear Browser Storage", async () => {

@@ -1047,6 +1047,7 @@ export class Edit {
     }
 
     askOpenAiQuestion = async (nodeId: string) => {
+
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId,
@@ -1066,6 +1067,10 @@ export class Edit {
         });
 
         if (res.code == C.RESPONSE_CODE_OK) {
+            dispatch("setShowGptCredit", s => {
+                s.showGptCredit = true;
+                s.gptCredit = res.gptCredit || 0.0;
+            });
             S.view.jumpToId(nodeId);
         }
     }
