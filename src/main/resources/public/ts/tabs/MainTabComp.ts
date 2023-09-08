@@ -70,6 +70,20 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                     }),
 
                     new Icon({
+                        className: "fa fa-clock-o fa-lg buttonBarIcon",
+                        title: "View Timeline (by Mod Time)",
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav.runTimeline
+                    }),
+
+                    new Icon({
+                        className: "fa fa-book fa-lg buttonBarIcon",
+                        title: "Show Document View\n\n(All content on a single page)",
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav.openDocumentView
+                    }),
+
+                    new Icon({
                         className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
                         title: "Previous Sibling Node",
                         onClick: S.nav.navToPrev
@@ -81,18 +95,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.navToNext
                     }),
-
-                    new IconButton("fa-clock-o", "Timeline", {
-                        title: "View Timeline (by Mod Time)",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.runTimeline
-                    }, "marginRight btn-primary"),
-
-                    new IconButton("fa-book", "Document", {
-                        title: "Show Document View\n\n(All content on a single page)",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.openDocumentView
-                    }, "marginRight btn-primary"),
 
                     new IconButton("fa-folder", "Up", {
                         [C.NODE_ID_ATTR]: ast.node.id,
