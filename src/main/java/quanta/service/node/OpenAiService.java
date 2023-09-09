@@ -127,6 +127,13 @@ public class OpenAiService extends ServiceBase {
         ChatCompletionResponse res = response.getBody();
         // log.debug("GPT Res: " + XString.prettyPrint(res));
 
+        updateUserCredit(userNode, userCredit, res);
+
+        res.userCredit = userCredit.getVal();
+        return res;
+    }
+
+    private void updateUserCredit(SubNode userNode, Val<Double> userCredit, ChatCompletionResponse res) {
         arun.run(as -> {
             // update user consumption
             Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
@@ -145,9 +152,6 @@ public class OpenAiService extends ServiceBase {
             update.save(as, userNode);
             return null;
         });
-
-        res.userCredit = userCredit.getVal();
-        return res;
     }
 
     private boolean moderationFailed(ChatGPTModerationResponse modResponse) {
@@ -256,7 +260,7 @@ public class OpenAiService extends ServiceBase {
         }
     }
 
-    public String formatAnswer(ChatCompletionResponse ccr) {
+    public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
         StringBuilder sb = new StringBuilder();
         int counter = 0;
         for (Choice choice : ccr.getChoices()) {
@@ -264,6 +268,12 @@ public class OpenAiService extends ServiceBase {
                 sb.append("\n\n");
             }
             sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getContent());
+
+            // Since we store the answer text in the content of the node and also store the answer object
+            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
+            if (nullify) {
+                choice.getMessage().setContent(null);
+            }
             counter++;
         }
         return sb.toString();
@@ -299,8 +309,6 @@ public class OpenAiService extends ServiceBase {
                     usrNode.hasProp(NodeProp.OPENAI_USER_CREDIT.s()) ? usrNode.getFloat(NodeProp.OPENAI_USER_CREDIT)
                             : 0.0;
 
-            // todo-0: need to dump token usage here, and total up to dollar amount too.
-            // $0.003/1KToken input, $0.004/KToken output
             sb.append("    " + usrNode.getStr(NodeProp.USER) + //
                     " -> Queries: " + String.valueOf(count) + " Tokens In/Out: (" //
                     + String.valueOf(inTokenCount) + "/" //
@@ -343,7 +351,7 @@ public class OpenAiService extends ServiceBase {
 
         ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString());
         res.setGptCredit(answer.userCredit);
-        res.setAnswer(formatAnswer(answer));
+        res.setAnswer(formatAnswer(answer, false));
         return res;
     }
 }

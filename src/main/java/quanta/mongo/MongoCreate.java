@@ -92,7 +92,7 @@ public class MongoCreate extends ServiceBase {
         if (updateParent && parent != null) {
             parent.setHasChildren(true);
 
-            // todo-0: I noticed it seems like parent it not getting set sometimes, namely when OpenAi is
+            // todo-1: I noticed it seems like parent is not getting set sometimes, namely when OpenAi is
             // creating a node response, so I need to investigate what's going on. For now this is a workaround
             update.saveSession(ms);
         }

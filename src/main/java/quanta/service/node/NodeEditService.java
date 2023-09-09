@@ -171,9 +171,6 @@ public class NodeEditService extends ServiceBase {
             throw new ForbiddenException();
         }
         CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-
-        // todo-0: there was a bug where (updateParent was passed as 'false' in here and that was a bug.
-        // check for other similar places we might have that bug)
         SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
                 null, true, true);
         if (req.isPendingEdit()) {
@@ -181,9 +178,7 @@ public class NodeEditService extends ServiceBase {
         }
 
         if (aiAnswer != null) {
-            // todo-0: will eventually be removing this 'content' value, and leaving content null, so that
-            // client can take care of rendering whatever it wants
-            newNode.setContent(oai.formatAnswer(aiAnswer));
+            newNode.setContent(oai.formatAnswer(aiAnswer, true));
             newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
             forceInheritSharing = true;
         } else {
@@ -294,7 +289,7 @@ public class NodeEditService extends ServiceBase {
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
                 null, null, true, true);
 
-        newNode.setContent(oai.formatAnswer(aiAnswer));
+        newNode.setContent(oai.formatAnswer(aiAnswer, true));
         newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
 
         newNode.touch();

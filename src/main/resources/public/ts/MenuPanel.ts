@@ -187,13 +187,6 @@ export class MenuPanel extends Div {
         }
     };
 
-    static openAiAskAnother = () => {
-        const node = S.nodeUtil.getHighlightedNode();
-        if (node) {
-            S.edit.askOpenAiAnotherQuestion(node.id);
-        }
-    };
-
     static showUrls = () => S.render.showNodeUrl(null);
     static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
     static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
@@ -439,8 +432,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser && S.quanta.config.useOpenAi) {
             children.push(new Menu("GPT-AI", [
-                new MenuItem("Ask Content as Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Ask Another Question", MenuPanel.openAiAskAnother, hltType == J.NodeType.OPENAI_ANSWER && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask about SubNodes", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
                 new MenuItem("Configure GPT", MenuPanel.configureGpt, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),

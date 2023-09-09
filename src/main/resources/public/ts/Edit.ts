@@ -3,7 +3,7 @@ import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
-import { AskAnotherQuestionDlg } from "./dlg/AskAnotherQuestionDlg";
+import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
 import { ConfigureGptPromptDlg } from "./dlg/ConfigureGptPromptDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
@@ -1076,7 +1076,7 @@ export class Edit {
     }
 
     askQuestionAboutSubGraph = async (nodeId: string) => {
-        const dlg = new AskAnotherQuestionDlg(nodeId, true);
+        const dlg = new AskAboutSubgraphDlg(nodeId);
         await dlg.open();
     }
 
@@ -1084,11 +1084,6 @@ export class Edit {
         const dlg = new ConfigureGptPromptDlg(node);
         await dlg.open();
     };
-
-    askOpenAiAnotherQuestion = async (nodeId: string) => {
-        const dlg = new AskAnotherQuestionDlg(nodeId, false);
-        await dlg.open();
-    }
 
     saveClipboardToChildNode = async (parentId: string) => {
         let clipText: string = await (navigator as any)?.clipboard?.readText();

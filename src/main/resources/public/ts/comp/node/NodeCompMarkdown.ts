@@ -167,7 +167,7 @@ export class NodeCompMarkdown extends Comp {
                 createElement(SyntaxHighlighterComp as any, {
                     key: "code-mk-" + this.getId(),
                     ...props,
-                    style: dark, // without the "as any" this is a syntax error. Check if this is even working. todo-0
+                    style: dark,
                     language,
                     PreTag: "div"
                 }, String(children).replace(/\n$/, ""))

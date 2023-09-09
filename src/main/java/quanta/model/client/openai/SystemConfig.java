@@ -4,7 +4,7 @@ public class SystemConfig {
     private String prompt; // ex: "you are a helpful assistant"
     private String model; // ex: "gpt-4"
 
-    // todo-0: add a way for users to alter this. Currently doesn't exist.
+    // todo-1: add a way for users to alter this. Currently doesn't exist.
     private Double temperature = 0.7;
 
     public String getPrompt() {

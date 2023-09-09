@@ -122,7 +122,6 @@ public class UserManagerService extends ServiceBase {
     // emitter.complete() is called below.
     //
     // public static void sessionDestroyed(HttpSession session) {
-    // // todo-0: where is the place where the redis record gets deleted?
     // String token = (String) session.getAttribute(Const.BEARER_TOKEN);
     // if (token != null) {
     // removePushEmitter(token);
