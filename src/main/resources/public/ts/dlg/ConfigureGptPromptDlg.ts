@@ -17,7 +17,7 @@ export class ConfigureGptPromptDlg extends DialogBase {
     textScrollPos = new ScrollPos();
 
     constructor(public node: J.NodeInfo) {
-        super("Configure GPT Prompting", "appModalContMediumWidth");
+        super("Configure GPT", "appModalContMediumWidth");
     }
 
     renderDlg(): CompIntf[] {

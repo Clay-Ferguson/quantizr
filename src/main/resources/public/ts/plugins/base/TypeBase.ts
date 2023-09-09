@@ -337,7 +337,7 @@ export class TypeBase implements TypeIntf {
                 aiConfigDiv = new Div("AI Config", {
                     onClick: () => S.edit.configureGpt(node),
                     className: "nodeTags aiTags microMarginBottom float-end",
-                    title: "Configure GPT Prompting"
+                    title: "Configure GPT"
                 });
             }
 
