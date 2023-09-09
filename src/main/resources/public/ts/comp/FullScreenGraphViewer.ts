@@ -185,10 +185,6 @@ export class FullScreenGraphViewer extends Main {
                     d3.select(this)
                         .style("fill", "green");
 
-                    thiz.tooltip.text("Opening...")
-                        .style("left", (event.pageX + 15) + "px")
-                        .style("top", (event.pageY - 50) + "px");
-
                     if (d.data.id) {
                         window.open(S.util.getHostAndPort() + "?id=" + d.data.id, "_blank");
                     }
