@@ -12,8 +12,8 @@ public class Const {
             "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Type: Desktop";
     // "Mozilla/5.0";
 
-    public static final boolean adminDebugStreaming = true;
-    public static final boolean debugFilterEntry = true;
+    public static final boolean adminDebugStreaming = false;
+    public static final boolean debugFilterEntry = false;
 
     public static String BEARER_TOKEN = "token";
 }

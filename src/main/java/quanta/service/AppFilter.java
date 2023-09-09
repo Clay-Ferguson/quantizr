@@ -22,6 +22,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -58,9 +59,8 @@ public class AppFilter extends GenericFilterBean {
         HttpServletResponse httpRes = (HttpServletResponse) res;
 
         HttpSession session = null;
-        boolean isNewSession = false;
+        boolean newSession = false;
         ReentrantLock mutex = null;
-        boolean useLock = true;
 
         try {
             ThreadLocals.removeAll();
@@ -69,75 +69,24 @@ public class AppFilter extends GenericFilterBean {
 
             // test if we have a session before creating it.
             session = httpReq.getSession(false);
-            isNewSession = (session == null);
+            newSession = (session == null);
 
             // always create session immediately so we get concurrency mutexing
-            session = httpReq.getSession(true);
+            if (session == null) {
+                session = httpReq.getSession(true);
+            }
             ThreadLocals.setHttpSession(session);
 
-            // bypass locking for these
-            switch (httpReq.getRequestURI()) {
-                case AppController.API_PATH + "/serverPush":
-                case AppController.API_PATH + "/signNodes":
-                case AppController.API_PATH + "/getOpenGraph":
-                case AppController.API_PATH + "/health":
-                    useLock = false;
-                    break;
-                default:
-                    break;
-            }
-
-            if (useLock) {
-                mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
-                if (mutex != null) {
-                    boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
-                    if (!isLockAcquired)
-                        throw new RuntimeException("Server too busy.");
-                }
-            }
-
-            if (Const.debugFilterEntry || debug) {
-                String url = "URI=" + httpReq.getRequestURI();
-                if (httpReq.getQueryString() != null) {
-                    url += " q=" + httpReq.getQueryString();
-                }
-                Map params = httpReq.getParameterMap();
-                if (params != null && params.size() > 0) {
-                    url += "\n    Params: " + XString.prettyPrint(httpReq.getParameterMap());
-                }
-                log.debug(url);
-            }
+            mutex = getMutex(httpReq, session, mutex);
+            logUrlAndParams(httpReq);
 
             if (audit) {
                 preProcess(httpReq);
             }
-            token = httpReq.getHeader("Bearer");
 
-            // allow token to be specified in URL as well
-            if (StringUtils.isEmpty(token)) {
-                token = httpReq.getParameter(Const.BEARER_TOKEN);
-            }
-
-            if (StringUtils.isEmpty(token) && session != null) {
-                token = (String) session.getAttribute(Const.BEARER_TOKEN);
-            }
-
+            token = getToken(httpReq, session);
             ThreadLocals.setReqSig(httpReq.getHeader("Sig"));
-
-            if (!StringUtils.isEmpty(token)) {
-                sc = ServiceBase.redis.get(token);
-
-                // if bad or unknown token.
-                if (sc == null) {
-                    // Don't throw exception here, because we need to just recover this session but with a fresh
-                    // SessionContext, and so leaving sc==null will do this.
-                    // throw new UnauthorizedException();
-                    session.removeAttribute(Const.BEARER_TOKEN);
-                } else {
-                    // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
-                    ThreadLocals.setReqBearerToken(token);
-                }
-            }
+            sc = getScFromRedis(token, sc, session);
 
             boolean newSc = false;
             if (sc == null) {
@@ -155,7 +104,7 @@ public class AppFilter extends GenericFilterBean {
             if (token == null && sc.getUserToken() != null) {
                 session.setAttribute(Const.BEARER_TOKEN, sc.getUserToken());
 
-                if (isNewSession) {
+                if (newSession) {
                     log.debug("New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token="
                             + sc.getUserToken());
                 }
@@ -191,6 +140,81 @@ public class AppFilter extends GenericFilterBean {
                 }
             }
         }
+    }
+
+    private SessionContext getScFromRedis(String token, SessionContext sc, HttpSession session) {
+        if (!StringUtils.isEmpty(token)) {
+            sc = ServiceBase.redis.get(token);
+
+            // if bad or unknown token.
+            if (sc == null) {
+                // Don't throw exception here, because we need to just recover this session but with a fresh
+                // SessionContext, and so leaving sc==null will do this.
+                // session.removeAttribute(Const.BEARER_TOKEN);
+                throw new UnauthorizedException();
+            } else {
+                // log.debug("REDIS: usr=" + sc.getUserName() + " token=" + sc.getUserToken());
+                ThreadLocals.setReqBearerToken(token);
+            }
+        }
+        return sc;
+    }
+
+    private ReentrantLock getMutex(HttpServletRequest httpReq, HttpSession session, ReentrantLock mutex)
+            throws InterruptedException {
+        boolean useLock = true;
+        // bypass locking for these
+        switch (httpReq.getRequestURI()) {
+            case AppController.API_PATH + "/serverPush":
+            case AppController.API_PATH + "/signNodes":
+            case AppController.API_PATH + "/getOpenGraph":
+            case AppController.API_PATH + "/health":
+                useLock = false;
+                break;
+            default:
+                break;
+        }
+
+        if (useLock) {
+            mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
+            if (mutex != null) {
+                boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
+                if (!isLockAcquired)
+                    throw new RuntimeException("Server too busy.");
+            }
+        }
+        return mutex;
+    }
+
+    private void logUrlAndParams(HttpServletRequest httpReq) {
+        if (Const.debugFilterEntry || debug) {
+            String url = "URI=" + httpReq.getRequestURI();
+            if (httpReq.getQueryString() != null) {
+                url += " q=" + httpReq.getQueryString();
+            }
+            Map params = httpReq.getParameterMap();
+            if (params != null && params.size() > 0) {
+                url += "\n    Params: " + XString.prettyPrint(httpReq.getParameterMap());
+            }
+            log.debug(url);
+        }
+    }
+
+    private String getToken(HttpServletRequest httpReq, HttpSession session) {
+        String token;
+        // first try to get the token from the HTTP header
+        token = httpReq.getHeader("Bearer");
+
+        // second, allow token to be specified in URL as well
+        if (StringUtils.isEmpty(token)) {
+            token = httpReq.getParameter(Const.BEARER_TOKEN);
+        }
+
+        // and finally get token from session of still null
+        if (StringUtils.isEmpty(token)) {
+            token = (String) session.getAttribute(Const.BEARER_TOKEN);
+        }
+        return token;
     }
 
     private void sendError(HttpServletResponse res, String msg, int code, Exception e) {

@@ -245,11 +245,12 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeException("invalid call to setAuthenticated for anon.");
         }
 
-        // only generate a token if not already set, becasue this SessionContext is shared across
-        // swarm replicas via redis
+        // only generate a token if not already set, because this SessionContext is shared across
+        // the swarm replicas via redis
         if (sc.getUserToken() == null) {
             sc.setUserToken(Util.genStrongToken());
-            log.debug("userToken: " + sc.getUserToken());
+            // log.debug("userName: " + userName + " NEW userToken: " + sc.getUserToken() + " sessionId="
+            // + ThreadLocals.getHttpSession().getId());
         }
         sc.setUserName(userName);
         sc.setUserNodeId(userNodeId.toHexString());
