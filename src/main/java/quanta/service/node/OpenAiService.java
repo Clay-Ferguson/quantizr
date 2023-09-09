@@ -128,7 +128,6 @@ public class OpenAiService extends ServiceBase {
         // log.debug("GPT Res: " + XString.prettyPrint(res));
 
         updateUserCredit(userNode, userCredit, res);
-
         res.userCredit = userCredit.getVal();
         return res;
     }

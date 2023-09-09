@@ -180,7 +180,6 @@ public class NodeEditService extends ServiceBase {
         if (aiAnswer != null) {
             newNode.setContent(oai.formatAnswer(aiAnswer, true));
             newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
-            forceInheritSharing = true;
         } else {
             newNode.setContent(req.getContent() != null ? req.getContent() : "");
         }
@@ -206,7 +205,7 @@ public class NodeEditService extends ServiceBase {
             nodeBeingRepliedTo = parentNode;
         }
 
-        if (allowSharing) {
+        if (allowSharing && aiAnswer == null) {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
