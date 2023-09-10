@@ -11,7 +11,7 @@ export class TourUtils {
             new Tour("Create a New Node", [
                 new TourStep("Click `My Account` to go to your Account Root.", ".ui-my-account"),
                 new TourStep("Open `Options` Menu, and be sure `Edit Mode` is selected.", ".ui-menu-options"),
-                new TourStep("Click the `Plus Button` to create a new Node under your account root.", ".ui-new-node-plus-top"),
+                new TourStep("Click the `Plus Button` to create a new Node under your account root.", ".ui-new-node-plus"),
                 new TourStep("Type some content and click `Save`.", ".ui-editor-save"),
                 new TourStep("If you want to Edit the Node again, click the `Edit` Button.", ".ui-edit-node")
             ]),

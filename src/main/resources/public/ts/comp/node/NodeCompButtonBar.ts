@@ -31,6 +31,7 @@ export class NodeCompButtonBar extends Div {
         let sharedIcon: Icon;
         let openButton: IconButton;
         let selCheckbox: Checkbox;
+        let createSubNodeButton: Button;
         let editNodeButton: Button;
         let cutNodeIcon: Icon;
         let moveNodeUpIcon: Icon;
@@ -43,6 +44,7 @@ export class NodeCompButtonBar extends Div {
         const specialAccountNode = type?.isSpecialAccountNode();
         if (specialAccountNode) this.allowNodeMove = false;
         let editingAllowed = S.edit.isEditAllowed(this.node);
+        const actPubId = S.props.getPropStr(J.NodeProp.OBJECT_ID, this.node);
         let deleteAllowed = false;
         let editableNode = true;
 
@@ -127,6 +129,23 @@ export class NodeCompButtonBar extends Div {
                 }, "float-start");
             }
 
+            let insertAllowed = true;
+
+            // if this is our own account node, we can always leave insertAllowed=true
+            if (ast.userProfile?.userNodeId !== this.node.id) {
+                if (type) {
+                    insertAllowed = ast.isAdminUser || type.allowAction(NodeActionType.insert, this.node);
+                }
+            }
+            const editInsertAllowed = S.props.isWritableByMe(this.node);
+
+            if (!isPageRootNode && C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed && !actPubId) {
+                createSubNodeButton = new Button(null, S.edit.newSubNode, {
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    title: "Create new SubNode"
+                }, "btn-secondary ui-new-node-plus", "fa-plus");
+            }
+
             const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
 
             if (editingAllowed) {
@@ -190,6 +209,7 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
+        // let upLevelButton: IconButton;
         const isMine = S.props.isMine(this.node);
 
         // Note we only allow 'Up Level' on home node if we're the admin.
@@ -198,6 +218,15 @@ export class NodeCompButtonBar extends Div {
                 ((isMine || this.node.type !== J.NodeType.POSTS) && this.node.name !== "home") ||
                 ast.isAdminUser
             )) {
+            if (S.nav.parentVisibleToUser()) {
+
+                // todo-1: leaving this here until I'm sure I like it on top of page instead
+                // upLevelButton = new IconButton("fa-folder", "Up", {
+                //     [C.NODE_ID_ATTR]: this.node.id,
+                //     onClick: S.nav.navUpLevelClick,
+                //     title: "Go to Parent Node"
+                // }, "btn-primary");
+            }
         }
 
         // ---------------------------
@@ -238,7 +267,7 @@ export class NodeCompButtonBar extends Div {
             floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
         }
 
-        let btnArray: Comp[] = [openButton, editNodeButton, floatEndSpan
+        let btnArray: Comp[] = [openButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan
         ];
 
         btnArray = btnArray.concat(this.extraButtons);
