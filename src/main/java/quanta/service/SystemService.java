@@ -14,8 +14,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import com.mongodb.client.MongoDatabase;
 import quanta.config.AppSessionListener;
@@ -51,11 +49,6 @@ public class SystemService extends ServiceBase {
     public static final Object adminNodesCacheLock = new Object();
     public TreeNode adminNodesCache;
     public HashMap<String, TreeNode> adminNodesCacheMap;
-
-    @EventListener
-    public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
-    }
 
     public void cacheAdminNodes() {
         arun.run(as -> {

@@ -1,7 +1,6 @@
 package quanta.service.ipfs;
 
 import java.util.LinkedHashMap;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,8 +14,7 @@ public class IPFSConfig extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSConfig.class);
     public String API_CONFIG;
 
-    @PostConstruct
-    public void init() {
+    public void postConstruct() {
         API_CONFIG = prop.getIPFSApiBase() + "/config";
     }
 

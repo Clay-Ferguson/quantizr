@@ -1,8 +1,6 @@
 package quanta.service.ipfs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.file.IPFSObjectStat;
@@ -25,8 +24,8 @@ public class IPFSObj extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSObj.class);
     public static String API_OBJECT;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_OBJECT = prop.getIPFSApiBase() + "/object";
     }
 
@@ -102,9 +101,8 @@ public class IPFSObj extends ServiceBase {
         if (StringUtils.isEmpty(filePath)) {
             filePath = fileCid;
         }
-        return objectOperation(
-                API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid
-                        + "&create=true");
+        return objectOperation(API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid
+                + "&create=true");
     }
 
     public IPFSObjectStat objectStat(String cid, boolean humanReadable) {

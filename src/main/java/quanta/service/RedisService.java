@@ -100,7 +100,7 @@ public class RedisService extends ServiceBase {
     // Note: This happens to be about the same as the session timeout, but doesn't need to be
     @Scheduled(fixedDelay = 60 * DateUtil.MINUTE_MILLIS)
     public void maintenance() {
-        if (!MongoRepository.fullInit)
+        if (!initComplete || !MongoRepository.fullInit)
             return;
 
         List<SessionContext> list = redis.query("*");

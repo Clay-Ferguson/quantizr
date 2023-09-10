@@ -6,7 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import quanta.config.ServiceBase;
@@ -33,6 +32,7 @@ public class AppServer extends ServiceBase {
 
     /* Java Main entry point for the application */
     public static void main(String[] args) {
+        log.debug("AppServer.main()");
         // WARNING: looks like logging is not enabled yet at this point (can't log here)
         /*
          * If we are running AppServer then enableScheduling, otherwise we may be running some command line
@@ -40,14 +40,6 @@ public class AppServer extends ServiceBase {
          */
         enableScheduling = true;
         SpringApplication.run(AppServer.class, args);
-    }
-
-    @EventListener
-    public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
-        log.info("log.info: ContextRefreshedEvent.");
-        log.debug("log.debug: PROFILE: " + prop.getProfileName());
-        log.trace("log.trace: test trace message.");
     }
 
     @EventListener

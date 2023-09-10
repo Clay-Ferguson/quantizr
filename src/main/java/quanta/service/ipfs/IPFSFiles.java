@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,8 +29,8 @@ public class IPFSFiles extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSFiles.class);
     public static String API_FILES;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_FILES = prop.getIPFSApiBase() + "/files";
     }
 

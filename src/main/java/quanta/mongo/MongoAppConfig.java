@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -53,12 +51,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
     @Autowired
     private AppProp appProp;
-
-    @EventListener
-    public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
-        log.debug("MongoAppConfig. Context refreshed.");
-    }
 
     @Override
     @Bean

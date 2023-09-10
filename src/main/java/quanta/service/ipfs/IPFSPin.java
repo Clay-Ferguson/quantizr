@@ -2,7 +2,6 @@ package quanta.service.ipfs;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +22,8 @@ public class IPFSPin extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSPin.class);
     public static String API_PIN;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_PIN = prop.getIPFSApiBase() + "/pin";
     }
 

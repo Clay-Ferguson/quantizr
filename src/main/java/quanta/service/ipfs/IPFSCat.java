@@ -2,7 +2,6 @@ package quanta.service.ipfs;
 
 import java.io.InputStream;
 import java.net.URL;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -17,8 +16,8 @@ public class IPFSCat extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSCat.class);
     public static String API_CAT;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_CAT = prop.getIPFSApiBase() + "/cat";
     }
 
@@ -32,11 +31,8 @@ public class IPFSCat extends ServiceBase {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    Util.getBasicRequestEntity(),
-                    String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
             ret = response.getBody();
         } catch (Exception e) {
             log.error("Failed to cat: " + hash, e);

@@ -1,13 +1,11 @@
 package quanta.service.ipfs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
@@ -79,15 +78,15 @@ public class IPFSService extends ServiceBase {
     public final RestTemplate restTemplateNoTimeout = new RestTemplate(Util.getClientHttpRequestFactory(0));
     public final ObjectMapper mapper = new ObjectMapper();
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_ID = prop.getIPFSApiBase() + "/id";
     }
 
     /* On regular interval forget which CIDs have failed and allow them to be retried */
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
-        if (!MongoRepository.fullInit)
+        if (!initComplete && !MongoRepository.fullInit)
             return;
         failedCIDs.clear();
     }

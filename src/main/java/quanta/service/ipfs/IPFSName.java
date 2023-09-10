@@ -1,8 +1,6 @@
 package quanta.service.ipfs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -12,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 
@@ -21,8 +20,8 @@ public class IPFSName extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSName.class);
     public static String API_NAME;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_NAME = prop.getIPFSApiBase() + "/name";
     }
 
@@ -39,11 +38,8 @@ public class IPFSName extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             // Use a rest call with no timeout because publish can take a LONG time.
             log.debug("Publishing IPNS: " + url);
-            ResponseEntity<String> response = ipfs.restTemplateNoTimeout.exchange(
-                    url,
-                    HttpMethod.POST,
-                    requestEntity,
-                    String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
         // ret output:

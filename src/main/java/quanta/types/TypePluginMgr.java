@@ -16,7 +16,7 @@ public class TypePluginMgr extends ServiceBase {
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
+        super.handleContextRefresh(event);
         log.debug("ContextRefreshedEvent");
         bookmarkType.postContruct();
         friendType.postContruct();

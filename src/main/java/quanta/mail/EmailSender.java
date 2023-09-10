@@ -1,6 +1,5 @@
 package quanta.mail;
 
-import com.sun.mail.smtp.SMTPTransport;
 import java.util.Date;
 import java.util.Properties;
 import javax.mail.BodyPart;
@@ -16,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import com.sun.mail.smtp.SMTPTransport;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
@@ -29,9 +29,6 @@ public class EmailSender extends ServiceBase implements TransportListener {
 
     private static Logger log = LoggerFactory.getLogger(EmailSender.class);
 
-    @Autowired
-    private AppProp appProp;
-
     public static final Object lock = new Object();
     public static final String MIME_HTML = "text/html";
     public int TIMEOUT = 10000; // ten seconds
@@ -41,6 +38,10 @@ public class EmailSender extends ServiceBase implements TransportListener {
     private Session mailSession;
     private SMTPTransport transport;
 
+    public void postConstruct() {
+        init();
+    }
+
     /*
      * This method can and should be called before sending mails, close() method should be called after
      * mail is sent
@@ -49,9 +50,9 @@ public class EmailSender extends ServiceBase implements TransportListener {
         if (!mailEnabled())
             return;
         log.trace("MailSender.init()");
-        String mailHost = appProp.getMailHost();
-        String mailUser = appProp.getMailUser();
-        String mailPassword = appProp.getMailPassword();
+        String mailHost = prop.getMailHost();
+        String mailUser = prop.getMailUser();
+        String mailPassword = prop.getMailPassword();
         if (mailSession == null) {
             props = new Properties();
             props.put("mail.smtps.host", mailHost);
@@ -81,7 +82,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
     }
 
     public boolean mailEnabled() {
-        return !StringUtils.isEmpty(appProp.getMailPassword());
+        return !StringUtils.isEmpty(prop.getMailPassword());
     }
 
     public static Object getLock() {
@@ -107,7 +108,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
         if (!mailEnabled())
             return;
         if (fromAddress == null) {
-            fromAddress = appProp.getMailFrom();
+            fromAddress = prop.getMailFrom();
         }
         if (transport == null) {
             throw ExUtil.wrapEx("Tried to use MailSender after close() call or without initializing.");

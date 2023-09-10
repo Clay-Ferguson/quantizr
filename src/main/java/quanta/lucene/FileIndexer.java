@@ -72,9 +72,6 @@ public class FileIndexer extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(FileIndexer.class);
 
-    @Autowired
-    private AppProp appProp;
-
     private IndexWriter writer;
     private FSDirectory fsDir;
     private int filesAdded = 0;
@@ -134,11 +131,11 @@ public class FileIndexer extends ServiceBase {
         if (initialized)
             return;
         initialized = true;
-        if (StringUtils.isEmpty(appProp.getLuceneDir())) {
+        if (StringUtils.isEmpty(prop.getLuceneDir())) {
             throw ExUtil.wrapEx("Lucend Data Dir is not configured.");
         }
         try {
-            fsDir = FSDirectory.open(Paths.get(appProp.getLuceneDir() + "/" + luceneIndexDataSubDir));
+            fsDir = FSDirectory.open(Paths.get(prop.getLuceneDir() + "/" + luceneIndexDataSubDir));
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             if (forceRebuild) {

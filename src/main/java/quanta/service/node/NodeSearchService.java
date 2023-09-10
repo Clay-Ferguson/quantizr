@@ -1,6 +1,5 @@
 package quanta.service.node;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.BreadcrumbInfo;
@@ -80,6 +80,8 @@ public class NodeSearchService extends ServiceBase {
      */
     @Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
     public void run() {
+        if (!initComplete)
+            return;
         /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
         synchronized (NodeSearchService.trendingFeedInfoLock) {
             NodeSearchService.apTrendingFeedInfo = null;

@@ -1352,6 +1352,8 @@ public class ActPubService extends ServiceBase {
     /* every 90 minutes read all the outboxes of all users */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
+        if (!initComplete)
+            return;
         if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
         // refreshForeignUsers();
@@ -1362,7 +1364,8 @@ public class ActPubService extends ServiceBase {
      */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        if (userRefresh || !prop.isActPubEnabled() || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+        if (!initComplete || userRefresh || !prop.isActPubEnabled() || !prop.isDaemonsEnabled()
+                || !MongoRepository.fullInit)
             return;
         try {
             userRefresh = true;

@@ -1,7 +1,5 @@
 package quanta.service.ipfs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +9,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -25,9 +22,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
-import quanta.config.SessionContext;
 import quanta.model.client.IPSMData;
 import quanta.model.client.IPSMMessage;
 import quanta.mongo.MongoRepository;
@@ -52,14 +50,14 @@ public class IPFSPubSub extends ServiceBase {
     // private static int heartbeatCounter = 0;
     private static final HashMap<String, Integer> fromCounter = new HashMap<>();
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_PUBSUB = prop.getIPFSApiBase() + "/pubsub";
     }
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
+        super.handleContextRefresh(event);
         log.debug("ContextRefreshedEvent");
         // swarmPeers();
         if (prop.ipfsEnabled() && IPSM_ENABLE) {
@@ -81,16 +79,11 @@ public class IPFSPubSub extends ServiceBase {
         LinkedHashMap<String, Object> res = null;
         // Pubsub.Router="floodsub" | "gossipsub"
         // todo-2: we can add this to the startup bash scripts along with the CORS configs?
-        res =
-                Cast.toLinkedHashMap(
-                        ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub",
-                                LinkedHashMap.class));
+        res = Cast.toLinkedHashMap(
+                ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
-        res =
-                Cast.toLinkedHashMap(
-                        ipfs.postForJsonReply(
-                                ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true",
-                                LinkedHashMap.class));
+        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(
+                ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }
 
@@ -182,7 +175,7 @@ public class IPFSPubSub extends ServiceBase {
     // clear throttle counters every minute.
     @Scheduled(fixedDelay = DateUtil.MINUTE_MILLIS)
     public void clearThrottles() {
-        if (!MongoRepository.fullInit)
+        if (!initComplete || !MongoRepository.fullInit)
             return;
         synchronized (fromCounter) {
             fromCounter.clear();

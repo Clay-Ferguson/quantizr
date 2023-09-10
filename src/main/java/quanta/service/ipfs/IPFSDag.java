@@ -3,7 +3,6 @@ package quanta.service.ipfs;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,8 @@ public class IPFSDag extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSDag.class);
     public static String API_DAG;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_DAG = prop.getIPFSApiBase() + "/dag";
     }
 
@@ -39,11 +38,8 @@ public class IPFSDag extends ServiceBase {
         String ret = null;
         try {
             String url = API_DAG + "/get?arg=" + hash; // + "&output-codec=dag-json";
-            ResponseEntity<String> response = ipfs.restTemplate.exchange(
-                    url,
-                    HttpMethod.POST,
-                    Util.getBasicRequestEntity(),
-                    String.class);
+            ResponseEntity<String> response =
+                    ipfs.restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
             ret = response.getBody();
             log.debug("IPFS post dagGet Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {

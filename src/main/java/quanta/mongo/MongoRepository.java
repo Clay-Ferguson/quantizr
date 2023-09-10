@@ -36,10 +36,6 @@ public class MongoRepository extends ServiceBase {
     private static final Object lock = new Object();
     private boolean initialized = false;
 
-    /*
-     * Warning: Spring will NOT be fully initialized in this constructor when this runs.
-     * Use @PostConstruct instead for spring processing.
-     */
     public MongoRepository() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -62,7 +58,7 @@ public class MongoRepository extends ServiceBase {
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
+        super.handleContextRefresh(event);
         log.debug("ContextRefreshedEvent");
         if (initialized)
             return;

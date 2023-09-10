@@ -1,7 +1,6 @@
 package quanta.service.ipfs;
 
 import java.util.LinkedHashMap;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -15,8 +14,8 @@ public class IPFSRepo extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSRepo.class);
     public static String API_REPO;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_REPO = prop.getIPFSApiBase() + "/repo";
     }
 

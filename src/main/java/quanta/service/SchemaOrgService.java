@@ -1,7 +1,5 @@
 package quanta.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,6 +12,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.client.SchemaOrgClass;
 import quanta.model.client.SchemaOrgProp;
@@ -38,7 +38,7 @@ public class SchemaOrgService extends ServiceBase {
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
+        super.handleContextRefresh(event);
         loadJson("classpath:public/schemaorg/schemaorg-all-https.jsonld");
     }
 

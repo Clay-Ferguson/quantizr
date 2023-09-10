@@ -15,8 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -193,14 +191,6 @@ public class AppController extends ServiceBase implements ErrorController {
         return "error";
     }
 
-    @EventListener
-    public void handleContextRefresh(ContextRefreshedEvent event) {
-        ServiceBase.init(event.getApplicationContext());
-        log.debug("ContextRefreshedEvent");
-        if (context == null) {
-            throw new RuntimeException("Failed to autowire ApplicationContext");
-        }
-    }
 
     public HashMap<String, Object> getThymeleafAttribs() {
         HashMap<String, Object> map = new HashMap<>();

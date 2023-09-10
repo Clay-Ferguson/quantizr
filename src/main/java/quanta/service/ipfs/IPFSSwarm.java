@@ -1,9 +1,7 @@
 package quanta.service.ipfs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -13,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -24,8 +23,8 @@ public class IPFSSwarm extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSSwarm.class);
     public static String API_SWARM;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void postConstruct() {
         API_SWARM = prop.getIPFSApiBase() + "/swarm";
     }
 

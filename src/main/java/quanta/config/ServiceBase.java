@@ -1,10 +1,13 @@
 package quanta.config;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import quanta.CallProcessor;
@@ -62,8 +65,8 @@ import quanta.service.node.NodeMoveService;
 import quanta.service.node.NodeRenderService;
 import quanta.service.node.NodeSearchService;
 import quanta.service.node.OpenAiService;
-import quanta.types.BookmarkType;
 import quanta.types.AIAnswerType;
+import quanta.types.BookmarkType;
 import quanta.types.FriendType;
 import quanta.types.RoomType;
 import quanta.types.RssFeedType;
@@ -100,15 +103,12 @@ import quanta.util.Validator;
  * not execute, becuase it won't ge called thru a proxy.
  */
 public class ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ServiceBase.class);
 
-    @Autowired
-    public AppProp prop;
+    static List<Runnable> postConstructs = new ArrayList<>();
+    public static ApplicationContext context;
 
-    @Autowired
-    public ApplicationContext context;
-
+    public static AppProp prop;
     public static UserFeedService userFeed;
     public static Convert convert;
     public static TypePluginMgr typePluginMgr;
@@ -184,18 +184,30 @@ public class ServiceBase {
 
     public ServiceBase() {}
 
+    @EventListener
+    public void handleContextRefresh(ContextRefreshedEvent event) {
+        // log.debug("handleContextRefresh: " + getClass().getName());
+        context = event.getApplicationContext();
+        ServiceBase.initBeans(context);
+    }
+
+    // This is similar to @PostConstruct, but guaranteed to be called AFTER all beans. Intended to be
+    // optionally overridden
+    public void postConstruct() {}
+
     /*
      * Note: All` @EventListener public void handleContextRefresh(ContextRefreshedEvent event)` should
      * call this method immediately before doing anything else, and this is fine because nothing happens
      * on subsequent runs. The reason is because we cannot predict WHICH @EventListener will be called
      * first, so we must allow any sequence that Spring happens to run with, in a non-deterministic way.
      */
-    public static void init(ApplicationContext ctx) {
+    public static void initBeans(ApplicationContext ctx) {
         synchronized (initLock) {
             if (initComplete) {
                 return;
             }
             log.debug("Setting ServiceBase Proxy Instances...");
+            prop = getBean(ctx, AppProp.class);
             userFeed = getBean(ctx, UserFeedService.class);
             convert = getBean(ctx, Convert.class);
             typePluginMgr = getBean(ctx, TypePluginMgr.class);
@@ -263,13 +275,24 @@ public class ServiceBase {
             ipfsSwarm = getBean(ctx, IPFSSwarm.class);
             ipfsConfig = getBean(ctx, IPFSConfig.class);
             ipfsPubSub = getBean(ctx, IPFSPubSub.class);
+
+            // We improve over Spring by only calling PostConstructs once all
+            // beans are initialized
+            for (Runnable lambda : postConstructs) {
+                lambda.run();
+            }
+
             initComplete = true;
         }
     }
 
     static <T> T getBean(ApplicationContext ctx, Class<T> requiredType) throws BeansException {
         // log.debug("getBean: " + requiredType.getSimpleName());
-        return ctx.getBean(requiredType);
+        T ret = ctx.getBean(requiredType);
+        if (ret instanceof ServiceBase _ret) {
+            ServiceBase.postConstructs.add(_ret::postConstruct);
+        }
+        return ret;
     }
 
     public void checkIpfs() {

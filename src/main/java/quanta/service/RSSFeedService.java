@@ -1,25 +1,5 @@
 package quanta.service;
 
-import com.rometools.modules.content.ContentModuleImpl;
-import com.rometools.modules.itunes.EntryInformationImpl;
-import com.rometools.modules.mediarss.MediaEntryModuleImpl;
-import com.rometools.modules.mediarss.types.MediaContent;
-import com.rometools.modules.mediarss.types.MediaGroup;
-import com.rometools.modules.mediarss.types.Metadata;
-import com.rometools.modules.mediarss.types.Thumbnail;
-import com.rometools.rome.feed.module.DCModuleImpl;
-import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.feed.synd.SyndContent;
-import com.rometools.rome.feed.synd.SyndContentImpl;
-import com.rometools.rome.feed.synd.SyndEnclosure;
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndEntryImpl;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.feed.synd.SyndFeedImpl;
-import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.SyndFeedOutput;
-import com.rometools.rome.io.XmlReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -51,6 +31,26 @@ import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import com.rometools.modules.content.ContentModuleImpl;
+import com.rometools.modules.itunes.EntryInformationImpl;
+import com.rometools.modules.mediarss.MediaEntryModuleImpl;
+import com.rometools.modules.mediarss.types.MediaContent;
+import com.rometools.modules.mediarss.types.MediaGroup;
+import com.rometools.modules.mediarss.types.Metadata;
+import com.rometools.modules.mediarss.types.Thumbnail;
+import com.rometools.rome.feed.module.DCModuleImpl;
+import com.rometools.rome.feed.module.Module;
+import com.rometools.rome.feed.synd.SyndContent;
+import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEnclosure;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.SyndFeedOutput;
+import com.rometools.rome.io.XmlReader;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMonEvent;
@@ -118,7 +118,7 @@ public class RSSFeedService extends ServiceBase {
      */
     @Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
     public void run() {
-        if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+        if (!initComplete || run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
         try {
             run = true;
