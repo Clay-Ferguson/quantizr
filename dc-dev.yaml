@@ -4,12 +4,13 @@ services:
     redis-dev:
         image: redis:6.0
         deploy:
-            restart_policy:
-                condition: on-failure
-                # delay is time between restart attempts
-                delay: 10s
-                max_attempts: 4
-                window: 120s
+            # Don't want a restart policy for DEV!
+            # restart_policy:
+            #     condition: on-failure
+            #     # delay is time between restart attempts
+            #     delay: 10s
+            #     max_attempts: 4
+            #     window: 120s
             replicas: 1
         hostname: redis-host-dev
         networks:
