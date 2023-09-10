@@ -48,14 +48,7 @@ Edit `/distro/setenv-run-distro.sh` to define your environment settings, and poi
 
 ## Help Fund the Project
 
-<form action="https://www.paypal.com/donate" method="post" target="_top">
-<input type="hidden" name="business" value="B7NE43HAUM2PA" />
-<input type="hidden" name="no_recurring" value="0" />
-<input type="hidden" name="item_name" value="Quanta: An Open-Source cloud-based hierarchical CMS with a unique collaborative and sharing experience with ChatGPT assistance" />
-<input type="hidden" name="currency_code" value="USD" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-</form>
+[Send Money via PayPal](https://PayPal.me/WILLIAMCFERGUSON) directly to the developer.
 
 ## Keywords
 
