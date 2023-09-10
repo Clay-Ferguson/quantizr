@@ -46,6 +46,17 @@ Quanta is a browser-based app that works on both mobile and desktop browsers, al
 
 Edit `/distro/setenv-run-distro.sh` to define your environment settings, and point the docker IMAGE name to Docker Hub. Then run `/distro/run-distro.sh`, which will startup a Docker Compose Swarm with one replica. All the defaults in the `setenv` file should probably work as is (port numbers, folder names, etc), but you do need to set the docker image names `DOCKER_IMAGE` to point to Docker Hub, unless you've already built locally and can just point to your local images.
 
+## Help Fund the Project
+
+<form action="https://www.paypal.com/donate" method="post" target="_top">
+<input type="hidden" name="business" value="B7NE43HAUM2PA" />
+<input type="hidden" name="no_recurring" value="0" />
+<input type="hidden" name="item_name" value="Quanta: An Open-Source cloud-based hierarchical CMS with a unique collaborative and sharing experience with ChatGPT assistance" />
+<input type="hidden" name="currency_code" value="USD" />
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+</form>
+
 ## Keywords
 
 ChatGPT, GPT-4, AI, Machine Learning, LLM, Large Language Model, OpenAI, Meta, Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
