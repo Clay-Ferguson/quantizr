@@ -6,18 +6,7 @@ import rehypeKatex from "rehype-katex";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeRaw from "rehype-raw";
 
-// DO NOT DELETE this mess of commented code (for now), because it might be needed in the future
-// because ChatGPT was helping me and I need to see if this for an earlier or later version before
-// I remove it.
-// const allowedTags = ["img", "p", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote"];
-// const allowedAttributes = {
-//     img: ["src", "alt", "class"],
-// };
-// const allowlist = {
-//     img: ["src", "className", "alt", "width", "height", "data-nodeid", "data-attkey"],
-//     span: ["className"],
-//     div: ["className"]
-// };
+// This was part of an experiment. Keeping it only as an FYI
 // const MySanitizeFunction = (node) => {
 //     console.log("Sanitize: " + S.util.prettyPrint(node));
 //     if (node.tagName === "img") {
@@ -34,7 +23,6 @@ const ReactMarkdownComp = forwardRef((props, ref) => {
         ...props,
         ref,
         remarkPlugins: [remarkMath, remarkGfm],
-        // rehypePlugins: [rehypeKatex, rehypeRaw, [rehypeSanitize, { allowedTags, allowedAttributes }]]
         rehypePlugins: [rehypeKatex, rehypeRaw],
         rehypeTransform: [rehypeSanitize /*, MySanitizeFunction*/]
     });
