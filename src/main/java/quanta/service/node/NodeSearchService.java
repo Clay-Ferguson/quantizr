@@ -127,8 +127,7 @@ public class NodeSearchService extends ServiceBase {
         NodeSearchResponse res = new NodeSearchResponse();
         String searchText = req.getSearchText();
         // if no search text OR sort order specified that's a bad request.
-        if ( //
-        StringUtils.isEmpty(searchText) && StringUtils.isEmpty(req.getSearchType()) && //
+        if (StringUtils.isEmpty(searchText) && StringUtils.isEmpty(req.getSearchType()) && //
         // note: for timelines this is called but with a sort
                 StringUtils.isEmpty(req.getSortField())) {
             throw new RuntimeException("Search text or ordering required.");
@@ -136,6 +135,7 @@ public class NodeSearchService extends ServiceBase {
         List<NodeInfo> searchResults = new LinkedList<>();
         res.setSearchResults(searchResults);
         int counter = 0;
+
         if ("node.id".equals(req.getSearchProp())) {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
@@ -163,7 +163,9 @@ public class NodeSearchService extends ServiceBase {
                     searchResults.add(info);
                 }
             }
-        } else { // othwerwise we're searching all node properties
+        }
+        // othwerwise we're searching all node properties
+        else {
             /* USER Search */
             if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
                     || Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
@@ -239,6 +241,7 @@ public class NodeSearchService extends ServiceBase {
                 }
             }
         }
+
         /*
          * If we didn't find any results and we aren't searching locally only then try to look this up as a
          * username, over the web (internet, fediverse)
@@ -386,8 +389,7 @@ public class NodeSearchService extends ServiceBase {
             strictFiltering = true;
             List<Criteria> ands = new LinkedList<>();
             Query q = new Query();
-            Criteria crit =
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH));
+            Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.USERS_PATH));
 
             List<Criteria> orCrit = new LinkedList<>();
 
@@ -745,8 +747,8 @@ public class NodeSearchService extends ServiceBase {
                     ws.inc(node, trending);
                 }
             } catch (Exception e) {
+                // ignore this
             }
-            // just ignore this.
         }
     }
 }

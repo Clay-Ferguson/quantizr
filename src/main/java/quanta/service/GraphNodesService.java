@@ -29,17 +29,21 @@ public class GraphNodesService extends ServiceBase {
         GraphResponse res = new GraphResponse();
         ms = ThreadLocals.ensure(ms);
         boolean searching = !StringUtils.isEmpty(req.getSearchText());
+
         SubNode node = read.getNode(ms, req.getNodeId());
         GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false, node.getLinks());
         String rootPath = node.getPath();
         int rootLevel = StringUtils.countMatches(rootPath, "/");
         mapByPath.put(gnode.getPath(), gnode);
+
         try {
             Iterable<SubNode> results = null;
             // Run subgraph query to get all nodes if no search text provided
             if (StringUtils.isEmpty(req.getSearchText())) {
                 results = read.getSubGraph(ms, node, null, 0, false, true, null);
-            } else { // If search text provided run subgraph search.
+            }
+            // If search text provided run subgraph search.
+            else {
                 int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
                 results = read.searchSubGraph(ms, node, null, req.getSearchText(), null, null, limit, 0, true, false,
                         null, true, false, false);
@@ -52,6 +56,7 @@ public class GraphNodesService extends ServiceBase {
                             StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
                     mapByPath.put(gn.getPath(), gn);
                 } catch (Exception e) {
+                    // ignore
                 }
             }
             // processNodes ensuring we have a coherent/complete/consistent tree (no orphans)
@@ -103,6 +108,7 @@ public class GraphNodesService extends ServiceBase {
         for (String path : keys) {
             ensureEnoughParents(rootPath, rootLevel, path, mapByPath);
         }
+
         // now add all nodes to the child list of their parents.
         for (String path : mapByPath.keySet()) {
             if (path.equals(rootPath))

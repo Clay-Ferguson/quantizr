@@ -287,6 +287,7 @@ public class ExportServiceFlexmark extends ServiceBase {
             }
             String style = "";
             String imgSize = att.getCssSize();
+
             if (imgSize != null && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
                 style = " style='width:" + imgSize + "'";
             } else {
@@ -297,6 +298,7 @@ public class ExportServiceFlexmark extends ServiceBase {
                     style = " style='width:100%'";
                 }
             }
+
             String src = null;
             if (req.isToIpfs() && "html".equals(format)) {
                 String fileName = att.getFileName();
@@ -320,13 +322,15 @@ public class ExportServiceFlexmark extends ServiceBase {
                      */
                     src = fileName + "?cid=" + ipfsLink;
                 }
-            } else /*
-                    * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
-                    * kind of reference to the image resource, because ultimately the Flexmark code that converts the
-                    * HTML to the PDF will be calling this image url to extract out the actual image data to embed
-                    * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
-                    * eventually put out on IPFS or simply provided to the user as a downloadable link.
-                    */if (bin != null) {
+            }
+            /*
+             * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
+             * kind of reference to the image resource, because ultimately the Flexmark code that converts the
+             * HTML to the PDF will be calling this image url to extract out the actual image data to embed
+             * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
+             * eventually put out on IPFS or simply provided to the user as a downloadable link.
+             */
+            else if (bin != null) {
                 String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
                         + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
                 src = prop.getProtocolHostAndPort() + path;

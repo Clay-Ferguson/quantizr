@@ -40,6 +40,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
         String fileName = lastSlashIdx == -1 ? name : name.substring(lastSlashIdx + 1);
         String path = lastSlashIdx == -1 ? name : name.substring(0, lastSlashIdx);
         log.trace("Import FILE Entry: " + entry.getName());
+
         try {
             ThreadLocals.setParentCheckEnabled(false);
             Val<Boolean> done = new Val<>(false);
@@ -59,16 +60,21 @@ public abstract class ImportArchiveBase extends ServiceBase {
                     });
                 }
             }
+
             // if we processed the above as an attachment we're done bail out.
             if (done.getVal())
                 return;
+
             // HTML FILE
             if (mimeUtil.isHtmlTypeFileName(fileName)) {
-            } else // we ignore the html files during import. Data will be in JSON files
+            }
+            // we ignore the html files during import. Data will be in JSON files
+            else
             // JSON FILE
             if (mimeUtil.isJsonFileType(fileName)) {
                 log.debug("  isJSON: " + fileName);
                 String json = IOUtils.toString(zis, "UTF-8");
+
                 // run unmarshalling as admin (otherwise setPath can bark about user being not same as owner)
                 SubNode node = (SubNode) arun.run(as -> {
                     try {
@@ -105,11 +111,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
                  * the obsolete values cannot be reused.
                  */
                 if (node.getAttachments() != null) {
-                    node
-                            .getAttachments()
-                            .forEach((String key, Attachment att) -> {
-                                att.setBin(null);
-                            });
+                    node.getAttachments().forEach((String key, Attachment att) -> {
+                        att.setBin(null);
+                    });
                 }
                 /*
                  * NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set into
@@ -148,25 +152,8 @@ public abstract class ImportArchiveBase extends ServiceBase {
         Long length = att.getSize();
         String mimeType = att.getMime();
         LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
-        attach.attachBinaryFromStream(
-                session,
-                true,
-                attName,
-                node,
-                null,
-                fileName,
-                length,
-                lzis,
-                mimeType,
-                -1,
-                -1,
-                false,
-                false,
-                true,
-                false,
-                true,
-                null,
-                false);
+        attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1,
+                false, false, true, false, true, null, false);
         return true;
     }
 }

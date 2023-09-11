@@ -123,8 +123,7 @@ public class MongoUpdate extends ServiceBase {
                  */
                 ThreadLocals.clearDirtyNodes();
             }
-        } catch ( //
-        Exception e) {
+        } catch (Exception e) {
             // don't rethrow any exceptions from in here.
             ExUtil.error(log, "exception in call processor", e);
         } finally {
@@ -153,16 +152,16 @@ public class MongoUpdate extends ServiceBase {
                     boolean attachment = false;
                     SubNode ipfsNode = read.findByIPFSPinned(as, pin);
                     Attachment att = ipfsNode.getFirstAttachment();
+
                     // if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
-                    if (ipfsNode == null) {
-                        //
-                    } else { // ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear
-                             // in the pinning system. // are // to pin it ever, so for now I'm leaving this code here,
-                             // but we don't need it, and the CIDs that // turns out MFS stuff will never be Garbage
-                             // Collected, no matter what, so we don't need
-                        attachment = true;
-                    }
                     if (ipfsNode != null) {
+                        /*
+                         * ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear in
+                         * the pinning system. // are // to pin it ever, so for now I'm leaving this code here, but we
+                         * don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no
+                         * matter what, so we don't need
+                         */
+                        attachment = true;
                         pinCount++;
                         log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId=" + ipfsNode.getIdStr());
                         if (attachment && statsMap != null) {

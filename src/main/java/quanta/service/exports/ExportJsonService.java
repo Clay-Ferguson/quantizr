@@ -60,7 +60,7 @@ public class ExportJsonService extends ServiceBase {
             Val<Integer> numBins = new Val<>(0);
             byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
             Query q = new Query();
-            Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
+            Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathPrefix));
             crit = auth.addReadSecurity(ms, crit);
 
             q.addCriteria(crit);
@@ -69,6 +69,7 @@ public class ExportJsonService extends ServiceBase {
             try {
                 os = new BufferedOutputStream(new FileOutputStream(fullFileName));
                 BufferedOutputStream _os = os;
+
                 iter.forEach(node -> {
                     // todo-2: this is not yet handling multiple images, but this method isn't currently used.
                     Attachment att = node.getFirstAttachment();
@@ -81,6 +82,7 @@ public class ExportJsonService extends ServiceBase {
                         String path = node.getPath();
                         log.debug("Node has no binary: " + path);
                     }
+
                     try {
                         String json = jsonWriter.writeValueAsString(node);
                         _os.write(json.getBytes(StandardCharsets.UTF_8));
@@ -132,6 +134,7 @@ public class ExportJsonService extends ServiceBase {
     // }
     // return ret;
     // }
+
     private boolean saveBinaryToFileSystem(String binFileName, String targetFolder, SubNode node) {
         boolean ret = false;
         if (binFileName != null) {
@@ -155,6 +158,7 @@ public class ExportJsonService extends ServiceBase {
         }
         return ret;
     }
+
     /*
      * Imports the data from /src/main/resources/nodes/[subFolder] into the db, which will update the
      * targetPath node path (like "/r/public"), content on the tree.

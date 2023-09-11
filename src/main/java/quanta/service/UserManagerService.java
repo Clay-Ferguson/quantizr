@@ -93,6 +93,7 @@ public class UserManagerService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
     private static final Random rand = new Random();
+
     /* Private keys of each user by user name as key */
     public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
 
@@ -114,23 +115,16 @@ public class UserManagerService extends ServiceBase {
         return emitter;
     }
 
-    // DO NOT DELETE
-    // I was planning to call this from the SessionListener destroyed callback but...
-    // For now I'm thinking an infinite timeout on the push emitter makes this
-    // unnecessary, but when I did try this code it also causes the PushEmitter to start
-    // getting executed in some kind of infinite loop whever, the
+    // DO NOT DELETE (yet)
     // emitter.complete() is called below.
-    //
     // public static void sessionDestroyed(HttpSession session) {
     // String token = (String) session.getAttribute(Const.BEARER_TOKEN);
     // if (token != null) {
     // removePushEmitter(token);
     // }
     // }
-
     // public static void removePushEmitter(String token) {
     // SseEmitter emitter = UserManagerService.pushEmitters.get(token);
-
     // // if we happened to be the right replica to push to browser, then push
     // if (emitter != null) {
     // log.debug("removePushEmitter doing nothing.");
@@ -572,9 +566,8 @@ public class UserManagerService extends ServiceBase {
          */
         log.debug("Signup URL: " + signupLink);
         String brandingAppName = prop.getConfigText("brandingAppName");
-        content = //
-                "Welcome to " + brandingAppName + ", " + userName + "!"
-                        + "<p>\nUse this link to complete the signup: <br>\n" + signupLink;
+        content = "Welcome to " + brandingAppName + ", " + userName + "!"
+                + "<p>\nUse this link to complete the signup: <br>\n" + signupLink;
         if (!StringUtils.isEmpty(prop.getMailHost())) {
             outbox.queueEmail(email, brandingAppName + " - Account Signup", content);
         }

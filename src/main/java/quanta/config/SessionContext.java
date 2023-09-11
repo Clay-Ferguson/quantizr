@@ -1,6 +1,5 @@
 package quanta.config;
 
-import java.security.PublicKey;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import quanta.model.UserPreferences;
 import quanta.model.client.PrincipalName;

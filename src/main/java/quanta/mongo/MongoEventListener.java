@@ -32,6 +32,9 @@ import quanta.util.XString;
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
  * persistence (reads/writes) of the MongoDB objects.
  *
+ * WARNING: This will NOT get called for bulk operations so all we should do in here is things
+ * related to when a user is manipulating objects one at a time.
+ * 
  * Listener Lifecycle Events:
  *
  * onBeforeConvert: Called in MongoTemplate insert, insertList, and save operations before the
@@ -146,6 +149,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             }
         }
         Date now = null;
+
         /* If no create/mod time has been set, then set it */
         if (node.getCreateTime() == null) {
             if (now == null) {
@@ -161,11 +165,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             dbObj.put(SubNode.MODIFY_TIME, now);
             node.setModifyTime(now);
         }
+
         /*
          * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
          * part of the path
          */
-        // node.getIdStr());
         if (node.getPath().endsWith("/?")) {
             String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
             dbObj.put(SubNode.PATH, path);
@@ -182,6 +186,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             read.checkParentExists(null, node.getPath());
         }
         saveAuthByThread(node, isNew);
+
         /* Node name not allowed to contain : or ~ */
         String nodeName = node.getName();
         if (nodeName != null) {
@@ -198,6 +203,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         if (snUtil.removeDefaultProps(node)) {
             dbObj.put(SubNode.PROPS, node.getProps());
         }
+
         if (node.getAc() != null) {
             /*
              * we need to ensure that we never save an empty Acl, but null instead, because some parts of the

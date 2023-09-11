@@ -256,7 +256,6 @@ public class NodeEditService extends ServiceBase {
 
     private void inheritSharingFromParent(MongoSession ms, CreateSubNodeRequest req, CreateSubNodeResponse res,
             SubNode nodeBeingRepliedTo, SubNode newNode) {
-        // else add default sharing
         // we always determine the access controls from the parent for any new nodes
         auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
 
@@ -348,16 +347,7 @@ public class NodeEditService extends ServiceBase {
                 }
             }
         }
-        // use this is for testing non string types
-        // newNode.set(NodeProp.ACT_PUB_OBJ_URLS, Arrays.asList(//
-        // new APOUrl("Link", "text/html", "https://drudgereport.com"),
-        // new APOUrl("Link", "text/html", "https://cnn.com")));
-        // newNode.set(NodeProp.ACT_PUB_OBJ_ICONS, Arrays.asList(//
-        // new APOIcon("Icon", "image/png",
-        // "https://pbs.twimg.com/media/FhpmO98UUAAB2Cm?format=png&name=small"),
-        // new APOIcon("Icon", "image/jpg",
-        // "https://pbs.twimg.com/media/FhpfAFNUUAAwjFR?format=jpg&name=small")));
-        // newNode.set(NodeProp.ACT_PUB_OBJ_NAME, "Test Name");
+
         // createNode might have altered 'hasChildren', so we save if dirty
         update.saveIfDirty(ms, parentNode);
         // We save this right away, before calling convertToNodeInfo in case that method does any Db related
@@ -366,11 +356,7 @@ public class NodeEditService extends ServiceBase {
         update.save(ms, newNode);
         res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null, false));
-        // if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
-        // // don't evern send notifications when 'admin' is the one doing the editing.
-        // && !PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-        // outboxMgr.sendNotificationForNodeEdit(newNode, sessionContext.getUserName());
-        // }
+
         return res;
     }
 
@@ -420,12 +406,14 @@ public class NodeEditService extends ServiceBase {
             res.setMessage("Sorry, can't drop that there.");
             return res;
         }
+
         SubNode linksNode =
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null, false);
         if (linksNode == null) {
             log.warn("unable to get linksNode");
             return null;
         }
+
         SubNode newNode = create.createNode(ms, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null,
                 null, true, true);
         String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
@@ -673,6 +661,7 @@ public class NodeEditService extends ServiceBase {
                     update.save(ms, node);
                 }
             }
+
             // if this is an account type then don't expect it to have any ACL but we still want to broadcast
             // out to the world the edit that was made to it, as long as it's not admin owned.
             boolean forceSendToPublic = isAccnt;
@@ -762,29 +751,6 @@ public class NodeEditService extends ServiceBase {
                 return null;
             });
         });
-    }
-
-    /*
-     * Since Quanta stores nodes under other nodes, and file systems are not capable of doing this we
-     * have to convert names to folders by putting a "-f" on them before writing to MFS
-     */
-    private String folderizePath(String path) {
-        List<String> nameTokens = XString.tokenize(path, "/", true);
-        StringBuilder sb = new StringBuilder();
-        int idx = 0;
-
-        for (String tok : nameTokens) {
-            if (idx < nameTokens.size()) {
-                sb.append("/");
-            }
-            if (idx < nameTokens.size() - 1) {
-                sb.append(tok + "-f");
-            } else {
-                sb.append(tok);
-            }
-            idx++;
-        }
-        return sb.toString();
     }
 
     /*

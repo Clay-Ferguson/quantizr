@@ -29,7 +29,6 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
-import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
 import quanta.util.Const;
 import quanta.util.ThreadLocals;
@@ -111,7 +110,8 @@ public class MongoDelete extends ServiceBase {
         LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
         Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Criteria crit = Criteria //
-                .where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null).and(SubNode.MODIFY_TIME).lt(date);
+                .where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null)//
+                .and(SubNode.MODIFY_TIME).lt(date);
         q.addCriteria(crit);
         DeleteResult res = ops.remove(q, SubNode.class);
         return res.getDeletedCount();
@@ -128,8 +128,8 @@ public class MongoDelete extends ServiceBase {
         LocalDate ldt = LocalDate.now().minusDays(5);
         Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
         Criteria crit = Criteria //
-                .where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath()))
-                .and(SubNode.MODIFY_TIME).lt(date); //
+                .where(SubNode.PATH).regex(mongoUtil.regexSubGraph(userNode.getPath())).and(SubNode.MODIFY_TIME)
+                .lt(date); //
         q.addCriteria(crit);
         // set all the parents of all nodes in 'q' to null child status
         bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
@@ -146,7 +146,7 @@ public class MongoDelete extends ServiceBase {
      */
     public long deleteUnderPath(MongoSession ms, String path) {
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+        q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
 
         SubNode parent = read.getNode(ms, path);
         if (parent != null) {
@@ -191,7 +191,7 @@ public class MongoDelete extends ServiceBase {
          * single operation!
          */
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
 
         crit = auth.addWriteSecurity(ms, crit);
         q.addCriteria(crit);
@@ -339,6 +339,7 @@ public class MongoDelete extends ServiceBase {
                 Query q = new Query();
                 q.addCriteria(Criteria.where(SubNode.PATH).is(parentPath));
                 SubNode parent = opsw.findOne(null, q);
+
                 // if parent node doesn't exist, this is an orphan we can delete.
                 if (parent == null) {
                     // lazy create our bulk ops here.
@@ -360,6 +361,7 @@ public class MongoDelete extends ServiceBase {
                     }
                 }
             });
+
             // after the DB scan is done delete the remainder left in ops pending
             if (opsPending.getVal() > 0) {
                 BulkWriteResult results = bops.getVal().execute();
@@ -446,6 +448,7 @@ public class MongoDelete extends ServiceBase {
                 // breaks out of while loop of 'passes'
                 break;
             }
+
             // delete all orphans identified in this pass
             orphans.entrySet().stream().forEach(entry -> {
                 // lazy create bops
@@ -574,7 +577,7 @@ public class MongoDelete extends ServiceBase {
 
         Query q = new Query();
         log.debug("DEL SUBGRAPH: " + node.getPath());
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         q.addCriteria(crit);
 
         // it's ok to call ops and not opsw here
@@ -635,19 +638,19 @@ public class MongoDelete extends ServiceBase {
          */
         Criteria crit = null;
         if (recursive) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())); //
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
         } else {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()));
         }
-        // Only allow deleting of TEXT-ish type node!!!
-        // Bad things can happen if we delete other nodes, even that contain
-        // "bad" content (N-word racial slur, etc.), because when people put those same words in their
-        // BLOCKED WORDS
-        // list in their accounts we don't want to mistake that for actual USE of the word, or for places
-        // where
-        // people might have blocked someone with an offensive username, we don't want to DELETE those
-        // blocked user
-        // nodes either, so for now we just delete if the type is a comment
+
+        /*
+         * Only allow deleting of TEXT-ish type node!!! Bad things can happen if we delete other nodes, even
+         * that contain "bad" content (N-word racial slur, etc.), because when people put those same words
+         * in their BLOCKED WORDS list in their accounts we don't want to mistake that for actual USE of the
+         * word, or for places where people might have blocked someone with an offensive username, we don't
+         * want to DELETE those blocked user nodes either, so for now we just delete if the type is a
+         * comment
+         */
         crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
         criterias.add(crit);
         if (!StringUtils.isEmpty(text)) {
@@ -699,6 +702,7 @@ public class MongoDelete extends ServiceBase {
         opsw.remove(ms, q);
     }
 
+    // todo-1: verify if there's now a constraint that disables duplicates
     public void removeDupFediNames() {
         Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
 

@@ -278,34 +278,4 @@ public class SystemService extends ServiceBase {
         redis.publish(msg);
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }
-
-    private static String runBashCommand(String title, String command) {
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command("bash", "-c", command);
-        // pb.directory(new File(dir));
-        // pb.redirectErrorStream(true);
-        StringBuilder output = new StringBuilder();
-        output.append("\n\n");
-        output.append(title);
-        output.append("\n");
-        try {
-            Process p = pb.start();
-            String s;
-            BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            while ((s = stdout.readLine()) != null) {
-                output.append(s);
-                output.append("\n");
-            }
-        } catch (
-        // output.append("Exit value: " + p.waitFor());
-        // p.getInputStream().close();
-        // p.getOutputStream().close();
-        // p.getErrorStream().close();
-        Exception e) {
-            ExUtil.error(log, "Unable to run script", e);
-        }
-        output.append("\n\n");
-        return output.toString();
-    }
 }

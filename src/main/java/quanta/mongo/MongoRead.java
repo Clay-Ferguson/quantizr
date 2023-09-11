@@ -138,7 +138,7 @@ public class MongoRead extends ServiceBase {
         if (noChildren(ms, path))
             return 0;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path));
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         return opsw.count(ms, q);
@@ -174,7 +174,7 @@ public class MongoRead extends ServiceBase {
         // counter-productive.
         // if (noChildren(ms, path)) return false;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path));
         q.addCriteria(crit);
         return opsw.exists(ms, q);
     }
@@ -487,8 +487,7 @@ public class MongoRead extends ServiceBase {
          * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          *
          */
-        Criteria crit = Criteria.where(SubNode.PATH)
-                .regex(mongoUtil.regexDirectChildrenOfPath(node == null ? "" : node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node == null ? "" : node.getPath()));
         if (ordered) {
             q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         }
@@ -531,7 +530,7 @@ public class MongoRead extends ServiceBase {
          * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          *
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path));
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
         }
@@ -612,7 +611,7 @@ public class MongoRead extends ServiceBase {
             return 0L;
         auth.auth(ms, node, PrivilegeType.READ);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
         q.limit(1);
@@ -628,7 +627,7 @@ public class MongoRead extends ServiceBase {
             return 0L;
         auth.auth(ms, node, PrivilegeType.READ);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
         q.limit(1);
@@ -654,7 +653,7 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -680,7 +679,7 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -711,7 +710,7 @@ public class MongoRead extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         if (publicOnly) {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
         }
@@ -757,9 +756,9 @@ public class MongoRead extends ServiceBase {
          */
         Criteria crit = null;
         if (recursive) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())); //
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
         } else {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()));
         }
 
         ands.add(crit);
@@ -875,7 +874,9 @@ public class MongoRead extends ServiceBase {
             Aggregation agg = Aggregation.newAggregation(aggOps);
             AggregationResults<SubNode> results = ops.aggregate(agg, SubNode.class, SubNode.class);
             return results.getMappedResults();
-        } else { // Otherwise a standard Query.
+        }
+        // Otherwise a standard Query.
+        else {
             Query q = new Query();
             Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
             q.addCriteria(c);
@@ -906,7 +907,7 @@ public class MongoRead extends ServiceBase {
         }
         auth.auth(ms, node, PrivilegeType.READ);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         /*
          * this mod time condition is simply to be sure the user has 'saved' the node and not pick up new
          * node currently being crafted
@@ -929,7 +930,7 @@ public class MongoRead extends ServiceBase {
         }
         auth.auth(ms, node, PrivilegeType.READ);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         crit = crit.and(SubNode.NAME).ne(null);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
@@ -1025,9 +1026,8 @@ public class MongoRead extends ServiceBase {
             return null;
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit =
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH))
-                        .and(SubNode.PROPS + "." + propName).is(propVal).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
+                .and(SubNode.PROPS + "." + propName).is(propVal).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
         if (allowAuth) {
             crit = auth.addReadSecurity(ms, crit);
@@ -1053,7 +1053,7 @@ public class MongoRead extends ServiceBase {
         // Otherwise for ordinary users root is based off their username
         // case-insensitive lookup of username:
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(pathToQuery))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(pathToQuery))
                 .and(SubNode.PROPS + "." + NodeProp.USER).is(user).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
         if (allowAuth) {
@@ -1102,9 +1102,8 @@ public class MongoRead extends ServiceBase {
         }
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))
-                .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s())
-                .is(userNode.getIdStr());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath())).and(SubNode.TYPE)
+                .is(type).and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         SubNode ret = opsw.findOne(ms, q);
@@ -1120,8 +1119,8 @@ public class MongoRead extends ServiceBase {
         }
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))
-                .and(SubNode.TYPE).is(type);
+        Criteria crit =
+                Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath())).and(SubNode.TYPE).is(type);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         return opsw.findOne(ms, q);
@@ -1156,9 +1155,9 @@ public class MongoRead extends ServiceBase {
     public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type, boolean recursive, Sort sort,
             Integer limit) {
         Query q = new Query();
-        Criteria crit =
-                Criteria.where(SubNode.PATH).regex(recursive ? mongoUtil.regexRecursiveChildrenOfPath(node.getPath())
-                        : mongoUtil.regexDirectChildrenOfPath(node.getPath())).and(SubNode.TYPE).is(type);
+        Criteria crit = Criteria.where(SubNode.PATH)
+                .regex(recursive ? mongoUtil.regexSubGraph(node.getPath()) : mongoUtil.regexChildren(node.getPath()))
+                .and(SubNode.TYPE).is(type);
         if (sort != null) {
             q.with(sort);
         }
@@ -1180,7 +1179,7 @@ public class MongoRead extends ServiceBase {
             return null;
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()))
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
@@ -1198,7 +1197,7 @@ public class MongoRead extends ServiceBase {
             return Collections.<SubNode>emptyList();
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path))
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
@@ -1245,12 +1244,12 @@ public class MongoRead extends ServiceBase {
 
         if (remote && local) {
             crit = new Criteria().orOperator(
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH)),
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH)));
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH)),
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH)));
         } else if (remote) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH));
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH));
         } else if (local) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH));
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
         }
 
         crit = auth.addReadSecurity(ms, crit);
@@ -1281,12 +1280,14 @@ public class MongoRead extends ServiceBase {
 
         if (remote && local) {
             crit = new Criteria().orOperator(
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH)),
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH)));
-        } else if (remote) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.REMOTE_USERS_PATH));
-        } else if (local) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.LOCAL_USERS_PATH));
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH)),
+                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH)));
+        } //
+        else if (remote) {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH));
+        } //
+        else if (local) {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
         }
 
         q.addCriteria(crit);
@@ -1423,8 +1424,8 @@ public class MongoRead extends ServiceBase {
     public long generateLogicalOrdinal(MongoSession ms, SubNode node) {
         Query q = new Query();
         Criteria crit = Criteria //
-                .where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()))
-                .and(SubNode.ORDINAL).lt(node.getOrdinal());
+                .where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getParentPath())).and(SubNode.ORDINAL)
+                .lt(node.getOrdinal());
         q.addCriteria(crit);
         return opsw.count(null, q);
     }

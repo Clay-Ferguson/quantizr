@@ -25,9 +25,10 @@ import quanta.util.Const;
 public class MongoCreate extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(MongoCreate.class);
-    // this large top reserve size means the "insert at top" will always be done with out multiple node
-    // updates
-    // except for once every thousand times.
+    /*
+     * this large top reserve size means the "insert at top" will always be done with out multiple node
+     * updates except for once every thousand times.
+     */
     private static long RESERVE_BLOCK_SIZE = 1000;
 
     public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,

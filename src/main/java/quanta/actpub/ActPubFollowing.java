@@ -400,9 +400,8 @@ public class ActPubFollowing extends ServiceBase {
          * query all the direct children under the friendsListNode, that are FRIEND type although they
          * should all be FRIEND types.
          */
-        Criteria crit =
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(friendsListNode.getPath()))
-                        .and(SubNode.TYPE).is(NodeType.FRIEND.s());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(friendsListNode.getPath()))
+                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);

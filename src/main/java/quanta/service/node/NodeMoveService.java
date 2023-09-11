@@ -217,11 +217,13 @@ public class NodeMoveService extends ServiceBase {
         String parentPath = parentToPasteInto.getPath();
         // log.debug("targetPath (pasting into this): " + parentPath);
         Long curTargetOrdinal = null;
+
         // location==inside
         if (location.equalsIgnoreCase("inside")) {
             curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
-        } else if (location.equalsIgnoreCase("inline")) { // enum) // location==inline (todo-2: rename this to
-                                                          // inline-below -- or better yet, do an
+        } //
+        else if (location.equalsIgnoreCase("inline")) { // enum) // location==inline (todo-2: rename this to
+                                                        // inline-below -- or better yet, do an
             curTargetOrdinal = targetNode.getOrdinal() + 1;
             create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
         } //
@@ -252,6 +254,7 @@ public class NodeMoveService extends ServiceBase {
         }
         // make sure nodes to move are in ordinal order.
         nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
+
         // process all nodes being moved.
         for (SubNode node : nodesToMove) {
             // log.debug("MovingID (and it's children): " + node.getIdStr() + "[" + node.getContent() + "] path:
@@ -331,16 +334,19 @@ public class NodeMoveService extends ServiceBase {
             if (bops == null) {
                 bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
             }
+
             Criteria crit = new Criteria("id").is(node.getId());
             crit = auth.addWriteSecurity(ms, crit);
             Query query = new Query().addCriteria(crit);
             Update update = new Update().set(SubNode.PATH, newPath);
+
             if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
                 // crypto sig uses path as part of it, so we just invalidated the signature.
                 node.getProps().remove(NodeProp.CRYPTO_SIG.s());
                 update.set(SubNode.PROPS, node.getProps());
                 res.setSignaturesRemoved(true);
             }
+
             bops.updateOne(query, update);
             if (++batchSize > Const.MAX_BULK_OPS) {
                 bops.execute();

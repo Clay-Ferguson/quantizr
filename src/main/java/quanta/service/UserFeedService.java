@@ -52,7 +52,7 @@ public class UserFeedService extends ServiceBase {
             return res;
         String pathToSearch = NodePath.USERS_PATH;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch)); //
         /*
          * limit to just markdown types and comments, because we need to avoid everything else since we are
          * searching from the root of all user accounts.
@@ -113,10 +113,7 @@ public class UserFeedService extends ServiceBase {
             pathToSearch = rootNode.getPath();
             /* if the chat root is public disable all auth logic in this method */
             if (AclService.isPublic(rootNode)) {
-            } else /*
-                    * // do nothing, for now. If chat node is NOT public we try to check our read auth on it and if not
-                    * this will throw an exception which is the correct flow here
-                    */ {
+            } else {
                 try {
                     auth.auth(ms, rootNode, PrivilegeType.READ, PrivilegeType.WRITE);
                 } catch (Exception e) {
@@ -143,8 +140,9 @@ public class UserFeedService extends ServiceBase {
 
         if (req.getMyMentions()) {
             searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
-        } //
-        else if (req.getToMe()) { // includes shares TO me (but not in the context of a 'bidirectional' query)
+        }
+        // includes shares TO me (but not in the context of a 'bidirectional' query)
+        else if (req.getToMe()) {
             myAcntNode = read.getNode(ms, sc.getRootId());
             if (myAcntNode != null) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
@@ -168,7 +166,7 @@ public class UserFeedService extends ServiceBase {
 
         Query q = new Query();
         // initialize criteria using the Path to select the correct sub-graph of the tree
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch)); //
         // DO NOT DELETE (keep as an example of how to do this)
         // if (no(req.getNodeId() )) {
         // criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
@@ -191,8 +189,7 @@ public class UserFeedService extends ServiceBase {
             allowBadWords = false;
         }
         // Don't show UNPUBLISHED nodes. The whole point of having the UNPUBLISHED feature for nodes is so
-        // we
-        // can do this criteria right here and not show those in feeds.
+        // we can do this criteria right here and not show those in feeds.
         ands.add(new Criteria(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null));
         /*
          * Save the 'string' representations for blocked user ids for use below, to mask out places where
@@ -247,6 +244,7 @@ public class UserFeedService extends ServiceBase {
                 }
             }
         }
+
         if (req.getFromMe()) {
             if (myAcntNode == null) {
                 myAcntNode = read.getNode(ms, sc.getRootId());
@@ -273,6 +271,7 @@ public class UserFeedService extends ServiceBase {
                     res.setMessage("You haven't added any Friends yet.");
                     return res;
                 }
+
                 if (allFriendNodes != null) {
                     for (SubNode friendNode : allFriendNodes) {
                         List<String> hashTags = XString.tokenize(friendNode.getTags(), " ,", false);

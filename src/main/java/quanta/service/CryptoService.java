@@ -206,8 +206,8 @@ public class CryptoService extends ServiceBase {
         }
 
         // query all nodes under the path that are owned by 'ms'
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath()))
-                .and(SubNode.OWNER).is(ms.getUserNodeId());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(parent.getPath())).and(SubNode.OWNER)
+                .is(ms.getUserNodeId());
         Val<NodeSigPushInfo> pushInfo = new Val<>();
         Query query = new Query();
         crit = auth.addReadSecurity(ms, crit);
@@ -223,6 +223,7 @@ public class CryptoService extends ServiceBase {
         pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), sig));
         count.inc();
         BooleanVal failed = new BooleanVal();
+
         ops.stream(query, SubNode.class).forEachRemaining(node -> {
             // make sure session is still alive
             if (failed.getVal() || !sc.isLive())
@@ -248,6 +249,7 @@ public class CryptoService extends ServiceBase {
                 pushInfo.setVal(null);
             }
         });
+
         // make sure session is still alive
         if (failed.getVal() || !sc.isLive())
             return;

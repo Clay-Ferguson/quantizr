@@ -160,7 +160,7 @@ public class MongoUtil extends ServiceBase {
          */
         crit = crit.orOperator( //
                 Criteria.where(SubNode.PATH).is(path), //
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+                Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
         Query q = new Query(crit);
         return !ops.exists(q, SubNode.class);
     }
@@ -844,7 +844,7 @@ public class MongoUtil extends ServiceBase {
      * In other words path '/abc/def' is a child of '/abc/' and is considered a direct child, whereas
      * '/abc/def/ghi' is a level deeper and NOT considered a direct child of '/abc'
      */
-    public String regexDirectChildrenOfPath(String path) {
+    public String regexChildren(String path) {
         path = XString.stripIfEndsWith(path, "/");
         // NOTES:
         // - The leftmost caret (^) matches path to first part of the string (i.e. starts with 'path')
@@ -865,7 +865,7 @@ public class MongoUtil extends ServiceBase {
      * In other words path '/abc/def' is a child of '/abc/' and is considered a match and ALSO
      * '/abc/def/ghi' which is a level deeper and is also considered a match
      */
-    public String regexRecursiveChildrenOfPath(String path) {
+    public String regexSubGraph(String path) {
         path = XString.stripIfEndsWith(path, "/");
         // Based on this page:
         // https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use

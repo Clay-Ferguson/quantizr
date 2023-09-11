@@ -99,6 +99,7 @@ public class MongoAuth extends ServiceBase {
     public List<String> getUsersSharedTo(MongoSession ms, SubNode node) {
         List<String> userNames = null;
         List<AccessControlInfo> acList = getAclEntries(ms, node);
+
         if (acList != null) {
             for (AccessControlInfo info : acList) {
                 String userNodeId = info.getPrincipalNodeId();
@@ -148,9 +149,11 @@ public class MongoAuth extends ServiceBase {
                     child.putAc(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
                 }
             }
-        } else /*
-                * otherwise if not a FRIEND node we just share to the owner of the parent node
-                */ {
+        }
+        /*
+         * otherwise if not a FRIEND node we just share to the owner of the parent node
+         */
+        else {
             // add `parent.owner` to the ACL
             child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
             processActPubForNewNode(parent, child);
@@ -176,6 +179,7 @@ public class MongoAuth extends ServiceBase {
                 tags.put("@" + user, new APOMention(url, "@" + user));
             }
         }
+
         if (tags.size() > 0) {
             String content = "";
 
@@ -402,16 +406,13 @@ public class MongoAuth extends ServiceBase {
                 return;
             }
         }
+
         String sessionUserNodeId = ms.getUserNodeId() != null ? ms.getUserNodeId().toHexString() : null;
         if (nodeAuth(node, sessionUserNodeId, priv)) {
             if (verbose)
                 log.trace("nodeAuth success");
             return;
         }
-        // Don't log this. It happens in normal flow cases.
-        // log.error("Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user:
-        // " + ms.getUserName()
-        // + "\n" + ExUtil.getStackTrace(null));
         throw new ForbiddenException();
     }
 
@@ -485,7 +486,9 @@ public class MongoAuth extends ServiceBase {
         /* If this is a share to public we don't need to lookup a user name */
         if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
             principalName = PrincipalName.PUBLIC.s();
-        } else /* else we need the user name */ {
+        }
+        /* else we need the user name */
+        else {
             SubNode principalNode = read.getNode(ms, principalId, false, null);
             if (principalNode == null) {
                 return null;
@@ -548,7 +551,7 @@ public class MongoAuth extends ServiceBase {
         }
         List<Criteria> ands = new LinkedList<Criteria>();
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch));
         if (sharedToAny != null && sharedToAny.size() > 0) {
             List<Criteria> orCriteria = new LinkedList<>();
 
@@ -603,7 +606,7 @@ public class MongoAuth extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch));
 
         ands.add(Criteria.where(SubNode.AC).ne(null));
         if (ownerIdMatch != null) {
@@ -649,6 +652,7 @@ public class MongoAuth extends ServiceBase {
                 // }
                 apub.userEncountered(userName, false);
             }
+
             if (acctNode != null) {
                 String acctNodeId = acctNode.getIdStr();
                 if (ac == null || !ac.containsKey(acctNodeId)) {
@@ -669,8 +673,5 @@ public class MongoAuth extends ServiceBase {
         if (acChanged) {
             node.setAc(ac);
         }
-        // for now this saving is being done at a higher layer up (method that calls this one), and is
-        // always run.
-        // update.save(ms, node);
     }
 }

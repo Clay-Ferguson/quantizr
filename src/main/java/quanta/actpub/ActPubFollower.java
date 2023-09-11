@@ -207,7 +207,7 @@ public class ActPubFollower extends ServiceBase {
                 return null;
             }
         }
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.USERS_PATH))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.USERS_PATH))
                 .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE)
                 .is(NodeType.FRIEND.s());
         crit = auth.addReadSecurity(ms, crit);

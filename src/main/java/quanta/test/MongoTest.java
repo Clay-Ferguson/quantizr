@@ -199,7 +199,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
     public void testPathRegex() {
         // Direct Children Test
-        String dc = mongoUtil.regexDirectChildrenOfPath("/abc");
+        String dc = mongoUtil.regexChildren("/abc");
         verify("/abc/def".matches(dc));
         verify("/abc/abc".matches(dc));
         verify(!"/abc/def/x".matches(dc));
@@ -211,7 +211,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         verify(!"/abc/abc/abc/".matches(dc));
         verify(!"/abcx".matches(dc));
         // Recursive Children Test
-        String rc = mongoUtil.regexRecursiveChildrenOfPath("/abc");
+        String rc = mongoUtil.regexSubGraph("/abc");
         verify("/abc/x".matches(rc));
         verify("/abc/def".matches(rc));
         verify("/abc/def/x".matches(rc));

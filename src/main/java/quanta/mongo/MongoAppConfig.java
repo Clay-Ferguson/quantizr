@@ -96,6 +96,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
             } else {
                 log.debug("MongoSecurity disabled.");
             }
+
             try {
                 String mongoHost = appProp.getMongoDbHost();
                 Integer mongoPort = appProp.getMongoDbPort();
@@ -126,6 +127,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 builder = builder.codecRegistry(pojoCodecRegistry); //
                 MongoClientSettings settings = builder.build();
                 mongoClient = MongoClients.create(settings);
+
                 if (mongoClient != null) {
                     if (credential != null) {
                         for (String db : mongoClient.listDatabaseNames()) {

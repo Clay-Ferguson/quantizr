@@ -87,6 +87,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             ArrayList<SubNode> nodeStack = new ArrayList<>();
             nodeStack.add(node);
             recurseNode("../", "", rootNode, nodeStack, 0, null);
+
             if (req.isIncludeHTML()) {
                 StringBuilder out = new StringBuilder();
                 appendHtmlBegin("", out);
@@ -98,6 +99,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 appendHtmlEnd("", out);
                 addFileEntry("content.html", out.toString().getBytes(StandardCharsets.UTF_8));
             }
+
             if (req.isIncludeMD()) {
                 StringBuilder out = new StringBuilder();
                 if (markdownToc.length() > 0) {
@@ -251,6 +253,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (req.isIncludeMD()) {
                 fullMd.append("\n" + mdContent.getVal() + "\n");
             }
+
             if (atts != null) {
                 for (Attachment att : atts) {
                     // Skip File Tag type attachments because they'll already have been processed above

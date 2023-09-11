@@ -110,7 +110,7 @@ public class RSSFeedService extends ServiceBase {
                 }
             };
     private static final int FEED_ITEMS_PER_PAGE = 75;
-    private static final int REFRESH_FREQUENCY_MINS = 360; // 6 hrs
+    private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
     static boolean run = false;
 
     /*
@@ -144,7 +144,7 @@ public class RSSFeedService extends ServiceBase {
             int count = 0;
             int fails = 0;
 
-            // // Reload all feeds that were perviously FAILED
+            // Reload all feeds that were perviously FAILED
             if (failedFeeds.size() > 0) {
                 List<String> failedFeedsList = new LinkedList<>(failedFeeds);
                 failedFeeds.clear();
@@ -258,6 +258,8 @@ public class RSSFeedService extends ServiceBase {
                 URLConnection conn = new URL(url).openConnection();
                 conn.setConnectTimeout(timeout * 1000);
                 conn.setReadTimeout(timeout * 1000);
+
+                // todo-0: fix this deprecation and search or other deprecations project wide.
                 reader = new XmlReader(conn);
                 SyndFeedInput input = new SyndFeedInput();
                 inFeed = input.build(reader);
@@ -302,9 +304,11 @@ public class RSSFeedService extends ServiceBase {
                     try {
                         return input
                                 .build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB)));
-                    } catch (FeedException e) {
+                    } //
+                    catch (FeedException e) {
                         throw new IOException("Could not parse response for feed: " + url, e);
-                    } finally {
+                    } //
+                    finally {
                         long time = System.currentTimeMillis() - start;
                         if (time > 2000) {
                             log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
@@ -414,8 +418,9 @@ public class RSSFeedService extends ServiceBase {
             List<SyndEntry> entries = new ArrayList<>();
             feed.setEntries(entries);
             aggregateFeeds(urlList, entries, req.getPage());
-        } else {
-            /* If not an aggregate return the one external feed itself */
+        }
+        /* If not an aggregate return the one external feed itself */
+        else {
             String url = urlList.get(0);
             SyndFeed cachedFeed = getFeed(url, true, 1, 1);
             if (cachedFeed != null) {
@@ -463,7 +468,6 @@ public class RSSFeedService extends ServiceBase {
                 } catch (Exception ex) {
                     log.debug("Failed to Process: " + e.getTitle());
                 }
-                // if anything goes wrong processing the entry, we can ignore it and continue with the next entry.
             }
         }
         log.debug("Returning RSS Display: " + XString.prettyPrint(rf));
@@ -659,9 +663,11 @@ public class RSSFeedService extends ServiceBase {
                     }
                 } //
                 else if (m instanceof DCModuleImpl) {
-                } else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource =
-                         // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
-                         // DCModuleImpl dm = (DCModuleImpl) m;
+                }
+                // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource =
+                // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
+                // DCModuleImpl dm = (DCModuleImpl) m;
+                else {
                     log.debug("Unknown module type: " + m.getClass().getName());
                 }
             }

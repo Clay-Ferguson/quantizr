@@ -94,8 +94,11 @@ public class AclService extends ServiceBase {
                         bops = null;
                     }
                 } catch (Exception e) {
+                    // ignore
                 }
-            } else { // not an error, we just can't properties on nodes we don't own, so we skip them
+            }
+            // not an error, we just can't properties on nodes we don't own, so we skip them
+            else {
                 auth.ownerAuth(ms, n);
                 n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
                 log.debug("Set Unpublished on node " + n.getIdStr() + " to " + unpublished);
@@ -195,9 +198,11 @@ public class AclService extends ServiceBase {
                 throw new RuntimeEx("Cannot make an encrypted node public.");
             }
             mapKey = PrincipalName.PUBLIC.s();
-        } else /*
-                * otherwise we're sharing to a person so we now get their userNodeId to use as map key
-                */ {
+        }
+        /*
+         * otherwise we're sharing to a person so we now get their userNodeId to use as map key
+         */
+        else {
             // if no principal node passed in, then look it up
             if (principalNode == null) {
                 String _principal = principal;
@@ -280,10 +285,13 @@ public class AclService extends ServiceBase {
         String newPrivs = "";
         boolean removed = false;
         AccessControl ac = null;
+
         // if removing all privileges
         if ("*".equals(privToRemove)) {
             removed = true;
-        } else { // else removing just some specific privileges
+        }
+        // else removing just some specific privileges
+        else {
             ac = acl.get(principalNodeId);
             if (ac == null) {
                 log.debug("ac not found for " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
@@ -296,6 +304,7 @@ public class AclService extends ServiceBase {
             }
             HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
             StringTokenizer t = new StringTokenizer(privs, ",", false);
+
             /*
              * build the new comma-delimited privs list by adding all that aren't in the setToRemove
              */

@@ -157,6 +157,7 @@ public class AttachmentService extends ServiceBase {
             } else {
                 node = read.getNode(ms, nodeId, false, null);
             }
+
             if (node == null) {
                 throw ExUtil.wrapEx("Node not found.");
             }
@@ -188,6 +189,7 @@ public class AttachmentService extends ServiceBase {
                     }
                 }
             }
+
             for (MultipartFile uploadFile : uploadFiles) {
                 String fileName = uploadFile.getOriginalFilename();
                 String contentType = uploadFile.getContentType();
@@ -203,13 +205,15 @@ public class AttachmentService extends ServiceBase {
                             -1, explodeZips, toIpfs, true, true, true, null, allowEmailParse);
                 }
             }
+
             // if we have enough images to lay it out into a square of 3 cols switch to that
             // layout
             if (imageCount >= 9) {
                 node.set(NodeProp.LAYOUT, "c3");
-            } //
-            else if (imageCount >= 2) { // switch to that layout. // otherwise, if we have enough images to lay it out
-                                        // into a square of 2 cols
+            }
+            // switch to that layout. // otherwise, if we have enough images to lay it out
+            // into a square of 2 cols
+            else if (imageCount >= 2) {
                 node.set(NodeProp.LAYOUT, "c2");
             }
             update.saveSession(ms);
@@ -244,13 +248,14 @@ public class AttachmentService extends ServiceBase {
             node.setContent(mkdown);
             update.save(ms, node);
         } //
-        else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) { //
+        else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
             /*
              * This is a prototype-scope bean, with state for processing one import at a time
              */
             ImportZipService importZipStreamService = (ImportZipService) context.getBean(ImportZipService.class);
             importZipStreamService.importFromStream(ms, is, node, false);
-        } else { //
+        } //
+        else {
             saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
                     calcImageSize, closeStream, storeLocally, sourceUrl);
         }
@@ -319,6 +324,7 @@ public class AttachmentService extends ServiceBase {
                 conn.setReadTimeout(timeout * 1000);
                 mimeType = conn.getContentType();
             } catch (Exception e) {
+                // ignore
             }
         }
         return mimeType;
@@ -327,7 +333,6 @@ public class AttachmentService extends ServiceBase {
     // Another way is this (according to baeldung site)
     // Path path = new File("product.png").toPath();
     // String mimeType = Files.probeContentType(path);
-    //
     public String getMimeFromFileType(String fileName) {
         String mimeType = null;
         /* mimeType can be passed as null if it's not yet determined */
@@ -361,8 +366,9 @@ public class AttachmentService extends ServiceBase {
         if (importMode) {
             att = node.getAttachment(attName, false, false);
             fileName = att.getFileName();
-        } else {
-            // if no attName given we try to use "primary", but if primary exists, we find a different name
+        }
+        // if no attName given we try to use "primary", but if primary exists, we find a different name
+        else {
             if (StringUtils.isEmpty(attName)
                     && node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false) != null) {
                 attName = getNextAttachmentKey(node);
@@ -699,6 +705,7 @@ public class AttachmentService extends ServiceBase {
     public Object getStreamResource(MongoSession ms, HttpHeaders headers, String nodeId) {
         BufferedInputStream inStream = null;
         ResponseEntity<ResourceRegion> ret = null;
+
         try {
             SubNode node = read.getNode(ms, nodeId, false, null);
             Attachment att = node.getFirstAttachment();
@@ -713,12 +720,7 @@ public class AttachmentService extends ServiceBase {
             if (fileName == null) {
                 fileName = "filename";
             }
-            // long startTime = System.currentTimeMillis();
             InputStream is = getStream(ms, "", node, false);
-            // if (session.isAdmin() && Const.adminDebugStreaming) {
-            // long duration = System.currentTimeMillis() - startTime;
-            // }
-            // startTime = System.currentTimeMillis();
             long size = att.getSize();
             if (size == 0) {
                 throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
@@ -856,11 +858,13 @@ public class AttachmentService extends ServiceBase {
                 // insert 0L for size now, because we don't know it yet
                 attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
                         false, false, true, true, storeLocally, sourceUrl, false);
-            } else /*
-                    * if not an image extension, we can just stream directly into the database, but we want to try to
-                    * get the mime type first, from calling detectImage so that if we do detect its an image we can
-                    * handle it as one.
-                    */ {
+            }
+            /*
+             * if not an image extension, we can just stream directly into the database, but we want to try to
+             * get the mime type first, from calling detectImage so that if we do detect its an image we can
+             * handle it as one.
+             */
+            else {
                 if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
                     HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
                     HttpGet request = new HttpGet(sourceUrl);
@@ -1122,9 +1126,11 @@ public class AttachmentService extends ServiceBase {
                                 // Because all the userstats are updated at the end of this scan.
                                 grid.delete(q);
                                 delCount++;
-                            } else /*
-                                    * else update the UserStats by adding the file length to the total for this user
-                                    */ {
+                            }
+                            /*
+                             * else update the UserStats by adding the file length to the total for this user
+                             */
+                            else {
                                 UserStats stats = statsMap.get(subNode.getOwner());
                                 if (stats == null) {
                                     stats = new UserStats();

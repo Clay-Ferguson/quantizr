@@ -116,8 +116,7 @@ public class NodeRenderService extends ServiceBase {
          */
         SubNode scanToNode = null;
         // we pass allowAuth=true because right here we DO care that the hasChildren is considering only
-        // based
-        // on what WE can access.
+        // based on what WE can access.
         if (req.isForceRenderParent()) {
             req.setUpLevel(true);
         }
@@ -332,10 +331,12 @@ public class NodeRenderService extends ServiceBase {
                         // ROWS_PER_PAGE max and we're done.
                         slidingWindow = null;
                     }
-                } else /*
-                        * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
-                        * iteration/node
-                        */ {
+                }
+                /*
+                 * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
+                 * iteration/node
+                 */
+                else {
                     /* lazily create sliding window */
                     if (slidingWindow == null) {
                         slidingWindow = new LinkedList<>();
@@ -426,6 +427,7 @@ public class NodeRenderService extends ServiceBase {
         return sort;
     }
 
+    // todo-0: move to EditNodeService.java
     public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
         InitNodeEditResponse res = new InitNodeEditResponse();
         String nodeId = req.getNodeId();
