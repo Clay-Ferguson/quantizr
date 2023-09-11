@@ -74,7 +74,7 @@ export class Edit {
     }
 
     public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string) => {
+        showJumpButton: boolean, replyToId: string, afterEditJumpToId: string) => {
         const ast = getAs();
         if (S.util.checkSuccess("Editing node", res)) {
             if (ast.mobileMode) forceUsePopup = true;
@@ -113,12 +113,14 @@ export class Edit {
                 else if (editInPopup) {
                     await promiseDispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
+                        s.afterEditJumpToId = afterEditJumpToId;
                     });
                     const dlg = new EditNodeDlg(encrypt, showJumpButton, null);
                     dlg.open();
                 } else {
                     dispatch("startEditing", s => {
                         s.editNode = res.nodeInfo;
+                        s.afterEditJumpToId = afterEditJumpToId;
                         s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
@@ -191,6 +193,9 @@ export class Edit {
     */
     startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo,
         nodeInsertTarget: J.NodeInfo, ordinalOffset: number) => {
+
+        const afterEditJumpToId = createAtTop ? parentNode.id : null;
+
         if (!S.props.isWritableByMe(parentNode)) {
             console.log("Rejecting request to edit. Not authorized");
             return;
@@ -237,7 +242,7 @@ export class Edit {
                     directMessage: false
                 });
                 if (blob) {
-                    this.createSubNodeResponse(res, false, null);
+                    this.createSubNodeResponse(res, false, null, afterEditJumpToId);
                 }
             }
 
@@ -274,7 +279,7 @@ export class Edit {
                     reply: false,
                     directMessage: false
                 });
-                this.createSubNodeResponse(res, false, null);
+                this.createSubNodeResponse(res, false, null, afterEditJumpToId);
             }
         }
     }
@@ -282,11 +287,11 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, getAs());
-            this.runEditNode(null, res.newNode.id, false, false, false, null, false);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, false, null);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string) => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditJumpToId: string) => {
         // console.log("createSubNode Res: " + S.util.prettyPrint(res));
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
@@ -294,7 +299,7 @@ export class Edit {
             }
             else {
                 this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, //
-                    false);
+                    false, afterEditJumpToId);
             }
         }
     }
@@ -353,7 +358,7 @@ export class Edit {
                     // because it got updated. That would take us away from whatever we're working on and
                     // is never right.
                     if (node.type !== J.NodeType.BOOKMARK && !S.nodeUtil.displayingOnTree(node.id)) {
-                        S.view.jumpToId(node.id);
+                        S.view.jumpToId(ast.afterEditJumpToId || node.id);
                     }
                 }
             }
@@ -701,7 +706,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, false);
+        this.runEditNode(null, id, false, false, false, null, false, null);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -711,7 +716,7 @@ export class Edit {
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
     runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean) => {
+        showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean, afterEditJumpToId: string) => {
         if (S.quanta.config.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -738,7 +743,7 @@ export class Edit {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId);
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditJumpToId);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, ast?: AppState) => {
@@ -1123,7 +1128,7 @@ export class Edit {
         });
 
         if (blob) {
-            this.createSubNodeResponse(res, false, null);
+            this.createSubNodeResponse(res, false, null, null);
         }
         else {
             let msg = "Saved in Notes folder";
@@ -1190,7 +1195,7 @@ export class Edit {
             reply: false,
             directMessage: false
         });
-        this.createSubNodeResponse(res, true, null);
+        this.createSubNodeResponse(res, true, null, null);
     }
 
     // like==false means 'unlike'
@@ -1244,7 +1249,7 @@ export class Edit {
         });
 
         if (!boostTarget) {
-            this.createSubNodeResponse(res, false, replyToId);
+            this.createSubNodeResponse(res, false, replyToId, null);
         }
         else {
             S.util.flashMessageQuick("Post was boosted!", "Boost");
@@ -1286,7 +1291,7 @@ export class Edit {
         if (!getAs().userPrefs.editMode) {
             await this.setEditMode(true);
         }
-        this.createSubNodeResponse(res, forceUsePopup, null);
+        this.createSubNodeResponse(res, forceUsePopup, null, null);
 
         // this is low priority so do it asynchronously
         setTimeout(() => {
@@ -1312,7 +1317,7 @@ export class Edit {
             reply: false,
             directMessage: false
         });
-        this.createSubNodeResponse(res, false, null);
+        this.createSubNodeResponse(res, false, null, null);
     }
 
     linkNodes = async (sourceNodeId: string, targetNodeId: string, name: string, type: string) => {

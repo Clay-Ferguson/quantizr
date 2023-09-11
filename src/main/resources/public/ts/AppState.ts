@@ -157,6 +157,7 @@ export class AppState {
     tour: Tour;
 
     editNode: J.NodeInfo;
+    afterEditJumpToId: string;
 
     editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'
     editNodeReplyToId: string;
