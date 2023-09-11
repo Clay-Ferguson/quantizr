@@ -43,7 +43,7 @@ public class OpenAiService extends ServiceBase {
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
 
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(60000));
+    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(300000));
     public static final ObjectMapper mapper = new ObjectMapper();
 
     // NOTE: This didn't allow unknown properties as expected but putting the
