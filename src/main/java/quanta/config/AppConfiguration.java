@@ -134,7 +134,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     // /*
     // * This is how we enable the JS files to be edited and tested without doing a rebuild and restart
     // of
-    // * server code. We can just run TSC compile to generate the new JS files (or let webpack do that),
+    // * server code. We can just run TSC compile to generate the new JS files (or let vite do that),
     // * and then refresh the browser to reload them. This jsBaseFolder should of course be empty
     // (unused)
     // * in production environment, or any time the JAR (build) should be used exclusively at runtime,

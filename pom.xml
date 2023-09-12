@@ -192,25 +192,11 @@
 
 		<!-- ========== DEV-VSCODE PROFILE BEGIN ==========	-->
 		<!-- This profile 'dev-vscode' is the one we activate by default so that when opening in
-		VSCode we don't run into the
-		bug that exists where 'node' process will HANG forever with maxed out CPU usage. This profile is
-		identical to the 'dev' 
-		profile except for omitting the webpack part which causes this bug/hang. All profiles work just
-		fine with or without
-		webpack when run on the command line, but it seems VSCode is not able to run any webpack without
-		this bug happening, so the 
-		solution is just that we never run any webpack from inside VSCode
-		
-		Interestingly, this bug only happens then VSCode is automatically running the the build behind the
-		scenes just because you
-		opened the project and it wants to run a build. Running from a tasks.json entry that runs
-		'./build.sh', from the Terminal 
-		menu inside VSCode works just fine.
-
+		VSCode 
 		UPDATE: There ended up being an additional need for this profile to the above, which is the fact
 		that it can compile the Java
 		and run the typescript-generator-maven-plugin to generate the generated TypeScript Interfaces,
-		without WebPack trying to run first
+		without vite trying to run first
 	    which can potentially have outdated (old) generated file, and fail.
 		-->
 		<profile>
@@ -218,13 +204,6 @@
 			<activation>
 				<!-- I think i added this 'default' designation so that IDEs can build always even
 				when no specific build config is being run 
-				
-				Update: I set this activeByDefaut to 'false' on 4/6/2019, because I noticed the webpack process was
-				hanging up in 'node' somehow, 
-				and the 'node' process in linux was sitting ther burning up 155% CPU forever, in a loop. This stops
-				VSCode from causing this to happen.
-				Somehow there is a bug in that scenario. VSCode detecting this and trying to run a build once you
-				just merely open your IDE.
 				-->
 				<activeByDefault>true</activeByDefault>
 			</activation>

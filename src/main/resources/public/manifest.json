@@ -1,9 +1,0 @@
-{
-  "name": "SubNode",
-  "short_name": "SubNode",
-  "icons": [{
-        "src": "images/favicon.ico",
-        "type": "image/png"
-      }],
-  "display": "standalone"
-}

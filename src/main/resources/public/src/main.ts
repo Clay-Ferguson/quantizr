@@ -4,7 +4,6 @@
 // import "font-awesome/css/font-awesome.min.css";
 
 import "./quanta.css"
-import "./katex.min.css"
 import * as bootstrap from "bootstrap";
 
 import React from "react";
@@ -24,7 +23,7 @@ import AppContainer from "./comp/core/AppContainer";
 import TutorialAppContainer from "./comp/core/TutorialAppContainer";
 
 if (bootstrap) {
-    console.log("bootstrap js loaded ok");
+    console.log("bootstrap js loaded ok(b)");
 }
 
 // we have this as the first import for troubleshooting how browsers are
@@ -46,9 +45,6 @@ const processAppLoad = async () => {
     switch (app) {
         // http://127.0.0.1:8182/?app=TxsApp
         case "TsxApp":
-            // NOTE: We can use JSX like this if we want... just by renaming this file to ".tsx" extension
-            // and of source updating the reference ti this index file in the webpack common config file.
-            // root.render(<AppContainer />);
             console.log("TsxApp");
             root.render(React.createElement(TsxApp));
             break;

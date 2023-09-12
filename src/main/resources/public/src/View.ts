@@ -7,7 +7,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
-// These are magically defined in webpack.common.js;
+// todo-0: These need to be made to work again. When switching to Vite we lost this for now.
 declare const BUILDTIME: string;
 declare const PROFILE: string;
 
