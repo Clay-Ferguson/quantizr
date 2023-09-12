@@ -66,7 +66,7 @@ export class CalcType extends TypeBase {
             win.eval(script);
             outputComp = new Pre(win.q.logs.join("\n"), { className: "calcOutputArea" });
         }
-        catch (e) {
+        catch (e: any) {
             outputComp = new Pre(e.message + "\n" + e.stack, { className: "calcOutputArea" });
         }
         finally {

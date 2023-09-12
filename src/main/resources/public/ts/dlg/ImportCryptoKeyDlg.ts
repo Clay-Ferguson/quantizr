@@ -63,7 +63,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 dlg.open();
             }
         }
-        catch (e) {
+        catch (e: any) {
             alert("Unable to import key: " + e.message);
         }
     }

@@ -789,12 +789,14 @@ export class EditNodeDlg extends DialogBase {
         this.addTagsToTextField(dlg);
     }
 
+    // @ts-ignore
     super_closeByUser = this.closeByUser;
     override closeByUser = () => {
         this.super_closeByUser();
         this.resetAutoSaver();
     }
 
+    // @ts-ignore
     super_close = this.close;
     override close = () => {
         setTimeout(() => S.speech.stopListening(), 100);

@@ -37,6 +37,7 @@ export class VideoPlayerDlg extends DialogBase {
         return this.videoPlayer.getVideoElement();
     }
 
+    // @ts-ignore
     super_close = this.close;
     /* When the dialog closes we need to stop and remove the player */
     override close = () => {

@@ -10,7 +10,7 @@ FOLDER=$(dirname "$FILE")
 export PRJROOT=$(dirname "$FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
-export WEBPACK_SCRIPT=build-prod
+export VITE_SCRIPT=vite-build
 export SASS_SCRIPT=sass-prod
 
 export DOCKER_IMAGE=quanta

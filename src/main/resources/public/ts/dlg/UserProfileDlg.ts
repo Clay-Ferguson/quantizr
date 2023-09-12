@@ -372,6 +372,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
+    // @ts-ignore
     super_close = this.close;
     override close = () => {
         this.super_close();

@@ -1,13 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-    <base href="/" />
-    <link rel="stylesheet" href="/dist/quanta.css?cb=<%= htmlWebpackPlugin.options.cacheBuster %>">
-    <script src="/bs-js/popper.min.js"></script>
-    <script src="/bs-js/bootstrap.min.js"></script>
-
-    <meta charset="utf-8" />
     <meta property="instanceId" th:attr="content=${instanceId}" />
     <meta name="description" th:attr="content=${brandingMetaContent}" />
     <meta name="viewport"
@@ -29,10 +24,10 @@
         th:attr="content=${ogDescription}" />
     <meta name="twitter:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
 
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png?v=3" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png?v=3" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png?v=3" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/src/images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/src/images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/src/images/favicon-16x16.png" />
+    <link rel="manifest" href="/src/site.webmanifest" />
 
     <title th:text="${brandingAppName}"></title>
 
@@ -40,31 +35,29 @@
         alert("This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
     </script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css">
-
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        window.g_config = /*[[${g_config}]]*/ null;
-        // console.log("g_config: " + JSON.stringify(window.g_config, null, 4));
-        /*]]>*/
-    </script>
-</head>
+      /*<![CDATA[*/
+      window.g_config = /*[[${g_config}]]*/ null;
+      // console.log("g_config: " + JSON.stringify(window.g_config, null, 4));
+      /*]]>*/
+  </script>
+  </head>
 
-<body style="background-color: 'black'; width: 100%; height: 100%;">
+  <body style="background-color: 'black'; width: 100%; height: 100%;">
     <noscript>
-        This app requires JavaScript.
-    </noscript>
+      This app requires JavaScript.
+      </noscript>
 
-    <div id="app">
-        <div style="height: 100vh; width: 20%; margin: auto">
-            <div style="margin-left: auto; margin-right: auto;" class="progressSpinner">
-                <div class="spinner-border text-success"></div>
-            </div>
-        </div>
-    </div>
+      <div id="app">
+          <div style="height: 100vh; width: 20%; margin: auto">
+              <div style="margin-left: auto; margin-right: auto;" class="progressSpinner">
+                  <div class="spinner-border text-success"></div>
+              </div>
+          </div>
+      </div>
 
-    <div id="overlayDiv" class="overlay"></div>
-    <div id="mouse-circle"></div>
-</body>
-
+  <div id="overlayDiv" class="overlay"></div>
+  <div id="mouse-circle"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

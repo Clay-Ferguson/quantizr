@@ -1,8 +1,11 @@
-
 // DO NOT DELETE (I want to keep the capability to go back to this if needed)
 // (see also: #css-imports-disabled)
 // import "bootstrap";
 // import "font-awesome/css/font-awesome.min.css";
+
+import "./quanta.css"
+import "./katex.min.css"
+import * as bootstrap from "bootstrap";
 
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -20,10 +23,14 @@ import TsxApp from "./TsxApp";
 import AppContainer from "./comp/core/AppContainer";
 import TutorialAppContainer from "./comp/core/TutorialAppContainer";
 
+if (bootstrap) {
+    console.log("bootstrap js loaded ok");
+}
+
 // we have this as the first import for troubleshooting how browsers are
 // able to handle the 'import' statement.
 ImportTest.check();
-console.log("index.ts finished imports");
+console.log("main.ts finished imports");
 let initialized = false;
 
 const processAppLoad = async () => {

@@ -119,6 +119,7 @@ export class SharingDlg extends DialogBase {
         this.removePrivilegeResponse();
     }
 
+    // @ts-ignore
     super_close = this.close;
     override close = () => {
         this.super_close();

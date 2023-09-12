@@ -17,6 +17,7 @@ export class CalendarType extends TypeBase {
         return true;
     }
 
+    // @ts-ignore
     super_render = this.render;
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);

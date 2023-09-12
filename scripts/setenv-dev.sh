@@ -14,7 +14,7 @@ source ./define-functions.sh
 # Define some functions that are specific only to managing the DEV environment
 source ./define-functions-dev.sh
 
-export WEBPACK_SCRIPT=build-dev
+export VITE_SCRIPT=vite-build
 export SASS_SCRIPT=sass-dev
 export DOCKER_IMAGE=quanta-dev
 

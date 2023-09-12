@@ -12,7 +12,7 @@ import { S } from "./Singletons";
 import { TrendingView } from "./tabs/TrendingView";
 
 export class Quanta {
-    // initialized in index.ts
+    // initialized in main.ts
     config: J.ClientConfig = null;
 
     // this is a convenience var pointing to Quanta.config.config
@@ -245,7 +245,7 @@ export class Quanta {
                 S.user.userLogin();
             }
         }
-        catch (e) {
+        catch (e: any) {
             S.util.logErr(e);
             alert("App failed to start: " + e?.message || "");
             throw e;

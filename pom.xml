@@ -306,7 +306,7 @@
 								<pattern>quanta.response.**</pattern>
 							</classPatterns>
 							<outputKind>module</outputKind>
-							<outputFile>src/main/resources/public/ts/JavaIntf.ts</outputFile>
+							<outputFile>src/main/resources/public/src/JavaIntf.ts</outputFile>
 							<outputFileType>implementationFile</outputFileType>
 
 							<!-- <mapClasses>asClasses</mapClasses>

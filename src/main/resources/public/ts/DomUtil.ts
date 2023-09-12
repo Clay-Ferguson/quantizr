@@ -150,7 +150,7 @@ export class DomUtil {
         return document.getElementById(id);
     }
 
-    forEachElmBySel = (sel: string, callback: Function) => {
+    forEachElmBySel = (sel: string, callback: (el: HTMLElement, i: any) => any) => {
         const elements = document.querySelectorAll(sel);
         Array.prototype.forEach.call(elements, callback);
     }
