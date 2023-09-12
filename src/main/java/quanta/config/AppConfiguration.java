@@ -209,7 +209,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     @Bean
     public ClassLoaderTemplateResolver templateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("templates/");
+        templateResolver.setPrefix("public/dist/");
         templateResolver.setCacheable(!"dev".equals(appProp.getProfileName()));
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML5");

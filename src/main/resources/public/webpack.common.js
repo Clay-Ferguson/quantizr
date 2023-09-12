@@ -25,7 +25,7 @@ function formatDate(date) {
 
 const plugins = [
     new HtmlWebpackPlugin({
-        filename: "../../templates/index.html",
+        filename: "../../public/dist/index.html",
         template: "indexTemplate.html",
         publicPath: "/dist",
         scriptLoading: "module",
@@ -34,7 +34,7 @@ const plugins = [
     }),
 
     new HtmlWebpackPlugin({
-        filename: "../../templates/error.html",
+        filename: "../../public/dist/error.html",
         template: "errorTemplate.html",
         publicPath: "/dist",
         // scriptLoading: "blocking",
