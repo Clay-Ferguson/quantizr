@@ -447,16 +447,14 @@ i'm backing out for now
 .openAiAnswer {
     border: 2px solid cyan;
     border-radius: $border-radius;
-    padding: 16px;
+    padding: 8px 8px 0 8px;
     margin-left: $tinyGap;
+    margin-bottom: 6px;
 }
 
-.openAiAnswer::after {
-    content: "by GPT";
-    position: absolute;
+.openAiAnswerFooter {
     color: cyan;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    bottom: 0;
-    right: 0;
+    font-weight: bold;
+    font-style: italic;
+    padding-right: 16px;
 }

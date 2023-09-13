@@ -17,3 +17,5 @@ src/main/resources/server/build
 src/main/resources/public/dist
 src/main/resources/public/node
 src/main/resources/public/src/quanta.css
+src/main/resources/public/src/quanta.css.map
+

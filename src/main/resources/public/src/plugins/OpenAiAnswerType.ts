@@ -1,5 +1,6 @@
 import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
+import { Div } from "../comp/core/Div";
 import { TypeBase } from "./base/TypeBase";
 
 export class OpenAiAnswerType extends TypeBase {
@@ -11,6 +12,10 @@ export class OpenAiAnswerType extends TypeBase {
     // node is a comment, so I'm just not doing it, but this code DOES work.
     override getExtraMarkdownClass(): string {
         return "openAiAnswer";
+    }
+
+    override getCustomFooter(): Div {
+        return new Div("by GPT", { className: "openAiAnswerFooter float-end" });
     }
 
     override getEditorOptions(): EditorOptions {

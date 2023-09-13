@@ -68,6 +68,10 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
+    getCustomFooter(): Div {
+        return null;
+    }
+
     getAllowRowHeader(): boolean {
         return true;
     }
@@ -186,7 +190,7 @@ export class TypeBase implements TypeIntf {
     }
 
     parseUrlsFromHtml = (node: J.NodeInfo): Set<string> => {
-        let val = node.content;
+        const val = node.content;
 
         // this is just a performance optimization to bypass the function if we know we can 
         if (val.indexOf("<a ") === -1 ||
@@ -293,6 +297,10 @@ export class TypeBase implements TypeIntf {
 
         let comp: CompIntf = null;
         let urls: Set<string> = null;
+        const containerClass = this.getExtraMarkdownClass();
+        const footerComp: Div = this.getCustomFooter();
+
+        const attrs = containerClass ? { className: containerClass } : null;
 
         // todo-1: tricky hack to detect if this is all HTML
         if (cont?.startsWith("<") && cont?.endsWith(">")) {
@@ -302,7 +310,7 @@ export class TypeBase implements TypeIntf {
         // else render as markdown
         else {
             urls = this.parseUrlsFromText(cont);
-            comp = cont ? new NodeCompMarkdown(node, this.getExtraMarkdownClass(), tabData, urls) : null;
+            comp = cont ? new NodeCompMarkdown(node, null, tabData, urls) : null;
         }
 
         /* if we have URLs, then render them if available, but note they render asynchronously
@@ -327,7 +335,9 @@ export class TypeBase implements TypeIntf {
                     }
                 }
             });
-            return new Diva(children);
+            children.push(footerComp);
+            children.push(new Clearfix());
+            return new Divc(attrs, children);
         }
         else {
             const isRoot = node.id === ast.node?.id;
@@ -344,17 +354,18 @@ export class TypeBase implements TypeIntf {
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
-                return new Diva([
+                return new Divc(attrs, [
                     comp,
                     choices,
                     aiConfigDiv,
                     S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
-                    new Clearfix()
+                    footerComp,
+                    new Clearfix(),
                 ])
             }
             // otherwise just return the content component itself.
             else {
-                return new Diva([comp, aiConfigDiv, choices]);
+                return new Divc(attrs, [comp, aiConfigDiv, choices, footerComp, new Clearfix()]);
             }
         }
     }

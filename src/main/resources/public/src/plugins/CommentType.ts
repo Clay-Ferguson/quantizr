@@ -7,12 +7,6 @@ export class CommentType extends TypeBase {
         super(J.NodeType.COMMENT, "Comment", "fa-comment", true);
     }
 
-    // For now i'm not sure how we should indicate visibly that a
-    // node is a comment, so I'm just not doing it, but this code DOES work.
-    // getExtraMarkdownClass(): string {
-    //     return "commentMarkdownClass";
-    // }
-
     override getEditorOptions(): EditorOptions {
         return {
             tags: true,
