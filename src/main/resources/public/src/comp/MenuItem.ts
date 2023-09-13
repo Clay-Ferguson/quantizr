@@ -31,7 +31,7 @@ export class MenuItem extends Div {
         let innerClazz: string;
         if (this.stateFunc) {
             innerSpan = new Checkbox(state.content, { className: "marginRight" }, {
-                setValue: (checked: boolean) => this.onClick(),
+                setValue: (_checked: boolean) => this.onClick(),
                 getValue: (): boolean => this.stateFunc()
             });
             innerClazz = "listGroupMenuItemCompact " + this.moreClasses;

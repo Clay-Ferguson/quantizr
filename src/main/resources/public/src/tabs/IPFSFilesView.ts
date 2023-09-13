@@ -95,7 +95,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
                 new Span(null, { className: "float-end marginBottom" }, [
                     new Checkbox("List CIDs", null, {
                         setValue: (checked: boolean) => {
-                            dispatch("setListCids", s => {
+                            dispatch("setListCids", _s => {
                                 this.data.props.listCids = checked;
                             });
                         },
@@ -293,7 +293,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
                 folder
             });
 
-            dispatch("loadIPFSFiles", s => {
+            dispatch("loadIPFSFiles", _s => {
                 // this condition just makes sure we're not pushing the same thing already at the top of the stack.
                 if (!(IPFSFilesView.history.length > 0 && IPFSFilesView.history[IPFSFilesView.history.length - 1] === folder)) {
                     IPFSFilesView.history.push(folder);

@@ -162,7 +162,7 @@ export class SpeechEngine {
 
         if (textToAdd) {
             this.appendTextToBuffer(textToAdd);
-            await promiseDispatch("speechEngineStateChange", s => {
+            await promiseDispatch("speechEngineStateChange", _s => {
                 setTimeout(() => {
                     this.highlightByIndex(this.ttsIdx);
                 }, 250);

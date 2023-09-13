@@ -175,13 +175,13 @@ export class AudioPlayerDlg extends DialogBase {
             this.player = elm as HTMLAudioElement;
             if (!this.player) return;
 
-            this.player.onpause = (event) => {
+            this.player.onpause = (_event) => {
                 this.updatePlayButton();
             };
-            this.player.onplay = (event) => {
+            this.player.onplay = (_event) => {
                 this.updatePlayButton();
             };
-            this.player.onended = (event) => {
+            this.player.onended = (_event) => {
                 this.updatePlayButton();
             };
         });

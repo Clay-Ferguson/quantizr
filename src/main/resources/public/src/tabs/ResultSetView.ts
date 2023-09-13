@@ -39,7 +39,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         if (!results) {
             this.setChildren([new Div("Nothing found.")]);
             return true;
-        };
+        }
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -125,7 +125,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     /* overridable (don't use arrow function) */
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
     // it's essentially to support DOM finding.
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
+    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): CompIntf {
         const ast = getAs();
         const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data,

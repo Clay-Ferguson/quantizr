@@ -50,7 +50,7 @@ export class PickNodeTypeDlg extends DialogBase {
 
         this.mergeState<LS>({ selType: curType || J.NodeType.NONE });
 
-        this.searchTextState.v.onStateChange = (val: any) => {
+        this.searchTextState.v.onStateChange = (_val: any) => {
             PickNodeTypeDlg.searchDirty = true;
             PickNodeTypeDlg.dirtyCounter = 0;
         };

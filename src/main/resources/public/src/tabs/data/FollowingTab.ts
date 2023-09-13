@@ -30,17 +30,17 @@ export class FollowingTab implements TabIntf<FollowingRSInfo> {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
-    nodeDeleted = (ust: AppState, nodeId: string): void => {
+    nodeDeleted = (_ust: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (_ust: AppState, newNode: J.NodeInfo): void => {
         this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
-    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+    processNode = (_ust: AppState, func: (node: J.NodeInfo) => void): void => {
         this.props.results?.forEach(n => func(n));
     }
 }

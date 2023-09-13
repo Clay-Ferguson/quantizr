@@ -229,7 +229,7 @@ export class EditAttachmentsPanel extends Div {
         }
 
         this.dlg.binaryDirty = true;
-        dispatch("attachmentMoveUp", s => { });
+        dispatch("attachmentMoveUp", _s => { });
     }
 
     moveAttUp = (att: J.Attachment, node: J.NodeInfo) => {
@@ -252,7 +252,7 @@ export class EditAttachmentsPanel extends Div {
         }
 
         this.dlg.binaryDirty = true;
-        dispatch("attachmentMoveUp", s => { });
+        dispatch("attachmentMoveUp", _s => { });
     }
 
     createImgSizeSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {

@@ -20,7 +20,7 @@ export class RssFeedsType extends TypeBase {
         return true;
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
                 return true;
@@ -29,7 +29,7 @@ export class RssFeedsType extends TypeBase {
         }
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new ButtonBar([
                 new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, true, false, null, null), {

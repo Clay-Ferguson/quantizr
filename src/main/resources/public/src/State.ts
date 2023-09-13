@@ -18,7 +18,7 @@ export class State {
     }
 
     setState = <T>(newState: T): void => {
-        this.setStateEx((state: any) => {
+        this.setStateEx((_state: any) => {
             return this.state = this.stateTranslator({ ...newState });
         });
     }

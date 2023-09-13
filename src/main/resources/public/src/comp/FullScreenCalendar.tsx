@@ -90,7 +90,7 @@ export class FullScreenCalendar extends Main {
         calendarApi.gotoDate(dateClick.date);
     }
 
-    handleDateSelect = (selectInfo: any) => {
+    handleDateSelect = (_selectInfo: any) => {
     }
 
     handleEventClick = (clickInfo: any) => {

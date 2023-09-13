@@ -26,7 +26,7 @@ const processAppLoad = async () => {
     S.quanta.initApp();
 }
 
-window.addEventListener("load", async (event) => {
+window.addEventListener("load", async (_event) => {
     if (!initialized) {
         initialized = true;
         console.log("Load event.");

@@ -751,8 +751,8 @@ export class Render {
         }, spans);
     }
 
-    renderUser(node: J.NodeInfo, user: string, userBio: string, imgSrc: string, actorUrl: string,
-        displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
+    renderUser(node: J.NodeInfo, user: string, _userBio: string, imgSrc: string, _actorUrl: string,
+        displayName: string, className: string, iconClass: string, _showMessageButton: boolean, onClick: (evt: any) => void): Comp {
 
         const img: Img = imgSrc
             ? new Img({

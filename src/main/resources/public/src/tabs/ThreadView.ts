@@ -26,7 +26,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         if (!results) {
             this.setChildren([new Div("Nothing found.")]);
             return true;
-        };
+        }
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
@@ -99,7 +99,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): CompIntf {
+    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, true, true, false, clazz, highlightClazz, null);
     }
 }

@@ -109,7 +109,7 @@ export class Nav {
     on an attribute of the element */
     clickTreeNode = async (evt: Event, id: string, ast?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, _reject) => {
             id = S.util.allowIdFromEvent(evt, id);
             ast = ast || getAs();
 

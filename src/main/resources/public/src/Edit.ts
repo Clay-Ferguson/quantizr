@@ -321,7 +321,7 @@ export class Edit {
                     FeedTab.inst.props.feedDirtyList = null;
 
                     // all the data in feedData will have been updated by forceFeedItem so force react to render now.
-                    dispatch("ForceFeedResults", s => { });
+                    dispatch("ForceFeedResults", _s => { });
                 }
             }
 
@@ -463,7 +463,7 @@ export class Edit {
         }
     }
 
-    setRssHeadlinesOnly = async (s: AppState, val: boolean) => {
+    setRssHeadlinesOnly = async (val: boolean) => {
         S.util.saveUserPrefs(s => s.userPrefs.rssHeadlinesOnly = val);
     }
 
@@ -810,13 +810,13 @@ export class Edit {
     }
 
     // todo-2: method is not used?
-    selectAllNodes = async () => {
-        const highlightNode = S.nodeUtil.getHighlightedNode();
-        const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
-            parentNodeId: highlightNode.id
-        });
-        S.nodeUtil.selectAllNodes(res.nodeIds);
-    }
+    // selectAllNodes = async () => {
+    //     const highlightNode = S.nodeUtil.getHighlightedNode();
+    //     const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
+    //         parentNodeId: highlightNode.id
+    //     });
+    //     S.nodeUtil.selectAllNodes(res.nodeIds);
+    // }
 
     clearInbox = async () => {
         const ast = getAs();

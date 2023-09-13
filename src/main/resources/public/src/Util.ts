@@ -464,13 +464,13 @@ export class Util {
     }
 
     /* iterates over an object creating a string containing it's keys */
-    printKeys = (obj: Object): string => {
+    printKeys = (obj: any): string => {
         if (!obj) {
             return "null";
         }
 
         let val: string = "";
-        this.forEachProp(obj, (k, v): boolean => {
+        this.forEachProp(obj, (k, _v): boolean => {
             if (!k) {
                 k = "null";
             }
@@ -750,7 +750,7 @@ export class Util {
 
     showSystemNotification = (title: string, message: string) => {
         if (window.Notification && Notification.permission !== "denied") {
-            Notification.requestPermission((status) => { // status is "granted", if accepted by user
+            Notification.requestPermission((_status) => { // status is "granted", if accepted by user
                 message = this.removeHtmlTags(message);
 
                 // eslint-disable-next-line no-new
@@ -808,7 +808,7 @@ export class Util {
     }
 
     // caller can optionally pass in the type, and yes for now 'id' is not used, but I want it as a param.
-    notifyNodeUpdated = (id: string, type: string) => {
+    notifyNodeUpdated = (_id: string, type: string) => {
         if (type === J.NodeType.BOOKMARK) {
             setTimeout(S.util.loadBookmarks, 100);
         }
@@ -948,7 +948,7 @@ export class Util {
     }
 
     readClipboardFile = (): Promise<any> => {
-        return new Promise<any>(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, _reject) => {
             (navigator as any)?.clipboard?.read().then(async (data: any) => {
                 let done: boolean = false;
                 let blob = null;
@@ -1009,19 +1009,19 @@ export class Util {
             let ast = getAs();
             if (!ast) return;
 
-            let elms = document.querySelectorAll(".ui-run-cmd");
+            const elms = document.querySelectorAll(".ui-run-cmd");
             if (elms.length != 0) {
                 for (let i = 0; i < elms.length; i++) {
-                    let elm: Element = elms[i];
+                    const elm: Element = elms[i];
 
                     if (!!elm.getAttribute("data-processed")) {
                         continue; // already processed            
                     }
 
-                    let cmd = elm.getAttribute("data-cmd");
+                    const cmd = elm.getAttribute("data-cmd");
                     if (cmd) {
                         elm.setAttribute("data-processed", "1");
-                        elm.addEventListener("click", (e: MouseEvent) => {
+                        elm.addEventListener("click", () => {
                             this.runCmd(cmd);
                         });
                     }

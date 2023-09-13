@@ -182,7 +182,7 @@ export class Quanta {
 
             window.addEventListener("orientationchange", () => {
                 // we force the page to re-render with an all new state.
-                dispatch("orientationChange", s => { });
+                dispatch("orientationChange", () => { });
             });
 
             // not used. do not delete.
@@ -213,7 +213,7 @@ export class Quanta {
             S.util.playAudioIfRequested();
 
             if (this.config.config) {
-                dispatch("configUpdates", s => {
+                dispatch("configUpdates", _s => {
 
                     // we show the user message after the config is set, but there's no reason to do it here
                     // other than perhaps have the screen updated with the latest based on the config.

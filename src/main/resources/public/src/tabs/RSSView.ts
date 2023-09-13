@@ -111,7 +111,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     className: "float-end"
                 }, {
                     setValue: (checked: boolean) => {
-                        dispatch("SetHeadlinesFlag", s => S.edit.setRssHeadlinesOnly(s, checked));
+                        dispatch("SetHeadlinesFlag", () => S.edit.setRssHeadlinesOnly(checked));
                     },
                     getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
                 }),
@@ -464,7 +464,7 @@ export class RSSView extends AppTab<any, RSSView> {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
 
-        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rssFeedListing img", (el: HTMLElement, i: any) => {
+        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rssFeedListing img", (el: HTMLElement, _i: any) => {
 
             // this logic doesn't apply to openGraphImages, so we detect those and bail out
             // Warning: this applies to openGraphImage, openGrapImageRss, and openGraphImageVert

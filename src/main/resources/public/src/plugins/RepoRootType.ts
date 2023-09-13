@@ -10,11 +10,11 @@ export class RepoRootType extends TypeBase {
         super(J.NodeType.REPO_ROOT, "Root", "fa-home", false);
     }
 
-    override allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(_propName: string): boolean {
         return true;
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, "Root", { className: "noMargin" })
         ]);

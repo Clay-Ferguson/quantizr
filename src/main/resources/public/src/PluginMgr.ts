@@ -28,7 +28,7 @@ import { S } from "./Singletons";
 export class PluginMgr {
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
 
-    addType = (ordinal: number, type: TypeIntf) => {
+    addType = (_ordinal: number, type: TypeIntf) => {
         if (this.types.get(type.getTypeName())) {
             throw new Error("duplicate type handler: " + type.getTypeName());
         }

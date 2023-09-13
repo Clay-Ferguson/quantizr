@@ -16,7 +16,7 @@ export class NavPanelDlg extends DialogBase {
     }
 }
 
-PubSub.sub(C.PUBSUB_closeNavPanel, (payload: string) => {
+PubSub.sub(C.PUBSUB_closeNavPanel, (_payload: string) => {
     if (NavPanelDlg.inst) {
         NavPanelDlg.inst.close();
         NavPanelDlg.inst = null;

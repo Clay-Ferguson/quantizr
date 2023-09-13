@@ -17,7 +17,7 @@ export class AccountType extends TypeBase {
         return false;
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.editNode:
                 return false;
@@ -26,11 +26,11 @@ export class AccountType extends TypeBase {
         }
     }
 
-    override allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(_propName: string): boolean {
         return true;
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const name = S.nodeUtil.getDisplayName(node);
         return new Divc({
             className: "systemNodeContent"

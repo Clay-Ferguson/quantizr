@@ -75,7 +75,7 @@ export class LocalDB {
 
     clearStore = (storeName: string): Promise<void> => {
         // don't await, just return promise
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<void>(async (resolve, _reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
                 (store: IDBObjectStore) => {
                     if (this.debug) {
@@ -163,7 +163,7 @@ export class LocalDB {
             console.error("key property 'k' is missing from object: " + S.util.prettyPrint(obj));
             return;
         }
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<void>(async (resolve) => {
             this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
                 (store: IDBObjectStore) => {
                     if (this.debug) {
@@ -183,7 +183,7 @@ export class LocalDB {
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
     public readObject = async (k: string, storeName: string = null): Promise<IndexedDBObj> => {
-        return new Promise<IndexedDBObj>((resolve, reject) => {
+        return new Promise<IndexedDBObj>((resolve) => {
             if (!storeName) storeName = this.STORE_DEFAULT;
 
             this.runTrans(LocalDB.ACCESS_READONLY, storeName,
@@ -221,7 +221,7 @@ export class LocalDB {
     }
 
     public dumpStore = async (storeName: string): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve) => {
             this.runTrans(LocalDB.ACCESS_READONLY, storeName,
                 (store: IDBObjectStore) => {
                     const req = store.getAll();

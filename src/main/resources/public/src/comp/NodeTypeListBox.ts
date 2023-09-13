@@ -23,7 +23,7 @@ export class NodeTypeListBox extends ListBox {
         const lcSearchText = this.searchText.toLowerCase();
         const showSchemaOrg = ast.showSchemaOrgProps;
 
-        types.forEach((type, k) => {
+        types.forEach((type, _k) => {
             if (type.schemaOrg && !showSchemaOrg) {
                 return;
             }

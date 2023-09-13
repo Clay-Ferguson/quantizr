@@ -22,7 +22,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         this.pagingContainerClass = "float-end";
     }
 
-    override renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean): CompIntf {
+    override renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): CompIntf {
 
         const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either
@@ -50,7 +50,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         return row;
     }
 
-    override pageChange(delta: number): void {
+    override pageChange(_delta: number): void {
         S.nav.openDocumentView(null, getAs().node?.id);
     }
 

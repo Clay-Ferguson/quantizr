@@ -18,11 +18,11 @@ export class BlockedUsersType extends TypeBase {
         return false;
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
         return false;
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
             new Div("These are the people you've blocked. Delete from this list to unblock.", { className: "marginLeft" })

@@ -10,6 +10,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   plugins: ["react-refresh"],
   rules: {
+    "no-extra-boolean-cast": "off",
     "prefer-spread": "off",
     "prefer-rest-params": "off",
     "@typescript-eslint/no-explicit-any": "off",

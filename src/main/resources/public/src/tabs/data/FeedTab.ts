@@ -32,17 +32,17 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         return S.util.searchNodeArray(this.props.feedResults, nodeId);
     }
 
-    nodeDeleted = (ust: AppState, nodeId: string): void => {
+    nodeDeleted = (_ust: AppState, nodeId: string): void => {
         this.props.feedResults = this.props.feedResults?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (_ust: AppState, newNode: J.NodeInfo): void => {
         this.props.feedResults = this.props.feedResults?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
-    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+    processNode = (_ust: AppState, func: (node: J.NodeInfo) => void): void => {
         this.props.feedResults?.forEach(n => func(n));
     }
 

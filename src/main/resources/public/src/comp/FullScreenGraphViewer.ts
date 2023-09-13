@@ -131,7 +131,7 @@ export class FullScreenGraphViewer extends Main {
             let nodeLink: any = null;
             if (ast.showNodeLinksInGraph && nodeLinks?.length > 0) {
                 nodeLink = g.append("g")
-                    .style("stroke", function (d: any) {
+                    .style("stroke", function (_d: any) {
                         return "green"
                     })
                     .attr("stroke-width", 1)
@@ -181,7 +181,7 @@ export class FullScreenGraphViewer extends Main {
                         .style("opacity", 0);
                 })
 
-                .on("click", function (event: any, d: any) {
+                .on("click", function (_event: any, d: any) {
                     d3.select(this)
                         .style("fill", "green");
 
@@ -273,10 +273,10 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    showTooltip = (d: any, x: number, y: number) => {
+    showTooltip = (d: any, _x: number, _y: number) => {
         this.tooltip.transition()
             .duration(300)
-            .style("opacity", (d: any) => this.isDragging ? 0 : 0.97);
+            .style("opacity", (_d: any) => this.isDragging ? 0 : 0.97);
 
         let content = d.data.name;
         if (d.data.links) {

@@ -388,7 +388,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    makeProfileImg(hasHeaderImg: boolean): CompIntf {
+    makeProfileImg(_hasHeaderImg: boolean): CompIntf {
         let src: string = null;
         const state: LS = this.getState<LS>();
 

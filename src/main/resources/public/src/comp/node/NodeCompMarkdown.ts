@@ -25,7 +25,7 @@ export class NodeCompMarkdown extends Comp {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string, tabData: TabIntf<any>, urls: Set<string>) {
+    constructor(public node: J.NodeInfo, extraContainerClass: string, _tabData: TabIntf<any>, urls: Set<string>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
@@ -72,7 +72,7 @@ export class NodeCompMarkdown extends Comp {
         return val;
     }
 
-    insertMarkdownLinks = (urls: Set<String>, val: string): string => {
+    insertMarkdownLinks = (urls: Set<string>, val: string): string => {
         if (!urls || !val) return val;
         urls.forEach((url: string) => {
             if (val.indexOf("(" + url) == -1) {

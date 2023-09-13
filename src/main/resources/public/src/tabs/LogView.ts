@@ -39,6 +39,6 @@ export class LogView extends AppTab<any, LogView> implements LogViewIntf {
     }
 
     // Opens the tab, querying the info from the server to update
-    open = (readOnly: boolean, userId: string): any => {
+    open = (_readOnly: boolean, _userId: string): any => {
     }
 }

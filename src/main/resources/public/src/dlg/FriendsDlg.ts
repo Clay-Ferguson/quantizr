@@ -57,7 +57,7 @@ export class FriendsDlg extends DialogBase {
             loading: true
         });
 
-        this.searchTextState.v.onStateChange = (val: any) => {
+        this.searchTextState.v.onStateChange = (_val: any) => {
             FriendsDlg.searchDirty = true;
             FriendsDlg.dirtyCounter = 0;
         };
@@ -274,7 +274,7 @@ export class FriendsDlg extends DialogBase {
     }
 }
 
-PubSub.sub(C.PUBSUB_friendsChanged, (payload: string) => {
+PubSub.sub(C.PUBSUB_friendsChanged, (_payload: string) => {
     if (FriendsDlg.inst) {
         FriendsDlg.inst.preLoad();
     }

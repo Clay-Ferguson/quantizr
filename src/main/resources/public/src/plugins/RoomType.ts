@@ -15,7 +15,7 @@ export class RoomType extends TypeBase {
         super(J.NodeType.ROOM, "Chat Room", "fa-comments", true);
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
         return true;
     }
 

@@ -42,7 +42,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             signatureVerify: false
         });
 
-        dispatch("RenderSearchResults", s => {
+        dispatch("RenderSearchResults", _s => {
             this.data.props.res = res;
         });
     }
@@ -95,10 +95,9 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
-        let heading = "Trending";
         this.setChildren([
             this.headingBar = new TabHeading([
-                new Div(heading, { className: "tabTitle" })
+                new Div("Trending", { className: "tabTitle" })
             ]),
 
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),

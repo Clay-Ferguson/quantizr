@@ -59,16 +59,16 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         return this.input.getRef() ? (this.input.getRef() as any).selectionStart : -1;
     }
 
-    insertTextAtCursor(text: string) {
+    insertTextAtCursor(_text: string) {
     }
 
-    setWordWrap(wordWrap: boolean): void {
+    setWordWrap(_wordWrap: boolean): void {
     }
 
-    setEnabled(enabled: boolean): void {
+    setEnabled(_enabled: boolean): void {
     }
 
-    setMode(mode: string): void {
+    setMode(_mode: string): void {
     }
 
     setValue(value: string): void {

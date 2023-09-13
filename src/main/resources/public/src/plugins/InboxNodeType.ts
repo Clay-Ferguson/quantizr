@@ -15,7 +15,7 @@ export class InboxNodeType extends TypeBase {
         super(J.NodeType.INBOX, "Inbox", "fa-inbox", false);
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
         return false;
     }
 
@@ -27,11 +27,11 @@ export class InboxNodeType extends TypeBase {
         return false;
     }
 
-    override allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(_propName: string): boolean {
         return false;
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new FlexRowLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([

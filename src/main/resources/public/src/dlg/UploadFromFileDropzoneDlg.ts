@@ -249,7 +249,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.runButtonEnablement();
                 });
 
-                this.on("maxfilesexceeded", function (arg: any) {
+                this.on("maxfilesexceeded", function (_arg: any) {
                     S.util.showMessage("Only " + dlg.maxFiles + " file can be uploaded to a node.", "Warning");
                 });
 
@@ -258,7 +258,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.runButtonEnablement();
                 });
 
-                this.on("sending", function (file: File, xhr: any, formData: any) {
+                this.on("sending", function (file: File, _xhr: any, formData: any) {
                     dlg.sent = true;
                     // console.log("sending file: " + file.name);
 
@@ -277,7 +277,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     dlg.zipQuestionAnswered = false;
                 });
 
-                this.on("error", function (param1: any, param2: any, param3: any) {
+                this.on("error", function (_param1: any, _param2: any, _param3: any) {
                     S.rpcUtil.stopBlockingProcess();
                     if (dlg.sent) {
                         dlg.uploadFailed = true;
@@ -286,11 +286,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 });
 
                 // not needed (this does work however)
-                this.on("uploadprogress", function (file: any, progress: any) {
+                this.on("uploadprogress", function (_file: any, progress: any) {
                     console.log("File progress" + progress);
                 });
 
-                this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {
+                this.on("success", function (_file: File, resp: J.ResponseBase, _evt: ProgressEvent) {
                     // console.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
                     if (!dlg.importMode && resp.code != C.RESPONSE_CODE_OK) {
                         if (!dlg.errorShown) {
@@ -308,7 +308,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }
                 });
 
-                this.on("queuecomplete", function (arg: any) {
+                this.on("queuecomplete", function (_arg: any) {
                     S.rpcUtil.stopBlockingProcess();
                     if (dlg.sent) {
                         dlg.close();

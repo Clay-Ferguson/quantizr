@@ -17,13 +17,13 @@
     "strictPropertyInitialization": false,
 
     /* Linting (todo-0: will eventually be setting most of these back to true and fixing errors) */
-    "strictFunctionTypes": false,
+    "strictFunctionTypes": true,
     "noImplicitThis": false,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strict": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": false
   },
   "include": ["src"],

@@ -44,7 +44,7 @@ export class ServerPush {
             }, 5000)
         };
 
-        this.eventSource.addEventListener("sessionTimeout", async (e: any) => {
+        this.eventSource.addEventListener("sessionTimeout", async () => {
             S.quanta.authToken = null;
             S.quanta.userName = null;
             if (S.quanta.loggingOut) return;
@@ -66,7 +66,7 @@ export class ServerPush {
             const nodeInfo = obj.nodeInfo;
 
             if (nodeInfo) {
-                dispatch("RenderTimelineResults", s => {
+                dispatch("RenderTimelineResults", _s => {
                     const data = TimelineTab.inst;
                     if (!data) return;
 
@@ -113,7 +113,7 @@ export class ServerPush {
             }
         }, false);
 
-        this.eventSource.addEventListener("newInboxNode", (e: any) => {
+        this.eventSource.addEventListener("newInboxNode", (_e: any) => {
             // const obj: J.NotificationMessage = JSON.parse(e.data);
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
             // new InboxNotifyDlg("Your Inbox has updates!").open();
@@ -140,7 +140,7 @@ export class ServerPush {
         }
     }
 
-    ipsmPushItem = (payload: string) => {
+    ipsmPushItem = (_payload: string) => {
         // IPSM currently disabled
         // const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
         // if (!feedData) return;
@@ -172,7 +172,7 @@ export class ServerPush {
             return;
         }
 
-        dispatch("RenderFeedResults", s => {
+        dispatch("RenderFeedResults", _s => {
             FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
             const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
             const updatesExistingItem = itemFoundIdx !== -1;

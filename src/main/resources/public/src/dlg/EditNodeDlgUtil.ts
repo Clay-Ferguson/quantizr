@@ -436,7 +436,7 @@ export class EditNodeDlgUtil {
     initStates = (dlg: EditNodeDlg) => {
         const ast = getAs();
 
-        dlg.onMount((elm: HTMLElement) => {
+        dlg.onMount((_elm: HTMLElement) => {
             dlg.initContent();
         });
 

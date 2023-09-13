@@ -13,11 +13,11 @@ export class IPFSNodeType extends TypeBase {
         super(J.NodeType.IPFS_NODE, "IPFS Node", "fa-sitemap", false);
     }
 
-    override allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(_propName: string): boolean {
         return true;
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const cid = S.props.getPropStr(J.NodeProp.IPFS_CID, node) || "";
         return new Diva([new Heading(6, "CID: " + cid, { className: "ipfsText" })]);
     }

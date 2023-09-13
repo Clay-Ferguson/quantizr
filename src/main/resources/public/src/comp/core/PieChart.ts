@@ -45,7 +45,7 @@ export class PieChart extends Div {
 
         // Draw arc paths
         arcs.append("path")
-            .attr("fill", (d: any, i: any) => {
+            .attr("fill", (_d: any, i: any) => {
                 return color(i);
             })
             .attr("d", arc);
@@ -57,7 +57,7 @@ export class PieChart extends Div {
                 return "translate(" + arc.centroid(d) + ")";
             })
             .attr("text-anchor", "middle")
-            .text((d: any, i: any) => {
+            .text((_d: any, i: any) => {
                 return this.data[i].label;
             });
     }

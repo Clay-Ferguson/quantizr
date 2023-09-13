@@ -7,7 +7,7 @@ export class InboxEntryType extends TypeBase {
         super(J.NodeType.INBOX_ENTRY, "Notification", "fa-envelope", false);
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
                 return true;
@@ -24,7 +24,7 @@ export class InboxEntryType extends TypeBase {
         return false;
     }
 
-    override allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(_propName: string): boolean {
         return false;
     }
 }

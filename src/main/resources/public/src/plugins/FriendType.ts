@@ -23,7 +23,7 @@ export class FriendType extends TypeBase {
         return false;
     }
 
-    override allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
             case NodeActionType.editNode:
@@ -41,7 +41,7 @@ export class FriendType extends TypeBase {
         return false;
     }
 
-    override allowPropertyEdit(propName: string): boolean {
+    override allowPropertyEdit(_propName: string): boolean {
         return false;
     }
 
@@ -54,7 +54,7 @@ export class FriendType extends TypeBase {
         return new Heading(3, user);
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);

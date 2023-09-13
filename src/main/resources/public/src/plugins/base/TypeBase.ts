@@ -35,7 +35,7 @@ export class TypeBase implements TypeIntf {
         return this.allowUserSelect;
     }
 
-    renderEditorSubPanel = (node: J.NodeInfo): Comp => {
+    renderEditorSubPanel = (_node: J.NodeInfo): Comp => {
         return null;
     }
 
@@ -49,7 +49,7 @@ export class TypeBase implements TypeIntf {
         return propName;
     }
 
-    getEditorRowsForProp(propName: string): number {
+    getEditorRowsForProp(_propName: string): number {
         return 1;
     }
 
@@ -151,7 +151,7 @@ export class TypeBase implements TypeIntf {
 
         // if a configured property scan for any fields that aren't on the node yet and add them with blank default
         if (typeObj) {
-            S.util.forEachProp(typeObj, (k: string, v: any): boolean => {
+            S.util.forEachProp(typeObj, (k: string, _v: any): boolean => {
                 if (k === prop) {
                     ret = false;
                     return false; // stop iterating
@@ -170,7 +170,7 @@ export class TypeBase implements TypeIntf {
 
         // if a configured property scan for any fields that aren't on the node yet and add them with blank default
         if (typeObj) {
-            S.util.forEachProp(typeObj, (k: string, v: any): boolean => {
+            S.util.forEachProp(typeObj, (k: string, _v: any): boolean => {
                 const propFound = node.properties.find(p => p.name === k);
                 if (!propFound) {
                     node.properties.push({ name: k, value: "" });
@@ -184,7 +184,7 @@ export class TypeBase implements TypeIntf {
         return this.displayName;
     }
 
-    allowPropertyEdit(propName: string): boolean {
+    allowPropertyEdit(_propName: string): boolean {
         return true;
     }
 
@@ -256,7 +256,7 @@ export class TypeBase implements TypeIntf {
     }
 
     // todo-1: need to rename this because it's easy to confuse with CompIntf render
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    render = (node: J.NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -375,11 +375,11 @@ export class TypeBase implements TypeIntf {
         return "fa " + this.iconStyle + " fa-lg";
     }
 
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean {
+    allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
         return true;
     }
 
-    domPreUpdateFunction(parent: CompIntf): void {
+    domPreUpdateFunction(_parent: CompIntf): void {
     }
 
     ensureStringPropExists(node: J.NodeInfo, propName: string) {

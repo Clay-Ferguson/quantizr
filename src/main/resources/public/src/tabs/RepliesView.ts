@@ -84,7 +84,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): CompIntf {
+    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): CompIntf {
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, true, true, false, clazz, highlightClazz, null);
     }
 }

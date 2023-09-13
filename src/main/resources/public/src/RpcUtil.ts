@@ -128,7 +128,7 @@ export class RpcUtil {
             this.lifoQueuePush(qi);
         }
 
-        let retPromise = new Promise<ResponseType>((resolve, reject) => {
+        const retPromise = new Promise<ResponseType>((resolve, reject) => {
             const func = () => {
                 const callId = ++this.callId;
                 postData = postData || {} as RequestType;
@@ -149,7 +149,7 @@ export class RpcUtil {
                     S.quanta.setOverlay(true);
                 }
 
-                const inner = this.rpcInner(postName, callId, postData);
+                const inner = this.rpcInner<RequestType, ResponseType>(postName, callId, postData);
                 inner.then((data: ResponseType) => {
                     this.concurrency--;
                     if (this.log) {
@@ -197,7 +197,7 @@ export class RpcUtil {
 
                             retrying = true;
                             console.log("rpcNew retry " + retries + ": " + postName);
-                            this.rpcInner(postName, callId, postData)
+                            this.rpcInner<RequestType, ResponseType>(postName, callId, postData)
                                 .then((data: ResponseType) => {
                                     clearTimeout(timeoutId);
                                     retrying = false;

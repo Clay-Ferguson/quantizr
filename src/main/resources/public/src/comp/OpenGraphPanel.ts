@@ -55,7 +55,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    processOgEntry = async (entry: any, elm: HTMLElement) => {
+    processOgEntry = async (entry: any, _elm: HTMLElement) => {
         if (!entry.isIntersecting) return;
         this.disconnect();
         await this.loadOpenGraph();

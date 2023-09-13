@@ -198,7 +198,7 @@ export class BlockedUsersDlg extends DialogBase {
     }
 }
 
-PubSub.sub(C.PUBSUB_friendsChanged, (payload: string) => {
+PubSub.sub(C.PUBSUB_friendsChanged, (_payload: string) => {
     if (BlockedUsersDlg.inst) {
         BlockedUsersDlg.inst.preLoad();
     }

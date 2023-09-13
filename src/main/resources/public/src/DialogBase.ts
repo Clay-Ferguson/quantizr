@@ -64,7 +64,7 @@ export abstract class DialogBase extends Comp {
 
         // We use an actual Promise and not async/await because our resolve function is held long term, and
         // represents the closing of the dialog.
-        return new Promise<DialogBase>((resolve, reject) => {
+        return new Promise<DialogBase>((resolve) => {
             if (this.mode === DialogMode.POPUP) {
                 this.zIndex = ++DialogBase.backdropZIndex;
             }
@@ -364,7 +364,7 @@ export abstract class DialogBase extends Comp {
             const elm: HTMLElement = this.getRef();
             if (!elm) return;
 
-            elm.addEventListener("mouseup", (e) => {
+            elm.addEventListener("mouseup", () => {
                 if (!this.isTopmost()) return;
                 this.isDown = false;
             }/*, true */);

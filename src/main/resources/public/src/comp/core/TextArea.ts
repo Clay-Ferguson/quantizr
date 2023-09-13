@@ -59,7 +59,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         });
     }
 
-    setMode(mode: string): void {
+    setMode(_mode: string): void {
     }
 
     setValue(val: string): void {

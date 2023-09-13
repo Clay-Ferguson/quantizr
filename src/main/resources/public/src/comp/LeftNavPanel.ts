@@ -61,7 +61,7 @@ export class LeftNavPanel extends Div {
         const docIndexToggle = showDocIndex ? new RadioButtonGroup([
             new Span(null, null, [
                 new RadioButton("Doc Index", false, "docIndexToggle", null, {
-                    setValue: (checked: boolean) => {
+                    setValue: (_checked: boolean) => {
                         dispatch("ToggleMenuIndex", s => {
                             s.menuIndexToggle = "index";
                         });
@@ -71,7 +71,7 @@ export class LeftNavPanel extends Div {
             ]),
             new Span(null, null, [
                 new RadioButton("Menu", false, "docIndexToggle", null, {
-                    setValue: (checked: boolean) => {
+                    setValue: (_checked: boolean) => {
                         dispatch("ToggleMenuIndex", s => {
                             s.menuIndexToggle = "menu";
                         });

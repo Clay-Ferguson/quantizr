@@ -98,7 +98,7 @@ export class DomUtil {
     that can be used optionally whenver that's more convenient */
     getElm = (id: string): Promise<HTMLElement> => {
         // Promise is used here instead of async/await because of the resolve being done inside the timer.
-        return new Promise<HTMLElement>((resolve, reject) => {
+        return new Promise<HTMLElement>((resolve) => {
 
             // First we immediately try to get the element.
             const e: HTMLElement = document.getElementById(id);
@@ -345,7 +345,7 @@ export class DomUtil {
 
     /* #mouseEffects (do not delete tag) */
     setMouseEffect = (mouseEffect: boolean) => {
-        dispatch("ToggleMouseEffect", s => {
+        dispatch("ToggleMouseEffect", () => {
             this.mouseEffect = mouseEffect;
             S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, this.mouseEffect ? "1" : "0");
         });
@@ -591,7 +591,7 @@ export class DomUtil {
 
     private domHighlight = (elm: HTMLElement, regex: RegExp, allRegex: RegExp): void => {
         if (elm.hasChildNodes()) {
-            elm.childNodes.forEach((e: HTMLElement) => this.domHighlight(e, regex, allRegex));
+            elm.childNodes.forEach((e: any) => this.domHighlight(e, regex, allRegex));
         }
         else if (elm.nodeType === 3) { // 3 == Text.TEXT_NODE
             if (elm.textContent.search(regex) !== -1 && !elm.classList?.contains("highlightText")) {

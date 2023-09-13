@@ -38,7 +38,7 @@ export class Search {
         S.nodeUtil.processInboundNodes(res.searchResults);
 
         if (res.searchResults?.length > 0) {
-            dispatch("RenderSearchResults", s => {
+            dispatch("RenderSearchResults", _s => {
                 S.domUtil.focusId(C.TAB_SHARES);
                 S.tabUtil.tabScroll(C.TAB_SHARES, 0);
                 if (!SharesTab.inst) return;
@@ -174,7 +174,7 @@ export class Search {
     search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean): Promise<boolean> => {
-        return new Promise<boolean>(async (resolve, reject) => {
+        return new Promise<boolean>(async (resolve, _reject) => {
             const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
                 searchRoot,
                 page,
@@ -326,7 +326,7 @@ export class Search {
             return;
         }
 
-        dispatch("RenderTimelineResults", s => {
+        dispatch("RenderTimelineResults", () => {
             S.domUtil.focusId(C.TAB_TIMELINE);
             S.tabUtil.tabScroll(C.TAB_TIMELINE, 0);
             if (!TimelineTab.inst) return;
@@ -489,7 +489,7 @@ export class Search {
         });
 
         if (res.searchResults?.length > 0) {
-            dispatch("RenderSearchResults", s => {
+            dispatch("RenderSearchResults", _s => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
                 S.tabUtil.tabScroll(C.TAB_FOLLOWERS, 0);
                 const data = FollowersTab.inst;
@@ -527,7 +527,7 @@ export class Search {
         });
 
         if (res.searchResults && res.searchResults.length > 0) {
-            dispatch("RenderSearchResults", s => {
+            dispatch("RenderSearchResults", () => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
                 S.tabUtil.tabScroll(C.TAB_FOLLOWING, 0);
                 const data = FollowingTab.inst;

@@ -88,8 +88,8 @@ export abstract class Comp implements CompIntf {
     }
 
     /* Not currently used, but let's keep this */
-    public getRefAsync = (warn: boolean = true): Promise<HTMLElement> => {
-        return new Promise<HTMLElement>((resolve, reject) => {
+    public getRefAsync = (_warn: boolean = true): Promise<HTMLElement> => {
+        return new Promise<HTMLElement>((resolve, _reject) => {
             const elm = this.getRef();
 
             // if we have element already, resolve with it, we're done
@@ -231,7 +231,7 @@ export abstract class Comp implements CompIntf {
 
             // Not fat arrow, because we need 'arguments',
             // create a new function that injects calls to userActive
-            obj.onClick = function (evt: any) {
+            obj.onClick = function (_evt: any) {
                 func.apply(null, arguments);
             };
 
@@ -358,7 +358,7 @@ export abstract class Comp implements CompIntf {
     }
 
     // Core 'render' function used by react. This is THE function for the functional component this object represents
-    renderCore = (props, ref): any => {
+    renderCore = (_props, _ref): any => {
         this.rendered = true;
 
         try {
@@ -516,7 +516,7 @@ export abstract class Comp implements CompIntf {
         return null;
     }
 
-    setScrollPos = (pos: number): void => {
+    setScrollPos = (_pos: number): void => {
     }
 
     /* Components should call this method instad of setting scrollTop directly on an element */

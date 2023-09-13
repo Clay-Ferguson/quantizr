@@ -29,16 +29,16 @@ export class SettingsTab implements TabIntf<any> {
     constructView = (data: TabIntf) => new SettingsView(data);
     getTabSubOptions = (): Div => { return null; };
 
-    findNode = (nodeId: string): J.NodeInfo => {
+    findNode = (_nodeId: string): J.NodeInfo => {
         return null;
     }
 
-    nodeDeleted = (ust: AppState, nodeId: string): void => {
+    nodeDeleted = (_ust: AppState, _nodeId: string): void => {
     }
 
-    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (_ust: AppState, _newNode: J.NodeInfo): void => {
     }
 
-    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+    processNode = (_ust: AppState, _func: (node: J.NodeInfo) => void): void => {
     }
 }

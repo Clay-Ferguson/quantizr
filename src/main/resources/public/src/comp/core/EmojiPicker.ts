@@ -8,7 +8,7 @@ export class EmojiPicker extends Comp {
     constructor(private selectionValueIntf: ValueIntf) {
         super();
         this.attribs.pickerStyle = { width: "100%", marginBottom: "16px" };
-        this.attribs.onEmojiClick = (emojiData: EmojiClickData, event: MouseEvent) => {
+        this.attribs.onEmojiClick = (emojiData: EmojiClickData, _event: MouseEvent) => {
             // console.log("emoji: & #x" + emojiData.unified + "; &#x" + emojiData.unified + "; ");
             this.selectionValueIntf.setValue(emojiData.emoji);
         };
