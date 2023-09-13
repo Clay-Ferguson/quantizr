@@ -5,9 +5,7 @@ import { createRoot } from "react-dom/client";
 import { Factory } from "./Factory";
 import { ImportTest } from "./ImportTest";
 import { S } from "./Singletons";
-import TsxApp from "./TsxApp";
 import AppContainer from "./comp/core/AppContainer";
-import TutorialAppContainer from "./comp/core/TutorialAppContainer";
 
 if (bootstrap) {
     console.log("bootstrap js loaded ok(b)");
@@ -23,32 +21,8 @@ const processAppLoad = async () => {
     new Factory();
     S.quanta.config = (window as any).g_config;
     S.quanta.cfg = S.quanta.config.config || {};
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const app = urlParams.get("app");
-    console.log("app=" + app);
     const root = createRoot(document.getElementById("app"));
-
-    switch (app) {
-        // http://127.0.0.1:8182/?app=TxsApp
-        case "TsxApp":
-            console.log("TsxApp");
-            root.render(React.createElement(TsxApp));
-            break;
-
-        // http://127.0.0.1:8182/?app=TutorialAppContainer
-        case "TutorialAppContainer":
-            console.log("TutorialAppContainer");
-            root.render(React.createElement(TutorialAppContainer));
-            break;
-
-        // normal Quanta app if no "app=" parameter is given.
-        default:
-            console.log("AppContainer");
-            root.render(React.createElement(AppContainer));
-            break;
-    }
-
+    root.render(React.createElement(AppContainer));
     S.quanta.initApp();
 }
 
