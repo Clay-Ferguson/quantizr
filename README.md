@@ -34,7 +34,7 @@ Quanta is a browser-based app that works on both mobile and desktop browsers, al
 
 * Java Language (back end) 
 * SpringBoot FAT Jar with embedded Tomcat (back end)
-* TypeScript & ReactJS (front end)
+* TypeScript, ReactJS, Vite (front end)
 * Bootstrap & SCSS
 * Deployer: Docker (docker compose)
 * MongoDB as the primary data store
