@@ -36,13 +36,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     constructor(private nodeId: string, private attName: string, private toIpfs: boolean, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: () => void) {
         super(importMode ? "Import File" : "Upload File");
-
-        // if control key is down we trigger a click on the "Clipboard" button for the user.
-        if (S.util.ctrlKeyCheck()) {
-            setTimeout(() => {
-                this.uploadFromClipboard();
-            }, 700);
-        }
     }
 
     renderDlg(): CompIntf[] {
@@ -135,48 +128,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
-    // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
-    // https://web.dev/image-support-for-async-clipboard/
-    // Linux Ubuntu note: Shift + Ctrl + PrtSc -> Copy the screenshot of a specific region to the clipboard.
-    // todo-2: I have a feature that pastes from clipboard to a node as text, but it needs to detect images and if image is in
-    // clipboard create a node and put that image in it.
-    uploadFromClipboard = async () => {
-        if (!S.util.clipboardReadable()) {
-            return;
-        }
-
-        // todo-0: there are multiple places we scan clipboard content and we need to package
-        // all that logic into a promise-based function (see the one that has an array of an array and flattens
-        // and use that pattern)
-        (navigator as any)?.clipboard?.read().then(async (data: any) => {
-            let done: boolean = false;
-            for (const clipboardItem of data) {
-                // this was supposed to be only images, but i'm getting all types as blob. whoops.
-                for (const type of clipboardItem.types) {
-                    const blob = await clipboardItem.getType(type);
-                    // console.log(URL.createObjectURL(blob));
-
-                    // DO NOT DELETE: The 'addedfile' emit may be the better way ? not sure yet. addFile() does work.
-                    // this.dropzone.emit("addedfile", blob);
-                    // //myDropzone.emit("thumbnail", existingFiles[i], "/image/url");
-                    // this.dropzone.emit("complete", blob);
-
-                    this.dropzone.addFile(blob);
-                    this.runButtonEnablement();
-
-                    // My personal preference is that a click on "From Clipboard" should instantly upload the image
-                    // and close the upload dialog, so let's call upload() now (same as using clicking Upload button).
-                    // For taking notes online this is a common scenario and saving one click goes a long way towards
-                    // better usability, but this line of code is completely optional.
-                    this.upload();
-
-                    done = true;
-                    break;
-                }
-                if (done) break;
-            }
-        });
-    }
 
     upload = async (): Promise<boolean> => {
         if (this.filesAreValid()) {
