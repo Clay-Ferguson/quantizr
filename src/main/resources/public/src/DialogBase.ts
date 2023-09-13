@@ -64,28 +64,27 @@ export abstract class DialogBase extends Comp {
 
         // We use an actual Promise and not async/await because our resolve function is held long term, and
         // represents the closing of the dialog.
-        return new Promise<DialogBase>(async (resolve, reject) => {
+        return new Promise<DialogBase>((resolve, reject) => {
             if (this.mode === DialogMode.POPUP) {
                 this.zIndex = ++DialogBase.backdropZIndex;
             }
 
             /* If the dialog has a function to load from server, call here first */
-            const preLoadPromise = this.preLoad();
-            if (preLoadPromise) {
-                await preLoadPromise;
-            }
+            const preLoadPromise = this.preLoad() || Promise.resolve();
 
-            dispatch("OpenDialog", s => {
-                // adding to dialogStack will cause it to be rendered by main App component.
-                s.dialogStack.push(this);
+            preLoadPromise.then(() => {
+                dispatch("OpenDialog", s => {
+                    // adding to dialogStack will cause it to be rendered by main App component.
+                    s.dialogStack.push(this);
 
-                // opening first dialog in mobile mode
-                if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 1) {
-                    document.body.style.overflow = "hidden";
-                }
+                    // opening first dialog in mobile mode
+                    if (this.mode === DialogMode.POPUP && s.mobileMode && s.dialogStack.length === 1) {
+                        document.body.style.overflow = "hidden";
+                    }
+                });
+
+                this.resolve = resolve;
             });
-
-            this.resolve = resolve;
         });
     }
 

@@ -10,7 +10,7 @@ import { DialogBase } from "../DialogBase";
  */
 export class MessageDlg extends DialogBase {
 
-    constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
+    constructor(private message: string, title: string, private callback: () => void, private customWidget: Comp, private preformatted: boolean,
         private flashTimeout: number, classOverride: string) {
         super(title, classOverride);
 

@@ -113,14 +113,14 @@ export class Util {
     }
 
     // #mouseEffects (do not delete tag)
-    delayFunc = (func: Function): Function => {
+    delayFunc = (func: () => void): () => void => {
         if (!func || !S.domUtil.mouseEffect) {
             return func;
         }
 
         // Not fat arrow, because we need 'arguments'
-        return function (evt: any) {
-            const args = arguments;
+        return function () {
+            const args: any = arguments;
             setTimeout(function () {
                 func.apply(null, args);
             },

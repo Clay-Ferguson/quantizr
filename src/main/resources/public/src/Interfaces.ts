@@ -69,7 +69,7 @@ export interface TextEditorIntf {
     setValue(val: string): void;
     setEnabled(val: boolean): void;
     focus(): void;
-    onMount(func: Function): void;
+    onMount(func: () => void): void;
     setError(error: string): void;
 }
 

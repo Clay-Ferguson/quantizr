@@ -531,7 +531,7 @@ export class MenuPanel extends Div {
         }
         else {
             const link: string = cfgItem.link;
-            let func: Function = null;
+            let func: () => void = null;
 
             if (link) {
                 // allows ability to select a tab

@@ -531,7 +531,7 @@ export class Edit {
     }
 
     // WARNING: This func is expected to NOT alter that the active tab is!
-    runScrollAffectingOp = async (func: Function) => {
+    runScrollAffectingOp = async (func: () => void) => {
         const doScrolling = await this.saveTabsTopmostVisible();
         if (doScrolling) {
             // turn off Comp stuff so it doesn't interfere with what we're about to do with scrolling.
@@ -1009,7 +1009,7 @@ export class Edit {
         });
     }
 
-    cutSelNodes = (evt: Event) => {
+    cutSelNodes = (evt?: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
 
         dispatch("SetNodesToMove", s => {

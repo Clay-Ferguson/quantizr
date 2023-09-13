@@ -6,14 +6,14 @@ export interface CompIntf {
     ordinal: number;
 
     getId(prefix?: string): string;
-    onMount(func: Function): void;
+    onMount(func: () => void): void;
 
     mergeState<T = any>(moreState: T): void;
     setState<T = any>(newState: T): void;
     getState<T = any>(): T;
 
     setClass(clazz: string): void;
-    getAttribs(): Object;
+    getAttribs(): any;
     compRender(): ReactNode;
     addChild(comp: CompIntf): void;
     insertFirstChild(comp: CompIntf): void;

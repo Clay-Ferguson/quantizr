@@ -6,7 +6,7 @@ import { ListBox } from "./ListBox";
 
 export class EditPrivsTable extends ListBox {
 
-    constructor(public shareNodeToUserFunc: Function, public acl: AccessControlInfo[], private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(public shareNodeToUserFunc: (userName: string, allowAppends: boolean) => void, public acl: AccessControlInfo[], private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
 
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;

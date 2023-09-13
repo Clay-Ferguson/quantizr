@@ -14,7 +14,7 @@ import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
 
 export class NodeCompContent extends Div {
-    domPreUpdateFunc: Function;
+    domPreUpdateFunc: (parent: CompIntf) => void;
     static PRE_PREFIX = "nc_";
 
     constructor(public node: J.NodeInfo,

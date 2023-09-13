@@ -193,7 +193,7 @@ export class Render {
                         if (s.startsWith(location.protocol + "//" + location.hostname)) {
                             return;
                         }
-                        S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null);
+                        S.attachment.openUploadFromUrlDlg(node ? node.id : null, null);
                     });
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
@@ -846,7 +846,7 @@ export class Render {
                 }
                 else {
                     const link: string = menuItem.link;
-                    let func: Function = null;
+                    let func: () => void = null;
 
                     if (link) {
                         // allows ability to select a tab

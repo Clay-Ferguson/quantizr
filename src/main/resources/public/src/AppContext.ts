@@ -11,8 +11,7 @@ state management we need and do it better (i.e. simpler) than Redux.
 NOTE: dispatcher doesn't get set until the root component calls initDispatch WHILE BEING
 rendered. This is a requirement because it comes from useReducer which can only be called
 inside a react function */
-
-let dispatcher: Function = null;
+let dispatcher: (o: { type: string, func: (s: AppState) => any }) => void = null;
 
 export let state = new AppState();
 export const AppContext = createContext(state);

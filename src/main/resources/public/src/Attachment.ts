@@ -21,7 +21,7 @@ export class Attachment {
         }).open();
     };
 
-    openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function) => {
+    openUploadFromUrlDlg = (nodeId: string, onUploadFunc: () => void) => {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (!node) {
@@ -34,7 +34,7 @@ export class Attachment {
         new UploadFromUrlDlg(nodeId, onUploadFunc).open();
     };
 
-    openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function) => {
+    openUploadFromIPFSDlg = (nodeId: string, onUploadFunc: () => void) => {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (!node) {

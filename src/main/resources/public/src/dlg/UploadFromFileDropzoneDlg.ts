@@ -34,7 +34,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private attName: string, private toIpfs: boolean, //
-        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: Function) {
+        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: () => void) {
         super(importMode ? "Import File" : "Upload File");
 
         // if control key is down we trigger a click on the "Clipboard" button for the user.
@@ -118,7 +118,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromUrl = () => {
-        S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
+        S.attachment.openUploadFromUrlDlg(this.nodeId, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
@@ -127,7 +127,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromIPFS = () => {
-        S.attachment.openUploadFromIPFSDlg(this.nodeId, null, () => {
+        S.attachment.openUploadFromIPFSDlg(this.nodeId, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
@@ -207,7 +207,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         // code expecting 'this' to be what the dropzoned lib needs.
         const dlg = this;
 
-        const config: Object = {
+        const config: any = {
             action,
             width: "100%",
             height: getAs().mobileMode ? "60%" : "100%",

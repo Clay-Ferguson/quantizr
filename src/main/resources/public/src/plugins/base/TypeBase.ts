@@ -8,7 +8,6 @@ import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
-import { Diva } from "../../comp/core/Diva";
 import { Divc } from "../../comp/core/Divc";
 import { Html } from "../../comp/core/Html";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";

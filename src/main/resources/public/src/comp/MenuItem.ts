@@ -15,7 +15,7 @@ interface LS { // Local State
 
 export class MenuItem extends Div {
 
-    constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null,
+    constructor(public name: string, public clickFunc: () => void, enabled: boolean = true, private stateFunc: () => boolean = null,
         private treeOp: boolean = null, private moreClasses: string = "") {
         super(name);
         this.onClick = this.onClick.bind(this);

@@ -6,7 +6,7 @@ import { Span } from "./core/Span";
 
 export class NodeTypeListBoxRow extends ListBoxRow {
 
-    constructor(public type: TypeIntf, onClickFunc: Function, public isSelected: boolean) {
+    constructor(public type: TypeIntf, onClickFunc: () => void, public isSelected: boolean) {
         super(null, onClickFunc);
     }
 

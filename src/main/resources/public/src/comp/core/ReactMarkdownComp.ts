@@ -17,7 +17,7 @@ import rehypeRaw from "rehype-raw";
 //     }
 // };
 
-// eslint-disable-next-line react/display-name
+// eslint-disable-next-line
 const ReactMarkdownComp = forwardRef((props, ref) => {
     return createElement(ReactMarkdown as any, {
         ...props,

@@ -27,7 +27,7 @@ export class State {
       because for functional components (which we're using) the useState hook won't (and cannot) be even called ever until
       the react function itself is currently executing (per the "Rules of Hooks")
     */
-    private setStateEx(state: Function) {
+    private setStateEx(state: (s?: any) => void) {
         this.state = state(this.state);
         if (this.onStateChange) {
             this.onStateChange(this.state);
@@ -39,7 +39,7 @@ export class State {
         this.state = state;
 
         if (this.onStateChange) {
-            this.setStateEx = (state: Function) => {
+            this.setStateEx = (state: () => void) => {
                 setStateEx(state);
                 this.onStateChange(state());
             }

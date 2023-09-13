@@ -9,7 +9,7 @@ interface LS { // Local State
 }
 
 export class Button extends Comp {
-    constructor(text: string, callback: Function, attribs: Object = null, moreClasses: string = "btn-secondary",
+    constructor(text: string, callback: (evt?: Event, id?: string) => void, attribs: any = null, moreClasses: string = "btn-secondary",
         private iconClass: string = null) {
         super(attribs, null);
         moreClasses = moreClasses || "btn-secondary";

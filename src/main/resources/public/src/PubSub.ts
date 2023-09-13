@@ -4,26 +4,26 @@ export class PubSub {
 
     // functions that will keep firing every time the pub event is published
     // (each element holds an array of functions)
-    private static registry: Object = {};
+    private static registry: any = {};
 
     // functions that are a fire-and-forget that fire once and never again
     // (each element holds an array of functions)
-    private static registryOnce: Object = {};
+    private static registryOnce: any = {};
 
     // allows only ONE function at a time to subscribe to any given event. Last sub overrides any previous or pending ones
     // (each element holds a function, not an array)
-    private static registrySingleOnce: Object = {};
+    private static registrySingleOnce: any = {};
 
-    private static lastFires: Object = {};
+    private static lastFires: any = {};
 
     static pub = (name: string, ...args: any[]) => {
         if (PubSub.registry[name]) {
             PubSub.lastFires[name] = args;
-            PubSub.registry[name].forEach(function (fn: Function) { fn.apply(null, args) });
+            PubSub.registry[name].forEach(function (fn: () => void) { fn.apply(null, args) });
         }
 
         if (PubSub.registryOnce[name]) {
-            PubSub.registryOnce[name].forEach(function (fn: Function) { fn.apply(null, args) });
+            PubSub.registryOnce[name].forEach(function (fn: () => void) { fn.apply(null, args) });
             delete PubSub.registryOnce[name];
         }
 
@@ -36,7 +36,7 @@ export class PubSub {
     /* 'retro=true' means that at the time we subscribe if an event of that type
     had already been published, then we refire it with the arguments it had last time it fired
     */
-    static sub = (name: string, fn: Function, retro: boolean = true) => {
+    static sub = (name: string, fn: (payload: any) => void, retro: boolean = true) => {
         if (retro && PubSub.lastFires[name]) {
             fn.apply(null, PubSub.lastFires[name]);
         }
@@ -49,7 +49,7 @@ export class PubSub {
     }
 
     /* Subscribe a fire-and-forget event in a way that multiple things can subscribe */
-    static subOnce = (name: string, fn: Function) => {
+    static subOnce = (name: string, fn: (payload: any) => void) => {
         if (!PubSub.registryOnce[name]) {
             PubSub.registryOnce[name] = [fn];
         } else {
@@ -58,7 +58,7 @@ export class PubSub {
     }
 
     /* Subscribe a fire-and-forget event in a way that ONE function can subscribe (last subscription wins) */
-    static subSingleOnce = (name: string, fn: Function) => {
+    static subSingleOnce = (name: string, fn: (payload: any) => void) => {
         PubSub.registrySingleOnce[name] = fn;
     }
 }
