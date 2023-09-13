@@ -175,7 +175,7 @@ export class Util {
         return hash.toString();
     }
 
-    hashOfObject = (obj: Object): string => {
+    hashOfObject = (obj: any): string => {
         if (!obj) return "null";
         return this.hashOfString(JSON.stringify(obj));
     }
@@ -284,7 +284,7 @@ export class Util {
         if (!a) return null;
         if (a.length === 0) return [];
         return a.slice(0);
-    };
+    }
 
     arrayIndexOfItemByProp = (props: J.PropertyInfo[], propName: string, propVal: string): number => {
         for (let i = 0; i < props.length; i++) {
@@ -338,7 +338,7 @@ export class Util {
     }
 
     /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor to be all prettyPrint */
-    prettyPrint = (obj: Object): string => {
+    prettyPrint = (obj: any): string => {
         return obj ? JSON.stringify(obj, null, 4) : "null"
     }
 
@@ -446,7 +446,7 @@ export class Util {
 
     /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as part of processing
     so it's debatable wether the overhead of that is better for large objects */
-    getPropertyCount = (obj: Object): number => {
+    getPropertyCount = (obj: any): number => {
         if (!obj) return 0;
         const names: string[] = Object.getOwnPropertyNames(obj);
         return names ? names.length : 0;
@@ -454,7 +454,7 @@ export class Util {
 
     /* Iterates by calling callback with property key/value pairs for each property in the object
     check to see if tyescript has a better native way to iterate 'hasOwn' properties */
-    forEachProp = (obj: Object, callback: I.PropertyIterator) => {
+    forEachProp = (obj: any, callback: I.PropertyIterator) => {
         if (!obj) return;
         const names: any[] = Object.getOwnPropertyNames(obj);
         names?.forEach(prop => {
@@ -488,7 +488,7 @@ export class Util {
 
     * ex: let example = InstanceLoader.getInstance<NamedThing>(window, 'ExampleClass', args...);
     */
-    getInstance = <T>(context: Object, name: string, ...args: any[]): T => {
+    getInstance = <T>(context: any, name: string, ...args: any[]): T => {
         const instance = Object.create(context[name].prototype);
         instance.constructor.apply(instance, args);
         return <T>instance;
@@ -948,22 +948,26 @@ export class Util {
     }
 
     readClipboardFile = (): Promise<any> => {
-        return new Promise<any>(async (resolve, _reject) => {
-            (navigator as any)?.clipboard?.read().then(async (data: any) => {
-                let done: boolean = false;
-                let blob = null;
-                for (const item of data) {
-                    for (const type of item.types) {
-                        blob = await item.getType(type);
-                        if (blob) {
-                            done = true;
-                            break;
-                        }
-                    }
-                    if (done) break;
-                }
-                resolve(blob);
-            });
+        return new Promise<any>((resolve, _reject) => {
+            const navigatorAny = navigator as any;
+            if (navigatorAny && navigatorAny.clipboard) {
+                navigatorAny.clipboard.read().then((data: any) => {
+                    let blob = null;
+                    const promises = data.map(item => {
+                        return item.types.map(type => {
+                            return item.getType(type).then((result: any) => {
+                                if (result) {
+                                    blob = result;
+                                }
+                            });
+                        });
+                    });
+
+                    Promise.all(promises.flat()).then(() => {
+                        resolve(blob);
+                    });
+                });
+            }
         });
     }
 
@@ -1006,7 +1010,7 @@ export class Util {
 
     afterDispatch = () => {
         setTimeout(() => {
-            let ast = getAs();
+            const ast = getAs();
             if (!ast) return;
 
             const elms = document.querySelectorAll(".ui-run-cmd");

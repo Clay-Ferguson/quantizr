@@ -191,18 +191,19 @@ export class EditAttachmentsPanel extends Div {
     }
 
     askMakeAllSameSize = async (node: J.NodeInfo, val: string): Promise<void> => {
-        setTimeout(async () => {
+        setTimeout(() => {
             const attachments = S.props.getOrderedAtts(node);
             if (attachments?.length > 1) {
                 const dlg = new ConfirmDlg("Display all images at " + (val === "0" ? "their actual" : val) + " width?", "All Images?",
                     "btn-info", "alert alert-info");
-                await dlg.open();
-                if (dlg.yes) {
-                    if (!this.node.attachments) return null;
-                    attachments.forEach(att => { att.c = val; });
-                    // trick to force screen render
-                    this.dlg.mergeState({});
-                }
+                dlg.open().then(() => {
+                    if (dlg.yes) {
+                        if (!this.node.attachments) return null;
+                        attachments.forEach(att => { att.c = val; });
+                        // trick to force screen render
+                        this.dlg.mergeState({});
+                    }
+                });
             }
             return null;
         }, 250);

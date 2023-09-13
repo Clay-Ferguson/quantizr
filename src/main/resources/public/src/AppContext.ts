@@ -103,7 +103,7 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
  * the state has transformed.
  */
 export function promiseDispatch(type: string, func: StateModFunc): Promise<void> {
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         if (!dispatcher) {
             throw new Error("Called dispatch before first render. type: " + type);
         }

@@ -8,7 +8,7 @@ interface LS { // Local State
 
 export class Main extends Comp {
 
-    constructor(content: string = "", attribs: Object = {}, children: CompIntf[] = null) {
+    constructor(content: string = "", attribs: any = {}, children: CompIntf[] = null) {
         super(attribs);
         this.setChildren(children);
         this.mergeState<LS>({ content });

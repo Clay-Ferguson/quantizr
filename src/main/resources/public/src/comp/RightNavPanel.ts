@@ -119,7 +119,7 @@ export class RightNavPanel extends Div {
                 for (const item of evt.dataTransfer.items) {
                     // console.log("DROP(c) kind=" + item.kind + " type=" + item.type);
                     if (item.kind === "string") {
-                        item.getAsString(async (s) => S.speech.speakText(s));
+                        item.getAsString(s => S.speech.speakText(s));
                         return;
                     }
                 }

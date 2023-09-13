@@ -7,7 +7,7 @@ interface LS { // Local State
 
 export class Span extends Comp {
 
-    constructor(public content: string = "", attribs: Object = {}, children: Comp[] = null, private rawHtml: boolean = false) {
+    constructor(public content: string = "", attribs: any = {}, children: Comp[] = null, private rawHtml: boolean = false) {
         super(attribs);
         this.setChildren(children);
         this.mergeState<LS>({ content });

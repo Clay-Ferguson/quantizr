@@ -10,7 +10,7 @@ export class TextareaTag extends Comp {
     static CHAR_THRESHOLD = 40;
     static MAX_ROWS = 15;
 
-    constructor(attribs: Object = {}, private valState: Validator, private dynamicRows: boolean = false, private minRows: number, private scrollPos: ScrollPos = null) {
+    constructor(attribs: any = {}, private valState: Validator, private dynamicRows: boolean = false, private minRows: number, private scrollPos: ScrollPos = null) {
         super(attribs, valState.v);
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });

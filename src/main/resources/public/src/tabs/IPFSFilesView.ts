@@ -270,12 +270,12 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         //     this.data.props.loading = true;
         // });
 
-        setTimeout(async () => {
-            await S.rpcUtil.rpc<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
+        setTimeout(() => {
+            S.rpcUtil.rpc<J.DeleteMFSFileRequest, J.DeleteMFSFileResponse>("deleteMFSFile", {
                 item
+            }).then(_res => {
+                this.refreshFiles();
             });
-
-            this.refreshFiles();
         }, 100);
     }
 
@@ -285,23 +285,23 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         //     this.data.props.loading = true;
         // });
 
-        setTimeout(async () => {
+        setTimeout(() => {
             // ensure this is never empty string. Server needs to get null instead of empty string.
             if (!folder) folder = null;
 
-            const res = await S.rpcUtil.rpc<J.GetIPFSFilesRequest, J.GetIPFSFilesResponse>("getIPFSFiles", {
+            S.rpcUtil.rpc<J.GetIPFSFilesRequest, J.GetIPFSFilesResponse>("getIPFSFiles", {
                 folder
-            });
-
-            dispatch("loadIPFSFiles", _s => {
-                // this condition just makes sure we're not pushing the same thing already at the top of the stack.
-                if (!(IPFSFilesView.history.length > 0 && IPFSFilesView.history[IPFSFilesView.history.length - 1] === folder)) {
-                    IPFSFilesView.history.push(folder);
-                }
-                this.data.props.loading = false;
-                this.data.props.mfsFiles = res.files;
-                this.data.props.cidField.setValue(res.folder);
-                this.data.props.mfsFolderCid = res.cid;
+            }).then(res => {
+                dispatch("loadIPFSFiles", _s => {
+                    // this condition just makes sure we're not pushing the same thing already at the top of the stack.
+                    if (!(IPFSFilesView.history.length > 0 && IPFSFilesView.history[IPFSFilesView.history.length - 1] === folder)) {
+                        IPFSFilesView.history.push(folder);
+                    }
+                    this.data.props.loading = false;
+                    this.data.props.mfsFiles = res.files;
+                    this.data.props.cidField.setValue(res.folder);
+                    this.data.props.mfsFolderCid = res.cid;
+                });
             });
         }, 100);
     }
@@ -330,14 +330,14 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
     }
 
     refreshFiles = () => {
-        setTimeout(async () => {
+        setTimeout(() => {
             const mfsFolder = this.data.props.cidField.getValue();
             this.openItem(mfsFolder);
         }, 100);
     }
 
     goToRoot = () => {
-        setTimeout(async () => {
+        setTimeout(() => {
             this.openItem(null);
         }, 100);
     }

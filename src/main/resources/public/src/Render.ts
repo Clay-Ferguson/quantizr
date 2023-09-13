@@ -188,7 +188,7 @@ export class Render {
                     return;
                 }
                 else if (item.type.match("^text/uri-list") && item.kind === "string") {
-                    item.getAsString(async (s) => {
+                    item.getAsString(s => {
                         /* Disallow dropping from our app onto our app */
                         if (s.startsWith(location.protocol + "//" + location.hostname)) {
                             return;
@@ -197,7 +197,7 @@ export class Render {
                     });
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
-                    item.getAsString(async (s) => {
+                    item.getAsString(s => {
                         if (!s) {
                             return;
                         }
@@ -210,10 +210,10 @@ export class Render {
                         }
 
                         const dlg = new PasteOrLinkDlg(node.id, s);
-                        await dlg.open();
-
-                        S.quanta.draggingId = null;
-                        S.quanta.dragElm = null;
+                        dlg.open().then(() => {
+                            S.quanta.draggingId = null;
+                            S.quanta.dragElm = null;
+                        });
                     });
                     return;
                 }

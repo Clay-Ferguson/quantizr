@@ -214,7 +214,7 @@ export abstract class Comp implements CompIntf {
         return this.children ? [first, ...this.children] : [first];
     }
 
-    getAttribs(): Object {
+    getAttribs(): any {
         return this.attribs;
     }
 

@@ -15,16 +15,15 @@
     "jsx": "react-jsx",
 
     "strictPropertyInitialization": false,
-
-    /* Linting (todo-0: will eventually be setting most of these back to true and fixing errors) */
     "strictFunctionTypes": true,
     "noImplicitThis": false,
     "noUnusedLocals": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strict": true,
+    "alwaysStrict": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

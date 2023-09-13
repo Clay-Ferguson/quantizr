@@ -127,13 +127,13 @@ export class SharingDlg extends DialogBase {
         if (this.dirty) {
             // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
-                setTimeout(async () => {
+                setTimeout(() => {
                     const ast = getAs();
-                    await S.rpcUtil.rpc<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
+                    S.rpcUtil.rpc<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
                         nodeId: ast.editNode.id
+                    }).then(() => {
+                        S.quanta.refresh();
                     });
-
-                    S.quanta.refresh();
                 }, 100);
             }
         }

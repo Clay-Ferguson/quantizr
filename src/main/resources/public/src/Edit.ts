@@ -413,7 +413,7 @@ export class Edit {
     // NOT CURRENTLY USED (but let's keep for future possible needs)
     //
     // refreshNodeFromServer = async (nodeId: string, newNodeTargetId: string): Promise<J.NodeInfo> => {
-    //     return new Promise<J.NodeInfo>(async (resolve, reject) => {
+    //     return new Promise<J.NodeInfo>( async (resolve, reject) => {
     //         const ast = getAst();
 
     //         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -509,7 +509,7 @@ export class Edit {
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
     scrollTabsTopmostVisible = () => {
         // this timer is because all scrolling in browser needs to be delayed or we can have failures.
-        setTimeout(async () => {
+        setTimeout(() => {
             // scroll into view whatever was the topmost item
             for (const data of getAs().tabData) {
                 if (data.topmostVisibleElmId) {
@@ -524,8 +524,8 @@ export class Edit {
                     }
                 }
             }
-            setTimeout(async () => {
-                await TabPanel.inst.setVisibility(true);
+            setTimeout(() => {
+                TabPanel.inst.setVisibility(true);
             }, 250);
         }, 250);
     }
@@ -548,7 +548,7 @@ export class Edit {
     // We allow a function (func) to run here in such a way that the scroll positions of every tab panel are
     // maintained so the user doesn't loose their place after the screen completely updates.
     setUserPreferenceVal = (mod: StateModFunc) => {
-        this.runScrollAffectingOp(async () => {
+        this.runScrollAffectingOp(() => {
             S.util.saveUserPrefs(mod);
         });
     }

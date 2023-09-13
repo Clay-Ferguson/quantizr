@@ -8,7 +8,7 @@ interface LS { // Local State
 
 export class ToggleIcon extends Comp {
 
-    constructor(private toggleOnClass: string, private toggleOffClass: string, attribs: Object = null) {
+    constructor(private toggleOnClass: string, private toggleOffClass: string, attribs: any = null) {
         super(attribs);
         this.mergeState<LS>({
             className: this.attribs.className,

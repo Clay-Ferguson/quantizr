@@ -258,7 +258,7 @@ export class RpcUtil {
                 credentials: "same-origin", // include, *same-origin, omit
                 referrerPolicy: "no-referrer"
             })
-                .then(async (res: any) => {
+                .then((res: any) => {
                     // Unauthorized refers to the session, and our session has likely timed out.
                     if (res.status === C.RESPONSE_CODE_UNAUTHORIZED) {
                         console.error("UNAUTHORIZED(401a) error for: " + postName + " RES: " + res);

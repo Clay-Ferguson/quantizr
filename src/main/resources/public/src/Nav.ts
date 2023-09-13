@@ -109,7 +109,7 @@ export class Nav {
     on an attribute of the element */
     clickTreeNode = async (evt: Event, id: string, ast?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
-        return new Promise<void>(async (resolve, _reject) => {
+        return new Promise<void>((resolve, _reject) => {
             id = S.util.allowIdFromEvent(evt, id);
             ast = ast || getAs();
 
@@ -292,12 +292,12 @@ export class Nav {
     }
 
     openDocumentViewById = (id: string) => {
-        setTimeout(async () => {
+        setTimeout(() => {
             let node = MainTab.inst?.findNode(id);
 
             // if we don't have this node locally on our tree, get it from the server.
             if (!node) {
-                const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                const resProm = S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                     nodeId: id,
                     upLevel: false,
                     siblingOffset: 0,
@@ -308,12 +308,14 @@ export class Nav {
                     singleNode: true,
                     jumpToRss: false
                 });
-                S.nodeUtil.processInboundNode(res.node);
-                if (!res.node) {
-                    S.util.showMessage("Failed to render node: " + id, "Warning");
-                    return;
-                }
-                node = res.node;
+                resProm.then(res => {
+                    S.nodeUtil.processInboundNode(res.node);
+                    if (!res.node) {
+                        S.util.showMessage("Failed to render node: " + id, "Warning");
+                        return;
+                    }
+                    node = res.node;
+                });
             }
             S.srch.showDocument(node);
         }, 10);

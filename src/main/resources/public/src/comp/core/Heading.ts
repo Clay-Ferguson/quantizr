@@ -3,7 +3,7 @@ import { Comp } from "../base/Comp";
 
 export class Heading extends Comp {
 
-    constructor(public level: number, public content: string, attrs: Object = {}) {
+    constructor(public level: number, public content: string, attrs: any = {}) {
         super(attrs);
     }
 

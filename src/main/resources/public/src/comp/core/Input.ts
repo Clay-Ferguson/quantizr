@@ -8,7 +8,7 @@ interface LS { // Local State
 
 export class Input extends Comp {
 
-    constructor(attribs: Object = {}, s?: State) {
+    constructor(attribs: any = {}, s?: State) {
         super(attribs, s || new State());
 
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {

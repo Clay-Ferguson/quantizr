@@ -4,7 +4,7 @@ import { PropTableCell } from "./PropTableCell";
 
 export class PropTableRow extends Comp {
 
-    constructor(attribs: Object = {}, children: PropTableCell[] = null) {
+    constructor(attribs: any = {}, children: PropTableCell[] = null) {
         super(attribs);
         this.setChildren(children);
     }

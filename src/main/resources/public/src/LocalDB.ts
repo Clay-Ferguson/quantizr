@@ -75,7 +75,7 @@ export class LocalDB {
 
     clearStore = (storeName: string): Promise<void> => {
         // don't await, just return promise
-        return new Promise<void>(async (resolve, _reject) => {
+        return new Promise<void>((resolve, _reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
                 (store: IDBObjectStore) => {
                     if (this.debug) {
@@ -163,7 +163,7 @@ export class LocalDB {
             console.error("key property 'k' is missing from object: " + S.util.prettyPrint(obj));
             return;
         }
-        return new Promise<void>(async (resolve) => {
+        return new Promise<void>((resolve) => {
             this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
                 (store: IDBObjectStore) => {
                     if (this.debug) {

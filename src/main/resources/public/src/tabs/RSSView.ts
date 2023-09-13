@@ -127,60 +127,62 @@ export class RSSView extends AppTab<any, RSSView> {
     static loadFeed = (ust: AppState, feedSrcHash: string, urls: string) => {
         if (RSSView.loading) return;
 
-        setTimeout(async () => {
-            let res = null;
-            try {
-                RSSView.loading = true;
+        setTimeout(() => {
+            (async () => {
+                let res = null;
+                try {
+                    RSSView.loading = true;
 
-                /* warning: paging here is not zero offset. First page is number 1 */
-                let page: number = ust.rssFeedPage[feedSrcHash];
-                if (!page) {
-                    page = 1;
-                    ust.rssFeedPage[feedSrcHash] = page;
+                    /* warning: paging here is not zero offset. First page is number 1 */
+                    let page: number = ust.rssFeedPage[feedSrcHash];
+                    if (!page) {
+                        page = 1;
+                        ust.rssFeedPage[feedSrcHash] = page;
+                    }
+
+                    res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+                        urls,
+                        page
+                    }, true);
+                    console.log("returned from getMultiRssFeed");
+                }
+                finally {
+                    RSSView.loading = false;
                 }
 
-                res = await S.rpcUtil.rpc<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
-                    urls,
-                    page
-                }, true);
-                console.log("returned from getMultiRssFeed");
-            }
-            finally {
-                RSSView.loading = false;
-            }
-
-            if (!res || !res.feed) {
-                // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
-                // console.log(err.message || "RSS Feed failed to load.");
-                dispatch("RSSUpdated", s => {
-                    s.rssFeedCache[feedSrcHash] = "failed";
-                    s.rssProgressText = null;
-                });
-            }
-            else {
-                dispatch("RSSUpdated", s => {
-                    S.domUtil.focusId(C.TAB_RSS);
-                    S.tabUtil.tabScroll(C.TAB_RSS, 0);
-                    setTimeout(() => {
+                if (!res || !res.feed) {
+                    // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
+                    // console.log(err.message || "RSS Feed failed to load.");
+                    dispatch("RSSUpdated", s => {
+                        s.rssFeedCache[feedSrcHash] = "failed";
+                        s.rssProgressText = null;
+                    });
+                }
+                else {
+                    dispatch("RSSUpdated", s => {
+                        S.domUtil.focusId(C.TAB_RSS);
                         S.tabUtil.tabScroll(C.TAB_RSS, 0);
-                    }, 1000);
-
-                    if (!res.feed.entries || res.feed.entries.length === 0) {
-                        s.rssFeedCache[feedSrcHash] = RSSView.lastGoodFeed || {};
-                        s.rssProgressText = null;
-                        s.rssFeedPage[feedSrcHash] = RSSView.lastGoodPage || 1;
                         setTimeout(() => {
-                            S.util.showMessage("No more RSS items found.", "RSS");
-                        }, 250);
-                    }
-                    else {
-                        s.rssFeedCache[feedSrcHash] = res.feed;
-                        s.rssProgressText = null;
-                        RSSView.lastGoodFeed = res.feed;
-                        RSSView.lastGoodPage = s.rssFeedPage[feedSrcHash];
-                    }
-                });
-            }
+                            S.tabUtil.tabScroll(C.TAB_RSS, 0);
+                        }, 1000);
+
+                        if (!res.feed.entries || res.feed.entries.length === 0) {
+                            s.rssFeedCache[feedSrcHash] = RSSView.lastGoodFeed || {};
+                            s.rssProgressText = null;
+                            s.rssFeedPage[feedSrcHash] = RSSView.lastGoodPage || 1;
+                            setTimeout(() => {
+                                S.util.showMessage("No more RSS items found.", "RSS");
+                            }, 250);
+                        }
+                        else {
+                            s.rssFeedCache[feedSrcHash] = res.feed;
+                            s.rssProgressText = null;
+                            RSSView.lastGoodFeed = res.feed;
+                            RSSView.lastGoodPage = s.rssFeedPage[feedSrcHash];
+                        }
+                    });
+                }
+            })();
         });
     }
 

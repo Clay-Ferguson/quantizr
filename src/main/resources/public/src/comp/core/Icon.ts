@@ -4,7 +4,7 @@ import { Comp } from "../base/Comp";
 
 export class Icon extends Comp {
 
-    constructor(attribs: Object = null, private label: string = null) {
+    constructor(attribs: any = null, private label: string = null) {
         super(attribs);
         this.attribs.className += getAs().mobileMode ? " mobileIcon" : "";
     }

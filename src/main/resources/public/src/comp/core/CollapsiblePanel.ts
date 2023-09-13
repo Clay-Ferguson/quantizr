@@ -11,10 +11,10 @@ export class CollapsiblePanel extends Comp {
 
     constructor(private collapsedButtonText: string,
         private expandedButtonText: string,
-        attribs: Object = {},
+        attribs: any = {},
         children: Comp[] = null,
         private textLink: boolean = false,
-        private stateCallback: Function = null,
+        private stateCallback: (exp: boolean) => void = null,
         expanded: boolean = false,
         private extraToggleButtonClass = "",
         private extraDivStyleExpanded: string = "",

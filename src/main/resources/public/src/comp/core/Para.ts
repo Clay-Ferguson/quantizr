@@ -3,7 +3,7 @@ import { Comp } from "../base/Comp";
 
 export class Para extends Comp {
 
-    constructor(public content: string = null, attribs: Object = {}) {
+    constructor(public content: string = null, attribs: any = {}) {
         super(attribs);
     }
 

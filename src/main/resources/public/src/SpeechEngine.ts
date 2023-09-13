@@ -229,7 +229,7 @@ export class SpeechEngine {
         // only because speech has had bugs over the years and one bug report I saw claimed putting the call
         // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
         // else make the claim.
-        setTimeout(async () => {
+        setTimeout(() => {
             this.getVoices();
             if (!this.voices) {
                 console.warn("Voices not loaded. Can't speak text");
@@ -239,7 +239,7 @@ export class SpeechEngine {
             // Just use 0 idx if the one passed in is out of range somehow.
             if (replayFromIdx >= this.queuedSpeech?.length) {
                 replayFromIdx = 0;
-            };
+            }
 
             if (replayFromIdx === -1) {
                 this.queuedSpeech = [];
@@ -250,93 +250,94 @@ export class SpeechEngine {
                 this.ttsIdx = replayFromIdx;
             }
 
-            await promiseDispatch("speechEngineStateChange", s => {
+            promiseDispatch("speechEngineStateChange", s => {
                 s.speechPaused = false;
                 s.speechSpeaking = true;
                 s.ttsRan = true;
-            });
-
-            this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
-            if (this.queuedSpeech.length === 0) {
-                this.queuedSpeech = null;
-                return;
-            }
-
-            let utter: SpeechSynthesisUtterance = null;
-
-            /* NOTE: This utterFunc gets used over and over in a daisy chain type way to process the
-            next utterance every time the previous one completes. */
-            const utterFunc = () => {
-                if (!this.ttsRunning || !this.queuedSpeech) return;
-                const ast = getAs();
-
-                // If we're out of stuff to speak
-                if (this.ttsIdx >= this.queuedSpeech.length) {
-                    this.stopSpeaking();
+            }).then(() => {
+                this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
+                if (this.queuedSpeech.length === 0) {
+                    this.queuedSpeech = null;
                     return;
                 }
 
-                // If we have more stuff to speak
-                if (this.ttsIdx < this.queuedSpeech.length) {
-                    let sayThis = this.queuedSpeech[this.ttsIdx];
+                let utter: SpeechSynthesisUtterance = null;
 
-                    // if this is a paragraph break skip it, with idx++
-                    while (sayThis === C.TTS_BREAK) {
-                        // no more left?
-                        if (++this.ttsIdx >= this.queuedSpeech.length) {
-                            this.stopSpeaking();
-                            return;
+                /* NOTE: This utterFunc gets used over and over in a daisy chain type way to process the
+                next utterance every time the previous one completes. */
+                const utterFunc = () => {
+                    if (!this.ttsRunning || !this.queuedSpeech) return;
+                    const ast = getAs();
+
+                    // If we're out of stuff to speak
+                    if (this.ttsIdx >= this.queuedSpeech.length) {
+                        this.stopSpeaking();
+                        return;
+                    }
+
+                    // If we have more stuff to speak
+                    if (this.ttsIdx < this.queuedSpeech.length) {
+                        let sayThis = this.queuedSpeech[this.ttsIdx];
+
+                        // if this is a paragraph break skip it, with idx++
+                        while (sayThis === C.TTS_BREAK) {
+                            // no more left?
+                            if (++this.ttsIdx >= this.queuedSpeech.length) {
+                                this.stopSpeaking();
+                                return;
+                            }
+
+                            // keep going, with this sayThis.
+                            sayThis = this.queuedSpeech[this.ttsIdx];
                         }
 
-                        // keep going, with this sayThis.
-                        sayThis = this.queuedSpeech[this.ttsIdx];
-                    }
+                        // Let's rip out all the hashtags and at symbols mainly just so we can read
+                        // text full of hashtags and have it sound good.
+                        sayThis = sayThis.replace("#", " ");
 
-                    // Let's rip out all the hashtags and at symbols mainly just so we can read
-                    // text full of hashtags and have it sound good.
-                    sayThis = sayThis.replace("#", " ");
+                        // replace backquote or else the engine will pronounce the actual word 'backquote' which we of courose
+                        // do not want.
+                        sayThis = sayThis.replace("`", "\"");
 
-                    // replace backquote or else the engine will pronounce the actual word 'backquote' which we of courose
-                    // do not want.
-                    sayThis = sayThis.replace("`", "\"");
+                        utter = new SpeechSynthesisUtterance(sayThis);
 
-                    utter = new SpeechSynthesisUtterance(sayThis);
+                        const isQuote = sayThis.startsWith("\"");
+                        if (isQuote && this.USE_VOICE2 && ast.speechVoice2 >= 0) {
+                            const voices = this.getVoices();
+                            utter.voice = voices[(ast.speechVoice2 < voices.length ? ast.speechVoice2 : 0)];
+                        }
+                        else if (ast.speechVoice >= 0) {
+                            const voices = this.getVoices();
+                            utter.voice = voices[(ast.speechVoice < voices.length ? ast.speechVoice : 0)];
+                        }
 
-                    const isQuote = sayThis.startsWith("\"");
-                    if (isQuote && this.USE_VOICE2 && ast.speechVoice2 >= 0) {
-                        const voices = this.getVoices();
-                        utter.voice = voices[(ast.speechVoice2 < voices.length ? ast.speechVoice2 : 0)];
-                    }
-                    else if (ast.speechVoice >= 0) {
-                        const voices = this.getVoices();
-                        utter.voice = voices[(ast.speechVoice < voices.length ? ast.speechVoice : 0)];
-                    }
+                        if (ast.speechRate) {
+                            utter.rate = this.parseRateValue(ast.speechRate);
+                        }
 
-                    if (ast.speechRate) {
-                        utter.rate = this.parseRateValue(ast.speechRate);
-                    }
+                        utter.onend = () => {
+                            this.ttsSpeakingTime = 0;
+                            this.utter = null;
+                            if (!this.ttsRunning) return;
+                            utterFunc();
+                        }
 
-                    utter.onend = () => {
-                        this.ttsSpeakingTime = 0;
-                        this.utter = null;
                         if (!this.ttsRunning) return;
-                        utterFunc();
+                        // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
+                        this.ttsSpeakingTime = 0;
+                        this.utter = utter;
+                        this.highlightByIndex(this.ttsIdx);
+                        this.ttsIdx++;
+                        this.tts.speak(utter);
                     }
-
-                    if (!this.ttsRunning) return;
-                    // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
-                    this.ttsSpeakingTime = 0;
-                    this.utter = utter;
-                    this.highlightByIndex(this.ttsIdx);
-                    this.ttsIdx++;
-                    this.tts.speak(utter);
                 }
-            };
-            this.ttsRunning = true;
-            // Get started by uttering idx=0, and the rest of the sentences will follow
-            // in a chain reaction every time utterFunc gets called via the 'onend' listener of
-            // the most recently completed utterance
-            utterFunc();
+                this.ttsRunning = true;
+                // Get started by uttering idx=0, and the rest of the sentences will follow
+                // in a chain reaction every time utterFunc gets called via the 'onend' listener of
+                // the most recently completed utterance
+                utterFunc();
+
+            });
         }, 100);
     }
 

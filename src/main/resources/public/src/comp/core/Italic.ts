@@ -3,7 +3,7 @@ import { Comp } from "../base/Comp";
 
 export class Italic extends Comp {
 
-    constructor(attribs : Object = {}) {
+    constructor(attribs: any = {}) {
         super(attribs);
     }
 

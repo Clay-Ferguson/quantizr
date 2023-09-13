@@ -123,7 +123,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         if (EditNodeDlg.pendingUploadFile) {
-            setTimeout(async () => {
+            setTimeout(() => {
                 // DO NOT DELETE. Leave this here as an FYI.
                 // await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
 
@@ -136,10 +136,10 @@ export class EditNodeDlg extends DialogBase {
         if (!EditNodeDlg.autoSaveTimer) {
             // save editor state every few seconds so user can recover editing if anything goes wrong.
             // This should be CLEARED upon successful saves only, and have this static var set back to null
-            EditNodeDlg.autoSaveTimer = setInterval(async () => {
+            EditNodeDlg.autoSaveTimer = setInterval(() => {
                 const ast = getAs();
                 if (!ast || !ast.editNode) return;
-                await S.localDB.setVal(C.STORE_EDITOR_DATA, {
+                S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: ast.editNode.id,
                     content: EditNodeDlg.currentInst.contentEditorState.getValue()
                 });
@@ -718,7 +718,7 @@ export class EditNodeDlg extends DialogBase {
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
         const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode)) : true;
-        let allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
+        const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);

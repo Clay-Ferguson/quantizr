@@ -3,7 +3,7 @@ import { Comp } from "../base/Comp";
 
 export class Label extends Comp {
 
-    constructor(private content: string = "", attribs: Object = {}) {
+    constructor(private content: string = "", attribs: any = {}) {
         super(attribs);
     }
 

@@ -530,13 +530,13 @@ export class DomUtil {
                     return;
                 }
                 else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
-                    item.getAsString(async (s) => {
+                    item.getAsString(s => {
                         if (attribs[C.NODE_ID_ATTR] === s) {
                             S.util.showMessage("Can't copy a node to itself.");
                             return;
                         }
                         const dlg = new PasteOrLinkDlg(id, s);
-                        await dlg.open();
+                        dlg.open();
                     });
                     return;
                 }

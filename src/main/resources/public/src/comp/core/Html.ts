@@ -25,7 +25,7 @@ interface LS { // Local State
 export class Html extends Comp {
     public purifyHtml = true;
 
-    constructor(content: string = "", attribs: Object = {}, children: CompIntf[] = null) {
+    constructor(content: string = "", attribs: any = {}, children: CompIntf[] = null) {
         super(attribs);
         this.setChildren(children);
         this.setText(content);

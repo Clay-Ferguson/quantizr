@@ -145,6 +145,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             return;
         }
 
+        // todo-0: there are multiple places we scan clipboard content and we need to package
+        // all that logic into a promise-based function (see the one that has an array of an array and flattens
+        // and use that pattern)
         (navigator as any)?.clipboard?.read().then(async (data: any) => {
             let done: boolean = false;
             for (const clipboardItem of data) {

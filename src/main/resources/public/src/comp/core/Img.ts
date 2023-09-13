@@ -4,7 +4,7 @@ import { S } from "../../Singletons";
 
 export class Img extends Comp {
 
-    constructor(attribs: Object = {}) {
+    constructor(attribs: any = {}) {
         super(attribs);
     }
 

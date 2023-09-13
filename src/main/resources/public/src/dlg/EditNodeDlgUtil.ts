@@ -285,7 +285,7 @@ export class EditNodeDlgUtil {
         this.deleteProperties(dlg, keys);
     }
 
-    setEncryption = (dlg: EditNodeDlg, encrypt: boolean) => {
+    setEncryption = async (dlg: EditNodeDlg, encrypt: boolean) => {
         dlg.mergeState({ encryptCheckboxVal: encrypt });
         const state = dlg.getState<EditNodeDlgState>();
         const ast = getAs();
@@ -295,46 +295,44 @@ export class EditNodeDlgUtil {
         }
         if (dlg.pendingEncryptionChange) return;
 
-        (async () => {
-            const encrypted: boolean = S.props.isEncrypted(ast.editNode);
+        const encrypted: boolean = S.props.isEncrypted(ast.editNode);
 
-            /* only if the encryption setting changed do we need to do anything here */
-            if (encrypted !== encrypt) {
-                dlg.pendingEncryptionChange = true;
-                try {
-                    /* If we're turning off encryption for the node */
-                    if (!encrypt) {
-                        /* Take what's in the editor and put
-                        that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
-                        in the case where the user made some changes before disabling encryption. */
-                        ast.editNode.content = dlg.contentEditor.getValue();
-                        S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, null);
-                    }
-                    /* Else need to ensure node is encrypted */
-                    else {
-                        // if we need to encrypt and the content is not currently encrypted.
-                        if (S.crypto.avail && !ast.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
-                            const content = dlg.contentEditor.getValue();
-                            const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);
+        /* only if the encryption setting changed do we need to do anything here */
+        if (encrypted !== encrypt) {
+            dlg.pendingEncryptionChange = true;
+            try {
+                /* If we're turning off encryption for the node */
+                if (!encrypt) {
+                    /* Take what's in the editor and put
+                    that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
+                    in the case where the user made some changes before disabling encryption. */
+                    ast.editNode.content = dlg.contentEditor.getValue();
+                    S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, null);
+                }
+                /* Else need to ensure node is encrypted */
+                else {
+                    // if we need to encrypt and the content is not currently encrypted.
+                    if (S.crypto.avail && !ast.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
+                        const content = dlg.contentEditor.getValue();
+                        const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);
 
-                            if (skdp.cipherKey && skdp.cipherKey) {
-                                ast.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
+                        if (skdp.cipherKey && skdp.cipherKey) {
+                            ast.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
 
-                                /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
-                                the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
-                                and so can only be decrypted with their private key. */
-                                S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, skdp.cipherKey);
-                            }
+                            /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
+                            the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
+                            and so can only be decrypted with their private key. */
+                            S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, skdp.cipherKey);
                         }
                     }
+                }
 
-                    dlg.mergeState<EditNodeDlgState>(state);
-                }
-                finally {
-                    dlg.pendingEncryptionChange = false;
-                }
+                dlg.mergeState<EditNodeDlgState>(state);
             }
-        })();
+            finally {
+                dlg.pendingEncryptionChange = false;
+            }
+        }
     }
 
     deleteUploads = async (dlg: EditNodeDlg) => {
