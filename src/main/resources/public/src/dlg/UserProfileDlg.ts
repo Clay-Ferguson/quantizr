@@ -169,8 +169,6 @@ export class UserProfileDlg extends DialogBase {
                 ], "avatarAndNamePanel"),
 
                 this.readOnly
-                    // #marked-removed
-                    // ? new Html(S.util.markdown(state.userProfile.userBio) || "", { className: "bioPanel" })
                     ? new Markdown(state.userProfile.userBio || "", { className: "bioPanel" })
                     : new TextArea("About Me", {
                         rows: 5

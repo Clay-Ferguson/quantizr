@@ -1,20 +1,7 @@
-// DO NOT DELETE (I want to keep the capability to go back to this if needed)
-// (see also: #css-imports-disabled)
-// import "bootstrap";
-// import "font-awesome/css/font-awesome.min.css";
-
 import "./quanta.css"
 import * as bootstrap from "bootstrap";
-
 import React from "react";
 import { createRoot } from "react-dom/client";
-
-// I decided there's far too much unnecessary complexity involved in combining the CSS into
-// the JS, because we don't have any component-specific CSS or any other reason to do this
-// and the net effect is that it just makes the JS bundle even larger when it's already too big.
-// DO NOT DELETE (I want to keep the capability to go back to this if needed)
-// (see also: #css-imports-disabled)
-// import "../css/quanta.scss";
 import { Factory } from "./Factory";
 import { ImportTest } from "./ImportTest";
 import { S } from "./Singletons";

@@ -70,11 +70,6 @@ export class Html extends Comp {
             });
         });
 
-        // #marked-removed
-        // elm.querySelectorAll(".hljs-copy").forEach((e: HTMLElement) => {
-        //     e.addEventListener("click", () => S.domUtil.codeSpanClick(e));
-        // });
-
         // /* When using tabs to indent code, highlightjs for some reason is rendering a code tag in a pre tag
         // but not putting the 'hljs' class on them, so we do that here, to make the styling look ok consistent
         // with how the 'fenced code blocks' look. */

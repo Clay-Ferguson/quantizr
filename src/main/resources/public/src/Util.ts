@@ -1,5 +1,3 @@
-// #marked-removed
-// import { marked } from "marked";
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
@@ -672,18 +670,6 @@ export class Util {
 
         return ret;
     }
-
-    // #marked-removed
-    // markdown = (val: string): any => {
-    //     if (!val) return "";
-    //     val = marked(val);
-
-    //     // the marked adds a 'p tag' wrapping we don't need so we remove it just to speed up DOM as much as possible
-    //     val = val.trim();
-    //     val = this.stripIfStartsWith(val, "<p>");
-    //     val = this.stripIfEndsWith(val, "</p>");
-    //     return val;
-    // }
 
     // External Emojis!
     insertActPubTags = (val: string, node: J.NodeInfo) => {

@@ -22,9 +22,6 @@ $form-select-indicator-color: lightGray;
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
-// By adding font-awesome into our SCSS here we consolildate all CSS into
-// one big CSS file called 'quanta.css', which we import directly into the HTML
-// (see also: #css-imports-disabled)
 $fa-font-path: "../fonts/fa";
 @import "../node_modules/font-awesome/scss/font-awesome";
 
@@ -73,9 +70,6 @@ $tourPanelHeight: 6rem;
     font-style: normal;
     font-display: swap;
 }
-
-// #marked-removed
-// @import '../node_modules/highlight.js/scss/dark.scss';
 
 @import './imports/breadcrumbs.scss';
 @import './imports/button.scss';
