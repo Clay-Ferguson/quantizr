@@ -598,7 +598,7 @@ export class Edit {
         }
         else {
             // update render state (using local state), this way if we're not refreshing the tree.
-            dispatch("setShowReplies", (s) => {
+            dispatch("setShowReplies", s => {
                 s.userPrefs.showReplies = ast.userPrefs.showReplies;
             });
         }
