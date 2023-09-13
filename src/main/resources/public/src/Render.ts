@@ -805,8 +805,7 @@ export class Render {
                     //     className: "userBio"
                     // }) : null
                 ])
-
-            ], "userInfo")
+            ])
         ]);
     }
 

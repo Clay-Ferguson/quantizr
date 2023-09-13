@@ -7,9 +7,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
-// todo-0: These need to be made to work again. When switching to Vite we lost this for now.
 declare const BUILDTIME: string;
-declare const PROFILE: string;
 
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
