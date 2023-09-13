@@ -16,7 +16,7 @@ NOTE: You should edit the password in the `setenv-*.sh` file before your first r
 To build and start an instance of Quanta on localhost for deveopment use `/scripts/build-dev.sh` which is configured by the settings in `setenv-dev.sh` Notice there's a QUANTA_BASE environment var where you should specifiy some folder you want to run your deployment from, and everything gets copied into there.
  
 
-If you then edit only TypeScript files and want to test those changes you can run just `build-webpack.sh` to make those changes go live. Or if you edit only Java files you can run `restart-dev.sh` to see those changes go live, and immediately test them. 
+If you then edit only TypeScript files and want to test those changes you can run just `build-vite.sh` to make those changes go live. Or if you edit only Java files you can run `restart-dev.sh` to see those changes go live, and immediately test them. 
 
 ## Production Builds
 
