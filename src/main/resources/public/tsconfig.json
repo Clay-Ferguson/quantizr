@@ -16,9 +16,6 @@
 
     "strictPropertyInitialization": false,
 
-    // todo-0: need to get rid of this 
-    // "checkJs": false,
-
     /* Linting (todo-0: will eventually be setting most of these back to true and fixing errors) */
     "strictFunctionTypes": false,
     "noImplicitThis": false,
