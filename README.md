@@ -2,6 +2,8 @@
 
 # Quanta Web Platform
 
+[Demo Instance: https://quanta.wiki](https://quanta.wiki)
+
 ## A new Kind of CMS with ChatGPT and Social Media features
 
 Quanta is a new kind of [Social Media](https://quanta.wiki/?view=feed) and Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
