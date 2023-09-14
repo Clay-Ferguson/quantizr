@@ -112,24 +112,6 @@ export class Util {
         return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
     }
 
-    // #mouseEffects (do not delete tag)
-    delayFunc = (func: () => void): () => void => {
-        if (!func || !S.domUtil.mouseEffect) {
-            return func;
-        }
-
-        // Not fat arrow, because we need 'arguments'
-        return function () {
-            const args: any = arguments;
-            setTimeout(function () {
-                func.apply(null, args);
-            },
-                /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
-                and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
-                300);
-        };
-    }
-
     formatMemory = (val: number): string => {
         // put these vals in const file KB,MB,GB
         if (val < 1024) {

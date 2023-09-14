@@ -196,8 +196,6 @@ export class Quanta {
             //     Log.log("The hash has changed: hash=" + location.hash);
             // }, false);
 
-            S.domUtil.initClickEffect();
-
             // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
             // do not delete.
@@ -236,7 +234,6 @@ export class Quanta {
             await this.initialRender();
 
             Log.log("initApp complete.");
-            S.domUtil.enableMouseEffect();
             if (S.quanta.config.login) {
                 S.user.userLogin();
             }

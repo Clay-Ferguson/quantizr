@@ -1,5 +1,3 @@
-/* #mouseEffects (do not delete this tag) */
-
 // *:hover {
 //     outline: 2px solid green;
 // }
@@ -66,37 +64,4 @@ div.annotationBox {
     text-align: center;
     margin: 0;
     padding: 5px;
-}
-
-div.clickEffect {
-    position: fixed;
-    border-style: solid;
-    border-color: yellow;
-    border-radius: 50%;
-    /* Warning: must match the time in util.ts#delayFunc AND in runClickAnimation */
-    animation: clickEffect 0.3s ease-out;
-
-    /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
-       but arguably we can to with any super large z-index here to enxure always on top.
-    */
-    z-index: 16002000;
-    width: 0;
-    height: 0;
-    border-width: 0;
-}
-
-@keyframes clickEffect {
-    0% {
-        width: 0em;
-        height: 0em;
-        transform: translate(0px, 0px);
-        border-width: 0;
-    }
-
-    100% {
-        width: 66px;
-        height: 66px;
-        transform: translate(-32px, -32px);
-        border-width: 12px;
-    }
 }

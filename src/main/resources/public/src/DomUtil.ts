@@ -1,4 +1,4 @@
-import { dispatch, getAs } from "./AppContext";
+import { getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
@@ -11,7 +11,6 @@ export class DomUtil {
     annotations: HTMLDivElement[] = [];
     mouseX: number;
     mouseY: number;
-    mouseEffect: boolean = false;
 
     static escapeMap: Map<string, string> = new Map<string, string>([
         ["&", "&amp;"],
@@ -336,52 +335,6 @@ export class DomUtil {
             event.currentTarget.classList.remove("dragTarget");
             func(event);
         };
-    }
-
-    enableMouseEffect = async () => {
-        const mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT);
-        this.mouseEffect = mouseEffect === "1";
-    }
-
-    /* #mouseEffects (do not delete tag) */
-    setMouseEffect = (mouseEffect: boolean) => {
-        dispatch("ToggleMouseEffect", () => {
-            this.mouseEffect = mouseEffect;
-            S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, this.mouseEffect ? "1" : "0");
-        });
-    }
-
-    /*
-    The other part of this is contained in click-effects.scss
-    */
-    initClickEffect = () => {
-        document.addEventListener("click", (e: MouseEvent) => {
-            // use a timeout so we can call 'getState()' without a react error.
-            setTimeout(() => {
-                /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
-                 and is apparently 0, 0, so we just check the sanity of the coordinates here */
-                if (!this.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
-                this.runClickAnimation(e.clientX, e.clientY);
-            }, 10);
-        });
-    }
-
-    runClickAnimation = (x: number, y: number) => {
-        const d = document.createElement("div");
-        d.className = "clickEffect";
-
-        /* todo-2: make this 5 and 12 offset user configurable. I'm using a custom moust pointer that draws a yellow
-        circle around my mouse for use with this effect, to record screencast videos, and that icon circle is not centered
-        around the actual mouse click arrow tip location, so we have to use an offset here (only when that Linux OS mouse theme is used)
-        to get our expanding circle in CSS to be perfectly centered with the one in the mouse theme, because an off center look
-        is terrible but the 5 and 12 makes it perfect */
-        d.style.left = `${x - 2}px`;
-        d.style.top = `${y - 2}px`;
-        document.body.appendChild(d);
-
-        setTimeout(() => {
-            d.parentElement.removeChild(d);
-        }, 300); // this val is in 3 places. put the TS two in a constants file.
     }
 
     addAnnotation = () => {

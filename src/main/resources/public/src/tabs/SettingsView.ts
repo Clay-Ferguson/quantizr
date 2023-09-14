@@ -77,15 +77,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                             setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
                             getValue: (): boolean => ast.userPrefs.showProps
                         }),
-
-                        /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
-                         that I have to impose an intentional performance lag to let the animation show up, so in order to have the
-                         absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
-                         the code in place for future reference. */
-                        new Checkbox("Mouse Effects", { className: "bigMarginLeft" }, {
-                            setValue: async (checked: boolean) => S.domUtil.setMouseEffect(checked),
-                            getValue: (): boolean => S.domUtil.mouseEffect
-                        })
                     ])
                 ], horzClass),
 

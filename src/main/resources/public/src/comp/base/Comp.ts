@@ -219,27 +219,9 @@ export abstract class Comp implements CompIntf {
     }
 
     create = (): ReactNode => {
-        this.wrapClick(this.attribs);
         return createElement(this.render, this.attribs);
     }
 
-    wrapClick = (obj: any) => {
-        // If 'mouseEffect' is turned on we impose a delay before processing each mouse click in order to
-        // give the animation time to run.
-        if (obj?.onClick) {
-            const func = obj.onClick;
-
-            // Not fat arrow, because we need 'arguments',
-            // create a new function that injects calls to userActive
-            obj.onClick = function (_evt: any) {
-                func.apply(null, arguments);
-            };
-
-            if (S.domUtil.mouseEffect) {
-                obj.onClick = S.util.delayFunc(obj.onClick);
-            }
-        }
-    }
 
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {
@@ -305,7 +287,6 @@ export abstract class Comp implements CompIntf {
         try {
             const children = this.createChildren(childrenArg);
 
-            this.wrapClick(props);
             if (children?.length > 0) {
                 // special case where tbody always needs to be immediate child of table
                 // https://github.com/facebook/react/issues/5652

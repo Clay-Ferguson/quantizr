@@ -93,7 +93,6 @@ export class Constants {
      location they were last viewing */
     static readonly LOCALDB_LAST_PARENT_NODEID: string = "lastParentId";
     static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
-    static readonly LOCALDB_MOUSE_EFFECT: string = "mouseEffect";
 
     static readonly LOCALDB_AUDIO_SOURCE: string = "audioSource";
     static readonly LOCALDB_VIDEO_SOURCE: string = "videoSource";
