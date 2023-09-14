@@ -86,7 +86,9 @@ public class OpenAiService extends ServiceBase {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + prop.getOpenAiKey());
 
+        // this will hold all the prior chat history
         List<ChatMessage> messages = new ArrayList<>();
+
         SystemConfig system = new SystemConfig();
 
         if (node != null) {
@@ -102,7 +104,6 @@ public class OpenAiService extends ServiceBase {
         }
 
         String input = node != null ? node.getContent() : question;
-        // log.debug("SystemPrompt: " + XString.prettyPrint(system));
         messages.add(0, new ChatMessage("system", system.getPrompt()));
         messages.add(new ChatMessage("user", input));
 
@@ -119,13 +120,14 @@ public class OpenAiService extends ServiceBase {
 
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString());
-        log.debug("GPT Req: " + XString.prettyPrint(request));
+        log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
+                + XString.prettyPrint(request));
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
         ResponseEntity<ChatCompletionResponse> response =
                 restTemplate.exchange(OPENAI_COMP_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
 
         ChatCompletionResponse res = response.getBody();
-        // log.debug("GPT Res: " + XString.prettyPrint(res));
+        log.debug("GPT Res: " + XString.prettyPrint(res));
 
         updateUserCredit(userNode, userCredit, res);
         res.userCredit = userCredit.getVal();
@@ -188,26 +190,25 @@ public class OpenAiService extends ServiceBase {
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
         parseAISystemFromContent(node, system);
-
-
-        boolean lastWasUser = !NodeType.OPENAI_ANSWER.s().equals(node.getType());
         SubNode parent = read.getParent(ms, node);
+        int nonAnswerCounter = NodeType.OPENAI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
             if (NodeType.OPENAI_ANSWER.s().equals(parent.getType())) {
-                lastWasUser = false;
+                nonAnswerCounter = 0;
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
+                nonAnswerCounter++;
                 parseAISystemFromContent(parent, system);
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
-                if (lastWasUser) {
+                if (nonAnswerCounter > 1) {
                     break;
                 }
-                lastWasUser = true;
+
                 messages.add(0, new ChatMessage("user", parent.getContent()));
             }
 
