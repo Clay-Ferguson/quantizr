@@ -730,17 +730,17 @@ export class EditNodeDlg extends DialogBase {
         return new ButtonBar([
             new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
 
-            allowUpload ? new IconButton("fa-upload", "File", {
+            allowUpload ? new IconButton("fa-upload", null, {
                 onClick: () => this.utl.upload(null, this),
                 title: "Upload file attachment"
             }) : null,
 
-            allowUpload && S.util.clipboardReadable() ? new IconButton("fa-paperclip", "Clip", {
+            allowUpload && S.util.clipboardReadable() ? new IconButton("fa-paperclip", null, {
                 onClick: () => this.utl.uploadFromClipboard(this),
                 title: "Upload from Clipboard"
             }) : null,
 
-            allowShare ? new IconButton("fa-share-alt", "Share", {
+            allowShare ? new IconButton("fa-share-alt", null, {
                 onClick: () => this.utl.share(this),
                 title: "Share Node"
             }, "ui-editor-share") : null,
@@ -774,7 +774,7 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
-            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask GPT", {
+            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", null, {
                 onClick: this.askChatGpt,
                 title: "Ask ChatGPT this Question"
             }) : null,
