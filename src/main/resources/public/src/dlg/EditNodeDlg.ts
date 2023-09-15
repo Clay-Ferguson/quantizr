@@ -30,7 +30,7 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
-import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
+import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 
 export interface LS {
     selectedProps?: Set<string>;
@@ -433,10 +433,10 @@ export class EditNodeDlg extends DialogBase {
         if (propsTable) {
             // only if not schema.org type do we want to have properties collapsible
             if (!type.schemaOrg) {
-                propsCollapsePanel = new CollapsiblePanel("Properties", "Hide Properties", null, [
+                propsCollapsePanel = new CollapsiblePanel("Show Properties", "Hide Properties", null, [
                     new Clearfix(),
                     propsDiv
-                ], false,
+                ], true,
                     (expanded: boolean) => {
                         if (autoExpandProps) return;
                         dispatch("setPropsPanelExpanded", s => {
@@ -450,10 +450,14 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        const tagsEditRow = editorOpts.tags ? new Divc({ className: "editorTagsSection" }, [
+        let tagsEditRow = editorOpts.tags ? new Divc({ className: "editorTagsSection" }, [
             this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this.removeTag, this.selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
+
+        if (tagsEditRow && !tagsEditRow.hasChildren()) {
+            tagsEditRow = null;
+        }
 
         let editorSubPanel: Comp = null;
         if (type) {
@@ -466,14 +470,19 @@ export class EditNodeDlg extends DialogBase {
             editorOpts.nodeName || editorOpts.priority;
 
         if (hasAdvControls) {
-            advCollapsePanel = !customProps ? new CollapsiblePanel("Advanced", "Hide Advanced", null, [
+
+            const advancedDiv = new Divc({ className: "advancedCont" }, [
                 tagsEditRow,
                 new Divc({ className: "row align-items-end" }, [
                     editorOpts.nodeName ? nodeNameTextField : null,
                     editorOpts.priority ? this.createPrioritySelection() : null
                 ]),
                 advFlowPanel
-            ], false,
+            ]);
+
+            advCollapsePanel = !customProps ? new CollapsiblePanel("Show Advanced", "Hide Advanced", null, [
+                advancedDiv
+            ], true,
                 (expanded: boolean) => {
                     dispatch("setMorePanelExpanded", s => {
                         s.morePanelExpanded = expanded;

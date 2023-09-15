@@ -144,6 +144,15 @@ td {
     background-color: #17202A;
     border: 1px solid $gray-600;
     margin-bottom: $smallGap;
+    border-radius: $border-radius;
+}
+
+.advancedCont {
+    background-color: #17202A;
+    border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+    padding: $smallGap;
+    border-radius: $border-radius;
 }
 
 .editPropsTable {
