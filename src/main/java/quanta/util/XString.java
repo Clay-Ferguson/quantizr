@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -243,6 +244,74 @@ public class XString {
         }
         return text;
     }
+
+    /**
+     * Removes specified characters from a given string.
+     *
+     * This method takes two strings, 'str' and 'removes', and returns a modified copy of 'str' where
+     * any characters that exist in the 'removes' string have been removed.
+     */
+    public static String removeChars(String str, String removes) {
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < str.length(); i++) {
+            char currentChar = str.charAt(i);
+
+            // Check if the current character is not in the 'removes' string
+            if (removes.indexOf(currentChar) == -1) {
+                result.append(currentChar);
+            }
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Returns a copy of the input string 'str' with characters from the 'removes' string removed from
+     * the beginning of 'str'.
+     */
+    public static String removeCharsFromBeginning(String str, String removes) {
+        if (str == null || removes == null || str.isEmpty() || removes.isEmpty()) {
+            return str;
+        }
+
+        Set<Character> removesSet = new HashSet<>();
+        for (char c : removes.toCharArray()) {
+            removesSet.add(c);
+        }
+
+        StringBuilder result = new StringBuilder(str);
+        while (!result.toString().isEmpty() && removesSet.contains(result.charAt(0))) {
+            result.deleteCharAt(0);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Returns a copy of the input string 'str' with characters from the 'removes' string removed from
+     * the end of 'str'.
+     */
+    public static String removeCharsFromEnd(String str, String removes) {
+        if (str == null || removes == null || str.isEmpty() || removes.isEmpty()) {
+            return str;
+        }
+
+        Set<Character> removesSet = new HashSet<>();
+        for (char c : removes.toCharArray()) {
+            removesSet.add(c);
+        }
+
+        StringBuilder result = new StringBuilder(str);
+        int length = result.length();
+        while (length > 0 && removesSet.contains(result.charAt(length - 1))) {
+            result.deleteCharAt(length - 1);
+            length = result.length();
+        }
+
+        return result.toString();
+    }
+
 
     public static String parseAfterLast(String text, String delim) {
         if (text == null)

@@ -520,6 +520,10 @@ public class NodeRenderService extends ServiceBase {
         return res;
     }
 
+    /**
+     * Generates breadcrumbs that are displayed at the top of the page. It is called recursively to walk
+     * up the tree and generate the list of breadcrumbs.
+     */
     public void getBreadcrumbs(MongoSession ms, SubNode node, LinkedList<BreadcrumbInfo> list) {
         ms = ThreadLocals.ensure(ms);
         try {
@@ -563,6 +567,9 @@ public class NodeRenderService extends ServiceBase {
          */
     }
 
+    /**
+     * Used to strip off any leading hashtags or usernames from the content of a node.
+     */
     public String stripRenderTags(String content) {
         if (content == null)
             return null;
@@ -575,6 +582,11 @@ public class NodeRenderService extends ServiceBase {
         return content;
     }
 
+    /**
+     * This is used to generate the first line of a node's content to be used as the title of the node
+     * in the tree view. It is also used to generate the title of the page when the node is rendered in
+     * the browser.
+     */
     public String getFirstLineAbbreviation(String content, int maxLen) {
         if (content == null)
             return null;
@@ -590,6 +602,8 @@ public class NodeRenderService extends ServiceBase {
         }
         content = XString.truncAfterFirst(content, "\n");
         content = XString.truncAfterFirst(content, "\r");
+        content = XString.removeCharsFromBeginning(content, "\"'`.!?=-_~@#$%^&*()[]{}|\\;:<>");
+        content = XString.removeCharsFromEnd(content, "\"'`.!?=-_~@#$%^&*()[]{}|\\;:<>");
         if (content.length() > maxLen) {
             content = content.substring(0, maxLen) + "...";
         }
