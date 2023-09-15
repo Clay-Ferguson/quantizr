@@ -1,6 +1,7 @@
 package quanta.service.ipfs;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
@@ -89,7 +90,8 @@ public class IPFSDag extends ServiceBase {
 
     public MerkleLink putString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize) {
         checkIpfs();
-        return ipfs.writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize);
+        return ipfs.writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val, StandardCharsets.UTF_8), null,
+                streamSize);
     }
 
     public MerkleLink putStream(MongoSession ms, InputStream stream, String mimeType, Val<Integer> streamSize) {

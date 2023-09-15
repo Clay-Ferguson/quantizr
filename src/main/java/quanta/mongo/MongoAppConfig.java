@@ -183,9 +183,4 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     protected String getDatabaseName() {
         return databaseName;
     }
-
-    @Override
-    protected String getMappingBasePackage() {
-        return "quanta.mongo";
-    }
 }

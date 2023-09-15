@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -84,7 +82,6 @@ public class RSSFeedService extends ServiceBase {
     private static final Object policyLock = new Object();
     PolicyFactory policy = null;
     private boolean USE_HTTP_READER = false;
-    private boolean USE_URL_READER = false;
     private boolean USE_SPRING_READER = true;
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(15000));
     /*
@@ -251,19 +248,7 @@ public class RSSFeedService extends ServiceBase {
                 log.debug("Reading Feed from Web: " + url);
             }
             int timeout = 60; // seconds
-            if (USE_URL_READER) {
-                /*
-                 * This is not a memory leak that we don't close the connection. This is correct. No need to close
-                 */
-                URLConnection conn = new URL(url).openConnection();
-                conn.setConnectTimeout(timeout * 1000);
-                conn.setReadTimeout(timeout * 1000);
 
-                // todo-0: fix this deprecation and search or other deprecations project wide.
-                reader = new XmlReader(conn);
-                SyndFeedInput input = new SyndFeedInput();
-                inFeed = input.build(reader);
-            }
             /*
              * I was experimenting this this way of getting a reader as a last attempt to get a specific
              * problematic URL to work, that keeps causing a timeout when I try to read from it thru the server
@@ -277,15 +262,17 @@ public class RSSFeedService extends ServiceBase {
              * best theory for why is that my restTemplate is doing something special that fixes these issues.
              */
             if (USE_HTTP_READER) {
-                RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-                        .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+                RequestConfig config = RequestConfig.custom()//
+                        .setConnectTimeout(timeout * 1000)//
+                        .setConnectionRequestTimeout(timeout * 1000)//
+                        .setSocketTimeout(timeout * 1000).build();
 
                 HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
                 HttpGet request = new HttpGet(url);
                 request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
                 HttpResponse response = client.execute(request);
                 InputStream is = response.getEntity().getContent();
-                LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, 100 * Const.ONE_MB);
+                LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, 10 * Const.ONE_MB);
                 byte[] buffer = IOUtils.toByteArray(limitedIs);
                 reader = new CharSequenceReader(new String(buffer));
                 SyndFeedInput input = new SyndFeedInput();

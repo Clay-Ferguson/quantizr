@@ -10,16 +10,18 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-/* We're going to be caching every Fediverse username we encounter for future unspecified purposes */
+/*
+ * We're going to be caching every Fediverse username we encounter for future unspecified purposes
+ */
 @Document(collection = "fediNames")
 @TypeAlias("fn")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ FediverseName.ID, FediverseName.NAME, FediverseName.CREATE_TIME })
+@JsonPropertyOrder({FediverseName.ID, FediverseName.NAME, FediverseName.CREATE_TIME})
 public class FediverseName {
 
     private static Logger log = LoggerFactory.getLogger(FediverseName.class);
@@ -39,7 +41,7 @@ public class FediverseName {
     @Field(CREATE_TIME)
     private Date createTime;
 
-    @PersistenceConstructor
+    @PersistenceCreator
     public FediverseName() {
         /*
          * WARNING: Do NOT initialize times (mod time or create time) in here this constructor gets called

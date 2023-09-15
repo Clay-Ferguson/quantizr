@@ -3,6 +3,7 @@ package quanta.service.ipfs;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -131,7 +132,7 @@ public class IPFSService extends ServiceBase {
     public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType,
             boolean wrapInFolder) {
         checkIpfs();
-        InputStream stream = IOUtils.toInputStream(text);
+        InputStream stream = IOUtils.toInputStream(text, StandardCharsets.UTF_8);
         try {
             return addFromStream(ms, stream, fileName, mimeType, null, wrapInFolder);
         } finally {

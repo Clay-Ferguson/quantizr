@@ -53,6 +53,10 @@ cd ${PRJROOT}/src/main/resources/public
 . ./build.sh
 
 cd ${PRJROOT}
+
+# for deprecated stuff
+# mvn -T 1C clean package -DskipTests=true -Dmaven.compiler.showDeprecation=true -P${mvn_profile}
+
 # Then this is the actual maven full build of the server springboot app
 mvn -T 1C clean package -DskipTests=true -P${mvn_profile}
 verifySuccess "Maven Build"
