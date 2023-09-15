@@ -258,20 +258,20 @@ export class RpcUtil {
                 credentials: "same-origin", // include, *same-origin, omit
                 referrerPolicy: "no-referrer"
             })
-                .then((res: any) => {
+                .then((res: Response) => {
                     // Unauthorized refers to the session, and our session has likely timed out.
                     if (res.status === C.RESPONSE_CODE_UNAUTHORIZED) {
-                        console.error("UNAUTHORIZED(401a) error for: " + postName + " RES: " + res);
+                        console.error("UNAUTHORIZED(401) error for: " + postName + " RES: " + res);
                         reject({ response: res });
                         this.authFail();
                     }
                     else if (res.status === C.RESPONSE_CODE_FORBIDDEN) {
-                        console.error("FORBIDDEN(403a) error for: " + postName + " RES: " + res);
+                        console.error("FORBIDDEN(403) error for: " + postName + " RES: " + res);
                         reject({ response: res });
                         S.util.showMessage("Content not visible to you.", "Message");
                     }
                     else if (res.status !== C.RESPONSE_CODE_OK) {
-                        console.log("reject: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
+                        console.log("reject: res: " + S.util.prettyPrint(res) + " PATH=" + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                         reject({ response: res });
                     }
                     else {
@@ -380,16 +380,18 @@ export class RpcUtil {
             console.log("FAIL [" + postName + "]\n    ERROR: " + S.util.prettyPrint(error) + //
                 "\n    POST DATA: " + S.util.prettyPrint(postData));
 
-            if (error?.response?.status === C.RESPONSE_CODE_UNAUTHORIZED) {
-                console.error("UNAUTHORIZED(401c) error");
-                this.authFail();
-                return;
-            }
-
-            if (error?.response?.status === C.RESPONSE_CODE_FORBIDDEN) {
-                console.error("FORBIDDEN(403c) error");
-                S.util.showMessage("Content not visible to you.", "Message");
-                return;
+            switch (error?.response?.status) {
+                case C.RESPONSE_CODE_UNAUTHORIZED:
+                    console.error("UNAUTHORIZED (401) error");
+                    this.authFail();
+                    return;
+                case C.RESPONSE_CODE_FORBIDDEN:
+                    console.error("FORBIDDEN (403) error");
+                    S.util.showMessage("Content not visible to you.", "Message");
+                    return;
+                case C.RESPONSE_CODE_SERVER_TOO_BUSY:
+                    S.util.showMessage("Server too busy (503). Try again later.", "Warning", true);
+                    return;
             }
 
             if (!background && allowErrorDlg) {

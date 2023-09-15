@@ -129,6 +129,10 @@ public class XString {
         return list;
     }
 
+    /**
+     * Returns a list of tokens from the input string 'val' that are separated by the input delimiter
+     * 'delimiter'. The tokens are trimmed of whitespace if the input 'trim' is true.
+     */
     public static HashSet<String> tokenizeToSet(String val, String delimiter, boolean trim) {
         HashSet<String> list = null;
         StringTokenizer t = new StringTokenizer(val, delimiter, false);
@@ -235,6 +239,9 @@ public class XString {
         return str.substring(0, str.length() - 1);
     }
 
+    /**
+     * Truncates after last delimiter including truncating the delimiter
+     */
     public static String truncAfterLast(String text, String delim) {
         if (text == null)
             return null;
@@ -311,7 +318,6 @@ public class XString {
 
         return result.toString();
     }
-
 
     public static String parseAfterLast(String text, String delim) {
         if (text == null)

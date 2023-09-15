@@ -6,6 +6,7 @@ export class Constants {
     static RESPONSE_CODE_INTERNAL_SERVER_ERROR = 500;
     static RESPONSE_CODE_UNAUTHORIZED = 401;
     static RESPONSE_CODE_FORBIDDEN = 403;
+    static RESPONSE_CODE_SERVER_TOO_BUSY = 503;
 
     // NOTE: Browsers can and DO fail sometimes if we don't have 'data-' as the prefix on any 'custom data attributes'
     // that aren't an official part of HTML Spec.

@@ -22,6 +22,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.exception.ServerTooBusyException;
 import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.Const;
@@ -123,10 +124,11 @@ public class AppFilter extends GenericFilterBean {
              * to still respond to this error even in the case where no ResponseBase is being returned which is
              * rare but is still possible
              */
-            sendError(httpRes, httpReq.getRequestURI(), e.getCode(), e);
+            sendError(httpRes, e.getMessage() != null ? e.getMessage() : httpReq.getRequestURI(), e.getCode(), e);
         } catch (Exception e) {
             // ditto comment above
-            sendError(httpRes, httpReq.getRequestURI(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+            sendError(httpRes, e.getMessage() != null ? e.getMessage() : httpReq.getRequestURI(),
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
         } finally {
             if (mutex != null) {
                 mutex.unlock();
@@ -178,9 +180,10 @@ public class AppFilter extends GenericFilterBean {
         if (useLock) {
             mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
             if (mutex != null) {
-                boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
+                boolean isLockAcquired = mutex.tryLock(180, TimeUnit.SECONDS);
+
                 if (!isLockAcquired)
-                    throw new RuntimeException("Server too busy.");
+                    throw new ServerTooBusyException();
             }
         }
         return mutex;
@@ -220,6 +223,7 @@ public class AppFilter extends GenericFilterBean {
     private void sendError(HttpServletResponse res, String msg, int code, Exception e) {
         ExUtil.error(log, "Failed in " + msg, e);
         try {
+            res.getWriter().write(msg);
             res.sendError(code);
         } catch (Exception ex) {
         }
