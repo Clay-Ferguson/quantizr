@@ -115,6 +115,7 @@ export class NodeCompRow extends Div {
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
         // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
         if (this.isTableCell) {
+            // do nothing
         }
         // else if (layout && layout.indexOf("c") === 0 && (isInlineChildren || this.node.id === state.node.id)) {
         // }
@@ -188,11 +189,14 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node);
         }
 
+        const askDelDiv = this.node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
+
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
             this.renderingBoost ? null : S.render.renderBoostHeader(this.node, true),
             S.render.renderLinkLabel(this.node.id),
             header,
+            askDelDiv,
             buttonBar,
             buttonBar ? new Clearfix() : null,
             jumpButton,

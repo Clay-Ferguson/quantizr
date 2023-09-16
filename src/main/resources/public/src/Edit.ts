@@ -923,49 +923,11 @@ export class Edit {
             return;
         }
 
-        let deletedPageNode: boolean = false;
-        if (selNodesArray.find(id => id === ast.node?.id)) {
-            deletedPageNode = true;
-        }
+        dispatch("ConfirmingDelete", s => {
+            s.nodeClickedToDel = id;
+            s.nodesToDel = selNodesArray;
+        });
 
-        const confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
-        const dlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
-            "btn-danger", "alert alert-danger");
-        await dlg.open();
-        if (dlg.yes) {
-            const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                nodeIds: selNodesArray,
-                childrenOnly: false,
-                bulkDelete: false
-            });
-
-            this.removeNodesFromHistory(selNodesArray);
-            this.removeNodesFromCalendarData(selNodesArray);
-
-            /* Node: state.node can be null if we've never been to the tree view yet */
-            if (ast.node && S.util.checkSuccess("Delete node", res)) {
-                S.util.notifyNodeDeleted();
-
-                if (ast.node.children) {
-                    ast.node.children = ast.node.children.filter(child => !selNodesArray.find(id => id === child?.id));
-                }
-
-                this.afterDeleteCleanup(selNodesArray);
-                if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
-                    // todo-2: Improvement here would be to try to go to the parent of the node, so we could pass
-                    // the deletedPageNode indicator to the deleteNodes endpoint and let that signal to it
-                    // to pass back to us the ID of the parent node or null if we don't have access to it, but for
-                    // now if user deletes their page root node we take them to their account node.
-                    S.nav.navToMyAccntRoot();
-                }
-                else if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {
-                    S.view.jumpToId(ast.node.id);
-                }
-                else {
-                    getAs().node.children = ast.node.children;
-                }
-            }
-        }
     }
 
     afterDeleteCleanup = (selNodesArray: string[]) => {
@@ -1465,7 +1427,7 @@ export class Edit {
     }
 
     helpNewUserEdit = () => {
-        let ast = getAs();
+        const ast = getAs();
         if (this.helpNewUserEditCalled) return;
         this.helpNewUserEditCalled = true;
         if (ast.userPrefs.editMode && ast.userPrefs.showMetaData) return;
@@ -1500,4 +1462,56 @@ export class Edit {
         }
     }
 
+    public endDelete = async () => {
+        dispatch("DeleteComplete", s => {
+            s.nodeClickedToDel = null;
+            s.nodesToDel = null;
+        });
+    }
+
+    public immediateDeleteSelNodes = async () => {
+        const ast = getAs();
+
+        // if a delete isn't being done return
+        if (!ast.nodeClickedToDel || !ast.nodesToDel || ast.nodesToDel.length === 0) {
+            return;
+        }
+
+        let deletedPageNode: boolean = false;
+        if (ast.nodesToDel.find(id => id === ast.node?.id)) {
+            deletedPageNode = true;
+        }
+        const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            nodeIds: ast.nodesToDel,
+            childrenOnly: false,
+            bulkDelete: false
+        });
+
+        this.removeNodesFromHistory(ast.nodesToDel);
+        this.removeNodesFromCalendarData(ast.nodesToDel);
+
+        /* Node: state.node can be null if we've never been to the tree view yet */
+        if (ast.node && S.util.checkSuccess("Delete node", res)) {
+            S.util.notifyNodeDeleted();
+
+            if (ast.node.children) {
+                ast.node.children = ast.node.children.filter(child => !ast.nodesToDel.find(id => id === child?.id));
+            }
+
+            this.afterDeleteCleanup(ast.nodesToDel);
+            if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
+                // todo-2: Improvement here would be to try to go to the parent of the node, so we could pass
+                // the deletedPageNode indicator to the deleteNodes endpoint and let that signal to it
+                // to pass back to us the ID of the parent node or null if we don't have access to it, but for
+                // now if user deletes their page root node we take them to their account node.
+                S.nav.navToMyAccntRoot();
+            }
+            else if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {
+                S.view.jumpToId(ast.node.id);
+            }
+            else {
+                getAs().node.children = ast.node.children;
+            }
+        }
+    }
 }

@@ -263,7 +263,7 @@ export class NodeCompRowHeader extends Div {
                                 S.speech.stopSpeaking();
                             }
                             else {
-                                let content = this.getTextContent();
+                                const content = this.getTextContent();
                                 if (content) {
                                     S.speech.speakText(content, false);
                                 }

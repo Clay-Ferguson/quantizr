@@ -131,8 +131,10 @@ export class AppState {
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
-
     highlightSearchNodeId: string;
+
+    nodeClickedToDel: string;
+    nodesToDel: string[];
 
     isAdminUser: boolean;
     isAnonUser: boolean = true;

@@ -1,5 +1,13 @@
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
 
+.askDeleteQuestion {
+    padding: 5px !important;
+    cursor: pointer;
+    margin-left: $tinyGap;
+    position: relative;
+    top: 7px;
+}
+
 .adminButton {
     font-weight: bold;
     color: var(--bs-green);

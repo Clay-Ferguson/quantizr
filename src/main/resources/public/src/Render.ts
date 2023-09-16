@@ -910,4 +910,21 @@ export class Render {
         if (!ast.gptCredit) return null;
         return new Div("GPT Credit: $" + getAs().gptCredit.toFixed(6), { className: "gptCredit float-end" });
     }
+
+    makeDeleteQuestionDiv = (): Div => {
+        const ast = getAs();
+        const question = ast.nodesToDel.length === 1 ? "Delete?" : "Delete " + ast.nodesToDel.length + " nodes ?";
+        return new Diva([
+            new Divc({ className: "float-end" }, [
+                new Span(question, {
+                    className: "alert alert-danger askDeleteQuestion",
+                    onClick: S.edit.immediateDeleteSelNodes
+                }),
+                new Span("Cancel", {
+                    className: "alert alert-info askDeleteQuestion",
+                    onClick: S.edit.endDelete
+                })
+            ])
+        ]);
+    }
 }
