@@ -293,7 +293,7 @@ export class Nav {
 
     openDocumentViewById = (id: string) => {
         setTimeout(() => {
-            let node = MainTab.inst?.findNode(id);
+            const node = MainTab.inst?.findNode(id);
 
             // if we don't have this node locally on our tree, get it from the server.
             if (!node) {
@@ -314,10 +314,12 @@ export class Nav {
                         S.util.showMessage("Failed to render node: " + id, "Warning");
                         return;
                     }
-                    node = res.node;
+                    S.srch.showDocument(res.node);
                 });
             }
-            S.srch.showDocument(node);
+            else {
+                S.srch.showDocument(node);
+            }
         }, 10);
     }
 
