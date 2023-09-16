@@ -4,7 +4,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
-import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
 import { Constants as C } from "../Constants";
@@ -38,7 +37,7 @@ export class MediaRecorderDlg extends DialogBase {
     recordingTimer: any;
     recordingTime: number = 0;
     continuable: boolean = false;
-    status: Heading;
+    status: Div;
 
     videoPlayer: VideoPlayer;
 
@@ -48,7 +47,7 @@ export class MediaRecorderDlg extends DialogBase {
     public recorded: boolean;
 
     constructor(public videoMode: boolean, private allowSave: boolean) {
-        super(videoMode ? "Video Recorder" : "Audio Recorder");
+        super(videoMode ? "Video Recorder" : "Audio Recorder", "appModalContNarrowWidth");
         this.mergeState<LS>({
             status: "",
             recording: false
@@ -147,7 +146,7 @@ export class MediaRecorderDlg extends DialogBase {
             this.displayStream();
         }
 
-        const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
+        const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "marginTop", {
             setValue: (val: string) => {
                 S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val);
                 this.mergeState<LS>({ audioInput: val });
@@ -160,7 +159,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         let videoSelect = null;
         if (this.videoMode) {
-            videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
+            videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "marginTop", {
                 setValue: (val: string) => {
                     S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val);
                     this.mergeState<LS>({ videoInput: val });
@@ -175,7 +174,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         return [
             new Diva([
-                this.status = new Heading(2, state.status),
+                this.status = state.status ? new Div(state.status, { className: "alert alert-info largerFont" }) : null,
                 new ButtonBar([
                     state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this.newRecording, null, "btn-primary"),
 
@@ -187,7 +186,7 @@ export class MediaRecorderDlg extends DialogBase {
                     state.recording || !this.continuable ? null : new Button("Play", this.play, null),
                     (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this.save, null),
                     new Button(this.allowSave ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
-                ], "marginTop"),
+                ]),
                 this.videoMode ? this.videoPlayer : null,
                 new Div("", { className: "marginTop" }, [audioSelect, videoSelect])
             ])
@@ -286,7 +285,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (!this.recordingTimer) return;
         this.continuable = true;
         this.cancelTimer();
-        this.mergeState<LS>({ status: "Paused", recording: false });
+        this.mergeState<LS>({ status: null, recording: false });
         if (this.recorder) {
             this.recorder.stop();
         }
@@ -332,11 +331,22 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    cancelImmediate = () => {
+    // @ts-ignore
+    super_closeByUser = this.closeByUser;
+    override closeByUser = () => {
+        this.super_closeByUser();
+        this.stopAndCleanupVideo();
+    }
+
+    stopAndCleanupVideo = () => {
         this.cancelTimer();
         this.stop();
         this.closeStream();
         this.cleanup();
+    }
+
+    cancelImmediate = () => {
+        this.stopAndCleanupVideo();
         this.close();
     }
 
