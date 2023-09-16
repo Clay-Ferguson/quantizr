@@ -1,5 +1,7 @@
 import { ReactNode, createElement } from "react";
-import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+// Good styles are: a11yDark, nightOwl, oneLight
+import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getAs } from "../../AppContext";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -143,34 +145,35 @@ export class NodeCompMarkdown extends Comp {
     }
 
     code = ({ node, inline, className, children, ...props }) => {
-        let match = /language-(\w+)/.exec(className || "");
+        const match = /language-(\w+)/.exec(className || "");
         const language = match ? match[1] : "txt";
         return !inline ? (
             createElement("div", null, [
-                createElement("span", {
-                    key: "code-div-" + this.getId(),
-                    className: "markdownLanguage"
-                }, language === "txt" ? "" : language),
-                createElement("i", {
-                    key: "code-i-" + this.getId(),
-                    className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon",
-                    onClick: () => {
-                        S.util.copyToClipboard(children[0]);
-                        // todo-1: move flashMessage into copyToClipboard
-                        S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
-                    }
-                }),
-                createElement("div", {
-                    key: "code-fix-" + this.getId(),
-                    className: "clearfix"
-                }),
-                createElement(SyntaxHighlighterComp as any, {
-                    key: "code-mk-" + this.getId(),
-                    ...props,
-                    style: dark,
-                    language,
-                    PreTag: "div"
-                }, String(children).replace(/\n$/, ""))
+                createElement("div", { className: "codeDivHeader" }, [
+                    createElement("span", {
+                        key: "code-div-" + this.getId(),
+                        className: "markdownLanguage"
+                    }, language === "txt" ? "" : language),
+                    createElement("i", {
+                        key: "code-i-" + this.getId(),
+                        className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon codeIcon",
+                        onClick: () => {
+                            S.util.copyToClipboard(children[0]);
+                            // todo-1: move flashMessage into copyToClipboard
+                            S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
+                        }
+                    })
+                ]),
+
+                createElement("div", null,
+                    createElement(SyntaxHighlighterComp as any, {
+                        key: "code-mk-" + this.getId(),
+                        ...props,
+                        style: highlightStyle,
+                        language,
+                        PreTag: "div"
+                    }, String(children).replace(/\n$/, ""))
+                )
             ])
         ) : (
             createElement("code", { ...props, className }, children)

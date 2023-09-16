@@ -53,11 +53,6 @@ export class Render {
     //     }
     // }, 500);
 
-    constructor() {
-        // https://github.com/highlightjs/highlight.js
-        // highlightjs.highlightAll();
-    }
-
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         // note: this is only here to get the markdown renderer to have padding in plain text, but also
         // it means we can leave off the language type and get a plaintext as default
