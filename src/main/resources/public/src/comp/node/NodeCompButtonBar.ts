@@ -84,16 +84,21 @@ export class NodeCompButtonBar extends Div {
         }
         */
 
+        const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
+        const allowExpnButton = !layout || !layout.startsWith("c");
         let expandChildren = false;
-        const expandByUser: string = S.props.getClientPropStr(J.NodeProp.EXPANSION_BY_USER, this.node);
 
-        // if we have a string, the user has clicked the expansion state and overridden it.
-        if (expandByUser?.length == 1) {
-            expandChildren = expandByUser === "1";
-        }
-        // otherwise expansion state is controlled by what's on the node itself.
-        else {
-            expandChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+        if (allowExpnButton) {
+            const expandByUser: string = S.props.getClientPropStr(J.NodeProp.EXPANSION_BY_USER, this.node);
+
+            // if we have a string, the user has clicked the expansion state and overridden it.
+            if (expandByUser?.length == 1) {
+                expandChildren = expandByUser === "1";
+            }
+            // otherwise expansion state is controlled by what's on the node itself.
+            else {
+                expandChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+            }
         }
 
         /*
@@ -109,11 +114,11 @@ export class NodeCompButtonBar extends Div {
                 title: "Explore content of this node"
             }, "btn-primary");
 
-            expnButton = new IconButton(expandChildren ? "fa-angle-double-up" : "fa-angle-double-down", null, {
+            expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-angle-double-up" : "fa-angle-double-down", null, {
                 [C.NODE_ID_ATTR]: this.node.id,
                 onClick: S.nav.toggleNodeInlineChildren,
                 title: expandChildren ? "Collapse Children" : "Expand Children"
-            }, "btn-primary");
+            }, "btn-primary") : null;
         }
 
         /*
