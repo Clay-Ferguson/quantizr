@@ -974,11 +974,17 @@ export class Edit {
             return;
         }
 
-        dispatch("ConfirmingDelete", s => {
-            s.nodeClickedToDel = id;
-            s.nodesToDel = selNodesArray;
-        });
-
+        // if CTRL key down to instant delete
+        if (S.util.ctrlKeyCheck()) {
+            S.edit.immediateDeleteSelNodes(selNodesArray);
+        }
+        // else confirm by user before deleting.
+        else {
+            dispatch("ConfirmingDelete", s => {
+                s.nodeClickedToDel = id;
+                s.nodesToDel = selNodesArray;
+            });
+        }
     }
 
     afterDeleteCleanup = (selNodesArray: string[]) => {
@@ -1520,33 +1526,34 @@ export class Edit {
         });
     }
 
-    public immediateDeleteSelNodes = async () => {
+    public immediateDeleteSelNodes = async (nodesToDel: string[] = null) => {
         const ast = getAs();
+        nodesToDel = nodesToDel || ast.nodesToDel;
 
         // if a delete isn't being done return
-        if (!ast.nodeClickedToDel || !ast.nodesToDel || ast.nodesToDel.length === 0) {
+        if (!nodesToDel || nodesToDel.length === 0) {
             return;
         }
 
         let deletedPageNode: boolean = false;
-        if (ast.nodesToDel.find(id => id === ast.node?.id)) {
+        if (nodesToDel.find(id => id === ast.node?.id)) {
             deletedPageNode = true;
         }
         const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-            nodeIds: ast.nodesToDel,
+            nodeIds: nodesToDel,
             childrenOnly: false,
             bulkDelete: false
         });
 
-        this.removeNodesFromHistory(ast.nodesToDel);
-        this.removeNodesFromCalendarData(ast.nodesToDel);
+        this.removeNodesFromHistory(nodesToDel);
+        this.removeNodesFromCalendarData(nodesToDel);
 
         /* Node: state.node can be null if we've never been to the tree view yet */
         if (ast.node && S.util.checkSuccess("Delete node", res)) {
             S.util.notifyNodeDeleted();
-            this.recursiveDelete(ast, ast.node);
+            this.recursiveDelete(nodesToDel, ast.node);
 
-            this.afterDeleteCleanup(ast.nodesToDel);
+            this.afterDeleteCleanup(nodesToDel);
             if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
                 // todo-2: Improvement here would be to try to go to the parent of the node, so we could pass
                 // the deletedPageNode indicator to the deleteNodes endpoint and let that signal to it
@@ -1563,9 +1570,9 @@ export class Edit {
         }
     }
 
-    recursiveDelete = (ast: AppState, node: J.NodeInfo) => {
+    recursiveDelete = (nodesToDel: string[], node: J.NodeInfo) => {
         if (node == null || !node.children) return;
-        node.children = node.children.filter(child => !ast.nodesToDel.find(id => id === child?.id));
-        node.children.forEach(child => this.recursiveDelete(ast, child));
+        node.children = node.children.filter(child => !nodesToDel.find(id => id === child?.id));
+        node.children.forEach(child => this.recursiveDelete(nodesToDel, child));
     }
 }
