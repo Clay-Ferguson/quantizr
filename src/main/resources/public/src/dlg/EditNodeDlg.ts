@@ -679,10 +679,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => S.props.getPropStr(J.NodeProp.NOWRAP, ast.editNode) !== "1"
         }) : null;
 
-        const inlineChildrenCheckbox = advancedOpts.inlineChildren && ast.editNode.hasChildren ? new Checkbox("Inline Subnodes", null,
-            this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null;
-
-        return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox, signCheckBox];
+        return [wordWrapCheckbox, encryptCheckBox, signCheckBox];
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {

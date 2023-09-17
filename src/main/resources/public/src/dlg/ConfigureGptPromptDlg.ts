@@ -53,6 +53,7 @@ export class ConfigureGptPromptDlg extends DialogBase {
 
         await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: this.node,
+            returnInlineChildren: false
         });
         this.close();
     }

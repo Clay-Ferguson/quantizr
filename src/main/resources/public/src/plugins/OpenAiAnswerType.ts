@@ -25,8 +25,7 @@ export class OpenAiAnswerType extends TypeBase {
             priority: true,
             wordWrap: true,
             encrypt: true,
-            sign: true,
-            inlineChildren: true
+            sign: true
         };
     }
 

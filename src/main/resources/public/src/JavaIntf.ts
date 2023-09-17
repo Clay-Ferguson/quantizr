@@ -585,6 +585,7 @@ export interface SaveNodeJsonRequest extends RequestBase {
 
 export interface SaveNodeRequest extends RequestBase {
     node: NodeInfo;
+    returnInlineChildren: boolean;
 }
 
 export interface SavePublicKeyRequest extends RequestBase {

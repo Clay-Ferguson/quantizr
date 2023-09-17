@@ -34,7 +34,6 @@ export interface EditorOptions {
     wordWrap?: boolean;
     encrypt?: boolean;
     sign?: boolean;
-    inlineChildren?: boolean;
 }
 
 export interface FullScreenConfig {

@@ -166,6 +166,34 @@ export class Nav {
         this.navPageNodeResponse(res);
     }
 
+    toggleNodeInlineChildren = async (evt: Event) => {
+        const id = S.util.allowIdFromEvent(evt, null);
+        const ast = getAs();
+        const node = MainTab.inst?.findNode(id, ast);
+
+        if (node) {
+            const isMine = S.props.isMine(node);
+
+            // if we are the owner of the node we set the actual property on the node
+            if (isMine) {
+                const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, node);
+                if (isInlineChildren) {
+                    S.props.setPropVal(J.NodeProp.INLINE_CHILDREN, node, "[null]");
+                }
+                else {
+                    S.props.setPropVal(J.NodeProp.INLINE_CHILDREN, node, "1");
+                }
+
+                await S.edit.saveNode(node, true);
+            }
+            else {
+                // I'm not sure I'm going to implement a way for people to have their own expansion states
+                // for nodes they don't own
+            }
+
+        }
+    }
+
     openNodeById = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const ast = getAs();

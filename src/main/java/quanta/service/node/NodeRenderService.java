@@ -94,6 +94,9 @@ public class NodeRenderService extends ServiceBase {
             res.setNoDataResponse("Node not found.");
             return res;
         }
+
+        read.forceCheckHasChildren(ms, node);
+
         // NOTE: This code was for loading MFS defined content live as it's rendered, but for now we don't
         // do this, and only have a kind of import/export to/from
         // a node and MFS as a menu option that must be explicitly run.

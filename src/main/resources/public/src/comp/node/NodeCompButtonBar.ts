@@ -14,7 +14,7 @@ import { S } from "../../Singletons";
 
 export class NodeCompButtonBar extends Div {
 
-    constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private extraButtons: Comp[], extraClass: string) {
+    constructor(public node: J.NodeInfo, public level: number, public allowNodeMove: boolean, private extraButtons: Comp[], extraClass: string) {
         super(null, {
             id: "ncbb_" + node.id,
             className: "nodeCompButtonBar " + (extraClass || "")
@@ -30,6 +30,7 @@ export class NodeCompButtonBar extends Div {
 
         let sharedIcon: Icon;
         let openButton: IconButton;
+        let expnButton: IconButton;
         let selCheckbox: Checkbox;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
@@ -91,14 +92,21 @@ export class NodeCompButtonBar extends Div {
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
         */
-        if (this.node.hasChildren && !isPageRootNode &&
-            // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
-            (!isInlineChildren || ast.userPrefs.editMode)) {
+        if (this.node.hasChildren && !isPageRootNode) {
             openButton = new IconButton("fa-folder-open", "Open", {
                 [C.NODE_ID_ATTR]: this.node.id,
                 onClick: S.nav.openNodeById,
                 title: "Explore content of this node"
             }, "btn-primary");
+
+            const isMine = S.props.isMine(this.node);
+            if (isMine) {
+                expnButton = new IconButton(isInlineChildren ? "fa-angle-double-up" : "fa-angle-double-down", null, {
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.toggleNodeInlineChildren,
+                    title: isInlineChildren ? "Collapse Children" : "Expand Children"
+                }, "btn-primary");
+            }
         }
 
         /*
@@ -165,7 +173,11 @@ export class NodeCompButtonBar extends Div {
                     });
                 }
 
-                if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
+                /* the 'level < 2' check is because we only allow moving up/down on the main children of the page for now
+                    todo-1: consider allowing moving up/down on all nodes
+                */
+                if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove && this.level < 2) {
+
                     if (this.node.logicalOrdinal > 0) {
                         moveNodeUpIcon = new Icon({
                             className: "fa fa-lg fa-arrow-up buttonBarIcon",
@@ -267,7 +279,7 @@ export class NodeCompButtonBar extends Div {
             floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
         }
 
-        let btnArray: Comp[] = [openButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan
+        let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan
         ];
 
         btnArray = btnArray.concat(this.extraButtons);

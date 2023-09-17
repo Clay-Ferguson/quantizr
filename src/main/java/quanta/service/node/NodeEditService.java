@@ -482,6 +482,7 @@ public class NodeEditService extends ServiceBase {
         String nodeId = nodeInfo.getId();
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
+        read.forceCheckHasChildren(ms, node);
         // remove orphaned attachments
         removeDeletedAttachments(ms, node, req.getNode().getAttachments());
         // set new attachments
@@ -600,8 +601,9 @@ public class NodeEditService extends ServiceBase {
         if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
             processAfterSave(ms, node, parent);
         }
+
         NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, true, null, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, req.isReturnInlineChildren(), false, false, true, true, null, false);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }

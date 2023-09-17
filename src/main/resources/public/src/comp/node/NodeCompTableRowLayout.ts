@@ -47,7 +47,7 @@ export class NodeCompTableRowLayout extends Div {
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
-        let inVerticalSpace = false;
+        // let inVerticalSpace = false;
 
         this.node.children?.forEach(n => {
             if (!n) return;
@@ -63,14 +63,17 @@ export class NodeCompTableRowLayout extends Div {
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
                 if (type?.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
+                    // do nothing
                 }
                 else {
                     lastNode = n;
-                    if (n.children && !inVerticalSpace) {
-                        comps.push(new Divc({ className: "verticalSpace" }));
-                    }
+
+                    // experimenting: Still need this?
+                    // if (n.children && !inVerticalSpace) {
+                    //     comps.push(new Divc({ className: "verticalSpace" }));
+                    // }
                     const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, false);
-                    inVerticalSpace = false;
+                    // inVerticalSpace = false;
                     comps.push(row);
                     rowCount++;
                 }
@@ -79,8 +82,11 @@ export class NodeCompTableRowLayout extends Div {
                 // This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-                    comps.push(new Divc({ className: "verticalSpace" }));
-                    inVerticalSpace = true;
+
+                    // experimenting: Still need this?
+                    // comps.push(new Divc({ className: "verticalSpace" }));
+
+                    // inVerticalSpace = true;
                 }
 
                 const curCol = new Divc({
@@ -135,7 +141,7 @@ export class NodeCompTableRowLayout extends Div {
             }
         }
 
-        if (rowCount == 0 && S.props.isMine(ast.node) && ast.node.type == J.NodeType.ACCOUNT) {
+        if (children.length == 0 && S.props.isMine(ast.node) && ast.node.type == J.NodeType.ACCOUNT) {
             children.push(S.render.newUserAccountTips());
             S.edit.helpNewUserEdit();
         }

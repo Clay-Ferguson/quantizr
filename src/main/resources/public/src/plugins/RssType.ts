@@ -40,8 +40,7 @@ export class RssType extends TypeBase {
             priority: true,
             wordWrap: true,
             encrypt: true,
-            sign: true,
-            inlineChildren: true
+            sign: true
         };
     }
 

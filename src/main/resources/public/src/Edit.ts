@@ -25,6 +25,26 @@ export class Edit {
     showReadOnlyProperties = false;
     helpNewUserEditCalled = false;
 
+    saveNode = async (node: J.NodeInfo, returnInlineChildren: boolean) => {
+        const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+            node,
+            returnInlineChildren
+        });
+
+        S.nodeUtil.processInboundNode(res.node);
+
+        if (res?.code != C.RESPONSE_CODE_OK) {
+            return false;
+        }
+
+        S.render.fadeInId = res.node.id;
+
+        // note: newNodeTargetId is only set when we're inserting a new node into the page, and not when we're
+        // expanding a node that's already on the page. Ditto for newNodeTargetOffset.
+        await S.edit.saveNodeResponse(res.node, res, S.quanta.newNodeTargetId, S.quanta.newNodeTargetOffset);
+        S.util.notifyNodeUpdated(res.node.id, res.node.type);
+    }
+
     editHashtags = async () => {
         const dlg = new EditTagsDlg();
         await dlg.open();
@@ -367,6 +387,16 @@ export class Edit {
                 S.render.showCalendar(ast.fullScreenConfig.nodeId);
             }
         }
+    }
+
+    replaceNodeRecursive = (node: J.NodeInfo, newNode: J.NodeInfo): void => {
+        if (!node || !node.children) return;
+
+        node.children = node.children.map(n => {
+            return n?.id === newNode?.id ? newNode : n;
+        });
+
+        node.children.forEach(n => this.replaceNodeRecursive(n, newNode));
     }
 
     injectNewNodeIntoChildren = (newNode: J.NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
@@ -1493,10 +1523,7 @@ export class Edit {
         /* Node: state.node can be null if we've never been to the tree view yet */
         if (ast.node && S.util.checkSuccess("Delete node", res)) {
             S.util.notifyNodeDeleted();
-
-            if (ast.node.children) {
-                ast.node.children = ast.node.children.filter(child => !ast.nodesToDel.find(id => id === child?.id));
-            }
+            this.recursiveDelete(ast, ast.node);
 
             this.afterDeleteCleanup(ast.nodesToDel);
             if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
@@ -1513,5 +1540,11 @@ export class Edit {
                 getAs().node.children = ast.node.children;
             }
         }
+    }
+
+    recursiveDelete = (ast: AppState, node: J.NodeInfo) => {
+        if (node == null || !node.children) return;
+        node.children = node.children.filter(child => !ast.nodesToDel.find(id => id === child?.id));
+        node.children.forEach(child => this.recursiveDelete(ast, child));
     }
 }

@@ -30,7 +30,7 @@ export class MainTab implements TabIntf<any> {
 
     findNode = (nodeId: string, ast: AppState = null): J.NodeInfo => {
         ast = ast || getAs();
-        return this.findNodeRecursive(getAs().node, nodeId, 0);
+        return this.findNodeRecursive(ast.node, nodeId, 0);
     }
 
     // finds a node matching node with 'id' on this node or any of it's children
@@ -39,7 +39,7 @@ export class MainTab implements TabIntf<any> {
         if (node.id === id) return node;
         if (node.boostedNode?.id === id) return node.boostedNode;
 
-        if (level < 3 && node.children) {
+        if (node.children) {
             for (const n of node.children) {
                 const found = this.findNodeRecursive(n, id, level + 1);
                 if (found) return found;
@@ -54,11 +54,7 @@ export class MainTab implements TabIntf<any> {
     }
 
     replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
-        if (!ust.node || !ust.node.children) return;
-
-        ust.node.children = ust.node.children.map(n => {
-            return n?.id === newNode?.id ? newNode : n;
-        });
+        S.edit.replaceNodeRecursive(ust.node, newNode);
     }
 
     processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {

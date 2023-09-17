@@ -21,8 +21,7 @@ export class MarkdownType extends TypeBase {
             priority: true,
             wordWrap: true,
             encrypt: true,
-            sign: true,
-            inlineChildren: true
+            sign: true
         };
     }
 }

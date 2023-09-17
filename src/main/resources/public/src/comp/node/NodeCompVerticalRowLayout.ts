@@ -8,6 +8,7 @@ import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { CompIntf } from "../base/CompIntf";
 import { Divc } from "../core/Divc";
 import { NodeCompRow } from "./NodeCompRow";
 
@@ -21,14 +22,14 @@ export class NodeCompVerticalRowLayout extends Div {
     override preRender(): boolean {
         const ast = getAs();
         const childCount: number = this.node.children.length;
-        const comps: Comp[] = [];
+        const comps: CompIntf[] = [];
         const allowInsert = S.props.isWritableByMe(this.node);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
-        let inVerticalSpace = false;
+        // let inVerticalSpace = false;
         const isMine = S.props.isMine(ast.node);
 
         this.node.children?.forEach(n => {
@@ -57,28 +58,33 @@ export class NodeCompVerticalRowLayout extends Div {
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
                     if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
+                        // do nothing
                     }
                     else {
                         lastNode = n;
                         let row: Comp = null;
-                        if (n.children && !inVerticalSpace) {
-                            comps.push(new Divc({ className: "verticalSpace" }));
-                        }
+
+                        // experimenting: Still need this?
+                        // if (n.children && !inVerticalSpace) {
+                        //     comps.push(new Divc({ className: "verticalSpace" }));
+                        // }
 
                         if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
                             row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, false);
                             rowCount++;
                             comps.push(row);
                         }
-                        inVerticalSpace = false;
+                        // inVerticalSpace = false;
                     }
 
                     // if we have any children on the node they will always have been loaded to be displayed so display them
                     // This is the linline children
                     if (n.children) {
                         comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-                        comps.push(new Divc({ className: "verticalSpace" }));
-                        inVerticalSpace = true;
+
+                        // experimenting: Still need this?
+                        // comps.push(new Divc({ className: "verticalSpace" }));
+                        // inVerticalSpace = true;
                     }
                 }
 
@@ -88,6 +94,14 @@ export class NodeCompVerticalRowLayout extends Div {
                 }
             }
             rowIdx++;
+
+            if (this.level > 1 && rowIdx == 100) {
+                const style = {
+                    marginLeft: "" + (this.level * 30) + "px",
+                    marginBottom: "12px"
+                };
+                comps.push(new Div("truncated...", { style }));
+            }
         });
 
         if (isMine && this.allowHeaders && allowInsert && !ast.isAnonUser && ast.userPrefs.editMode) {
@@ -139,7 +153,7 @@ export class NodeCompVerticalRowLayout extends Div {
             }
         }
 
-        if (rowCount == 0 && S.props.isMine(ast.node) && ast.node.type == J.NodeType.ACCOUNT) {
+        if (comps.length == 0 && S.props.isMine(ast.node) && ast.node.type == J.NodeType.ACCOUNT) {
             comps.push(S.render.newUserAccountTips());
             S.edit.helpNewUserEdit();
         }

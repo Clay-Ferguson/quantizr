@@ -172,9 +172,12 @@ public class Convert extends ServiceBase {
         if (node.getPath().startsWith(NodePath.PENDING_PATH + "/")) {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.IN_PENDING_PATH.s(), "1"));
         }
+
         if (allowInlineChildren) {
             boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
             if (hasInlineChildren) {
+                // todo-0: this number 100 exists on client too at: "if (this.level > 1 && rowIdx == 100) {"
+                // need to consolidate into a constant.
                 Iterable<SubNode> nodeIter =
                         read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0, true);
                 Iterator<SubNode> iterator = nodeIter.iterator();
@@ -185,11 +188,9 @@ public class Convert extends ServiceBase {
                         break;
                     }
                     SubNode n = iterator.next();
-                    // NOTE: If this is set to false it then only would allow one level of depth in
-                    // the 'inlineChildren' capability
-                    boolean multiLevel = true;
-                    NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, multiLevel,
-                            lastChild, false, loadLikes, false, null, false);
+
+                    NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++,
+                            allowInlineChildren, lastChild, false, loadLikes, false, null, false);
                     if (info != null) {
                         nodeInfo.safeGetChildren().add(info);
                     }

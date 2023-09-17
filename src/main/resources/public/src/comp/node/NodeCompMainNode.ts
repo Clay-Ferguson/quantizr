@@ -108,7 +108,7 @@ export class NodeCompMainNode extends Div {
 
             const askDelDiv = node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
 
-            const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, null, null) : null;
+            const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, 0, false, null, null) : null;
 
             this.setChildren([
                 S.render.renderBoostHeader(node, true),

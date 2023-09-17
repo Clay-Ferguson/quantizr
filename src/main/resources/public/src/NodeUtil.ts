@@ -110,14 +110,29 @@ export class NodeUtil {
         return null;
     }
 
-    /* Returns the node if it's currently displaying on the page. For now we don't have ability */
+    /* Returns the node if it's currently displaying on the page. */
     displayingOnTree = (nodeId: string): J.NodeInfo => {
         const ast = getAs();
         if (!ast.node) return null;
         if (ast.node.id === nodeId) return ast.node;
         if (!ast.node.children) return null;
-        return ast.node.children.find(node => node?.id === nodeId);
+        return this.nodeOrChilderenMatch(ast.node, nodeId);
     }
+
+    /**
+     * Recursively search for a node by id in the given node and it's children.
+     */
+    nodeOrChilderenMatch = (node: J.NodeInfo, nodeId: string): J.NodeInfo => {
+        if (!node) return null;
+        if (node.id === nodeId) return node;
+        if (!node.children) return null;
+        for (const child of node.children) {
+            const ret = this.nodeOrChilderenMatch(child, nodeId);
+            if (ret) return ret;
+        }
+        return null;
+    }
+
 
     getNodeByName = (node: J.NodeInfo, name: string, ust: AppState): J.NodeInfo => {
         if (!node) return null;
@@ -383,6 +398,8 @@ export class NodeUtil {
         if (node.boostedNode) {
             this.processInboundNode(node.boostedNode);
         }
+
+        // todo-0: this method probably needs to be recursive.
         if (node.children) {
             this.processInboundNodes(node.children);
         }

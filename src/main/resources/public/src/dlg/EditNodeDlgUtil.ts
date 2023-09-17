@@ -1,5 +1,4 @@
 import { dispatch, getAs, promiseDispatch } from "../AppContext";
-import { Constants as C } from "../Constants";
 import { SymKeyDataPackage } from "../Crypto";
 import { DialogMode } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -47,10 +46,6 @@ export class EditNodeDlgUtil {
         const ast = getAs();
         const editNode = ast.editNode;
 
-        // save these two values, because the S.quanta copy can get overwritten before we use them here.
-        const newNodeTargetId = S.quanta.newNodeTargetId;
-        const newNodeTargetOffset = S.quanta.newNodeTargetOffset;
-
         let content: string;
         let clearText: string;
         if (dlg.contentEditor) {
@@ -97,21 +92,8 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
-        // console.log("saveNode(): sendToActPub=" + ast.sendToActPub);
-        const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-            node: editNode,
-        });
-        S.nodeUtil.processInboundNode(res.node);
-
-        if (res?.code != C.RESPONSE_CODE_OK) {
-            return false;
-        }
-
         dlg.resetAutoSaver();
-
-        S.render.fadeInId = editNode.id;
-        S.edit.saveNodeResponse(editNode, res, newNodeTargetId, newNodeTargetOffset);
-        S.util.notifyNodeUpdated(editNode.id, editNode.type);
+        await S.edit.saveNode(editNode, true);
         return true;
     }
 

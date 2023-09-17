@@ -169,6 +169,11 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
+    public void forceCheckHasChildren(MongoSession ms, SubNode node) {
+        boolean ret = directChildrenExist(ms, node.getPath());
+        node.setHasChildren(ret);
+    }
+
     public boolean directChildrenExist(MongoSession ms, String path) {
         // WARNING: Leave this as a note to NOT call this optimization here. It is definitely
         // counter-productive.
