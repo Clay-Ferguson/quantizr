@@ -14,7 +14,7 @@ import { S } from "../../Singletons";
 
 export class NodeCompButtonBar extends Div {
 
-    constructor(public node: J.NodeInfo, public level: number, public allowNodeMove: boolean, private extraButtons: Comp[], extraClass: string) {
+    constructor(public node: J.NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean, private extraButtons: Comp[], extraClass: string) {
         super(null, {
             id: "ncbb_" + node.id,
             className: "nodeCompButtonBar " + (extraClass || "")
@@ -85,7 +85,7 @@ export class NodeCompButtonBar extends Div {
         */
 
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
-        const allowExpnButton = !layout || !layout.startsWith("c");
+        const allowExpnButton = !this.isTableCell && (!layout || !layout.startsWith("c"));
         let expandChildren = false;
 
         if (allowExpnButton) {
