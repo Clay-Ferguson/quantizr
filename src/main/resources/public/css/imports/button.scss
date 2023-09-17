@@ -99,8 +99,11 @@
 }
 
 .pasteButton {
-    border: 2px dotted green !important;
-    margin-right: $tinyGap;
+    border: 2px dotted var(--bs-green) !important;
+    border-radius: 6px;
+    padding: 5px !important;
+    cursor: pointer;
+    margin-left: $tinyGap;
 }
 
 .feedDirtyButton {
