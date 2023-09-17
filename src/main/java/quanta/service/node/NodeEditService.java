@@ -22,6 +22,7 @@ import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeInfo;
@@ -49,6 +50,7 @@ import quanta.request.LinkNodesRequest;
 import quanta.request.SaveNodeJsonRequest;
 import quanta.request.SaveNodeRequest;
 import quanta.request.SearchAndReplaceRequest;
+import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
@@ -63,6 +65,7 @@ import quanta.response.LinkNodesResponse;
 import quanta.response.SaveNodeJsonResponse;
 import quanta.response.SaveNodeResponse;
 import quanta.response.SearchAndReplaceResponse;
+import quanta.response.SetExpandedResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.SubGraphHashResponse;
 import quanta.response.TransferNodeResponse;
@@ -610,6 +613,34 @@ public class NodeEditService extends ServiceBase {
 
         return res;
     }
+
+    public SetExpandedResponse toggleExpanded(MongoSession ms, SetExpandedRequest req) {
+        SetExpandedResponse res = new SetExpandedResponse();
+        SubNode node = read.getNode(ms, req.getNodeId());
+
+        // get default expanded state from node itself
+        boolean expanded = node.getBool(NodeProp.INLINE_CHILDREN);
+        SessionContext sc = ThreadLocals.getSC();
+
+        // if user has already taken control of state, toggle it according to their state
+        if (sc.getNodeExpandStates().containsKey(req.getNodeId())) {
+            expanded = !sc.getNodeExpandStates().get(req.getNodeId());
+        }
+        // otherwise the 'expanded' var is the thing to toggle
+        else {
+            expanded = !expanded;
+        }
+        sc.getNodeExpandStates().put(req.getNodeId(), expanded);
+        read.forceCheckHasChildren(ms, node);
+
+        NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
+                Convert.LOGICAL_ORDINAL_GENERATE, expanded, false, false, true, true, null, false);
+        if (newNodeInfo != null) {
+            res.setNode(newNodeInfo);
+        }
+        return res;
+    }
+
 
     // Removes all attachments from 'node' that are not on 'newAttrs'
     /**

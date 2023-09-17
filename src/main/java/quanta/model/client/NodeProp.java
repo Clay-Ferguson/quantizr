@@ -191,6 +191,7 @@ public enum NodeProp {
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate"), //
 
     INLINE_CHILDREN("inlineChildren"), //
+    EXPANSION_BY_USER("expansionByUser"),
 
     PRIORITY("priority"), //
     PRIORITY_FULL("p.priority"), //

@@ -633,6 +633,10 @@ export interface SetCipherKeyRequest extends RequestBase {
     cipherKey: string;
 }
 
+export interface SetExpandedRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface SetNodePositionRequest extends RequestBase {
     nodeId: string;
     targetName: string;
@@ -1046,6 +1050,10 @@ export interface ServerPushInfo {
 export interface SetCipherKeyResponse extends ResponseBase {
 }
 
+export interface SetExpandedResponse extends ResponseBase {
+    node: NodeInfo;
+}
+
 export interface SetNodePositionResponse extends ResponseBase {
 }
 
@@ -1293,6 +1301,7 @@ export const enum NodeProp {
     CRYPTO_KEY_PUBLIC = "sn:cryptoKeyPublic",
     CRYPTO_KEY_PRIVATE = "sn:cryptoKeyPrivate",
     INLINE_CHILDREN = "inlineChildren",
+    EXPANSION_BY_USER = "expansionByUser",
     PRIORITY = "priority",
     PRIORITY_FULL = "p.priority",
     LAYOUT = "layout",

@@ -45,6 +45,23 @@ export class Edit {
         S.util.notifyNodeUpdated(res.node.id, res.node.type);
     }
 
+    toggleUserExpansion = async (node: J.NodeInfo) => {
+        const res = await S.rpcUtil.rpc<J.SetExpandedRequest, J.SetExpandedResponse>("toggleNodeExpanded", {
+            nodeId: node.id
+        });
+
+        // can this method be rolled into 'injectUpdatedNode' ?
+        S.nodeUtil.processInboundNode(res.node);
+
+        if (res?.code != C.RESPONSE_CODE_OK) {
+            return false;
+        }
+
+        S.render.fadeInId = res.node.id;
+        await this.injectUpdatedNode(res.node);
+        S.util.notifyNodeUpdated(res.node.id, res.node.type);
+    }
+
     editHashtags = async () => {
         const dlg = new EditTagsDlg();
         await dlg.open();
@@ -352,17 +369,7 @@ export class Edit {
 
             const newNode = res.node;
             if (!newNodeTargetId) {
-                promiseDispatch("nodeUpdated", s => {
-                    // if the node is our page parent (page root)
-                    if (newNode.id === s.node?.id) {
-                        // preserve the children, when updating the root node, because they will not have been obtained
-                        // due to the 'singleNode=true' in the request
-                        newNode.children = s.node.children;
-                        s.node = newNode;
-                    }
-
-                    ast.tabData.forEach(td => td.replaceNode(s, newNode));
-                });
+                this.injectUpdatedNode(newNode);
             }
 
             S.util.updateNodeHistory(newNode, false);
@@ -387,6 +394,20 @@ export class Edit {
                 S.render.showCalendar(ast.fullScreenConfig.nodeId);
             }
         }
+    }
+
+    injectUpdatedNode = async (node: J.NodeInfo) => {
+        await promiseDispatch("nodeUpdated", s => {
+            // if the node is our page parent (page root)
+            if (node.id === s.node?.id) {
+                // preserve the children, when updating the root node, because they will not have been obtained
+                // due to the 'singleNode=true' in the request
+                node.children = s.node.children;
+                s.node = node;
+            }
+
+            getAs().tabData.forEach(td => td.replaceNode(s, node));
+        });
     }
 
     replaceNodeRecursive = (node: J.NodeInfo, newNode: J.NodeInfo): void => {

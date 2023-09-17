@@ -173,8 +173,21 @@ public class Convert extends ServiceBase {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.IN_PENDING_PATH.s(), "1"));
         }
 
+        // todo-0: refactor this into separate method
         if (allowInlineChildren) {
-            boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
+            boolean hasInlineChildren = false;
+
+            // first check if user has controlled expansion by a click yet
+            if (sc.getNodeExpandStates().containsKey(node.getIdStr())) {
+                hasInlineChildren = sc.getNodeExpandStates().get(node.getIdStr());
+                nodeInfo.safeGetClientProps()
+                        .add(new PropertyInfo(NodeProp.EXPANSION_BY_USER.s(), hasInlineChildren ? "1" : "0"));
+            }
+            // if user is not controlling expansion get state from node itself as set by owner of the node.
+            else {
+                hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
+            }
+
             if (hasInlineChildren) {
                 // todo-0: this number 100 exists on client too at: "if (this.level > 1 && rowIdx == 100) {"
                 // need to consolidate into a constant.
@@ -197,6 +210,7 @@ public class Convert extends ServiceBase {
                 }
             }
         }
+
         // -----------------------
         // DO NOT DELETE: This code works, but for now we don't use it. However this is important and VERY
         // likely we'll be needing this, once we have some use case where we want the linked node
@@ -219,6 +233,8 @@ public class Convert extends ServiceBase {
         // }
         // }
         // -----------------------
+
+        // todo-0: refactor this into separate method
         if (attachBoosted) {
             SubNode boostedNode = null;
             if (boostedNodeVal != null) {

@@ -84,7 +84,17 @@ export class NodeCompButtonBar extends Div {
         }
         */
 
-        const isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+        let expandChildren = false;
+        const expandByUser: string = S.props.getClientPropStr(J.NodeProp.EXPANSION_BY_USER, this.node);
+
+        // if we have a string, the user has clicked the expansion state and overridden it.
+        if (expandByUser?.length == 1) {
+            expandChildren = expandByUser === "1";
+        }
+        // otherwise expansion state is controlled by what's on the node itself.
+        else {
+            expandChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+        }
 
         /*
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
@@ -99,14 +109,11 @@ export class NodeCompButtonBar extends Div {
                 title: "Explore content of this node"
             }, "btn-primary");
 
-            const isMine = S.props.isMine(this.node);
-            if (isMine) {
-                expnButton = new IconButton(isInlineChildren ? "fa-angle-double-up" : "fa-angle-double-down", null, {
-                    [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.toggleNodeInlineChildren,
-                    title: isInlineChildren ? "Collapse Children" : "Expand Children"
-                }, "btn-primary");
-            }
+            expnButton = new IconButton(expandChildren ? "fa-angle-double-up" : "fa-angle-double-down", null, {
+                [C.NODE_ID_ATTR]: this.node.id,
+                onClick: S.nav.toggleNodeInlineChildren,
+                title: expandChildren ? "Collapse Children" : "Expand Children"
+            }, "btn-primary");
         }
 
         /*

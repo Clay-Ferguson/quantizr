@@ -399,7 +399,7 @@ export class NodeUtil {
             this.processInboundNode(node.boostedNode);
         }
 
-        // todo-0: this method probably needs to be recursive.
+        // todo-0: this method probably should be recursive.
         if (node.children) {
             this.processInboundNodes(node.children);
         }

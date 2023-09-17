@@ -789,6 +789,7 @@ export class Util {
         }
     }
 
+    // todo-0: I think this method can be rolled into injectUpdatedNode
     // caller can optionally pass in the type, and yes for now 'id' is not used, but I want it as a param.
     notifyNodeUpdated = (_id: string, type: string) => {
         if (type === J.NodeType.BOOKMARK) {

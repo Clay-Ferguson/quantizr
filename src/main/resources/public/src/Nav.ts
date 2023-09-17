@@ -187,10 +187,8 @@ export class Nav {
                 await S.edit.saveNode(node, true);
             }
             else {
-                // I'm not sure I'm going to implement a way for people to have their own expansion states
-                // for nodes they don't own
+                await S.edit.toggleUserExpansion(node);
             }
-
         }
     }
 

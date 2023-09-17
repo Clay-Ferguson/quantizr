@@ -913,7 +913,7 @@ export class Render {
 
     makeDeleteQuestionDiv = (): Div => {
         const ast = getAs();
-        const question = ast.nodesToDel.length === 1 ? "Delete?" : "Delete " + ast.nodesToDel.length + " nodes ?";
+        const question = ast.nodesToDel.length === 1 ? "Delete" : "Delete " + ast.nodesToDel.length + " nodes";
         return new Diva([
             new Divc({ className: "float-end" }, [
                 new Span(question, {

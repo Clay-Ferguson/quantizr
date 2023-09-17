@@ -114,6 +114,7 @@ import quanta.request.SelectAllNodesRequest;
 import quanta.request.SendLogTextRequest;
 import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
+import quanta.request.SetExpandedRequest;
 import quanta.request.SetNodePositionRequest;
 import quanta.request.SetUnpublishedRequest;
 import quanta.request.SignNodesRequest;
@@ -889,6 +890,14 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
         return callProc.run("saveNode", true, true, req, session, ms -> {
             return edit.saveNode(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/toggleNodeExpanded", method = RequestMethod.POST)
+    @ResponseBody
+    public Object toggleNodeExpanded(@RequestBody SetExpandedRequest req, HttpSession session) {
+        return callProc.run("toggleNodeExpanded", true, true, req, session, ms -> {
+            return edit.toggleExpanded(ms, req);
         });
     }
 

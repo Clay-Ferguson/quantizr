@@ -1,5 +1,6 @@
 package quanta.config;
 
+import java.util.HashMap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import quanta.model.UserPreferences;
 import quanta.model.client.PrincipalName;
@@ -51,6 +52,13 @@ public class SessionContext {
      * the chat node when the user is in a chat room.
      */
     private String watchingPath;
+
+    /*
+     * Keeps track of expansion states set by user. We can't just use a set to represent expanded nodes,
+     * because we need to know if a node is expanded or not, based on an actual action taken by the
+     * user.
+     */
+    private HashMap<String, Boolean> nodeExpandStates = new HashMap<>();
 
     public SessionContext() {}
 
@@ -248,5 +256,13 @@ public class SessionContext {
 
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    public HashMap<String, Boolean> getNodeExpandStates() {
+        return nodeExpandStates;
+    }
+
+    public void setNodeExpandStates(HashMap<String, Boolean> nodeExpandStates) {
+        this.nodeExpandStates = nodeExpandStates;
     }
 }
