@@ -6,6 +6,8 @@ import circularDependency from "vite-plugin-circular-dependency";
 // non-Node version of the tsconfig which is fine and can't really be fixed.
 import path from "path";
 
+console.log("vite.config.ts: ENV=" + process.env.DOCKER_ENV);
+
 declare const __dirname;
 
 export default defineConfig({
@@ -14,8 +16,8 @@ export default defineConfig({
     },
     build: {
         chunkSizeWarningLimit: 3000,
-        minify: true,
-        // sourcemap: true
+        minify: process.env.DOCKER_ENV === "dev" ? false : true,
+        sourcemap: process.env.DOCKER_ENV === "dev" ? true : false
     },
     plugins: [
         circularDependency({
