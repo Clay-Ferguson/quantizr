@@ -107,7 +107,7 @@ public class RSSFeedService extends ServiceBase {
                 }
             };
     private static final int FEED_ITEMS_PER_PAGE = 75;
-    private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
+    private static final int REFRESH_FREQUENCY_MINS = 480; // 8 hrs
     static boolean run = false;
 
     /*
@@ -290,7 +290,7 @@ public class RSSFeedService extends ServiceBase {
                     long start = System.currentTimeMillis();
                     try {
                         return input
-                                .build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB)));
+                                .build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 10 * Const.ONE_MB)));
                     } //
                     catch (FeedException e) {
                         throw new IOException("Could not parse response for feed: " + url, e);
