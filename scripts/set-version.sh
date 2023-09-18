@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export QUANTA_VER="2.23.0"
+export QUANTA_VER="3.0"
 echo "Set Version: ${QUANTA_VER}"
