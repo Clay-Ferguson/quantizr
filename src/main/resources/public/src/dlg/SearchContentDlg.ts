@@ -36,7 +36,7 @@ export class SearchContentDlg extends DialogBase {
         blockedWords: false,
         caseSensitive: false,
         recursive: true,
-        sortField: "0",
+        sortField: "mtm",
         sortDir: "",
         requirePriority: false,
         requireAttachment: false
@@ -138,14 +138,13 @@ export class SearchContentDlg extends DialogBase {
                     }),
                     new Diva([
                         new Selection(null, "Sort by", [
-                            { key: "0", val: "Relevance" },
-                            { key: "ctm", val: "Create Time" },
                             { key: "mtm", val: "Modify Time" },
+                            { key: "ctm", val: "Create Time" },
                             { key: "contentLength", val: "Text Length" },
                             { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
                         ], null, "searchDlgOrderBy", {
                             setValue: (val: string) => {
-                                let sortDir = val === "0" ? "" : "DESC";
+                                let sortDir = "DESC";
                                 if (val === J.NodeProp.PRIORITY_FULL) {
                                     sortDir = "asc";
                                 }

@@ -830,9 +830,8 @@ public class MongoRead extends ServiceBase {
                 } //
                 else if ("pastOnly".equals(timeRangeType)) { //
                     ands.add(Criteria.where(sortField).lt(new Date().getTime()));
-                } //
-                else if ("all".equals(timeRangeType)) { // prop on the node // if showing all dates the condition here
-                                                        // is that there at least IS a 'date'
+                } // prop on the node // if showing all dates the condition here is that there at least IS a 'date'
+                else if ("all".equals(timeRangeType)) {
                     ands.add(Criteria.where(sortField).ne(null));
                 }
             }
