@@ -64,7 +64,7 @@ export class RightNavPanel extends Div {
             className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
-                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES, "Saved in Notes Folder");
             },
             title: "Save clipboard"
         });
@@ -146,7 +146,7 @@ export class RightNavPanel extends Div {
         ]) : null;
 
         let scrollDiv = null;
-        let gptCreditDiv = ast.showGptCredit ? S.render.buildGptCretitDiv() : null;
+        const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCretitDiv() : null;
 
         this.setChildren([
             scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [

@@ -828,7 +828,8 @@ export class Edit {
         const ast = getAs();
 
         if (S.util.ctrlKeyCheck()) {
-            this.saveClipboardToChildNode(id);
+            await this.saveClipboardToChildNode(id, null);
+            S.view.jumpToId(id);
         }
         else {
             this.createSubNode(id, null, true, ast.node);
@@ -1109,7 +1110,7 @@ export class Edit {
         await dlg.open();
     };
 
-    saveClipboardToChildNode = async (parentId: string) => {
+    saveClipboardToChildNode = async (parentId: string, msg: string) => {
         let clipText: string = await (navigator as any)?.clipboard?.readText();
         if (clipText) {
             clipText = clipText.trim();
@@ -1150,11 +1151,12 @@ export class Edit {
             this.createSubNodeResponse(res, false, null, null);
         }
         else {
-            let msg = "Saved in Notes folder";
-            if (clipText) {
-                msg += ":\n\n" + clipText;
+            if (msg) {
+                if (clipText) {
+                    msg += ":\n\n" + clipText;
+                }
+                S.util.flashMessage(msg, "Saved", true);
             }
-            S.util.flashMessage(msg, "Saved", true);
         }
     }
 

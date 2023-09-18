@@ -918,7 +918,7 @@ export class Render {
             new Divc({ className: "float-end" }, [
                 new Span(question, {
                     className: "alert alert-danger askDeleteQuestion",
-                    onClick: S.edit.immediateDeleteSelNodes
+                    onClick: () => S.edit.immediateDeleteSelNodes(getAs().nodesToDel)
                 }),
                 new Span("Cancel", {
                     className: "alert alert-info askDeleteQuestion",
