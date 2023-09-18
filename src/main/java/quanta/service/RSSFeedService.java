@@ -19,6 +19,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
@@ -248,6 +249,21 @@ public class RSSFeedService extends ServiceBase {
                 log.debug("Reading Feed from Web: " + url);
             }
             int timeout = 60; // seconds
+
+            // Here's how GPT-4 suggested this code be done.
+            // ========== BEGIN GPT
+            // HttpClient client = HttpClients.createDefault();
+            // HttpGet request = new HttpGet(url);
+
+            // // Set User-Agent to simulate browser
+            // request.setHeader("User-Agent", Const.FAKE_USER_AGENT);
+
+            // HttpResponse response = client.execute(request);
+            // InputStream stream = response.getEntity().getContent();
+
+            // SyndFeedInput input = new SyndFeedInput();
+            // inFeed = input.build(new XmlReader(stream));
+            // ========== END GPT
 
             /*
              * I was experimenting this this way of getting a reader as a last attempt to get a specific
