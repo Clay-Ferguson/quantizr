@@ -585,7 +585,6 @@ public class NodeEditService extends ServiceBase {
             if (!crypto.nodeSigVerify(node, sig)) {
                 // stop this node from being saved with 'clean'
                 ThreadLocals.clean(node);
-                log.debug("Save request failed on bad signature.");
                 throw new RuntimeException("Signature failed.");
             }
         }

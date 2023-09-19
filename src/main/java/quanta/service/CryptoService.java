@@ -65,29 +65,34 @@ public class CryptoService extends ServiceBase {
             return false;
         PublicKey pubKey = null;
         try {
-            // if we didn't get this as admin key we'll be generating the key
-            if (pubKey == null) {
-                SubNode ownerAccntNode = arun.run(as -> read.getNode(as, node.getOwner()));
-                if (ownerAccntNode == null) {
-                    log.error("sig check failed. Can't find owner of node: " + node.getIdStr());
-                    return false;
-                }
-                String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-
-                if (pubKeyJson == null) {
-                    log.debug("User Account didn't have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr()
-                            + " They own nodeId=" + node.getIdStr());
-                    return false;
-                }
-                pubKey = parseJWK(pubKeyJson);
-                if (pubKey == null) {
-                    log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + ownerAccntNode.getIdStr());
-                    return false;
-                }
+            SubNode ownerAccntNode = arun.run(as -> read.getNode(as, node.getOwner()));
+            if (ownerAccntNode == null) {
+                log.error("sig check failed. Can't find owner of node: " + node.getIdStr());
+                return false;
             }
+            String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+
+            if (pubKeyJson == null) {
+                log.debug("User Account didn't have SIG KEY: accntNodeId=" + ownerAccntNode.getIdStr()
+                        + " They own nodeId=" + node.getIdStr());
+                return false;
+            }
+            pubKey = parseJWK(pubKeyJson);
+            if (pubKey == null) {
+                log.error("Unable generate USER_PREF_PUBLIC_SIG_KEY for accnt " + ownerAccntNode.getIdStr());
+                return false;
+            }
+
             String strToSign = getNodeSigData(node);
             boolean verified =
                     sigVerify(pubKey, Util.hexStringToBytes(sig), strToSign.getBytes(StandardCharsets.UTF_8));
+
+            if (!verified) {
+                log.error("sig check failed. nodeId=" + node.getIdStr() + //
+                        "\n sig=" + sig + //
+                        "\n strToSign=" + strToSign + //
+                        "\n pubKeyJson=" + pubKeyJson);
+            }
 
             return verified;
         } catch (Exception e) {

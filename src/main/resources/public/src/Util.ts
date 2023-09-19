@@ -196,6 +196,11 @@ export class Util {
         return this.getFileTypeFormFileName(fileName) === "video";
     }
 
+    // todo-0: GPT-4 says this is a better method than the one I have below...
+    // function buf2hex(buffer) {
+    //     return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+    // }
+
     buf2hex = (arr: Uint8Array): string => {
         let hexStr = "";
         if (arr) {
