@@ -276,6 +276,16 @@ public class ExportServiceFlexmark extends ServiceBase {
             return;
         // process all attachments specifically to embed the image ones
         for (Attachment att : atts) {
+            // todo-0: this is a hack for now to keep animated gifs from appearing in the PDF output
+            // because PDFs can't display them and it looks bad, so we disable ALL GIFs for now
+            if (att.getFileName() != null && att.getFileName().toLowerCase().endsWith(".gif")) {
+                continue;
+            }
+
+            if (att.getMime() != null && att.getMime().toLowerCase().endsWith("/gif")) {
+                continue;
+            }
+
             String mime = att.getMime();
             if (!ImageUtil.isImageMime(mime))
                 continue;
