@@ -158,6 +158,7 @@ export class MenuPanel extends Div {
     static import = () => S.edit.openImportDlg();
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority();
     static export = () => S.edit.openExportDlg();
+    static viewNodeGraph = () => S.render.showGraph(null, "");
 
     static openTtsTab = () => {
         // this ttsTabSelected var is a quick hack to make tab show up, but we really need common
@@ -410,6 +411,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
+                new MenuItem("Node Graph", MenuPanel.viewNodeGraph),
                 new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
                 new MenuItemSeparator(), //
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //

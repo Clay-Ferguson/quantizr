@@ -60,7 +60,7 @@ export class FullScreenControlBar extends Div {
         if (ast.fullScreenConfig.type === FullScreenType.GRAPH) {
 
             buttons.push(
-                new Selection(null, "Power Factor", [
+                new Selection(null, null, [
                     { key: "constant", val: "Constant" },
                     { key: "linear", val: "Linear" },
                     { key: "quadratic", val: "Quadratic" },
@@ -98,7 +98,7 @@ export class FullScreenControlBar extends Div {
         }
 
         buttons.push(
-            new IconButton("fa-window-close fa-lg", "Close", {
+            new IconButton("fa-window-close fa-lg", null, {
                 onClick: () => S.nav.closeFullScreenViewer(),
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));

@@ -13,6 +13,7 @@ export class FullScreenGraphViewer extends Main {
     simulation: any;
     tooltip: any;
     isDragging: boolean;
+    mouseOverTimeoutId: any;
 
     override preRender(): boolean {
         this.setChildren([new Divc({ className: "d3Graph" })]);
@@ -97,7 +98,7 @@ export class FullScreenGraphViewer extends Main {
                 .force("charge", d3.forceManyBody()
                     .strength(function (d: any) {
                         if (power === 0) return -50;
-                        return -100 * (1 / (d.data.level * power + 1));
+                        return -100 * (1 / ((d.data.level + 1) * power));
                     })
                 )
 
@@ -196,14 +197,26 @@ export class FullScreenGraphViewer extends Main {
                 })
 
                 .on("mouseover", function (event: any, d: any) {
-                    if (d.data.id.startsWith("/")) {
-                        thiz.updateTooltip(d, event.pageX, event.pageY);
+                    if (thiz.mouseOverTimeoutId) {
+                        clearTimeout(thiz.mouseOverTimeoutId);
+                        thiz.mouseOverTimeoutId = null;
                     }
-                    else {
-                        thiz.showTooltip(d, event.pageX, event.pageY);
-                    }
+
+                    thiz.mouseOverTimeoutId = setTimeout(() => {
+                        if (d.data.id.startsWith("/")) {
+                            thiz.updateTooltip(d, event.pageX, event.pageY);
+                        }
+                        else {
+                            thiz.showTooltip(d, event.pageX, event.pageY);
+                        }
+                        thiz.mouseOverTimeoutId = null;
+                    }, 800);
                 })
                 .on("mouseout", function () {
+                    if (thiz.mouseOverTimeoutId) {
+                        clearTimeout(thiz.mouseOverTimeoutId);
+                        thiz.mouseOverTimeoutId = null;
+                    }
                     thiz.tooltip.transition()
                         .duration(300)
                         .style("opacity", 0);
@@ -247,6 +260,10 @@ export class FullScreenGraphViewer extends Main {
                 });
 
             zoomHandler(svg);
+
+            // This works but we don't need it.
+            // let initZoom = 1.5
+            // zoomHandler.scaleTo(svg, initZoom);
         };
     }
 
