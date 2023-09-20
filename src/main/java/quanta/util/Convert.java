@@ -173,42 +173,8 @@ public class Convert extends ServiceBase {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.IN_PENDING_PATH.s(), "1"));
         }
 
-        // todo-0: refactor this into separate method
         if (allowInlineChildren) {
-            boolean hasInlineChildren = false;
-
-            // first check if user has controlled expansion by a click yet
-            if (sc.getNodeExpandStates().containsKey(node.getIdStr())) {
-                hasInlineChildren = sc.getNodeExpandStates().get(node.getIdStr());
-                nodeInfo.safeGetClientProps()
-                        .add(new PropertyInfo(NodeProp.EXPANSION_BY_USER.s(), hasInlineChildren ? "1" : "0"));
-            }
-            // if user is not controlling expansion get state from node itself as set by owner of the node.
-            else {
-                hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
-            }
-
-            if (hasInlineChildren) {
-                // todo-0: this number 100 exists on client too at: "if (this.level > 1 && rowIdx == 100) {"
-                // need to consolidate into a constant.
-                Iterable<SubNode> nodeIter =
-                        read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0, true);
-                Iterator<SubNode> iterator = nodeIter.iterator();
-                long inlineOrdinal = 0;
-
-                while (true) {
-                    if (!iterator.hasNext()) {
-                        break;
-                    }
-                    SubNode n = iterator.next();
-
-                    NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++,
-                            allowInlineChildren, lastChild, false, loadLikes, false, null, false);
-                    if (info != null) {
-                        nodeInfo.safeGetChildren().add(info);
-                    }
-                }
-            }
+            processInlineChildren(sc, ms, node, initNodeEdit, allowInlineChildren, lastChild, loadLikes, nodeInfo);
         }
 
         // -----------------------
@@ -234,7 +200,6 @@ public class Convert extends ServiceBase {
         // }
         // -----------------------
 
-        // todo-0: refactor this into separate method
         if (attachBoosted) {
             SubNode boostedNode = null;
             if (boostedNodeVal != null) {
@@ -261,6 +226,44 @@ public class Convert extends ServiceBase {
             }
         }
         return nodeInfo;
+    }
+
+    private void processInlineChildren(SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,
+            boolean allowInlineChildren, boolean lastChild, boolean loadLikes, NodeInfo nodeInfo) {
+        boolean hasInlineChildren = false;
+
+        // first check if user has controlled expansion by a click yet
+        if (sc.getNodeExpandStates().containsKey(node.getIdStr())) {
+            hasInlineChildren = sc.getNodeExpandStates().get(node.getIdStr());
+            nodeInfo.safeGetClientProps()
+                    .add(new PropertyInfo(NodeProp.EXPANSION_BY_USER.s(), hasInlineChildren ? "1" : "0"));
+        }
+        // if user is not controlling expansion get state from node itself as set by owner of the node.
+        else {
+            hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
+        }
+
+        if (hasInlineChildren) {
+            // todo-0: this number 100 exists on client too at: "if (this.level > 1 && rowIdx == 100) {"
+            // need to consolidate into a constant.
+            Iterable<SubNode> nodeIter =
+                    read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0, true);
+            Iterator<SubNode> iterator = nodeIter.iterator();
+            long inlineOrdinal = 0;
+
+            while (true) {
+                if (!iterator.hasNext()) {
+                    break;
+                }
+                SubNode n = iterator.next();
+
+                NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, allowInlineChildren,
+                        lastChild, false, loadLikes, false, null, false);
+                if (info != null) {
+                    nodeInfo.safeGetChildren().add(info);
+                }
+            }
+        }
     }
 
     /*
