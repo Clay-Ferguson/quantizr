@@ -364,6 +364,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (tagsEditRow && tagsEditRow.hasChildren()) {
             mainPropsTable.addChild(tagsEditRow);
+            mainPropsTable.addChild(new Clearfix());
         }
 
         let propsHeaderBar: Div = null;
