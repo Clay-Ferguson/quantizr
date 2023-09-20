@@ -167,13 +167,6 @@ export class MenuPanel extends Div {
         S.tabUtil.selectTab(C.TAB_TTS);
     };
 
-    static openAiAsk = () => {
-        const node = S.nodeUtil.getHighlightedNode();
-        if (node) {
-            S.edit.askOpenAiQuestion(node.id);
-        }
-    };
-
     static openAiAskDoc = () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
@@ -411,8 +404,8 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
-                new MenuItem("Node Graph", MenuPanel.viewNodeGraph),
-                new MenuItem("Text-to-Speech", MenuPanel.openTtsTab),
+                new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab, null, true),
+                new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab),
                 new MenuItemSeparator(), //
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
@@ -433,10 +426,8 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser && S.quanta.config.useOpenAi) {
-            children.push(new Menu("GPT-AI", [
-                new MenuItem("Ask Question", MenuPanel.openAiAsk, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Ask about SubNodes", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItemSeparator(), //
+            children.push(new Menu("ChatGPT", [
+                new MenuItem("Question about Content", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Configure GPT", MenuPanel.configureGpt, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
