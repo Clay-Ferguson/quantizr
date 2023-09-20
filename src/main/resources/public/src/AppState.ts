@@ -168,6 +168,7 @@ export class AppState {
     serverInfoText: string = null;
     showNodeLinksInGraph: boolean = true;
     attractionLinksInGraph: boolean = true;
+    graphPowerFactor: string = "constant";
 
     // holds nodeId of the current conversation thread leaf node. The one the thread view was 'executed' on.
     threadViewFromNodeId: string = null;

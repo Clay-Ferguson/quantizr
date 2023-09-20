@@ -7,6 +7,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
+import { Selection } from "../comp/core/Selection";
 
 // todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
@@ -57,6 +58,24 @@ export class FullScreenControlBar extends Div {
         }
 
         if (ast.fullScreenConfig.type === FullScreenType.GRAPH) {
+
+            buttons.push(
+                new Selection(null, "Power Factor", [
+                    { key: "constant", val: "Constant" },
+                    { key: "linear", val: "Linear" },
+                    { key: "quadratic", val: "Quadratic" },
+                    { key: "cubic", val: "Cubic" }
+
+                ], null, "selectPowerFactorDropDown", {
+                    setValue: (val: string) => {
+                        dispatch("setPowerFactor", s => {
+                            s.graphPowerFactor = val;
+                        });
+                    },
+                    getValue: (): string => getAs().graphPowerFactor
+                })
+            );
+
             buttons.push(new Checkbox("Links", { title: "Show NodeLinks" }, {
                 setValue: (checked: boolean) => {
                     dispatch("OpenDialog", s => {
