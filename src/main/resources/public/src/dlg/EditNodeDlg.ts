@@ -338,7 +338,8 @@ export class EditNodeDlg extends DialogBase {
             nodeNameTextField = new TextField({
                 label: "Node Name",
                 outterClass: "col-9",
-                val: this.nameState
+                val: this.nameState,
+                labelClass: "none"
             });
         }
 
@@ -354,6 +355,15 @@ export class EditNodeDlg extends DialogBase {
             mainPropsTable.addChild(this.makeContentEditor(rows, type?.schemaOrg ? 1 : 3));
             this.contentEditor.setWordWrap(isWordWrap);
             propsVisible = true;
+        }
+
+        const tagsEditRow = editorOpts.tags ? new Divc({ className: "editorTagsSection float-end" }, [
+            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this.removeTag, this.selectTags) : null,
+            this.utl.renderLinksEditing()
+        ]) : null;
+
+        if (tagsEditRow && tagsEditRow.hasChildren()) {
+            mainPropsTable.addChild(tagsEditRow);
         }
 
         let propsHeaderBar: Div = null;
@@ -450,15 +460,6 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        let tagsEditRow = editorOpts.tags ? new Divc({ className: "editorTagsSection" }, [
-            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this.removeTag, this.selectTags) : null,
-            this.utl.renderLinksEditing()
-        ]) : null;
-
-        if (tagsEditRow && !tagsEditRow.hasChildren()) {
-            tagsEditRow = null;
-        }
-
         let editorSubPanel: Comp = null;
         if (type) {
             editorSubPanel = type.renderEditorSubPanel(ast.editNode);
@@ -466,13 +467,12 @@ export class EditNodeDlg extends DialogBase {
 
         let advCollapsePanel = null;
         let advCollapsePanelContainer = null;
-        const hasAdvControls = tagsEditRow?.hasChildren() || advFlowPanel?.hasChildren() || //
+        const hasAdvControls = advFlowPanel?.hasChildren() || //
             editorOpts.nodeName || editorOpts.priority;
 
         if (hasAdvControls) {
 
             const advancedDiv = new Divc({ className: "advancedCont" }, [
-                tagsEditRow,
                 new Divc({ className: "row align-items-end" }, [
                     editorOpts.nodeName ? nodeNameTextField : null,
                     editorOpts.priority ? this.createPrioritySelection() : null
@@ -625,7 +625,8 @@ export class EditNodeDlg extends DialogBase {
 
     sortTags = (tagStr: string) => {
         if (!tagStr) return tagStr;
-        const tags: string[] = tagStr.split(" ");
+        let tags: string[] = tagStr.split(" ");
+        tags = Array.from(new Set(tags)); // removes dupliates
         tags.sort();
         return tags.join(" ");
     }

@@ -1,8 +1,14 @@
 import { toArray } from "react-emoji-render";
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
+import { Constants as C } from "./Constants";
+import { FullScreenType } from "./Interfaces";
+import * as J from "./JavaIntf";
+import { PubSub } from "./PubSub";
+import { S } from "./Singletons";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { AppNavLink } from "./comp/core/AppNavLink";
+import { Button } from "./comp/core/Button";
 import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
@@ -10,26 +16,20 @@ import { Diva } from "./comp/core/Diva";
 import { Divc } from "./comp/core/Divc";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
-import { IconButton } from "./comp/core/IconButton";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
 import { NodeCompBinary } from "./comp/node/NodeCompBinary";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
-import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
-import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { S } from "./Singletons";
-import { MainTab } from "./tabs/data/MainTab";
 import { RSSView } from "./tabs/RSSView";
-import { Button } from "./comp/core/Button";
+import { MainTab } from "./tabs/data/MainTab";
+import { IconButton } from "./comp/core/IconButton";
 
 export class Render {
     private debug: boolean = false;
@@ -890,18 +890,18 @@ export class Render {
 
         const attrs = classes ? { className: classes } : null;
         return new Div(null, attrs, [
+            new Divc({ className: "inlineBlock" }, [
+                new Divc({
+                    className: "tagsFlexContainer"
+                }, spans)
+            ]),
             new IconButton("fa-tag", "", {
                 onClick: (evt: Event) => {
                     evt.stopPropagation();
                     labelClickFunc();
                 },
                 title: "Select Hashtags"
-            }, "marginRight"),
-            new Divc({ className: "inlineBlock" }, [
-                new Divc({
-                    className: "tagsFlexContainer"
-                }, spans)
-            ])
+            })
         ]);
     }
 
