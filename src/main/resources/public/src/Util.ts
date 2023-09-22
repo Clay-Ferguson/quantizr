@@ -319,15 +319,9 @@ export class Util {
         return obj ? JSON.stringify(obj, null, 4) : "null"
     }
 
-    /*
-     * This came from here:
-     * http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-     */
     getParameterByName = (name?: any, url?: any): string => {
         if (!name) return null;
         url = url || window.location.href;
-
-        name = name.replace(/[\[\]]/g, "\\$&");
         const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
         const results = regex.exec(url);
         if (!results) {

@@ -69,6 +69,10 @@ export class FullScreenGraphViewer extends Main {
             const links: any = root.links();
             const nodes: any = root.descendants();
 
+            // Sort nodes by level so that the higher level nodes are drawn on top of lower level nodes.
+            // we need do to this so we can always grab a clump of nodes centered around their parent for example
+            nodes.sort((a, b) => b.data.level - a.data.level);
+
             const nodeLinks: any = [];
 
             if (ast.showNodeLinksInGraph) {
