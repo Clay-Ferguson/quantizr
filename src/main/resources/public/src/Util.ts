@@ -381,9 +381,10 @@ export class Util {
      * requires: res.success res.message
      */
     checkSuccess = (opFriendlyName: string, res: J.ResponseBase): boolean => {
-        if (!res || res.code != C.RESPONSE_CODE_OK) {
+        if ((!res || res.code != C.RESPONSE_CODE_OK) && !(res as any).errorShown) {
             this.showMessage(opFriendlyName + " failed: " + (res?.message ? res.message : ""), "Warning");
         }
+
         return res.code == C.RESPONSE_CODE_OK;
     }
 
@@ -472,7 +473,7 @@ export class Util {
     }
 
     /* Programatically creates objects by name, similar to what Java reflection does
-
+    
     * ex: let example = InstanceLoader.getInstance<NamedThing>(window, 'ExampleClass', args...);
     */
     getInstance = <T>(context: any, name: string, ...args: any[]): T => {

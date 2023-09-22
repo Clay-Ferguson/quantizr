@@ -503,7 +503,8 @@ public class MongoDelete extends ServiceBase {
             if (node == null)
                 continue;
             auth.ownerAuth(ms, node);
-
+            read.hasChildrenConsistencyCheck(ms, node);
+            
             // get the parent of the node and add it's id to parentIds
             SubNode parent = read.getParent(ms, node, false);
 

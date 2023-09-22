@@ -184,6 +184,28 @@ public class MongoRead extends ServiceBase {
         return opsw.exists(ms, q);
     }
 
+    /*
+     * This is used mainly during a delete request to verify the user is deleting what they think
+     * they're deleting Specifically a rogue case where they don't think there are children under a
+     * node, because the GUI looks that way for some pathelogocial case and they attemp to delete. This
+     * method will throw an exception if anythig about the child state of 'node' seems off.
+     */
+    public void hasChildrenConsistencyCheck(MongoSession ms, SubNode node) {
+        Boolean hasChildren = node.getHasChildren();
+        boolean childrenFound = read.directChildrenExist(ms, node.getPath());
+
+        // detect inconsistency
+        if (childrenFound && (hasChildren == null || !hasChildren.booleanValue())) {
+
+            // repair inconsistency
+            node.setHasChildren(true);
+            update.saveSession(ms);
+
+            // terminate user operation
+            throw new RuntimeException("One or more nodes were in an invalid state.");
+        }
+    }
+
     public long getNodeCount() {
         Query q = new Query();
         return opsw.count(null, q);

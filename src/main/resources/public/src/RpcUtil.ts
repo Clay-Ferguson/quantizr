@@ -345,6 +345,7 @@ export class RpcUtil {
                 }
 
                 if (res.message) {
+                    (res as any).errorShown = true;
                     S.util.showMessage(res.message, "Message");
 
                     // get rid of message so it can't be shown again
