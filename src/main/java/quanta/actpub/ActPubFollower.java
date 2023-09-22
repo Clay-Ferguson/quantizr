@@ -202,7 +202,7 @@ public class ActPubFollower extends ServiceBase {
     public Query getPeopleByUserName_query(MongoSession ms, SubNode userNode, String userName) {
         Query q = new Query();
         if (userNode == null) {
-            userNode = read.getUserNodeByUserName(ms, userName, false);
+            userNode = read.getAccountByUserName(ms, userName, false);
             if (userNode == null) {
                 return null;
             }

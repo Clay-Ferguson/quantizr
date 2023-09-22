@@ -293,7 +293,7 @@ public class MongoRead extends ServiceBase {
              * pass a null session here to cause adminSession to be used which is required to get a user node,
              * but it always safe to get this node this way here.
              */
-            userNode = getUserNodeByUserName(null, userName, false);
+            userNode = getAccountByUserName(null, userName, false);
             if (userNode == null) {
                 log.debug("Unable to find node by: " + name);
                 return null;
@@ -951,7 +951,7 @@ public class MongoRead extends ServiceBase {
             if (userName == null) {
                 userName = ThreadLocals.getSC().getUserName();
             }
-            userNode = getUserNodeByUserName(ms, userName, false);
+            userNode = getAccountByUserName(ms, userName, false);
         }
         if (userNode == null) {
             log.warn("userNode not found for user name: " + userName);
@@ -1040,7 +1040,7 @@ public class MongoRead extends ServiceBase {
         return opsw.findOne(allowAuth ? ms : null, q);
     }
 
-    public SubNode getUserNodeByUserName(MongoSession ms, String user, boolean allowAuth) {
+    public SubNode getAccountByUserName(MongoSession ms, String user, boolean allowAuth) {
         if (user == null) {
             user = ThreadLocals.getSC().getUserName();
         }
@@ -1076,7 +1076,7 @@ public class MongoRead extends ServiceBase {
      */
     public SubNode findFriendNode(MongoSession ms, ObjectId ownerId, SubNode userNode, String userName) {
         if (userNode == null) {
-            userNode = getUserNodeByUserName(ms, userName, false);
+            userNode = getAccountByUserName(ms, userName, false);
             if (userNode == null) {
                 return null;
             }
@@ -1099,7 +1099,7 @@ public class MongoRead extends ServiceBase {
     public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, SubNode userNode, String userName,
             String type) {
         if (userNode == null) {
-            userNode = getUserNodeByUserName(ms, userName, false);
+            userNode = getAccountByUserName(ms, userName, false);
             if (userNode == null) {
                 return null;
             }

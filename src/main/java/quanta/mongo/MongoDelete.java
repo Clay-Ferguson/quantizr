@@ -487,7 +487,7 @@ public class MongoDelete extends ServiceBase {
      */
     public DeleteNodesResponse deleteNodes(MongoSession ms, List<String> nodeIds) {
         DeleteNodesResponse res = new DeleteNodesResponse();
-        SubNode userNode = read.getUserNodeByUserName(null, null, false);
+        SubNode userNode = read.getAccountByUserName(null, null, false);
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }
@@ -601,7 +601,7 @@ public class MongoDelete extends ServiceBase {
      */
     public DeleteNodesResponse bulkDeleteNodes(MongoSession ms) {
         DeleteNodesResponse res = new DeleteNodesResponse();
-        SubNode userNode = read.getUserNodeByUserName(null, null, false);
+        SubNode userNode = read.getAccountByUserName(null, null, false);
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }

@@ -62,7 +62,7 @@ public class OpenAiService extends ServiceBase {
      */
     public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question) {
 
-        SubNode userNode = read.getUserNodeByUserName(ms, ms.getUserName(), false);
+        SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }

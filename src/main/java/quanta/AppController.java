@@ -1403,7 +1403,7 @@ public class AppController extends ServiceBase implements ErrorController {
         res.setRequireCrypto(prop.isRequireCrypto());
 
         arun.run(as -> {
-            SubNode userNode = read.getUserNodeByUserName(as, sc.getUserName(), false);
+            SubNode userNode = read.getAccountByUserName(as, sc.getUserName(), false);
             if (userNode != null) {
                 Double val = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
                 if (val != null) {

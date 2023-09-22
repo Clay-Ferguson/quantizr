@@ -472,7 +472,7 @@ public class ActPubService extends ServiceBase {
             return acctNode;
         }
         if (preferDbNode) {
-            acctNode = read.getUserNodeByUserName(ms, apUserName, false);
+            acctNode = read.getAccountByUserName(ms, apUserName, false);
         }
         if (acctNode == null && allowImport) {
             /* First try to get a cached actor APObj */
@@ -553,7 +553,7 @@ public class ActPubService extends ServiceBase {
             log.trace("importing Actor: " + apUserName);
             saveFediverseName(apUserName);
             // Try to get the userNode for this actor
-            userNode = read.getUserNodeByUserName(ms, apUserName, false);
+            userNode = read.getAccountByUserName(ms, apUserName, false);
             /*
              * If we don't have this user in our system, create them.
              */
@@ -1260,7 +1260,7 @@ public class ActPubService extends ServiceBase {
             SubNode acctNode = null;
             if (apUtil.isLocalActorUrl(actorUrl)) {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(ms, userDoingAction, actorUrl);
-                acctNode = read.getUserNodeByUserName(ms, longUserName, false);
+                acctNode = read.getAccountByUserName(ms, longUserName, false);
             } else {
                 saveFediverseName(actorUrl);
             }
@@ -1294,7 +1294,7 @@ public class ActPubService extends ServiceBase {
         return arun.<APOPerson>run(as -> {
             // we get the usernode without authorizing because the APOPerson is guaranteed to only contain
             // public info.
-            SubNode userNode = read.getUserNodeByUserName(as, userName, false);
+            SubNode userNode = read.getAccountByUserName(as, userName, false);
             if (userNode != null) {
                 return apFactory.generatePersonObj(userNode);
             }

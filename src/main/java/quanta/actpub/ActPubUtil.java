@@ -428,7 +428,7 @@ public class ActPubUtil extends ServiceBase {
                     String host = XString.truncAfterFirst(fullHost, ":");
                     if (host.equals(prop.getMetaHost())) {
                         String username = parts[0];
-                        SubNode userNode = read.getUserNodeByUserName(null, username, false);
+                        SubNode userNode = read.getAccountByUserName(null, username, false);
                         if (userNode != null) {
                             return new APOWebFinger(username + "@" + fullHost, makeActorUrlForUserName(username));
                         }

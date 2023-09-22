@@ -187,7 +187,7 @@ public class MongoUtil extends ServiceBase {
                     continue;
                 }
                 String userName = accountInfoList.get(0);
-                SubNode ownerNode = read.getUserNodeByUserName(as, userName, false);
+                SubNode ownerNode = read.getAccountByUserName(as, userName, false);
                 if (ownerNode == null) {
                     log.debug("userName not found: " + userName + ". Account will be created.");
                     SignupRequest signupReq = new SignupRequest();
@@ -886,7 +886,7 @@ public class MongoUtil extends ServiceBase {
 
     public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated,
             Val<SubNode> postsNodeVal, boolean forceRemoteUser) {
-        SubNode userNode = read.getUserNodeByUserName(ms, newUserName, false);
+        SubNode userNode = read.getAccountByUserName(ms, newUserName, false);
         if (userNode != null) {
             throw new RuntimeException("User already existed: " + newUserName);
         }
@@ -938,7 +938,7 @@ public class MongoUtil extends ServiceBase {
      */
     public void createAdminUser(MongoSession ms) {
         String adminUser = prop.getMongoAdminUserName();
-        SubNode adminNode = read.getUserNodeByUserName(ms, adminUser, false);
+        SubNode adminNode = read.getAccountByUserName(ms, adminUser, false);
         if (adminNode == null) {
             adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true,
                     null, null);

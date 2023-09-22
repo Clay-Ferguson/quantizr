@@ -114,7 +114,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
     public void authTest() {
         MongoSession as = asUser(PrincipalName.ADMIN.s());
-        SubNode adminNode = read.getUserNodeByUserName(as, PrincipalName.ADMIN.s(), true);
+        SubNode adminNode = read.getAccountByUserName(as, PrincipalName.ADMIN.s(), true);
         if (adminNode == null) {
             throw new RuntimeEx("Unable to find admin user node.");
         }
@@ -167,7 +167,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
         }
         // adam successfully inserts node in his root
         SubNode adamsNode = null;
-        SubNode adamsRootNode = read.getUserNodeByUserName(adamSession, "adam", false);
+        SubNode adamsRootNode = read.getAccountByUserName(adamSession, "adam", false);
         if (adamsRootNode != null) {
             adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
             adamsNode.setContent("adam's test node " + System.currentTimeMillis());
@@ -248,7 +248,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
     }
 
     private MongoSession asUser(String userName) {
-        SubNode userNode = read.getUserNodeByUserName(null, userName, false);
+        SubNode userNode = read.getAccountByUserName(null, userName, false);
         if (userNode == null) {
             throw new RuntimeException("UserNode not found for userName " + userName);
         }

@@ -206,7 +206,7 @@ public class AclService extends ServiceBase {
             // if no principal node passed in, then look it up
             if (principalNode == null) {
                 String _principal = principal;
-                principalNode = read.getUserNodeByUserName(null, _principal, false);
+                principalNode = read.getAccountByUserName(null, _principal, false);
                 if (principalNode == null) {
                     if (res != null) {
                         res.error("Unknown user name: " + principal);

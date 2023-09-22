@@ -67,7 +67,7 @@ public class ActPubOutbox extends ServiceBase {
                 return false;
             }
             if (userNode == null) {
-                userNode = read.getUserNodeByUserName(ms, apUserName, false);
+                userNode = read.getAccountByUserName(ms, apUserName, false);
             }
             SubNode outboxNode = user.getPostsNode(ms, apUserName, userNode);
             if (outboxNode == null) {
@@ -156,7 +156,7 @@ public class ActPubOutbox extends ServiceBase {
     public Long getOutboxItemCount(String userName, String sharedTo) {
         Long totalItems = arun.run(as -> {
             long count = 0;
-            SubNode userNode = read.getUserNodeByUserName(null, userName, false);
+            SubNode userNode = read.getAccountByUserName(null, userName, false);
             if (userNode != null) {
                 List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
@@ -247,7 +247,7 @@ public class ActPubOutbox extends ServiceBase {
             }
         }
         try {
-            SubNode userNode = read.getUserNodeByUserName(null, userName, false);
+            SubNode userNode = read.getAccountByUserName(null, userName, false);
             if (userNode == null) {
                 return null;
             }

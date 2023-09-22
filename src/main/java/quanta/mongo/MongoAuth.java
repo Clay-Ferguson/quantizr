@@ -144,7 +144,7 @@ public class MongoAuth extends ServiceBase {
             String userName = parent.getStr(NodeProp.USER);
             // if we have a userProp, find the account node for the user
             if (userName != null) {
-                SubNode accountNode = read.getUserNodeByUserName(null, userName, false);
+                SubNode accountNode = read.getAccountByUserName(null, userName, false);
                 if (accountNode != null) {
                     child.putAc(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
                 }
@@ -636,7 +636,7 @@ public class MongoAuth extends ServiceBase {
             if (!(val instanceof APOMention))
                 continue;
             userName = XString.stripIfStartsWith(userName, "@");
-            SubNode acctNode = read.getUserNodeByUserName(ms, userName, false);
+            SubNode acctNode = read.getAccountByUserName(ms, userName, false);
             /*
              * If this is a foreign 'mention' user name that is not imported into our system, we auto-import
              * that user now

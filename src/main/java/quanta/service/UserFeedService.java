@@ -229,7 +229,7 @@ public class UserFeedService extends ServiceBase {
          * a single rev-chron.
          */
         if (bidirectional) {
-            SubNode toUserNode = read.getUserNodeByUserName(ms, req.getToUser(), false);
+            SubNode toUserNode = read.getAccountByUserName(ms, req.getToUser(), false);
             if (myAcntNode == null) {
                 myAcntNode = read.getNode(ms, sc.getRootId());
             }

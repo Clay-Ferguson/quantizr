@@ -365,7 +365,7 @@ public class NodeEditService extends ServiceBase {
 
     public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
-        SubNode userNode = read.getUserNodeByUserName(ms, userToFollow, false);
+        SubNode userNode = read.getAccountByUserName(ms, userToFollow, false);
         if (userNode != null) {
             List<PropertyInfo> properties = new LinkedList<>();
             properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
@@ -823,7 +823,7 @@ public class NodeEditService extends ServiceBase {
                 }
                 Val<SubNode> userNode = new Val<SubNode>();
 
-                userNode.setVal(read.getUserNodeByUserName(null, friendUserName, false));
+                userNode.setVal(read.getAccountByUserName(null, friendUserName, false));
 
                 if (userNode.getVal() != null) {
                     userNodeId = userNode.getVal().getIdStr();
@@ -1019,7 +1019,7 @@ public class NodeEditService extends ServiceBase {
         // get user node of person being transfered to
         SubNode toUserNode = null;
         if (req.getOperation().equals("transfer")) {
-            toUserNode = read.getUserNodeByUserName(null, req.getToUser(), false);
+            toUserNode = read.getAccountByUserName(null, req.getToUser(), false);
             if (toUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getToUser());
             }
@@ -1027,7 +1027,7 @@ public class NodeEditService extends ServiceBase {
         // get account node of person doing the transfer
         SubNode fromUserNode = null;
         if (!StringUtils.isEmpty(req.getFromUser())) {
-            fromUserNode = read.getUserNodeByUserName(null, req.getFromUser(), false);
+            fromUserNode = read.getAccountByUserName(null, req.getFromUser(), false);
             if (fromUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getFromUser());
             }

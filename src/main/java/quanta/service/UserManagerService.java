@@ -186,7 +186,7 @@ public class UserManagerService extends ServiceBase {
             }
 
             arun.run(as -> {
-                SubNode userNode = read.getUserNodeByUserName(as, req.getUserName(), false);
+                SubNode userNode = read.getAccountByUserName(as, req.getUserName(), false);
                 if (userNode == null) {
                     throw new RuntimeException("User not found: " + req.getUserName());
                 }
@@ -199,7 +199,7 @@ public class UserManagerService extends ServiceBase {
         else {
             // lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
             arun.run(as -> {
-                SubNode userNode = read.getUserNodeByUserName(as, req.getUserName(), false);
+                SubNode userNode = read.getAccountByUserName(as, req.getUserName(), false);
                 if (userNode == null) {
                     throw new RuntimeException("User not found: " + req.getUserName());
                 }
@@ -264,7 +264,7 @@ public class UserManagerService extends ServiceBase {
         }
         // if pubSigKey not yet saved in SessionContext then generate it
         if (sc.getPubSigKeyJson() == null) {
-            SubNode userNode = read.getUserNodeByUserName(null, sc.getUserName(), false);
+            SubNode userNode = read.getAccountByUserName(null, sc.getUserName(), false);
             if (userNode == null) {
                 throw new RuntimeException("Unknown user: " + sc.getUserName());
             }
@@ -284,7 +284,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     public void ensureUserHomeNodeExists(MongoSession ms, String userName, String content, String type, String name) {
-        SubNode userNode = read.getUserNodeByUserName(ms, userName, false);
+        SubNode userNode = read.getAccountByUserName(ms, userName, false);
         if (userNode != null) {
             SubNode userHomeNode = read.getNodeByName(ms, userName + ":" + name);
             if (userHomeNode == null) {
@@ -326,7 +326,7 @@ public class UserManagerService extends ServiceBase {
             String sigKey) {
         SessionContext sc = ThreadLocals.getSC();
         if (userNode == null) {
-            userNode = read.getUserNodeByUserName(null, userName, false);
+            userNode = read.getAccountByUserName(null, userName, false);
         }
         if (userNode == null) {
             throw new RuntimeEx("User not found: " + userName);
@@ -384,7 +384,7 @@ public class UserManagerService extends ServiceBase {
         log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
         arun.run(as -> {
             String userName = ThreadLocals.getSC().getUserName();
-            SubNode ownerNode = read.getUserNodeByUserName(as, userName, false);
+            SubNode ownerNode = read.getAccountByUserName(as, userName, false);
             if (ownerNode != null) {
                 delete.delete(as, ownerNode, false);
             }
@@ -426,7 +426,7 @@ public class UserManagerService extends ServiceBase {
      */
     public void addBytesToUserNodeBytes(MongoSession ms, long binSize, SubNode userNode) {
         if (userNode == null) {
-            userNode = read.getUserNodeByUserName(null, null, false);
+            userNode = read.getAccountByUserName(null, null, false);
         }
         // get the current binTotal on the user account (max they are allowed to upload)
         Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
@@ -549,7 +549,7 @@ public class UserManagerService extends ServiceBase {
      * signupCode has been used to validate their email address.
      */
     public void initiateSignup(MongoSession ms, String userName, String password, String email) {
-        SubNode ownerNode = read.getUserNodeByUserName(ms, userName, false);
+        SubNode ownerNode = read.getAccountByUserName(ms, userName, false);
         if (ownerNode != null) {
             throw new RuntimeEx("User already exists.");
         }
@@ -582,7 +582,7 @@ public class UserManagerService extends ServiceBase {
         SavePublicKeyResponse res = new SavePublicKeyResponse();
         String userName = ThreadLocals.getSC().getUserName();
         arun.run(as -> {
-            SubNode userNode = read.getUserNodeByUserName(as, userName, false);
+            SubNode userNode = read.getAccountByUserName(as, userName, false);
             if (userNode != null) {
                 if (!StringUtils.isEmpty(req.getAsymEncKey())) {
                     userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
@@ -604,7 +604,7 @@ public class UserManagerService extends ServiceBase {
         GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
         String userName = ThreadLocals.getSC().getUserName();
         arun.run(as -> {
-            SubNode userNode = read.getUserNodeByUserName(as, userName, false);
+            SubNode userNode = read.getAccountByUserName(as, userName, false);
             if (userNode == null) {
                 res.error("unknown user: " + userName);
             }
@@ -670,7 +670,7 @@ public class UserManagerService extends ServiceBase {
         String userName = ThreadLocals.getSC().getUserName();
         arun.run(as -> {
             boolean failed = false;
-            SubNode userNode = read.getUserNodeByUserName(as, userName, false);
+            SubNode userNode = read.getAccountByUserName(as, userName, false);
             // DO NOT DELETE: This is temporaryly disabled (no ability to edit userName)
             // If userName is changing, validate it first.
             // if (!req.getUserName().equals(userName)) {
@@ -903,7 +903,7 @@ public class UserManagerService extends ServiceBase {
         }
         // If we don't know the account id of the person doing the follow, then look it up.
         if (accntIdDoingFollow == null) {
-            SubNode followerAcctNode = arun.run(s -> read.getUserNodeByUserName(s, userDoingFollow, false));
+            SubNode followerAcctNode = arun.run(s -> read.getAccountByUserName(s, userDoingFollow, false));
             if (followerAcctNode == null) {
                 throw new RuntimeException("Unable to find user: " + userDoingFollow);
             }
@@ -939,7 +939,7 @@ public class UserManagerService extends ServiceBase {
         }
         // the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
         // must use arun.
-        SubNode userNode = arun.run(s -> read.getUserNodeByUserName(s, userToFollow, false));
+        SubNode userNode = arun.run(s -> read.getAccountByUserName(s, userToFollow, false));
         if (userNode == null)
             return;
 
@@ -972,7 +972,7 @@ public class UserManagerService extends ServiceBase {
             SubNode userNode = null;
             if (_userNode == null) {
                 if (userId == null) {
-                    userNode = read.getUserNodeByUserName(as, sessionUserName, false);
+                    userNode = read.getAccountByUserName(as, sessionUserName, false);
                 } else {
                     userNode = read.getNode(as, userId, false, null);
                 }
@@ -1084,7 +1084,7 @@ public class UserManagerService extends ServiceBase {
         arun.run(as -> {
             SubNode prefsNode = _prefsNode;
             if (prefsNode == null) {
-                prefsNode = read.getUserNodeByUserName(as, userName, false);
+                prefsNode = read.getAccountByUserName(as, userName, false);
             }
             userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
             userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
@@ -1146,7 +1146,7 @@ public class UserManagerService extends ServiceBase {
                 return null;
             });
         } else {
-            userNode.setVal(read.getUserNodeByUserName(ms, ms.getUserName(), true));
+            userNode.setVal(read.getAccountByUserName(ms, ms.getUserName(), true));
             if (userNode.getVal() == null) {
                 throw ExUtil.wrapEx("changePassword cannot find user.");
             }
@@ -1179,7 +1179,7 @@ public class UserManagerService extends ServiceBase {
                 res.error("User name is illegal.");
                 return null;
             }
-            SubNode ownerNode = read.getUserNodeByUserName(as, user, false);
+            SubNode ownerNode = read.getAccountByUserName(as, user, false);
             if (ownerNode == null) {
                 res.error("User does not exist.");
                 return null;
@@ -1267,7 +1267,7 @@ public class UserManagerService extends ServiceBase {
                 if (user.equals(_ownerName))
                     return;
                 try {
-                    SubNode accntNode = read.getUserNodeByUserName(as, user, false);
+                    SubNode accntNode = read.getAccountByUserName(as, user, false);
                     if (accntNode != null) {
                         String id = accntNode.getIdStr();
                         if (!idSet.contains(id)) {
@@ -1405,7 +1405,7 @@ public class UserManagerService extends ServiceBase {
             String userName, boolean sort, Criteria moreCriteria) {
         ms = ThreadLocals.ensure(ms);
         List<SubNode> nodeList = new LinkedList<>();
-        SubNode userNode = read.getUserNodeByUserName(ms, userName, false);
+        SubNode userNode = read.getAccountByUserName(ms, userName, false);
         if (userNode == null)
             return null;
         SubNode parentNode = read.findSubNodeByType(ms, userNode, underType);
@@ -1464,7 +1464,7 @@ public class UserManagerService extends ServiceBase {
 
     public void updateLastActiveTime(SessionContext sc) {
         arun.run(as -> {
-            SubNode userNode = read.getUserNodeByUserName(as, sc.getUserName(), false);
+            SubNode userNode = read.getAccountByUserName(as, sc.getUserName(), false);
             if (userNode != null) {
                 userNode.set(NodeProp.LAST_ACTIVE_TIME, sc.getLastActiveTime());
                 update.save(as, userNode);
@@ -1480,7 +1480,7 @@ public class UserManagerService extends ServiceBase {
         if (ms.isAdmin()) {
             return Integer.MAX_VALUE;
         }
-        SubNode userNode = read.getUserNodeByUserName(null, ThreadLocals.getSC().getUserName(), false);
+        SubNode userNode = read.getAccountByUserName(null, ThreadLocals.getSC().getUserName(), false);
         long ret = userNode.getInt(NodeProp.BIN_QUOTA);
         if (ret == 0) {
             return Const.DEFAULT_USER_QUOTA;
@@ -1495,7 +1495,7 @@ public class UserManagerService extends ServiceBase {
         if (ms.isAdmin()) {
             return Integer.MAX_VALUE;
         }
-        SubNode userNode = read.getUserNodeByUserName(null, ThreadLocals.getSC().getUserName(), false);
+        SubNode userNode = read.getAccountByUserName(null, ThreadLocals.getSC().getUserName(), false);
         if (userNode == null)
             return 0L;
 
