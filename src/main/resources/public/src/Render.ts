@@ -56,9 +56,9 @@ export class Render {
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         // note: this is only here to get the markdown renderer to have padding in plain text, but also
         // it means we can leave off the language type and get a plaintext as default
-        val = S.util.replaceAll(val, "```txt\n", "```plaintext\n");
+        val = val.replaceAll("```txt\n", "```plaintext\n");
 
-        val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
+        val = val.replaceAll("{{locationOrigin}}", window.location.origin);
         val = this.injectCustomButtons(val);
 
         /* These allow us to enter into the markdown things like this:
@@ -69,8 +69,8 @@ export class Render {
         However, this also works and may be the more 'clear' way:
         [Link Test App](?id=:my-test-name)
         */
-        val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
-        val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
+        val = val.replaceAll("{{byName}}", window.location.origin + window.location.pathname + "?id=:");
+        val = val.replaceAll("{{url}}", window.location.origin + window.location.pathname);
 
         if (node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAtts(node);
@@ -109,7 +109,7 @@ export class Render {
 
                 // ft=at file tag
                 else if (a.p === "ft") {
-                    val = S.util.replaceAll(val, `{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
+                    val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
                 }
             }
 

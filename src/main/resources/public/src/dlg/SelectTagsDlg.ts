@@ -52,7 +52,7 @@ export class SelectTagsDlg extends DialogBase {
         if (this.curTags) {
             const tags = this.curTags.split(" ");
             tags?.forEach(t => {
-                t = S.util.replaceAll(t, "\"", "");
+                t = t.replaceAll("\"", "");
                 tagSet.add(t);
             });
         }

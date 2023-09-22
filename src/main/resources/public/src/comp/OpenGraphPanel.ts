@@ -197,7 +197,7 @@ export class OpenGraphPanel extends Div {
             // According to my test results this can cause a scrolling glitch, where the browser throws an error and somehow
             // apparently that interfered with rendering. Wasn't able to repro on localhost because of using http I think, so
             // this code is probably harmless even if I'm making a mistake blaming the scrolling glitch on this.
-            state.og.image = S.util.replaceAll(state.og.image, "http://", "https://");
+            state.og.image = state.og.image.replaceAll("http://", "https://");
 
             // if mobile portrait mode render image above (not beside) description
             if (ast.mobileMode && window.innerWidth < window.innerHeight) {

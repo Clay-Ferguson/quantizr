@@ -225,16 +225,6 @@ export class Util {
         return new Uint8Array(a);
     }
 
-    escapeRegExp = (s: string): string => {
-        if (!s) return s;
-        return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-    }
-
-    replaceAll = (s: string, find: string, replace: string): string => {
-        if (!s || s.indexOf(find) === -1) return s;
-        return s.replace(new RegExp(this.escapeRegExp(find), "g"), replace);
-    }
-
     chopAtLastChar = (str: string, char: string): string => {
         const idx = str.lastIndexOf(char);
         if (idx !== -1) {
@@ -617,7 +607,7 @@ export class Util {
 
     removeHtmlTags = (text: string) => {
         if (!text) return text;
-        text = this.replaceAll(text, "```", " ");
+        text = text.replaceAll("```", " ");
         const doc = new DOMParser().parseFromString(text, "text/html");
         const ret = doc.body.textContent || "";
         return ret.trim();
@@ -666,7 +656,7 @@ export class Util {
             tags.forEach((t: any) => {
                 if (t.name && t.icon?.url && t.type === "Emoji") {
                     const img = `<img src='${t.icon.url}'">`;
-                    val = this.replaceAll(val, t.name, img);
+                    val = val.replaceAll(t.name, img);
                 }
             })
         }
