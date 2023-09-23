@@ -252,35 +252,23 @@ export class NodeCompRowHeader extends Div {
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
             if (!ast.isAnonUser && allowWideViewIcons) {
-
-                ddItems.push(new Li(null, null, [
-                    new Span("Text-to-Speech", {
-                        className: "dropdown-item",
-                        onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-                        onMouseOut: () => { S.quanta.selectedForTts = null; },
-                        onClick: async () => {
-                            if (getAs().speechSpeaking) {
-                                S.speech.stopSpeaking();
+                children.push(new Icon({
+                    className: "fa fa-volume-up fa-lg rowHeaderIcon",
+                    title: "Speech-to-Text (Read Aloud)",
+                    onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+                    onMouseOut: () => { S.quanta.selectedForTts = null; },
+                    onClick: async () => {
+                        if (getAs().speechSpeaking) {
+                            S.speech.stopSpeaking();
+                        }
+                        else {
+                            const content = this.getTextContent();
+                            if (content) {
+                                S.speech.speakText(content, false);
                             }
-                            else {
-                                const content = this.getTextContent();
-                                if (content) {
-                                    S.speech.speakText(content, false);
-                                }
-                            }
-                        },
-                    })
-                ]));
-
-                // Leaving in case I change my mind, but for now this option is under the Intelligence menu only
-                // ddItems.push(new Li(null, null, [
-                //     new Span("Ask AI", {
-                //         className: "dropdown-item",
-                //         onClick: async () => {
-                //             S.edit.askOpenAiQuestion(this.node.id);
-                //         }
-                //     })
-                // ]));
+                        }
+                    },
+                }));
             }
         }
 
