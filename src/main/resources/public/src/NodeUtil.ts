@@ -5,7 +5,6 @@ import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
-import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
@@ -301,11 +300,8 @@ export class NodeUtil {
                 // to open the user.
                 if (ac.principalNodeId) {
                     props = {
-                        onClick: (event: any) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            new UserProfileDlg(ac.principalNodeId).open();
-                        },
+                        [C.USER_ID_ATTR]: ac.principalNodeId,
+                        onClick: S.nav.clickToOpenUserProfile,
                         className: "sharingName clickable",
                         title
                     }

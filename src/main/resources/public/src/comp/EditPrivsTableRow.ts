@@ -1,19 +1,19 @@
+import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
-import { UserProfileDlg } from "../dlg/UserProfileDlg";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
+import { ListBoxRow } from "./ListBoxRow";
 import { Checkbox } from "./core/Checkbox";
 import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
-import { ListBoxRow } from "./ListBoxRow";
 
 export class EditPrivsTableRow extends ListBoxRow {
 
-    constructor(private shareNodeToUserFunc: Function, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(private shareNodeToUserFunc: (userName: string, allowAppends: boolean) => void, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super();
     }
 
@@ -61,9 +61,8 @@ export class EditPrivsTableRow extends ListBoxRow {
                         src ? new Img({
                             className: "friendListImage",
                             src,
-                            onClick: () => {
-                                new UserProfileDlg(this.aclEntry.principalNodeId).open();
-                            }
+                            [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
+                            onClick: S.nav.clickToOpenUserProfile
                         }) : null
                     ]) : null,
                     isPublic ? new Divc({ className: "friendListImgDiv centerChild" }, [
@@ -77,14 +76,12 @@ export class EditPrivsTableRow extends ListBoxRow {
                     isPublic ? new Div("Public (Everyone)", { className: "largeFont" })
                         : new Div(displayName, {
                             className: "friendName",
-                            onClick: () => {
-                                new UserProfileDlg(this.aclEntry.principalNodeId).open();
-                            }
+                            [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
+                            onClick: S.nav.clickToOpenUserProfile
                         }),
                     isPublic ? null : new Div(userNameDisp, {
-                        onClick: () => {
-                            new UserProfileDlg(this.aclEntry.principalNodeId).open();
-                        }
+                        [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
+                        onClick: S.nav.clickToOpenUserProfile
                     })
                 ])
             ])

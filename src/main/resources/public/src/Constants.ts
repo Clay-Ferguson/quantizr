@@ -11,6 +11,10 @@ export class Constants {
     // NOTE: Browsers can and DO fail sometimes if we don't have 'data-' as the prefix on any 'custom data attributes'
     // that aren't an official part of HTML Spec.
     static NODE_ID_ATTR = "data-nid";
+    static DOM_ID_ATTR = "data-domid";
+    static BOOSTOWNER_ID_ATTR = "data-boostowner";
+    static USER_ID_ATTR = "data-usrid";
+    static TAB_ID_ATTR = "data-tab";
     static WORD_ATTR = "data-word";
     static ARROW_OPTION_ATTR = "data-arrow-option";
 

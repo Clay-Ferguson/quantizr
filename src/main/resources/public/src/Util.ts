@@ -196,7 +196,7 @@ export class Util {
         return this.getFileTypeFormFileName(fileName) === "video";
     }
 
-    // todo-0: GPT-4 says this is a better method than the one I have below...
+    // todo-1: GPT-4 says this is a better method than the one we have below...
     // function buf2hex(buffer) {
     //     return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
     // }
@@ -1028,6 +1028,12 @@ export class Util {
             idx++;
         }
         return false;
+    }
+
+    getNodeFromEvent = (evt: Event): J.NodeInfo => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+        return S.nodeUtil.findNode(nodeId);
     }
 
     // Leave this at the END of the module since it makes calls to methods that might not be created at

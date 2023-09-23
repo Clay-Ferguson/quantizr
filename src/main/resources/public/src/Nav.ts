@@ -8,6 +8,7 @@ import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -658,7 +659,7 @@ export class Nav {
             FeedTab.inst.props.searchTextState.setValue("@" + userName);
         }
 
-        S.nav.messages({
+        this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterMyMentions: false,
@@ -767,5 +768,102 @@ export class Nav {
         else if (op === "collapse") {
             ast.expandedMenus.delete(menuName);
         }
+    }
+
+    jumpToNode = (evt: Event) => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (nodeId) {
+            S.view.jumpToId(nodeId);
+        }
+    }
+
+    showUsersList = (evt: Event) => {
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+        S.user.showUsersList(node);
+    }
+
+    showNodeUrl = (evt: Event) => {
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+        S.render.showNodeUrl(node);
+    }
+
+    showThread = (evt: Event) => {
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+        S.srch.showThread(node.id)
+    }
+
+    showReplies = (evt: Event) => {
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+        S.srch.showReplies(node);
+    }
+
+    ttsClick = (evt: Event) => {
+        if (getAs().speechSpeaking) {
+            S.speech.stopSpeaking();
+        }
+        else {
+            const domId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+            const elm = document.getElementById(domId);
+            const content = elm ? elm.textContent : null;
+
+            if (content) {
+                S.speech.speakText(content, false);
+            }
+        }
+    }
+
+    clickToOpenUserProfile = (evt: Event) => {
+        evt.stopPropagation();
+        evt.preventDefault();
+        // Note: It's correct that in some places we don't use USER_ID_ATTR, but instead use the
+        // null value for the userId. This is because we want to open the profile of the active user
+        const userId = S.domUtil.getPropFromDom(evt, C.USER_ID_ATTR);
+        new UserProfileDlg(userId).open();
+    }
+
+    clickSearchNode = (evt: Event) => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+        S.srch.clickSearchNode(nodeId);
+    }
+
+    searchByNodeIdClick = (evt: Event) => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+        this.runSearchByNodeId(nodeId);
+    }
+
+    runTimelineByClick = (evt: Event) => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+        this.runTimelineByNodeId(nodeId);
+    }
+
+    openDocViewByClick = (evt: Event) => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+        this.openDocumentViewById(nodeId);
+    }
+
+    copyNodeNameToClipboard = (evt: Event) => {
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+        const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
+        S.util.copyToClipboard(byNameUrl);
+        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+    }
+
+    jumpToTargetIdClick = (evt: Event) => {
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+
+        const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
+        if (!targetId) return;
+
+        S.view.jumpToId(targetId);
     }
 }

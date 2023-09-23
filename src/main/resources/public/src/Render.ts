@@ -16,6 +16,7 @@ import { Diva } from "./comp/core/Diva";
 import { Divc } from "./comp/core/Divc";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
+import { IconButton } from "./comp/core/IconButton";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
@@ -24,12 +25,10 @@ import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
-import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
-import { IconButton } from "./comp/core/IconButton";
 
 export class Render {
     private debug: boolean = false;
@@ -644,9 +643,8 @@ export class Render {
         return new Div("Boosted by " + displayName, {
             className: clazz,
             title: "Show Profile:\n\n" + node.owner,
-            onClick: () => {
-                new UserProfileDlg(node.ownerId).open();
-            }
+            [C.USER_ID_ATTR]: node.ownerId,
+            onClick: S.nav.clickToOpenUserProfile
         });
     }
 
@@ -680,11 +678,8 @@ export class Render {
             // For Transfer in Progress need a RED border here.
             className: "avatarImage",
             title: "User: @" + node.owner + "\n\nShow Profile",
-            // align: "left", // causes text to flow around
-
-            onClick: () => {
-                new UserProfileDlg(node.ownerId).open();
-            }
+            [C.USER_ID_ATTR]: node.ownerId,
+            onClick: S.nav.clickToOpenUserProfile
         });
     }
 

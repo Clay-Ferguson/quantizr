@@ -40,10 +40,14 @@ export class DocIndexPanel extends Div {
 
         let backToDocLink = null;
         if (ast.activeTab != C.TAB_DOCUMENT) {
-            backToDocLink = new Div("Back to Doc", { className: "backToDocLink float-end", onClick: () => S.tabUtil.selectTab(C.TAB_DOCUMENT) })
+            backToDocLink = new Div("Back to Doc", { className: "backToDocLink float-end", onClick: this.goToDocTab })
         }
         this.setChildren([backToDocLink, backToDocLink ? new Clearfix() : null, html]);
         return true;
+    }
+
+    goToDocTab = () => {
+        S.tabUtil.selectTab(C.TAB_DOCUMENT);
     }
 
     getLevelBullet = (level: number) => {

@@ -5,7 +5,6 @@ import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { DialogMode } from "../DialogBase";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
-import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
@@ -142,7 +141,8 @@ export class App extends Main {
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Span(ast.userName, {
                     className: "clickable",
-                    onClick: () => new UserProfileDlg(null).open()
+                    // NOTE: No data attribute here. Null opens our own profile
+                    onClick: S.nav.clickToOpenUserProfile
                 }) : null
             ]);
 

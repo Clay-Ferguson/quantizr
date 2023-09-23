@@ -1422,7 +1422,7 @@ export class Edit {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (dlg: EditNodeDlg, node: J.NodeInfo) => {
+    editNodeSharing = async (_dlg: EditNodeDlg, node: J.NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -1433,13 +1433,14 @@ export class Edit {
         await sharingDlg.open();
 
         // if not all the shares are mentioned in the text ask the user about putting them the content automatically
-        if (!dlg.areAllSharesInContent()) {
-            const confDlg = new ConfirmDlg("Insert Mentions into content text?", "Add Mentions ?");
-            await confDlg.open();
-            if (confDlg.yes) {
-                await dlg.addSharingToContentText();
-            }
-        }
+        // todo-1: i don't want this for now. I may never bring it back. Not sure if it even still works.
+        // if (!dlg.areAllSharesInContent()) {
+        //     const confDlg = new ConfirmDlg("Insert Mentions into content text?", "Add Mentions ?");
+        //     await confDlg.open();
+        //     if (confDlg.yes) {
+        //         await dlg.addSharingToContentText();
+        //     }
+        // }
     }
 
     /* Whenever we share an encrypted node to a another user, this is the final operation we run which
@@ -1576,5 +1577,71 @@ export class Edit {
         if (node == null || !node.children) return;
         node.children = node.children.filter(child => !nodesToDel.find(id => id === child?.id));
         node.children.forEach(child => this.recursiveDelete(nodesToDel, child));
+    }
+
+    replyToNode = (evt: Event) => {
+        const ast = getAs();
+        if (ast.isAnonUser) {
+            S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+        }
+        else {
+            const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+            if (!nodeId) return;
+
+            // Note: boostOwnerId can be null, this is not an error.
+            const boostOwnerId = S.domUtil.getPropFromDom(evt, C.BOOSTOWNER_ID_ATTR);
+
+            // when replying to a boost, we want to be able to additionally add to the sharing the person
+            // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
+            S.edit.addNode(boostOwnerId, nodeId, J.NodeType.COMMENT,
+                true, null, null, nodeId, null, true, false);
+        }
+    }
+
+    boostNode = (evt: Event) => {
+        if (getAs().isAnonUser) {
+            S.util.showMessage("Login to boost nodes.", "Login!");
+            return;
+        }
+
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+
+        S.edit.addNode(null, null, J.NodeType.COMMENT, false, null, null,
+            null, nodeId, false, false)
+    }
+
+    likeNodeClick = (evt: Event) => {
+        const ast = getAs();
+        if (ast.isAdminUser) {
+            S.util.showMessage("Admin user can't do Likes.", "Admin");
+            return;
+        }
+
+        if (ast.isAnonUser) {
+            S.util.showMessage("Login to like and create content.", "Login!");
+            return
+        }
+
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+
+        const youLiked = !!node.likes.find(u => u === ast.userName);
+        S.edit.likeNode(node, !youLiked);
+    }
+
+    addBookmarkClick = (evt: Event) => {
+        const domId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const elm = document.getElementById(domId);
+        let content = elm ? elm.textContent : null;
+
+        if (content && content.length > 50) {
+            content = content.substring(0, 50) + "...";
+        }
+
+        const node = S.util.getNodeFromEvent(evt);
+        if (!node) return;
+
+        S.edit.addBookmark(node, content);
     }
 }

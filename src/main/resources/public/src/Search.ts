@@ -553,6 +553,19 @@ export class Search {
         }
     }
 
+    clickHandler = (evt: Event) => {
+        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        if (!nodeId) return;
+        const node = S.nodeUtil.findNode(nodeId);
+        if (!node) return;
+        S.util.updateNodeHistory(node, true);
+
+        // after updating state we need this to ensure this click also focused this window.
+        const tabId = S.domUtil.getPropFromDom(evt, C.TAB_ID_ATTR);
+        if (!tabId) return;
+        S.domUtil.focusId(tabId);
+    }
+
     /*
      * Renders a single line of search results on the search results page
      */
@@ -642,12 +655,8 @@ export class Search {
             className: `${clazz} ${divClass} ${tabData.id}`,
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
             [C.NODE_ID_ATTR]: node.id,
-            onClick: async () => {
-                S.util.updateNodeHistory(node, true);
-
-                // after updating state we need this to ensure this click also focused this window.
-                S.domUtil.focusId(tabData.id);
-            }
+            [C.TAB_ID_ATTR]: tabData.id,
+            onClick: this.clickHandler
         };
 
         if (extraStyle) {

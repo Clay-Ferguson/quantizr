@@ -1,18 +1,18 @@
 import { getAs } from "../AppContext";
+import * as J from "../JavaIntf";
+import { FriendInfo } from "../JavaIntf";
+import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "../dlg/SelectTagsDlg";
-import { UserProfileDlg } from "../dlg/UserProfileDlg";
-import * as J from "../JavaIntf";
-import { FriendInfo } from "../JavaIntf";
-import { S } from "../Singletons";
+import { Constants as C } from "../Constants";
+import { ListBoxRow } from "./ListBoxRow";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./core/Checkbox";
 import { Divc } from "./core/Divc";
 import { FlexLayout } from "./core/FlexLayout";
 import { Icon } from "./core/Icon";
-import { ListBoxRow } from "./ListBoxRow";
 
 export class FriendsTableRow extends ListBoxRow {
 
@@ -56,7 +56,8 @@ export class FriendsTableRow extends ListBoxRow {
                 new Divc({ className: "friendListImgDivCont" }, [
                     new Divc({
                         className: "friendListImgDiv centerChild",
-                        onClick: () => new UserProfileDlg(this.friend.userNodeId).open(),
+                        [C.USER_ID_ATTR]: this.friend.userNodeId,
+                        onClick: S.nav.clickToOpenUserProfile,
                         title: "Click for Profile"
                     }, [
                         src ? new Img({
@@ -68,7 +69,8 @@ export class FriendsTableRow extends ListBoxRow {
 
                 new Div(null, {
                     className: "marginLeft marginTop",
-                    onClick: () => new UserProfileDlg(this.friend.userNodeId).open(),
+                    [C.USER_ID_ATTR]: this.friend.userNodeId,
+                    onClick: S.nav.clickToOpenUserProfile,
                     title: "Click for Profile"
                 }, [
                     this.friend.displayName ? new Div(this.friend.displayName, { className: "friendName" }) : null,

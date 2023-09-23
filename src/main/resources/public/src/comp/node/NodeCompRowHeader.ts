@@ -5,7 +5,6 @@ import { Icon } from "../../comp/core/Icon";
 import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
-import { UserProfileDlg } from "../../dlg/UserProfileDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
@@ -85,9 +84,8 @@ export class NodeCompRowHeader extends Div {
             children.push(new Span(displayName, {
                 className: (this.node.transferFromId ? "transferPending" : (isMine ? "createdByMe" : "createdByOther")),
                 title: "Show Profile:\n\n" + this.node.owner,
-                onClick: () => {
-                    new UserProfileDlg(this.node.ownerId).open();
-                }
+                [C.USER_ID_ATTR]: this.node.ownerId,
+                onClick: S.nav.clickToOpenUserProfile
             }, null, true));
         }
 
@@ -114,22 +112,18 @@ export class NodeCompRowHeader extends Div {
         // WARNING: Mastodon can't cope with the concept of replying to the actual booster node but only the booseted node,
         // do don't allow replying to boosts.
         if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
-            children.push(new Icon({
+            const iconProps = {
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg rowHeaderIcon",
-                onClick: () => {
-                    if (ast.isAnonUser) {
-                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
-                    }
-                    else {
-                        // when replying to a boost, we want to be able to additionally add to the sharing the person
-                        // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
+                [C.NODE_ID_ATTR]: this.node.id,
+                onClick: S.edit.replyToNode
+            }
 
-                        S.edit.addNode(this.boostingNode?.ownerId, this.node.id, NodeType.COMMENT,
-                            true, null, null, this.node.id, null, true, false);
-                    }
-                }
-            }));
+            if (this.boostingNode?.ownerId) {
+                iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
+            }
+
+            children.push(new Icon(iconProps));
         }
 
         if (showInfo) {
@@ -138,15 +132,8 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     title: "Boost this Node",
                     className: "fa fa-retweet fa-lg rowHeaderIcon",
-                    onClick: () => {
-                        if (ast.isAnonUser) {
-                            S.util.showMessage("Login to boost nodes.", "Login!");
-                        }
-                        else {
-                            S.edit.addNode(null, null, NodeType.COMMENT, false, null, null,
-                                null, this.node.id, false, false)
-                        }
-                    }
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.boostNode
                 }));
             }
 
@@ -168,19 +155,8 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     title: likeDisplay ? likeDisplay : "Like this Node",
                     className: "fa fa-star fa-lg rowHeaderIcon " + (youLiked ? "likedByMeIcon" : ""),
-                    onClick: () => {
-                        if (ast.isAdminUser) {
-                            S.util.showMessage("Admin user can't do Likes.", "Admin");
-                            return;
-                        }
-
-                        if (ast.isAnonUser) {
-                            S.util.showMessage("Login to like and create content.", "Login!");
-                        }
-                        else {
-                            S.edit.likeNode(this.node, !youLiked);
-                        }
-                    }
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.likeNodeClick
                 }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
             }
 
@@ -190,7 +166,8 @@ export class NodeCompRowHeader extends Div {
                 ddItems.push(new Li(null, null, [
                     new Span("People", {
                         className: "dropdown-item",
-                        onClick: () => S.user.showUsersList(this.node)
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.nav.showUsersList
                     })
                 ]));
             }
@@ -200,7 +177,8 @@ export class NodeCompRowHeader extends Div {
                     new Span("Links", {
                         className: "dropdown-item",
                         title: "Show URLs for this node",
-                        onClick: () => S.render.showNodeUrl(this.node)
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.nav.showNodeUrl
                     })
                 ]));
             }
@@ -210,14 +188,9 @@ export class NodeCompRowHeader extends Div {
                 ddItems.push(new Li(null, null, [
                     new Span("Bookmark", {
                         className: "dropdown-item",
-                        onClick: () => {
-                            let content = this.getTextContent();
-                            if (content && content.length > 50) {
-                                content = content.substring(0, 50) + "...";
-                            }
-
-                            S.edit.addBookmark(this.node, content);
-                        }
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        [C.DOM_ID_ATTR]: this.getContentDomId(),
+                        onClick: S.edit.addBookmarkClick
                     })
                 ]));
             }
@@ -234,7 +207,8 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     className: "fa fa-th-list fa-lg rowHeaderIcon",
                     title: "Show Thread History",
-                    onClick: () => S.srch.showThread(this.node.id)
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.showThread
                 }));
             }
 
@@ -243,7 +217,8 @@ export class NodeCompRowHeader extends Div {
                 ddItems.push(new Li(null, null, [
                     new Span("Show Replies", {
                         className: "dropdown-item",
-                        onClick: () => S.srch.showReplies(this.node)
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.nav.showReplies
                     })
                 ]));
             }
@@ -257,17 +232,8 @@ export class NodeCompRowHeader extends Div {
                     title: "Speech-to-Text (Read Aloud)",
                     onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                     onMouseOut: () => { S.quanta.selectedForTts = null; },
-                    onClick: async () => {
-                        if (getAs().speechSpeaking) {
-                            S.speech.stopSpeaking();
-                        }
-                        else {
-                            const content = this.getTextContent();
-                            if (content) {
-                                S.speech.speakText(content, false);
-                            }
-                        }
-                    },
+                    [C.DOM_ID_ATTR]: this.getContentDomId(),
+                    onClick: S.nav.ttsClick
                 }));
             }
         }
@@ -278,7 +244,8 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     title: "Jump To Node",
                     className: "fa fa-hand-o-right fa-lg rowHeaderIcon",
-                    onClick: () => S.srch.clickSearchNode(this.node.id)
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.clickSearchNode
                 }));
             }
             // for all other tabs bury the Jump to Node in the dropdown menu
@@ -286,7 +253,8 @@ export class NodeCompRowHeader extends Div {
                 ddItems.push(new Li(null, null, [
                     new Span("Jump to Node", {
                         className: "dropdown-item",
-                        onClick: () => S.srch.clickSearchNode(this.node.id)
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.nav.clickSearchNode
                     })
                 ]));
             }
@@ -296,21 +264,24 @@ export class NodeCompRowHeader extends Div {
             ddItems.push(new Li(null, null, [
                 new Span("Search", {
                     className: "dropdown-item",
-                    onClick: () => S.nav.runSearchByNodeId(this.node.id)
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.searchByNodeIdClick
                 })
             ]));
 
             ddItems.push(new Li(null, null, [
                 new Span("Timeline", {
                     className: "dropdown-item",
-                    onClick: () => S.nav.runTimelineByNodeId(this.node.id)
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.runTimelineByClick
                 })
             ]));
 
             ddItems.push(new Li(null, null, [
                 new Span("Document", {
                     className: "dropdown-item",
-                    onClick: () => S.nav.openDocumentViewById(this.node.id)
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.openDocViewByClick
                 })
             ]));
         }
@@ -356,14 +327,11 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (showInfo && this.node.name) {
-            const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(this.node);
             floatUpperRightDiv.addChild(new Span(this.node.name, {
                 className: "nodeNameDisp",
                 title: "Node name (Click to copy link to clipboard)",
-                onClick: () => {
-                    S.util.copyToClipboard(byNameUrl);
-                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                }
+                [C.NODE_ID_ATTR]: this.node.id,
+                onClick: S.nav.copyNodeNameToClipboard
             }));
         }
 
@@ -463,7 +431,8 @@ export class NodeCompRowHeader extends Div {
             if (targetId) {
                 jumpButton = new Icon({
                     className: "fa fa-arrow-right fa-lg buttonBarIcon",
-                    onClick: () => S.view.jumpToId(targetId),
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.jumpToTargetIdClick,
                     title: "Jump to Tree"
                 });
             }
