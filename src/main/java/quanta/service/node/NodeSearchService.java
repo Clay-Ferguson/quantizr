@@ -166,8 +166,11 @@ public class NodeSearchService extends ServiceBase {
         }
         // othwerwise we're searching all node properties
         else {
+            if (Constant.SEARCH_TYPE_LINKED_NODES.s().equals(req.getSearchType())) {
+                searchLinkedNodes(ms, req, res);
+            }
             /* USER Search */
-            if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
+            else if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
                     || Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
                     Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
                 userSearch(ms, null, req, searchResults);
@@ -208,6 +211,21 @@ public class NodeSearchService extends ServiceBase {
             }
         }
         return res;
+    }
+
+    private void searchLinkedNodes(MongoSession ms, NodeSearchRequest req, NodeSearchResponse res) {
+        int counter = 0;
+        for (SubNode node : read.getLinkedNodes(ms, req.getNodeId(), req.getSearchText())) {
+            try {
+                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
+                        false, false, false, false, true, null, false);
+                if (info != null) {
+                    res.getSearchResults().add(info);
+                }
+            } catch (Exception e) {
+                ExUtil.error(log, "Failed converting node", e);
+            }
+        }
     }
 
     private void userSearch(MongoSession ms, String userDoingAction, NodeSearchRequest req,

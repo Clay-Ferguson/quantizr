@@ -1,11 +1,10 @@
-import { asyncDispatch, dispatch, getAs, promiseDispatch } from "./AppContext";
+import { asyncDispatch, getAs, promiseDispatch } from "./AppContext";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
-import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
 import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
@@ -61,45 +60,6 @@ export class MenuPanel extends Div {
         if (ast.editNode) {
             S.view.jumpToId(ast.editNode.id);
         }
-    };
-
-    static setLinkSource = () => {
-        const node = S.nodeUtil.getHighlightedNode();
-        dispatch("setLinkSourceNodeId", s => {
-            if (node) {
-                s.linkSource = node.id;
-            }
-        });
-    };
-
-    static setLinkTarget = () => {
-        const node = S.nodeUtil.getHighlightedNode();
-        dispatch("setLinkTargetNodeId", s => {
-            if (node) {
-                s.linkTarget = node.id;
-            }
-        });
-    };
-
-    static linkNodes = () => {
-        dispatch("setLinkSourceNodeId", s => {
-            const node = S.nodeUtil.getHighlightedNode();
-            if (node) {
-                const sourceId = s.linkSource;
-                const targetId = s.linkTarget;
-
-                const run = async () => {
-                    const dlg = new AskNodeLinkNameDlg();
-                    await dlg.open();
-                    if (dlg.nameEntered) {
-                        S.edit.linkNodes(sourceId, targetId, dlg.nameEntered, "forward-link");
-                    }
-                };
-                run();
-            }
-            s.linkSource = null;
-            s.linkTarget = null;
-        });
     };
 
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
@@ -444,10 +404,10 @@ export class MenuPanel extends Div {
                 new MenuItem("Node Stats", onMainTab && MenuPanel.nodeStats) //
             ], null));
 
-            children.push(new Menu("Shortcuts", [
-                new MenuItem("Set Link Source", MenuPanel.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
-                new MenuItem("Set Link Target", MenuPanel.setLinkTarget, onMainTab && ast.userPrefs.editMode, null, true), //
-                new MenuItem("Link Nodes", MenuPanel.linkNodes, onMainTab && ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget, null, true)
+            children.push(new Menu("RDF Triple", [
+                new MenuItem("Set Subject", S.edit.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
+                new MenuItem("Set Object", S.edit.setLinkTarget, onMainTab && ast.userPrefs.editMode, null, true), //
+                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget, null, true)
             ]));
         }
 

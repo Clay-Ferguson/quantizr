@@ -150,10 +150,10 @@ export class Render {
         const ast = getAs();
         let linkText = null;
         if (id === ast.linkSource) {
-            linkText = "Link Source";
+            linkText = "RDF Subject";
         }
         else if (id === ast.linkTarget) {
-            linkText = "Link Target";
+            linkText = "RDF Object";
         }
         return linkText ? new Div(linkText, {
             className: "linkLabel",
@@ -804,23 +804,20 @@ export class Render {
 
         const linkComps: CompIntf[] = [];
         if (node.links) {
+            const nameSet: Set<string> = new Set();
             Object.keys(node.links).forEach(key => {
-                const nodeId = node.links[key].i; // i == nodeId
                 const linkName = node.links[key].n;
-                linkComps.push(new Span(linkName, {
-                    title: "Click to Open (CRTL+CLICK for new Browser Tab)",
-                    className: "nodeLink",
-                    onClick: () => {
-                        // if CTRL key down open in separate browser tab
-                        if (S.util.ctrlKeyCheck()) {
-                            window.open(window.location.origin + "?id=" + nodeId, "_blank");
+                if (!nameSet.has(linkName)) {
+                    nameSet.add(linkName);
+                    linkComps.push(new Span(linkName, {
+                        title: "Click to Find Objects",
+                        className: "nodeLink",
+                        onClick: () => {
+                            S.srch.search(node, null, linkName, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + linkName, null, false,
+                                false, 0, true, null, null, false, false, false);
                         }
-                        // else open node in the current browser.
-                        else {
-                            S.view.jumpToId(nodeId);
-                        }
-                    }
-                }));
+                    }));
+                }
             });
         }
         return linkComps.length > 0 ? new Divc({ className: "linksPanel" }, linkComps) : null;

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -922,6 +924,26 @@ public class MongoRead extends ServiceBase {
             }
             return opsw.find(ms, q);
         }
+    }
+
+    public Iterable<SubNode> getLinkedNodes(MongoSession ms, String nodeId, String search) {
+        SubNode node = getNode(ms, nodeId);
+
+        List<ObjectId> nodeIds = new LinkedList<>();
+        HashMap<String, NodeLink> links = node.getLinks();
+        for (Map.Entry<String, NodeLink> entry : links.entrySet()) {
+            NodeLink lnk = entry.getValue();
+            if (lnk.getName().equals(search)) {
+                nodeIds.add(new ObjectId(lnk.getNodeId()));
+            }
+        }
+
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.ID).in(nodeIds);
+        crit = auth.addReadSecurity(ms, crit);
+        q.addCriteria(crit);
+        q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
+        return opsw.find(ms, q);
     }
 
     /**

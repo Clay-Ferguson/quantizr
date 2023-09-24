@@ -1200,6 +1200,7 @@ export const enum Constant {
     SEARCH_TYPE_USER_LOCAL = "userLocal",
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",
+    SEARCH_TYPE_LINKED_NODES = "linkedNodes",
     ENC_TAG = "<[ENC]>",
     FEED_NEW = "myNewMessages",
     FEED_PUB = "publicFediverse",

@@ -90,8 +90,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         this.addPaginationBar(children, false, this.allowTopMoreButton, true);
 
         let i = 0;
-        const jumpButton = ast.isAdminUser || !this.data.props.searchType;
-
         results.forEach(node => {
             if (ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
             if (ast.editNode && ast.editNode.id === node.id && ast.editNodeOnTab === this.data.id) {
@@ -99,7 +97,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                     new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
             }
             else {
-                const c = this.renderItem(node, i, rowCount, jumpButton);
+                const c = this.renderItem(node, i, rowCount, true);
                 if (c) {
                     if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
                         S.domUtil.setNodeDragHandler(c.attribs, node.id);

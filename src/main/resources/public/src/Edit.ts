@@ -4,6 +4,7 @@ import { Comp } from "./comp/base/Comp";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
+import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
 import { ConfigureGptPromptDlg } from "./dlg/ConfigureGptPromptDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
@@ -1644,4 +1645,59 @@ export class Edit {
 
         S.edit.addBookmark(node, content);
     }
+
+    setLinkSource = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        dispatch("setLinkSourceNodeId", s => {
+            if (node) {
+                s.linkSource = node.id;
+            }
+        });
+    };
+
+    setLinkTarget = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        dispatch("setLinkTargetNodeId", s => {
+            if (node) {
+                s.linkTarget = node.id;
+            }
+        });
+    };
+
+    linkNodesClick = () => {
+        dispatch("setLinkSourceNodeId", s => {
+            const node = S.nodeUtil.getHighlightedNode();
+            if (node) {
+                const sourceId = s.linkSource;
+                const targetId = s.linkTarget;
+
+                if (!sourceId) {
+                    S.util.showMessage("Please select a Subject Node.");
+                    return;
+                }
+
+                if (!targetId) {
+                    S.util.showMessage("Please select an Object Node.");
+                    return;
+                }
+
+                if (sourceId === targetId) {
+                    S.util.showMessage("Subject and Object nodes cannot be the same.");
+                    return;
+                }
+
+                const run = async () => {
+                    const dlg = new AskNodeLinkNameDlg();
+                    await dlg.open();
+                    if (dlg.nameEntered) {
+                        this.linkNodes(sourceId, targetId, dlg.nameEntered, "forward-link");
+                    }
+                };
+                run();
+            }
+            s.linkSource = null;
+            s.linkTarget = null;
+        });
+    };
+
 }

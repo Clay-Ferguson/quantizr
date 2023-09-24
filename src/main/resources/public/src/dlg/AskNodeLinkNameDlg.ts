@@ -14,14 +14,14 @@ export class AskNodeLinkNameDlg extends DialogBase {
     ]);
 
     constructor() {
-        super("Node Link Name", "appModalContNarrowWidth");
+        super("RDF Predicate", "appModalContNarrowWidth");
         this.validatedStates = [this.nameState];
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Diva([
-                new TextField({ label: "Name", val: this.nameState })
+                new TextField({ label: "Predicate", val: this.nameState })
             ]),
             new ButtonBar([
                 new Button("Ok", this.save, null, "btn-primary"),
