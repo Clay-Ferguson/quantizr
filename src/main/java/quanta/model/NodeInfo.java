@@ -39,7 +39,7 @@ public class NodeInfo {
     private String type;
     private List<PropertyInfo> properties;
     private HashMap<String, Attachment> attachments;
-    private HashMap<String, NodeLink> links;
+    private List<NodeLink> links;
     /*
      * Holds information that the server needs to send back to the client to support client features,
      * but that are not actually stored properties on the actual node
@@ -78,7 +78,7 @@ public class NodeInfo {
 
     public NodeInfo(String id, String path, String name, String content, String renderContent, String tags,
             String displayName, String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified,
-            List<PropertyInfo> properties, HashMap<String, Attachment> attachments, HashMap<String, NodeLink> links,
+            List<PropertyInfo> properties, HashMap<String, Attachment> attachments, List<NodeLink> links,
             List<AccessControlInfo> ac, List<String> likes, boolean hasChildren, String type, long logicalOrdinal,
             boolean lastChild, String cipherKey, String avatarVer, String apAvatar, String apImage) {
         this.id = id;
@@ -213,7 +213,7 @@ public class NodeInfo {
         return this.attachments;
     }
 
-    public HashMap<String, NodeLink> getLinks() {
+    public List<NodeLink> getLinks() {
         return this.links;
     }
 
@@ -337,7 +337,7 @@ public class NodeInfo {
         this.attachments = attachments;
     }
 
-    public void setLinks(final HashMap<String, NodeLink> links) {
+    public void setLinks(final List<NodeLink> links) {
         this.links = links;
     }
 

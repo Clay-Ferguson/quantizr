@@ -158,10 +158,10 @@ public class SubNode {
     @JsonIgnore
     private Object linksLock = new Object();
 
-    public static final String LINKS = "lnk";
+    public static final String LINKS = "rdf";
 
     @Field(LINKS)
-    private HashMap<String, NodeLink> links;
+    private List<NodeLink> links;
 
     @Transient
     @JsonIgnore
@@ -512,14 +512,14 @@ public class SubNode {
     }
 
     @JsonProperty(LINKS)
-    public HashMap<String, NodeLink> getLinks() {
+    public List<NodeLink> getLinks() {
         synchronized (linksLock) {
             return links;
         }
     }
 
     @JsonProperty(LINKS)
-    public void setLinks(HashMap<String, NodeLink> links) {
+    public void setLinks(List<NodeLink> links) {
         if (links == null && this.links == null)
             return;
         ThreadLocals.dirty(this);
@@ -530,17 +530,28 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public void addLink(String key, NodeLink link) {
+    public void addLink(NodeLink link) {
         synchronized (linksLock) {
             if (links == null) {
-                links = new HashMap<>();
+                links = new LinkedList<>();
+            } else {
+                if (linkExists(link))
+                    return;
             }
-            if (key == null) {
-                key = "k" + links.size();
-            }
-            links.put(key, link);
+            links.add(link);
             ThreadLocals.dirty(this);
         }
+    }
+
+    public boolean linkExists(NodeLink link) {
+        if (links == null || link == null)
+            return false;
+        for (NodeLink lnk : links) {
+            if (link.getName().equals(lnk.getName()) && link.getNodeId().equals(lnk.getNodeId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Transient

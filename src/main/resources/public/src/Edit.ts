@@ -1699,5 +1699,4 @@ export class Edit {
             s.linkTarget = null;
         });
     };
-
 }

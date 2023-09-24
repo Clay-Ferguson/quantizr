@@ -1145,7 +1145,7 @@ public class NodeEditService extends ServiceBase {
             NodeLink link = new NodeLink();
             link.setNodeId(req.getTargetNodeId());
             link.setName(req.getName());
-            sourceNode.addLink(null, link);
+            sourceNode.addLink(link);
         }
         return res;
     }

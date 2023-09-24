@@ -930,9 +930,8 @@ public class MongoRead extends ServiceBase {
         SubNode node = getNode(ms, nodeId);
 
         List<ObjectId> nodeIds = new LinkedList<>();
-        HashMap<String, NodeLink> links = node.getLinks();
-        for (Map.Entry<String, NodeLink> entry : links.entrySet()) {
-            NodeLink lnk = entry.getValue();
+        List<NodeLink> links = node.getLinks();
+        for (NodeLink lnk : links) {
             if (lnk.getName().equals(search)) {
                 nodeIds.add(new ObjectId(lnk.getNodeId()));
             }
@@ -940,6 +939,15 @@ public class MongoRead extends ServiceBase {
 
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.ID).in(nodeIds);
+        crit = auth.addReadSecurity(ms, crit);
+        q.addCriteria(crit);
+        q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
+        return opsw.find(ms, q);
+    }
+
+    public Iterable<SubNode> getRdfSubjects(MongoSession ms, String nodeId) {
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.LINKS).elemMatch(Criteria.where(NodeLink.ID).is(nodeId));
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));

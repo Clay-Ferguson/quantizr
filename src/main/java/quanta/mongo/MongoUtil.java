@@ -29,6 +29,7 @@ import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
+import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -583,6 +584,7 @@ public class MongoUtil extends ServiceBase {
         // account)
         createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.OBJECT_ID.s());
         createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
+        createPartialIndex(ms, "rdf-i", SubNode.class, SubNode.LINKS + "." + NodeLink.ID);
         createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),
                 NodeType.ACCOUNT.s());
         /*

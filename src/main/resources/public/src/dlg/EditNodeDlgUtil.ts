@@ -519,27 +519,22 @@ an upload has been added or removed.
         let hasLinks = false;
         const linkComps: CompIntf[] = [];
         if (ast.editNode.links) {
-            linkComps.push(new Span("Links: ", { className: "linksPrompt" }));
-            Object.keys(ast.editNode.links).forEach(key => {
+            linkComps.push(new Span("RDF: ", { className: "linksPrompt" }));
+            ast.editNode.links.forEach((link: J.NodeLink) => {
                 hasLinks = true;
-                const linkName = ast.editNode.links[key].n;
-                linkComps.push(new Span(linkName, {
+                linkComps.push(new Span(link.name, {
                     className: "nodeLink",
                     title: "Click to Remove Link",
-                    onClick: () => this.removeNodeLink(linkName)
+                    onClick: () => this.removeNodeLink(link.name)
                 }));
             });
         }
         return hasLinks ? new Divc({ className: "linksPanelInEditor" }, linkComps) : null;
     }
 
-    removeNodeLink = (nodeName: string): void => {
+    removeNodeLink = (name: string): void => {
         const ast = getAs();
-        Object.keys(ast.editNode.links).forEach(key => {
-            if (ast.editNode.links[key].n === nodeName) {
-                delete ast.editNode.links[key];
-            }
-        });
+        ast.editNode.links = ast.editNode.links.filter(link => link.name !== name);
         S.edit.updateNode(ast.editNode);
     }
 }

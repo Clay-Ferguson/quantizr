@@ -10,6 +10,7 @@ public enum Constant {
     SEARCH_TYPE_USER_ALL("userAll"), //
     SEARCH_TYPE_USER_FOREIGN("userForeign"), //
     SEARCH_TYPE_LINKED_NODES("linkedNodes"), //
+    SEARCH_TYPE_RDF_SUBJECTS("rdfSubjects"), //
     ENC_TAG("<[ENC]>"), //
     FEED_NEW("myNewMessages"), //
     FEED_PUB("publicFediverse"), //

@@ -729,4 +729,14 @@ export class Search {
 
         this.findSharedNodes(focusNode, 0, type, shareTarget, accessOption);
     }
+
+    findRdfSubjects = () => {
+        dispatch("findRdfSubjects", _s => {
+            const node = S.nodeUtil.getHighlightedNode();
+            if (node) {
+                S.srch.search(node, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RFF Subjects", null, false,
+                    false, 0, true, null, null, false, false, false);
+            }
+        });
+    };
 }

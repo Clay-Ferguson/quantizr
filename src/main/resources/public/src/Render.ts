@@ -805,15 +805,14 @@ export class Render {
         const linkComps: CompIntf[] = [];
         if (node.links) {
             const nameSet: Set<string> = new Set();
-            Object.keys(node.links).forEach(key => {
-                const linkName = node.links[key].n;
-                if (!nameSet.has(linkName)) {
-                    nameSet.add(linkName);
-                    linkComps.push(new Span(linkName, {
+            node.links.forEach((link: J.NodeLink) => {
+                if (!nameSet.has(link.name)) {
+                    nameSet.add(link.name);
+                    linkComps.push(new Span(link.name, {
                         title: "Click to Find Objects",
                         className: "nodeLink",
                         onClick: () => {
-                            S.srch.search(node, null, linkName, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + linkName, null, false,
+                            S.srch.search(node, null, link.name, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + link.name, null, false,
                                 false, 0, true, null, null, false, false, false);
                         }
                     }));

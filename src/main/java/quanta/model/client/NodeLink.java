@@ -1,5 +1,6 @@
 package quanta.model.client;
 
+import org.springframework.data.mongodb.core.mapping.Field;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -8,39 +9,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NodeLink {
+    public static final String ID = "id";
+    public static final String NAME = "name";
 
-    private Integer ordinal = 0;
+    @Field(ID)
     private String nodeId;
+
+    @Field(NAME)
     private String name;
 
     public NodeLink() {}
 
-    @JsonProperty("o")
-    public Integer getOrdinal() {
-        return ordinal;
-    }
-
-    @JsonProperty("o")
-    public void setOrdinal(Integer ordinal) {
-        this.ordinal = ordinal;
-    }
-
-    @JsonProperty("i")
+    @JsonProperty(ID)
     public String getNodeId() {
         return nodeId;
     }
 
-    @JsonProperty("i")
+    @JsonProperty(ID)
     public void setNodeId(String nodeId) {
         this.nodeId = nodeId;
     }
 
-    @JsonProperty("n")
+    @JsonProperty(NAME)
     public String getName() {
         return name;
     }
 
-    @JsonProperty("n")
+    @JsonProperty(NAME)
     public void setName(String name) {
         this.name = name;
     }

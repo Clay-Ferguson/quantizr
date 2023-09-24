@@ -401,13 +401,15 @@ export class MenuPanel extends Div {
                 new MenuItem("Show Raw Data", MenuPanel.showRawData, onMainTab && selNodeIsMine, null, true), //
                 ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson, onMainTab, null, true) : null, //
                 new MenuItemSeparator(), //
-                new MenuItem("Node Stats", onMainTab && MenuPanel.nodeStats) //
+                new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab) //
             ], null));
 
             children.push(new Menu("RDF Triple", [
                 new MenuItem("Set Subject", S.edit.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
                 new MenuItem("Set Object", S.edit.setLinkTarget, onMainTab && ast.userPrefs.editMode, null, true), //
-                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget, null, true)
+                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget, null, true), //
+                new MenuItemSeparator(), //
+                new MenuItem("Find Subjects", S.srch.findRdfSubjects, onMainTab) //
             ]));
         }
 

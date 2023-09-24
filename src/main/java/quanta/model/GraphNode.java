@@ -1,11 +1,10 @@
 package quanta.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.data.annotation.Transient;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import quanta.model.client.NodeLink;
 
 public class GraphNode {
@@ -17,9 +16,9 @@ public class GraphNode {
     private String path;
     private List<GraphNode> children;
     private HashSet<String> childIds;
-    private HashMap<String, NodeLink> links;
+    private List<NodeLink> links;
 
-    public GraphNode(String id, String name, String path, int level, boolean highlight, HashMap<String, NodeLink> links) {
+    public GraphNode(String id, String name, String path, int level, boolean highlight, List<NodeLink> links) {
         this.id = id;
         this.name = name;
         this.path = path;
@@ -29,7 +28,8 @@ public class GraphNode {
     }
 
     public void addChild(GraphNode child) {
-        if (childIds != null && childIds.contains(child.getId())) return;
+        if (childIds != null && childIds.contains(child.getId()))
+            return;
         if (children == null) {
             children = new LinkedList<>();
         }
@@ -80,7 +80,7 @@ public class GraphNode {
         return this.children;
     }
 
-    public HashMap<String, NodeLink> getLinks() {
+    public List<NodeLink> getLinks() {
         return this.links;
     }
 
@@ -104,7 +104,7 @@ public class GraphNode {
         this.children = children;
     }
 
-    public void setLinks(final HashMap<String, NodeLink> links) {
+    public void setLinks(final List<NodeLink> links) {
         this.links = links;
     }
 

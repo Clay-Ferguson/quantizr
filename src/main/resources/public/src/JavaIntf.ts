@@ -78,9 +78,8 @@ export interface MFSDirEntry {
 }
 
 export interface NodeLink {
-    o: number;
-    i: string;
-    n: string;
+    id: string;
+    name: string;
 }
 
 export interface OpenGraph {
@@ -1124,7 +1123,7 @@ export interface NodeInfo {
     type: string;
     properties: PropertyInfo[];
     attachments: { [index: string]: Attachment };
-    links: { [index: string]: NodeLink };
+    links: NodeLink[];
     clientProps: PropertyInfo[];
     ac: AccessControlInfo[];
     hasChildren: boolean;
@@ -1173,7 +1172,7 @@ export interface GraphNode {
     highlight: boolean;
     name: string;
     children: GraphNode[];
-    links: { [index: string]: NodeLink };
+    links: NodeLink[];
 }
 
 export interface CalendarItem {
@@ -1201,6 +1200,7 @@ export const enum Constant {
     SEARCH_TYPE_USER_ALL = "userAll",
     SEARCH_TYPE_USER_FOREIGN = "userForeign",
     SEARCH_TYPE_LINKED_NODES = "linkedNodes",
+    SEARCH_TYPE_RDF_SUBJECTS = "rdfSubjects",
     ENC_TAG = "<[ENC]>",
     FEED_NEW = "myNewMessages",
     FEED_PUB = "publicFediverse",

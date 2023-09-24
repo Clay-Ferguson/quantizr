@@ -168,6 +168,9 @@ public class NodeSearchService extends ServiceBase {
         else {
             if (Constant.SEARCH_TYPE_LINKED_NODES.s().equals(req.getSearchType())) {
                 searchLinkedNodes(ms, req, res);
+            } //
+            else if (Constant.SEARCH_TYPE_RDF_SUBJECTS.s().equals(req.getSearchType())) {
+                searchRdfSubjects(ms, req, res);
             }
             /* USER Search */
             else if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
@@ -216,6 +219,21 @@ public class NodeSearchService extends ServiceBase {
     private void searchLinkedNodes(MongoSession ms, NodeSearchRequest req, NodeSearchResponse res) {
         int counter = 0;
         for (SubNode node : read.getLinkedNodes(ms, req.getNodeId(), req.getSearchText())) {
+            try {
+                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
+                        false, false, false, false, true, null, false);
+                if (info != null) {
+                    res.getSearchResults().add(info);
+                }
+            } catch (Exception e) {
+                ExUtil.error(log, "Failed converting node", e);
+            }
+        }
+    }
+
+    private void searchRdfSubjects(MongoSession ms, NodeSearchRequest req, NodeSearchResponse res) {
+        int counter = 0;
+        for (SubNode node : read.getRdfSubjects(ms, req.getNodeId())) {
             try {
                 NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
                         false, false, false, false, true, null, false);
