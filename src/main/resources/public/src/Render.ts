@@ -234,7 +234,6 @@ export class Render {
 
         dispatch("ShowCalendar", s => {
             s.fullScreenConfig = { type: FullScreenType.CALENDAR, nodeId };
-            if (res) console.log("has res");
             s.calendarData = S.util.buildCalendarData(res.items);
         });
     }

@@ -79,7 +79,7 @@ export class FullScreenCalendar extends Main {
                         }
                     }
                 }
-            }, null)
+            })
         ]);
     }
 
