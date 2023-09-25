@@ -1655,33 +1655,19 @@ export class Edit {
         });
     };
 
-    setLinkTarget = () => {
-        const node = S.nodeUtil.getHighlightedNode();
-        dispatch("setLinkTargetNodeId", s => {
-            if (node) {
-                s.linkTarget = node.id;
-            }
-        });
-    };
 
     linkNodesClick = () => {
         dispatch("setLinkSourceNodeId", s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 const sourceId = s.linkSource;
-                const targetId = s.linkTarget;
 
                 if (!sourceId) {
                     S.util.showMessage("Please select a Subject Node.");
                     return;
                 }
 
-                if (!targetId) {
-                    S.util.showMessage("Please select an Object Node.");
-                    return;
-                }
-
-                if (sourceId === targetId) {
+                if (sourceId === node.id) {
                     S.util.showMessage("Subject and Object nodes cannot be the same.");
                     return;
                 }
@@ -1690,13 +1676,12 @@ export class Edit {
                     const dlg = new AskNodeLinkNameDlg();
                     await dlg.open();
                     if (dlg.nameEntered) {
-                        this.linkNodes(sourceId, targetId, dlg.nameEntered, "forward-link");
+                        this.linkNodes(sourceId, node.id, dlg.nameEntered, "forward-link");
                     }
                 };
                 run();
             }
             s.linkSource = null;
-            s.linkTarget = null;
         });
     };
 }

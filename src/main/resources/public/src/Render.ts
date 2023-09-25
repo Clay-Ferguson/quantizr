@@ -152,9 +152,6 @@ export class Render {
         if (id === ast.linkSource) {
             linkText = "RDF Subject";
         }
-        else if (id === ast.linkTarget) {
-            linkText = "RDF Object";
-        }
         return linkText ? new Div(linkText, {
             className: "linkLabel",
             title: "Choose 'Link Nodes' after you pick Source & Target"

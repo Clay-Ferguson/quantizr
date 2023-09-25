@@ -406,10 +406,9 @@ export class MenuPanel extends Div {
 
             children.push(new Menu("RDF Triple", [
                 new MenuItem("Set Subject", S.edit.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
-                new MenuItem("Set Object", S.edit.setLinkTarget, onMainTab && ast.userPrefs.editMode, null, true), //
-                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource && !!ast.linkTarget, null, true), //
+                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource), //
                 new MenuItemSeparator(), //
-                new MenuItem("Find Subjects", S.srch.findRdfSubjects, onMainTab) //
+                new MenuItem("Find Subjects", S.srch.findRdfSubjects, onMainTab, null, true) //
             ]));
         }
 
