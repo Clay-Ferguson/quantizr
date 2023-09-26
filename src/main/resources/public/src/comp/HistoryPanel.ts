@@ -1,4 +1,4 @@
-import { getAs } from "../AppContext";
+import { dispatch, getAs } from "../AppContext";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
@@ -30,7 +30,11 @@ export class HistoryPanel extends Div {
         children.push(new Diva([
             new Span("History", { className: "historyPanelTitle" }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
-                setValue: (checked: boolean) => ast.nodeHistoryLocked = checked,
+                setValue: (checked: boolean) => {
+                    dispatch("historyLockChanged", s => {
+                        s.nodeHistoryLocked = checked;
+                    })
+                },
                 getValue: (): boolean => ast.nodeHistoryLocked
             }, "form-switch formCheckInlineNoMargin")
         ]));
