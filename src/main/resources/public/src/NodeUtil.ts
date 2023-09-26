@@ -83,8 +83,6 @@ export class NodeUtil {
         }
 
         if (!ust.isAnonUser) {
-            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, ust.node.id);
-            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
             S.util.updateHistory(node);
         }
 

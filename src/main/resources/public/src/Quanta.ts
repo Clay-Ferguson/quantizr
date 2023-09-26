@@ -301,36 +301,20 @@ export class Quanta {
 
         /* set ID to be the page we want to show user right after login */
         let id: string = null;
-        let childId: string = null;
         const ast = getAs();
 
         if (S.quanta.config.initialNodeId) {
             id = S.quanta.config.initialNodeId;
             S.quanta.config.initialNodeId = null;
-
-            const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
-
-            // if server is instructing the initial page load to just go to ":home" we know we
-            // should override that with the actua last node the usere was browsing if we can
-            if (id == ":home" && lastNode != null) {
-                id = lastNode;
-            }
         } //
         else {
-            const lastNode = await S.localDB.getVal(C.LOCALDB_LAST_PARENT_NODEID);
-
-            if (lastNode) {
-                id = lastNode;
-                childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
-            } else {
-                id = ast.userProfile?.userNodeId;
-            }
+            id = ast.userProfile?.userNodeId;
         }
 
         await S.view.refreshTree({
             nodeId: id,
             zeroOffset: true,
-            highlightId: childId,
+            highlightId: null,
             forceIPFSRefresh: false,
             scrollToTop: false,
             allowScroll: true,

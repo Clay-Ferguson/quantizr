@@ -77,9 +77,6 @@ export class User {
 
             if (res?.code == C.RESPONSE_CODE_OK) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-                if (!S.quanta.config.initialNodeId) {
-                    S.quanta.config.initialNodeId = ":home";
-                }
             }
 
             if (usingCredentials) {
@@ -95,9 +92,6 @@ export class User {
         catch (e) {
             S.util.logErr(e);
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
-            if (!S.quanta.config.initialNodeId) {
-                S.quanta.config.initialNodeId = ":home";
-            }
         }
     }
 

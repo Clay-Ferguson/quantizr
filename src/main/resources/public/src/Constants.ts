@@ -94,11 +94,6 @@ export class Constants {
     static readonly LOCALDB_LOGIN_STATE: string = "loginState";
     static readonly LOCALDB_MOBILE_MODE: string = "mobileMode";
 
-    /* These two persist what the user is viewing so when the come back later we can go to same node
-     location they were last viewing */
-    static readonly LOCALDB_LAST_PARENT_NODEID: string = "lastParentId";
-    static readonly LOCALDB_LAST_CHILD_NODEID: string = "lastChildId";
-
     static readonly LOCALDB_AUDIO_SOURCE: string = "audioSource";
     static readonly LOCALDB_VIDEO_SOURCE: string = "videoSource";
 

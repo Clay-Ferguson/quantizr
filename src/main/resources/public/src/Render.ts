@@ -492,8 +492,6 @@ export class Render {
                     if (s.node && !s.isAnonUser) {
                         // do this async just for performance
                         setTimeout(() => {
-                            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
-                            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNode?.id);
                             S.util.updateHistory(targetNode);
                         }, 10);
                     }

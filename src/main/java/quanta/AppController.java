@@ -269,6 +269,7 @@ public class AppController extends ServiceBase implements ErrorController {
         String _id = id;
         boolean _hasUrlId = hasUrlId;
         boolean _isHomeNodeRequest = isHomeNodeRequest;
+        ClientConfig config = new ClientConfig();
         arun.run(as -> {
             SubNode node = null;
             try {
@@ -283,10 +284,10 @@ public class AppController extends ServiceBase implements ErrorController {
                 sc.setUrlIdFailMsg("Unable to access node: " + _id);
                 ExUtil.warn(log, "Unable to access node: " + _id, e);
             }
+
             if (node != null) {
                 if (_hasUrlId) {
-                    // todo-2: should this always be set even when we used ":home" above?
-                    sc.setInitialNodeId(_id);
+                    config.setInitialNodeId(_id);
                 }
                 if (AclService.isPublic(node)) {
                     render.populateSocialCardProps(node, model);
@@ -300,7 +301,6 @@ public class AppController extends ServiceBase implements ErrorController {
             sc.setUserMsg(user.processSignupCode(signupCode));
         }
 
-        ClientConfig config = new ClientConfig();
         loadConfig(config);
         config.setSearch(search);
         config.setLogin(login);
@@ -1394,9 +1394,10 @@ public class AppController extends ServiceBase implements ErrorController {
             res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
             // we only need to display this once so remove it.
             sc.setUrlIdFailMsg(null);
+
+            // todo-0: shouldn't these sc values be st back to null here?
             res.setUserMsg(sc.getUserMsg());
             res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
-            res.setInitialNodeId(sc.getInitialNodeId());
         }
         res.setConfig(prop.getConfig());
         res.setBrandingAppName(prop.getConfigText("brandingAppName"));

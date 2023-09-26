@@ -21,7 +21,6 @@ public class SessionContext {
     private String urlIdFailMsg;
     private String userMsg;
     private String displayUserProfileId;
-    private String initialNodeId;
     private String pubSigKeyJson;
 
     private boolean live = true;
@@ -240,14 +239,6 @@ public class SessionContext {
 
     public void setDisplayUserProfileId(String displayUserProfileId) {
         this.displayUserProfileId = displayUserProfileId;
-    }
-
-    public String getInitialNodeId() {
-        return initialNodeId;
-    }
-
-    public void setInitialNodeId(String initialNodeId) {
-        this.initialNodeId = initialNodeId;
     }
 
     public String getCommand() {
