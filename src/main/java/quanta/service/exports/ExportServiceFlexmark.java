@@ -1,5 +1,19 @@
 package quanta.service.exports;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -10,19 +24,6 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
@@ -265,9 +266,25 @@ public class ExportServiceFlexmark extends ServiceBase {
                 lev = 6;
             content = edit.translateHeadingsForLevel(session, content, lev);
         }
+
+        content = insertPropertySubstitutions(content, node);
+
         markdown.append(content);
         markdown.append("\n");
         writeImages(node);
+    }
+
+    private String insertPropertySubstitutions(String content, SubNode node) {
+        HashMap<String, Object> propMap = node.getProps();
+        if (propMap != null && propMap.keySet() != null) {
+            for (String propName : propMap.keySet()) {
+                Object val = propMap.get(propName);
+                if (val instanceof String sval) {
+                    content = content.replace("{{" + propName + "}}", sval);
+                }
+            }
+        }
+        return content;
     }
 
     private void writeImages(SubNode node) {
