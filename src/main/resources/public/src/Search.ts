@@ -168,12 +168,13 @@ export class Search {
             return;
         }
         this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
-            J.NodeProp.PRIORITY_FULL, "asc", true, false, false);
+            J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false);
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
-        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean): Promise<boolean> => {
+        sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
+        jumpIfSingleResult: boolean): Promise<boolean> => {
 
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
@@ -193,6 +194,13 @@ export class Search {
             requireAttachment,
             deleteMatches
         });
+
+        // if exactly one search result found we might want to optionally jump to it on the tree
+        if (jumpIfSingleResult && res.searchResults?.length == 1) {
+            S.view.jumpToId(res.searchResults[0].id);
+            return;
+        }
+
         S.nodeUtil.processInboundNodes(res.searchResults);
 
         if (res.code == C.RESPONSE_CODE_OK && deleteMatches) {
@@ -735,7 +743,7 @@ export class Search {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 S.srch.search(node, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RFF Subjects", null, false,
-                    false, 0, true, null, null, false, false, false);
+                    false, 0, true, null, null, false, false, false, false);
             }
         });
     };

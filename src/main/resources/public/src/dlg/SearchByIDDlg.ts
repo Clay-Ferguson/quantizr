@@ -43,7 +43,7 @@ export class SearchByIDDlg extends DialogBase {
 
         const desc = "For ID: " + SearchByIDDlg.defaultSearchText;
         const success = await S.srch.search(null, "node.id", SearchByIDDlg.defaultSearchText, null, desc, null, false,
-            false, 0, true, null, null, false, false, false);
+            false, 0, true, null, null, false, false, false, false);
         if (success) {
             this.close();
         }

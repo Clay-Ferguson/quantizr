@@ -406,7 +406,7 @@ export class MenuPanel extends Div {
 
             children.push(new Menu("RDF Triple", [
                 new MenuItem("Set Subject", S.edit.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
-                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource), //
+                new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource, null, true), //
                 new MenuItemSeparator(), //
                 new MenuItem("Find Subjects", S.srch.findRdfSubjects, onMainTab, null, true) //
             ]));

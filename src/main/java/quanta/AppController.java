@@ -1395,7 +1395,7 @@ public class AppController extends ServiceBase implements ErrorController {
             // we only need to display this once so remove it.
             sc.setUrlIdFailMsg(null);
 
-            // todo-0: shouldn't these sc values be st back to null here?
+            // todo-0: shouldn't these sc values be set back to null here?
             res.setUserMsg(sc.getUserMsg());
             res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
         }

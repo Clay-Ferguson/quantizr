@@ -274,7 +274,7 @@ export class SearchContentDlg extends DialogBase {
             state.sortDir,
             requirePriority,
             state.requireAttachment,
-            deleteMatches);
+            deleteMatches, false);
         if (success) {
             this.close();
         }

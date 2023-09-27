@@ -803,11 +803,11 @@ export class Render {
                 if (!nameSet.has(link.name)) {
                     nameSet.add(link.name);
                     linkComps.push(new Span(link.name, {
-                        title: "Click to Find Objects",
+                        title: "RDF: Click to Find Objects",
                         className: "nodeLink",
                         onClick: () => {
                             S.srch.search(node, null, link.name, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + link.name, null, false,
-                                false, 0, true, null, null, false, false, false);
+                                false, 0, true, null, null, false, false, false, true);
                         }
                     }));
                 }
