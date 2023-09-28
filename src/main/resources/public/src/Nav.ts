@@ -806,7 +806,7 @@ export class Nav {
             S.speech.stopSpeaking();
         }
         else {
-            const domId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+            const domId = S.domUtil.getPropFromDom(evt, C.DOM_ID_ATTR);
             const elm = document.getElementById(domId);
             const content = elm ? elm.textContent : null;
 
