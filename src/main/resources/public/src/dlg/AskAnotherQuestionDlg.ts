@@ -20,7 +20,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
     textArea: TextArea;
 
     constructor(public nodeId: string) {
-        super("Question about SubGraph", "appModalContMediumWidth");
+        super("Question about Content", "appModalContMediumWidth");
         this.onMount(() => { this.textArea?.focus(); });
     }
 

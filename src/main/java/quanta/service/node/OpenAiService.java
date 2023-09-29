@@ -351,7 +351,7 @@ public class OpenAiService extends ServiceBase {
 
         ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString());
         res.setGptCredit(answer.userCredit);
-        res.setAnswer(formatAnswer(answer, false));
+        res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
         return res;
     }
 }
