@@ -20,7 +20,7 @@ export class UploadFromIPFSDlg extends DialogBase {
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
-    constructor(private nodeId: string, private onUploadFunc: Function) {
+    constructor(private nodeId: string, private onUploadFunc: () => void) {
         super("Upload File");
         this.validatedStates = [this.cidState, this.mimeState];
     }

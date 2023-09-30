@@ -495,14 +495,6 @@ export class Util {
             // looks like on localhost (http) we always end up here unable to access clipboard but the
             // prod server (https) allows the clipboard to work. Not sure the reason.
             console.warn("clipboard.read not available");
-
-            // This experiment fails on localhost
-            // const f: Function = navigator.permissions.query;
-            // f({ name: "clipboard-read" }).then((result: any) => {
-            //     if (result.state === "granted" || result.state === "prompt") {
-            //         console.log("granted");
-            //     }
-            // });
         }
         return allowed;
     }

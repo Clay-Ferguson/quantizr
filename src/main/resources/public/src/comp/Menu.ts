@@ -7,7 +7,7 @@ import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
 
 export class Menu extends Comp {
-    constructor(public name: string, public menuItems: CompIntf[], private func: Function = null, private floatRightComp: CompIntf = null, private moreClasses: string = "", private subMenu: boolean = false) {
+    constructor(public name: string, public menuItems: CompIntf[], private func: () => void = null, private floatRightComp: CompIntf = null, private moreClasses: string = "", private subMenu: boolean = false) {
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 

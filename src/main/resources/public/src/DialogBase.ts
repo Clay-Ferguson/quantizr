@@ -14,7 +14,7 @@ export abstract class DialogBase extends Comp {
     static backdropZIndex: number = 16000000; // z-index
 
     // NOTE: resolve function stays null for EMBED mode.
-    resolve: Function;
+    resolve: (dlg: DialogBase) => void;
 
     aborted: boolean = false;
     backdrop: HTMLElement;
@@ -64,7 +64,7 @@ export abstract class DialogBase extends Comp {
 
         // We use an actual Promise and not async/await because our resolve function is held long term, and
         // represents the closing of the dialog.
-        return new Promise<DialogBase>((resolve) => {
+        return new Promise<DialogBase>(resolve => {
             if (this.mode === DialogMode.POPUP) {
                 this.zIndex = ++DialogBase.backdropZIndex;
             }

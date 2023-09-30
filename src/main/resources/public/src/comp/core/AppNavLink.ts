@@ -5,7 +5,7 @@ import { PubSub } from "../../PubSub";
 import { Comp } from "../base/Comp";
 
 export class AppNavLink extends Comp {
-    constructor(private content: string = "", func: Function, moreClasses: string = "") {
+    constructor(private content: string = "", func: () => void, moreClasses: string = "") {
         super(null);
         this.attribs.className = (getAs().mobileMode ? "tabSubOptionsItemMobile" : "tabSubOptionsItem") + " " + moreClasses;
         this.attribs.onClick = () => {
