@@ -23,7 +23,7 @@ export class PasteOrLinkDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Divc({ className: "dragTargetDlgSection" }, [
-                new Heading(4, "Paste"),
+                new Heading(6, "Paste"),
                 new ButtonBar([
                     new Button("Inside", () => {
                         S.edit.moveNodeByDrop(this.nodeId, this.sourceId, "inside");
@@ -36,7 +36,7 @@ export class PasteOrLinkDlg extends DialogBase {
                 ], "marginTop")
             ]),
             new Divc({ className: "dragTargetDlgSection" }, [
-                new Heading(4, "Link Nodes"),
+                new Heading(6, "Link Nodes"),
                 new TextField({ label: "Link Name", val: this.nameState }),
                 new ButtonBar([
                     new Button("Link", () => {
