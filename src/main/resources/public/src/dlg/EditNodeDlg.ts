@@ -1040,8 +1040,22 @@ export class EditNodeDlg extends DialogBase {
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
                 onClick: () => this.utl.speakerClickInEditor(this),
                 title: "Text-to-Speech: Editor Text or Selection"
+            }),
+            new Selection(null, null, [
+                { key: "h0", val: "" },
+                { key: "h1", val: "H1" },
+                { key: "h2", val: "H2" },
+                { key: "h3", val: "H3" },
+                { key: "h4", val: "H4" },
+                { key: "h5", val: "H5" },
+                { key: "h6", val: "H6" }
+            ], "compactFormSelect", "headingDropDown", {
+                setValue: (val: string) => {
+                    this.utl.setHeadingLevel(this, val);
+                },
+                getValue: (): string => this.utl.getHeadingLevel(this)
             })
-        ], "float-end microMarginBottom bigMarginRight"));
+        ], "float-end microMarginBottom"));
         editItems.push(this.contentEditor as any as Comp);
 
         return new Divc({ className: "contentEditor" }, editItems);

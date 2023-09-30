@@ -453,6 +453,32 @@ an upload has been added or removed.
         }
     }
 
+    getHeadingLevel = (dlg: EditNodeDlg): string => {
+        const content = dlg.contentEditor?.getValue() || getAs().editNode.content;
+        const level = S.util.countLeadingChars(content, "#");
+        if (level > 6) {
+            return "h6";
+        }
+        return "h" + level;
+    }
+
+    // Makes sure the editor text starts with 'level' number of "#" characters (markdown headings)
+    setHeadingLevel = (dlg: EditNodeDlg, level: string) => {
+        // get integer from second character in string
+        const levelInt = parseInt(level.substring(1));
+
+        let content = dlg.contentEditor?.getValue();
+        const curLevel = S.util.countLeadingChars(content, "#");
+        if (levelInt == curLevel) return;
+        content = S.util.stripAllLeading(content, "#");
+        if (!content.startsWith(" ")) {
+            content = " " + content;
+        }
+        content = "#".repeat(levelInt) + content;
+        content = content.trim();
+        dlg.contentEditor?.setValue(content);
+    }
+
     insertTime = (dlg: EditNodeDlg) => {
         dlg.contentEditor?.insertTextAtCursor("[" + S.util.formatDateTime(new Date()) + "]");
     }

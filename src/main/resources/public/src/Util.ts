@@ -235,6 +235,14 @@ export class Util {
         }
     }
 
+    stripAllLeading = (s: string, char: string): string => {
+        if (!s) return s;
+        while (s.startsWith(char)) {
+            s = s.substring(char.length);
+        }
+        return s;
+    }
+
     stripIfStartsWith = (s: string, str: string): string => {
         if (!s) return s;
         if (s.startsWith(str)) {
@@ -249,6 +257,21 @@ export class Util {
             return s.substring(0, s.length - str.length);
         }
         return s;
+    }
+
+    // gets how many of the first chars in 's' match 'char'
+    countLeadingChars = (s: string, char: string): number => {
+        if (!s) return 0;
+        let count = 0;
+        for (let i = 0; i < s.length; i++) {
+            if (s.charAt(i) === char) {
+                count++;
+            }
+            else {
+                break;
+            }
+        }
+        return count;
     }
 
     trimLeadingChars = (s: string, char: string) => {

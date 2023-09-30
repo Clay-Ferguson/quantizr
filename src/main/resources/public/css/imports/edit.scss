@@ -196,7 +196,11 @@ td {
 
 .formSelect {
     border: 1px solid gray !important;
-    padding: 5px 5px 5px 10px;
+    padding: 0 0 0 5px;
+}
+
+.compactFormSelect {
+    border: 1px solid gray !important;
 }
 
 .validationError {
