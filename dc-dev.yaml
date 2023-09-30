@@ -116,6 +116,26 @@ services:
     #         - "4001:4001"
     #         - "4001:4001/udp"
 
+    # pgdb-dev:
+    #     image: postgres
+    #     deploy:
+    #         # Don't want a restart policy for DEV!
+    #         # restart_policy:
+    #         #     condition: on-failure
+    #         #     # delay is time between restart attempts
+    #         #     delay: 10s
+    #         #     max_attempts: 4
+    #         #     window: 120s
+    #         replicas: 1
+    #     hostname: pgdb-host-dev
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - pgdb-host-dev
+    #     environment:
+    #         - POSTGRES_USER=compose-postgres
+    #         - POSTGRES_PASSWORD=compose-postgres
+
     quanta-dev:
         image: ${DOCKER_IMAGE}
         build: 
@@ -207,6 +227,11 @@ services:
             REDIS_HOST: "${REDIS_HOST}"
             REDIS_PORT: "${REDIS_PORT}"
             REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
+            # SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/compose-postgres"
+            # SPRING_DATASOURCE_USERNAME: "compose-postgres"
+            # SPRING_DATASOURCE_PASSWORD: "compose-postgres"
+            # SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # examples are "LangTest,UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest,SchemaOrgTest"
