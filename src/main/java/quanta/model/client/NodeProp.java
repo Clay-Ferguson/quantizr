@@ -172,8 +172,6 @@ public enum NodeProp {
     // prepaid dollar amount as a float
     OPENAI_USER_CREDIT("sn:oaiCredit"), //
     OPENAI_QUERY_COUNT("sn:oaiCount"), //
-    OPENAI_IN_TOKEN_COUNT("sn:oaiIc"), //
-    OPENAI_OUT_TOKEN_COUNT("sn:oaiOc"), //
 
     // if this contains web3, then web3 active, etc.
     ALLOWED_FEATURES("sn:features"), //

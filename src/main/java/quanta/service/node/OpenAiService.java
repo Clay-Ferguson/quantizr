@@ -27,6 +27,7 @@ import quanta.model.client.openai.ChatGPTTextModerationItem;
 import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
+import quanta.model.client.openai.Usage;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AskSubGraphRequest;
@@ -120,6 +121,15 @@ public class OpenAiService extends ServiceBase {
 
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString());
+
+        switch (system.getModel().toLowerCase()) {
+            case "gpt-4":
+            case "gpt-3.5-turbo":
+                break;
+            default:
+                throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported");
+        }
+
         log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
         HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
@@ -140,13 +150,7 @@ public class OpenAiService extends ServiceBase {
             Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
             userNode.set(NodeProp.OPENAI_QUERY_COUNT, userQuota + 1);
 
-            Long inputCount = userNode.getInt(NodeProp.OPENAI_IN_TOKEN_COUNT);
-            userNode.set(NodeProp.OPENAI_IN_TOKEN_COUNT, inputCount + res.getUsage().getPromptTokens());
-
-            Long outputCount = userNode.getInt(NodeProp.OPENAI_OUT_TOKEN_COUNT);
-            userNode.set(NodeProp.OPENAI_OUT_TOKEN_COUNT, outputCount + res.getUsage().getCompletionTokens());
-
-            Double cost = calculateCost(inputCount, outputCount);
+            Double cost = calculateCost(res);
             userCredit.setVal(userCredit.getVal() - cost);
             userNode.set(NodeProp.OPENAI_USER_CREDIT, userCredit.getVal());
 
@@ -279,7 +283,7 @@ public class OpenAiService extends ServiceBase {
         return sb.toString();
     }
 
-    public String getOpenAiStats(MongoSession ms) {
+    public String getOpenAiStats(MongoSession ms, String model) {
         ms = ThreadLocals.ensure(ms);
         Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, false, true);
 
@@ -287,39 +291,65 @@ public class OpenAiService extends ServiceBase {
         sb.append("\nOpenAI Queries\n");
 
         // add in admin account
-        appendUserStats(sb, read.getDbRoot());
+        appendUserStats(model, sb, read.getDbRoot());
 
         /*
          * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
          * amount).
          */
         for (SubNode usrNode : accountNodes) {
-            appendUserStats(sb, usrNode);
+            appendUserStats(model, sb, usrNode);
         }
         return sb.toString();
     }
 
-    private void appendUserStats(StringBuilder sb, SubNode usrNode) {
+    private void appendUserStats(String model, StringBuilder sb, SubNode usrNode) {
         log.debug("usrNode: " + XString.prettyPrint(usrNode));
         Long count = usrNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
         if (count > 0) {
-            Long inTokenCount = usrNode.getInt(NodeProp.OPENAI_IN_TOKEN_COUNT);
-            Long outTokenCount = usrNode.getInt(NodeProp.OPENAI_OUT_TOKEN_COUNT);
             Double userCredit =
                     usrNode.hasProp(NodeProp.OPENAI_USER_CREDIT.s()) ? usrNode.getFloat(NodeProp.OPENAI_USER_CREDIT)
                             : 0.0;
 
             sb.append("    " + usrNode.getStr(NodeProp.USER) + //
-                    " -> Queries: " + String.valueOf(count) + " Tokens In/Out: (" //
-                    + String.valueOf(inTokenCount) + "/" //
-                    + String.valueOf(outTokenCount) + ")" + //
-                    " Charges: $" + decimalFormatter.format(calculateCost(inTokenCount, outTokenCount)) + //
+                    " -> Queries: " + String.valueOf(count) + " " + //
                     " Credit: $" + decimalFormatter.format(userCredit) + "\n");
         }
     }
 
-    private double calculateCost(Long inTokenCount, Long outTokenCount) {
-        return (inTokenCount * 0.003 / 1000) + (outTokenCount * 0.004 / 1000);
+    // decimalFormatter.format(calculateCost(model, inTokenCount, outTokenCount))
+    private double calculateCost(ChatCompletionResponse res) {
+        Usage usage = res.getUsage();
+
+        // price per kilotoken
+        double inputPpk = 0;
+        double outputPpk = 0;
+
+        switch (res.getModel().toLowerCase()) {
+            case "gpt-4":
+                if (usage.getPromptTokens() < 8000) {
+                    inputPpk = 0.03;
+                    outputPpk = 0.06;
+                } else {
+                    inputPpk = 0.06;
+                    outputPpk = 0.12;
+                }
+                break;
+
+            case "gpt-3.5-turbo":
+                if (usage.getPromptTokens() < 4000) {
+                    inputPpk = 0.0015;
+                    outputPpk = 0.002;
+                } else {
+                    inputPpk = 0.003;
+                    outputPpk = 0.004;
+                }
+                break;
+
+            default:
+                throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported");
+        }
+        return (usage.getPromptTokens() * inputPpk / 1000) + (usage.getCompletionTokens() * outputPpk / 1000);
     }
 
     public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
