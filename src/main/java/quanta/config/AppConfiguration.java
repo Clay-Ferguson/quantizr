@@ -73,7 +73,10 @@ public class AppConfiguration implements WebMvcConfigurer {
         FilterRegistrationBean<DataTransferRateFilter> reg = new FilterRegistrationBean<>();
         reg.setFilter(dataTransferRateFilter);
         reg.setOrder(1);
-        reg.addUrlPatterns("/*");
+        reg.addUrlPatterns("/images/*");
+        reg.addUrlPatterns("/fonts/*");
+        reg.addUrlPatterns("/dist/*");
+        reg.addUrlPatterns(AppController.API_PATH + "/bin/*");
         return reg;
     }
 
