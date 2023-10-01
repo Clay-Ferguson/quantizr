@@ -126,7 +126,8 @@ public class OpenAiService extends ServiceBase {
             case "gpt-3.5-turbo":
                 break;
             default:
-                throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported");
+                throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported: " + system.getModel()
+                        + " is not supported.");
         }
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
@@ -323,31 +324,33 @@ public class OpenAiService extends ServiceBase {
         // price per kilotoken
         double inputPpk = 0;
         double outputPpk = 0;
+        String model = res.getModel().toLowerCase();
 
-        switch (res.getModel().toLowerCase()) {
-            case "gpt-4":
-                if (usage.getPromptTokens() < 8000) {
-                    inputPpk = 0.03;
-                    outputPpk = 0.06;
-                } else {
-                    inputPpk = 0.06;
-                    outputPpk = 0.12;
-                }
-                break;
-
-            case "gpt-3.5-turbo":
-                if (usage.getPromptTokens() < 4000) {
-                    inputPpk = 0.0015;
-                    outputPpk = 0.002;
-                } else {
-                    inputPpk = 0.003;
-                    outputPpk = 0.004;
-                }
-                break;
-
-            default:
-                throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported");
+        // We detect using startsWith, because the actual model used will be slightly different than the one
+        // specified
+        if (model.startsWith("gpt-4")) {
+            if (usage.getPromptTokens() < 8000) {
+                inputPpk = 0.03;
+                outputPpk = 0.06;
+            } else {
+                inputPpk = 0.06;
+                outputPpk = 0.12;
+            }
         }
+        //
+        else if (model.startsWith("gpt-3.5")) {
+            if (usage.getPromptTokens() < 4000) {
+                inputPpk = 0.0015;
+                outputPpk = 0.002;
+            } else {
+                inputPpk = 0.003;
+                outputPpk = 0.004;
+            }
+        } else {
+            throw new RuntimeException(
+                    "Only gpt-4 and gpt-3.5-turbo are currently supported. " + res.getModel() + " is not supported.");
+        }
+
         return (usage.getPromptTokens() * inputPpk / 1000) + (usage.getCompletionTokens() * outputPpk / 1000);
     }
 
