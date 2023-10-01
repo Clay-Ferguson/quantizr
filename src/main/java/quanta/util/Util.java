@@ -20,6 +20,17 @@ public class Util {
     private static Logger log = LoggerFactory.getLogger(Util.class);
     private static final Random rand = new Random();
 
+    public static double calculateKBps(double bytes, double nanoseconds) {
+        // Convert nanoseconds to seconds
+        double seconds = nanoseconds / 1e9; // 1e9 is 1 billion
+
+        // Convert bytes to kilobytes
+        double kilobytes = bytes / 1024.0; // 1 kilobyte = 1024 bytes
+
+        // Calculate KBps
+        return kilobytes / seconds;
+    }
+
     public static boolean gracefulReadyCheck(ServletResponse res) throws RuntimeException, IOException {
         if (!MongoRepository.fullInit) {
             sleep(2000);

@@ -1,13 +1,16 @@
 package quanta.instrument;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.model.client.PrincipalName;
+import quanta.service.DataTransferRateFilter;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 
 public class PerformanceReport {
 
@@ -26,6 +29,13 @@ public class PerformanceReport {
     public static String getReport() {
         ThreadLocals.requireAdmin();
         StringBuilder sb = new StringBuilder();
+
+        DecimalFormat decimalFormat = new DecimalFormat("0.000");
+        sb.append(htmlH(6,
+                "Data: " + decimalFormat.format(
+                        Util.calculateKBps(DataTransferRateFilter.totalBytesSent, DataTransferRateFilter.totalTime))
+                        + " KBps"));
+
         // Sort list by whichever are consuming the most time (i.e. by duration, descending order)
         List<PerfMonEvent> orderedData;
         synchronized (Instrument.data) {
