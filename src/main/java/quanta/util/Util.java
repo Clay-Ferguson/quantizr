@@ -1,27 +1,18 @@
 package quanta.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.Random;
-import java.util.Scanner;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import quanta.mongo.MongoRepository;
 
 public class Util {
@@ -121,82 +112,10 @@ public class Util {
         return mime;
     }
 
-    // timeout=0 means infinite timeout (no timeout)
-    public static ClientHttpRequestFactory getClientHttpRequestFactory(int timeout) {
-        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        clientHttpRequestFactory.setConnectionRequestTimeout(timeout);
-        clientHttpRequestFactory.setConnectTimeout(timeout);
-        clientHttpRequestFactory.setReadTimeout(timeout);
-        return clientHttpRequestFactory;
-    }
-
     public static HttpEntity<MultiValueMap<String, Object>> getBasicRequestEntity() {
         HttpHeaders headers = new HttpHeaders();
         MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
         return requestEntity;
-    }
-
-    // //other example from Baeldung
-    // private ClientHttpRequestFactory getClientHttpRequestFactory() {
-    // int timeout = 5000;
-    // RequestConfig config = RequestConfig.custom()
-    // .setConnectTimeout(timeout)
-    // .setConnectionRequestTimeout(timeout)
-    // .setSocketTimeout(timeout)
-    // .build();
-    // CloseableHttpClient client = HttpClientBuilder
-    // .create()
-    // .setDefaultRequestConfig(config)
-    // .build();
-    // return new HttpComponentsClientHttpRequestFactory(client);
-    // }
-    public static String extractTitleFromUrl(String url) {
-        String title = null;
-        InputStream is = null;
-        Scanner scanner = null;
-        long startTime = System.currentTimeMillis();
-        try {
-            int timeout = 20;
-            RequestConfig config = //
-                    //
-                    //
-                    RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
-                            .setSocketTimeout(timeout * 1000).build();
-            HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-            HttpGet request = new HttpGet(url);
-            request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-            HttpResponse response = client.execute(request);
-            log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-                    + response.getStatusLine().getReasonPhrase());
-            scanner = new Scanner(response.getEntity().getContent());
-            String responseBody = scanner.useDelimiter("\\A").next();
-            title = responseBody.substring(responseBody.indexOf("<title>") + 7, responseBody.indexOf("</title>"));
-        } catch (Exception e) {
-            log.error("*** ERROR reading url: " + url, e);
-            return null;
-        } finally {
-            StreamUtil.close(scanner, is);
-            log.info("Stream read took: " + (System.currentTimeMillis() - startTime) + "ms");
-        }
-        return title;
-        // InputStream response = null;
-        // try {
-        // String url = "http://www.google.com";
-        // response = new URL(url).openStream();
-        // Scanner scanner = new Scanner(response);
-        // String responseBody = scanner.useDelimiter("\\A").next();
-        // System.out.println(
-        // responseBody.substring(responseBody.indexOf("<title>") + 7,
-        // responseBody.indexOf("</title>")));
-        // } catch (IOException ex) {
-        // ex.printStackTrace();
-        // } finally {
-        // try {
-        // response.close();
-        // } catch (IOException ex) {
-        // ex.printStackTrace();
-        // }
-        // }
     }
 }

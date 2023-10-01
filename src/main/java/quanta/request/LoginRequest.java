@@ -1,7 +1,7 @@
 
 package quanta.request;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import quanta.request.base.RequestBase;
 
 public class LoginRequest extends RequestBase {
@@ -13,6 +13,7 @@ public class LoginRequest extends RequestBase {
     /* timezone offset */
     @Nullable
     private Integer tzOffset;
+
     /* daylight savings time */
     @Nullable
     private Boolean dst;

@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -1691,7 +1691,7 @@ public class ActPubService extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         IntVal count = new IntVal();
 
-        ops.stream(new Query(), FediverseName.class).forEachRemaining(obj -> {
+        ops.stream(new Query(), FediverseName.class).forEach(obj -> {
             sb.append(obj.getName());
             sb.append("\n");
             count.inc();

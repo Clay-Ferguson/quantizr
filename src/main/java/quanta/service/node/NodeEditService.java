@@ -40,7 +40,6 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.request.AppDropRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.GetNodeJsonRequest;
@@ -55,7 +54,6 @@ import quanta.request.SplitNodeRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateFriendNodeRequest;
-import quanta.response.AppDropResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.response.DeletePropertyResponse;
 import quanta.response.GetNodeJsonResponse;
@@ -395,39 +393,6 @@ public class NodeEditService extends ServiceBase {
         } else {
             throw new RuntimeException("User not found: " + userToFollow);
         }
-    }
-
-    public AppDropResponse appDrop(MongoSession ms, AppDropRequest req) {
-        AppDropResponse res = new AppDropResponse();
-        String data = req.getData();
-        String lcData = data.toLowerCase();
-        // for now we only support dropping of links onto our window. I threw in
-        // 'file://' but i have no idea
-        // if that's going to work or not (yet)
-        if (!lcData.startsWith("http://") && !lcData.startsWith("https://") && !lcData.startsWith("file://")) {
-            log.info("Drop even ignored: " + data);
-            res.setMessage("Sorry, can't drop that there.");
-            return res;
-        }
-
-        SubNode linksNode =
-                read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null, false);
-        if (linksNode == null) {
-            log.warn("unable to get linksNode");
-            return null;
-        }
-
-        SubNode newNode = create.createNode(ms, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null,
-                null, true, true);
-        String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
-        String content = title != null ? "#### " + title + "\n" : "";
-        content += data;
-        newNode.setContent(content);
-        openGraph.parseNode(newNode, true);
-        newNode.touch();
-        update.save(ms, newNode);
-        res.setMessage("Drop Accepted: Created link to: " + data);
-        return res;
     }
 
     public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {

@@ -7,14 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -30,8 +24,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.ServiceBase;
-import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeType;
@@ -48,12 +42,10 @@ import quanta.service.exports.ExportIpfsFile;
 import quanta.service.mfs.SyncFromMFSService;
 import quanta.service.mfs.SyncToMFSService;
 import quanta.util.Cast;
-import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -75,8 +67,8 @@ public class IPFSService extends ServiceBase {
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
      */
-    public final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
-    public final RestTemplate restTemplateNoTimeout = new RestTemplate(Util.getClientHttpRequestFactory(0));
+    public final RestTemplate restTemplate = new RestTemplate();
+    public final RestTemplate restTemplateNoTimeout = new RestTemplate();
     public final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -303,29 +295,35 @@ public class IPFSService extends ServiceBase {
     }
 
     public InputStream getStream(MongoSession ms, String hash) {
-        checkIpfs();
-        if (failedCIDs.get(hash) != null) {
-            throw new RuntimeException("failed CIDs: " + hash);
+        // todo-0: Spring 3 took away HttpClient
+        if (true) {
+            throw new RuntimeException("This feature is temporarily disabled");
         }
-        String sourceUrl = prop.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
-        try {
-            int timeout = 15;
-            RequestConfig config = //
-                    //
-                    //
-                    RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000)
-                            .setSocketTimeout(timeout * 1000).build();
-            HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-            HttpGet request = new HttpGet(sourceUrl);
-            request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-            HttpResponse response = client.execute(request);
-            InputStream is = response.getEntity().getContent();
-            return is;
-        } catch (Exception e) {
-            failedCIDs.put(hash, true);
-            log.error("getStream failed: " + sourceUrl, e);
-            throw new RuntimeEx("Streaming failed.", e);
-        }
+        return null;
+        // checkIpfs();
+        // if (failedCIDs.get(hash) != null) {
+        // throw new RuntimeException("failed CIDs: " + hash);
+        // }
+        // String sourceUrl = prop.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
+        // try {
+        // int timeout = 15;
+        // RequestConfig config = //
+        // //
+        // //
+        // RequestConfig.custom().setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout *
+        // 1000)
+        // .setSocketTimeout(timeout * 1000).build();
+        // HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+        // HttpGet request = new HttpGet(sourceUrl);
+        // request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
+        // HttpResponse response = client.execute(request);
+        // InputStream is = response.getEntity().getContent();
+        // return is;
+        // } catch (Exception e) {
+        // failedCIDs.put(hash, true);
+        // log.error("getStream failed: " + sourceUrl, e);
+        // throw new RuntimeEx("Streaming failed.", e);
+        // }
     }
 
     public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession ms, PublishNodeToIpfsRequest req) {

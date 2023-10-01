@@ -18,16 +18,10 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -52,6 +46,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -74,7 +69,6 @@ import quanta.response.UploadFromUrlResponse;
 import quanta.response.UploadResponse;
 import quanta.response.base.ResponseBase;
 import quanta.service.imports.ImportZipService;
-import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
 import quanta.util.LimitedInputStream;
@@ -802,93 +796,100 @@ public class AttachmentService extends ServiceBase {
      */
     public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
             String mimeType, long maxFileSize, boolean storeLocally) {
-        if (mimeType == null) {
-            mimeType = getMimeTypeFromUrl(sourceUrl);
-            if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
-                mimeType = URLConnection.guessContentTypeFromName(mimeHint);
-            }
-        }
-        if (node == null) {
-            node = read.getNode(ms, nodeId);
-        }
-        // only need to auth if we looked up the node.
-        auth.ownerAuth(node);
-        String attKey = getNextAttachmentKey(node);
-        if (!storeLocally) {
-            int maxAttOrdinal = getMaxAttachmentOrdinal(node);
-            Attachment att = node.getAttachment(attKey, true, true);
-            if (mimeType != null) {
-                att.setMime(mimeType);
-            }
-            att.setUrl(sourceUrl);
-            att.setOrdinal(maxAttOrdinal + 1);
-            return;
-        }
-        if (maxFileSize <= 0) {
-            maxFileSize = user.getUserStorageRemaining(ms);
-        }
-        ms = ThreadLocals.ensure(ms);
-        LimitedInputStreamEx limitedIs = null;
-        try {
-            URL url = new URL(sourceUrl);
-            int timeout = 20;
-            RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-                    .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-            /*
-             * if this is an image extension, handle it in a special way, mainly to extract the width, height
-             * from it
-             */
-            if (ImageUtil.isImageMime(mimeType)) {
-                /*
-                 * DO NOT DELETE
-                 *
-                 * Basic version without masquerading as a web browser can cause a 403 error because some sites
-                 * don't want just any old stream reading from them. Leave this note here as a warning and
-                 * explanation
-                 */
-                // would restTemplate be better for this ?
-                HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-                HttpGet request = new HttpGet(sourceUrl);
-                request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-                HttpResponse response = client.execute(request);
-                log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-                        + response.getStatusLine().getReasonPhrase());
-                InputStream is = response.getEntity().getContent();
-                limitedIs = new LimitedInputStreamEx(is, maxFileSize);
-                // insert 0L for size now, because we don't know it yet
-                attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
-                        false, false, true, true, storeLocally, sourceUrl, false);
-            }
-            /*
-             * if not an image extension, we can just stream directly into the database, but we want to try to
-             * get the mime type first, from calling detectImage so that if we do detect its an image we can
-             * handle it as one.
-             */
-            else {
-                if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
-                    HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-                    HttpGet request = new HttpGet(sourceUrl);
-                    request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-                    HttpResponse response = client.execute(request);
-                    /*
-                     * log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason=" +
-                     * response.getStatusLine().getReasonPhrase());
-                     */
-                    InputStream is = response.getEntity().getContent();
-                    limitedIs = new LimitedInputStreamEx(is, maxFileSize);
-                    // insert 0L for size now, because we don't know it yet
-                    attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-                            false, true, true, storeLocally, sourceUrl, false);
-                }
-            }
-        } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
-        } finally {
-            /* finally block just for extra safety */
-            // this stream will have been closed by 'attachBinaryFromStream' but we close
-            // here too anyway.
-            StreamUtil.close(limitedIs);
-        }
+
+        // todo-0: Spring 3 took away HttpClient
+        if (true)
+            throw new RuntimeException("Feature is temporarily disabled.");
+
+        // if (mimeType == null) {
+        // mimeType = getMimeTypeFromUrl(sourceUrl);
+        // if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
+        // mimeType = URLConnection.guessContentTypeFromName(mimeHint);
+        // }
+        // }
+        // if (node == null) {
+        // node = read.getNode(ms, nodeId);
+        // }
+        // // only need to auth if we looked up the node.
+        // auth.ownerAuth(node);
+        // String attKey = getNextAttachmentKey(node);
+        // if (!storeLocally) {
+        // int maxAttOrdinal = getMaxAttachmentOrdinal(node);
+        // Attachment att = node.getAttachment(attKey, true, true);
+        // if (mimeType != null) {
+        // att.setMime(mimeType);
+        // }
+        // att.setUrl(sourceUrl);
+        // att.setOrdinal(maxAttOrdinal + 1);
+        // return;
+        // }
+        // if (maxFileSize <= 0) {
+        // maxFileSize = user.getUserStorageRemaining(ms);
+        // }
+        // ms = ThreadLocals.ensure(ms);
+        // LimitedInputStreamEx limitedIs = null;
+        // try {
+        // URL url = new URL(sourceUrl);
+        // int timeout = 20;
+        // RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+        // .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+        // /*
+        // * if this is an image extension, handle it in a special way, mainly to extract the width, height
+        // * from it
+        // */
+        // if (ImageUtil.isImageMime(mimeType)) {
+        // /*
+        // * DO NOT DELETE
+        // *
+        // * Basic version without masquerading as a web browser can cause a 403 error because some sites
+        // * don't want just any old stream reading from them. Leave this note here as a warning and
+        // * explanation
+        // */
+        // // would restTemplate be better for this ?
+        // HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+        // HttpGet request = new HttpGet(sourceUrl);
+        // request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
+        // HttpResponse response = client.execute(request);
+        // log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
+        // + response.getStatusLine().getReasonPhrase());
+        // InputStream is = response.getEntity().getContent();
+        // limitedIs = new LimitedInputStreamEx(is, maxFileSize);
+        // // insert 0L for size now, because we don't know it yet
+        // attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1,
+        // -1,
+        // false, false, true, true, storeLocally, sourceUrl, false);
+        // }
+        // /*
+        // * if not an image extension, we can just stream directly into the database, but we want to try to
+        // * get the mime type first, from calling detectImage so that if we do detect its an image we can
+        // * handle it as one.
+        // */
+        // else {
+        // if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
+        // HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+        // HttpGet request = new HttpGet(sourceUrl);
+        // request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
+        // HttpResponse response = client.execute(request);
+        // /*
+        // * log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason=" +
+        // * response.getStatusLine().getReasonPhrase());
+        // */
+        // InputStream is = response.getEntity().getContent();
+        // limitedIs = new LimitedInputStreamEx(is, maxFileSize);
+        // // insert 0L for size now, because we don't know it yet
+        // attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1,
+        // false,
+        // false, true, true, storeLocally, sourceUrl, false);
+        // }
+        // }
+        // } catch (Exception e) {
+        // throw ExUtil.wrapEx(e);
+        // } finally {
+        // /* finally block just for extra safety */
+        // // this stream will have been closed by 'attachBinaryFromStream' but we close
+        // // here too anyway.
+        // StreamUtil.close(limitedIs);
+        // }
     }
 
     // FYI: Warning: this way of getting content type doesn't work.

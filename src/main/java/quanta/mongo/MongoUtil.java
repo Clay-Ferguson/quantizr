@@ -325,7 +325,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("pre scan...");
         IntVal scanCount = new IntVal();
         LinkedList<SubNode> toDel = new LinkedList<>();
-        ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+        ops.stream(new Query(), SubNode.class).forEach(node -> {
             String path = node.getPath();
             if (path.equals(NodePath.LOCAL_USERS_PATH) || path.equals(NodePath.REMOTE_USERS_PATH)
                     || path.startsWith(NodePath.LOCAL_USERS_PATH + "/")
@@ -384,7 +384,7 @@ public class MongoUtil extends ServiceBase {
         IntVal opCount = new IntVal();
         IntVal total = new IntVal();
         // stream every node
-        ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+        ops.stream(new Query(), SubNode.class).forEach(node -> {
             String path = node.getPath();
             String newPath = null;
             if (!path.startsWith(NodePath.USERS_PATH + "/") || path.startsWith(NodePath.LOCAL_USERS_PATH + "/")
@@ -486,7 +486,7 @@ public class MongoUtil extends ServiceBase {
         q.addCriteria(Criteria.where(SubNode.TYPE).is(NodeType.ACCOUNT.s()));
         BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 
-        ops.stream(q, SubNode.class).forEachRemaining(node -> {
+        ops.stream(q, SubNode.class).forEach(node -> {
             String userName = node.getStr(NodeProp.USER);
             if (!userName.startsWith("."))
                 return;

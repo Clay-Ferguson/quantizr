@@ -1,15 +1,9 @@
 package quanta;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -51,7 +46,6 @@ import quanta.model.client.UserProfile;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
-import quanta.request.AppDropRequest;
 import quanta.request.AskSubGraphRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
@@ -149,14 +143,11 @@ import quanta.response.SignSubGraphResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.service.AclService;
 import quanta.service.AppFilter;
-import quanta.service.RSSFeedService;
 import quanta.service.exports.ExportServiceFlexmark;
 import quanta.service.exports.ExportTarService;
 import quanta.service.exports.ExportZipService;
 import quanta.util.CaptchaMaker;
-import quanta.util.Const;
 import quanta.util.ExUtil;
-import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.val.Val;
@@ -176,11 +167,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public static final String ADMIN_PATH = "/admin";
     public static final String FILE_PATH = "/f";
 
-    /*
-     * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
-     * instance ever
-     */
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
     // NOTE: server.error.path app property points to this.
     private static final String ERROR_MAPPING = "/error";
 
@@ -257,7 +243,8 @@ public class AppController extends ServiceBase implements ErrorController {
         }
 
         boolean hasUrlId = false;
-        // if we have an ID, try to look it up, to put it in the session and load the Social Card properties
+        // if we have an ID, try to look it up, to put it in the session and load the Social Card
+        // properties
         // for this request.
         // If no id given defalt to ":home" only so we can get the social card props.
         if (id != null) {
@@ -360,49 +347,52 @@ public class AppController extends ServiceBase implements ErrorController {
     // return null;
     // });
     // }
+
     /*
      * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when retrieving RSS
      * directly from arbitrary servers
      *
      * todo-2: need a 'useCache' url param option
+     * 
+     * No longer used. Consider deleting.
      */
-    @GetMapping({"/proxyGet"})
-    public void proxyGet(@RequestParam(value = "url", required = true) String url, //
-            HttpSession session, HttpServletResponse response) {
-        callProc.run("proxyGet", true, true, null, session, ms -> {
-            try {
-                // try to get proxy info from cache.
-                byte[] cacheBytes = null;
-                synchronized (RSSFeedService.proxyCache) {
-                    cacheBytes = RSSFeedService.proxyCache.get(url);
-                }
-                if (cacheBytes != null) {
-                    // limiting the stream just because for now this is only used in feed
-                    // processing, and 5MB is plenty
-                    IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
-                            response.getOutputStream());
-                } else { // not in cache then read and update cache
-                    ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
-                    response.setStatus(HttpStatus.OK.value());
-                    byte[] body = resp.getBody();
-                    synchronized (RSSFeedService.proxyCache) {
-                        RSSFeedService.proxyCache.put(url, body);
-                    }
-                    IOUtils.copy(new ByteArrayInputStream(body), response.getOutputStream());
-                    // DO NOT DELETE (good example)
-                    // restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
-                    // -> {
-                    // }, responseExtractor -> {
-                    // IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
-                    // return null;
-                    // });
-                }
-            } catch (Exception e) {
-            }
-            // throw new RuntimeException("internal server error");
-            return null;
-        });
-    }
+    // @GetMapping({"/proxyGet"})
+    // public void proxyGet(@RequestParam(value = "url", required = true) String url, //
+    // HttpSession session, HttpServletResponse response) {
+    // callProc.run("proxyGet", true, true, null, session, ms -> {
+    // try {
+    // // try to get proxy info from cache.
+    // byte[] cacheBytes = null;
+    // synchronized (RSSFeedService.proxyCache) {
+    // cacheBytes = RSSFeedService.proxyCache.get(url);
+    // }
+    // if (cacheBytes != null) {
+    // // limiting the stream just because for now this is only used in feed
+    // // processing, and 5MB is plenty
+    // IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
+    // response.getOutputStream());
+    // } else { // not in cache then read and update cache
+    // ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
+    // response.setStatus(HttpStatus.OK.value());
+    // byte[] body = resp.getBody();
+    // synchronized (RSSFeedService.proxyCache) {
+    // RSSFeedService.proxyCache.put(url, body);
+    // }
+    // IOUtils.copy(new ByteArrayInputStream(body), response.getOutputStream());
+    // // DO NOT DELETE (good example)
+    // // restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
+    // // -> {
+    // // }, responseExtractor -> {
+    // // IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
+    // // return null;
+    // // });
+    // }
+    // } catch (Exception e) {
+    // }
+    // // throw new RuntimeException("internal server error");
+    // return null;
+    // });
+    // }
 
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
@@ -418,7 +408,8 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object signup(@RequestBody SignupRequest req, HttpSession session) {
         return callProc.run("signup", false, false, req, session, ms -> {
-            // This automated flag will bypass the captcha check, and email confirmation, and just immediately
+            // This automated flag will bypass the captcha check, and email confirmation, and just
+            // immediately
             // create the user.
             boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
             return user.signup(req, automated);
@@ -564,19 +555,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
         return callProc.run("initNodeEdit", true, true, req, session, ms -> {
             return render.initNodeEdit(ms, req);
-        });
-    }
-
-    /*
-     * Called when user does drag-n-drop onto the application window
-     *
-     * NOTE: Looks like this is currently not enabled in TypeScript
-     */
-    @RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
-    @ResponseBody
-    public Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
-        return callProc.run("appDrop", true, true, req, session, ms -> {
-            return edit.appDrop(ms, req);
         });
     }
 
@@ -946,7 +924,7 @@ public class AppController extends ServiceBase implements ErrorController {
             /*
              * NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
              * but check below only after knowing whether the node has any sharing on it at all or not.
-             * 
+             *
              * Node Names are identified using a colon in front of it, to make it detectable
              */
             if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
@@ -965,7 +943,8 @@ public class AppController extends ServiceBase implements ErrorController {
                     if (node == null) {
                         throw new RuntimeException("Node not found.");
                     }
-                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
+                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow
+                    // access.
                     // This is for good fediverse interoperability but still with a level of privacy for completely
                     // unshared nodes.
                     if (node.getAc() == null || node.getAc().size() == 0) {
@@ -1040,8 +1019,9 @@ public class AppController extends ServiceBase implements ErrorController {
                     return null;
                 });
             } //
-            else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request and if so
-                                                      // bypass security
+            else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request
+                // and if so
+                // bypass security
                 arun.run(as -> {
                     attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null,
                             response);
@@ -1387,7 +1367,8 @@ public class AppController extends ServiceBase implements ErrorController {
     }
 
     private void loadConfig(ClientConfig res) {
-        // Identifier generated once on Browser, can uniquely identify one single session to associate with
+        // Identifier generated once on Browser, can uniquely identify one single session to associate
+        // with
         // the given webpage/tab
         SessionContext sc = ThreadLocals.getSC();
         if (sc != null) {

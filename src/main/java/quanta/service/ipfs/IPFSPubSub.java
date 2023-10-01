@@ -44,7 +44,7 @@ public class IPFSPubSub extends ServiceBase {
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
     private static final String IPSM_TOPIC_TEST = "/ipsm/test";
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
+    private static final RestTemplate restTemplate = new RestTemplate();
     private static final ObjectMapper mapper = new ObjectMapper();
     public static String API_PUBSUB;
     // private static int heartbeatCounter = 0;

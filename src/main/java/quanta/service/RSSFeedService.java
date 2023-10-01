@@ -1,7 +1,6 @@
 package quanta.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -11,15 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.CharSequenceReader;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
@@ -71,7 +62,6 @@ import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.Util;
 import quanta.util.XString;
 
 /* Proof of Concept RSS Publishing */
@@ -82,9 +72,7 @@ public class RSSFeedService extends ServiceBase {
     private static boolean refreshingCache = false;
     private static final Object policyLock = new Object();
     PolicyFactory policy = null;
-    private boolean USE_HTTP_READER = false;
-    private boolean USE_SPRING_READER = true;
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(15000));
+    private static final RestTemplate restTemplate = new RestTemplate();
     /*
      * Cache of all feeds.
      */
@@ -250,77 +238,29 @@ public class RSSFeedService extends ServiceBase {
             }
             int timeout = 60; // seconds
 
-            // Here's how GPT-4 suggested this code be done.
-            // ========== BEGIN GPT
-            // HttpClient client = HttpClients.createDefault();
-            // HttpGet request = new HttpGet(url);
+            if (ThreadLocals.getSC() != null) {
+                push.pushInfo(ThreadLocals.getSC(), new PushPageMessage(
+                        "Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText"));
+            }
 
-            // // Set User-Agent to simulate browser
-            // request.setHeader("User-Agent", Const.FAKE_USER_AGENT);
-
-            // HttpResponse response = client.execute(request);
-            // InputStream stream = response.getEntity().getContent();
-
-            // SyndFeedInput input = new SyndFeedInput();
-            // inFeed = input.build(new XmlReader(stream));
-            // ========== END GPT
-
-            /*
-             * I was experimenting this this way of getting a reader as a last attempt to get a specific
-             * problematic URL to work, that keeps causing a timeout when I try to read from it thru the server
-             * side, even though the same url works fine when entered into my browser url, so one trick that has
-             * worked in the past was to masquerade as a browser using the 'user agent'. So this code DOES work,
-             * but never did solve the problem with that one specific URL that simply refuses to send data to
-             * the Quanta server.
-             *
-             * UPDATE: I'm leaving the long explanation above, but once I tried the code inside
-             * USE_SPRING_READER=true, block suddenly all the RSS feeds no longer have any timeout issues. My
-             * best theory for why is that my restTemplate is doing something special that fixes these issues.
-             */
-            if (USE_HTTP_READER) {
-                RequestConfig config = RequestConfig.custom()//
-                        .setConnectTimeout(timeout * 1000)//
-                        .setConnectionRequestTimeout(timeout * 1000)//
-                        .setSocketTimeout(timeout * 1000).build();
-
-                HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-                HttpGet request = new HttpGet(url);
-                request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-                HttpResponse response = client.execute(request);
-                InputStream is = response.getEntity().getContent();
-                LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, 10 * Const.ONE_MB);
-                byte[] buffer = IOUtils.toByteArray(limitedIs);
-                reader = new CharSequenceReader(new String(buffer));
+            inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
                 SyndFeedInput input = new SyndFeedInput();
-                inFeed = input.build(reader);
-            }
-
-            if (USE_SPRING_READER) {
-                if (ThreadLocals.getSC() != null) {
-                    push.pushInfo(ThreadLocals.getSC(), new PushPageMessage(
-                            "Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText"));
-                }
-
-                inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
-                    SyndFeedInput input = new SyndFeedInput();
-                    long start = System.currentTimeMillis();
-                    try {
-                        return input
-                                .build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 10 * Const.ONE_MB)));
-                    } //
-                    catch (FeedException e) {
-                        throw new IOException("Could not parse response for feed: " + url, e);
-                    } //
-                    finally {
-                        long time = System.currentTimeMillis() - start;
-                        if (time > 2000) {
-                            log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
-                        }
-                        new PerfMonEvent(System.currentTimeMillis() - start, "readFeed",
-                                ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin");
+                long start = System.currentTimeMillis();
+                try {
+                    return input.build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 10 * Const.ONE_MB)));
+                } //
+                catch (FeedException e) {
+                    throw new IOException("Could not parse response for feed: " + url, e);
+                } //
+                finally {
+                    long time = System.currentTimeMillis() - start;
+                    if (time > 2000) {
+                        log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
                     }
-                });
-            }
+                    new PerfMonEvent(System.currentTimeMillis() - start, "readFeed",
+                            ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin");
+                }
+            });
 
             // another example from online (that I've never tried):
             // try (CloseableHttpClient client = HttpClients.createMinimal()) {

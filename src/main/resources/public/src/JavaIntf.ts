@@ -235,10 +235,6 @@ export interface AddPrivilegeRequest extends RequestBase {
     principals: string[];
 }
 
-export interface AppDropRequest extends RequestBase {
-    data: string;
-}
-
 export interface AskSubGraphRequest extends RequestBase {
     nodeId: string;
     question: string;
@@ -282,7 +278,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     shareToUserId: string;
     boosterUserId: string;
     fediSend: boolean;
-    payloadType?: string;
+    payloadType: string;
     reply: boolean;
 }
 
@@ -475,8 +471,8 @@ export interface LoginRequest extends RequestBase {
     password: string;
     asymEncKey: string;
     sigKey: string;
-    tzOffset?: number;
-    dst?: boolean;
+    tzOffset: number;
+    dst: boolean;
 }
 
 export interface LogoutRequest extends RequestBase {
@@ -712,9 +708,6 @@ export interface AddFriendResponse extends ResponseBase {
 export interface AddPrivilegeResponse extends ResponseBase {
     principalPublicKey: string;
     principalNodeId: string;
-}
-
-export interface AppDropResponse extends ResponseBase {
 }
 
 export interface AskSubGraphResponse extends ResponseBase {

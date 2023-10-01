@@ -36,18 +36,18 @@ verifySuccess "Maven install common pom"
 
 cd ${PRJROOT}
 
+# These aren't normally needed, so I'll just keep commented out most of time. Tip: Only run any of these AFTER
+# you've successfully run a build, and if you changed a bunch of stuff delete ".m2" folder on your machine first!
+# mvn dependency:sources clean
+# mvn dependency:resolve -Dclassifier=javadoc
+# mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
+
 # This build command creates the SpringBoot fat jar in the /target/ folder.
 echo "Maven CLEAN package ${mvn_profile}"
 # This run is required only to ensure TypeScript generated files are up to date.
 # Always do the same profile here (dev-vscode)
 mvn -T 1C package -DskipTests=true -Pdev-vscode
 verifySuccess "Maven install commmon dev-vscode (typescript gen)"
-
-# These aren't normally needed, so I'll just keep commented out most of time. Tip: Only run any of these AFTER
-# you've successfully run a build, and if you changed a bunch of stuff delete ".m2" folder on your machine first!
-# mvn dependency:sources clean
-# mvn dependency:resolve -Dclassifier=javadoc
-# mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
 cd ${PRJROOT}/src/main/resources/public
 . ./build.sh

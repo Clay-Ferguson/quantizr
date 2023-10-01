@@ -1,6 +1,6 @@
 package quanta.exception;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import quanta.exception.base.RuntimeEx;
 
 public class ServerTooBusyException extends RuntimeEx {

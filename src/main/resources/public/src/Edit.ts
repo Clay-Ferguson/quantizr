@@ -277,7 +277,8 @@ export class Edit {
                     fediSend: false,
                     boosterUserId: null,
                     reply: false,
-                    directMessage: false
+                    directMessage: false,
+                    payloadType: null,
                 });
                 if (blob) {
                     this.createSubNodeResponse(res, false, null, afterEditJumpToId);
@@ -315,7 +316,8 @@ export class Edit {
                     fediSend: false,
                     boosterUserId: null,
                     reply: false,
-                    directMessage: false
+                    directMessage: false,
+                    payloadType: null,
                 });
                 this.createSubNodeResponse(res, false, null, afterEditJumpToId);
             }
@@ -1089,7 +1091,8 @@ export class Edit {
             fediSend: false,
             boosterUserId: null,
             reply: false,
-            directMessage: false
+            directMessage: false,
+            payloadType: null
         });
 
         if (res.code == C.RESPONSE_CODE_OK) {
@@ -1145,7 +1148,8 @@ export class Edit {
             fediSend: false,
             boosterUserId: null,
             reply: false,
-            directMessage: false
+            directMessage: false,
+            payloadType: null
         });
 
         if (blob) {
@@ -1267,7 +1271,8 @@ export class Edit {
             fediSend,
             boosterUserId,
             reply,
-            directMessage
+            directMessage,
+            payloadType: null
         });
 
         if (!boostTarget) {
@@ -1337,7 +1342,8 @@ export class Edit {
             fediSend: false,
             boosterUserId: null,
             reply: false,
-            directMessage: false
+            directMessage: false,
+            payloadType: null
         });
         this.createSubNodeResponse(res, false, null, null);
     }

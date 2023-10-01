@@ -33,7 +33,6 @@ import quanta.mongo.model.SubNode;
 import quanta.request.AskSubGraphRequest;
 import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
-import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -44,7 +43,7 @@ public class OpenAiService extends ServiceBase {
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
 
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(300000));
+    private static final RestTemplate restTemplate = new RestTemplate();
     public static final ObjectMapper mapper = new ObjectMapper();
 
     // NOTE: This didn't allow unknown properties as expected but putting the

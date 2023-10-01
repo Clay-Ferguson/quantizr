@@ -3,7 +3,7 @@ package quanta.service.node;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

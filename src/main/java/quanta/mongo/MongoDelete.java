@@ -252,7 +252,7 @@ public class MongoDelete extends ServiceBase {
         // this hash set just makes sure we only submit each val set once! No replicated work.
         HashSet<ObjectId> parentIds = new HashSet<>();
 
-        ops.stream(q, SubNode.class).forEachRemaining(node -> {
+        ops.stream(q, SubNode.class).forEach(node -> {
             // lazy create bops
             if (!bops.hasVal()) {
                 bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
@@ -327,7 +327,7 @@ public class MongoDelete extends ServiceBase {
             deletesInPass.setVal(0L);
             // scan the entire DB
 
-            ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+            ops.stream(new Query(), SubNode.class).forEach(node -> {
                 // if this node is root node, ignore
                 if (NodePath.ROOT_PATH.equals(node.getPath()))
                     return;
@@ -408,7 +408,7 @@ public class MongoDelete extends ServiceBase {
         // map every path to it's ObjectId
         HashMap<String, ObjectId> allNodes = new HashMap<>();
         // first all we do is build up the 'allNodes' hashMap.
-        ops.stream(new Query(), SubNode.class).forEachRemaining(node -> {
+        ops.stream(new Query(), SubNode.class).forEach(node -> {
             // print progress every 1000th node
             nodesProcessed.inc();
             if (nodesProcessed.getVal() % 1000 == 0) {
@@ -504,7 +504,7 @@ public class MongoDelete extends ServiceBase {
                 continue;
             auth.ownerAuth(ms, node);
             read.hasChildrenConsistencyCheck(ms, node);
-            
+
             // get the parent of the node and add it's id to parentIds
             SubNode parent = read.getParent(ms, node, false);
 

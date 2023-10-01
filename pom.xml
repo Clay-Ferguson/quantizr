@@ -25,7 +25,7 @@
 
 			WARNING: This version number is in BOTH pom files!
 		-->
-		<version>2.7.3</version>
+		<version>3.1.4</version>
 		<relativePath />
 	</parent>
 

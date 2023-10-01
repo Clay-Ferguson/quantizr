@@ -1,7 +1,7 @@
 package quanta.request;
 
 import java.util.List;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import quanta.model.PropertyInfo;
 import quanta.request.base.RequestBase;
 

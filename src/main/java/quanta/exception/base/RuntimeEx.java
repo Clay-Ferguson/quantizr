@@ -1,6 +1,6 @@
 package quanta.exception.base;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class RuntimeEx extends RuntimeException {
 
