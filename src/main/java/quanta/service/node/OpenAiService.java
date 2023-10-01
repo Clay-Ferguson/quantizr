@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -43,7 +42,6 @@ public class OpenAiService extends ServiceBase {
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
 
-    private static final RestTemplate restTemplate = new RestTemplate();
     public static final ObjectMapper mapper = new ObjectMapper();
 
     // NOTE: This didn't allow unknown properties as expected but putting the
