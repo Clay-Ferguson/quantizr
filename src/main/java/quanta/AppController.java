@@ -1478,6 +1478,9 @@ public class AppController extends ServiceBase implements ErrorController {
                 case "performanceReport":
                     res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
                     break;
+                case "clearPerformanceData":
+                    res.getMessages().add(new InfoMessage(PerformanceReport.clearData(), null));
+                    break;
                 case "crawlUsers":
                     res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
                     break;

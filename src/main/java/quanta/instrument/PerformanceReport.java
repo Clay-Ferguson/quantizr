@@ -15,6 +15,14 @@ public class PerformanceReport {
     // Any calls that complete faster than this time, are not even considered. They're not a problem.
     public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 
+    public static String clearData() {
+        ThreadLocals.requireAdmin();
+        synchronized (Instrument.data) {
+            Instrument.data.clear();
+        }
+        return getReport();
+    }
+
     public static String getReport() {
         ThreadLocals.requireAdmin();
         StringBuilder sb = new StringBuilder();
