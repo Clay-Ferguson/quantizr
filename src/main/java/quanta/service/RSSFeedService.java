@@ -1,8 +1,8 @@
 package quanta.service;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -15,12 +15,12 @@ import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import com.rometools.modules.content.ContentModuleImpl;
 import com.rometools.modules.itunes.EntryInformationImpl;
 import com.rometools.modules.mediarss.MediaEntryModuleImpl;
@@ -37,7 +37,6 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
-import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
@@ -63,6 +62,7 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import reactor.core.publisher.Mono;
 
 /* Proof of Concept RSS Publishing */
 @Component
@@ -72,7 +72,6 @@ public class RSSFeedService extends ServiceBase {
     private static boolean refreshingCache = false;
     private static final Object policyLock = new Object();
     PolicyFactory policy = null;
-    private static final RestTemplate restTemplate = new RestTemplate();
     /*
      * Cache of all feeds.
      */
@@ -243,36 +242,27 @@ public class RSSFeedService extends ServiceBase {
                         "Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText"));
             }
 
-            inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
-                SyndFeedInput input = new SyndFeedInput();
-                long start = System.currentTimeMillis();
-                try {
-                    return input.build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 10 * Const.ONE_MB)));
-                } //
-                catch (FeedException e) {
-                    throw new IOException("Could not parse response for feed: " + url, e);
-                } //
-                finally {
-                    long time = System.currentTimeMillis() - start;
-                    if (time > 2000) {
-                        log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
-                    }
-                    new PerfMonEvent(System.currentTimeMillis() - start, "readFeed",
-                            ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin");
-                }
-            });
+            long start = System.currentTimeMillis();
+            Mono<SyndFeed> inFeedMono = WebClient.create().get().uri(url).retrieve().bodyToMono(DataBuffer.class)
+                    .timeout(Duration.ofSeconds(timeout)).map(dataBuffer -> {
+                        try {
+                            SyndFeedInput input = new SyndFeedInput();
+                            return input.build(new XmlReader(
+                                    new LimitedInputStreamEx(dataBuffer.asInputStream(), 10 * Const.ONE_MB)));
+                        } catch (Exception e) {
+                            throw new RuntimeException("Could not parse response for feed: " + url, e);
+                        }
+                    });
 
-            // another example from online (that I've never tried):
-            // try (CloseableHttpClient client = HttpClients.createMinimal()) {
-            // HttpUriRequest request = new HttpGet(url);
-            // try (CloseableHttpResponse response = client.execute(request);
-            // InputStream stream = response.getEntity().getContent()) {
-            // SyndFeedInput input = new SyndFeedInput();
-            // SyndFeed feed = input.build(new XmlReader(stream));
-            // System.out.println(feed.getTitle());
-            // }
-            // }
-            // entries.");
+            inFeed = inFeedMono.block();
+
+            long time = System.currentTimeMillis() - start;
+            if (time > 2000) {
+                log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
+            }
+            new PerfMonEvent(System.currentTimeMillis() - start, "readFeed",
+                    ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin");
+
             // we update the cache regardless of 'fromCache' val. this is correct.
             feedCache.put(url, inFeed);
             // store knowledge of which feed Title goes with each entry instance.

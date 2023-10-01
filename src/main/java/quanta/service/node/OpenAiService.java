@@ -7,13 +7,12 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
@@ -35,6 +34,7 @@ import quanta.response.AskSubGraphResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import reactor.core.publisher.Mono;
 
 @Component
 public class OpenAiService extends ServiceBase {
@@ -82,10 +82,6 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Sorry, you have no more OpenAI credit.");
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + prop.getOpenAiKey());
-
         // this will hold all the prior chat history
         List<ChatMessage> messages = new ArrayList<>();
 
@@ -109,17 +105,23 @@ public class OpenAiService extends ServiceBase {
 
         /* Moderate Call before submitting */
         String contentToModerate = concatenateContent(messages);
-        ChatGPTModerationRequest modRequest = new ChatGPTModerationRequest(contentToModerate);
-        HttpEntity<ChatGPTModerationRequest> modEntity = new HttpEntity<>(modRequest, headers);
-        ResponseEntity<ChatGPTModerationResponse> modResponse =
-                restTemplate.exchange(OPENAI_MOD_URL, HttpMethod.POST, modEntity, ChatGPTModerationResponse.class);
 
-        if (moderationFailed(modResponse.getBody())) {
+        ChatGPTModerationRequest modRequest = new ChatGPTModerationRequest(contentToModerate);
+
+        WebClient webClient =
+                WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                        .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + prop.getOpenAiKey())
+                        .baseUrl(OPENAI_MOD_URL).build();
+
+        Mono<ChatGPTModerationResponse> modResponse =
+                webClient.post().body(Mono.just(modRequest), ChatGPTModerationRequest.class).retrieve()
+                        .bodyToMono(ChatGPTModerationResponse.class);
+
+        ChatGPTModerationResponse modRes = modResponse.block();
+
+        if (moderationFailed(modRes)) {
             throw new RuntimeException("Sorry, the AI would reject that question.");
         }
-
-        ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString());
 
         switch (system.getModel().toLowerCase()) {
             case "gpt-4":
@@ -130,13 +132,21 @@ public class OpenAiService extends ServiceBase {
                         + " is not supported.");
         }
 
+        webClient = WebClient.builder().baseUrl(OPENAI_COMP_URL)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
+
+        ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
+                ms.getUserNodeId().toHexString());
+
         log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
-        HttpEntity<ChatGPTRequest> entity = new HttpEntity<>(request, headers);
-        ResponseEntity<ChatCompletionResponse> response =
-                restTemplate.exchange(OPENAI_COMP_URL, HttpMethod.POST, entity, ChatCompletionResponse.class);
 
-        ChatCompletionResponse res = response.getBody();
+        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(request)).retrieve()
+                .bodyToMono(ChatCompletionResponse.class);
+
+        ChatCompletionResponse res = mono.block();
+
         log.debug("GPT Res: " + XString.prettyPrint(res));
 
         updateUserCredit(userNode, userCredit, res);

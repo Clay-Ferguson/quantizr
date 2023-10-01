@@ -7,6 +7,7 @@ import static quanta.actpub.model.AP.apStr;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.model.AP;
@@ -49,8 +51,8 @@ import quanta.mongo.model.SubNode;
 import quanta.response.GetThreadViewResponse;
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
-import quanta.util.Util;
 import quanta.util.XString;
+import reactor.core.publisher.Mono;
 
 /**
  * AP-related utilities
@@ -215,6 +217,38 @@ public class ActPubUtil extends ServiceBase {
      * acceptable too. 'clazz' is optional and tells which APObj-derived class to marshall into.
      */
     public APObj getJson(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
+        WebClient webClient = WebClient.builder().baseUrl(url).defaultHeaders(httpHeaders -> {
+            if (headers != null) {
+                httpHeaders.addAll(headers);
+            } else {
+                httpHeaders.addAll(new HttpHeaders());
+            }
+            if (mediaType != null) {
+                httpHeaders.setAccept(Collections.singletonList(mediaType));
+            }
+        }).build();
+
+        Mono<APObj> mono = webClient.get().retrieve().bodyToMono(String.class).flatMap(responseBody -> {
+            try {
+                APObj ret = (APObj) mapper.readValue(responseBody, clazz);
+                return Mono.just(ret);
+            } catch (Exception e) {
+                log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class="
+                        + e.getClass().getName());
+                return Mono.error(e);
+            }
+        }).onErrorResume(HttpClientErrorException.Gone.class, goneEx -> {
+            log.debug("http says Gone: " + url);
+            return Mono.empty();
+        }).onErrorResume(HttpClientErrorException.Forbidden.class, forbiddenEx -> {
+            log.debug("http says Forbidden: " + url);
+            return Mono.empty();
+        });
+        return mono.block();
+    }
+
+    // todo-0: we can delete this old method once we're sure the new one works
+    public APObj getJson_old(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
         APObj ret = null;
         int responseCode = 0;
         try {
@@ -390,7 +424,33 @@ public class ActPubUtil extends ServiceBase {
         return finger;
     }
 
-    public APObj postJson(String url, String body, HttpHeaders headers, MediaType postType) {
+    public void postJson(String url, String body, HttpHeaders headers, MediaType postType) {
+        try {
+            if (headers == null) {
+                headers = new HttpHeaders();
+            }
+            headers.setAccept(List.of(APConst.MTYPE_ACT_JSON, APConst.MTYPE_JSON));
+            String appName = prop.getConfigText("brandingAppName");
+            if (appName == null)
+                appName = "Quanta";
+            // NOTE: I'm not sure this is ever necessary. Noticed Pleroma doing it and copied it.
+            headers.add("user-agent", appName + "; https://" + prop.getMetaHost() + " <fake@email.com>");
+            headers.setContentType(postType);
+            HttpHeaders _headers = headers;
+            WebClient.create().post().uri(url).headers(httpHeaders -> httpHeaders.addAll(_headers))
+                    .body(Mono.just(body), String.class).retrieve().bodyToMono(String.class)
+                    .doOnSuccess(response -> log.trace("POST: " + body + "\nTO: " + url + " RESULT: " + response))
+                    .doOnError(e -> {
+                        log.error("postJson failed: " + url, e);
+                        throw new RuntimeException(e);
+                    });
+        } catch (Exception e) {
+            log.error("postJson failed: " + url, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public APObj postJson_old(String url, String body, HttpHeaders headers, MediaType postType) {
         APObj ret = null;
         try {
             if (headers == null) {
