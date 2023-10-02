@@ -60,6 +60,8 @@ public class Convert extends ServiceBase {
             boolean attachLinkedNodes) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
+        // todo-0: this is a hack because our new markdown renderer can badly blow up the entire page if it
+        // contains tags
         node.setContent(node.getContent().replace("<", "&lt;").replace(">", "&gt;"));
 
         // if we have a signature, check it.
