@@ -115,7 +115,9 @@ services:
     #         - "4001:4001"
     #         - "4001:4001/udp"
 
+    # #pgdb
     # pgdb-dev:
+    #     # todo-0: research other images like 'postgres:13.1-alpine'
     #     image: postgres
     #     deploy:
     #         # Don't want a restart policy for DEV!
@@ -227,7 +229,8 @@ services:
             REDIS_PORT: "${REDIS_PORT}"
             REDIS_PASSWORD: "${REDIS_PASSWORD}"
 
-            # SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/compose-postgres"
+            # #pgdb
+            # SPRING_DATASOURCE_URL: "jdbc:postgresql://pgdb-host-dev:5432/compose-postgres"
             # SPRING_DATASOURCE_USERNAME: "compose-postgres"
             # SPRING_DATASOURCE_PASSWORD: "compose-postgres"
             # SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
