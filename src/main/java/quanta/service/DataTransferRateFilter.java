@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import quanta.util.Util;
 import quanta.util.XString;
 
+/* This filter is helpful only for diagnostics. It's currently disabled by not being mentioned in */
 @Component
 public class DataTransferRateFilter extends GenericFilterBean {
 
@@ -36,6 +37,7 @@ public class DataTransferRateFilter extends GenericFilterBean {
         HttpServletResponse originalResponse = (HttpServletResponse) response;
         CountingResponseWrapper responseWrapper = new CountingResponseWrapper(originalResponse);
 
+        String prefix = getLogPrefix((HttpServletRequest) request);
         long startTime = System.nanoTime();
         chain.doFilter(request, responseWrapper);
         long responseSize = responseWrapper.getByteCount();
@@ -51,8 +53,13 @@ public class DataTransferRateFilter extends GenericFilterBean {
             totalBytesSent += responseSize;
             DecimalFormat decimalFormat = new DecimalFormat("0.000");
 
-            log.debug(getLogPrefix((HttpServletRequest) request) + "\n    Data Rate: " + decimalFormat.format(dataRate)
-                    + " KBps, Bytes: " + responseSize + " (Avg: " + DataTransferRateFilter.formatAverageRate() + ")");
+            double seconds = duration / 1e9; // 1e9 is 1 billion
+
+            // log any slow requests
+            if (seconds > 1) {
+                log.debug(prefix + "\n    Data Rate: " + decimalFormat.format(dataRate) + " KBps, Bytes: "
+                        + responseSize + " (Avg: " + DataTransferRateFilter.formatAverageRate() + ")");
+            }
         }
     }
 

@@ -26,7 +26,6 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import quanta.AppController;
 import quanta.actpub.APConst;
 import quanta.service.AppFilter;
-import quanta.service.DataTransferRateFilter;
 import quanta.service.UtilFilter;
 
 // @EnableAspectJAutoProxy // (proxyTargetClass = true)
@@ -45,8 +44,9 @@ public class AppConfiguration implements WebMvcConfigurer {
     @Autowired
     private AppFilter appFilter;
 
-    @Autowired
-    private DataTransferRateFilter dataTransferRateFilter;
+    // // DO NOT DELETE (this is diagnostic code)
+    // @Autowired
+    // private DataTransferRateFilter dataTransferRateFilter;
 
     @Autowired
     private UtilFilter utilFilter;
@@ -68,17 +68,18 @@ public class AppConfiguration implements WebMvcConfigurer {
         return reg;
     }
 
-    @Bean
-    public FilterRegistrationBean<DataTransferRateFilter> filterRegistrationBean() {
-        FilterRegistrationBean<DataTransferRateFilter> reg = new FilterRegistrationBean<>();
-        reg.setFilter(dataTransferRateFilter);
-        reg.setOrder(1);
-        reg.addUrlPatterns("/images/*");
-        reg.addUrlPatterns("/fonts/*");
-        reg.addUrlPatterns("/dist/*");
-        reg.addUrlPatterns(AppController.API_PATH + "/bin/*");
-        return reg;
-    }
+    // DO NOT DELETE (this is diagnostic code)
+    // @Bean
+    // public FilterRegistrationBean<DataTransferRateFilter> filterRegistrationBean() {
+    // FilterRegistrationBean<DataTransferRateFilter> reg = new FilterRegistrationBean<>();
+    // reg.setFilter(dataTransferRateFilter);
+    // reg.setOrder(1);
+    // reg.addUrlPatterns("/images/*");
+    // reg.addUrlPatterns("/fonts/*");
+    // reg.addUrlPatterns("/dist/*");
+    // reg.addUrlPatterns(AppController.API_PATH + "/bin/*");
+    // return reg;
+    // }
 
 
     @Bean
