@@ -59,6 +59,9 @@ public class Convert extends ServiceBase {
             boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal,
             boolean attachLinkedNodes) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
+
+        node.setContent(node.getContent().replace("<", "&lt;").replace(">", "&gt;"));
+
         // if we have a signature, check it.
         boolean sigFail = false;
         if (sig != null && !crypto.nodeSigVerify(node, sig)) {
