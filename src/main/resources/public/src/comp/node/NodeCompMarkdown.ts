@@ -70,6 +70,7 @@ export class NodeCompMarkdown extends Comp {
 
         val = S.util.insertActPubTags(val, node);
         val = this.translateLaTex(val);
+        val = this.sanitize(val);
         val = this.insertMarkdownLinks(urls, val);
         return val;
     }
@@ -89,6 +90,12 @@ export class NodeCompMarkdown extends Comp {
         val = val.replaceAll("\\)", "$");
         val = val.replaceAll("\\[", "$$");
         val = val.replaceAll("\\]", "$$");
+        return val;
+    }
+
+    sanitize = (val: string): string => {
+        val = val.replaceAll("<", "&lt;");
+        val = val.replaceAll(">", "&gt;");
         return val;
     }
 
