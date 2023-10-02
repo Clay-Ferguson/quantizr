@@ -228,22 +228,34 @@ public class ActPubUtil extends ServiceBase {
             }
         }).build();
 
-        Mono<APObj> mono = webClient.get().retrieve().bodyToMono(String.class).flatMap(responseBody -> {
+        // todo-0: keep thos older 'flatMap' version around for a while to make sure the new one works
+        // Mono<APObj> mono = webClient.get().retrieve().bodyToMono(String.class).flatMap(responseBody -> {
+        // try {
+        // APObj ret = (APObj) mapper.readValue(responseBody, clazz);
+        // return Mono.just(ret);
+        // } catch (Exception e) {
+        // log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class="
+        // + e.getClass().getName());
+        // return Mono.error(e);
+        // }
+        // }).onErrorResume(HttpClientErrorException.Gone.class, goneEx -> {
+        // log.debug("http says Gone: " + url);
+        // return Mono.empty();
+        // }).onErrorResume(HttpClientErrorException.Forbidden.class, forbiddenEx -> {
+        // log.debug("http says Forbidden: " + url);
+        // return Mono.empty();
+        // });
+
+        Mono<APObj> mono = webClient.get().retrieve().bodyToMono(String.class).map(responseBody -> {
             try {
-                APObj ret = (APObj) mapper.readValue(responseBody, clazz);
-                return Mono.just(ret);
+                return (APObj) mapper.readValue(responseBody, clazz);
             } catch (Exception e) {
                 log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class="
                         + e.getClass().getName());
-                return Mono.error(e);
+                return null;
             }
-        }).onErrorResume(HttpClientErrorException.Gone.class, goneEx -> {
-            log.debug("http says Gone: " + url);
-            return Mono.empty();
-        }).onErrorResume(HttpClientErrorException.Forbidden.class, forbiddenEx -> {
-            log.debug("http says Forbidden: " + url);
-            return Mono.empty();
         });
+
         return mono.block();
     }
 

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,8 +41,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -72,7 +69,6 @@ import quanta.response.UploadFromUrlResponse;
 import quanta.response.UploadResponse;
 import quanta.response.base.ResponseBase;
 import quanta.service.imports.ImportZipService;
-import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
 import quanta.util.LimitedInputStream;
@@ -82,7 +78,6 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
-import reactor.core.publisher.Mono;
 
 /**
  * Service for managing node attachments.
