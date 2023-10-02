@@ -73,7 +73,6 @@ public class DataTransferRateFilter extends GenericFilterBean {
         return decimalFormat.format(Util.calculateKBps(totalBytesSent, totalTime)) + " KBps";
     }
 
-
     private static class CountingResponseWrapper extends HttpServletResponseWrapper {
 
         private CountingServletOutputStream outputStream;
@@ -132,5 +131,10 @@ public class DataTransferRateFilter extends GenericFilterBean {
         public long getByteCount() {
             return count.get();
         }
+    }
+
+    public static void reset() {
+        totalBytesSent = 0;
+        totalTime = 0;
     }
 }

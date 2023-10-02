@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,6 +42,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -69,6 +72,7 @@ import quanta.response.UploadFromUrlResponse;
 import quanta.response.UploadResponse;
 import quanta.response.base.ResponseBase;
 import quanta.service.imports.ImportZipService;
+import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
 import quanta.util.LimitedInputStream;
@@ -78,6 +82,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
+import reactor.core.publisher.Mono;
 
 /**
  * Service for managing node attachments.
@@ -795,101 +800,75 @@ public class AttachmentService extends ServiceBase {
      * NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
      */
     public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
-            String mimeType, long maxFileSize, boolean storeLocally) {
+            String mimeType, int maxFileSize, boolean storeLocally) {
 
-        // todo-0: Spring 3 took away HttpClient
-        if (true)
-            throw new RuntimeException("Feature is temporarily disabled.");
+        if (mimeType == null) {
+            mimeType = getMimeTypeFromUrl(sourceUrl);
+            if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
+                mimeType = URLConnection.guessContentTypeFromName(mimeHint);
+            }
+        }
+        if (node == null) {
+            node = read.getNode(ms, nodeId);
+        }
 
-        // if (mimeType == null) {
-        // mimeType = getMimeTypeFromUrl(sourceUrl);
-        // if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
-        // mimeType = URLConnection.guessContentTypeFromName(mimeHint);
-        // }
-        // }
-        // if (node == null) {
-        // node = read.getNode(ms, nodeId);
-        // }
-        // // only need to auth if we looked up the node.
-        // auth.ownerAuth(node);
-        // String attKey = getNextAttachmentKey(node);
-        // if (!storeLocally) {
-        // int maxAttOrdinal = getMaxAttachmentOrdinal(node);
-        // Attachment att = node.getAttachment(attKey, true, true);
-        // if (mimeType != null) {
-        // att.setMime(mimeType);
-        // }
-        // att.setUrl(sourceUrl);
-        // att.setOrdinal(maxAttOrdinal + 1);
-        // return;
-        // }
-        // if (maxFileSize <= 0) {
-        // maxFileSize = user.getUserStorageRemaining(ms);
-        // }
-        // ms = ThreadLocals.ensure(ms);
-        // LimitedInputStreamEx limitedIs = null;
-        // try {
-        // URL url = new URL(sourceUrl);
-        // int timeout = 20;
-        // RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-        // .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-        // /*
-        // * if this is an image extension, handle it in a special way, mainly to extract the width, height
-        // * from it
-        // */
-        // if (ImageUtil.isImageMime(mimeType)) {
-        // /*
-        // * DO NOT DELETE
-        // *
-        // * Basic version without masquerading as a web browser can cause a 403 error because some sites
-        // * don't want just any old stream reading from them. Leave this note here as a warning and
-        // * explanation
-        // */
-        // // would restTemplate be better for this ?
-        // HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        // HttpGet request = new HttpGet(sourceUrl);
-        // request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-        // HttpResponse response = client.execute(request);
-        // log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason="
-        // + response.getStatusLine().getReasonPhrase());
-        // InputStream is = response.getEntity().getContent();
-        // limitedIs = new LimitedInputStreamEx(is, maxFileSize);
-        // // insert 0L for size now, because we don't know it yet
-        // attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1,
-        // -1,
-        // false, false, true, true, storeLocally, sourceUrl, false);
-        // }
-        // /*
-        // * if not an image extension, we can just stream directly into the database, but we want to try to
-        // * get the mime type first, from calling detectImage so that if we do detect its an image we can
-        // * handle it as one.
-        // */
-        // else {
-        // if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
-        // HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-        // HttpGet request = new HttpGet(sourceUrl);
-        // request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
-        // HttpResponse response = client.execute(request);
-        // /*
-        // * log.debug("Response Code: " + response.getStatusLine().getStatusCode() + " reason=" +
-        // * response.getStatusLine().getReasonPhrase());
-        // */
-        // InputStream is = response.getEntity().getContent();
-        // limitedIs = new LimitedInputStreamEx(is, maxFileSize);
-        // // insert 0L for size now, because we don't know it yet
-        // attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1,
-        // false,
-        // false, true, true, storeLocally, sourceUrl, false);
-        // }
-        // }
-        // } catch (Exception e) {
-        // throw ExUtil.wrapEx(e);
-        // } finally {
-        // /* finally block just for extra safety */
-        // // this stream will have been closed by 'attachBinaryFromStream' but we close
-        // // here too anyway.
-        // StreamUtil.close(limitedIs);
-        // }
+        // only need to auth if we looked up the node.
+        auth.ownerAuth(node);
+        String attKey = getNextAttachmentKey(node);
+        if (!storeLocally) {
+            int maxAttOrdinal = getMaxAttachmentOrdinal(node);
+            Attachment att = node.getAttachment(attKey, true, true);
+            if (mimeType != null) {
+                att.setMime(mimeType);
+            }
+            att.setUrl(sourceUrl);
+            att.setOrdinal(maxAttOrdinal + 1);
+            return;
+        }
+
+        if (maxFileSize <= 0) {
+            maxFileSize = user.getUserStorageRemaining(ms);
+        }
+
+        ms = ThreadLocals.ensure(ms);
+        LimitedInputStreamEx limitedIs = null;
+        try {
+            URL url = new URL(sourceUrl);
+            int timeout = 20;
+
+            /*
+             * if this is an image extension, handle it in a special way, mainly to extract the width, height
+             * from it
+             */
+            if (ImageUtil.isImageMime(mimeType)) {
+                limitedIs = StreamUtil.getLimitedStream(sourceUrl, timeout, maxFileSize);
+
+                // insert 0L for size now, because we don't know it yet
+                attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
+                        false, false, true, true, storeLocally, sourceUrl, false);
+            }
+            /*
+             * if not an image extension, we can just stream directly into the database, but we want to try to
+             * get the mime type first, from calling detectImage so that if we do detect its an image we can
+             * handle it as one.
+             */
+            else {
+                if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
+                    limitedIs = StreamUtil.getLimitedStream(sourceUrl, timeout, maxFileSize);
+
+                    // insert 0L for size now, because we don't know it yet
+                    attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
+                            false, true, true, storeLocally, sourceUrl, false);
+                }
+            }
+        } catch (Exception e) {
+            throw ExUtil.wrapEx(e);
+        } finally {
+            /* finally block just for extra safety */
+            // this stream will have been closed by 'attachBinaryFromStream' but we close
+            // here too anyway.
+            StreamUtil.close(limitedIs);
+        }
     }
 
     // FYI: Warning: this way of getting content type doesn't work.

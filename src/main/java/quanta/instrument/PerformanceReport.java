@@ -23,6 +23,7 @@ public class PerformanceReport {
         synchronized (Instrument.data) {
             Instrument.data.clear();
         }
+        DataTransferRateFilter.reset();
         return getReport();
     }
 

@@ -21,6 +21,9 @@ public class Util {
     private static final Random rand = new Random();
 
     public static double calculateKBps(double bytes, double nanoseconds) {
+        if (nanoseconds == 0)
+            nanoseconds = 1; // avoid divide by zero
+
         // Convert nanoseconds to seconds
         double seconds = nanoseconds / 1e9; // 1e9 is 1 billion
 

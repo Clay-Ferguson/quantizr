@@ -1488,7 +1488,7 @@ public class UserManagerService extends ServiceBase {
         return ret;
     }
 
-    public long getUserStorageRemaining(MongoSession ms) {
+    public int getUserStorageRemaining(MongoSession ms) {
         if (ms.isAnon()) {
             return 0;
         }
@@ -1497,14 +1497,14 @@ public class UserManagerService extends ServiceBase {
         }
         SubNode userNode = read.getAccountByUserName(null, ThreadLocals.getSC().getUserName(), false);
         if (userNode == null)
-            return 0L;
+            return 0;
 
-        long quota = userNode.getInt(NodeProp.BIN_QUOTA);
+        int quota = userNode.getInt(NodeProp.BIN_QUOTA).intValue();
         if (quota == 0) {
             return Const.DEFAULT_USER_QUOTA;
         }
 
-        long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
+        int binTotal = userNode.getInt(NodeProp.BIN_TOTAL).intValue();
         return quota - binTotal;
     }
 }

@@ -3,13 +3,43 @@ package quanta.util;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.InputStream;
+import java.time.Duration;
 import javax.imageio.ImageReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 public class StreamUtil {
-
     private static Logger log = LoggerFactory.getLogger(StreamUtil.class);
+
+    public static InputStream getStream(String sourceUrl, int timeout, final int maxFileSize) {
+        try {
+            final ExchangeStrategies strategies = ExchangeStrategies.builder()
+                    .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(maxFileSize)).build();
+
+            WebClient webClient = WebClient.builder().exchangeStrategies(strategies).baseUrl(sourceUrl)
+                    .defaultHeader(HttpHeaders.USER_AGENT, Const.FAKE_USER_AGENT).build();
+
+            Mono<ByteArrayResource> result =
+                    webClient.get().retrieve().bodyToMono(ByteArrayResource.class).timeout(Duration.ofSeconds(timeout));
+
+            ByteArrayResource resource = result.block();
+            InputStream is = resource.getInputStream();
+            return is;
+        } catch (Exception e) {
+            throw ExUtil.wrapEx(e);
+        }
+    }
+
+    public static LimitedInputStreamEx getLimitedStream(String sourceUrl, int timeout, final int maxFileSize) {
+        InputStream is = getStream(sourceUrl, timeout, maxFileSize);
+        LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, maxFileSize);
+        return limitedIs;
+    }
 
     public static void close(Object... objects) {
         for (Object obj : objects) {
