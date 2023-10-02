@@ -248,7 +248,7 @@ public class RSSFeedService extends ServiceBase {
                         try {
                             SyndFeedInput input = new SyndFeedInput();
                             return input.build(new XmlReader(
-                                    new LimitedInputStreamEx(dataBuffer.asInputStream(), 10 * Const.ONE_MB)));
+                                    new LimitedInputStreamEx(dataBuffer.asInputStream(), 10 * Const.ONE_MB), true));
                         } catch (Exception e) {
                             throw new RuntimeException("Could not parse response for feed: " + url, e);
                         }
