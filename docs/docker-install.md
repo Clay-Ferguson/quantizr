@@ -1,5 +1,7 @@
 # How to Install Docker & Docker Compose
 
+There's nothing in this file specific to Quanta. This information is just purely about how to install Docker and Docker Compose, and would be the same for any Ubuntu 22.04 user. This file is provided just as a quick reference.
+
 # Prerequisite
 
     sudo apt update
