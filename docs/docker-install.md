@@ -29,7 +29,18 @@ Here are the commands in case digitalocean.com is ever not available:
 
     sudo systemctl status docker
 
-todo-0: Test and add commands from the link above, for how to make Docker able to run without Sudo
+# Allow Docker Command without Sudo
+
+Note: leave ${USER} in the command below. run verbatim as shown below:
+
+Run when logged in as 'clay'
+
+    sudo usermod -aG docker ${USER}
+    su - ${USER}
+
+Check that it worked:
+
+    groups
 
 
 # Installing Docker Compose
@@ -39,14 +50,13 @@ https://github.com/docker/compose/releases
 
 And take the version number that's the latest and embed it into the command below and run...
 
-    sudo curl -L "https://github.com/docker/compose/releases/download/v2.11.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
     sudo chmod +x /usr/local/bin/docker-compose
 
 check the version
 
     docker-compose -v
-
 
 # Put Docker in Swarm Mode
 

@@ -97,6 +97,29 @@ checkFunctions() {
     echo "Functions Defined Ok."
 }
 
+# Define the askYesOrNo function
+askYesOrNo() {
+    local question="$1"
+    
+    # Prompt the user for a single character "y" or "n"
+    read -n 1 -p "$question (y/n): " answer
+    echo
+    
+    # Check if the answer is "y" (case-insensitive)
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Example of using the askYesOrNo function
+# if askYesOrNo "Do you want to say hi?"; then
+#     echo "hi there"
+# else
+#     echo "You chose not to say hi."
+# fi
+
 set -a
 echo "Functions ready"
 

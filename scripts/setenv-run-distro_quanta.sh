@@ -55,7 +55,7 @@ export MONGO_PORT=27017
 
 export REDIS_HOST=redis-host-distro
 export REDIS_PORT=6379
-export REDIS_PASSWORD=password
+export REDIS_PASSWORD=
 
 export DOCKER_DOWN_DELAY=30s
 export DOCKER_UP_DELAY=20s
