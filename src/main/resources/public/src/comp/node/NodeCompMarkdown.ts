@@ -94,9 +94,33 @@ export class NodeCompMarkdown extends Comp {
     }
 
     sanitize = (val: string): string => {
-        val = val.replaceAll("<", "&lt;");
-        val = val.replaceAll(">", "&gt;");
-        return val;
+
+        // if no code blocks do this the fast way.
+        if (val.indexOf("```") == -1) {
+            val = val.replaceAll("<", "&lt;");
+            val = val.replaceAll(">", "&gt;");
+            return val;
+        }
+
+        const regex = /(\r\n|\r|\n)/;
+
+        // Split the input string based on the regex
+        const tokens = val.split(regex);
+
+        let v = "";
+        let inCodeBlock = false;
+        tokens.forEach(t => {
+            if (t.startsWith("```")) {
+                inCodeBlock = !inCodeBlock;
+            }
+            if (!inCodeBlock) {
+                t = t.replaceAll("<", "&lt;");
+                t = t.replaceAll(">", "&gt;");
+            }
+            // console.log("LINE: " + token);
+            v += t;
+        });
+        return v;
     }
 
     // DO NOT DELETE (#inline-image-rendering)
