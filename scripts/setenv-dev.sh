@@ -83,7 +83,7 @@ export emailPassword=
 
 export REDIS_HOST=redis-host-dev
 export REDIS_PORT=6378
-export REDIS_PASSWORD=
+export REDIS_PASSWORD=password
 
 # Warning: To be able to create our test accounts we need this email prop defined even
 # even if it's a dummy string

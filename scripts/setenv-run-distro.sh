@@ -40,7 +40,7 @@ export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_BACKUP=${DEPLOY_TARGET}/backup
 
 export MONGO_HOST=mongo-host-distro
-export MONGO_PORT=27020
+export MONGO_PORT=27017
 
 export DOCKER_DOWN_DELAY=15s
 export DOCKER_UP_DELAY=20s
@@ -54,7 +54,7 @@ export emailPassword=
 
 export REDIS_HOST=redis-host-distro
 export REDIS_PORT=6379
-export REDIS_PASSWORD=
+export REDIS_PASSWORD=password
 
 # Warning: To be able to create our test accounts we need this email prop defined even
 # even if it's a dummy string

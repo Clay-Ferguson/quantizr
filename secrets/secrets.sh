@@ -7,7 +7,7 @@ export emailPassword=
 
 export REDIS_HOST=
 export REDIS_PORT=
-export REDIS_PASSWORD=
+export REDIS_PASSWORD=password
 
 # Warning: To be able to create our test accounts we need this email prop defined even
 # even if it's a dummy string

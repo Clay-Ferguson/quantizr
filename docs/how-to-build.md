@@ -4,12 +4,14 @@ todo-0: this doc needs to be updated.
 
 ## Overview
 
-The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself, using Linux shell scripts. Regardless of whether you run from the Docker public repository image, or a docker image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. A fully complete example runtime folder is provided in the github repository project under the '/distro' folder.
+The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself, using Linux shell scripts. 
+
+Regardless of whether you run from the Docker public repository image, or a docker image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. A fully complete example runtime folder is provided in the github repository project under the '/distro' folder.
 ## Option #1: Run from Public Docker Image
 
 To run a Quanta instance from the Docker Public Repository you can just run `run-distro.sh` from the 'distro' folder. This 'distro' folder is completely self-contained, and can be copied to a production machine or anywhere else to serve as your Quanta installation folder. To stop the app run `stop-distro.sh`. 
 
-The only prerequisite for this is that you have `docker` and `docker-compose` installed, and you need to setup docker to have 'swarm' capability using this command: `docker swarm init`
+The only prerequisite for this is that you have `docker` and `docker-compose` installed, and you need to setup docker to have 'swarm' capability using this command: `docker swarm init`. Referr to the `docker-install.md` file for complete instructions if you're not sure how to do this.
 
 NOTE: You should edit the password in the `setenv-*.sh` file before your first run, because that password will become your `admin` user password which you can use to login as the `admin` user in the app, and also will be the password securing your MongoDB instance. Also before you run the app you should probably at least look in the `setenv-*.sh` file, to see what other configs are in there, and perhaps the docker-compose YAML file too, but they should all contain usable defaults right out of the box.
 
