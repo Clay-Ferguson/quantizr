@@ -69,6 +69,12 @@ public class Convert extends ServiceBase {
         // this can be enabled/disabled easily by admin
         if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/")) {
             if ((sig == null || sigFail) && !sc.isAdmin()) {
+                // todo-0: This is designed to silently fail here and not show the nodes, however on a
+                // clean install when an anon user visits the site and the 'home' node is not yet signed
+                // we get this error with no explaination of why. We need to throw an actual error if
+                // this is a 'page root' node that's failing rather than a contained node.
+
+                log.error("Bad Signature on Admin Node: " + node.getIdStr());
                 // todo-2: we need a special global counter for when this happens, so the server info can show it.
                 /*
                  * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
