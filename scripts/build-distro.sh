@@ -1,4 +1,7 @@
 #!/bin/bash -i
+#
+# Tip: You may want to update QUANTA_VER in setenv-version.sh before running this script.
+#
 # (NOTE: -i arg makes .bashrc get sourced and without this NPM commands won't be found)
 
 # To just build a folder to deploy from (which can be used to run remote docker IMAGES from) set this

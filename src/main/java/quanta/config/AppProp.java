@@ -328,7 +328,7 @@ public class AppProp {
     }
 
     public String getAppVersion() {
-        return env.getProperty("QUANTA_VER");
+        return "3.0.4"; // env.getProperty("QUANTA_VER");
     }
 
     public String getSwarmTaskId() {

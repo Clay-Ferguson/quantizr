@@ -1,5 +1,7 @@
 # How to Run/Build Quanta
 
+todo-0: this doc needs to be updated.
+
 ## Overview
 
 The easiest way to run Quanta is to run the Public Docker Repo image, without building the executables yourself. This file will explain how to do that as well as how to build the executable yourself, using Linux shell scripts. Regardless of whether you run from the Docker public repository image, or a docker image you build yourself, you'll need a runtime folder that holds all the configuration files for the installation. A fully complete example runtime folder is provided in the github repository project under the '/distro' folder.

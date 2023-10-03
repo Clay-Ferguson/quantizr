@@ -1,20 +1,15 @@
 #!/bin/bash
-# This is the version of the 'setenv' file that's used to build the distro. The file named
-# 'setenv-run-distro.sh' is the environment setter for the runtime/deployment.
 
 source ./set-version.sh
 source ./define-functions.sh
 
-FILE=$(readlink -f "$BASH_SOURCE")
-FOLDER=$(dirname "$FILE")
-export PRJROOT=$(dirname "$FOLDER")
-export PRJPARENT=$(dirname "$PRJROOT")
-
-export VITE_SCRIPT=vite-build
-export SASS_SCRIPT=sass-prod
+# To Run from DockerHub do this:
+# export DOCKER_IMAGE=subnode/quanta:2.20.12
 
 export DOCKER_IMAGE=quanta
-export SCRIPTS=${PRJROOT}/scripts
+
+export DEPLOY_TARGET=$PWD
+
 export DOCKER_NETWORK=bridge
 
 # If you're using a DNS name that should go here instead of the ip.
@@ -26,36 +21,29 @@ export quanta_domain=172.17.0.1
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro
 
-export DOCKER_ENV=distro
-export mvn_profile=prod
+export ipfs_data=${DEPLOY_TARGET}/ipfs
+export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
 # make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
 # dependency in the dockercompose YAML file to start IPFS deamon before the app starts
 export ipfsEnabled=
 export ipfs_container=ipfs-distro
 
-# deploy target folder is where we will be running the app from or what will become the ZIP file content
-export DEPLOY_TARGET=/home/clay/ferguson/Quantizr/distro
-mkdir -p ${DEPLOY_TARGET}
-
-export ipfs_data=${DEPLOY_TARGET}/ipfs
-export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
-
-# Note: define-functions.sh is where we pass the ARGS into dockerfile
 export HOST_PORT=80
 export PORT=80
 export PORT_DEBUG=8000
-export XMS=512m
+export XMS=1g
 export XMX=2g
 
 export MONGO_DATA=${DEPLOY_TARGET}/data
+export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_BACKUP=${DEPLOY_TARGET}/backup
+
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27020
-export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 
 export DOCKER_DOWN_DELAY=15s
-export DOCKER_UP_DELAY=15s
+export DOCKER_UP_DELAY=20s
 
 # SECRETS 
 
@@ -66,7 +54,7 @@ export emailPassword=
 
 export REDIS_HOST=redis-host-distro
 export REDIS_PORT=6379
-export REDIS_PASSWORD=password
+export REDIS_PASSWORD=
 
 # Warning: To be able to create our test accounts we need this email prop defined even
 # even if it's a dummy string
@@ -80,3 +68,20 @@ export mongoPassword=password
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.
 export testPassword=password
+
+# OVERRIDE SECRETS IN here....
+
+# If this additional variable setter file exists we run it, so it can 
+# be used to override any of these settings
+
+# first apply any overrides that exist in this folder
+if [ -f "setenv-quanta-ext.sh" ]; then
+    echo "Overriding secrets with setenv-quanta-ext.sh"
+    source setenv-quanta-ext.sh
+fi
+
+# then apply any overrides from parent folder
+if [ -f "../setenv-quanta-ext.sh" ]; then
+    echo "Overriding secrets with ../setenv-quanta-ext.sh"
+    source ../setenv-quanta-ext.sh
+fi
