@@ -407,6 +407,12 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
     @ResponseBody
     public Object signup(@RequestBody SignupRequest req, HttpSession session) {
+
+        String mailPassword = prop.getMailPassword();
+        if (StringUtils.isEmpty(mailPassword)) {
+            throw new RuntimeEx("Signups are temporarily disabled.");
+        }
+
         return callProc.run("signup", false, false, req, session, ms -> {
             // This automated flag will bypass the captcha check, and email confirmation, and just
             // immediately
@@ -890,6 +896,12 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
     @ResponseBody
     public Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
+
+        String mailPassword = prop.getMailPassword();
+        if (StringUtils.isEmpty(mailPassword)) {
+            throw new RuntimeEx("Password resets are temporarily disabled.");
+        }
+
         return callProc.run("resetPassword", false, false, req, session, ms -> {
             return user.resetPassword(req);
         });

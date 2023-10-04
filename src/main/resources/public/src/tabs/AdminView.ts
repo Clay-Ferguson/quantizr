@@ -110,8 +110,8 @@ export class AdminView extends AppTab<any, AdminView> {
                 new FlexRowLayout([
                     new Divc({ className: "settingsCol" }, [
                         this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
-                        this.settingsLink("Send Email", () => S.util.sendTestEmail()),
-                        this.settingsLink("Server Log Text", () => S.util.sendLogText()),
+                        this.settingsLink("Send Email", S.util.sendTestEmail),
+                        this.settingsLink("Server Log Text", S.util.sendLogText),
                         this.settingsLink("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
                     ]),
                     new Divc({ className: "settingsCol" }, [

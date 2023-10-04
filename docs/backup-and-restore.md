@@ -10,6 +10,8 @@ Here's how you can execute those scripts inside the MongoDB container from the h
 
 Note: for an interactive terminal insert "-it" (without the quotes) after the 'exec'
 
-    docker exec mongo-distro /backup/_backup.sh
+Use `docker ps` to get container id
 
-    docker exec mongo-distro /backup/_restore.sh
+    docker exec ${containerId} /backup/_backup.sh
+
+    docker exec ${containerId} /backup/_restore.sh

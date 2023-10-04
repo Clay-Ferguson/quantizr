@@ -70,7 +70,10 @@ export class NodeCompMarkdown extends Comp {
 
         val = S.util.insertActPubTags(val, node);
         val = this.translateLaTex(val);
-        val = this.sanitize(val);
+
+        // todo-0: temporarily disabling this because it's causing problems 
+        // val = this.sanitize(val);
+
         val = this.insertMarkdownLinks(urls, val);
         return val;
     }
