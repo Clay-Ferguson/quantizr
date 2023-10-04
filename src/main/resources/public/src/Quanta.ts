@@ -106,6 +106,7 @@ export class Quanta {
             throw new Error("initApp called multiple times.");
         }
         this.appInitialized = true;
+        S.nodeUtil.initHistorySaver();
 
         try {
             this.setOverlay(false);

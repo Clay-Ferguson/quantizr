@@ -611,7 +611,10 @@ export class Util {
 
             // now add to top.
             s.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node) });
+            while (s.nodeHistory.length > 40) s.nodeHistory.pop();
         }, addLater);
+
+        S.nodeUtil.historyDirty = true;
     }
 
     removeHtmlTags = (text: string) => {

@@ -149,6 +149,7 @@ export class User {
                         this.checkMessages();
                     }
                     S.util.loadBookmarks();
+                    S.nodeUtil.loadHistoryData();
                 }, 500);
 
                 // todo-2: technically this delay is a bit of a hack because we really need a way to be SURE
