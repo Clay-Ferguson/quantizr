@@ -70,10 +70,6 @@ export class NodeCompMarkdown extends Comp {
 
         val = S.util.insertActPubTags(val, node);
         val = this.translateLaTex(val);
-
-        // todo-0: temporarily disabling this because it's causing problems 
-        // val = this.sanitize(val);
-
         val = this.insertMarkdownLinks(urls, val);
         return val;
     }
@@ -94,36 +90,6 @@ export class NodeCompMarkdown extends Comp {
         val = val.replaceAll("\\[", "$$");
         val = val.replaceAll("\\]", "$$");
         return val;
-    }
-
-    sanitize = (val: string): string => {
-
-        // if no code blocks do this the fast way.
-        if (val.indexOf("```") == -1) {
-            val = val.replaceAll("<", "&lt;");
-            val = val.replaceAll(">", "&gt;");
-            return val;
-        }
-
-        const regex = /(\r\n|\r|\n)/;
-
-        // Split the input string based on the regex
-        const tokens = val.split(regex);
-
-        let v = "";
-        let inCodeBlock = false;
-        tokens.forEach(t => {
-            if (t.startsWith("```")) {
-                inCodeBlock = !inCodeBlock;
-            }
-            if (!inCodeBlock) {
-                t = t.replaceAll("<", "&lt;");
-                t = t.replaceAll(">", "&gt;");
-            }
-            // console.log("LINE: " + token);
-            v += t;
-        });
-        return v;
     }
 
     // DO NOT DELETE (#inline-image-rendering)
