@@ -35,18 +35,18 @@ Quanta is a browser-based app that works on both mobile and desktop browsers, al
 ## Technology Stack
 
 * Java Language (back end) 
-* SpringBoot FAT Jar with embedded Tomcat (back end)
+* Spring Boot 3 FAT Jar with embedded Tomcat (back end)
 * TypeScript, ReactJS, Vite (front end)
-* Bootstrap & SCSS
-* Deployer: Docker (docker compose)
-* MongoDB as the primary data store
+* Bootstrap Styling
+* MongoDB as primary data store
 * Redis for Session Data
 * IPFS Gateway
 * ChatGPT (via OpenAI API)
+* Deployment: Docker Compose (Swarm Mode)
 
 ## To Run the Server
 
-Edit `/distro/setenv-run-distro.sh` to define your environment settings, and point the docker IMAGE name to Docker Hub. Then run `/distro/run-distro.sh`, which will startup a Docker Compose Swarm with one replica. All the defaults in the `setenv` file should probably work as is (port numbers, folder names, etc), but you do need to set the docker image names `DOCKER_IMAGE` to point to Docker Hub, unless you've already built locally and can just point to your local images.
+Instructions on how to build and run the app are found in the [docs folder](docs/how-to-run.md)
 
 ## Help Fund the Project
 
@@ -54,4 +54,4 @@ Edit `/distro/setenv-run-distro.sh` to define your environment settings, and poi
 
 ## Keywords
 
-ChatGPT, GPT-4, AI, Machine Learning, LLM, Large Language Model, OpenAI, Meta, Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene
+Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene, ChatGPT, GPT-4, AI, Machine Learning, LLM, Large Language Model, OpenAI, Meta
