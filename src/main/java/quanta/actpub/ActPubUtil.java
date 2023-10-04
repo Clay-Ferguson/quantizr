@@ -228,7 +228,7 @@ public class ActPubUtil extends ServiceBase {
             }
         }).build();
 
-        // todo-0: keep thos older 'flatMap' version around for a while to make sure the new one works
+        // todo-0: keep this older 'flatMap' version around for a while to make sure the new one works
         // Mono<APObj> mono = webClient.get().retrieve().bodyToMono(String.class).flatMap(responseBody -> {
         // try {
         // APObj ret = (APObj) mapper.readValue(responseBody, clazz);
@@ -257,42 +257,6 @@ public class ActPubUtil extends ServiceBase {
         });
 
         return mono.block();
-    }
-
-    // todo-0: we can delete this old method once we're sure the new one works
-    public APObj getJson_old(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
-        APObj ret = null;
-        int responseCode = 0;
-        try {
-            if (headers == null) {
-                headers = new HttpHeaders();
-            }
-            if (mediaType != null) {
-                List<MediaType> acceptableMediaTypes = new LinkedList<>();
-                acceptableMediaTypes.add(mediaType);
-                headers.setAccept(acceptableMediaTypes);
-            }
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            if (response != null) {
-                responseCode = response.getStatusCodeValue();
-                // DO NOT DELETE: Example of how to query with completely unknown class.
-                // mapper.readValue(response.getBody(), new TypeReference<>() {});
-                ret = (APObj) mapper.readValue(response.getBody(), clazz);
-            }
-        } catch (HttpClientErrorException.Gone goneEx) {
-            log.debug("http says Gone: " + url);
-            return null;
-        } catch (HttpClientErrorException.Forbidden forbiddenEx) {
-            log.debug("http says Forbidden: " + url);
-            return null;
-        } catch (Exception e) {
-            log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class=" + e.getClass().getName()
-                    + " respCode=" + responseCode);
-            return null;
-        }
-        return ret;
     }
 
     public APObj secureGet(String url, Class<?> clazz, String privateKey, String actor, MediaType mediaType) {

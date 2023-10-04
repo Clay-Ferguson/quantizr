@@ -12,7 +12,7 @@ import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
 
-    // todo-0: put all history-related code into a separate singleton
+    // todo-1: put all history-related code into a separate singleton
     historySaverInterval = null;
     historyDirty = false;
     static NODEHISTORY_KEY = "NodeHistoryData";
