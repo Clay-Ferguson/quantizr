@@ -3,6 +3,12 @@ import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
+export class NodeHistoryItem {
+    content: string;
+    id: string;
+    type: string;
+}
+
 export class HistoryUtil {
     // todo-1: put all history-related code into a separate singleton
     historySaverInterval = null;

@@ -1,10 +1,10 @@
 import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
+import { NodeHistoryItem } from "./HistoryUtil";
 import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeHistoryItem } from "./NodeHistoryItem";
 import { Tour } from "./Tour";
 
 export interface ExportSettings {
