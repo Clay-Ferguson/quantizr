@@ -375,7 +375,7 @@ export class Edit {
                 this.injectUpdatedNode(newNode);
             }
 
-            S.util.updateNodeHistory(newNode, false);
+            S.histUtil.updateNodeHistory(newNode, false);
 
             if (ast.activeTab === C.TAB_MAIN) {
                 // Inject the new node right into the page children
@@ -1002,17 +1002,6 @@ export class Edit {
         });
     }
 
-    /* Updates 'nodeHistory' when nodes are deleted */
-    removeNodesFromHistory = (selNodesArray: string[]) => {
-        if (!selNodesArray) return;
-        dispatch("removeNodesFromHistory", s => {
-            selNodesArray.forEach(id => {
-                // remove any top level history item that matches 'id'
-                s.nodeHistory = s.nodeHistory.filter(h => h.id !== id);
-            });
-        });
-    }
-
     removeNodesFromCalendarData = (selNodesArray: string[]) => {
         dispatch("UpdateCalendarData", s => {
             selNodesArray.forEach(id => {
@@ -1555,7 +1544,7 @@ export class Edit {
             bulkDelete: false
         });
 
-        this.removeNodesFromHistory(nodesToDel);
+        S.histUtil.removeNodesFromHistory(nodesToDel);
         this.removeNodesFromCalendarData(nodesToDel);
 
         /* Node: state.node can be null if we've never been to the tree view yet */

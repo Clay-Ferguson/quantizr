@@ -11,6 +11,7 @@ import { Attachment } from "./Attachment";
 import { Crypto } from "./Crypto";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
+import { HistoryUtil } from "./HistoryUtil";
 import { LocalDB } from "./LocalDB";
 import { Nav } from "./Nav";
 import { NodeUtil } from "./NodeUtil";
@@ -48,6 +49,7 @@ export class Factory {
             S.rpcUtil = new RpcUtil();
             S.tabUtil = new TabUtil();
             S.nodeUtil = new NodeUtil();
+            S.histUtil = new HistoryUtil();
             S.push = new ServerPush();
             S.edit = new Edit();
             S.attachment = new Attachment();

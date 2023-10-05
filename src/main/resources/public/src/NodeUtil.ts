@@ -5,36 +5,11 @@ import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
-import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
-
-    // todo-1: put all history-related code into a separate singleton
-    historySaverInterval = null;
-    historyDirty = false;
-    static NODEHISTORY_KEY = "NodeHistoryData";
-
-    loadHistoryData = async () => {
-        const val: IndexedDBObj = await S.localDB.readObject(NodeUtil.NODEHISTORY_KEY);
-        if (val) {
-            dispatch("loadHistoryData", s => s.nodeHistory = val.v);
-        }
-    }
-
-    historySaverFunc = async () => {
-        if (!this.historyDirty) return;
-        await S.localDB.writeObject({ k: NodeUtil.NODEHISTORY_KEY, v: getAs().nodeHistory });
-        this.historyDirty = false;
-    }
-
-    initHistorySaver = () => {
-        // if already initialized return
-        if (this.historySaverInterval) return;
-        this.historySaverInterval = setInterval(this.historySaverFunc, 5000);
-    }
 
     getSelNodeIdsArray = (): string[] => {
         const sels: string[] = [];
@@ -109,7 +84,7 @@ export class NodeUtil {
         }
 
         if (!ust.isAnonUser) {
-            S.util.updateHistory(node);
+            S.histUtil.updateHistory(node);
         }
 
         // this highlightNodeId is only really used to ensure state change happens, but really everything always

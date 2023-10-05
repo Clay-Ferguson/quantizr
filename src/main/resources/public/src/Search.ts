@@ -566,7 +566,7 @@ export class Search {
         if (!nodeId) return;
         const node = S.nodeUtil.findNode(nodeId);
         if (!node) return;
-        S.util.updateNodeHistory(node, true);
+        S.histUtil.updateNodeHistory(node, true);
 
         // after updating state we need this to ensure this click also focused this window.
         const tabId = S.domUtil.getPropFromDom(evt, C.TAB_ID_ATTR);
@@ -616,7 +616,7 @@ export class Search {
             }
             boostComp = new Divc({
                 onClick: async () => {
-                    S.util.updateNodeHistory(node.boostedNode, true);
+                    S.histUtil.updateNodeHistory(node.boostedNode, true);
 
                     // after updating state we need this to ensure this click also focused this window.
                     S.domUtil.focusId(tabData.id);
