@@ -24,6 +24,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
+import quanta.service.SystemService;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -223,6 +224,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                 }
             }
         }
+
+        // If saving an admin owned node, update the lastAdminOwnedSaveTime
+        if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
+            SystemService.lastAdminOwnedSaveTime = System.currentTimeMillis();
+        }
+
         // Since we're saving this node already make sure none of our setters above left it flagged
         // as dirty or it might unnecessarily get saved twice.
         ThreadLocals.clean(node);

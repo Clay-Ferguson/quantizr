@@ -1,7 +1,5 @@
 package quanta.service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
@@ -14,6 +12,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.mongodb.client.MongoDatabase;
 import quanta.config.AppSessionListener;
@@ -28,7 +27,7 @@ import quanta.mongo.model.SubNode;
 import quanta.redis.RedisBrowserPushInfo;
 import quanta.response.ServerPushInfo;
 import quanta.util.Const;
-import quanta.util.ExUtil;
+import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.TreeNode;
 import quanta.util.XString;
@@ -49,6 +48,20 @@ public class SystemService extends ServiceBase {
     public static final Object adminNodesCacheLock = new Object();
     public TreeNode adminNodesCache;
     public HashMap<String, TreeNode> adminNodesCacheMap;
+    private static long lastCacheAdminNodesTime = 0;
+    public static long lastAdminOwnedSaveTime = 0;
+
+    /*
+     * Every 5mins check if latest admin-owned node save time is after last cacheAdminNodes call time
+     * then force a recache now
+     */
+    @Scheduled(fixedDelay = 5 * DateUtil.MINUTE_MILLIS)
+    public void autoCacheAdminNodes() {
+        if (lastCacheAdminNodesTime > 0 && lastAdminOwnedSaveTime > 0
+                && lastAdminOwnedSaveTime > lastCacheAdminNodesTime) {
+            cacheAdminNodes();
+        }
+    }
 
     public void cacheAdminNodes() {
         arun.run(as -> {
@@ -58,6 +71,7 @@ public class SystemService extends ServiceBase {
                 synchronized (adminNodesCacheLock) {
                     adminNodesCacheMap = new HashMap<String, TreeNode>();
                     adminNodesCache = read.getSubGraphTree(as, node.getIdStr(), null, adminNodesCacheMap);
+                    lastCacheAdminNodesTime = System.currentTimeMillis();
                 }
             }
             return null;
