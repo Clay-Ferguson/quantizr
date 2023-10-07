@@ -1,3 +1,15 @@
+.userAdminPanel {
+    margin: $smallGap 0 $smallGap 0;
+    padding: $smallGap;
+    border: 2px solid gray;
+    border-radius: $border-radius;
+}
+
+.userAdminHeading {
+    margin-bottom: $smallGap;
+    font-size: 115%;
+}
+
 .userProfileDlgAvatar {
     background-color: $modal-content-bg;
     max-width: 120px;

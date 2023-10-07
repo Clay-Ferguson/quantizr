@@ -10,11 +10,13 @@ export class UserAdminPanel extends Div {
 
     constructor(private dlg: UserProfileDlg) {
         super(null);
+        this.attribs.className = "userAdminPanel";
     }
 
     override preRender(): boolean {
         const userProfile = this.dlg.getState<UserProfileDlgState>().userProfile;
         this.setChildren([
+            new Div("User Admin", { className: "userAdminHeading" }),
             userProfile?.balance ? new Div("Balance: " + userProfile.balance) : null,
             new ButtonBar([
                 new Button("Add Credit", async () => {
