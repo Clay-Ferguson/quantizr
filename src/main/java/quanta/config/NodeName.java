@@ -7,4 +7,5 @@ public class NodeName {
     public static final String FRIENDS = "friends";
     public static final String BLOCKED_USERS = "blocked";
     public static final String POSTS = "posts";
+    public static final String NOTES = "notes";
 }

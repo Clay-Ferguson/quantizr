@@ -927,6 +927,9 @@ public class MongoUtil extends ServiceBase {
             postsNodeVal.setVal(postsNode);
         }
 
+        // ensure this node exists.
+        SubNode notesNode = user.getNotesNode(ms, null, userNode);
+
         update.save(ms, userNode);
         return userNode;
     }

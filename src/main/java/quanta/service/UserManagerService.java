@@ -320,6 +320,11 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
+    public SubNode getNotesNode(MongoSession ms, String userName, SubNode userNode) {
+        return read.getUserNodeByType(ms, userName, userNode, "### Notes", NodeType.NOTES.s(),
+                Arrays.asList(PrivilegeType.READ.s()), NodeName.NOTES, true);
+    }
+
     public SubNode getPostsNode(MongoSession ms, String userName, SubNode userNode) {
         return read.getUserNodeByType(ms, userName, userNode, "### Posts", NodeType.POSTS.s(),
                 Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
@@ -371,6 +376,9 @@ public class UserManagerService extends ServiceBase {
         ThreadLocals.getSC().setPubSigKeyJson(null);
         res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
         ensureValidCryptoKeys(userNode);
+
+        SubNode notesNode = user.getNotesNode(ms, userName, userNode);
+
         update.save(ms, userNode);
     }
 
