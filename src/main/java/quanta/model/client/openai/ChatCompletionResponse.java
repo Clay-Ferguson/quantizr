@@ -1,5 +1,7 @@
 package quanta.model.client.openai;
 
+import java.math.BigDecimal;
+
 import java.util.List;
 
 public class ChatCompletionResponse {
@@ -11,7 +13,7 @@ public class ChatCompletionResponse {
     private Usage usage;
 
     // transient, part of pojo
-    public Double userCredit;
+    public BigDecimal userCredit;
 
     public ChatCompletionResponse() {}
 

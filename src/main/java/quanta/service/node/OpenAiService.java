@@ -1,6 +1,9 @@
 package quanta.service.node;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -28,11 +31,13 @@ import quanta.model.client.openai.SystemConfig;
 import quanta.model.client.openai.Usage;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.postgres.Transaction;
+import quanta.postgres.UserAccount;
 import quanta.request.AskSubGraphRequest;
 import quanta.response.AskSubGraphResponse;
+import quanta.service.UserManagerService;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import quanta.util.val.Val;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -65,19 +70,18 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Unknown user.");
         }
 
-        // grant unpaid users a whopping nickle to play with
-        if (!userNode.hasProp(NodeProp.OPENAI_USER_CREDIT.s())) {
-            userNode.set(NodeProp.OPENAI_USER_CREDIT, 0.05);
-        }
-
-        Double val = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
-        if (val == null) {
-            throw new RuntimeException("Sorry, you have no more OpenAI credit.");
-        }
-
-        Val<Double> userCredit = new Val<>(val);
-        if (userCredit.getVal() < 0) {
-            throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+        BigDecimal balance = null;
+        if (user.initialGrant(userNode.getIdStr())) {
+            balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
+        } else {
+            balance = transactionRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
+            if (balance == null) {
+                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+            }
+            int comparisonResult = balance.compareTo(BigDecimal.ZERO);
+            if (comparisonResult <= 0) {
+                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+            }
         }
 
         // this will hold all the prior chat history
@@ -144,27 +148,34 @@ public class OpenAiService extends ServiceBase {
                 .bodyToMono(ChatCompletionResponse.class);
 
         ChatCompletionResponse res = mono.block();
-
+        updateUserCredit(userNode, balance, res);
         log.debug("GPT Res: " + XString.prettyPrint(res));
-
-        updateUserCredit(userNode, userCredit, res);
-        res.userCredit = userCredit.getVal();
         return res;
     }
 
-    private void updateUserCredit(SubNode userNode, Val<Double> userCredit, ChatCompletionResponse res) {
-        arun.run(as -> {
-            // update user consumption
-            Long userQuota = userNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
-            userNode.set(NodeProp.OPENAI_QUERY_COUNT, userQuota + 1);
+    // updates the user's credit and returns the cost of the transaction
+    private void updateUserCredit(SubNode userNode, BigDecimal curBal, ChatCompletionResponse res) {
+        BigDecimal cost = new BigDecimal(calculateCost(res));
+        UserAccount user = userRepository.findByMongoId(userNode.getIdStr());
 
-            Double cost = calculateCost(res);
-            userCredit.setVal(userCredit.getVal() - cost);
-            userNode.set(NodeProp.OPENAI_USER_CREDIT, userCredit.getVal());
+        if (user == null) {
+            // creating here should never be necessary but we do it anyway
+            log.debug("User not found, creating...");
+            user = userRepository.save(new UserAccount(userNode.getIdStr()));
+        }
 
-            update.save(as, userNode);
-            return null;
-        });
+        Transaction debit = new Transaction();
+        debit.setAmt(cost);
+        debit.setTransType("D");
+        debit.setTs(Timestamp.from(Instant.now()));
+        debit.setDescCode("OAI"); // OpenAI
+        debit.setUserAccount(user);
+
+        // Eventually we will add to this information about the gpt request too. Entire Q & A
+        // debit.setDetail(mapper.valueToTree(res));
+
+        transactionRepository.save(debit);
+        res.userCredit = curBal.subtract(cost);
     }
 
     private boolean moderationFailed(ChatGPTModerationResponse modResponse) {
@@ -305,6 +316,7 @@ public class OpenAiService extends ServiceBase {
          * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
          * amount).
          */
+        // this will have to change to scale to lots of users. We'll use an SQL "group by"
         for (SubNode usrNode : accountNodes) {
             appendUserStats(model, sb, usrNode);
         }
@@ -312,20 +324,22 @@ public class OpenAiService extends ServiceBase {
     }
 
     private void appendUserStats(String model, StringBuilder sb, SubNode usrNode) {
-        log.debug("usrNode: " + XString.prettyPrint(usrNode));
-        Long count = usrNode.getInt(NodeProp.OPENAI_QUERY_COUNT);
-        if (count > 0) {
-            Double userCredit =
-                    usrNode.hasProp(NodeProp.OPENAI_USER_CREDIT.s()) ? usrNode.getFloat(NodeProp.OPENAI_USER_CREDIT)
-                            : 0.0;
+        // log.debug("usrNode: " + XString.prettyPrint(usrNode));
 
-            sb.append("    " + usrNode.getStr(NodeProp.USER) + //
-                    " -> Queries: " + String.valueOf(count) + " " + //
-                    " Credit: $" + decimalFormatter.format(userCredit) + "\n");
+        long userTransactionCount = transactionRepository.countByMongoId(usrNode.getIdStr());
+        if (userTransactionCount == 0) {
+            return;
         }
+
+        BigDecimal userCredit = transactionRepository.getBalByMongoId(usrNode.getIdStr());
+        if (userCredit == null) {
+            userCredit = BigDecimal.ZERO;
+        }
+
+        sb.append("    " + usrNode.getStr(NodeProp.USER) + //
+                " Credit: $" + decimalFormatter.format(userCredit) + "\n");
     }
 
-    // decimalFormatter.format(calculateCost(model, inTokenCount, outTokenCount))
     private double calculateCost(ChatCompletionResponse res) {
         Usage usage = res.getUsage();
 

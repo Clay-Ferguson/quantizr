@@ -28,13 +28,6 @@ import quanta.actpub.APConst;
 import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
 
-// #pgdb
-// import java.util.List;
-// import org.springframework.boot.context.event.ApplicationReadyEvent;
-// import org.springframework.context.event.EventListener;
-// import quanta.postgres.Customer;
-// import quanta.postgres.CustomerRepository;
-
 // @EnableAspectJAutoProxy // (proxyTargetClass = true)
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
@@ -57,10 +50,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private UtilFilter utilFilter;
-
-    // #pgdb
-    // @Autowired
-    // private CustomerRepository repository;
 
     private static Object execInitLock = new Object();
     private static ThreadPoolTaskExecutor executor;
@@ -91,7 +80,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     // reg.addUrlPatterns(AppController.API_PATH + "/bin/*");
     // return reg;
     // }
-
 
     @Bean
     public FilterRegistrationBean<UtilFilter> utilFilterRegistration() {
@@ -235,7 +223,7 @@ public class AppConfiguration implements WebMvcConfigurer {
         templateResolver.setPrefix("public/dist/");
         templateResolver.setCacheable(!"dev".equals(appProp.getProfileName()));
         templateResolver.setSuffix(".html");
-        templateResolver.setTemplateMode("HTML5");
+        templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
         return templateResolver;
     }
@@ -254,20 +242,4 @@ public class AppConfiguration implements WebMvcConfigurer {
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
     }
-
-    // #pgdb
-    // @EventListener(ApplicationReadyEvent.class)
-    // public void runAfterStartup() {
-    // List allCustomers = this.repository.findAll();
-    // log.debug("Number of customers: " + allCustomers.size());
-
-    // Customer newCustomer = new Customer();
-    // newCustomer.setFirstName("John");
-    // newCustomer.setLastName("Doe");
-    // log.debug("Saving new customer...");
-    // this.repository.save(newCustomer);
-
-    // allCustomers = this.repository.findAll();
-    // log.debug("Number of customers: " + allCustomers.size());
-    // }
 }

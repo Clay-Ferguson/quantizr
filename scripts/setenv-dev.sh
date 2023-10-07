@@ -67,6 +67,9 @@ export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
 export MONGO_BASE=${PRJPARENT}
 export MONGO_BACKUP=/home/clay/mongodb-dev-backup
 
+export POSTGRES_BASE=${PRJPARENT}
+export POSTGRES_PORT=5433
+
 # This tells our scripts where we are actually running from 
 # (The Distro Folder on this machine. The folder containing the runtime and configs)
 export QUANTA_BASE=/home/clay/quanta-localhost-dev
@@ -93,6 +96,7 @@ export devEmail=somebody@someserver.com
 # this password is used in the yaml as the root password for MongoDB.
 export adminPassword=password
 export mongoPassword=password
+export pgPassword=password
 
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.

@@ -1,17 +1,18 @@
 
 package quanta.response;
 
+import java.math.BigDecimal;
 import quanta.response.base.ResponseBase;
 
 public class AskSubGraphResponse extends ResponseBase {
     private String answer;
-    private Double gptCredit; // user credit remaining
+    private BigDecimal gptCredit; // user credit remaining
 
-    public Double getGptCredit() {
+    public BigDecimal getGptCredit() {
         return gptCredit;
     }
 
-    public void setGptCredit(Double gptCredit) {
+    public void setGptCredit(BigDecimal gptCredit) {
         this.gptCredit = gptCredit;
     }
 

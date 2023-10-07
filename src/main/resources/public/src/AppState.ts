@@ -205,5 +205,4 @@ export class AppState {
 
     menuIndexToggle: string = "menu";
     showGptCredit: boolean = false;
-    gptCredit: number = 0;
 }

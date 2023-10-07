@@ -1,8 +1,11 @@
 package quanta.service;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -21,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
@@ -48,6 +52,11 @@ import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.postgres.Transaction;
+import quanta.postgres.TransactionRepository;
+import quanta.postgres.UserAccount;
+import quanta.postgres.UserRepository;
+import quanta.request.AddCreditRequest;
 import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
@@ -59,6 +68,7 @@ import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
 import quanta.request.SignupRequest;
+import quanta.response.AddCreditResponse;
 import quanta.response.AddFriendResponse;
 import quanta.response.BlockUserResponse;
 import quanta.response.ChangePasswordResponse;
@@ -93,6 +103,13 @@ public class UserManagerService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
     private static final Random rand = new Random();
+    public static final float INITIAL_GRANT_AMOUNT = 0.01f;
+
+    @Autowired(required = false)
+    private TransactionRepository transactionRepository;
+
+    @Autowired(required = false)
+    private UserRepository userRepository;
 
     /* Private keys of each user by user name as key */
     public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -622,6 +639,47 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    public boolean initialGrant(String userId) {
+        UserAccount user = userRepository.findByMongoId(userId);
+        if (user == null) {
+            log.debug("User not found, creating...");
+            user = userRepository.save(new UserAccount(userId));
+
+            Transaction credit = new Transaction();
+            credit.setAmt(new BigDecimal(INITIAL_GRANT_AMOUNT));
+            credit.setTransType("C");
+            credit.setDescCode("NEW");
+            credit.setTs(Timestamp.from(Instant.now()));
+            credit.setUserAccount(user);
+            transactionRepository.save(credit);
+            return true;
+        }
+        return false;
+    }
+
+
+    public AddCreditResponse addCredit(AddCreditRequest req) {
+        AddCreditResponse res = new AddCreditResponse();
+
+        UserAccount user = userRepository.findByMongoId(req.getUserId());
+        if (user == null) {
+            log.debug("User not found, creating...");
+            user = userRepository.save(new UserAccount(req.getUserId()));
+        }
+
+        Transaction credit = new Transaction();
+        credit.setAmt(req.getAmount());
+        credit.setTransType("C");
+        credit.setDescCode("PAY");
+        credit.setTs(Timestamp.from(Instant.now()));
+        credit.setUserAccount(user);
+        transactionRepository.save(credit);
+
+        // calculate new balance and return it.
+        res.setBalance(transactionRepository.getBalByMongoId(req.getUserId()));
+        return res;
+    }
+
     public SaveUserPreferencesResponse saveUserPreferences(SaveUserPreferencesRequest req) {
         SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
         UserPreferences userPrefs = ThreadLocals.getSC().getUserPreferences();
@@ -993,6 +1051,9 @@ public class UserManagerService extends ServiceBase {
                 userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
                 userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
                 userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
+
+                BigDecimal balance = transactionRepository.getBalByMongoId(userNode.getIdStr());
+                userProfile.setBalance(balance);
 
                 Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
                 if (att != null) {

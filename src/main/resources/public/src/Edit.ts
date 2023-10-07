@@ -1087,7 +1087,6 @@ export class Edit {
         if (res.code == C.RESPONSE_CODE_OK) {
             dispatch("setShowGptCredit", s => {
                 s.showGptCredit = true;
-                s.gptCredit = res.gptCredit || 0.0;
             });
             S.view.jumpToId(nodeId);
         }

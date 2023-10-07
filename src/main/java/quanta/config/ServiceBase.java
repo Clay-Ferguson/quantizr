@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -34,6 +35,10 @@ import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoTemplateWrapper;
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.MongoUtil;
+import quanta.postgres.DatabaseService;
+import quanta.postgres.PaymentService;
+import quanta.postgres.TransactionRepository;
+import quanta.postgres.UserRepository;
 import quanta.service.AclService;
 import quanta.service.AttachmentService;
 import quanta.service.CryptoService;
@@ -108,6 +113,12 @@ public class ServiceBase {
     static List<Runnable> postConstructs = new ArrayList<>();
     public static ApplicationContext context;
 
+    @Autowired
+    public TransactionRepository transactionRepository;
+
+    @Autowired
+    public UserRepository userRepository;
+
     public static AppProp prop;
     public static UserFeedService userFeed;
     public static Convert convert;
@@ -141,6 +152,8 @@ public class ServiceBase {
     public static ActPubOutbox apOutbox;
     public static EnglishDictionary english;
     public static AsyncExec exec;
+    public static DatabaseService pgSvc;
+    public static PaymentService pgPayments;
     public static NodeSearchService search;
     public static CallProcessor callProc;
     public static NodeMoveService move;
@@ -240,6 +253,8 @@ public class ServiceBase {
             apOutbox = getBean(ctx, ActPubOutbox.class);
             english = getBean(ctx, EnglishDictionary.class);
             exec = getBean(ctx, AsyncExec.class);
+            pgSvc = getBean(ctx, DatabaseService.class);
+            pgPayments = getBean(ctx, PaymentService.class);
             search = getBean(ctx, NodeSearchService.class);
             callProc = getBean(ctx, CallProcessor.class);
             move = getBean(ctx, NodeMoveService.class);

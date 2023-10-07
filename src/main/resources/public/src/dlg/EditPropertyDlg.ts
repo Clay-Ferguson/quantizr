@@ -12,7 +12,7 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
 export interface LS { // Local State
-    selections?: Map<String, J.SchemaOrgProp>;
+    selections?: Map<string, J.SchemaOrgProp>;
 }
 
 /* When this dialog returns the caller should be able to either get one property name from nameState, or

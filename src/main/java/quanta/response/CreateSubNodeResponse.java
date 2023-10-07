@@ -1,6 +1,7 @@
 
 package quanta.response;
 
+import java.math.BigDecimal;
 import quanta.model.NodeInfo;
 import quanta.response.base.ResponseBase;
 
@@ -13,7 +14,7 @@ public class CreateSubNodeResponse extends ResponseBase {
 	 * Mainly used in a 'reply' to an encrypted node.
 	 */
 	private boolean encrypt;
-	private Double gptCredit; // user credit remaining
+	private BigDecimal gptCredit; // user credit remaining
 
 	public NodeInfo getNewNode() {
 		return this.newNode;
@@ -31,11 +32,11 @@ public class CreateSubNodeResponse extends ResponseBase {
 		this.encrypt = encrypt;
 	}
 
-	public Double getGptCredit() {
+	public BigDecimal getGptCredit() {
 		return gptCredit;
 	}
 
-	public void setGptCredit(Double gptCredit) {
+	public void setGptCredit(BigDecimal gptCredit) {
 		this.gptCredit = gptCredit;
 	}
 

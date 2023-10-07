@@ -40,10 +40,10 @@ import quanta.model.client.Attachment;
 import quanta.model.client.ClientConfig;
 import quanta.model.client.Constant;
 import quanta.model.client.MFSDirEntry;
-import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.UserProfile;
 import quanta.mongo.model.SubNode;
+import quanta.request.AddCreditRequest;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
 import quanta.request.AskSubGraphRequest;
@@ -1316,6 +1316,14 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
+    @RequestMapping(value = API_PATH + "/addCredit", method = RequestMethod.POST)
+    @ResponseBody
+    public Object addCredit(@RequestBody AddCreditRequest req, HttpSession session) {
+        return callProc.run("addCredit", true, true, req, session, ms -> {
+            return user.addCredit(req);
+        });
+    }
+
     @RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
@@ -1379,9 +1387,10 @@ public class AppController extends ServiceBase implements ErrorController {
     }
 
     private void loadConfig(ClientConfig res) {
-        // Identifier generated once on Browser, can uniquely identify one single session to associate
-        // with
-        // the given webpage/tab
+        /*
+         * Identifier generated once on Browser, can uniquely identify one single session to associate with
+         * the given webpage/tab
+         */
         SessionContext sc = ThreadLocals.getSC();
         if (sc != null) {
             res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
@@ -1395,18 +1404,6 @@ public class AppController extends ServiceBase implements ErrorController {
         res.setConfig(prop.getConfig());
         res.setBrandingAppName(prop.getConfigText("brandingAppName"));
         res.setRequireCrypto(prop.isRequireCrypto());
-
-        arun.run(as -> {
-            SubNode userNode = read.getAccountByUserName(as, sc.getUserName(), false);
-            if (userNode != null) {
-                Double val = userNode.getFloat(NodeProp.OPENAI_USER_CREDIT);
-                if (val != null) {
-                    res.setGptCredit(val);
-                }
-            }
-            return null;
-        });
-
         res.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
         SubNode root = read.getDbRoot();
     }

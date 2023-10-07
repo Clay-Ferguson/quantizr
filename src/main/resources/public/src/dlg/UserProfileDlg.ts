@@ -23,8 +23,9 @@ import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
+import { UserAdminPanel } from "./UserAdminPanel";
 
-interface LS { // Local State
+export interface LS { // Local State
     userProfile?: J.UserProfile;
 }
 
@@ -175,6 +176,7 @@ export class UserProfileDlg extends DialogBase {
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
                 web3Div,
+                getAs().isAdminUser && localUser ? new UserAdminPanel(this) : null,
 
                 new ButtonBar([
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this.save, null, "btn-primary"),
@@ -254,10 +256,9 @@ export class UserProfileDlg extends DialogBase {
     }
 
     reload = async () => {
-        let res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: this.userNodeId
         });
-        // console.log("First UserProfile Response: " + S.util.prettyPrint(res));
 
         if (res?.userProfile) {
             if (res?.userProfile) {

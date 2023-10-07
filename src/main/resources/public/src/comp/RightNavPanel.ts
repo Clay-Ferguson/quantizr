@@ -146,7 +146,7 @@ export class RightNavPanel extends Div {
         ]) : null;
 
         let scrollDiv = null;
-        const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCretitDiv() : null;
+        const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCreditDiv() : null;
 
         this.setChildren([
             scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [

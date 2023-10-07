@@ -250,7 +250,8 @@ export class Nav {
                             new Button("Copy Google Link to Clipboard", () => {
                                 S.util.copyToClipboard(googleUrl);
                                 S.util.flashMessage("Copied to Clipboard: " + googleUrl, "Clipboard", true);
-                            })])
+                            })
+                        ])
                     ]), false, 0, null
                 ).open();
             });

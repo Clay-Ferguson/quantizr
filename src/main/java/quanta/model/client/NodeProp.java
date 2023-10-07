@@ -169,10 +169,6 @@ public enum NodeProp {
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota"), //
 
-    // prepaid dollar amount as a float
-    OPENAI_USER_CREDIT("sn:oaiCredit"), //
-    OPENAI_QUERY_COUNT("sn:oaiCount"), //
-
     // if this contains web3, then web3 active, etc.
     ALLOWED_FEATURES("sn:features"), //
 

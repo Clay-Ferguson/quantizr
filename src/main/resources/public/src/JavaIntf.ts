@@ -53,7 +53,6 @@ export interface ClientConfig {
     urlView: string;
     search: string;
     login: string;
-    gptCredit: number;
 }
 
 export interface IPSMData {
@@ -164,6 +163,7 @@ export interface UserProfile {
     following: boolean;
     blocked: boolean;
     relays: string;
+    balance: number;
 }
 
 export interface ChatCompletionResponse {
@@ -222,6 +222,11 @@ export interface Usage {
     prompt_tokens: number;
     completion_tokens: number;
     text_generation: number;
+}
+
+export interface AddCreditRequest extends RequestBase {
+    amount: number;
+    userId: string;
 }
 
 export interface AddFriendRequest extends RequestBase {
@@ -700,6 +705,10 @@ export interface UploadFromUrlRequest extends RequestBase {
 }
 
 export interface RequestBase {
+}
+
+export interface AddCreditResponse extends ResponseBase {
+    balance: number;
 }
 
 export interface AddFriendResponse extends ResponseBase {
@@ -1285,8 +1294,6 @@ export const enum NodeProp {
     BIN = "bin",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
-    OPENAI_USER_CREDIT = "sn:oaiCredit",
-    OPENAI_QUERY_COUNT = "sn:oaiCount",
     ALLOWED_FEATURES = "sn:features",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_ACTIVE_TIME = "sn:lastActive",

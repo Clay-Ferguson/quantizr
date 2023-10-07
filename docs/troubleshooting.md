@@ -76,6 +76,7 @@ Stop docker just to force it to reload and know NO images exist
 Bring it back up
 
     sudo systemctl start docker
+    
 ### Try to Pull again. 
 
 Should tell you image is already up to date

@@ -51,6 +51,7 @@ mkdir -p ${DEPLOY_TARGET}/tmp
 mkdir -p ${DEPLOY_TARGET}/log
 mkdir -p ${DEPLOY_TARGET}/config
 mkdir -p ${MONGO_DATA}
+mkdir -p ${POSTGRES_DATA}
 
 # Default app configs
 # We only need this if overriding/extending the default properties

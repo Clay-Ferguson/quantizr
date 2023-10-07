@@ -1,5 +1,7 @@
 package quanta.model.client;
 
+import java.math.BigDecimal;
+
 public class UserProfile {
 
     private String displayName;
@@ -33,6 +35,8 @@ public class UserProfile {
     private boolean following;
     private boolean blocked;
     private String relays;
+
+    private BigDecimal balance;
 
     public String getDisplayName() {
         return this.displayName;
@@ -200,6 +204,14 @@ public class UserProfile {
 
     public void setRelays(final String relays) {
         this.relays = relays;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     public UserProfile() {}

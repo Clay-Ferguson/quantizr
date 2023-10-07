@@ -890,10 +890,13 @@ export class Render {
         ]);
     }
 
-    buildGptCretitDiv = (): Div => {
+    buildGptCreditDiv = (): Div => {
         const ast = getAs();
-        if (!ast.gptCredit) return null;
-        return new Div("GPT Credit: $" + getAs().gptCredit.toFixed(6), { className: "gptCredit float-end" });
+        debugger;
+        if (ast.userProfile?.balance) {
+            return new Div("GPT Credit: $" + getAs().userProfile.balance.toFixed(6), { className: "gptCredit float-end" });
+        }
+        return null;
     }
 
     makeDeleteQuestionDiv = (): Div => {

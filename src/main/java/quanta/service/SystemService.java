@@ -228,8 +228,8 @@ public class SystemService extends ServiceBase {
         sb.append("AuditFilter Enabed: " + String.valueOf(AppFilter.audit) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
 
+        sb.append(pgSvc.getInfo());
         sb.append(oai.getOpenAiStats(null, null));
-
         sb.append(getRedisReport());
         sb.append("HttpSessions: " + AppSessionListener.sessionCounter + "\n");
 

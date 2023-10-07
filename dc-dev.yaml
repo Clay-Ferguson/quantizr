@@ -115,30 +115,57 @@ services:
     #         - "4001:4001"
     #         - "4001:4001/udp"
 
-    # #pgdb
-    # pgdb-dev:
-    #     # todo-0: research other images like 'postgres:13.1-alpine'
-    #     image: postgres
-    #     deploy:
-    #         # Don't want a restart policy for DEV!
-    #         # restart_policy:
-    #         #     condition: on-failure
-    #         #     # delay is time between restart attempts
-    #         #     delay: 10s
-    #         #     max_attempts: 4
-    #         #     window: 120s
-    #         replicas: 1
-    #     hostname: pgdb-host-dev
-    #     networks:
-    #         bridge:
-    #             aliases:
-    #                 - pgdb-host-dev
+    pgdb-dev:
+        # todo-0: research other images like 'postgres:13.1-alpine'
+        image: postgres
+        deploy:
+            # Don't want a restart policy for DEV!
+            # restart_policy:
+            #     condition: on-failure
+            #     # delay is time between restart attempts
+            #     delay: 10s
+            #     max_attempts: 4
+            #     window: 120s
+            replicas: 1
+        hostname: pgdb-host-dev
+        networks:
+            bridge:
+                aliases:
+                    - pgdb-host-dev
+        environment:
+            - POSTGRES_USER=quanta-pg
+            - POSTGRES_PASSWORD=${pgPassword}
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        # expose to host machine for management.
+        ports:
+            - '${POSTGRES_PORT}:5432'
+        volumes: 
+            - '${POSTGRES_BASE}/postgres-data-dev:/var/lib/postgresql/data'
+
+    # This pgadmin4 service works perfectly, but we're not using it, in order to save server resources.
+    # See '/docs/postgres.md'
+    # pgadmin4:
+    #     image: dpage/pgadmin4:latest
+    #     depends_on:
+    #         - pgdb-dev
     #     environment:
-    #         - POSTGRES_USER=compose-postgres
-    #         - POSTGRES_PASSWORD=compose-postgres
+    #         PGADMIN_DEFAULT_EMAIL: pgadmin4@mydomain.com # replace with your email
+    #         PGADMIN_DEFAULT_PASSWORD: secret # replace with your password
+    #     ports:
+    #         - '5050:80'
+    #     networks:
+    #         - bridge
 
     quanta-dev:
         image: ${DOCKER_IMAGE}
+        depends_on:
+            - redis-dev
+            - mongo-dev
+            - pgdb-dev
+            # - ipfs-dev
         build: 
             context: ${PRJROOT}
             args:
@@ -229,11 +256,9 @@ services:
             REDIS_PORT: "${REDIS_PORT}"
             REDIS_PASSWORD: "${REDIS_PASSWORD}"
 
-            # #pgdb
-            # SPRING_DATASOURCE_URL: "jdbc:postgresql://pgdb-host-dev:5432/compose-postgres"
-            # SPRING_DATASOURCE_USERNAME: "compose-postgres"
-            # SPRING_DATASOURCE_PASSWORD: "compose-postgres"
-            # SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+            SPRING_DATASOURCE_URL: "jdbc:postgresql://pgdb-dev:5432/quanta-pg"
+            SPRING_DATASOURCE_USERNAME: "quanta-pg"
+            SPRING_DATASOURCE_PASSWORD: ${pgPassword}
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # examples are "LangTest,UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest,SchemaOrgTest"
