@@ -170,6 +170,7 @@ export class NodeCompMarkdown extends Comp {
                         key: "code-mk-" + this.getId(),
                         ...props,
                         style: highlightStyle,
+                        className: "codeDivBody",
                         language,
                         PreTag: "div"
                     }, String(children).replace(/\n$/, ""))
