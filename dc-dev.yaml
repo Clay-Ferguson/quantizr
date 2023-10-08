@@ -116,7 +116,6 @@ services:
     #         - "4001:4001/udp"
 
     pgdb-dev:
-        # todo-0: research other images like 'postgres:13.1-alpine'
         image: postgres
         deploy:
             # Don't want a restart policy for DEV!

@@ -60,7 +60,6 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
     pgdb-distro:
-        # todo-0: research other images like 'postgres:13.1-alpine'
         image: postgres
         deploy:
             # Don't want a restart policy for DEV!
