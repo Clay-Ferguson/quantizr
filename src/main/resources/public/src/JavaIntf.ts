@@ -1226,6 +1226,7 @@ export const enum Constant {
 
 export const enum ConstantInt {
     ROWS_PER_PAGE = 25,
+    MAX_EXPANDED_CHILDREN = 100,
 }
 
 export const enum NodeProp {

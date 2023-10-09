@@ -28,6 +28,7 @@ import quanta.model.PrivilegeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
+import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
@@ -251,10 +252,8 @@ public class Convert extends ServiceBase {
         }
 
         if (hasInlineChildren) {
-            // todo-0: this number 100 exists on client too at: "if (this.level > 1 && rowIdx == 100) {"
-            // need to consolidate into a constant.
-            Iterable<SubNode> nodeIter =
-                    read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0, true);
+            Iterable<SubNode> nodeIter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL),
+                    ConstantInt.MAX_EXPANDED_CHILDREN.val(), 0, true);
             Iterator<SubNode> iterator = nodeIter.iterator();
             long inlineOrdinal = 0;
 

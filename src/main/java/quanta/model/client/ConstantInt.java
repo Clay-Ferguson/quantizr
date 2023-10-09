@@ -3,7 +3,8 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ConstantInt {
-    ROWS_PER_PAGE(25);
+    ROWS_PER_PAGE(25), //
+    MAX_EXPANDED_CHILDREN(100);
 
     @JsonValue
     private final Integer value;

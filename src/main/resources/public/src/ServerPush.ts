@@ -106,7 +106,7 @@ export class ServerPush {
                 return;
             }
             if (data.usePopup) {
-                S.util.showMessage(data.payload, "Admin Message");
+                S.util.showMessage(data.payload, "Message");
             }
             else {
                 S.util.showPageMessage(data.payload);

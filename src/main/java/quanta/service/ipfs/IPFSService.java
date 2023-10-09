@@ -295,7 +295,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public InputStream getStream(MongoSession ms, String hash) {
-        // todo-0: Spring 3 took away HttpClient
+        // todo-1: Spring 3 took away HttpClient
         if (true) {
             throw new RuntimeException("This feature is temporarily disabled");
         }

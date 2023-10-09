@@ -61,10 +61,8 @@ public class NodeRenderService extends ServiceBase {
     public String getIndexPage(String nameOnAdminNode, String nameOnUserNode, String userName, String id, String search,
             String name, String signupCode, String login, String view, Model model) {
         HashMap<String, Object> attrs = getThymeleafAttribs();
-
-        SessionContext sc = ThreadLocals.getSC();
-
         boolean isHomeNodeRequest = false;
+
         // Node Names are identified using a colon in front of it, to make it detectable
         if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
             if ("home".equalsIgnoreCase(nameOnUserNode)) {
@@ -80,10 +78,10 @@ public class NodeRenderService extends ServiceBase {
         }
 
         boolean hasUrlId = false;
-        // if we have an ID, try to look it up, to put it in the session and load the Social Card
-        // properties
-        // for this request.
-        // If no id given defalt to ":home" only so we can get the social card props.
+        /*
+         * if we have an ID, try to look it up, to put it in the session and load the Social Card properties
+         * for this request. If no id given defalt to ":home" only so we can get the social card props.
+         */
         if (id != null) {
             hasUrlId = true;
         } else {
@@ -130,7 +128,6 @@ public class NodeRenderService extends ServiceBase {
         config.setBrandingAppName(prop.getConfigText("brandingAppName"));
         config.setRequireCrypto(prop.isRequireCrypto());
         config.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
-        // SubNode root = read.getDbRoot();
         config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);

@@ -381,7 +381,7 @@ public class OpenAiService extends ServiceBase {
     public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
         AskSubGraphResponse res = new AskSubGraphResponse();
 
-        // todo-0: in future use cases we'd want to allow includeComments
+        // todo-1: in future use cases we'd want to allow includeComments
         List<SubNode> nodes = read.getFlatSubGraph(ms, req.getNodeId(), false);
         int counter = 0;
 

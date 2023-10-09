@@ -65,7 +65,7 @@ export class Search {
         // we don't need to load any events from relays via client
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
-            loadOthers: false // todo-0: disabling this for now, to make GPT threads cleaner looking
+            loadOthers: false // todo-1: disabling this for now, to make GPT threads cleaner looking
         });
         S.nodeUtil.processInboundNodes(res.nodes);
 

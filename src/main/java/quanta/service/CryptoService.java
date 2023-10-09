@@ -206,6 +206,7 @@ public class CryptoService extends ServiceBase {
         Val<NodeSigPushInfo> pushInfo = new Val<>();
         pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
         pushInfo.getVal().setListToSign(new LinkedList<>());
+        int errorCount = 0;
 
         for (String id : ids) {
             if (pushInfo.getVal() == null) {
@@ -228,7 +229,7 @@ public class CryptoService extends ServiceBase {
             // if we have enough to send a block send it.
             if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
                 if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
-                    // todo-0: handle error case better here.
+                    errorCount++;
                     continue;
                 }
                 // reset the push object.
@@ -239,8 +240,12 @@ public class CryptoService extends ServiceBase {
         // process any remainder
         if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
             if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
-                // todo-0: handle error case better here.
+                errorCount++;
             }
+        }
+
+        if (errorCount > 0) {
+            push.pushInfo(sc, new PushPageMessage("Failed signing " + errorCount + " nodes.", true, "error"));
         }
     }
 
