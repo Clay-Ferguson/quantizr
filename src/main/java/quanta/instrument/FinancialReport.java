@@ -81,7 +81,6 @@ public class FinancialReport extends ServiceBase {
                 }
                 // anything else is numeric and right justified
                 else {
-                    log.debug("Class: " + col.getClass().getName());
                     r.append(htmlTdRt(String.valueOf(col)));
                 }
             }
