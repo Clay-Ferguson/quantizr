@@ -158,14 +158,6 @@ export class User {
             }
 
             await S.util.setInitialStateVars(res);
-
-            /* if we know the server already failed to get the content requested on the url then
-            default to main tab (tree) and set it up to display an error */
-            if (S.quanta.config.urlIdFailMsg) {
-                await promiseDispatch("setAccessFailed", s => {
-                    s.activeTab = C.TAB_MAIN;
-                });
-            }
         } else {
             console.log("LocalDb login failed.");
 

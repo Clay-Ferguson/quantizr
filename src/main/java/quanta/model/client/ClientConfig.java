@@ -8,7 +8,6 @@ public class ClientConfig {
     private String brandingAppName;
     private boolean requireCrypto;
     private boolean useOpenAi;
-    private String urlIdFailMsg;
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
@@ -60,10 +59,6 @@ public class ClientConfig {
         this.useOpenAi = useOpenAi;
     }
 
-    public String getUrlIdFailMsg() {
-        return this.urlIdFailMsg;
-    }
-
     public String getUserMsg() {
         return this.userMsg;
     }
@@ -86,10 +81,6 @@ public class ClientConfig {
 
     public void setRequireCrypto(final boolean requireCrypto) {
         this.requireCrypto = requireCrypto;
-    }
-
-    public void setUrlIdFailMsg(final String urlIdFailMsg) {
-        this.urlIdFailMsg = urlIdFailMsg;
     }
 
     public void setUserMsg(final String userMsg) {

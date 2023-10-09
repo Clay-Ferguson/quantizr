@@ -101,11 +101,11 @@ public class NodeRenderService extends ServiceBase {
                 node = read.getNode(as, _id, true, accntNode);
                 if (node == null) {
                     if (_isHomeNodeRequest && accntNode.hasVal()) {
-                        sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
+                        config.setDisplayUserProfileId(accntNode.getVal().getIdStr());
                     }
                 }
             } catch (Exception e) {
-                sc.setUrlIdFailMsg("Unable to access node: " + _id);
+                config.setUserMsg("Unable to access node: " + _id);
                 ExUtil.warn(log, "Unable to access node: " + _id, e);
             }
 
@@ -117,43 +117,26 @@ public class NodeRenderService extends ServiceBase {
                     render.populateSocialCardProps(node, model);
                 }
             } else {
-                sc.setUrlIdFailMsg("Unable to open node: " + _id);
+                config.setUserMsg("Unable to open node: " + _id);
             }
             return null;
         });
+
         if (signupCode != null) {
-            sc.setUserMsg(user.processSignupCode(signupCode));
+            config.setUserMsg(user.processSignupCode(signupCode));
         }
 
-        loadConfig(config);
+        config.setConfig(prop.getConfig());
+        config.setBrandingAppName(prop.getConfigText("brandingAppName"));
+        config.setRequireCrypto(prop.isRequireCrypto());
+        config.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
+        // SubNode root = read.getDbRoot();
         config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);
         attrs.put("g_config", config);
         model.addAllAttributes(attrs);
         return "index";
-    }
-
-    public void loadConfig(ClientConfig res) {
-        /*
-         * Identifier generated once on Browser, can uniquely identify one single session to associate with
-         * the given webpage/tab
-         */
-        SessionContext sc = ThreadLocals.getSC();
-        if (sc != null) {
-            res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
-            // we only need to display this once so remove it.
-            sc.setUrlIdFailMsg(null);
-
-            // todo-0: shouldn't these sc values be set back to null here?
-            res.setUserMsg(sc.getUserMsg());
-            res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
-        }
-        res.setConfig(prop.getConfig());
-        res.setBrandingAppName(prop.getConfigText("brandingAppName"));
-        res.setRequireCrypto(prop.isRequireCrypto());
-        res.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
-        SubNode root = read.getDbRoot();
     }
 
     public HashMap<String, Object> getThymeleafAttribs() {

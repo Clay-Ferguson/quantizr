@@ -16,13 +16,8 @@ import quanta.mongo.MongoUtil;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionContext {
-
     private String command;
-    private String urlIdFailMsg;
-    private String userMsg;
-    private String displayUserProfileId;
     private String pubSigKeyJson;
-
     private boolean live = true;
     private String rootId;
     /*
@@ -215,30 +210,6 @@ public class SessionContext {
 
     public void setFriendsTagsDirty(boolean friendsTagsDirty) {
         this.friendsTagsDirty = friendsTagsDirty;
-    }
-
-    public String getUrlIdFailMsg() {
-        return urlIdFailMsg;
-    }
-
-    public void setUrlIdFailMsg(String urlIdFailMsg) {
-        this.urlIdFailMsg = urlIdFailMsg;
-    }
-
-    public String getUserMsg() {
-        return userMsg;
-    }
-
-    public void setUserMsg(String userMsg) {
-        this.userMsg = userMsg;
-    }
-
-    public String getDisplayUserProfileId() {
-        return displayUserProfileId;
-    }
-
-    public void setDisplayUserProfileId(String displayUserProfileId) {
-        this.displayUserProfileId = displayUserProfileId;
     }
 
     public String getCommand() {

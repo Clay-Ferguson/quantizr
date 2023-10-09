@@ -5,7 +5,6 @@ import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Divc } from "../comp/core/Divc";
-import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -28,10 +27,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         const ast = getAs();
 
         let contentDiv: CompIntf = null;
-        if (S.quanta.config.urlIdFailMsg) {
-            contentDiv = new Heading(4, S.quanta.config.urlIdFailMsg);
-        }
-        else if (!ast.node) {
+        if (!ast.node) {
             contentDiv = null;
         }
         else {

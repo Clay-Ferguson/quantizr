@@ -442,7 +442,6 @@ export class Render {
                 back to false, no matter what */
                 try {
                     if (res) {
-                        S.quanta.config.urlIdFailMsg = null;
                         s.node = res.node;
                         s.endReached = res.endReached;
 
