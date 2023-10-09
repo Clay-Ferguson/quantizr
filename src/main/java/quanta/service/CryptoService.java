@@ -198,8 +198,50 @@ public class CryptoService extends ServiceBase {
         return new SignNodesResponse();
     }
 
-    public void signNodesById(List<String> ids) {
-        // todo-0: wip, implement this just like (signSubGrah, below), but make it use the list, not a query
+    public void signNodesById(MongoSession ms, List<String> ids) {
+        if (ids == null || ids.size() == 0)
+            return;
+        SessionContext sc = ThreadLocals.getSC();
+
+        Val<NodeSigPushInfo> pushInfo = new Val<>();
+        pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
+        pushInfo.getVal().setListToSign(new LinkedList<>());
+
+        for (String id : ids) {
+            if (pushInfo.getVal() == null) {
+                pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
+                pushInfo.getVal().setListToSign(new LinkedList<>());
+            }
+
+            SubNode node = read.getNode(ms, id);
+            if (node == null) {
+                continue;
+            }
+
+            // add this node.
+            String sigData = getNodeSigData(node);
+            pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sigData));
+            if (debugSigning) {
+                log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sigData);
+            }
+
+            // if we have enough to send a block send it.
+            if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
+                if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+                    // todo-0: handle error case better here.
+                    continue;
+                }
+                // reset the push object.
+                pushInfo.setVal(null);
+            }
+        }
+
+        // process any remainder
+        if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
+            if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+                // todo-0: handle error case better here.
+            }
+        }
     }
 
     public void signSubGraph(MongoSession ms, SessionContext sc, SignSubGraphRequest req) {
@@ -215,18 +257,22 @@ public class CryptoService extends ServiceBase {
         // query all nodes under the path that are owned by 'ms'
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(parent.getPath())).and(SubNode.OWNER)
                 .is(ms.getUserNodeId());
-        Val<NodeSigPushInfo> pushInfo = new Val<>();
+
         Query query = new Query();
         crit = auth.addReadSecurity(ms, crit);
         query.addCriteria(crit);
         IntVal count = new IntVal();
-        // add in root node first
+
+        Val<NodeSigPushInfo> pushInfo = new Val<>();
         pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
         pushInfo.getVal().setListToSign(new LinkedList<>());
+
         String sig = getNodeSigData(parent);
         if (debugSigning) {
             log.debug("signed: nodeId=" + parent.getIdStr() + " sig=" + sig);
         }
+
+        // add in root node first
         pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), sig));
         count.inc();
         BooleanVal failed = new BooleanVal();
@@ -260,6 +306,7 @@ public class CryptoService extends ServiceBase {
         // make sure session is still alive
         if (failed.getVal() || !sc.isLive())
             return;
+
         // send the accumulated remainder
         if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
             if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {

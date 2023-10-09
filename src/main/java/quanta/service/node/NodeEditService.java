@@ -860,6 +860,8 @@ public class NodeEditService extends ServiceBase {
         }
         int idx = 0;
 
+        List<String> sigDirtyNodes = new LinkedList<>();
+
         for (String part : contentParts) {
             // log.debug("ContentPart[" + idx + "] " + part);
             part = part.trim();
@@ -868,21 +870,22 @@ public class NodeEditService extends ServiceBase {
                 node.setOrdinal(firstOrdinal);
                 node.touch();
                 update.save(ms, node);
+                sigDirtyNodes.add(node.getIdStr());
             } else {
                 SubNode newNode = create.createNode(ms, parentForNewNodes, null, firstOrdinal + idx,
                         CreateNodeLocation.ORDINAL, false);
                 newNode.setContent(part);
                 newNode.setAc(node.getAc());
                 newNode.touch();
-
-                // todo-0: collect all IDs here to send to signNodesById, once that method is implemented
                 update.save(ms, newNode);
+                sigDirtyNodes.add(newNode.getIdStr());
             }
             idx++;
         }
         if (req.getSplitType().equalsIgnoreCase("children")) {
             parentForNewNodes.setHasChildren(true);
         }
+        crypto.signNodesById(ms, sigDirtyNodes);
         return res;
     }
 
