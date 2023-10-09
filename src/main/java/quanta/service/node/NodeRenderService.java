@@ -1,5 +1,6 @@
 package quanta.service.node;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import quanta.model.BreadcrumbInfo;
 import quanta.model.CalendarItem;
 import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
+import quanta.model.client.ClientConfig;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
@@ -36,11 +38,14 @@ import quanta.request.RenderNodeRequest;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
+import quanta.service.AclService;
 import quanta.util.Const;
 import quanta.util.Convert;
 import quanta.util.DateUtil;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered on the server side.
@@ -52,6 +57,112 @@ import quanta.util.XString;
 public class NodeRenderService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
+
+    public String getIndexPage(String nameOnAdminNode, String nameOnUserNode, String userName, String id, String search,
+            String name, String signupCode, String login, String view, Model model) {
+        HashMap<String, Object> attrs = getThymeleafAttribs();
+
+        SessionContext sc = ThreadLocals.getSC();
+
+        boolean isHomeNodeRequest = false;
+        // Node Names are identified using a colon in front of it, to make it detectable
+        if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+            if ("home".equalsIgnoreCase(nameOnUserNode)) {
+                isHomeNodeRequest = true;
+            }
+            id = ":" + userName + ":" + nameOnUserNode;
+        } //
+        else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+            id = ":" + nameOnAdminNode;
+        } //
+        else if (!StringUtils.isEmpty(name)) {
+            id = ":" + name;
+        }
+
+        boolean hasUrlId = false;
+        // if we have an ID, try to look it up, to put it in the session and load the Social Card
+        // properties
+        // for this request.
+        // If no id given defalt to ":home" only so we can get the social card props.
+        if (id != null) {
+            hasUrlId = true;
+        } else {
+            id = ":home";
+        }
+
+        String _id = id;
+        boolean _hasUrlId = hasUrlId;
+        boolean _isHomeNodeRequest = isHomeNodeRequest;
+        ClientConfig config = new ClientConfig();
+        arun.run(as -> {
+            SubNode node = null;
+            try {
+                Val<SubNode> accntNode = new Val<>();
+                node = read.getNode(as, _id, true, accntNode);
+                if (node == null) {
+                    if (_isHomeNodeRequest && accntNode.hasVal()) {
+                        sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
+                    }
+                }
+            } catch (Exception e) {
+                sc.setUrlIdFailMsg("Unable to access node: " + _id);
+                ExUtil.warn(log, "Unable to access node: " + _id, e);
+            }
+
+            if (node != null) {
+                if (_hasUrlId) {
+                    config.setInitialNodeId(_id);
+                }
+                if (AclService.isPublic(node)) {
+                    render.populateSocialCardProps(node, model);
+                }
+            } else {
+                sc.setUrlIdFailMsg("Unable to open node: " + _id);
+            }
+            return null;
+        });
+        if (signupCode != null) {
+            sc.setUserMsg(user.processSignupCode(signupCode));
+        }
+
+        loadConfig(config);
+        config.setSearch(search);
+        config.setLogin(login);
+        config.setUrlView(view);
+        attrs.put("g_config", config);
+        model.addAllAttributes(attrs);
+        return "index";
+    }
+
+    public void loadConfig(ClientConfig res) {
+        /*
+         * Identifier generated once on Browser, can uniquely identify one single session to associate with
+         * the given webpage/tab
+         */
+        SessionContext sc = ThreadLocals.getSC();
+        if (sc != null) {
+            res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
+            // we only need to display this once so remove it.
+            sc.setUrlIdFailMsg(null);
+
+            // todo-0: shouldn't these sc values be set back to null here?
+            res.setUserMsg(sc.getUserMsg());
+            res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
+        }
+        res.setConfig(prop.getConfig());
+        res.setBrandingAppName(prop.getConfigText("brandingAppName"));
+        res.setRequireCrypto(prop.isRequireCrypto());
+        res.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
+        SubNode root = read.getDbRoot();
+    }
+
+    public HashMap<String, Object> getThymeleafAttribs() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("instanceId", prop.getInstanceId());
+        map.put("brandingAppName", prop.getConfigText("brandingAppName"));
+        map.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
+        return map;
+    }
 
     /*
      * This is the call that gets all the data to show on a page. Whenever user is browsing to a new

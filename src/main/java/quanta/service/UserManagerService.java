@@ -20,6 +20,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -62,7 +63,9 @@ import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
 import quanta.request.DeleteUserTransactionsRequest;
+import quanta.request.GetPeopleRequest;
 import quanta.request.GetUserAccountInfoRequest;
+import quanta.request.GetUserProfileRequest;
 import quanta.request.LoginRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SavePublicKeyRequest;
@@ -79,7 +82,9 @@ import quanta.response.DeleteUserTransactionsResponse;
 import quanta.response.FriendInfo;
 import quanta.response.GetPeopleResponse;
 import quanta.response.GetUserAccountInfoResponse;
+import quanta.response.GetUserProfileResponse;
 import quanta.response.LoginResponse;
+import quanta.response.LogoutResponse;
 import quanta.response.PushPageMessage;
 import quanta.response.ResetPasswordResponse;
 import quanta.response.SavePublicKeyResponse;
@@ -406,7 +411,7 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
-    public CloseAccountResponse closeAccount(CloseAccountRequest req) {
+    public CloseAccountResponse closeAccount(CloseAccountRequest req, HttpSession session) {
         CloseAccountResponse res = new CloseAccountResponse();
         log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
         arun.run(as -> {
@@ -417,6 +422,7 @@ public class UserManagerService extends ServiceBase {
             }
             return null;
         });
+        session.invalidate();
         return res;
     }
 
@@ -1443,6 +1449,17 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    public Object getPeople(GetPeopleRequest req, MongoSession ms) {
+        GetPeopleResponse ret = null;
+        if (req.getNodeId() != null) {
+            ret = user.getPeopleOnNode(ms, req.getNodeId());
+        } else {
+            ret = user.getPeople(ms, ThreadLocals.getSC().getUserName(), req.getType());
+        }
+        ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
+        return ret;
+    }
+
     public FriendInfo buildPersonInfoFromFriendNode(MongoSession ms, SubNode friendNode) {
         String userName = friendNode.getStr(NodeProp.USER);
         FriendInfo fi = null;
@@ -1586,5 +1603,22 @@ public class UserManagerService extends ServiceBase {
 
         int binTotal = userNode.getInt(NodeProp.BIN_TOTAL).intValue();
         return quota - binTotal;
+    }
+
+    public Object logout(HttpSession session) {
+        redis.delete(ThreadLocals.getSC());
+        ThreadLocals.getSC().forceAnonymous();
+        session.invalidate();
+        LogoutResponse res = new LogoutResponse();
+        return res;
+    }
+
+    public Object getUserProfile(GetUserProfileRequest req) {
+        GetUserProfileResponse res = new GetUserProfileResponse();
+        UserProfile userProfile = user.getUserProfile(req.getUserId(), null, false);
+        if (userProfile != null) {
+            res.setUserProfile(userProfile);
+        }
+        return res;
     }
 }

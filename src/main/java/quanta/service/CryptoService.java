@@ -35,6 +35,7 @@ import quanta.response.NodeSigData;
 import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
 import quanta.response.SignNodesResponse;
+import quanta.response.SignSubGraphResponse;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
@@ -158,7 +159,7 @@ public class CryptoService extends ServiceBase {
         }
     }
 
-    public void signNodes(MongoSession ms, SignNodesRequest req, SignNodesResponse res) {
+    public SignNodesResponse signNodes(MongoSession ms, SignNodesRequest req) {
         /*
          * if the signPendingQueue contains the workload we assume it's the same workload, which is fine
          * because we aren't doing that security right here.
@@ -194,6 +195,7 @@ public class CryptoService extends ServiceBase {
         } else {
             log.warn("Unknown workload id: " + req.getWorkloadId());
         }
+        return new SignNodesResponse();
     }
 
     public void signNodesById(List<String> ids) {
@@ -288,5 +290,14 @@ public class CryptoService extends ServiceBase {
             totalTime += sleepTime;
         }
         return totalTime < 30000;
+    }
+
+    public Object signSubGraph(SignSubGraphRequest req, MongoSession ms) {
+        // run the signing in an async thread, so we can push messages back to browser from it without
+        // any session mutexing getting in the way
+        exec.run(() -> {
+            crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
+        });
+        return new SignSubGraphResponse();
     }
 }

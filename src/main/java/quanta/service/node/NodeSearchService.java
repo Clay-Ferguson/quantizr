@@ -362,7 +362,7 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
-    public void getBookmarks(MongoSession ms, GetBookmarksRequest req, GetBookmarksResponse res) {
+    public GetBookmarksResponse getBookmarks(MongoSession ms, GetBookmarksRequest req) {
         List<Bookmark> bookmarks = new LinkedList<>();
         List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, null, NodeType.BOOKMARK_LIST.s(), null, true, null);
         if (bookmarksNode != null) {
@@ -376,10 +376,13 @@ public class NodeSearchService extends ServiceBase {
                 bookmarks.add(bm);
             }
         }
+        GetBookmarksResponse res = new GetBookmarksResponse();
         res.setBookmarks(bookmarks);
+        return res;
     }
 
-    public void getNodeStats(MongoSession ms, GetNodeStatsRequest req, GetNodeStatsResponse res) {
+    public GetNodeStatsResponse getNodeStats(MongoSession ms, GetNodeStatsRequest req) {
+        GetNodeStatsResponse res = new GetNodeStatsResponse();
         boolean countVotes = !req.isFeed();
         /*
          * If this is the 'feed' being queried (i.e. the Trending tab on the app), then get the data from
@@ -392,7 +395,7 @@ public class NodeSearchService extends ServiceBase {
                     res.setTopMentions(NodeSearchService.apTrendingFeedInfo.getTopMentions());
                     res.setTopTags(NodeSearchService.apTrendingFeedInfo.getTopTags());
                     res.setTopWords(NodeSearchService.apTrendingFeedInfo.getTopWords());
-                    return;
+                    return res;
                 }
             }
         }
@@ -721,6 +724,8 @@ public class NodeSearchService extends ServiceBase {
                 NodeSearchService.apTrendingFeedInfo = res;
             }
         }
+
+        return res;
     }
 
     private HashSet<String> getAdminBlockedWords(GetNodeStatsRequest req) {

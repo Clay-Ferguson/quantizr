@@ -1,13 +1,7 @@
 package quanta;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
@@ -28,21 +22,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
-import quanta.instrument.PerformanceReport;
-import quanta.mail.EmailSender;
-import quanta.model.NodeInfo;
-import quanta.model.client.Attachment;
-import quanta.model.client.ClientConfig;
-import quanta.model.client.Constant;
-import quanta.model.client.MFSDirEntry;
 import quanta.model.client.NodeType;
-import quanta.model.client.UserProfile;
-import quanta.mongo.model.SubNode;
 import quanta.request.AddCreditRequest;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
@@ -122,36 +105,7 @@ import quanta.request.UpdateFriendNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
 import quanta.request.UploadFromIPFSRequest;
 import quanta.request.UploadFromUrlRequest;
-import quanta.response.CloseAccountResponse;
-import quanta.response.ExportResponse;
-import quanta.response.GetActPubObjectResponse;
-import quanta.response.GetBookmarksResponse;
-import quanta.response.GetIPFSContentResponse;
-import quanta.response.GetIPFSFilesResponse;
-import quanta.response.GetNodeStatsResponse;
-import quanta.response.GetPeopleResponse;
-import quanta.response.GetServerInfoResponse;
-import quanta.response.GetThreadViewResponse;
-import quanta.response.GetUserProfileResponse;
-import quanta.response.GraphResponse;
-import quanta.response.InfoMessage;
-import quanta.response.LogoutResponse;
-import quanta.response.PingResponse;
-import quanta.response.SendLogTextResponse;
-import quanta.response.SendTestEmailResponse;
-import quanta.response.SignNodesResponse;
-import quanta.response.SignSubGraphResponse;
-import quanta.response.UpdateHeadingsResponse;
-import quanta.service.AclService;
-import quanta.service.AppFilter;
-import quanta.service.exports.ExportServiceFlexmark;
-import quanta.service.exports.ExportTarService;
-import quanta.service.exports.ExportZipService;
 import quanta.util.CaptchaMaker;
-import quanta.util.ExUtil;
-import quanta.util.ThreadLocals;
-import quanta.util.Util;
-import quanta.util.val.Val;
 
 /**
  * Primary Spring MVC controller.
@@ -160,9 +114,6 @@ import quanta.util.val.Val;
 public class AppController extends ServiceBase implements ErrorController {
 
     private static Logger log = LoggerFactory.getLogger(AppController.class);
-
-    @Autowired
-    private GracefulShutdown gracefulShutdown;
 
     public static final String API_PATH = "/api";
     public static final String ADMIN_PATH = "/admin";
@@ -174,18 +125,9 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(ERROR_MAPPING)
     public String error(Model model) {
         model.addAttribute("hostAndPort", prop.getHostAndPort());
-        model.addAllAttributes(getThymeleafAttribs());
+        model.addAllAttributes(render.getThymeleafAttribs());
         // pulls up error.html
         return "error";
-    }
-
-
-    public HashMap<String, Object> getThymeleafAttribs() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("instanceId", prop.getInstanceId());
-        map.put("brandingAppName", prop.getConfigText("brandingAppName"));
-        map.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
-        return map;
     }
 
     /*
@@ -224,176 +166,16 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "view", required = false) String view, //
             HttpSession session, //
             Model model) {
-        HashMap<String, Object> attrs = getThymeleafAttribs();
-
-        SessionContext sc = ThreadLocals.getSC();
-
-        boolean isHomeNodeRequest = false;
-        // Node Names are identified using a colon in front of it, to make it detectable
-        if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
-            if ("home".equalsIgnoreCase(nameOnUserNode)) {
-                isHomeNodeRequest = true;
-            }
-            id = ":" + userName + ":" + nameOnUserNode;
-        } //
-        else if (!StringUtils.isEmpty(nameOnAdminNode)) {
-            id = ":" + nameOnAdminNode;
-        } //
-        else if (!StringUtils.isEmpty(name)) {
-            id = ":" + name;
-        }
-
-        boolean hasUrlId = false;
-        // if we have an ID, try to look it up, to put it in the session and load the Social Card
-        // properties
-        // for this request.
-        // If no id given defalt to ":home" only so we can get the social card props.
-        if (id != null) {
-            hasUrlId = true;
-        } else {
-            id = ":home";
-        }
-
-        String _id = id;
-        boolean _hasUrlId = hasUrlId;
-        boolean _isHomeNodeRequest = isHomeNodeRequest;
-        ClientConfig config = new ClientConfig();
-        arun.run(as -> {
-            SubNode node = null;
-            try {
-                Val<SubNode> accntNode = new Val<>();
-                node = read.getNode(as, _id, true, accntNode);
-                if (node == null) {
-                    if (_isHomeNodeRequest && accntNode.hasVal()) {
-                        sc.setDisplayUserProfileId(accntNode.getVal().getIdStr());
-                    }
-                }
-            } catch (Exception e) {
-                sc.setUrlIdFailMsg("Unable to access node: " + _id);
-                ExUtil.warn(log, "Unable to access node: " + _id, e);
-            }
-
-            if (node != null) {
-                if (_hasUrlId) {
-                    config.setInitialNodeId(_id);
-                }
-                if (AclService.isPublic(node)) {
-                    render.populateSocialCardProps(node, model);
-                }
-            } else {
-                sc.setUrlIdFailMsg("Unable to open node: " + _id);
-            }
-            return null;
-        });
-        if (signupCode != null) {
-            sc.setUserMsg(user.processSignupCode(signupCode));
-        }
-
-        loadConfig(config);
-        config.setSearch(search);
-        config.setLogin(login);
-        config.setUrlView(view);
-        attrs.put("g_config", config);
-        model.addAllAttributes(attrs);
-        return "index";
+        return render.getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode, login, view,
+                model);
     }
 
-    /*
-     * Renders with Thymeleaf
-     *
-     * Renders statich HTML if whatever is in demo.html, used for experimenting with HTML snippets.
-     *
-     * Renders files in './src/main/resources/templates/demo' folder.
-     */
-    @PerfMon
-    // todo-2: broken for now. Needs '/admin/' path and token
-    @RequestMapping({"/demo/{file}"})
-    public String demo(@PathVariable(value = "file", required = false) String file, //
-            Model model) {
-        model.addAllAttributes(getThymeleafAttribs());
-        return "demo/" + file;
-    }
-
-    /*
-     * DO NOT DELETE: Leave as example for how to render plain HTML directly from a string
-     */
-    // @GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
-    // public @ResponseBody String systemPage() {
-    // return "<html><body>Hi.</body></html>";
-    // }
     @PerfMon
     @GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String fediverseUsers() {
         return apub.dumpFediverseUsers();
     }
-
-    /*
-     * This was sort of experimental, but I need to document how it works and put in the User Guide
-     */
-    // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
-    // @GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
-    // public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
-    // HttpServletResponse response, //
-    // HttpSession session) {
-    // callProc.run("rss", false, false, null, session, ms -> {
-    // arun.run(as -> {
-    // try {
-    // rssFeed.getRssFeed(as, nodeId, response.getWriter());
-    // } catch (Exception e) {
-    // throw new RuntimeException("internal server error");
-    // }
-    // return null;
-    // });
-    // return null;
-    // });
-    // }
-
-    /*
-     * Proxies an HTTP GET thru to the specified url. Used to avoid CORS errors when retrieving RSS
-     * directly from arbitrary servers
-     *
-     * todo-2: need a 'useCache' url param option
-     * 
-     * No longer used. Consider deleting.
-     */
-    // @GetMapping({"/proxyGet"})
-    // public void proxyGet(@RequestParam(value = "url", required = true) String url, //
-    // HttpSession session, HttpServletResponse response) {
-    // callProc.run("proxyGet", true, true, null, session, ms -> {
-    // try {
-    // // try to get proxy info from cache.
-    // byte[] cacheBytes = null;
-    // synchronized (RSSFeedService.proxyCache) {
-    // cacheBytes = RSSFeedService.proxyCache.get(url);
-    // }
-    // if (cacheBytes != null) {
-    // // limiting the stream just because for now this is only used in feed
-    // // processing, and 5MB is plenty
-    // IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
-    // response.getOutputStream());
-    // } else { // not in cache then read and update cache
-    // ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
-    // response.setStatus(HttpStatus.OK.value());
-    // byte[] body = resp.getBody();
-    // synchronized (RSSFeedService.proxyCache) {
-    // RSSFeedService.proxyCache.put(url, body);
-    // }
-    // IOUtils.copy(new ByteArrayInputStream(body), response.getOutputStream());
-    // // DO NOT DELETE (good example)
-    // // restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)
-    // // -> {
-    // // }, responseExtractor -> {
-    // // IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
-    // // return null;
-    // // });
-    // }
-    // } catch (Exception e) {
-    // }
-    // // throw new RuntimeException("internal server error");
-    // return null;
-    // });
-    // }
 
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
@@ -408,16 +190,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
     @ResponseBody
     public Object signup(@RequestBody SignupRequest req, HttpSession session) {
-
-        String mailPassword = prop.getMailPassword();
-        if (StringUtils.isEmpty(mailPassword)) {
-            throw new RuntimeEx("Signups are temporarily disabled.");
-        }
-
         return callProc.run("signup", false, false, req, session, ms -> {
-            // This automated flag will bypass the captcha check, and email confirmation, and just
-            // immediately
-            // create the user.
             boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
             return user.signup(req, automated);
         });
@@ -435,9 +208,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
         return callProc.run("closeAccount", true, true, req, session, ms -> {
-            CloseAccountResponse res = user.closeAccount(req);
-            session.invalidate();
-            return res;
+            return user.closeAccount(req, session);
         });
     }
 
@@ -446,11 +217,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
             HttpSession session) {
         return callProc.run("logout", true, true, req, session, ms -> {
-            redis.delete(ThreadLocals.getSC());
-            ThreadLocals.getSC().forceAnonymous();
-            session.invalidate();
-            LogoutResponse res = new LogoutResponse();
-            return res;
+            return user.logout(session);
         });
     }
 
@@ -477,10 +244,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object loadActPubObject(@RequestBody GetActPubObjectRequest req, HttpServletRequest httpReq,
             HttpSession session) {
         return callProc.run("loadActPubObject", true, true, req, session, ms -> {
-            NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
-            GetActPubObjectResponse res = new GetActPubObjectResponse();
-            res.setNode(node);
-            return res;
+            return snUtil.loadObjectNodeInfoReq(req, ms);
         });
     }
 
@@ -488,8 +252,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
         return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
-            GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
-            return res;
+            return apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
         });
     }
 
@@ -497,8 +260,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeRepliesView(@RequestBody GetThreadViewRequest req, HttpSession session) {
         return callProc.run("getNodeRepliesView", false, false, req, session, ms -> {
-            GetThreadViewResponse res = apUtil.getNodeReplies(ms, req.getNodeId());
-            return res;
+            return apUtil.getNodeReplies(ms, req.getNodeId());
         });
     }
 
@@ -515,20 +277,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, HttpServletRequest httpReq, HttpSession session) {
         checkIpfs();
         return callProc.run("getIPFSFiles", false, false, req, session, ms -> {
-            Val<String> folder = new Val<>();
-            Val<String> cid = new Val<>();
-            List<MFSDirEntry> files = null;
-            // Get files using MFS
-            if (req.getFolder() == null || req.getFolder().startsWith("/")) {
-                files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
-            } else { // Get files using DAG
-                files = ipfsDag.getIPFSFiles(ms, folder, cid, req);
-            }
-            GetIPFSFilesResponse res = new GetIPFSFilesResponse();
-            res.setFiles(files);
-            res.setCid(cid.getVal());
-            res.setFolder(folder.getVal());
-            return res;
+            return ipfsFiles.getIPFSFiles(req, ms);
         });
     }
 
@@ -538,9 +287,7 @@ public class AppController extends ServiceBase implements ErrorController {
             HttpSession session) {
         checkIpfs();
         return callProc.run("deleteMFSFile", false, false, req, session, ms -> {
-            ipfsFiles.deleteMFSFile(ms, req);
-            GetIPFSFilesResponse res = new GetIPFSFilesResponse();
-            return res;
+            return ipfsFiles.deleteMFSFile(ms, req);
         });
     }
 
@@ -550,10 +297,7 @@ public class AppController extends ServiceBase implements ErrorController {
             HttpSession session) {
         checkIpfs();
         return callProc.run("getIPFSContent", false, false, req, session, ms -> {
-            String content = ipfsFiles.getIPFSContent(ms, req);
-            GetIPFSContentResponse res = new GetIPFSContentResponse();
-            res.setContent(content);
-            return res;
+            return ipfsFiles.getIPFSContent(ms, req);
         });
     }
 
@@ -593,14 +337,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
         return callProc.run("getPeople", false, false, req, session, ms -> {
-            GetPeopleResponse ret = null;
-            if (req.getNodeId() != null) {
-                ret = user.getPeopleOnNode(ms, req.getNodeId());
-            } else {
-                ret = user.getPeople(ms, ThreadLocals.getSC().getUserName(), req.getType());
-            }
-            ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
-            return ret;
+            return user.getPeople(req, ms);
         });
     }
 
@@ -655,69 +392,8 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/export", method = RequestMethod.POST)
     @ResponseBody
     public Object export(@RequestBody ExportRequest req, HttpSession session) {
-        if (req.isToIpfs()) {
-            checkIpfs();
-        }
         return callProc.run("export", true, true, req, session, ms -> {
-            ExportResponse res = new ExportResponse();
-
-            arun.run(as -> {
-                SubNode node = read.getNode(as, req.getNodeId());
-                if (node == null)
-                    throw new RuntimeException("Node not found: " + req.getNodeId());
-                if (!auth.ownedByThreadUser(node)) {
-                    throw new RuntimeException("You can only export nodes you own");
-                }
-                return null;
-            });
-            if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-                ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
-                svc.export(ms, "pdf", req, res);
-            }
-            // ================================================
-            // // } // // } // res.setSuccess(false);
-            // // res.setMessage("Export of Markdown to
-            // IPFS not yet available."); // if
-            // (req.isToIpfs()) { // else if
-            // ("md".equalsIgnoreCase(req.getExportExt()))
-            // { // } // // svc.export(ms, "html", req,
-            // res); // ExportServiceFlexmark svc =
-            // (ExportServiceFlexmark)
-            // context.getBean(ExportServiceFlexmark.class);
-            // // else if
-            // ("html".equalsIgnoreCase(req.getExportExt()))
-            // { // and we don't need these options,
-            // but I'm leaving the code in place for
-            // now. // I think the HTML and MARKDOWN
-            // export as ZIP/TAR formats can suffice
-            // for this // DO NOT DELETE (YET) //
-            // ================================================
-            // //
-            else if ("zip".equalsIgnoreCase(req.getExportExt())) {
-                if (req.isToIpfs()) {
-                    res.error("Export of ZIP to IPFS not yet available.");
-                }
-                ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
-                svc.export(ms, req, res);
-            } //
-            else if ("tar".equalsIgnoreCase(req.getExportExt())) {
-                if (req.isToIpfs()) {
-                    res.error("Export of TAR to IPFS not yet available.");
-                }
-                ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
-                svc.export(ms, req, res);
-            } //
-            else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
-                if (req.isToIpfs()) {
-                    res.error("Export of TAR.GZ to IPFS not yet available.");
-                }
-                ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
-                svc.setUseGZip(true);
-                svc.export(ms, req, res);
-            } else {
-                throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
-            }
-            return res;
+            return system.export(req, ms);
         });
     }
 
@@ -748,7 +424,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
     @ResponseBody
     public Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
-        checkIpfs();
         return callProc.run("publishNodeToIpfs", true, true, req, session, ms -> {
             return ipfs.publishNodeToIpfs(ms, req);
         });
@@ -757,7 +432,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
     @ResponseBody
     public Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
-        checkIpfs();
         return callProc.run("loadNodeFromIpfs", true, true, req, session, ms -> {
             return ipfs.loadNodeFromIpfs(ms, req);
         });
@@ -780,7 +454,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    /* Creates a new node as a child of the specified node */
     @RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
     @ResponseBody
     public Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
@@ -789,9 +462,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    /*
-     * Inserts node 'inline' at the position specified in the InsertNodeRequest.targetName
-     */
     @RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
     @ResponseBody
     public Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
@@ -804,11 +474,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
         return callProc.run("deleteNodes", true, true, req, session, ms -> {
-            if (req.isBulkDelete()) {
-                return delete.bulkDeleteNodes(ms);
-            } else {
-                return delete.deleteNodes(ms, req.getNodeIds());
-            }
+            return delete.delete(req, ms);
         });
     }
 
@@ -832,9 +498,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
         return callProc.run("updateHeadings", true, true, req, session, ms -> {
-            edit.updateHeadings(ms, req.getNodeId());
-            UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-            return res;
+            return edit.updateHeadings(ms, req.getNodeId());
         });
     }
 
@@ -897,21 +561,11 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
     @ResponseBody
     public Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
-
-        String mailPassword = prop.getMailPassword();
-        if (StringUtils.isEmpty(mailPassword)) {
-            throw new RuntimeEx("Password resets are temporarily disabled.");
-        }
-
         return callProc.run("resetPassword", false, false, req, session, ms -> {
             return user.resetPassword(req);
         });
     }
 
-    /*
-     * An alternative way to get the binary attachment from a node allowing more friendly url format
-     * (named nodes). Note, currently this is the format we use for generated ActivityPub objects.
-     */
     @PerfMon
     @RequestMapping({FILE_PATH + "/id/{id}", FILE_PATH + "/{nameOnAdminNode}",
             FILE_PATH + "/{userName}/{nameOnUserNode}"})
@@ -930,81 +584,9 @@ public class AppController extends ServiceBase implements ErrorController {
             // defaults to "p" (primary)
             @RequestParam(value = "att", required = false) String attName, HttpSession session, HttpServletRequest req,
             HttpServletResponse response) {
-        try {
-            if (StringUtils.isEmpty(attName)) {
-                attName = Constant.ATTACHMENT_PRIMARY.s();
-            }
-            /*
-             * NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
-             * but check below only after knowing whether the node has any sharing on it at all or not.
-             *
-             * Node Names are identified using a colon in front of it, to make it detectable
-             */
-            if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
-                id = ":" + userName + ":" + nameOnUserNode;
-            } //
-            else if (!StringUtils.isEmpty(nameOnAdminNode)) {
-                id = ":" + nameOnAdminNode;
-            }
-            if (id != null) {
-                String _id = id;
-                String _attName = attName;
-                arun.run(as -> {
-                    // we don't check ownership of node at this time, but merely check sanity of
-                    // whether this ID is even existing or not.
-                    SubNode node = read.getNode(as, _id);
-                    if (node == null) {
-                        throw new RuntimeException("Node not found.");
-                    }
-                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow
-                    // access.
-                    // This is for good fediverse interoperability but still with a level of privacy for completely
-                    // unshared nodes.
-                    if (node.getAc() == null || node.getAc().size() == 0) {
-                        user.authBearer();
-                        user.authSig();
-                    }
-                    String _gid = gid;
-                    // if no cachebuster gid was on url then redirect to a url that does have the gid
-                    if (_gid == null) {
-                        Attachment att = node.getAttachment(_attName, false, false);
-                        _gid = att != null ? att.getIpfsLink() : null;
-                        if (_gid == null) {
-                            _gid = att != null ? att.getBin() : null;
-                        }
-                        if (_gid != null) {
-                            try {
-                                response.sendRedirect(Util.getFullURL(req, "gid=" + _gid));
-                            } catch (Exception e) {
-                                throw new RuntimeException("fail.");
-                            }
-                        }
-                    }
-                    if (_gid == null) {
-                        throw new RuntimeException("No attachment data for node.");
-                    }
-                    if (node == null) {
-                        log.debug("Node did not exist: " + _id);
-                        throw new RuntimeException("Node not found.");
-                    } else {
-                        attach.getBinary(as, _attName, node, null, null, download != null, response);
-                    }
-                    return null;
-                });
-            }
-        } catch (Exception e) {
-            // need to add some kind of message to exception to indicate to user something
-            // with the arguments went wrong.
-            ExUtil.error(log, "exception in call processor", e);
-        }
+        attach.getAttachment(nameOnAdminNode, nameOnUserNode, userName, id, download, gid, attName, req, response);
     }
 
-    /*
-     * binId param not uses currently but the client will send either the gridId or the ipfsHash of the
-     * node depending on which type of attachment it sees on the node
-     *
-     * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
-     */
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
     public void getBinary(@PathVariable("binId") String binId,
             @RequestParam(value = "nodeId", required = false) String nodeId,
@@ -1023,41 +605,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "token", required = false) String token,
             @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {
-        if (token == null) {
-            // Check if this is an 'avatar' request and if so bypass security
-            if ("avatar".equals(binId)) {
-                arun.run(as -> {
-                    attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, download != null,
-                            response);
-                    return null;
-                });
-            } //
-            else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request
-                // and if so
-                // bypass security
-                arun.run(as -> {
-                    attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null,
-                            response);
-                    return null;
-                });
-            } else /* Else if not an avatar request then do a secure acccess */ {
-                callProc.run("bin", false, false, null, session, ms -> {
-                    if (ipfsCid != null) {
-                        ipfs.streamResponse(response, ms, ipfsCid, null);
-                    } else {
-                        attach.getBinary(null, null, null, nodeId, binId, download != null, response);
-                    }
-                    return null;
-                });
-            }
-        } else {
-            if (user.validToken(token, null)) {
-                arun.run(as -> {
-                    attach.getBinary(as, null, null, nodeId, binId, download != null, response);
-                    return null;
-                });
-            }
-        }
+        attach.getBinary(binId, nodeId, ipfsCid, token, download, session, response);
     }
 
     /*
@@ -1119,47 +667,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    /*
-     * NOTE: this rest endpoint has -xxx appended so it never gets called, however for efficient
-     * streaming of content for 'non-seekable' media, this works perfectly, but i'm using the
-     * getFileSystemResourceStreamMultiPart call below instead which DOES support seeking, which means
-     * very large video files can be played
-     *
-     * I never tried this: so what I'm doing here CAN be done simpler if this following snippet will
-     * have worked:
-     *
-     * @RequestMapping(method = RequestMethod.GET, value = "/testVideo")
-     *
-     * @ResponseBody public FileSystemResource testVideo(Principal principal) throws IOException {
-     * return new FileSystemResource(new File("D:\\oceans.mp4")); } however, the above snipped might not
-     * be as powerful/flexible as what i have implemented since my solution can be modified easier at a
-     * lower level if we ever need to.
-     *
-     * <pre> https://dzone.com/articles/writing-download-server-part-i
-     * https://www.logicbig.com/tutorials/spring-framework/spring-web-mvc/streaming- response-body.html
-     * https://stackoverflow.com/questions/38957245/spring-mvc-streamingresponsebody
-     * -return-chunked-file </pre>
-     */
-    // todo-2: broken for now. Needs accepted path (by AppFilter) and token
-    @RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
-    public Object getFileSystemResourceStream(@PathVariable("nodeId") String nodeId,
-            @RequestParam(name = "disp", required = false) String disposition, HttpSession session) {
-        return callProc.run("filesys", false, false, null, session, ms -> {
-            // return attachmentService.getFileSystemResourceStream(ms, nodeId,
-            // disposition);
-            return null;
-        });
-    }
-
-    ///////////////////////////////////////////////
-    // @GetMapping("/videos/{name}/full")
-    // public ResponseEntity<UrlResource> getFullVideo(@PathVariable String name) throws
-    /////////////////////////////////////////////// MalformedURLException {
-    // UrlResource video = new UrlResource("file:${video.location}/${name}");
-    // return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-    // .contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM))
-    // .body(video);
-    // }
     @PerfMon
     @RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
     public ResponseEntity<ResourceRegion> streamMultiPart(@PathVariable("fileName") String fileName,
@@ -1171,20 +678,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    // /* Used for displaying a file specified by a file url parameter (tbd) */
-    // @RequestMapping(value = "/view/{fileName:.+}", method = RequestMethod.GET)
-    // public String view(@PathVariable("fileName") String fileName, //
-    // Model model) {
-    //
-    // logRequest("view", null);
-    //
-    // model.addAttribute("content ", attachmentService.getFileContent(null,
-    // fileName));
-    //
-    // // tag: view.html
-    // return "view";
-    // }
-    //
     @RequestMapping(value = API_PATH + "/parseFiles", method = RequestMethod.POST)
     @ResponseBody
     public Object parseFiles(@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,
@@ -1272,11 +765,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    /*
-     * This function is similar to getPeople, but since getPeople is for a picker dialog we can consider
-     * it to be the odd man out which will eventually need to support paging (currently doesn't) and go
-     * ahead and duplicate that functionality here in a way analogous to getFollowers
-     */
     @RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
@@ -1337,12 +825,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
         return callProc.run("getUserProfile", false, false, req, session, ms -> {
-            GetUserProfileResponse res = new GetUserProfileResponse();
-            UserProfile userProfile = user.getUserProfile(req.getUserId(), null, false);
-            if (userProfile != null) {
-                res.setUserProfile(userProfile);
-            }
-            return res;
+            return user.getUserProfile(req);
         });
     }
 
@@ -1373,7 +856,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
     @ResponseBody
     public Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
-        // SessionContext.authReq(true);
         return callProc.run("blockUser", true, true, req, session, ms -> {
             return user.blockUsers(ms, req);
         });
@@ -1395,35 +877,11 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    private void loadConfig(ClientConfig res) {
-        /*
-         * Identifier generated once on Browser, can uniquely identify one single session to associate with
-         * the given webpage/tab
-         */
-        SessionContext sc = ThreadLocals.getSC();
-        if (sc != null) {
-            res.setUrlIdFailMsg(sc.getUrlIdFailMsg());
-            // we only need to display this once so remove it.
-            sc.setUrlIdFailMsg(null);
-
-            // todo-0: shouldn't these sc values be set back to null here?
-            res.setUserMsg(sc.getUserMsg());
-            res.setDisplayUserProfileId(sc.getDisplayUserProfileId());
-        }
-        res.setConfig(prop.getConfig());
-        res.setBrandingAppName(prop.getConfigText("brandingAppName"));
-        res.setRequireCrypto(prop.isRequireCrypto());
-        res.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
-        SubNode root = read.getDbRoot();
-    }
-
     @RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
     @ResponseBody
     public Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
         return callProc.run("getBookmarks", true, true, req, session, ms -> {
-            GetBookmarksResponse res = new GetBookmarksResponse();
-            search.getBookmarks(ms, req, res);
-            return res;
+            return search.getBookmarks(ms, req);
         });
     }
 
@@ -1431,9 +889,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
         return callProc.run("signNodes", true, true, req, session, ms -> {
-            SignNodesResponse res = new SignNodesResponse();
-            crypto.signNodes(ms, req, res);
-            return res;
+            return crypto.signNodes(ms, req);
         });
     }
 
@@ -1441,13 +897,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object signSubGraph(@RequestBody SignSubGraphRequest req, HttpSession session) {
         return callProc.run("signSubGraph", true, true, req, session, ms -> {
-            SignSubGraphResponse res = new SignSubGraphResponse();
-            // run the signing in an async thread, so we can push messages back to browser from it without
-            // any session mutexing getting in the way
-            exec.run(() -> {
-                crypto.signSubGraph(ms, ThreadLocals.getSC(), req);
-            });
-            return res;
+            return crypto.signSubGraph(req, ms);
         });
     }
 
@@ -1455,9 +905,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
         return callProc.run("getNodeStats", false, false, req, session, ms -> {
-            GetNodeStatsResponse res = new GetNodeStatsResponse();
-            search.getNodeStats(ms, req, res);
-            return res;
+            return search.getNodeStats(ms, req);
         });
     }
 
@@ -1481,94 +929,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
         return callProc.run("getServerInfo", true, true, req, session, ms -> {
-            GetServerInfoResponse res = new GetServerInfoResponse();
-            res.setMessages(new LinkedList<>());
-            if (req.getCommand().equalsIgnoreCase("getJson")) {
-            } else { // allow this one if user owns node.
-                ThreadLocals.requireAdmin();
-            }
-
-            log.debug("Command: " + req.getCommand());
-            switch (req.getCommand()) {
-                case "redisPubSubTest":
-                    res.getMessages().add(new InfoMessage(system.redisPubSubTest(), null));
-                    break;
-                case "performanceReport":
-                    res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
-                    break;
-                case "transactionsReport":
-                    res.getMessages().add(new InfoMessage(financialReport.getReport(), null));
-                    break;
-                case "clearPerformanceData":
-                    res.getMessages().add(new InfoMessage(PerformanceReport.clearData(), null));
-                    break;
-                case "crawlUsers":
-                    res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
-                    break;
-                case "actPubMaintenance":
-                    res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
-                    break;
-                case "compactDb":
-                    res.getMessages().add(new InfoMessage(system.compactDb(), null));
-                    break;
-                case "runConversion":
-                    res.getMessages().add(new InfoMessage(system.runConversion(), null));
-                    break;
-                case "deleteLeavingOrphans":
-                    res.getMessages().add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
-                    break;
-                case "validateDb":
-                    res.getMessages().add(new InfoMessage(system.validateDb(), null));
-                    break;
-                case "cacheAdminContent":
-                    system.cacheAdminNodes();
-                    res.getMessages().add(new InfoMessage("Done", null));
-                    break;
-                case "repairDb":
-                    res.getMessages().add(new InfoMessage(system.repairDb(), null));
-                    break;
-                case "rebuildIndexes":
-                    res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
-                    break;
-                case "refreshRssCache":
-                    res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
-                    break;
-                case "refreshTrendingCache":
-                    res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
-                    break;
-                case "refreshAPAccounts":
-                    apub.refreshActorPropsForAllUsers();
-                    res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
-                    break;
-                case "toggleAuditFilter":
-                    AppFilter.audit = !AppFilter.audit;
-                    res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                    break;
-                case "toggleDaemons":
-                    prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
-                    res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                    break;
-                case "ipfsPubSubTest":
-                    // currently unused (leaving hook in place)
-                    throw new RuntimeException("ipfsPubSubTest depricated");
-                // res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
-                // break;
-                case "getServerInfo":
-                    res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
-                    break;
-                case "getJson":
-                    res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
-                    break;
-                case "getActPubJson":
-                    res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
-                    break;
-                case "readOutbox":
-                    res.getMessages().add(new InfoMessage(apub.readOutbox(req.getParameter()), null));
-                    break;
-                default:
-                    throw new RuntimeEx("Invalid command: " + req.getCommand());
-            }
-            return res;
+            return system.getServerInfo(req, ms);
         });
     }
 
@@ -1576,8 +937,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
         return callProc.run("graphNodes", true, true, req, session, ms -> {
-            GraphResponse res = graphNodes.graphNodes(ms, req);
-            return res;
+            return graphNodes.graphNodes(ms, req);
         });
     }
 
@@ -1585,12 +945,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
         return callProc.run("luceneIndex", true, true, req, session, ms -> {
-            ThreadLocals.requireAdmin();
-            /*
-             * We need to run this in a thread, and return control back to browser imediately, and then have the
-             * "ServerInfo" request able to display the current state of this indexing process, or potentially
-             * have a dedicated ServerInfo-like tab to display the state in
-             */
             return lucene.reindex(ms, req.getNodeId(), req.getPath());
         });
     }
@@ -1599,7 +953,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
         return callProc.run("luceneSearch", true, true, req, session, ms -> {
-            ThreadLocals.requireAdmin();
             return lucene.search(ms, req.getNodeId(), req.getText());
         });
     }
@@ -1607,24 +960,14 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String health() {
-        return "Health Check\n\n" + //
-                "Ver: " + prop.getAppVersion() + "\n" + //
-                "Server Time: " + System.currentTimeMillis() + "\n" + //
-                "Swarm Task Id: " + prop.getSwarmTaskId() + "\n" + //
-                "slot: " + prop.getSwarmTaskSlot();
+        return system.getHealth();
     }
 
-    /*
-     * Used to keep session from timing out when browser is doing something long-running like playing an
-     * audio file, and the user may not be interacting at all.
-     */
     @RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
     @ResponseBody
     public Object ping(@RequestBody PingRequest req, HttpSession session) {
         return callProc.run("ping", false, false, req, session, ms -> {
-            PingResponse res = new PingResponse();
-            res.setServerInfo("Server: t=" + System.currentTimeMillis() + " SwarmTaskId=" + prop.getSwarmTaskId());
-            return res;
+            return system.ping();
         });
     }
 
@@ -1632,22 +975,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
         return callProc.run("sendTestEmail", true, true, req, session, ms -> {
-            SendTestEmailResponse res = new SendTestEmailResponse();
-            ThreadLocals.requireAdmin();
-            log.debug("SendEmailTest detected on server.");
-            String timeString = new Date().toString();
-            synchronized (EmailSender.getLock()) {
-                try {
-                    mail.init();
-                    mail.sendMail("wclayf@gmail.com", null,
-                            "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
-                                    + prop.getConfigText("brandingAppName") + " admin menu.",
-                            "Test Subject");
-                } finally {
-                    mail.close();
-                }
-            }
-            return res;
+            return system.sendTestEmail();
         });
     }
 
@@ -1655,12 +983,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
         return callProc.run("sendLogText", true, true, req, session, ms -> {
-            ThreadLocals.requireAdmin();
-            SendLogTextResponse res = new SendLogTextResponse();
-            log.debug("DEBUG: " + req.getText());
-            log.info("INFO: " + req.getText());
-            log.trace("TRACE: " + req.getText());
-            return res;
+            return system.sendLogText(req);
         });
     }
 
@@ -1672,62 +995,81 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    //
-    // @RequestMapping(value = API_PATH + "/openSystemFile", method =
-    // RequestMethod.POST)
-    // public @ResponseBody OpenSystemFileResponse saveUserPreferences(@RequestBody
-    // OpenSystemFileRequest req) {
-    // logRequest("openSystemFile", req);
-    // OpenSystemFileResponse res = new OpenSystemFileResponse();
-    //
-    // DesktopApi.open(new File(req.getFileName()));
-    // return res;
-    // }
-    // reference: https://www.baeldung.com/spring-server-sent-events
     @GetMapping(API_PATH + "/serverPush/{token}")
     public SseEmitter serverPush(@PathVariable(value = "token", required = true) String token, //
             HttpSession session) {
-        if (StringUtils.isEmpty(token)) {
-            throw new RuntimeException("No token for serverPush");
-        }
-
-        SessionContext sc = redis.get(token);
-        if (sc == null) {
-            throw new RuntimeException("bad token for push emitter: " + token);
-        }
-
-        SseEmitter emitter = user.getPushEmitter(token);
-        if (emitter == null) {
-            throw new RuntimeException("Failed getting emitter for token: " + token);
-        }
-        return emitter;
+        return system.serverPush(token);
     }
 
     @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public byte[] captcha(HttpSession session) {
         return (byte[]) callProc.run("captcha", false, false, null, session, ms -> {
-            String captcha = CaptchaMaker.createCaptchaString();
-            ThreadLocals.getHttpSession().setAttribute("captcha", captcha);
-            return CaptchaMaker.makeCaptcha(captcha);
+            return CaptchaMaker.getCaptcha();
         });
     }
 
     /*
-     * We have this because docker-compose stop seems to be incapable of sending a graceful termination
-     * command to the app, so we'll just use curl from a shell script
-     *
-     * So doing this request terminates the server: curl
-     * http://${quanta_domain}:${PORT}/api/shutdown?password=${adminPassword}
+     * This was sort of experimental, but I need to document how it works and put in the User Guide
      */
-    @RequestMapping(value = API_PATH + "/shutdown", method = RequestMethod.GET)
-    @ResponseBody
-    public String shutdown(HttpSession session, @RequestParam(value = "password", required = true) String password) {
-        return (String) callProc.run("shutdown", false, false, null, session, ms -> {
-            if (prop.getAdminPassword().equals(password)) {
-                gracefulShutdown.initiateShutdown(0);
-            }
-            return null;
-        });
-    }
+    // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
+    // @GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
+    // public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
+    // HttpServletResponse response, //
+    // HttpSession session) {
+    // callProc.run("rss", false, false, null, session, ms -> {
+    // arun.run(as -> {
+    // try {
+    // rssFeed.getRssFeed(as, nodeId, response.getWriter());
+    // } catch (Exception e) {
+    // throw new RuntimeException("internal server error");
+    // }
+    // return null;
+    // });
+    // return null;
+    // });
+    // }
+
+    /*
+     * NOTE: this rest endpoint has -xxx appended so it never gets called, however for efficient
+     * streaming of content for 'non-seekable' media, this works perfectly, but i'm using the
+     * getFileSystemResourceStreamMultiPart call below instead which DOES support seeking, which means
+     * very large video files can be played
+     *
+     * I never tried this: so what I'm doing here CAN be done simpler if this following snippet will
+     * have worked:
+     *
+     * @RequestMapping(method = RequestMethod.GET, value = "/testVideo")
+     *
+     * @ResponseBody public FileSystemResource testVideo(Principal principal) throws IOException {
+     * return new FileSystemResource(new File("D:\\oceans.mp4")); } however, the above snipped might not
+     * be as powerful/flexible as what i have implemented since my solution can be modified easier at a
+     * lower level if we ever need to.
+     *
+     * <pre> https://dzone.com/articles/writing-download-server-part-i
+     * https://www.logicbig.com/tutorials/spring-framework/spring-web-mvc/streaming- response-body.html
+     * https://stackoverflow.com/questions/38957245/spring-mvc-streamingresponsebody
+     * -return-chunked-file </pre>
+     */
+
+    // todo-2: disabled for now. Needs accepted path (by AppFilter) and token
+    // @RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
+    // public Object getFileSystemResourceStream(@PathVariable("nodeId") String nodeId,
+    // @RequestParam(name = "disp", required = false) String disposition, HttpSession session) {
+    // return callProc.run("filesys", false, false, null, session, ms -> {
+    // // return attachmentService.getFileSystemResourceStream(ms, nodeId,
+    // // disposition);
+    // return null;
+    // });
+    // }
+
+    ///////////////////////////////////////////////
+    // @GetMapping("/videos/{name}/full")
+    // public ResponseEntity<UrlResource> getFullVideo(@PathVariable String name) throws
+    /////////////////////////////////////////////// MalformedURLException {
+    // UrlResource video = new UrlResource("file:${video.location}/${name}");
+    // return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+    // .contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM))
+    // .body(video);
+    // }
 }

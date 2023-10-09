@@ -19,6 +19,8 @@ import quanta.mongo.MongoSession;
 import quanta.request.DeleteMFSFileRequest;
 import quanta.request.GetIPFSContentRequest;
 import quanta.request.GetIPFSFilesRequest;
+import quanta.response.GetIPFSContentResponse;
+import quanta.response.GetIPFSFilesResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
@@ -124,10 +126,10 @@ public class IPFSFiles extends ServiceBase {
         }
     }
 
-    public void deleteMFSFile(MongoSession ms, DeleteMFSFileRequest req) {
+    public GetIPFSFilesResponse deleteMFSFile(MongoSession ms, DeleteMFSFileRequest req) {
         checkIpfs();
         if (!ThreadLocals.getSC().allowWeb3()) {
-            return;
+            return null;
         }
         // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
         String userNodeId = ThreadLocals.getSC().getUserNodeId();
@@ -136,14 +138,18 @@ public class IPFSFiles extends ServiceBase {
             throw new RuntimeException("You do not own the path: " + req.getItem());
         }
         deletePath(req.getItem());
+        return new GetIPFSFilesResponse();
     }
 
-    public String getIPFSContent(MongoSession ms, GetIPFSContentRequest req) {
+    public GetIPFSContentResponse getIPFSContent(MongoSession ms, GetIPFSContentRequest req) {
         checkIpfs();
         if (!ThreadLocals.getSC().allowWeb3()) {
             return null;
         }
-        return readFile(req.getId());
+        String content = readFile(req.getId());
+        GetIPFSContentResponse res = new GetIPFSContentResponse();
+        res.setContent(content);
+        return res;
     }
 
     public List<MFSDirEntry> getIPFSFiles(MongoSession ms, Val<String> folder, Val<String> cid,
@@ -179,5 +185,22 @@ public class IPFSFiles extends ServiceBase {
             }
         }
         return files;
+    }
+
+    public Object getIPFSFiles(GetIPFSFilesRequest req, MongoSession ms) {
+        Val<String> folder = new Val<>();
+        Val<String> cid = new Val<>();
+        List<MFSDirEntry> files = null;
+        // Get files using MFS
+        if (req.getFolder() == null || req.getFolder().startsWith("/")) {
+            files = ipfsFiles.getIPFSFiles(ms, folder, cid, req);
+        } else { // Get files using DAG
+            files = ipfsDag.getIPFSFiles(ms, folder, cid, req);
+        }
+        GetIPFSFilesResponse res = new GetIPFSFilesResponse();
+        res.setFiles(files);
+        res.setCid(cid.getVal());
+        res.setFolder(folder.getVal());
+        return res;
     }
 }

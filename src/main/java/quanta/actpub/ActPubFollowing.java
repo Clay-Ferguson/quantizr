@@ -329,6 +329,11 @@ public class ActPubFollowing extends ServiceBase {
         });
     }
 
+    /*
+     * This function is similar to getPeople, but since getPeople is for a picker dialog we can consider
+     * it to be the odd man out which will eventually need to support paging (currently doesn't) and go
+     * ahead and duplicate that functionality here in a way analogous to getFollowers
+     */
     public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
         GetFollowingResponse res = new GetFollowingResponse();
         return arun.run(as -> {

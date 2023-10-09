@@ -1688,6 +1688,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public String dumpFediverseUsers() {
+        ThreadLocals.requireAdmin();
         StringBuilder sb = new StringBuilder();
         IntVal count = new IntVal();
 

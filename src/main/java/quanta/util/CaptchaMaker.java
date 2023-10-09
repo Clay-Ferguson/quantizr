@@ -99,4 +99,10 @@ public class CaptchaMaker {
         }
         return tmp.toByteArray();
     }
+
+    public static Object getCaptcha() {
+        String captcha = CaptchaMaker.createCaptchaString();
+        ThreadLocals.getHttpSession().setAttribute("captcha", captcha);
+        return CaptchaMaker.makeCaptcha(captcha);
+    }
 }

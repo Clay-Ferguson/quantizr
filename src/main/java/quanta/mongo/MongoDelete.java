@@ -29,6 +29,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
+import quanta.request.DeleteNodesRequest;
 import quanta.response.DeleteNodesResponse;
 import quanta.util.Const;
 import quanta.util.ThreadLocals;
@@ -713,6 +714,14 @@ public class MongoDelete extends ServiceBase {
                 ops.remove(fName);
                 log.debug("Removed Dup FediName: " + fName.getName());
             }
+        }
+    }
+
+    public Object delete(DeleteNodesRequest req, MongoSession ms) {
+        if (req.isBulkDelete()) {
+            return delete.bulkDeleteNodes(ms);
+        } else {
+            return delete.deleteNodes(ms, req.getNodeIds());
         }
     }
 }

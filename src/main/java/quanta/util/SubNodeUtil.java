@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.config.ServiceBase;
+import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
@@ -17,6 +18,8 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
+import quanta.request.GetActPubObjectRequest;
+import quanta.response.GetActPubObjectResponse;
 import quanta.util.val.Val;
 
 /**
@@ -318,5 +321,12 @@ public class SubNodeUtil extends ServiceBase {
 
     public String getIdBasedUrl(SubNode node) {
         return prop.getProtocolHostAndPort() + "?id=" + node.getIdStr();
+    }
+
+    public Object loadObjectNodeInfoReq(GetActPubObjectRequest req, MongoSession ms) {
+        NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
+        GetActPubObjectResponse res = new GetActPubObjectResponse();
+        res.setNode(node);
+        return res;
     }
 }

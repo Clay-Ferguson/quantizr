@@ -8,6 +8,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.LuceneIndexResponse;
 import quanta.response.LuceneSearchResponse;
+import quanta.util.ThreadLocals;
 
 /**
  * Service for processing Lucene-related functions.
@@ -17,7 +18,13 @@ public class LuceneService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(LuceneService.class);
 
+    /*
+     * We need to run this in a thread, and return control back to browser imediately, and then have the
+     * "ServerInfo" request able to display the current state of this indexing process, or potentially
+     * have a dedicated ServerInfo-like tab to display the state in
+     */
     public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
+        ThreadLocals.requireAdmin();
         LuceneIndexResponse res = new LuceneIndexResponse();
         String ret = null;
         SubNode node = read.getNode(ms, nodeId, true, null);
@@ -39,6 +46,7 @@ public class LuceneService extends ServiceBase {
     }
 
     public LuceneSearchResponse search(MongoSession ms, String nodeId, String searchText) {
+        ThreadLocals.requireAdmin();
         LuceneSearchResponse res = new LuceneSearchResponse();
         String ret = null;
         // disabled for now.

@@ -87,10 +87,10 @@ import quanta.util.Validator;
 
 /**
  * We have lots of circular references in our services, and since SpringBoot has decided it doesn't
- * support that without setting a flag to disable checking, I solved this problem in this monolithic
- * way, because I don't consider circular references among beans to be a bad thing, nor am I going
- * to refactor a million line of code to eliminate them because of this flawed presumptuious
- * opinionated decision made by Spring Boot developers.
+ * support circular refs without setting a flag to disable checking, I solved this problem in this
+ * monolithic way, because I don't consider circular references among singleton beans to be a bad
+ * thing, nor am I going to refactor a million line of code to eliminate them because of this flawed
+ * and presumptuious opinionated decision made by Spring Boot developers.
  *
  * To make all services able to access other services we break convention here and use inheritance
  * in a non "is-a" way, which is normally bad practice. However the benefit to this small design
@@ -196,6 +196,7 @@ public class ServiceBase {
     public static IPFSPubSub ipfsPubSub;
     public static boolean initComplete = false;
     public static final Object initLock = new Object();
+    public static GracefulShutdown gracefulShutdown;
 
     public ServiceBase() {}
 
@@ -293,6 +294,7 @@ public class ServiceBase {
             ipfsSwarm = getBean(ctx, IPFSSwarm.class);
             ipfsConfig = getBean(ctx, IPFSConfig.class);
             ipfsPubSub = getBean(ctx, IPFSPubSub.class);
+            gracefulShutdown = getBean(ctx, GracefulShutdown.class);
 
             // We improve over Spring by only calling PostConstructs once all
             // beans are initialized

@@ -46,7 +46,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -76,6 +78,7 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.MimeTypeUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -1137,5 +1140,125 @@ public class AttachmentService extends ServiceBase {
             log.debug(String.valueOf(delCount) + " grid orphans deleted.");
             return null;
         });
+    }
+
+    /*
+     * An alternative way to get the binary attachment from a node allowing more friendly url format
+     * (named nodes). Note, currently this is the format we use for generated ActivityPub objects.
+     */
+    public void getAttachment(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
+            String download, String gid, String attName, HttpServletRequest req, HttpServletResponse response) {
+        try {
+            if (StringUtils.isEmpty(attName)) {
+                attName = Constant.ATTACHMENT_PRIMARY.s();
+            }
+            /*
+             * NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
+             * but check below only after knowing whether the node has any sharing on it at all or not.
+             *
+             * Node Names are identified using a colon in front of it, to make it detectable
+             */
+            if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+                id = ":" + userName + ":" + nameOnUserNode;
+            } //
+            else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+                id = ":" + nameOnAdminNode;
+            }
+            if (id != null) {
+                String _id = id;
+                String _attName = attName;
+                arun.run(as -> {
+                    // we don't check ownership of node at this time, but merely check sanity of
+                    // whether this ID is even existing or not.
+                    SubNode node = read.getNode(as, _id);
+                    if (node == null) {
+                        throw new RuntimeException("Node not found.");
+                    }
+                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow
+                    // access.
+                    // This is for good fediverse interoperability but still with a level of privacy for completely
+                    // unshared nodes.
+                    if (node.getAc() == null || node.getAc().size() == 0) {
+                        user.authBearer();
+                        user.authSig();
+                    }
+                    String _gid = gid;
+                    // if no cachebuster gid was on url then redirect to a url that does have the gid
+                    if (_gid == null) {
+                        Attachment att = node.getAttachment(_attName, false, false);
+                        _gid = att != null ? att.getIpfsLink() : null;
+                        if (_gid == null) {
+                            _gid = att != null ? att.getBin() : null;
+                        }
+                        if (_gid != null) {
+                            try {
+                                response.sendRedirect(Util.getFullURL(req, "gid=" + _gid));
+                            } catch (Exception e) {
+                                throw new RuntimeException("fail.");
+                            }
+                        }
+                    }
+                    if (_gid == null) {
+                        throw new RuntimeException("No attachment data for node.");
+                    }
+                    if (node == null) {
+                        log.debug("Node did not exist: " + _id);
+                        throw new RuntimeException("Node not found.");
+                    } else {
+                        attach.getBinary(as, _attName, node, null, null, download != null, response);
+                    }
+                    return null;
+                });
+            }
+        } catch (Exception e) {
+            // need to add some kind of message to exception to indicate to user something
+            // with the arguments went wrong.
+            ExUtil.error(log, "exception in call processor", e);
+        }
+    }
+
+    /*
+     * binId param not uses currently but the client will send either the gridId or the ipfsHash of the
+     * node depending on which type of attachment it sees on the node
+     *
+     * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
+     */
+    public void getBinary(String binId, String nodeId, String ipfsCid, String token, String download,
+            HttpSession session, HttpServletResponse response) {
+        if (token == null) {
+            // Check if this is an 'avatar' request and if so bypass security
+            if ("avatar".equals(binId)) {
+                arun.run(as -> {
+                    attach.getBinary(as, Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, download != null,
+                            response);
+                    return null;
+                });
+            } //
+            else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request
+                // and if so
+                // bypass security
+                arun.run(as -> {
+                    attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null,
+                            response);
+                    return null;
+                });
+            } else /* Else if not an avatar request then do a secure acccess */ {
+                callProc.run("bin", false, false, null, session, ms -> {
+                    if (ipfsCid != null) {
+                        ipfs.streamResponse(response, ms, ipfsCid, null);
+                    } else {
+                        attach.getBinary(null, null, null, nodeId, binId, download != null, response);
+                    }
+                    return null;
+                });
+            }
+        } else {
+            if (user.validToken(token, null)) {
+                arun.run(as -> {
+                    attach.getBinary(as, null, null, nodeId, binId, download != null, response);
+                    return null;
+                });
+            }
+        }
     }
 }
