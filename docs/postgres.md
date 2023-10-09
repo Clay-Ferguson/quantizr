@@ -1,6 +1,6 @@
 # PostgreSQL Notes
 
-Currently (as of 10/05/23) Quanta doesn't use Postgre for anything, but we are adding Postgre going forward so we have SQL capabilities for certain pieces of system information.
+Postgres is used to hold a transactions table which keeps track of financial expendatures for all users. The only kinds of expendatures currently are the OpenAI API charges, for access to ChatGPT
 
 ## Postgre Docker Compose
 
@@ -13,11 +13,14 @@ In the docker compose yaml file, there is a section (currently commented out) wh
 The way we do this is by running a separate dockerized pgAdmin4 instance from some other maching like this:
 
 ```sh
+docker pull dpage/pgadmin4
 docker run -p 5050:80 \
-    -e 'PGADMIN_DEFAULT_EMAIL=user@domain.com' \
-    -e 'PGADMIN_DEFAULT_PASSWORD=SuperSecret' \
+    -e 'PGADMIN_DEFAULT_EMAIL=user@none.com' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=password' \
     -d dpage/pgadmin4
 ```
+
+Makes server avilable at http://127.0.0.1:5050
 
 Once you login to the admin console, here are the connection settings that can get you connected to a locally running (like during development) instance of the Quanta app and it's Postgres instance:
 

@@ -61,6 +61,7 @@ import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
+import quanta.request.DeleteUserTransactionsRequest;
 import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.LoginRequest;
 import quanta.request.ResetPasswordRequest;
@@ -74,6 +75,7 @@ import quanta.response.BlockUserResponse;
 import quanta.response.ChangePasswordResponse;
 import quanta.response.CloseAccountResponse;
 import quanta.response.DeleteFriendResponse;
+import quanta.response.DeleteUserTransactionsResponse;
 import quanta.response.FriendInfo;
 import quanta.response.GetPeopleResponse;
 import quanta.response.GetUserAccountInfoResponse;
@@ -647,11 +649,11 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public boolean initialGrant(String userId) {
+    public boolean initialGrant(String userId, String userName) {
         UserAccount user = userRepository.findByMongoId(userId);
         if (user == null) {
             log.debug("User not found, creating...");
-            user = userRepository.save(new UserAccount(userId));
+            user = userRepository.save(new UserAccount(userId, userName));
 
             Transaction credit = new Transaction();
             credit.setAmt(new BigDecimal(INITIAL_GRANT_AMOUNT));
@@ -665,14 +667,23 @@ public class UserManagerService extends ServiceBase {
         return false;
     }
 
+    public DeleteUserTransactionsResponse deleteUserTransactions(MongoSession as, DeleteUserTransactionsRequest req) {
+        ThreadLocals.requireAdmin();
+        DeleteUserTransactionsResponse res = new DeleteUserTransactionsResponse();
+        userRepository.deleteByMongoId(req.getUserId());
+        return res;
+    }
 
-    public AddCreditResponse addCredit(AddCreditRequest req) {
+    public AddCreditResponse addCredit(MongoSession as, AddCreditRequest req) {
+        ThreadLocals.requireAdmin();
         AddCreditResponse res = new AddCreditResponse();
 
         UserAccount user = userRepository.findByMongoId(req.getUserId());
         if (user == null) {
             log.debug("User not found, creating...");
-            user = userRepository.save(new UserAccount(req.getUserId()));
+            SubNode userNode = read.getNode(as, req.getUserId(), true, null);
+            String userName = userNode.getStr(NodeProp.USER);
+            user = userRepository.save(new UserAccount(req.getUserId(), userName));
         }
 
         Transaction credit = new Transaction();

@@ -21,6 +21,7 @@ import quanta.actpub.ActPubOutbox;
 import quanta.actpub.ActPubReplies;
 import quanta.actpub.ActPubService;
 import quanta.actpub.ActPubUtil;
+import quanta.instrument.FinancialReport;
 import quanta.lucene.FileIndexer;
 import quanta.mail.EmailSender;
 import quanta.mail.EmailSenderDaemon;
@@ -161,6 +162,7 @@ public class ServiceBase {
     public static ImportService importService;
     public static LuceneService lucene;
     public static FileIndexer fileIndexer;
+    public static FinancialReport financialReport;
     public static SystemService system;
     public static RSSFeedService rssFeed;
     public static OpenGraphService openGraph;
@@ -262,6 +264,7 @@ public class ServiceBase {
             importService = getBean(ctx, ImportService.class);
             lucene = getBean(ctx, LuceneService.class);
             fileIndexer = getBean(ctx, FileIndexer.class);
+            financialReport = getBean(ctx, FinancialReport.class);
             system = getBean(ctx, SystemService.class);
             rssFeed = getBean(ctx, RSSFeedService.class);
             openGraph = getBean(ctx, OpenGraphService.class);

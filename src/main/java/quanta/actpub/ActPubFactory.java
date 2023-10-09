@@ -292,8 +292,9 @@ public class ActPubFactory extends ServiceBase {
      */
     public APOPerson generatePersonObj(SubNode userNode) {
         String host = prop.getProtocolHostAndPort();
-        String userName = userNode.getStr(NodeProp.USER);
+
         try {
+            String userName = userNode.getStr(NodeProp.USER);
             user.ensureValidCryptoKeys(userNode);
             String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
             String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);

@@ -58,6 +58,7 @@ import quanta.request.DeleteFriendRequest;
 import quanta.request.DeleteMFSFileRequest;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
+import quanta.request.DeleteUserTransactionsRequest;
 import quanta.request.ExportRequest;
 import quanta.request.GetActPubObjectRequest;
 import quanta.request.GetBookmarksRequest;
@@ -1316,11 +1317,19 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
+    @RequestMapping(value = API_PATH + "/deleteUserTransactions", method = RequestMethod.POST)
+    @ResponseBody
+    public Object deleteUserTransactions(@RequestBody DeleteUserTransactionsRequest req, HttpSession session) {
+        return callProc.run("deleteUserTransactions", true, true, req, session, ms -> {
+            return user.deleteUserTransactions(ms, req);
+        });
+    }
+
     @RequestMapping(value = API_PATH + "/addCredit", method = RequestMethod.POST)
     @ResponseBody
     public Object addCredit(@RequestBody AddCreditRequest req, HttpSession session) {
         return callProc.run("addCredit", true, true, req, session, ms -> {
-            return user.addCredit(req);
+            return user.addCredit(ms, req);
         });
     }
 
@@ -1486,6 +1495,9 @@ public class AppController extends ServiceBase implements ErrorController {
                     break;
                 case "performanceReport":
                     res.getMessages().add(new InfoMessage(PerformanceReport.getReport(), null));
+                    break;
+                case "transactionsReport":
+                    res.getMessages().add(new InfoMessage(financialReport.getReport(), null));
                     break;
                 case "clearPerformanceData":
                     res.getMessages().add(new InfoMessage(PerformanceReport.clearData(), null));

@@ -311,6 +311,10 @@ export interface DeletePropertyRequest extends RequestBase {
     propNames: string[];
 }
 
+export interface DeleteUserTransactionsRequest extends RequestBase {
+    userId: string;
+}
+
 export interface ExportRequest extends RequestBase {
     nodeId: string;
     exportExt: string;
@@ -764,6 +768,9 @@ export interface DeleteNodesResponse extends ResponseBase {
 }
 
 export interface DeletePropertyResponse extends ResponseBase {
+}
+
+export interface DeleteUserTransactionsResponse extends ResponseBase {
 }
 
 export interface ExportResponse extends ResponseBase {

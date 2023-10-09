@@ -1,5 +1,11 @@
 package quanta.instrument;
 
+import static quanta.util.HtmlUtil.htmlH;
+import static quanta.util.HtmlUtil.htmlTable;
+import static quanta.util.HtmlUtil.htmlTd;
+import static quanta.util.HtmlUtil.htmlTdRt;
+import static quanta.util.HtmlUtil.htmlTh;
+import static quanta.util.HtmlUtil.htmlTr;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -115,7 +121,6 @@ public class PerformanceReport {
     }
 
     static class MethodStat {
-
         String category;
         int totalTime;
         int totalCount;
@@ -182,29 +187,5 @@ public class PerformanceReport {
         }
         tr += htmlTdRt(String.valueOf(se.hashCode()));
         return htmlTr(tr);
-    }
-
-    public static String htmlH(int level, String heading) {
-        return "<h" + String.valueOf(level) + " class='marginTop'>\n" + heading + "</h" + String.valueOf(level) + ">\n";
-    }
-
-    public static String htmlTable(String table) {
-        return "<table>\n" + table + "</table>\n";
-    }
-
-    public static String htmlTr(String row) {
-        return "<tr>\n" + row + "</tr>\n";
-    }
-
-    public static String htmlTd(String td) {
-        return "<td>\n" + td + "</td>\n";
-    }
-
-    public static String htmlTdRt(String td) {
-        return "<td align='right'>\n" + td + "</td>\n";
-    }
-
-    public static String htmlTh(String td) {
-        return "<th>\n" + td + "</th>\n";
     }
 }

@@ -1,10 +1,13 @@
 package quanta.postgres;
 
+import java.util.List;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,12 +22,19 @@ public class UserAccount {
     @Column(name = "mongo_id", nullable = false, unique = true)
     private String mongoId;
 
+    @Column(name = "user_name", nullable = false, unique = true)
+    private String userName;
+
+    @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
+
     public UserAccount() {
         // JPA requires a default constructor
     }
 
-    public UserAccount(String mongoId) {
+    public UserAccount(String mongoId, String userName) {
         this.mongoId = mongoId;
+        this.userName = userName;
     }
 
     public Long getId() {
@@ -41,5 +51,21 @@ public class UserAccount {
 
     public void setMongoId(String mongoId) {
         this.mongoId = mongoId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }

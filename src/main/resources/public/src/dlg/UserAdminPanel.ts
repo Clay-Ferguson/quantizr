@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { AddCreditDlg } from "./AddCreditDlg";
+import { ConfirmDlg } from "./ConfirmDlg";
 import { UserProfileDlg, LS as UserProfileDlgState } from "./UserProfileDlg";
 
 export class UserAdminPanel extends Div {
@@ -29,12 +30,25 @@ export class UserAdminPanel extends Div {
                             amount: dlg.amtState.getValue()
                         });
 
-                        debugger;
                         if (ret?.balance) {
                             userProfile.balance = ret.balance;
                             this.dlg.mergeState<UserProfileDlgState>({ userProfile });
                         }
                     }
+                }),
+                new Button("Clear Transactions", async () => {
+                    const dlg = new ConfirmDlg("Are you sure you want to clear transactions?", "Clear Transactions");
+                    await dlg.open();
+                    if (!dlg.yes) {
+                        return;
+                    }
+                    const userProfile = this.dlg.getState<UserProfileDlgState>().userProfile;
+                    await S.rpcUtil.rpc<J.DeleteUserTransactionsRequest, J.DeleteUserTransactionsResponse>("deleteUserTransactions", {
+                        userId: userProfile.userNodeId
+                    });
+
+                    userProfile.balance = 0;
+                    this.dlg.mergeState<UserProfileDlgState>({ userProfile });
                 })
             ])
         ]);

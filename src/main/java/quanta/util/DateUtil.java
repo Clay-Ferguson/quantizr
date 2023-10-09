@@ -94,6 +94,12 @@ public class DateUtil {
         return format.format(time);
     }
 
+    public static String standardFormatDateFromUTC(long time) {
+        SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE);
+        format.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
+        return format.format(time);
+    }
+
     public static String getFormattedDate(long time) {
         SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
         return format.format(time);

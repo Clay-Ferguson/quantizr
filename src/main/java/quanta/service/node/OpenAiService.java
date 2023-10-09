@@ -71,7 +71,8 @@ public class OpenAiService extends ServiceBase {
         }
 
         BigDecimal balance = null;
-        if (user.initialGrant(userNode.getIdStr())) {
+        String userName = userNode.getStr(NodeProp.USER);
+        if (user.initialGrant(userNode.getIdStr(), userName)) {
             balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
         } else {
             balance = transactionRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
@@ -161,7 +162,8 @@ public class OpenAiService extends ServiceBase {
         if (user == null) {
             // creating here should never be necessary but we do it anyway
             log.debug("User not found, creating...");
-            user = userRepository.save(new UserAccount(userNode.getIdStr()));
+            String userName = userNode.getStr(NodeProp.USER);
+            user = userRepository.save(new UserAccount(userNode.getIdStr(), userName));
         }
 
         Transaction debit = new Transaction();
