@@ -77,23 +77,6 @@ public class RedisService extends ServiceBase {
             }
         }
         new PerfMonEvent(System.currentTimeMillis() - start, "redisQuery", "_sys_");
-
-        // DO NOT DELETE
-        // I found this pattern online and I'm not sure of it's purpose becuase it reads apparently only
-        // bytes,
-        // so I guess the expectation is that we setup some kind of deserializer.
-        // RedisConnection redisConnection = null;
-        // try {
-        // redisConnection = redisTemplate.getConnectionFactory().getConnection();
-        // ScanOptions options = ScanOptions.scanOptions().match("*").count(Integer.MAX_VALUE).build();
-        // Cursor c = redisConnection.scan(options);
-        // while (c.hasNext()) {
-        // Object obj = c.next();
-        // log.debug("REDIS SCAN: " + obj.getClass().getName());
-        // }
-        // } finally {
-        // redisConnection.close(); //Ensure closing this connection.
-        // }
         return list;
     }
 

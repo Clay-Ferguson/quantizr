@@ -568,23 +568,13 @@ public class RSSFeedService extends ServiceBase {
                     }
                 } //
                 else if (m instanceof ContentModuleImpl) {
-                } else if (m instanceof EntryInformationImpl itunesMod) { // } // } // log.debug("CI.url: " +
-                    // ci.getContentResource()); // log.debug("CI.value: " +
-                    // ci.getContentValue()); // log.debug("CI.format: " +
-                    // ci.getContentFormat()); // log.debug("CI.encoding: "
-                    // + ci.getContentEncoding()); // for (ContentItem ci :
-                    // contentMod.getContentItems()) { // if
-                    // (ok(contentMod.getContentItems() )) { // } // } //
-                    // log.debug("CI.contents: " + contents); // for (String
-                    // contents : contentMod.getContents()) { // if
-                    // (ok(contentMod.getContents() )) { //
-                    // ContentModuleImpl contentMod = (ContentModuleImpl) m;
+                } else if (m instanceof EntryInformationImpl itunesMod) {
                     if (itunesMod.getImage() != null) {
                         try {
                             e.setImage(itunesMod.getImage().toURI().toString());
                         } catch (Exception e1) {
                         }
-                    } else { // ignore
+                    } else {
                         e.setImage(itunesMod.getImageUri());
                     }
                     if (!StringUtils.isEmpty(itunesMod.getTitle())) {
@@ -596,11 +586,7 @@ public class RSSFeedService extends ServiceBase {
                     }
                 } //
                 else if (m instanceof DCModuleImpl) {
-                }
-                // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource =
-                // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
-                // DCModuleImpl dm = (DCModuleImpl) m;
-                else {
+                } else {
                     log.debug("Unknown module type: " + m.getClass().getName());
                 }
             }

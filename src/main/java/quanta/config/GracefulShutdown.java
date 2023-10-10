@@ -14,7 +14,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
-/* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
 /**
  * Handles Tomcat shutdown
  *

@@ -1,7 +1,6 @@
 package quanta.config;
 
 public class NodePath {
-
     public static final String ROOT = "r";
     public static final String PENDING = "p";
     public static final String USER = "usr";

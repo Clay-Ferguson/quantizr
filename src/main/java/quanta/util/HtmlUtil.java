@@ -24,4 +24,16 @@ public class HtmlUtil {
     public static String htmlTh(String td) {
         return "<th>\n" + td + "</th>\n";
     }
+
+    public static String htmlHeader2(String... headers) {
+        return "";
+    }
+
+    public static String htmlHeader(String... headers) {
+        StringBuilder sb = new StringBuilder();
+        for (String header : headers) {
+            sb.append(htmlTh(header));
+        }
+        return htmlTr(sb.toString());
+    }
 }

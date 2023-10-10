@@ -1,7 +1,6 @@
 package quanta.config;
 
 public class NodeName {
-
     public static final String HOME = "home";
     public static final String INBOX = "inbox";
     public static final String FRIENDS = "friends";

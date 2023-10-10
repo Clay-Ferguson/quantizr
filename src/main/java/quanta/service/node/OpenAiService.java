@@ -304,44 +304,6 @@ public class OpenAiService extends ServiceBase {
         return sb.toString();
     }
 
-    public String getOpenAiStats(MongoSession ms, String model) {
-        ms = ThreadLocals.ensure(ms);
-        Iterable<SubNode> accountNodes = read.getAccountNodes(ms, null, null, null, -1, false, true);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nOpenAI Queries\n");
-
-        // add in admin account
-        appendUserStats(model, sb, read.getDbRoot());
-
-        /*
-         * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
-         * amount).
-         */
-        // this will have to change to scale to lots of users. We'll use an SQL "group by"
-        for (SubNode usrNode : accountNodes) {
-            appendUserStats(model, sb, usrNode);
-        }
-        return sb.toString();
-    }
-
-    private void appendUserStats(String model, StringBuilder sb, SubNode usrNode) {
-        // log.debug("usrNode: " + XString.prettyPrint(usrNode));
-
-        long userTransactionCount = transactionRepository.countByMongoId(usrNode.getIdStr());
-        if (userTransactionCount == 0) {
-            return;
-        }
-
-        BigDecimal userCredit = transactionRepository.getBalByMongoId(usrNode.getIdStr());
-        if (userCredit == null) {
-            userCredit = BigDecimal.ZERO;
-        }
-
-        sb.append("    " + usrNode.getStr(NodeProp.USER) + //
-                " Credit: $" + decimalFormatter.format(userCredit) + "\n");
-    }
-
     private double calculateCost(ChatCompletionResponse res) {
         Usage usage = res.getUsage();
 

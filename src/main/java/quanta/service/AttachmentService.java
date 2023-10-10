@@ -110,6 +110,7 @@ public class AttachmentService extends ServiceBase {
             if (!"message/rfc822".equals(contentType)) {
                 continue;
             }
+
             try {
                 LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
                 String mkdown = mail.convertEmailToMarkdown(limitedIs);
@@ -133,6 +134,7 @@ public class AttachmentService extends ServiceBase {
         if (nodeId == null) {
             throw ExUtil.wrapEx("target nodeId not provided");
         }
+
         try {
             /*
              * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
@@ -161,6 +163,7 @@ public class AttachmentService extends ServiceBase {
             auth.ownerAuth(node);
             long maxFileSize = user.getUserStorageRemaining(ms);
             int imageCount = 0;
+
             /*
              * if uploading multiple files check quota first, to make sure there's space for all files before we
              * start uploading any of them If there's only one file, the normal flow will catch an out of space
@@ -360,6 +363,7 @@ public class AttachmentService extends ServiceBase {
         InputStream isTemp = null;
         long maxFileSize = user.getUserStorageRemaining(ms);
         Attachment att = null;
+
         if (importMode) {
             att = node.getAttachment(attName, false, false);
             fileName = att.getFileName();
@@ -374,6 +378,7 @@ public class AttachmentService extends ServiceBase {
             att = node.getAttachment(attName, true, true);
             att.setOrdinal(maxAttOrdinal + 1);
         }
+
         if (ImageUtil.isImageMime(mimeType)) {
             // default image to be 100% size
             att.setCssSize("100%");
@@ -995,7 +1000,7 @@ public class AttachmentService extends ServiceBase {
      * Gets the binary data attachment stream from the node regardless of wether it's from IPFS_LINK or
      * BIN.
      *
-     * tood-0: search all calls to this and verify attName is correct.
+     * todo-1: search all calls to this and verify attName is correct.
      */
     public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean allowAuth) {
         if (allowAuth) {
@@ -1036,7 +1041,6 @@ public class AttachmentService extends ServiceBase {
         }
 
         GridFsResource gridFsResource = grid.getResource(gridFile);
-
         try {
             InputStream is = gridFsResource.getInputStream();
             if (is == null) {
@@ -1201,12 +1205,8 @@ public class AttachmentService extends ServiceBase {
                     if (_gid == null) {
                         throw new RuntimeException("No attachment data for node.");
                     }
-                    if (node == null) {
-                        log.debug("Node did not exist: " + _id);
-                        throw new RuntimeException("Node not found.");
-                    } else {
-                        attach.getBinary(as, _attName, node, null, null, download != null, response);
-                    }
+
+                    attach.getBinary(as, _attName, node, null, null, download != null, response);
                     return null;
                 });
             }

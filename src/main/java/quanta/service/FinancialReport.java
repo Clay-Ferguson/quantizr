@@ -1,6 +1,11 @@
-package quanta.instrument;
+package quanta.service;
 
-import static quanta.util.HtmlUtil.*;
+import static quanta.util.HtmlUtil.htmlH;
+import static quanta.util.HtmlUtil.htmlHeader;
+import static quanta.util.HtmlUtil.htmlTable;
+import static quanta.util.HtmlUtil.htmlTd;
+import static quanta.util.HtmlUtil.htmlTdRt;
+import static quanta.util.HtmlUtil.htmlTr;
 import java.sql.Timestamp;
 import java.util.List;
 import org.slf4j.Logger;
@@ -40,9 +45,7 @@ public class FinancialReport extends ServiceBase {
         }
 
         String rows = formatTableRow(results);
-        sb.append(htmlTable(
-                htmlTr(htmlTh("Time") + htmlTh("User ID") + htmlTh("User Name") + htmlTh("Code") + htmlTh("Amount"))
-                        + rows));
+        sb.append(htmlTable(htmlHeader("Time", "User ID", "User Name", "Code", "Amount") + rows));
         return sb.toString();
     }
 
@@ -55,10 +58,7 @@ public class FinancialReport extends ServiceBase {
         }
 
         String rows = formatTableRow(results);
-
-        sb.append(htmlTable(htmlTr(htmlTh("User ID") + htmlTh("User Name") + htmlTh("Code") + htmlTh("Count")
-                + htmlTh("Total") + htmlTh("Avg")) + rows));
-
+        sb.append(htmlTable(htmlHeader("User ID", "User Name", "Code", "Count", "Total", "Avg") + rows));
         return sb.toString();
     }
 

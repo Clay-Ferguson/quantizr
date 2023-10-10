@@ -243,7 +243,7 @@ export class NodeCompRowHeader extends Div {
             if (this.tabData.id !== C.TAB_MAIN && this.tabData.id !== C.TAB_FEED) {
                 children.push(new Icon({
                     title: "Jump To Node",
-                    className: "fa fa-hand-o-right fa-lg rowHeaderIcon",
+                    className: "fa fa-arrow-right fa-lg rowHeaderIcon",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.clickSearchNode
                 }));

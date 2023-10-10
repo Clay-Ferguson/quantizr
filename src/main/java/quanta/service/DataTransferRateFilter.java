@@ -42,17 +42,15 @@ public class DataTransferRateFilter extends GenericFilterBean {
         chain.doFilter(request, responseWrapper);
         long responseSize = responseWrapper.getByteCount();
         long endTime = System.nanoTime();
-        long duration = endTime - startTime; // Total execution time in nano seconds
+        long duration = endTime - startTime;
         if (duration == 0)
             duration = 1;
 
         if (response instanceof HttpServletResponse) {
             totalTime += duration;
-
             double dataRate = Util.calculateKBps(responseSize, duration);
             totalBytesSent += responseSize;
             DecimalFormat decimalFormat = new DecimalFormat("0.000");
-
             double seconds = duration / 1e9; // 1e9 is 1 billion
 
             // log any slow requests

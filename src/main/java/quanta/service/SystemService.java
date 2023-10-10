@@ -127,7 +127,6 @@ public class SystemService extends ServiceBase {
             });
             ret = "Completed ok.";
         } finally {
-            //
             prop.setDaemonsEnabled(true);
         }
         return ret;
@@ -158,7 +157,6 @@ public class SystemService extends ServiceBase {
             ret += runMongoDbCommand(MongoAppConfig.databaseName, new Document("compact", "nodes"));
             ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
         } finally {
-            //
             prop.setDaemonsEnabled(true);
         }
         return ret;
@@ -182,7 +180,7 @@ public class SystemService extends ServiceBase {
     // })
     public String validateDb() {
         String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
-                new Document("validate", "nodes").append("full", true));
+                new Document("validate", "nodes").append("full", true).append("repair", true));
         ret += "\n\ndbStats: "
                 + runMongoDbCommand(MongoAppConfig.databaseName, new Document("dbStats", 1).append("scale", 1024));
         ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
@@ -194,7 +192,7 @@ public class SystemService extends ServiceBase {
     }
 
     public String repairDb() {
-        update.runRepairs();
+        update.resetChildrenState();
         return "Repair completed ok.";
     }
 
@@ -203,14 +201,6 @@ public class SystemService extends ServiceBase {
         MongoDatabase database = mdbf.getMongoDatabase(dbName);
         Document result = database.runCommand(doc);
         return XString.prettyPrint(result);
-    }
-
-    public static void logMemory() {
-        // Runtime runtime = Runtime.getRuntime();
-        // long freeMem = runtime.freeMemory() / ONE_MB;
-        // long maxMem = runtime.maxMemory() / ONE_MB;
-        // log.info(String.format("GC Cycle. FreeMem=%dMB, MaxMem=%dMB", freeMem,
-        // maxMem));
     }
 
     public String getJson(MongoSession ms, String nodeId) {
@@ -246,8 +236,6 @@ public class SystemService extends ServiceBase {
         sb.append("AuditFilter Enabed: " + String.valueOf(AppFilter.audit) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
 
-        sb.append(pgSvc.getInfo());
-        sb.append(oai.getOpenAiStats(null, null));
         sb.append(getRedisReport());
         sb.append("HttpSessions: " + AppSessionListener.sessionCounter + "\n");
 

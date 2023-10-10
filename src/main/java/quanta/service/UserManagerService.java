@@ -377,7 +377,6 @@ public class UserManagerService extends ServiceBase {
         ensureValidCryptoKeys(userNode);
 
         SubNode notesNode = user.getNotesNode(ms, userName, userNode);
-
         update.save(ms, userNode);
     }
 
@@ -728,6 +727,7 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
             prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
             prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
+
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
             userPrefs.setNsfw(reqUserPrefs.isNsfw());
@@ -897,7 +897,6 @@ public class UserManagerService extends ServiceBase {
             StringBuilder sb = new StringBuilder();
             Criteria moreCriteria = null;
             String fileName = listType.equals(NodeType.FRIEND_LIST.s()) ? "friends.txt" : "blocks.txt";
-
             List<SubNode> friendNodes = getSpecialNodesList(ms, null, listType, ms.getUserName(), true, moreCriteria);
 
             if (friendNodes != null) {
@@ -947,7 +946,6 @@ public class UserManagerService extends ServiceBase {
             String tags = tagsVal.getVal() != null ? tagsVal.getVal() : req.getTags();
             addFriend(ms, userDoingAction, null, userVal.getVal(), tags);
         });
-
         return res;
     }
 

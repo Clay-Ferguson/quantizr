@@ -320,6 +320,7 @@ public class AclService extends ServiceBase {
                 newPrivs += tok;
             }
         }
+
         if (removed) {
             /*
              * If there are no privileges left for this principal, then remove the principal entry completely

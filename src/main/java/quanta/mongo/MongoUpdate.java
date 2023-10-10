@@ -199,7 +199,7 @@ public class MongoUpdate extends ServiceBase {
         return ret.getVal();
     }
 
-    public void runRepairs() {
+    public void resetChildrenState() {
         Query query = new Query();
         Update update = new Update();
         update.set(SubNode.HAS_CHILDREN, null);
