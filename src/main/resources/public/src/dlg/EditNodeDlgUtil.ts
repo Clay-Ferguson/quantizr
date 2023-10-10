@@ -479,10 +479,6 @@ an upload has been added or removed.
         dlg.contentEditor?.setValue(content);
     }
 
-    insertTime = (dlg: EditNodeDlg) => {
-        dlg.contentEditor?.insertTextAtCursor("[" + S.util.formatDateTime(new Date()) + "]");
-    }
-
     insertEmoji = async (dlg: EditNodeDlg) => {
         if (!dlg.contentEditor) return;
         // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also

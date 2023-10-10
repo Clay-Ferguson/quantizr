@@ -777,7 +777,7 @@ export class EditNodeDlg extends DialogBase {
 
             // show Calendar Entry button only if this node is not a Calendar Entry nor CALENDAR type.
             // Note: CALENDAR types contain Calendar Entries but are not themselves Calendar Entries.
-            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar", null, {
+            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar-plus-o", null, {
                 title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
@@ -1014,12 +1014,6 @@ export class EditNodeDlg extends DialogBase {
                 className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-microphone editorIcon"),
                 title: "Toggle on/off Speech Recognition to input text",
                 onClick: () => this.utl.toggleRecognition(this)
-            }),
-
-            new Icon({
-                className: "fa fa-lg fa-clock-o editorIcon",
-                title: "Insert current time at cursor",
-                onClick: () => this.utl.insertTime(this)
             }),
 
             new Icon({
