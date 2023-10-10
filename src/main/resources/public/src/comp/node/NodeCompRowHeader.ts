@@ -408,12 +408,18 @@ export class NodeCompRowHeader extends Div {
             }
 
             if (deleteAllowed && this.node.id !== ast.userProfile?.userNodeId) {
-                floatUpperRightDiv.addChild(new Icon({
-                    className: "fa fa-trash fa-lg buttonBarIcon",
-                    title: "Delete node(s)",
-                    [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.edit.deleteSelNodes
-                }));
+                const askDelDiv = this.node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
+                if (askDelDiv) {
+                    floatUpperRightDiv.addChild(askDelDiv);
+                }
+                else {
+                    floatUpperRightDiv.addChild(new Icon({
+                        className: "fa fa-trash fa-lg buttonBarIcon",
+                        title: "Delete node(s)",
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.edit.deleteSelNodes
+                    }));
+                }
             }
         }
 

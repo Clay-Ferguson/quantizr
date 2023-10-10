@@ -190,14 +190,11 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node);
         }
 
-        const askDelDiv = this.node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
-
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
             this.renderingBoost ? null : S.render.renderBoostHeader(this.node, true),
             S.render.renderLinkLabel(this.node.id),
             header,
-            askDelDiv,
             buttonBar,
             buttonBar ? new Clearfix() : null,
             jumpButton,

@@ -106,15 +106,12 @@ export class NodeCompMainNode extends Div {
                 S.render.setNodeDropHandler(this.attribs, node);
             }
 
-            const askDelDiv = node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
-
             const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, 0, false, null, null) : null;
 
             this.setChildren([
                 S.render.renderBoostHeader(node, true),
                 S.render.renderLinkLabel(node.id),
                 header,
-                askDelDiv,
                 buttonBar,
                 new Clearfix(),
                 jumpButton,

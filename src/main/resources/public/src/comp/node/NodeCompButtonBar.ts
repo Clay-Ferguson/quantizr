@@ -38,6 +38,7 @@ export class NodeCompButtonBar extends Div {
         let moveNodeUpIcon: Icon;
         let moveNodeDownIcon: Icon;
         let deleteNodeIcon: Icon;
+        let askDelDiv: Div;
         let pasteSpan: Span;
 
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
@@ -213,12 +214,15 @@ export class NodeCompButtonBar extends Div {
             if (deleteAllowed) {
                 // not this user's own account node!
                 if (this.node.id !== ast.userProfile?.userNodeId) {
-                    deleteNodeIcon = new Icon({
-                        className: "fa fa-trash fa-lg buttonBarIcon",
-                        title: "Delete node(s)",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.deleteSelNodes
-                    });
+                    askDelDiv = this.node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
+                    if (!askDelDiv) {
+                        deleteNodeIcon = new Icon({
+                            className: "fa fa-trash fa-lg buttonBarIcon",
+                            title: "Delete node(s)",
+                            [C.NODE_ID_ATTR]: this.node.id,
+                            onClick: S.edit.deleteSelNodes
+                        });
+                    }
                 }
             }
 
@@ -282,7 +286,7 @@ export class NodeCompButtonBar extends Div {
         // ---------------------------
 
         const spanArray = [moveNodeUpIcon, //
-            moveNodeDownIcon, cutNodeIcon, deleteNodeIcon,
+            moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, askDelDiv, //
             /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */
             pasteSpan];
 

@@ -901,17 +901,16 @@ export class Render {
     makeDeleteQuestionDiv = (): Div => {
         const ast = getAs();
         const question = ast.nodesToDel.length === 1 ? "Delete" : "Delete " + ast.nodesToDel.length + " nodes";
-        return new Diva([
-            new Divc({ className: "float-end" }, [
-                new Span(question, {
-                    className: "alert alert-danger askDeleteQuestion",
-                    onClick: () => S.edit.immediateDeleteSelNodes(getAs().nodesToDel)
-                }),
-                new Span("Cancel", {
-                    className: "alert alert-info askDeleteQuestion",
-                    onClick: S.edit.endDelete
-                })
-            ])
+        return new Divc({ className: "deleteQuestion" }, [
+            new Span(question, {
+                className: "alert alert-danger askDeleteQuestion",
+                onClick: () => S.edit.immediateDeleteSelNodes(getAs().nodesToDel)
+            }),
+            new Span("Cancel", {
+                className: "alert alert-info askDeleteQuestion",
+                onClick: S.edit.endDelete
+            })
         ]);
+
     }
 }
