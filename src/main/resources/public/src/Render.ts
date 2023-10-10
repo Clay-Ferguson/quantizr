@@ -806,7 +806,7 @@ export class Render {
                         className: "nodeLink",
                         onClick: () => {
                             S.srch.search(node, null, link.name, J.Constant.SEARCH_TYPE_LINKED_NODES, "Predicate: " + link.name, null, false,
-                                false, 0, true, null, null, false, false, false, true);
+                                false, 0, true, null, null, false, false, false, true, false);
                         }
                     }));
                 }

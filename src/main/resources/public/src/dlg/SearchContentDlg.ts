@@ -27,6 +27,7 @@ interface LS { // Local State
     sortDir?: string;
     requirePriority?: boolean;
     requireAttachment?: boolean;
+    requireDate?: boolean;
 }
 
 export class SearchContentDlg extends DialogBase {
@@ -37,9 +38,10 @@ export class SearchContentDlg extends DialogBase {
         caseSensitive: false,
         recursive: true,
         sortField: "mtm",
-        sortDir: "",
+        sortDir: "desc",
         requirePriority: false,
-        requireAttachment: false
+        requireAttachment: false,
+        requireDate: false
     };
 
     searchTextField: TextField;
@@ -119,6 +121,13 @@ export class SearchContentDlg extends DialogBase {
                             this.mergeState<LS>({ requireAttachment: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().requireAttachment
+                    }),
+                    new Checkbox("Has Date", null, {
+                        setValue: (checked: boolean) => {
+                            SearchContentDlg.dlgState.requireDate = checked;
+                            this.mergeState<LS>({ requireDate: checked });
+                        },
+                        getValue: (): boolean => this.getState<LS>().requireDate
                     })
                 ], "marginBottom"),
 
@@ -274,7 +283,7 @@ export class SearchContentDlg extends DialogBase {
             state.sortDir,
             requirePriority,
             state.requireAttachment,
-            deleteMatches, false);
+            deleteMatches, false, state.requireDate);
         if (success) {
             this.close();
         }

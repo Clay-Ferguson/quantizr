@@ -18,6 +18,7 @@ export class ResultSetInfo {
     public sortDir: string;
     public requirePriority: boolean;
     public requireAttachment: boolean;
+    public requireDate: boolean;
 
     /* holds array of all parent items all the way up the tree (as far as user is authorized) */
     breadcrumbs: J.BreadcrumbInfo[];

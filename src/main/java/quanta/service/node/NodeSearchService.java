@@ -177,7 +177,9 @@ public class NodeSearchService extends ServiceBase {
                     || Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
                     Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
                 userSearch(ms, null, req, searchResults);
-            } else { // else we're doing a normal subgraph search for the text
+            }
+            // else we're doing a normal subgraph search for the text
+            else {
                 SubNode searchRoot = null;
 
                 if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRoot())) {
@@ -199,7 +201,7 @@ public class NodeSearchService extends ServiceBase {
                             req.getSortField(), req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(),
                             ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), req.isFuzzy(), req.isCaseSensitive(),
                             req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority(),
-                            req.isRequireAttachment())) {
+                            req.isRequireAttachment(), req.isRequireDate())) {
                         try {
                             NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
                                     counter + 1, false, false, false, false, true, null, false);

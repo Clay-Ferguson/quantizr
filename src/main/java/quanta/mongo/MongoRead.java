@@ -769,7 +769,7 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> searchSubGraph(MongoSession ms, SubNode node, String prop, String text, String sortField,
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType,
-            boolean recursive, boolean requirePriority, boolean requireAttachment) {
+            boolean recursive, boolean requirePriority, boolean requireAttachment, boolean requireDate) {
         if (noChildren(node)) {
             return Collections.<SubNode>emptyList();
         }
@@ -834,6 +834,9 @@ public class MongoRead extends ServiceBase {
         }
         if (requireAttachment) {
             ands.add(Criteria.where(SubNode.ATTACHMENTS).ne(null));
+        }
+        if (requireDate) {
+            ands.add(Criteria.where(SubNode.PROPS + "." + NodeProp.DATE).ne(null));
         }
 
         if (!StringUtils.isEmpty(sortField)) {

@@ -32,6 +32,8 @@ public class NodeSearchRequest extends RequestBase {
 	private boolean requirePriority;
 	private boolean requireAttachment;
 
+	private boolean requireDate;
+
 	// Admin can set this, and it will delete all matches to the search results
 	private boolean deleteMatches;
 
@@ -161,6 +163,14 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setDeleteMatches(final boolean deleteMatches) {
 		this.deleteMatches = deleteMatches;
+	}
+
+	public boolean isRequireDate() {
+		return requireDate;
+	}
+
+	public void setRequireDate(boolean requireDate) {
+		this.requireDate = requireDate;
 	}
 
 	public NodeSearchRequest() {}

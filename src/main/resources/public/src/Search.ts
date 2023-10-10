@@ -168,13 +168,13 @@ export class Search {
             return;
         }
         this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
-            J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false);
+            J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false, false);
     }
 
     search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
-        jumpIfSingleResult: boolean): Promise<boolean> => {
+        jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> => {
 
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
@@ -192,7 +192,8 @@ export class Search {
             recursive,
             requirePriority,
             requireAttachment,
-            deleteMatches
+            deleteMatches,
+            requireDate
         });
 
         // if exactly one search result found we might want to optionally jump to it on the tree
@@ -231,6 +232,7 @@ export class Search {
                 data.props.sortField = sortField;
                 data.props.requirePriority = requirePriority;
                 data.props.requireAttachment = requireAttachment;
+                data.props.requireDate = requireDate;
                 data.props.sortDir = sortDir;
                 data.props.prop = prop;
                 data.props.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
@@ -324,7 +326,8 @@ export class Search {
             recursive,
             requirePriority: false,
             requireAttachment: false,
-            deleteMatches: false
+            deleteMatches: false,
+            requireDate: false
         });
         S.nodeUtil.processInboundNodes(res.searchResults);
 
@@ -743,7 +746,7 @@ export class Search {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
                 S.srch.search(node, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RFF Subjects", null, false,
-                    false, 0, true, null, null, false, false, false, false);
+                    false, 0, true, null, null, false, false, false, false, false);
             }
         });
     };

@@ -536,6 +536,7 @@ export interface NodeSearchRequest extends RequestBase {
     recursive: boolean;
     requirePriority: boolean;
     requireAttachment: boolean;
+    requireDate: boolean;
     deleteMatches: boolean;
 }
 

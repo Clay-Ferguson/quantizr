@@ -32,6 +32,7 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
             this.data.props.requirePriority,
             this.data.props.requireAttachment,
             false,
+            false,
             false);
     }
 
