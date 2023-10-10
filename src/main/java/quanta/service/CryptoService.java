@@ -352,4 +352,24 @@ public class CryptoService extends ServiceBase {
         });
         return new SignSubGraphResponse();
     }
+
+    /**
+     * Gets ths sig key json from "sc", and assigns it into "sc" if not assigned yet.
+     */
+    public String getPubSigKeyJson(SessionContext sc) {
+        String json = sc.getPubSigKeyJson();
+
+        if (json == null) {
+            SubNode userNode = read.getAccountByUserName(null, sc.getUserName(), false);
+            if (userNode == null) {
+                throw new RuntimeException("Unknown user: " + sc.getUserName());
+            }
+            json = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
+            if (json == null) {
+                throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
+            }
+            sc.setPubSigKeyJson(json);
+        }
+        return json;
+    }
 }

@@ -279,26 +279,18 @@ public class UserManagerService extends ServiceBase {
         if (sc == null) {
             throw new RuntimeException("Unable to get SessionContext to check token.");
         }
+
         if (!prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
             return;
         }
+
         String sig = ThreadLocals.getReqSig();
         if (StringUtils.isEmpty(sig)) {
             throw new RuntimeException("Request failed. No signature.");
         }
-        // if pubSigKey not yet saved in SessionContext then generate it
-        if (sc.getPubSigKeyJson() == null) {
-            SubNode userNode = read.getAccountByUserName(null, sc.getUserName(), false);
-            if (userNode == null) {
-                throw new RuntimeException("Unknown user: " + sc.getUserName());
-            }
-            String pubKeyJson = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
-            if (pubKeyJson == null) {
-                throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
-            }
-            sc.setPubSigKeyJson(pubKeyJson);
-        }
-        boolean verified = crypto.sigVerify(crypto.parseJWK(sc.getPubSigKeyJson()), Util.hexStringToBytes(sig),
+
+        String pkJson = crypto.getPubSigKeyJson(sc);
+        boolean verified = crypto.sigVerify(crypto.parseJWK(pkJson), Util.hexStringToBytes(sig),
                 sc.getUserName().getBytes(StandardCharsets.UTF_8));
 
         if (!verified) {

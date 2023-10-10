@@ -42,6 +42,7 @@ public class CallProcessor extends ServiceBase {
         if (authBearer) {
             user.authBearer();
         }
+
         /*
          * #sig: this works fine, but I'm disabling for now (except for admin) until there's a better way to
          * inform the user that this can happen when their key on their browser is different than expected,

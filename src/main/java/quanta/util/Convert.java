@@ -66,32 +66,35 @@ public class Convert extends ServiceBase {
         if (sig != null && !crypto.nodeSigVerify(node, sig)) {
             sigFail = true;
         }
+
         // #sig: need a config setting that specifies which path(s) are required to be signed so
         // this can be enabled/disabled easily by admin
-        if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/")) {
-            if ((sig == null || sigFail) && !sc.isAdmin()) {
-                // todo-0: This is designed to silently fail here and not show the nodes, however on a
-                // clean install when an anon user visits the site and the 'home' node is not yet signed
-                // we get this error with no explaination of why. We need to throw an actual error if
-                // this is a 'page root' node that's failing rather than a contained node.
+        if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
+                (sig == null || sigFail) && !sc.isAdmin()) {
+            // todo-1: This is designed to silently fail here and not show the nodes where a signature is
+            // failing and a possible database hack, however on a
+            // clean install when an anon user visits the site and the 'home' node is not yet signed
+            // we get this error with no explaination of why. We need to throw an actual error if
+            // this is a 'page root' node that's failing rather than a contained node.
 
-                log.error("Bad Signature on Admin Node: " + node.getIdStr());
-                // todo-2: we need a special global counter for when this happens, so the server info can show it.
-                /*
-                 * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
-                 * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
-                 * of a server DB being potentially hacked so we completely refuse to display this content to the
-                 * user by returning null here. We only show 'signed' admin nodes to users. If we're logged in as
-                 * admin we will be allowed to see even nodes that are failing their signature check, or unsigned.
-                 */
-                return null;
-            }
+            log.error("Bad Signature on Admin Node: " + node.getIdStr());
+            // todo-2: we need a special global counter for when this happens, so the server info can show it.
+            /*
+             * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
+             * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
+             * of a server DB being potentially hacked so we completely refuse to display this content to the
+             * user by returning null here. We only show 'signed' admin nodes to users. If we're logged in as
+             * admin we will be allowed to see even nodes that are failing their signature check, or unsigned.
+             */
+            return null;
         }
+
         // if we know we shold only be including admin node then throw an error if this is not an admin
         // node, but only if we ourselves are not admin.
         if (adminOnly && !acl.isAdminOwned(node) && !sc.isAdmin()) {
             throw new ForbiddenException();
         }
+
         /* If session user shouldn't be able to see secrets on this node remove them */
         if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
             if (!ms.isAdmin()) {
@@ -114,12 +117,14 @@ public class Convert extends ServiceBase {
         String apImage = null;
         String owner = PrincipalName.ADMIN.s();
         SubNode ownerAccnt = ThreadLocals.getCachedNode(node.getOwner());
+
         if (ownerAccnt == null) {
             ownerAccnt = read.getOwner(ms, node, false);
             if (ownerAccnt != null) {
                 ThreadLocals.cacheNode(ownerAccnt);
             }
         }
+
         if (ownerAccnt != null) {
             nameProp = ownerAccnt.getStr(NodeProp.USER);
             Attachment userAtt = ownerAccnt.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
@@ -131,6 +136,7 @@ public class Convert extends ServiceBase {
             apImage = ownerAccnt.getStr(NodeProp.USER_BANNER_URL);
             owner = nameProp;
         }
+
         /*
          * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
          * to client packaged in this response, so that tooltip on the browser can display it, and the
