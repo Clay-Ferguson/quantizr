@@ -60,118 +60,81 @@ public class SubNode {
     // note: All bulk ops using "id" when the value here is "_id". I can't remember the
     // reason for "_id"
     public static final String ID = "_id";
-
     @Id
     @Field(ID)
     private ObjectId id;
 
     public static final String ORDINAL = "ord";
-
     @Field(ORDINAL)
     private Long ordinal;
 
     // Holds null if children status unknown. Not yet generated.
     // NOTE: We have no index on this field because we never query on it.
     public static final String HAS_CHILDREN = "hch";
-
     @Field(HAS_CHILDREN)
     private Boolean hch;
 
     public static final String PATH = "pth";
-
     @Field(PATH)
     private String path;
 
     public static final String TYPE = "typ";
-
     @Field(TYPE)
     private String type;
 
     public static final String CONTENT = "cont";
-
     @Field(CONTENT)
     private String content;
 
     public static final String TAGS = "tag";
-
     @Field(TAGS)
     private String tags;
 
     public static final String NAME = "name";
-
     @Field(NAME)
     private String name;
 
     public static final String OWNER = "own";
-
     @Field(OWNER)
     private ObjectId owner;
 
     // OwnerId of person who transfered this node to "owner"
     public static final String XFR = "xfr";
-
     @Field(XFR)
     private ObjectId transferFrom;
 
     public static final String CREATE_TIME = "ctm";
-
     @Field(CREATE_TIME)
     private Date createTime;
 
     public static final String MODIFY_TIME = "mtm";
-
     @Field(MODIFY_TIME)
     private Date modifyTime;
 
     // Also defined in NodeProp.SUBNODE_PROPS
     public static final String PROPS = "p";
-
     @Field(PROPS)
     private HashMap<String, Object> props;
 
-    @Transient
-    @JsonIgnore
-    private Object propLock = new Object();
-
     public static final String ATTACHMENTS = "a";
-
-    // for now the key string can be "p" (primary) or "h" (header). Header is the user's account header
-    // image.
-
     @Field(ATTACHMENTS)
     private HashMap<String, Attachment> attachments;
 
-    @Transient
-    @JsonIgnore
-    private Object linksLock = new Object();
-
     public static final String LINKS = "rdf";
-
     @Field(LINKS)
     private List<NodeLink> links;
 
-    @Transient
-    @JsonIgnore
-    private Object attLock = new Object();
-
     public static final String LIKES = "like";
-
     @Field(LIKES)
     private HashSet<String> likes;
 
-    @Transient
-    @JsonIgnore
-    private Object likesLock = new Object();
-
     // these are public on purpose. (the M means this CID is from MFS, and no need to pin or unpin ever)
     public static final String MCID = "mcid";
-
     @Field(MCID)
     public String mcid;
 
     // (the M means this CID is from MFS, and no need to pin or unpin ever)
     public static final String PREV_MCID = "prevMcid";
-
     @Field(PREV_MCID)
     public String prevMcid;
 
@@ -183,13 +146,8 @@ public class SubNode {
      * a key which indicates privileges granted to everyone (the entire public)
      */
     public static final String AC = "ac";
-
     @Field(AC)
     private HashMap<String, AccessControl> ac;
-
-    @Transient
-    @JsonIgnore
-    private Object acLock = new Object();
 
     public static final String[] ALL_FIELDS = { //
             SubNode.PATH, //
@@ -209,10 +167,6 @@ public class SubNode {
             SubNode.ATTACHMENTS, //
             SubNode.LINKS, //
             SubNode.LIKES,};
-
-    @Transient
-    @JsonIgnore
-    private int contentLength;
 
     @PersistenceCreator
     public SubNode() {
@@ -400,134 +354,112 @@ public class SubNode {
     }
 
     @JsonProperty(AC)
-    public HashMap<String, AccessControl> getAc() {
-        synchronized (acLock) {
-            return ac;
-        }
+    public synchronized HashMap<String, AccessControl> getAc() {
+        return ac;
     }
 
     @Transient
     @JsonIgnore
-    public HashMap<String, AccessControl> safeGetAc() {
-        synchronized (acLock) {
-            if (ac == null) {
-                ac = new HashMap<>();
-                ThreadLocals.dirty(this);
-            }
-            return ac;
+    public synchronized HashMap<String, AccessControl> safeGetAc() {
+        if (ac == null) {
+            ac = new HashMap<>();
+            ThreadLocals.dirty(this);
         }
+        return ac;
     }
 
     // Write an access control value. Does nothing if same value is already existing.
     @Transient
     @JsonIgnore
-    public void putAc(String key, AccessControl ac) {
+    public synchronized void putAc(String key, AccessControl ac) {
         // don't allow adding this node to it's own sharing.
         if (getOwner() != null && getOwner().toHexString().equals(key))
             return;
-        synchronized (acLock) {
-            // look up any ac already existing for this key
-            AccessControl thisAc = safeGetAc().get(key);
-            // only put the new ac key in the map if the existing was not found or if it's not the same value we
-            // already have
-            if (thisAc == null || !thisAc.eq(ac)) {
-                safeGetAc().put(key, ac);
-                ThreadLocals.dirty(this);
-            }
+
+        // look up any ac already existing for this key
+        AccessControl thisAc = safeGetAc().get(key);
+        // only put the new ac key in the map if the existing was not found or if it's not the same value we
+        // already have
+        if (thisAc == null || !thisAc.eq(ac)) {
+            safeGetAc().put(key, ac);
+            ThreadLocals.dirty(this);
         }
     }
 
     @JsonProperty(AC)
-    public void setAc(HashMap<String, AccessControl> ac) {
+    public synchronized void setAc(HashMap<String, AccessControl> ac) {
         if (ac == null && this.ac == null)
             return;
         ThreadLocals.dirty(this);
-        synchronized (acLock) {
-            // sanity check do disallow this this node sharing to it's owner
-            if (ac != null && getOwner() != null) {
-                ac.remove(getOwner().toHexString());
-            }
-            this.ac = ac;
+
+        // sanity check do disallow this this node sharing to it's owner
+        if (ac != null && getOwner() != null) {
+            ac.remove(getOwner().toHexString());
         }
+        this.ac = ac;
     }
 
-    public void clearSecretProperties() {
-        synchronized (propLock) {
-            if (props != null) {
-                props.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
-                props.remove(NodeProp.EMAIL.s());
-                props.remove(NodeProp.CODE.s());
-                props.remove(NodeProp.ENC_KEY.s());
-                props.remove(NodeProp.PWD_HASH.s());
-                props.remove(NodeProp.VOTE.s());
-            }
-        }
-    }
-
-    @JsonProperty(PROPS)
-    public HashMap<String, Object> getProps() {
-        synchronized (propLock) {
-            return props;
+    public synchronized void clearSecretProperties() {
+        if (props != null) {
+            props.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
+            props.remove(NodeProp.EMAIL.s());
+            props.remove(NodeProp.CODE.s());
+            props.remove(NodeProp.ENC_KEY.s());
+            props.remove(NodeProp.PWD_HASH.s());
+            props.remove(NodeProp.VOTE.s());
         }
     }
 
     @JsonProperty(PROPS)
-    public void setProps(HashMap<String, Object> props) {
+    public synchronized HashMap<String, Object> getProps() {
+        return props;
+    }
+
+    @JsonProperty(PROPS)
+    public synchronized void setProps(HashMap<String, Object> props) {
         if (props == null && this.props == null)
             return;
         ThreadLocals.dirty(this);
-        synchronized (propLock) {
-            this.props = props;
-        }
+        this.props = props;
     }
 
     @JsonProperty(ATTACHMENTS)
-    public HashMap<String, Attachment> getAttachments() {
-        synchronized (attLock) {
-            return attachments;
-        }
+    public synchronized HashMap<String, Attachment> getAttachments() {
+        return attachments;
     }
 
     @JsonProperty(ATTACHMENTS)
-    public void setAttachments(HashMap<String, Attachment> attachments) {
+    public synchronized void setAttachments(HashMap<String, Attachment> attachments) {
         if (attachments == null && this.attachments == null)
             return;
         ThreadLocals.dirty(this);
-        synchronized (attLock) {
-            this.attachments = attachments;
-        }
+        this.attachments = attachments;
     }
 
     @JsonProperty(LINKS)
-    public List<NodeLink> getLinks() {
-        synchronized (linksLock) {
-            return links;
-        }
+    public synchronized List<NodeLink> getLinks() {
+        return links;
     }
 
     @JsonProperty(LINKS)
-    public void setLinks(List<NodeLink> links) {
+    public synchronized void setLinks(List<NodeLink> links) {
         if (links == null && this.links == null)
             return;
         ThreadLocals.dirty(this);
-        synchronized (linksLock) {
-            this.links = links;
-        }
+        this.links = links;
     }
 
     @Transient
     @JsonIgnore
-    public void addLink(NodeLink link) {
-        synchronized (linksLock) {
-            if (links == null) {
-                links = new LinkedList<>();
-            } else {
-                if (linkExists(link))
-                    return;
-            }
-            links.add(link);
-            ThreadLocals.dirty(this);
+    public synchronized void addLink(NodeLink link) {
+        if (links == null) {
+            links = new LinkedList<>();
+        } else {
+            if (linkExists(link))
+                return;
         }
+        links.add(link);
+        ThreadLocals.dirty(this);
     }
 
     public boolean linkExists(NodeLink link) {
@@ -543,14 +475,12 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public Attachment getFirstAttachment() {
+    public synchronized Attachment getFirstAttachment() {
         Attachment att = null;
-        synchronized (attLock) {
-            if (attachments != null) {
-                List<Attachment> atts = getOrderedAttachments();
-                if (atts != null && atts.size() > 0) {
-                    att = atts.get(0);
-                }
+        if (attachments != null) {
+            List<Attachment> atts = getOrderedAttachments();
+            if (atts != null && atts.size() > 0) {
+                att = atts.get(0);
             }
         }
         return att;
@@ -558,27 +488,23 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public void addAttachment(Attachment att) {
-        synchronized (attLock) {
-            if (attachments == null) {
-                attachments = new HashMap<>();
-            }
-            attachments.put(att.getKey(), att);
-            ThreadLocals.dirty(this);
+    public synchronized void addAttachment(Attachment att) {
+        if (attachments == null) {
+            attachments = new HashMap<>();
         }
+        attachments.put(att.getKey(), att);
+        ThreadLocals.dirty(this);
     }
 
     @Transient
     @JsonIgnore
-    public List<Attachment> getOrderedAttachments() {
+    public synchronized List<Attachment> getOrderedAttachments() {
         List<Attachment> list = new LinkedList<>();
-        synchronized (attLock) {
-            if (attachments != null) {
-                attachments.forEach((String key, Attachment att) -> {
-                    att.setKey(key);
-                    list.add(att);
-                });
-            }
+        if (attachments != null) {
+            attachments.forEach((String key, Attachment att) -> {
+                att.setKey(key);
+                list.add(att);
+            });
         }
         list.sort((a1, a2) -> {
             int a1Idx = a1.getOrdinal() != null ? a1.getOrdinal().intValue() : 0;
@@ -592,37 +518,35 @@ public class SubNode {
     // and return it.
     @Transient
     @JsonIgnore
-    public Attachment getAttachment(String name, boolean create, boolean forceNew) {
-        synchronized (attLock) {
-            if (StringUtils.isEmpty(name)) {
-                name = Constant.ATTACHMENT_PRIMARY.s();
-            }
-            Attachment ret = null;
-            if (attachments != null) {
-                if (forceNew) {
+    public synchronized Attachment getAttachment(String name, boolean create, boolean forceNew) {
+        if (StringUtils.isEmpty(name)) {
+            name = Constant.ATTACHMENT_PRIMARY.s();
+        }
+        Attachment ret = null;
+        if (attachments != null) {
+            if (forceNew) {
+                ret = new Attachment(this);
+                attachments.put(name, ret);
+                ThreadLocals.dirty(this);
+            } else {
+                ret = attachments.get(name);
+                if (ret != null) {
+                    return ret;
+                }
+                if (create) {
                     ret = new Attachment(this);
                     attachments.put(name, ret);
                     ThreadLocals.dirty(this);
-                } else {
-                    ret = attachments.get(name);
-                    if (ret != null) {
-                        return ret;
-                    }
-                    if (create) {
-                        ret = new Attachment(this);
-                        attachments.put(name, ret);
-                        ThreadLocals.dirty(this);
-                    }
                 }
-            } //
-            else if (create || forceNew) {
-                ret = new Attachment(this);
-                attachments = new HashMap<>();
-                attachments.put(name, ret);
-                ThreadLocals.dirty(this);
             }
-            return ret;
+        } //
+        else if (create || forceNew) {
+            ret = new Attachment(this);
+            attachments = new HashMap<>();
+            attachments.put(name, ret);
+            ThreadLocals.dirty(this);
         }
+        return ret;
     }
 
     public void fixAttachments() {
@@ -641,20 +565,16 @@ public class SubNode {
     }
 
     @JsonProperty(LIKES)
-    public HashSet<String> getLikes() {
-        synchronized (likesLock) {
-            return likes;
-        }
+    public synchronized HashSet<String> getLikes() {
+        return likes;
     }
 
     @JsonProperty(LIKES)
-    public void setLikes(HashSet<String> likes) {
+    public synchronized void setLikes(HashSet<String> likes) {
         if (likes == null && this.likes == null)
             return;
         ThreadLocals.dirty(this);
-        synchronized (likesLock) {
-            this.likes = likes;
-        }
+        this.likes = likes;
     }
 
     @Transient
@@ -700,28 +620,26 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public boolean set(String key, Object val) {
-        synchronized (propLock) {
-            if (props == null) {
-                // if there are no props currently, and the val is null we do nothing, because
-                // the way we set a null prop anyway is by REMOVING it from the props.
-                if (val == null)
-                    return false;
-                props = props();
-            }
-            boolean changed = false;
-            if (val == null) {
-                changed = props.remove(key) != null;
-            } else {
-                Object curVal = props.get(key);
-                changed = curVal == null || !val.equals(curVal);
-                props.put(key, val);
-            }
-            if (changed) {
-                ThreadLocals.dirty(this);
-            }
-            return changed;
+    public synchronized boolean set(String key, Object val) {
+        if (props == null) {
+            // if there are no props currently, and the val is null we do nothing, because
+            // the way we set a null prop anyway is by REMOVING it from the props.
+            if (val == null)
+                return false;
+            props = props();
         }
+        boolean changed = false;
+        if (val == null) {
+            changed = props.remove(key) != null;
+        } else {
+            Object curVal = props.get(key);
+            changed = curVal == null || !val.equals(curVal);
+            props.put(key, val);
+        }
+        if (changed) {
+            ThreadLocals.dirty(this);
+        }
+        return changed;
     }
 
     @Transient
@@ -732,13 +650,11 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public void delete(String key) {
+    public synchronized void delete(String key) {
         if (props == null)
             return;
-        synchronized (propLock) {
-            if (props().remove(key) != null) {
-                ThreadLocals.dirty(this);
-            }
+        if (props().remove(key) != null) {
+            ThreadLocals.dirty(this);
         }
     }
 
@@ -750,16 +666,14 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public String getStr(String key) {
+    public synchronized String getStr(String key) {
         if (props == null)
             return null;
         try {
-            synchronized (propLock) {
-                Object v = props().get(key);
-                if (v == null)
-                    return null;
-                return v.toString();
-            }
+            Object v = props().get(key);
+            if (v == null)
+                return null;
+            return v.toString();
         } catch (Exception e) {
             ExUtil.error(log, "failed to get String from key: " + key, e);
             return null;
@@ -774,27 +688,25 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public Long getInt(String key) {
+    public synchronized Long getInt(String key) {
         if (props == null)
             return 0L;
         try {
-            synchronized (propLock) {
-                Object v = props().get(key);
-                if (v == null)
-                    return 0L;
-                if (v instanceof Integer o) {
-                    return Long.valueOf(o);
-                }
-                // todo-2: When saving from client the values are always sent as strings, and
-                // this is a workaround until that changes.
-                if (v instanceof String o) {
-                    if (o.length() == 0) {
-                        return 0L;
-                    }
-                    return Long.parseLong((String) v);
-                }
-                return (Long) v;
+            Object v = props().get(key);
+            if (v == null)
+                return 0L;
+            if (v instanceof Integer o) {
+                return Long.valueOf(o);
             }
+            // todo-2: When saving from client the values are always sent as strings, and
+            // this is a workaround until that changes.
+            if (v instanceof String o) {
+                if (o.length() == 0) {
+                    return 0L;
+                }
+                return Long.parseLong((String) v);
+            }
+            return (Long) v;
         } catch (Exception e) {
             ExUtil.error(log, "failed to get Long from key: " + key, e);
             return null;
@@ -809,16 +721,14 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public Date getDate(String key) {
+    public synchronized Date getDate(String key) {
         if (props == null)
             return null;
         try {
-            synchronized (propLock) {
-                Object v = props().get(key);
-                if (v == null)
-                    return null;
-                return (Date) v;
-            }
+            Object v = props().get(key);
+            if (v == null)
+                return null;
+            return (Date) v;
         } catch (Exception e) {
             return null;
         }
@@ -826,31 +736,27 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public <T> T getObj(String key, Class<T> classType) {
+    public synchronized <T> T getObj(String key, Class<T> classType) {
         if (props == null)
             return null;
-        synchronized (propLock) {
-            try {
-                return (T) props().get(key);
-            } catch (Exception e) {
-                log.debug("Failed to read prop " + key + " as a type " + classType.getName());
-                return null;
-            }
+        try {
+            return (T) props().get(key);
+        } catch (Exception e) {
+            log.debug("Failed to read prop " + key + " as a type " + classType.getName());
+            return null;
         }
     }
 
     @Transient
     @JsonIgnore
-    public <T> T getTypedObj(String key, TypeReference ref) {
+    public synchronized <T> T getTypedObj(String key, TypeReference ref) {
         if (props == null)
             return null;
-        synchronized (propLock) {
-            try {
-                return (T) Util.mapper.convertValue(props().get(key), ref);
-            } catch (Exception e) {
-                log.debug("Failed to read prop " + key + " as a type " + ref.toString());
-                return null;
-            }
+        try {
+            return (T) Util.mapper.convertValue(props().get(key), ref);
+        } catch (Exception e) {
+            log.debug("Failed to read prop " + key + " as a type " + ref.toString());
+            return null;
         }
     }
 
@@ -862,19 +768,17 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public Double getFloat(String key) {
+    public synchronized Double getFloat(String key) {
         if (props == null)
             return 0.0;
         try {
-            synchronized (propLock) {
-                Object v = props().get(key);
-                if (v == null)
-                    return 0.0;
-                if (v instanceof Float) {
-                    return ((Float) v).doubleValue();
-                }
-                return (Double) v;
+            Object v = props().get(key);
+            if (v == null)
+                return 0.0;
+            if (v instanceof Float) {
+                return ((Float) v).doubleValue();
             }
+            return (Double) v;
         } catch (Exception e) {
             ExUtil.error(log, "failed to get Float from key: " + key, e);
             return null;
@@ -889,25 +793,23 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public Boolean getBool(String key) {
+    public synchronized Boolean getBool(String key) {
         if (props == null)
             return false;
         try {
-            synchronized (propLock) {
-                Object v = props().get(key);
-                if (v == null)
-                    return false;
-                /*
-                 * Our current property editor only knows how to save strings, so we just cope with that here, but
-                 * eventually we will have type-safety and types even in the editor.
-                 */
-                if (v instanceof String o) {
-                    String s = o.toLowerCase();
-                    // detect true or 1.
-                    return s.contains("t") || s.contains("1");
-                }
-                return (Boolean) v;
+            Object v = props().get(key);
+            if (v == null)
+                return false;
+            /*
+             * Our current property editor only knows how to save strings, so we just cope with that here, but
+             * eventually we will have type-safety and types even in the editor.
+             */
+            if (v instanceof String o) {
+                String s = o.toLowerCase();
+                // detect true or 1.
+                return s.contains("t") || s.contains("1");
             }
+            return (Boolean) v;
         } catch (Exception e) {
             ExUtil.error(log, "failed to get Boolean from key: " + key, e);
             return null;
@@ -916,13 +818,11 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    private HashMap<String, Object> props() {
-        synchronized (propLock) {
-            if (props == null) {
-                props = new HashMap<String, Object>();
-            }
-            return props;
+    private synchronized HashMap<String, Object> props() {
+        if (props == null) {
+            props = new HashMap<String, Object>();
         }
+        return props;
     }
 
     @Transient
@@ -992,19 +892,9 @@ public class SubNode {
         this.tags = tags;
     }
 
-    public void addProps(HashMap<String, Object> props) {
+    public synchronized void addProps(HashMap<String, Object> props) {
         ThreadLocals.dirty(this);
-        synchronized (propLock) {
-            props().putAll(props);
-        }
-    }
-
-    public int getContentLength() {
-        return contentLength;
-    }
-
-    public void setContentLength(int contentLength) {
-        this.contentLength = contentLength;
+        props().putAll(props);
     }
 
     public String getMcid() {
