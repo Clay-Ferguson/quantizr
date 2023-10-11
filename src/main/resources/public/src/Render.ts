@@ -73,9 +73,10 @@ export class Render {
 
         if (node.attachments) {
             const list: J.Attachment[] = S.props.getOrderedAtts(node);
-            let imgHtml = "";
 
             for (const a of list) {
+                if (a.p !== "ft") continue;
+
                 let imgSize = a ? a.c : null;
                 // 'actual size' designation is stored as prop val == "0"
                 if (!imgSize || imgSize === "0") {
@@ -84,38 +85,9 @@ export class Render {
 
                 const key = (a as any).key;
                 const imgUrl = S.attachment.getUrlForNodeAttachment(node, key, false);
-                let topClass = null;
-                let suffix = "";
 
-                // Center Top
-                if (a.p === "c") {
-                    topClass = "imgUpperCenter";
-                }
-                // Upper Left
-                else if (a.p === "ul") {
-                    topClass = "imgUpperLeft";
-                    suffix = "<div class=\"clearfix\"/>";
-                }
-                // Upper Right
-                else if (a.p === "ur") {
-                    topClass = "imgUpperRight";
-                    suffix = "<div class=\"clearfix\"/>";
-                }
-
-                if (topClass) {
-                    imgHtml += `<img class="${topClass} enlargableImg" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">` + suffix;
-                }
-
-                // ft=at file tag
-                else if (a.p === "ft") {
-                    val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
-                }
-            }
-
-            // we have to insert a double space or else we can have the end of the image
-            // tag so close to markdown headings (###) that the rendering enging won't translate the headings.
-            if (imgHtml) {
-                val = imgHtml + "\n\n" + val;
+                // todo-1: the sanitizer is wiping out both the class and style here, and I haven't found out why yet.
+                val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" style="margin-bottom: 12px" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
             }
         }
 
@@ -315,7 +287,7 @@ export class Render {
                 attachmentComps.push(new Tag("hr"));
                 const bin = att ? att.b : null;
                 if (bin) {
-                    attachmentComps.push(new Divc({ className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true)]));
+                    attachmentComps.push(new Divc({ className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
                     attachmentComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
                     const linkGroup = new Divc({ className: "attachmentLinkGroup" });
 

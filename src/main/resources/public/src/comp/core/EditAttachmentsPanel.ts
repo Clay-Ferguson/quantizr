@@ -130,7 +130,7 @@ export class EditAttachmentsPanel extends Div {
 
         const topBinRow = new FlexRowLayout([
             attCheckbox,
-            new NodeCompBinary(ast.editNode, key, true, false, true),
+            new NodeCompBinary(ast.editNode, key, true, false, true, null),
             imgSizeSelection,
             imgPositionSelection,
             fileNameField,

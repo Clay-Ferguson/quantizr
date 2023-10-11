@@ -57,6 +57,32 @@ export class NodeCompContent extends Div {
             children.push(new Heading(4, name, { className: "marginLeft marginTop" }));
         }
 
+        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
+        showing the normal attachment for this node, because that will the same as the avatar */
+        const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
+        if (S.props.hasBinary(this.node) && !isAccountNode) {
+            const attachments = S.props.getOrderedAtts(this.node);
+            attachments.forEach(att => {
+                // don't process here, we process below
+                if (!att.p || att.p === "auto" || att.p === "ft") return;
+                let clazz = null;
+
+                // Center Top
+                if (att.p === "c") {
+                    clazz = "imgUpperCenter";
+                }
+                // Upper Left
+                else if (att.p === "ul") {
+                    clazz = "imgUpperLeft";
+                }
+                // Upper Right
+                else if (att.p === "ur") {
+                    clazz = "imgUpperRight";
+                }
+                children.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, clazz));
+            });
+        }
+
         children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode));
 
         if ((ast.isAdminUser || this.node.type !== J.NodeType.ACCOUNT) && //
@@ -70,10 +96,6 @@ export class NodeCompContent extends Div {
             children.push(new Clearfix());
         }
 
-        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
-         showing the normal attachment for this node, because that will the same as the avatar */
-        const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
-
         if (S.props.hasBinary(this.node) && !isAccountNode) {
             const attComps: CompIntf[] = [];
             const attachments = S.props.getOrderedAtts(this.node);
@@ -84,7 +106,7 @@ export class NodeCompContent extends Div {
                 // show it here only if there's no "position(p)" for it, because the positioned ones are layed out
                 // via html in 'render.injectSubstitutions'
                 if (!att.p || att.p === "auto") {
-                    attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0));
+                    attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, null));
                 }
             });
             children.push(new Divc({ className: "rowImageContainer" }, attComps));

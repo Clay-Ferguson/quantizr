@@ -22,7 +22,7 @@ export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
     constructor(public node: J.NodeInfo, public attName: string, private isEditorEmbed: boolean,
-        private isFullScreenEmbed: boolean, private allowRightMargin: boolean) {
+        private isFullScreenEmbed: boolean, private allowRightMargin: boolean, private imgClass: string) {
         super();
         this.mergeState<LS>({ node });
     }
@@ -72,7 +72,7 @@ export class NodeCompBinary extends Div {
         }
 
         const imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
-        const className = this.isFullScreenEmbed ? "fullScreenImg" : (this.isEditorEmbed ? "imgInEditor" : "imgInRow")
+        const className = this.isFullScreenEmbed ? "fullScreenImg" : (this.isEditorEmbed ? "imgInEditor" : "imgInRow");
         const img = new Img();
         const imgAttrs: any = {
             ...img.attribs, // need to keep because of 'id' etc.
@@ -91,7 +91,12 @@ export class NodeCompBinary extends Div {
         else {
             this.attribs.style = style;
             if (!this.isEditorEmbed) {
-                this.attribs.className = rtMargin && this.allowRightMargin ? "nodeCompBinary" : "nodeCompBinaryNoRtMargin";
+                if (this.imgClass) {
+                    this.attribs.className = this.imgClass;
+                }
+                else {
+                    this.attribs.className = rtMargin && this.allowRightMargin ? "nodeCompBinary" : "nodeCompBinaryNoRtMargin";
+                }
             }
         }
 
