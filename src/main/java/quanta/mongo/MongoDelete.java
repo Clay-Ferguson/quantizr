@@ -67,7 +67,7 @@ public class MongoDelete extends ServiceBase {
     public void removeAbandonedNodes(MongoSession ms) {
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.MODIFY_TIME).is(null));
-        DeleteResult res = ops.remove(q, SubNode.class);
+        DeleteResult res = opsw.remove(ms, q, SubNode.class);
         log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
     }
 
@@ -114,7 +114,7 @@ public class MongoDelete extends ServiceBase {
                 .where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null)//
                 .and(SubNode.MODIFY_TIME).lt(date);
         q.addCriteria(crit);
-        DeleteResult res = ops.remove(q, SubNode.class);
+        DeleteResult res = opsw.remove(ms, q, SubNode.class);
         return res.getDeletedCount();
     }
 
@@ -136,7 +136,7 @@ public class MongoDelete extends ServiceBase {
         bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
         // Example: Time Range check:
         // query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
-        DeleteResult res = ops.remove(q, SubNode.class);
+        DeleteResult res = opsw.remove(ms, q, SubNode.class);
         if (res.getDeletedCount() > 0) {
             log.debug("Temp Records Deleted (Under User: " + userNode.getIdStr() + "): " + res.getDeletedCount());
         }
@@ -159,7 +159,8 @@ public class MongoDelete extends ServiceBase {
 
     // deletes without checking any security
     public void adminDelete(ObjectId id) {
-        ops.remove(new Query().addCriteria(new Criteria("id").is(id)), SubNode.class);
+        MongoSession as = auth.getAdminSession();
+        opsw.remove(as, new Query().addCriteria(new Criteria("id").is(id)), SubNode.class);
     }
 
     /**
@@ -196,7 +197,7 @@ public class MongoDelete extends ServiceBase {
 
         crit = auth.addWriteSecurity(ms, crit);
         q.addCriteria(crit);
-        DeleteResult res = ops.remove(q, SubNode.class);
+        DeleteResult res = opsw.remove(ms, q, SubNode.class);
         log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
         long totalDelCount = res.getDeletedCount();
         /*
@@ -224,11 +225,11 @@ public class MongoDelete extends ServiceBase {
         if (parent != null) {
             parent.setHasChildren(null);
         }
-        return ops.remove(node);
+        return opsw.remove(node);
     }
 
     public void directDelete(SubNode node) {
-        ops.remove(node);
+        opsw.remove(node);
     }
 
     public void deleteByPropVal(MongoSession ms, String prop, String val) {
@@ -240,7 +241,7 @@ public class MongoDelete extends ServiceBase {
         // since we're deleting all nodes matching the query 'q' we set the parents of all those nodes do
         // unknown children state
         bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null);
-        // look for all calls to 'ops.remove' just to doublecheck none of them need the above
+        // look for all calls to 'opsw.remove' just to doublecheck none of them need the above
         // 'bulkSetPropValOnParents'
         DeleteResult res = opsw.remove(ms, q);
         log.debug("Nodes deleted: " + res.getDeletedCount());
@@ -253,10 +254,10 @@ public class MongoDelete extends ServiceBase {
         // this hash set just makes sure we only submit each val set once! No replicated work.
         HashSet<ObjectId> parentIds = new HashSet<>();
 
-        ops.stream(q, SubNode.class).forEach(node -> {
+        opsw.stream(q, SubNode.class).forEach(node -> {
             // lazy create bops
             if (!bops.hasVal()) {
-                bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
             }
 
             SubNode parent = read.getParent(ms, node, false);
@@ -328,7 +329,7 @@ public class MongoDelete extends ServiceBase {
             deletesInPass.setVal(0L);
             // scan the entire DB
 
-            ops.stream(new Query(), SubNode.class).forEach(node -> {
+            opsw.stream(new Query(), SubNode.class).forEach(node -> {
                 // if this node is root node, ignore
                 if (NodePath.ROOT_PATH.equals(node.getPath()))
                     return;
@@ -345,7 +346,7 @@ public class MongoDelete extends ServiceBase {
                 if (parent == null) {
                     // lazy create our bulk ops here.
                     if (bops.getVal() == null) {
-                        bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                        bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
                     }
                     // add bulk ops command to delete this orphan
 
@@ -409,7 +410,7 @@ public class MongoDelete extends ServiceBase {
         // map every path to it's ObjectId
         HashMap<String, ObjectId> allNodes = new HashMap<>();
         // first all we do is build up the 'allNodes' hashMap.
-        ops.stream(new Query(), SubNode.class).forEach(node -> {
+        opsw.stream(new Query(), SubNode.class).forEach(node -> {
             // print progress every 1000th node
             nodesProcessed.inc();
             if (nodesProcessed.getVal() % 1000 == 0) {
@@ -454,7 +455,7 @@ public class MongoDelete extends ServiceBase {
             orphans.entrySet().stream().forEach(entry -> {
                 // lazy create bops
                 if (bops.getVal() == null) {
-                    bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                    bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
                 }
                 allNodes.remove(entry.getKey());
 
@@ -574,7 +575,7 @@ public class MongoDelete extends ServiceBase {
     public void deleteSubGraphChildren(MongoSession ms, SubNode node, boolean includeRoot) {
         if (includeRoot) {
             // it's ok to call ops and not opsw here
-            ops.remove(node);
+            opsw.remove(node);
         }
 
         Query q = new Query();
@@ -583,13 +584,13 @@ public class MongoDelete extends ServiceBase {
         q.addCriteria(crit);
 
         // it's ok to call ops and not opsw here
-        ops.remove(q, SubNode.class);
+        opsw.remove(ms, q, SubNode.class);
     }
 
     // returns a new BulkOps if one not yet existing
     public BulkOperations bulkOpRemoveNode(MongoSession ms, BulkOperations bops, ObjectId id) {
         if (bops == null) {
-            bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+            bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
         }
         Criteria crit = new Criteria("id").is(id);
         crit = auth.addWriteSecurity(ms, crit);
@@ -621,7 +622,7 @@ public class MongoDelete extends ServiceBase {
          * This will potentially leave orphans and this is fine. We don't bother cleaning orphans now
          * because there's no need.
          */
-        DeleteResult delRes = ops.remove(q, SubNode.class);
+        DeleteResult delRes = opsw.remove(ms, q, SubNode.class);
         String msg = "Nodes deleted: " + delRes.getDeletedCount();
         log.debug("Bulk Delete: " + msg);
         res.setMessage(msg);
@@ -706,12 +707,12 @@ public class MongoDelete extends ServiceBase {
 
     // todo-1: verify if there's now a constraint that disables duplicates
     public void removeDupFediNames() {
-        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+        Iterable<FediverseName> recs = opsw.findAll(FediverseName.class);
 
         HashSet<String> names = new HashSet<>();
         for (FediverseName fName : recs) {
             if (!names.add(fName.getName())) {
-                ops.remove(fName);
+                opsw.remove(fName);
                 log.debug("Removed Dup FediName: " + fName.getName());
             }
         }

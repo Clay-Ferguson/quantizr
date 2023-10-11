@@ -32,7 +32,7 @@ public class MongoUpdate extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
     public void saveObj(Object obj) {
-        ops.save(obj);
+        opsw.save(obj);
     }
 
     public void saveIfDirty(MongoSession ms, SubNode node) {
@@ -65,14 +65,14 @@ public class MongoUpdate extends ServiceBase {
         // because the MongoEventListener looks in threadlocals for auth
         if (!allowAuth) {
             arun.run(as -> {
-                ops.save(node);
+                opsw.save(node);
                 return null;
             });
         }
         // otherwise leave same/current threadlocals as is and MongoEventListener will auth based
         // on this
         else {
-            ops.save(node);
+            opsw.save(node);
         }
         ThreadLocals.clean(node);
     }
@@ -203,13 +203,13 @@ public class MongoUpdate extends ServiceBase {
         Query query = new Query();
         Update update = new Update();
         update.set(SubNode.HAS_CHILDREN, null);
-        ops.findAndModify(query, update, SubNode.class);
+        opsw.findAndModify(query, update, SubNode.class);
     }
 
     // returns a new BulkOps if one not yet existing
     public BulkOperations bulkOpSetPropVal(MongoSession ms, BulkOperations bops, ObjectId id, String prop, Object val) {
         if (bops == null) {
-            bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+            bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
         }
         Criteria crit = new Criteria("id").is(id);
         crit = auth.addWriteSecurity(ms, crit);

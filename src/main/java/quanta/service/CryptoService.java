@@ -272,7 +272,7 @@ public class CryptoService extends ServiceBase {
         count.inc();
         BooleanVal failed = new BooleanVal();
 
-        ops.stream(query, SubNode.class).forEach(node -> {
+        opsw.stream(query, SubNode.class).forEach(node -> {
             // make sure session is still alive
             if (failed.getVal() || !sc.isLive())
                 return;

@@ -176,7 +176,6 @@ public class ServiceBase {
     public static RoomType roomType;
     public static RssFeedType rssType;
     public static MongoTemplateWrapper opsw;
-    public static MongoTemplate ops;
     public static MongoRepository mongoRepo;
     public static SimpleMongoClientDatabaseFactory mdbf;
     public static CryptoService crypto;

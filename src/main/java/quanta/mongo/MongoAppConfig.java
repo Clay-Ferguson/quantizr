@@ -158,7 +158,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
             log.debug("create mongoTemplate");
             ops = super.mongoTemplate(databaseFactory, converter);
             ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-            ServiceBase.ops = ops;
         }
         return ops;
     }

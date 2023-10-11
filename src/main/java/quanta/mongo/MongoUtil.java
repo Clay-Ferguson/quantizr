@@ -163,7 +163,7 @@ public class MongoUtil extends ServiceBase {
                 Criteria.where(SubNode.PATH).is(path), //
                 Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
         Query q = new Query(crit);
-        return !ops.exists(q, SubNode.class);
+        return !opsw.exists(auth.getAdminSession(), q, SubNode.class);
     }
 
     /*
@@ -325,7 +325,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("pre scan...");
         IntVal scanCount = new IntVal();
         LinkedList<SubNode> toDel = new LinkedList<>();
-        ops.stream(new Query(), SubNode.class).forEach(node -> {
+        opsw.stream(new Query(), SubNode.class).forEach(node -> {
             String path = node.getPath();
             if (path.equals(NodePath.LOCAL_USERS_PATH) || path.equals(NodePath.REMOTE_USERS_PATH)
                     || path.startsWith(NodePath.LOCAL_USERS_PATH + "/")
@@ -384,7 +384,7 @@ public class MongoUtil extends ServiceBase {
         IntVal opCount = new IntVal();
         IntVal total = new IntVal();
         // stream every node
-        ops.stream(new Query(), SubNode.class).forEach(node -> {
+        opsw.stream(new Query(), SubNode.class).forEach(node -> {
             String path = node.getPath();
             String newPath = null;
             if (!path.startsWith(NodePath.USERS_PATH + "/") || path.startsWith(NodePath.LOCAL_USERS_PATH + "/")
@@ -404,7 +404,7 @@ public class MongoUtil extends ServiceBase {
             Query query = new Query().addCriteria(crit);
             Update update = new Update().set(SubNode.PATH, newPath);
             if (!bops.hasVal()) {
-                bops.setVal(ops.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
             }
             bops.getVal().updateOne(query, update);
             opCount.inc();
@@ -484,9 +484,9 @@ public class MongoUtil extends ServiceBase {
         IntVal batchSize = new IntVal();
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.TYPE).is(NodeType.ACCOUNT.s()));
-        BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+        BulkOperations bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
 
-        ops.stream(q, SubNode.class).forEach(node -> {
+        opsw.stream(q, SubNode.class).forEach(node -> {
             String userName = node.getStr(NodeProp.USER);
             if (!userName.startsWith("."))
                 return;
@@ -557,7 +557,7 @@ public class MongoUtil extends ServiceBase {
         // maxPathLen = fullPath.length();
         // }
         // node.setPath(fullPath.toString());
-        // ops.save(node);
+        // opsw.save(node);
         // }
         // log.debug("PATH PROCESSING DONE: maxPathLen=" + maxPathLen);
     }
@@ -572,7 +572,7 @@ public class MongoUtil extends ServiceBase {
         try {
             delete.removeDupFediNames();
             log.debug("Indexing FediverseName collection");
-            ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
+            opsw.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
         } catch (Exception e) {
             ExUtil.error(log, "FediverseName index failed", e);
         }
@@ -626,7 +626,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         String indexName = "unique-friends";
         try {
-            ops.indexOps(SubNode.class).ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC)
+            opsw.indexOps(SubNode.class).ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC)
                     .on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC).unique().named(indexName)
                     .partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
         } catch (Exception e) {
@@ -640,7 +640,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         String indexName = "unique-node-name";
         try {
-            ops.indexOps(SubNode.class)
+            opsw.indexOps(SubNode.class)
                     .ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC).on(SubNode.NAME, Direction.ASC).unique()
                             .named(indexName).partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
         } catch (Exception e) {
@@ -651,14 +651,14 @@ public class MongoUtil extends ServiceBase {
     public void dropAllIndexes(MongoSession ms) {
         log.debug("dropAllIndexes");
         auth.requireAdmin(ms);
-        ops.indexOps(SubNode.class).dropAllIndexes();
+        opsw.indexOps(SubNode.class).dropAllIndexes();
     }
 
     public void dropIndex(MongoSession ms, Class<?> clazz, String indexName) {
         try {
             auth.requireAdmin(ms);
             log.debug("Dropping index: " + indexName);
-            ops.indexOps(clazz).dropIndex(indexName);
+            opsw.indexOps(clazz).dropIndex(indexName);
         } catch (Exception e) {
             ExUtil.error(log, "exception in dropIndex: " + indexName, e);
         }
@@ -667,7 +667,7 @@ public class MongoUtil extends ServiceBase {
     public void logIndexes(MongoSession ms, Class<?> clazz) {
         StringBuilder sb = new StringBuilder();
         sb.append("INDEXES LIST\n:");
-        List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
+        List<IndexInfo> indexes = opsw.indexOps(clazz).getIndexInfo();
 
         for (IndexInfo idx : indexes) {
             List<IndexField> indexFields = idx.getIndexFields();
@@ -689,7 +689,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         try {
             // Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
-            ops.indexOps(clazz).ensureIndex(
+            opsw.indexOps(clazz).ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property1, Direction.ASC).on(property2, Direction.ASC).unique().named(name).partial(
                             PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
@@ -708,7 +708,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
-            ops.indexOps(clazz).ensureIndex(
+            opsw.indexOps(clazz).ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).named(name)
                             .partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
@@ -727,7 +727,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
-            ops.indexOps(clazz).ensureIndex(
+            opsw.indexOps(clazz).ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name)
                             .partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
@@ -743,7 +743,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
-            ops.indexOps(clazz).ensureIndex(
+            opsw.indexOps(clazz).ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of( //
                             //
@@ -757,7 +757,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("Ensuring unique index on: " + property);
         try {
             auth.requireAdmin(ms);
-            ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
+            opsw.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
         } catch (Exception e) {
             ExUtil.error(log, "Failed in createUniqueIndex: " + property, e);
         }
@@ -767,7 +767,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("createIndex: " + property);
         try {
             auth.requireAdmin(ms);
-            ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
+            opsw.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
         } catch (Exception e) {
             ExUtil.error(log, "Failed in createIndex: " + property, e);
         }
@@ -777,7 +777,7 @@ public class MongoUtil extends ServiceBase {
         log.debug("createIndex: " + property + " dir=" + dir);
         try {
             auth.requireAdmin(ms);
-            ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
+            opsw.indexOps(clazz).ensureIndex(new Index().on(property, dir));
         } catch (Exception e) {
             ExUtil.error(log, "Failed in createIndex: " + property + " dir=" + dir, e);
         }
@@ -810,7 +810,7 @@ public class MongoUtil extends ServiceBase {
     // dbo.put("unique", true);
     // dbo.put("dropDups", true);
     //
-    // ops.indexOps(clazz).ensureIndex(textIndex);
+    // opsw.indexOps(clazz).ensureIndex(textIndex);
     // }
     public void createTextIndexes(MongoSession ms, Class<?> clazz) {
         log.debug("creatingText Indexes.");
@@ -828,7 +828,7 @@ public class MongoUtil extends ServiceBase {
                     // .onField(SubNode.CONTENT) //
                     // .onField(SubNode.TAGS) //
                     new TextIndexDefinitionBuilder().onAllFields().build();
-            ops.indexOps(clazz).ensureIndex(textIndex);
+            opsw.indexOps(clazz).ensureIndex(textIndex);
             log.debug("createTextIndex successful.");
         } catch (Exception e) {
             log.debug("createTextIndex failed.");
@@ -837,7 +837,7 @@ public class MongoUtil extends ServiceBase {
 
     public void dropCollection(MongoSession ms, Class<?> clazz) {
         auth.requireAdmin(ms);
-        ops.dropCollection(clazz);
+        opsw.dropCollection(clazz);
     }
 
     /*

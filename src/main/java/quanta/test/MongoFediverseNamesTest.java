@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.mongo.MongoSession;
 import quanta.mongo.model.FediverseName;
 
 @Component("MongoFediverseNamesTest")
@@ -22,12 +23,12 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
         log.debug("*****************************************************************************************");
         log.debug("MongoFediverseNamesTest Running!");
         removeAll();
-        ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
+        opsw.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
         String name = "jameson2@server.com";
         FediverseName fName = new FediverseName();
         fName.setName(name);
         fName.setCreateTime(Calendar.getInstance().getTime());
-        ops.save(fName);
+        opsw.save(fName);
         log.debug("Saved: " + name);
         try {
             fName = new FediverseName();
@@ -44,7 +45,7 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
 
     private void dump() {
         log.debug("Dumping all FediverseNames...");
-        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+        Iterable<FediverseName> recs = opsw.findAll(FediverseName.class);
 
         for (FediverseName fName : recs) {
             log.debug(fName.getName());
@@ -54,7 +55,8 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
     private void removeAll() {
         Query q = new Query();
         q.addCriteria(Criteria.where(FediverseName.NAME).ne(null));
-        DeleteResult res = ops.remove(q, FediverseName.class);
+        MongoSession as = auth.getAdminSession();
+        DeleteResult res = opsw.remove(as, q, FediverseName.class);
         log.debug("Objects deleted: " + res.getDeletedCount());
     }
 }

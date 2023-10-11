@@ -224,7 +224,7 @@ public class MongoRead extends ServiceBase {
     }
 
     /* Checks ALL parent paths to make sure they all exist. Returns true if some parent doesn't exist */
-    public boolean isOrphan(String path) {
+    public boolean isOrphan(MongoSession ms, String path) {
         int sanityCheck = 0;
         // if this is a path we KNOW exists, return false
         if (knownPath(path))
@@ -236,7 +236,7 @@ public class MongoRead extends ServiceBase {
             if (knownPath(path))
                 return false;
             // if the parent path does not exist, we're done. Path passed in is an orphan.
-            if (!pathExists(path)) {
+            if (!pathExists(ms, path)) {
                 return true;
             }
         }
@@ -277,7 +277,7 @@ public class MongoRead extends ServiceBase {
         if (parPath.equals(NodePath.LOCAL_USERS_PATH) || parPath.equals(NodePath.LOCAL_USERS_PATH + "/")) {
             return;
         }
-        if (!pathExists(parPath)) {
+        if (!pathExists(ms, parPath)) {
             throw new RuntimeEx("Attempted to add a node before its parent exists:" + parPath);
         }
     }
@@ -414,18 +414,18 @@ public class MongoRead extends ServiceBase {
         return opsw.findOne(ms, q);
     }
 
-    public boolean pathExists(String path) {
+    public boolean pathExists(MongoSession ms, String path) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).is(path);
         q.addCriteria(crit);
-        return ops.exists(q, SubNode.class);
+        return opsw.exists(ms, q, SubNode.class);
     }
 
     public boolean nodeExists(MongoSession ms, ObjectId id) {
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.ID).is(id));
-        return ops.exists(q, SubNode.class);
+        return opsw.exists(ms, q, SubNode.class);
     }
 
     public SubNode getNode(MongoSession ms, ObjectId objId) {
@@ -902,7 +902,7 @@ public class MongoRead extends ServiceBase {
             aggOps.add(Aggregation.skip((long) skip));
             aggOps.add(Aggregation.limit(limit));
             Aggregation agg = Aggregation.newAggregation(aggOps);
-            AggregationResults<SubNode> results = ops.aggregate(agg, SubNode.class, SubNode.class);
+            AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
             return results.getMappedResults();
         }
         // Otherwise a standard Query.

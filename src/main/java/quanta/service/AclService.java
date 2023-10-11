@@ -77,7 +77,7 @@ public class AclService extends ServiceBase {
             if (batchMode) {
                 // lazy instantiate
                 if (bops == null) {
-                    bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+                    bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
                 }
                 try {
                     auth.ownerAuth(ms, n);

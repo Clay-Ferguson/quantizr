@@ -1544,7 +1544,7 @@ public class ActPubService extends ServiceBase {
             fName.setName(name);
             fName.setCreateTime(Calendar.getInstance().getTime());
             try {
-                ops.save(fName);
+                opsw.save(fName);
             } catch (Exception e) {
             }
             // this will happen for every duplicate. so A LOT!
@@ -1632,7 +1632,7 @@ public class ActPubService extends ServiceBase {
                     continue;
                 knownUsers.add(userName);
             }
-            Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+            Iterable<FediverseName> recs = opsw.findAll(FediverseName.class);
             int numLoaded = 0;
 
             for (FediverseName fName : recs) {
@@ -1692,7 +1692,7 @@ public class ActPubService extends ServiceBase {
         StringBuilder sb = new StringBuilder();
         IntVal count = new IntVal();
 
-        ops.stream(new Query(), FediverseName.class).forEach(obj -> {
+        opsw.stream(new Query(), FediverseName.class).forEach(obj -> {
             sb.append(obj.getName());
             sb.append("\n");
             count.inc();

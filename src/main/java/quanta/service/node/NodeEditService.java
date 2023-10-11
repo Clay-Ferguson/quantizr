@@ -490,7 +490,8 @@ public class NodeEditService extends ServiceBase {
             }
             SubNode nodeByName = read.getNodeByName(ms, nodeName);
             // delete if orphan (but be safe and double check we aren't deleting `nodeId` node)
-            if (nodeByName != null && !nodeId.equals(nodeByName.getIdStr()) && read.isOrphan(nodeByName.getPath())) {
+            if (nodeByName != null && !nodeId.equals(nodeByName.getIdStr())
+                    && read.isOrphan(ms, nodeByName.getPath())) {
                 // if we don't be sure to delete this orphan we might end up with a constraint violation
                 // on the node name unique index.
                 delete.directDelete(nodeByName);

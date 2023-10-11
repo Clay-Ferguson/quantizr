@@ -332,7 +332,7 @@ public class NodeMoveService extends ServiceBase {
             String newPath = node.getPath().replace(oldPathPrefix, newPathPrefix);
             // log.debug(" SETTING new path:" + newPath);
             if (bops == null) {
-                bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+                bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
             }
 
             Criteria crit = new Criteria("id").is(node.getId());
