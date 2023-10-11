@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.APConst;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
@@ -86,10 +85,7 @@ import quanta.util.val.Val;
  */
 @Component
 public class NodeEditService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-    public static final ObjectMapper jsonMapper = new ObjectMapper();
 
     /*
      * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -1286,7 +1282,7 @@ public class NodeEditService extends ServiceBase {
         ThreadLocals.requireAdmin();
 
         try {
-            SubNode n = jsonMapper.readValue(req.getJson(), SubNode.class);
+            SubNode n = Util.simpleMapper.readValue(req.getJson(), SubNode.class);
             update.save(ms, n, false);
         } catch (Exception e) {
             throw new RuntimeException(e);

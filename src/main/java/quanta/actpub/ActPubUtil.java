@@ -26,13 +26,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOWebFinger;
@@ -51,6 +46,7 @@ import quanta.mongo.model.SubNode;
 import quanta.response.GetThreadViewResponse;
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
@@ -68,18 +64,10 @@ public class ActPubUtil extends ServiceBase {
      * instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate();
-    public static final ObjectMapper mapper = new ObjectMapper();
-
-    // NOTE: This didn't allow unknown properties as expected but putting the
-    // following in the JSON classes did:
-    // @JsonIgnoreProperties(ignoreUnknown = true)
-    {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     public APObj buildObj(byte[] bytes) {
         try {
-            APObj payload = ActPubUtil.mapper.readValue(bytes, APObj.class);
+            APObj payload = Util.mapper.readValue(bytes, APObj.class);
             return AP.typeFromFactory(payload);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -230,7 +218,7 @@ public class ActPubUtil extends ServiceBase {
 
         Mono<APObj> mono = webClient.get().retrieve().bodyToMono(String.class).map(responseBody -> {
             try {
-                return (APObj) mapper.readValue(responseBody, clazz);
+                return (APObj) Util.mapper.readValue(responseBody, clazz);
             } catch (Exception e) {
                 log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class="
                         + e.getClass().getName());

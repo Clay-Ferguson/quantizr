@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
@@ -46,6 +45,7 @@ import quanta.util.DateUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -69,7 +69,6 @@ public class IPFSService extends ServiceBase {
      */
     public final RestTemplate restTemplate = new RestTemplate();
     public final RestTemplate restTemplateNoTimeout = new RestTemplate();
-    public final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void postConstruct() {
@@ -190,7 +189,7 @@ public class IPFSService extends ServiceBase {
             } else {
                 String body = response.getBody();
                 try {
-                    ret = XString.jsonMapper.readValue(body, MerkleLink.class);
+                    ret = Util.mapper.readValue(body, MerkleLink.class);
                 } catch (Exception e) {
                 }
                 // some calls, like the mfs file add, don't send back the MerkleLink, so for now let's just tolerate
@@ -362,7 +361,7 @@ public class IPFSService extends ServiceBase {
                         ret = "success";
                     } else {
                         try {
-                            ret = XString.jsonMapper.readValue(response.getBody(), clazz);
+                            ret = Util.mapper.readValue(response.getBody(), clazz);
                         } catch (Exception e) {
                             log.error("Failed to parse body: " + body + " to class " + clazz.getName(), e);
                         }

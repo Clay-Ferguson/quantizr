@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
@@ -20,13 +19,11 @@ import quanta.response.FeedPushInfo;
 import quanta.response.ServerPushInfo;
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
 public class PushService extends ServiceBase {
-
-    public static final ObjectMapper jsonMapper = new ObjectMapper();
-
     private static Logger log = LoggerFactory.getLogger(PushService.class);
     static final int MAX_FEED_ITEMS = 25;
 
@@ -147,7 +144,7 @@ public class PushService extends ServiceBase {
             // log.debug("Message handled by replica " + prop.getSwarmTaskSlot() + ": "
             // + XString.prettyPrint(rinfo));
             try {
-                FeedPushInfo info = jsonMapper.readValue(rinfo.getPayload(), FeedPushInfo.class);
+                FeedPushInfo info = Util.simpleMapper.readValue(rinfo.getPayload(), FeedPushInfo.class);
                 pushInfo(rinfo.getToken(), info);
             } catch (Exception e) {
                 throw new RuntimeException(e);

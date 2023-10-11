@@ -13,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
+import quanta.util.Util;
 
 @Component
 public class IPFSKey extends ServiceBase {
@@ -38,7 +39,7 @@ public class IPFSKey extends ServiceBase {
             log.debug("Generate IPFS Key: " + url);
             ResponseEntity<String> response =
                     ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            ret = Util.simpleMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
         // ret output:
         // {

@@ -19,8 +19,6 @@ import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -48,18 +46,10 @@ import quanta.util.val.Val;
 public class CryptoService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(CryptoService.class);
-    public static final ObjectMapper mapper = new ObjectMapper();
     public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
     private static final Random rand = new Random();
     private static boolean debugSigning = false;
     int SIGN_BLOCK_SIZE = 100;
-
-    // NOTE: This didn't allow unknown properties as expected but putting the
-    // following in the JSON classes did:
-    // @JsonIgnoreProperties(ignoreUnknown = true)
-    {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     public boolean nodeSigVerify(SubNode node, String sig) {
         if (sig == null || node == null)
@@ -132,7 +122,7 @@ public class CryptoService extends ServiceBase {
     public PublicKey parseJWK(String jwkJson) {
         PublicKey pubKey = null;
         try {
-            Jwk keyObj = mapper.readValue(jwkJson.getBytes(StandardCharsets.UTF_8), Jwk.class);
+            Jwk keyObj = Util.mapper.readValue(jwkJson.getBytes(StandardCharsets.UTF_8), Jwk.class);
             if (keyObj == null) {
                 log.error("Unable to parse USER_PREF_PUBLIC_SIG_KEY from accnt");
                 return null;

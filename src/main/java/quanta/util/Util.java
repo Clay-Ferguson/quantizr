@@ -10,15 +10,28 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import quanta.mongo.MongoRepository;
 
 public class Util {
-
     private static Logger log = LoggerFactory.getLogger(Util.class);
     private static final Random rand = new Random();
+
+    public static ObjectMapper simpleMapper = new ObjectMapper();
+
+    public static final ObjectMapper mapper = new ObjectMapper();
+    {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setSerializationInclusion(Include.NON_NULL);
+    }
+
+    public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     public static double calculateKBps(double bytes, double nanoseconds) {
         if (nanoseconds == 0)

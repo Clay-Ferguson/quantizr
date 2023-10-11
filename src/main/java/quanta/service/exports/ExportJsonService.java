@@ -1,8 +1,5 @@
 package quanta.service.exports;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
@@ -21,6 +19,7 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
+import quanta.util.Util;
 import quanta.util.val.Val;
 
 /**
@@ -29,16 +28,9 @@ import quanta.util.val.Val;
 @Component
 @Scope("prototype")
 public class ExportJsonService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ExportJsonService.class);
-    /* This object is Threadsafe so this is the correct usage 'static final' */
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    static {
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
-    }
-
-    private static final ObjectWriter jsonWriter = objectMapper.writerWithDefaultPrettyPrinter();
+    private static final ObjectWriter jsonWriter = Util.mapper.writerWithDefaultPrettyPrinter();
 
     /*
      * todo-2: need capability to handle binary files also, but before implementing that look for any

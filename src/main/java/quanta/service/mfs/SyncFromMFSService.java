@@ -1,7 +1,5 @@
 package quanta.service.mfs;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +16,14 @@ import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /* Does the reverse of SyncToMFSService */
 @Component
 @Scope("prototype")
 public class SyncFromMFSService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(SyncFromMFSService.class);
-    public static final ObjectMapper jsonMapper = new ObjectMapper();
-
-    {
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     int failedFiles = 0;
     int matchingFiles = 0;
@@ -201,14 +194,14 @@ public class SyncFromMFSService extends ServiceBase {
                                  * I need to check the rest of the codebase to be sure there's nowhere that this
                                  * surprise will break things. (import/export logic?)
                                  */
-                                node = jsonMapper.readValue(json, SubNodeIdentity.class);
+                                node = Util.mapper.readValue(json, SubNodeIdentity.class);
                                 // we assume the node.id values can be the same across Federated instances.
                                 SubNode findNode = read.getNode(session, node.getId());
                                 if (findNode != null) {
                                     log.debug("Node existed: " + node.getId());
                                     matchingFiles++;
                                 } else { // todo-2: check if node is same content here.
-                                    SubNode realNode = jsonMapper.readValue(json, SubNode.class);
+                                    SubNode realNode = Util.mapper.readValue(json, SubNode.class);
                                     update.save(session, realNode);
                                     log.debug("Created Node: " + node.getId());
                                     createdFiles++;

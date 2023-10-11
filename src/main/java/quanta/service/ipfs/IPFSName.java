@@ -13,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
+import quanta.util.Util;
 
 @Component
 public class IPFSName extends ServiceBase {
@@ -40,7 +41,7 @@ public class IPFSName extends ServiceBase {
             log.debug("Publishing IPNS: " + url);
             ResponseEntity<String> response =
                     ipfs.restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            ret = Util.simpleMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (
         // ret output:
         // {
@@ -64,7 +65,7 @@ public class IPFSName extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response =
                     ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            ret = Util.simpleMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }

@@ -1,6 +1,5 @@
 package quanta.service.imports;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.HashMap;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -15,13 +14,13 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
 public abstract class ImportArchiveBase extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
-    public static final ObjectMapper jsonMapper = new ObjectMapper();
+
     /*
      * This is used to detect if this 'prototype scope' object might have been autowired, and is getting
      * called for a second time which is NOT supported. Each use of this object requires a new instance
@@ -78,7 +77,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 // run unmarshalling as admin (otherwise setPath can bark about user being not same as owner)
                 SubNode node = (SubNode) arun.run(as -> {
                     try {
-                        SubNode n = jsonMapper.readValue(json, SubNode.class);
+                        SubNode n = Util.simpleMapper.readValue(json, SubNode.class);
                         // this may not be necessary but we definitely don't want this node cached now
                         // with it's currently undetermined id.
                         ThreadLocals.clean(n);

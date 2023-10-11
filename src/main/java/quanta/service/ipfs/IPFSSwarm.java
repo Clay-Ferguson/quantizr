@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
@@ -40,7 +41,7 @@ public class IPFSSwarm extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response =
                     ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            ret = Util.simpleMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
             log.debug("IPFS swarm connect: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
@@ -59,7 +60,7 @@ public class IPFSSwarm extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response =
                     ipfs.restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            ret = Util.simpleMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
             log.debug("IPFS swarm peers: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);

@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.file.IPFSObjectStat;
+import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
@@ -41,7 +42,7 @@ public class IPFSObj extends ServiceBase {
             ResponseEntity<String> result = ipfs.restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                ret = XString.jsonMapper.readValue(result.getBody(), MerkleNode.class);
+                ret = Util.mapper.readValue(result.getBody(), MerkleNode.class);
                 ret.setHash(hash);
                 ret.setContentType(contentType.getType());
             }
@@ -60,7 +61,7 @@ public class IPFSObj extends ServiceBase {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response =
                     ipfs.restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
-            ret = ipfs.mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
+            ret = Util.simpleMapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }

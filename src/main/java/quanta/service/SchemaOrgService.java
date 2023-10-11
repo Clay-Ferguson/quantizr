@@ -13,20 +13,19 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.client.SchemaOrgClass;
 import quanta.model.client.SchemaOrgProp;
 import quanta.model.client.SchemaOrgRange;
 import quanta.response.GetSchemaOrgTypesResponse;
 import quanta.util.StreamUtil;
+import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
 public class SchemaOrgService extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
-    public static final ObjectMapper mapper = new ObjectMapper();
     public static HashMap<String, Object> schema = null;
     /*
      * We'll keep properties and classes separate rather than doing any containment, because we can
@@ -48,7 +47,7 @@ public class SchemaOrgService extends ServiceBase {
             InputStream is = resource.getInputStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(is));
             try {
-                schema = mapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
+                schema = Util.simpleMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
                 if (schema == null) {
                     log.debug("schema.org data failed to load.");
                     schema = new HashMap<>();

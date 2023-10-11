@@ -23,8 +23,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -38,8 +36,6 @@ import quanta.util.XString;
 
 /**
  * The primary element of storage for the entire Quanta DB.
- *
- * todo-p0: should all @JsonIgnores in here also be @Transient ?
  */
 @Document(collection = "nodes")
 @TypeAlias("n1")
@@ -47,16 +43,7 @@ import quanta.util.XString;
 @JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER,
         SubNode.XFR, SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS, SubNode.ATTACHMENTS,})
 public class SubNode {
-
     private static Logger log = LoggerFactory.getLogger(SubNode.class);
-    public static final ObjectMapper mapper = new ObjectMapper();
-
-    // NOTE: This didn't allow unknown properties as expected but putting the
-    // following in the JSON classes did:
-    // @JsonIgnoreProperties(ignoreUnknown = true)
-    {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     // This optimization is optional and we have this flag if we need to turn it off.
     public static final boolean USE_HAS_CHILDREN = true;
@@ -859,7 +846,7 @@ public class SubNode {
             return null;
         synchronized (propLock) {
             try {
-                return (T) mapper.convertValue(props().get(key), ref);
+                return (T) Util.mapper.convertValue(props().get(key), ref);
             } catch (Exception e) {
                 log.debug("Failed to read prop " + key + " as a type " + ref.toString());
                 return null;

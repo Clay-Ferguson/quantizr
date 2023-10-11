@@ -1,9 +1,5 @@
 package quanta.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -18,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import quanta.exception.base.RuntimeEx;
 
 /**
@@ -27,16 +25,10 @@ import quanta.exception.base.RuntimeEx;
  * lines, strip, stripLeading, stripTrailing, and repeat.
  */
 public class XString {
-
     private static Logger log = LoggerFactory.getLogger(XString.class);
-    public static final ObjectMapper jsonMapper = new ObjectMapper();
 
-    static {
-        jsonMapper.setSerializationInclusion(Include.NON_NULL);
-    }
-
-    private static ObjectWriter jsonPrettyWriter = jsonMapper.writerWithDefaultPrettyPrinter();
-    private static ObjectWriter jsonCompactWriter = jsonMapper.writer();
+    private static ObjectWriter jsonPrettyWriter = Util.mapper.writerWithDefaultPrettyPrinter();
+    private static ObjectWriter jsonCompactWriter = Util.mapper.writer();
 
     public static String prettyPrint(Object obj) {
         if (obj == null)

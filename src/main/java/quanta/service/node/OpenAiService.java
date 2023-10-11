@@ -15,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -36,7 +34,6 @@ import quanta.postgres.UserAccount;
 import quanta.request.AskSubGraphRequest;
 import quanta.response.AskSubGraphResponse;
 import quanta.service.UserManagerService;
-import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
@@ -46,15 +43,6 @@ public class OpenAiService extends ServiceBase {
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
-
-    public static final ObjectMapper mapper = new ObjectMapper();
-
-    // NOTE: This didn't allow unknown properties as expected but putting the
-    // following in the JSON classes did:
-    // @JsonIgnoreProperties(ignoreUnknown = true)
-    {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
 

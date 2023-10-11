@@ -23,7 +23,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.model.client.IPSMData;
@@ -45,7 +44,6 @@ public class IPFSPubSub extends ServiceBase {
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
     private static final String IPSM_TOPIC_TEST = "/ipsm/test";
     private static final RestTemplate restTemplate = new RestTemplate();
-    private static final ObjectMapper mapper = new ObjectMapper();
     public static String API_PUBSUB;
     // private static int heartbeatCounter = 0;
     private static final HashMap<String, Integer> fromCounter = new HashMap<>();
@@ -165,7 +163,7 @@ public class IPFSPubSub extends ServiceBase {
             if (buf[r - 1] == LINE_FEED) {
                 log.debug("LINE: " + new String(resp.toByteArray()));
                 Map<String, Object> event =
-                        mapper.readValue(resp.toByteArray(), new TypeReference<Map<String, Object>>() {});
+                        Util.simpleMapper.readValue(resp.toByteArray(), new TypeReference<Map<String, Object>>() {});
                 processInboundEvent(event);
                 resp = new ByteArrayOutputStream();
             }
@@ -252,7 +250,7 @@ public class IPFSPubSub extends ServiceBase {
 
     private IPSMMessage parseIpsmPayload(String payload) {
         try {
-            IPSMMessage msg = mapper.readValue(payload, IPSMMessage.class);
+            IPSMMessage msg = Util.simpleMapper.readValue(payload, IPSMMessage.class);
             if (verifySignature(msg)) {
                 log.debug("Signature Failed.");
                 return null;

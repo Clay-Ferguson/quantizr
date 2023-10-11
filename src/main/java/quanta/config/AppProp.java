@@ -1,8 +1,5 @@
 package quanta.config;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -17,10 +14,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.actpub.APConst;
 import quanta.mongo.MongoRepository;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /**
@@ -43,7 +42,6 @@ public class AppProp {
     // if false this disables all backgrouind processing.
     private boolean daemonsEnabled = true;
     private String protocolHostAndPort = null;
-    public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
     HashMap<String, Object> configMap = null;
     private static final Object configLock = new Object();
 
@@ -52,7 +50,7 @@ public class AppProp {
             if (configMap != null) {
                 return configMap;
             }
-            synchronized (yamlMapper) {
+            synchronized (Util.yamlMapper) {
                 try {
                     configMap = readYamlExternal("config-text.yaml");
                     // if we found the external config file in [deploy]/config/ folder then use it's contents
@@ -92,14 +90,14 @@ public class AppProp {
      * Reads a yaml file into a map from internal file at "classname:[fileName]
      */
     private HashMap<String, Object> readYamlInternal(String fileName) {
-        synchronized (yamlMapper) {
+        synchronized (Util.yamlMapper) {
             InputStream is = null;
             HashMap<String, Object> map = null;
             try {
                 log.debug("Loading config from internal classpath: " + fileName);
                 Resource resource = context.getResource("classpath:" + fileName);
                 is = resource.getInputStream();
-                map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
+                map = Util.yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
                 if (map == null) {
                     map = new HashMap<>();
                 }
@@ -113,14 +111,14 @@ public class AppProp {
     }
 
     private HashMap<String, Object> readYamlExternal(String fileName) {
-        synchronized (yamlMapper) {
+        synchronized (Util.yamlMapper) {
             HashMap<String, Object> map = null;
             try {
                 File file = new File("/config/" + fileName);
                 // if an external config file is found use it.
                 if (file.isFile()) {
                     log.debug("Loading config from file system: " + fileName);
-                    map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
+                    map = Util.yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
                 }
             } catch (Exception e) {
                 ExUtil.error(log, "failed to load help-text.yaml", e);
