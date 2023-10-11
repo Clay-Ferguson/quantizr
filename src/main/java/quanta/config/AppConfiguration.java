@@ -23,8 +23,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import quanta.AppController;
 import quanta.actpub.APConst;
+import quanta.service.AppController;
 import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
 

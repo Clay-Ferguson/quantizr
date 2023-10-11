@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.ServerTooBusyException;

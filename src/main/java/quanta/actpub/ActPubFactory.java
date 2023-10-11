@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import quanta.AppController;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOActor;
 import quanta.actpub.model.APOAnnounce;
@@ -32,6 +31,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.service.AppController;
 import quanta.util.Convert;
 import quanta.util.DateUtil;
 

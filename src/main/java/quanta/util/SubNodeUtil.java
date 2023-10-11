@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import quanta.AppController;
 import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
@@ -20,6 +19,7 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetActPubObjectRequest;
 import quanta.response.GetActPubObjectResponse;
+import quanta.service.AppController;
 import quanta.util.val.Val;
 
 /**
