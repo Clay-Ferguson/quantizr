@@ -28,7 +28,7 @@
     margin-right: 24px;
     margin-left: $smallGap;
     margin-bottom: $smallGap;
-    margin-top: 0;
+    margin-top: $smallGap;
     float: left !important;
     border: 2px solid $gray-700;
     border-radius: $border-radius;
@@ -38,7 +38,7 @@
 .imgUpperRight {
     margin-left: 24px;
     margin-bottom: $smallGap;
-    margin-top: 0;
+    margin-top: $smallGap;
     float: right !important;
     border: 2px solid $gray-700;
     border-radius: $border-radius;
@@ -50,7 +50,7 @@
     margin-left: auto;
     margin-right: auto;
     margin-bottom: $smallGap;
-    margin-top: 0;
+    margin-top: $smallGap;
     border: 2px solid $gray-700;
     border-radius: $border-radius;
 }
