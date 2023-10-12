@@ -32,7 +32,7 @@ export class RssFeedsType extends TypeBase {
     override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new Divc({ className: "systemNodeContent" }, [
             new ButtonBar([
-                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, true, false, null, null), {
+                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, true, false, null), {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-end"),

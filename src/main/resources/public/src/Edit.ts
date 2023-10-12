@@ -1187,7 +1187,7 @@ export class Edit {
     }
 
     addBookmark = (node: J.NodeInfo, content: string = null) => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, content);
+        this.createNode(node, J.NodeType.BOOKMARK, true, true, content);
     }
 
     addLinkBookmark = async (content: any, audioUrl: string) => {
@@ -1272,17 +1272,7 @@ export class Edit {
     }
 
     createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
-        pendingEdit: boolean, payloadType: string, content: string) => {
-        let properties: J.PropertyInfo[] = null;
-        if (payloadType === "addDateProp") {
-            properties = [{
-                name: J.NodeProp.DATE,
-                value: new Date().getTime()
-            }, {
-                name: J.NodeProp.DURATION,
-                value: "01:00"
-            }];
-        }
+        pendingEdit: boolean, content: string) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
@@ -1292,8 +1282,8 @@ export class Edit {
             createAtTop: true,
             content,
             typeLock: true,
-            properties,
-            payloadType,
+            properties: null,
+            payloadType: null,
             shareToUserId: null,
             boostTarget: null,
             fediSend: false,

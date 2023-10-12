@@ -32,10 +32,7 @@ export class CalendarType extends TypeBase {
                 }, null),
                 new Button("Calendar", () => {
                     S.render.showCalendar(node.id);
-                }, null),
-                new Button("Create", () => S.edit.createNode(node, J.NodeType.NONE, true, false, "addDateProp", null), {
-                    title: "Add new Calendar Item"
-                })
+                }, null)
             ], "marginLeft marginBottom")
         ]);
     }

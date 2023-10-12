@@ -3,6 +3,7 @@ package quanta.service.node;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -231,6 +232,13 @@ public class NodeEditService extends ServiceBase {
             }
         }
         openGraph.parseNode(newNode, true);
+
+        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
+            // if parent is a calendar node, then we need to set the date on this new node
+            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
+            newNode.set(NodeProp.DURATION, "01:00");
+        }
+
         update.save(ms, newNode);
 
         if (req.isOpenAiQuestion() && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
@@ -351,6 +359,13 @@ public class NodeEditService extends ServiceBase {
         // We save this right away, before calling convertToNodeInfo in case that method does any Db related
         // stuff where it's expecting the node to exist.
         openGraph.parseNode(newNode, true);
+
+        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
+            // if parent is a calendar node, then we need to set the date on this new node
+            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
+            newNode.set(NodeProp.DURATION, "01:00");
+        }
+
         update.save(ms, newNode);
         res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null, false));

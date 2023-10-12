@@ -68,8 +68,6 @@ public class SubNode {
     @Field(ORDINAL)
     private Long ordinal;
 
-    // Holds null if children status unknown. Not yet generated.
-    // NOTE: We have no index on this field because we never query on it.
     public static final String HAS_CHILDREN = "hch";
     @Field(HAS_CHILDREN)
     private Boolean hch;
@@ -98,7 +96,6 @@ public class SubNode {
     @Field(OWNER)
     private ObjectId owner;
 
-    // OwnerId of person who transfered this node to "owner"
     public static final String XFR = "xfr";
     @Field(XFR)
     private ObjectId transferFrom;
@@ -111,7 +108,6 @@ public class SubNode {
     @Field(MODIFY_TIME)
     private Date modifyTime;
 
-    // Also defined in NodeProp.SUBNODE_PROPS
     public static final String PROPS = "p";
     @Field(PROPS)
     private HashMap<String, Object> props;
@@ -128,23 +124,14 @@ public class SubNode {
     @Field(LIKES)
     private HashSet<String> likes;
 
-    // these are public on purpose. (the M means this CID is from MFS, and no need to pin or unpin ever)
     public static final String MCID = "mcid";
     @Field(MCID)
     public String mcid;
 
-    // (the M means this CID is from MFS, and no need to pin or unpin ever)
     public static final String PREV_MCID = "prevMcid";
     @Field(PREV_MCID)
     public String prevMcid;
 
-    /*
-     * ACL=Access Control List
-     *
-     * Keys are userNodeIds, and values is a comma delimited list of any of PrivilegeType.java values.
-     * However in addition to userNodeIds identifying users the additional key of "public" is allowed as
-     * a key which indicates privileges granted to everyone (the entire public)
-     */
     public static final String AC = "ac";
     @Field(AC)
     private HashMap<String, AccessControl> ac;
