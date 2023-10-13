@@ -18,6 +18,7 @@ import quanta.model.client.OpenGraph;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
+import quanta.util.Util;
 import quanta.util.XString;
 
 @Component
@@ -51,7 +52,7 @@ public class OpenGraphService extends ServiceBase {
         try {
             openGraph = parseOpenGraph(url);
         } catch (Exception e) {
-            String mime = attach.getMimeTypeFromUrl(url);
+            String mime = Util.getMimeTypeFromUrl(url);
             openGraph = new OpenGraph();
             openGraph.setMime(mime);
         }

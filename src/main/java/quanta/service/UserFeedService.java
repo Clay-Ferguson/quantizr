@@ -227,7 +227,7 @@ public class UserFeedService extends ServiceBase {
          * to result in what will end up being all conversations between us and the other person mixed into
          * a single rev-chron.
          */
-        if (bidirectional) {
+        else {
             SubNode toUserNode = read.getAccountByUserName(ms, req.getToUser(), false);
             if (myAcntNode == null) {
                 myAcntNode = read.getNode(ms, sc.getRootId());

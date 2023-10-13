@@ -1,8 +1,11 @@
 package quanta.util;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 import java.util.Random;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,5 +160,44 @@ public class Util {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    public static String getMimeTypeFromUrl(String url) {
+        String mimeType = null;
+        // try to get mime from name first.
+        mimeType = URLConnection.guessContentTypeFromName(url);
+        // if didn't get mime from name, try reading the actual url
+        if (StringUtils.isEmpty(mimeType)) {
+            int timeout = 60; // seconds
+            try {
+                URLConnection conn = new URL(url).openConnection();
+                conn.setConnectTimeout(timeout * 1000);
+                conn.setReadTimeout(timeout * 1000);
+                mimeType = conn.getContentType();
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+        return mimeType;
+    }
+
+    // Another way is this (according to baeldung site)
+    // Path path = new File("product.png").toPath();
+    // String mimeType = Files.probeContentType(path);
+    public static String getMimeFromFileType(String fileName) {
+        String mimeType = null;
+        /* mimeType can be passed as null if it's not yet determined */
+        if (mimeType == null) {
+            mimeType = URLConnection.guessContentTypeFromName(fileName);
+        }
+        if (mimeType == null) {
+            String ext = FilenameUtils.getExtension(fileName);
+            mimeType = MimeTypeUtils.getMimeType(ext);
+        }
+        /* fallback to at lest some acceptable mime type */
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+        return mimeType;
     }
 }

@@ -100,4 +100,36 @@ public class IPFSPin extends ServiceBase {
             }
         });
     }
+
+    public void pinLocalIpfsAttachments(SubNode node) {
+        if (node == null || node.getAttachments() == null)
+            return;
+        node.getAttachments().forEach((String key, Attachment att) -> {
+            /*
+             * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
+             * (IPFS_REF means 'referenced' and external to our server).
+             */
+            if (att.getIpfsLink() != null) {
+                // if there's no 'ref' property this is not a foreign reference, which means we
+                // DO pin this.
+                if (att.getIpfsRef() == null) {
+                    arun.run(sess -> {
+                        // don't pass the actual node into here, because it runs in a separate thread and would
+                        // be a concurrency problem.
+                        ipfsPin.ipfsAsyncPinNode(sess, node.getId());
+                        return null;
+                    });
+                } else { // otherwise we don't pin it.
+                    /*
+                     * Don't do this removePin. Leave this comment here as a warning of what NOT to do! We can't simply
+                     * remove the CID from our IPFS database because some node stopped using it, because there may be
+                     * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
+                     * pins ever get removed, because that method does a safe and correct delete of all pins that are
+                     * truly no longer in use by anyone
+                     */
+                    // ipfs.removePin(ipfsLink);
+                }
+            }
+        });
+    }
 }

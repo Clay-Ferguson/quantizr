@@ -18,19 +18,18 @@ import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
@@ -54,9 +53,7 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.Transaction;
-import quanta.postgres.TransactionRepository;
 import quanta.postgres.UserAccount;
-import quanta.postgres.UserRepository;
 import quanta.request.AddCreditRequest;
 import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
@@ -111,12 +108,6 @@ public class UserManagerService extends ServiceBase {
 
     private static final Random rand = new Random();
     public static final float INITIAL_GRANT_AMOUNT = 0.01f;
-
-    @Autowired(required = false)
-    private TransactionRepository transactionRepository;
-
-    @Autowired(required = false)
-    private UserRepository userRepository;
 
     /* Private keys of each user by user name as key */
     public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();

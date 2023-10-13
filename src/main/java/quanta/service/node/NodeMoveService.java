@@ -37,7 +37,6 @@ import quanta.util.ThreadLocals;
  */
 @Component
 public class NodeMoveService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
     /*

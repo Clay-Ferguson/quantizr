@@ -26,6 +26,7 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeJsonRequest;
+import quanta.request.InitNodeEditRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
 import quanta.request.SaveNodeJsonRequest;
@@ -35,6 +36,7 @@ import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.request.UpdateFriendNodeRequest;
 import quanta.response.GetNodeJsonResponse;
+import quanta.response.InitNodeEditResponse;
 import quanta.response.LikeNodeResponse;
 import quanta.response.LinkNodesResponse;
 import quanta.response.SaveNodeJsonResponse;
@@ -241,7 +243,7 @@ public class NodeEditService extends ServiceBase {
         } else /* if node is currently encrypted */ {
             res.setAclEntries(auth.getAclEntries(ms, node));
         }
-        attach.pinLocalIpfsAttachments(node);
+        ipfsPin.pinLocalIpfsAttachments(node);
         /*
          * If the node being saved is currently in the pending area /p/ then we publish it now, and move it
          * out of pending.
@@ -662,6 +664,41 @@ public class NodeEditService extends ServiceBase {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return res;
+    }
+
+    // todo-1: move to EditNodeService.java
+    public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
+        InitNodeEditResponse res = new InitNodeEditResponse();
+        String nodeId = req.getNodeId();
+        /*
+         * IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
+         * wanting to edit his Friend node representing this user.
+         */
+        if (req.getEditMyFriendNode()) {
+            String _nodeId = nodeId;
+            nodeId = arun.run(as -> {
+                Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
+                // we query as a list, but there should only be ONE result.
+                List<SubNode> friendNodes =
+                        user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
+                if (friendNodes != null) {
+                    for (SubNode friendNode : friendNodes) {
+                        return friendNode.getIdStr();
+                    }
+                }
+                return null;
+            });
+        }
+        SubNode node = read.getNode(ms, nodeId);
+        auth.ownerAuth(ms, node);
+        if (node == null) {
+            res.error("Node not found.");
+            return res;
+        }
+        NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
+                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, null, false);
+        res.setNodeInfo(nodeInfo);
         return res;
     }
 }

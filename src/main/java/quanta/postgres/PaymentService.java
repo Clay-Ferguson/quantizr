@@ -2,7 +2,6 @@ package quanta.postgres;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
@@ -10,12 +9,6 @@ import quanta.config.ServiceBase;
 public class PaymentService extends ServiceBase {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
-
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     public String printTransactions() {
         StringBuilder sb = new StringBuilder();

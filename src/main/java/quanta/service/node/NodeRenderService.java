@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -32,10 +32,8 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.InitNodeEditRequest;
 import quanta.request.RenderCalendarRequest;
 import quanta.request.RenderNodeRequest;
-import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
 import quanta.service.AclService;
@@ -519,41 +517,6 @@ public class NodeRenderService extends ServiceBase {
             }
         }
         return sort;
-    }
-
-    // todo-1: move to EditNodeService.java
-    public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
-        InitNodeEditResponse res = new InitNodeEditResponse();
-        String nodeId = req.getNodeId();
-        /*
-         * IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
-         * wanting to edit his Friend node representing this user.
-         */
-        if (req.getEditMyFriendNode()) {
-            String _nodeId = nodeId;
-            nodeId = arun.run(as -> {
-                Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(_nodeId);
-                // we query as a list, but there should only be ONE result.
-                List<SubNode> friendNodes =
-                        user.getSpecialNodesList(as, null, NodeType.FRIEND_LIST.s(), null, false, crit);
-                if (friendNodes != null) {
-                    for (SubNode friendNode : friendNodes) {
-                        return friendNode.getIdStr();
-                    }
-                }
-                return null;
-            });
-        }
-        SubNode node = read.getNode(ms, nodeId);
-        auth.ownerAuth(ms, node);
-        if (node == null) {
-            res.error("Node not found.");
-            return res;
-        }
-        NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, null, false);
-        res.setNodeInfo(nodeInfo);
-        return res;
     }
 
     /*

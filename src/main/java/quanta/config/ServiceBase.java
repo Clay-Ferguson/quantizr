@@ -5,7 +5,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -80,6 +79,7 @@ import quanta.util.AsyncExec;
 import quanta.util.CallProcessor;
 import quanta.util.Convert;
 import quanta.util.EnglishDictionary;
+import quanta.util.EventPublisher;
 import quanta.util.FileUtils;
 import quanta.util.MimeUtil;
 import quanta.util.SubNodeUtil;
@@ -114,12 +114,9 @@ public class ServiceBase {
     static List<Runnable> postConstructs = new ArrayList<>();
     public static ApplicationContext context;
 
-    @Autowired
-    public TransactionRepository transactionRepository;
-
-    @Autowired
-    public UserRepository userRepository;
-
+    public static TransactionRepository transactionRepository;
+    public static UserRepository userRepository;
+    public static EventPublisher publisher;
     public static AppProp prop;
     public static UserFeedService userFeed;
     public static Convert convert;
@@ -278,7 +275,10 @@ public class ServiceBase {
             roomType = getBean(ctx, RoomType.class);
             rssType = getBean(ctx, RssFeedType.class);
             mongoRepo = getBean(ctx, MongoRepository.class);
+            transactionRepository = getBean(ctx, TransactionRepository.class);
+            userRepository = getBean(ctx, UserRepository.class);
             opsw = getBean(ctx, MongoTemplateWrapper.class);
+            publisher = getBean(ctx, EventPublisher.class);
             crypto = getBean(ctx, CryptoService.class);
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);

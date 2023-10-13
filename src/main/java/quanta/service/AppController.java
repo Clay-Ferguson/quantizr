@@ -305,7 +305,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
         return callProc.run("initNodeEdit", true, true, req, session, ms -> {
-            return render.initNodeEdit(ms, req);
+            return edit.initNodeEdit(ms, req);
         });
     }
 

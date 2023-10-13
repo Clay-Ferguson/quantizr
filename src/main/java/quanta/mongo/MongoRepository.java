@@ -1,15 +1,13 @@
 package quanta.mongo;
 
-import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PreDestroy;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
-import quanta.util.EventPublisher;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 
@@ -20,9 +18,6 @@ import quanta.util.ThreadLocals;
 public class MongoRepository extends ServiceBase {
 
     private static Logger log = LoggerFactory.getLogger(MongoRepository.class);
-
-    @Autowired
-    private EventPublisher publisher;
 
     /*
      * Flag only gets set to true when application is fully initialized, all DB conversiona have been

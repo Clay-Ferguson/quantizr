@@ -18,7 +18,6 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -240,7 +239,7 @@ public class AttachmentService extends ServiceBase {
         auth.ownerAuth(ms, node);
         /* mimeType can be passed as null if it's not yet determined */
         if (mimeType == null) {
-            mimeType = getMimeFromFileType(fileName);
+            mimeType = Util.getMimeFromFileType(fileName);
         }
         if (allowEmailParse && "message/rfc822".equals(mimeType)) {
             // this is EML file format.
@@ -261,38 +260,6 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    public void pinLocalIpfsAttachments(SubNode node) {
-        if (node == null || node.getAttachments() == null)
-            return;
-        node.getAttachments().forEach((String key, Attachment att) -> {
-            /*
-             * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
-             * (IPFS_REF means 'referenced' and external to our server).
-             */
-            if (att.getIpfsLink() != null) {
-                // if there's no 'ref' property this is not a foreign reference, which means we
-                // DO pin this.
-                if (att.getIpfsRef() == null) {
-                    arun.run(sess -> {
-                        // don't pass the actual node into here, because it runs in a separate thread and would
-                        // be a concurrency problem.
-                        ipfsPin.ipfsAsyncPinNode(sess, node.getId());
-                        return null;
-                    });
-                } else { // otherwise we don't pin it.
-                    /*
-                     * Don't do this removePin. Leave this comment here as a warning of what NOT to do! We can't simply
-                     * remove the CID from our IPFS database because some node stopped using it, because there may be
-                     * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
-                     * pins ever get removed, because that method does a safe and correct delete of all pins that are
-                     * truly no longer in use by anyone
-                     */
-                    // ipfs.removePin(ipfsLink);
-                }
-            }
-        });
-    }
-
     public void fixAllAttachmentMimes(SubNode node) {
         if (node == null || node.getAttachments() == null)
             return;
@@ -302,52 +269,13 @@ public class AttachmentService extends ServiceBase {
             if (StringUtils.isEmpty(mimeType)) {
                 String binUrl = att.getUrl();
                 if (!StringUtils.isEmpty(binUrl)) {
-                    mimeType = getMimeTypeFromUrl(binUrl);
+                    mimeType = Util.getMimeTypeFromUrl(binUrl);
                     if (!StringUtils.isEmpty(mimeType)) {
                         att.setMime(mimeType);
                     }
                 }
             }
         });
-    }
-
-    public String getMimeTypeFromUrl(String url) {
-        String mimeType = null;
-        // try to get mime from name first.
-        mimeType = URLConnection.guessContentTypeFromName(url);
-        // if didn't get mime from name, try reading the actual url
-        if (StringUtils.isEmpty(mimeType)) {
-            int timeout = 60; // seconds
-            try {
-                URLConnection conn = new URL(url).openConnection();
-                conn.setConnectTimeout(timeout * 1000);
-                conn.setReadTimeout(timeout * 1000);
-                mimeType = conn.getContentType();
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-        return mimeType;
-    }
-
-    // Another way is this (according to baeldung site)
-    // Path path = new File("product.png").toPath();
-    // String mimeType = Files.probeContentType(path);
-    public String getMimeFromFileType(String fileName) {
-        String mimeType = null;
-        /* mimeType can be passed as null if it's not yet determined */
-        if (mimeType == null) {
-            mimeType = URLConnection.guessContentTypeFromName(fileName);
-        }
-        if (mimeType == null) {
-            String ext = FilenameUtils.getExtension(fileName);
-            mimeType = MimeTypeUtils.getMimeType(ext);
-        }
-        /* fallback to at lest some acceptable mime type */
-        if (mimeType == null) {
-            mimeType = "application/octet-stream";
-        }
-        return mimeType;
     }
 
     public void saveBinaryStreamToNode(MongoSession ms, boolean importMode, String attName,
@@ -806,7 +734,7 @@ public class AttachmentService extends ServiceBase {
             String mimeType, int maxFileSize, boolean storeLocally) {
 
         if (mimeType == null) {
-            mimeType = getMimeTypeFromUrl(sourceUrl);
+            mimeType = Util.getMimeTypeFromUrl(sourceUrl);
             if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
                 mimeType = URLConnection.guessContentTypeFromName(mimeHint);
             }
