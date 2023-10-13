@@ -49,6 +49,7 @@ import quanta.service.RSSFeedService;
 import quanta.service.RedisService;
 import quanta.service.SchemaOrgService;
 import quanta.service.SystemService;
+import quanta.service.TransferService;
 import quanta.service.UserFeedService;
 import quanta.service.UserManagerService;
 import quanta.service.imports.ImportService;
@@ -180,6 +181,7 @@ public class ServiceBase {
     public static CryptoService crypto;
     public static SchemaOrgService schema;
     public static OpenAiService oai;
+    public static TransferService transfer;
     public static IPFSService ipfs;
     public static IPFSCat ipfsCat;
     public static IPFSFiles ipfsFiles;
@@ -280,6 +282,7 @@ public class ServiceBase {
             crypto = getBean(ctx, CryptoService.class);
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);
+            transfer = getBean(ctx, TransferService.class);
             ipfs = getBean(ctx, IPFSService.class);
             ipfsCat = getBean(ctx, IPFSCat.class);
             ipfsFiles = getBean(ctx, IPFSFiles.class);

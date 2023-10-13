@@ -27,12 +27,15 @@ import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.client.openai.Usage;
+import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.Transaction;
 import quanta.postgres.UserAccount;
 import quanta.request.AskSubGraphRequest;
+import quanta.request.CreateSubNodeRequest;
 import quanta.response.AskSubGraphResponse;
+import quanta.response.CreateSubNodeResponse;
 import quanta.service.UserManagerService;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
@@ -359,5 +362,23 @@ public class OpenAiService extends ServiceBase {
         res.setGptCredit(answer.userCredit);
         res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
         return res;
+    }
+
+    // Assumes node is a question, and inserts the answer to is under it as a subnode
+    public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
+            CreateSubNodeResponse res) {
+        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
+        res.setGptCredit(aiAnswer.userCredit);
+
+        SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
+                null, null, true, true);
+
+        newNode.setContent(oai.formatAnswer(aiAnswer, true));
+        newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+
+        newNode.touch();
+        newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+        acl.inheritSharingFromParent(ms, req, res, node, newNode);
+        update.save(ms, newNode);
     }
 }

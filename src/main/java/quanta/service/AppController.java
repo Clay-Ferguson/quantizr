@@ -401,7 +401,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object subGraphHash(@RequestBody SubGraphHashRequest req, HttpSession session) {
         return callProc.run("subGraphHash", true, true, req, session, ms -> {
-            return edit.subGraphHash(ms, req);
+            return crypto.subGraphHash(ms, req);
         });
     }
 
@@ -409,7 +409,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
         return callProc.run("export", true, true, req, session, ms -> {
-            return edit.transferNode(ms, req);
+            return transfer.transferNode(ms, req);
         });
     }
 
@@ -458,7 +458,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
         return callProc.run("createSubNode", true, true, req, session, ms -> {
-            return edit.createSubNode(ms, req);
+            return create.createSubNode(ms, req);
         });
     }
 
@@ -466,7 +466,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
         return callProc.run("insertNode", true, true, req, session, ms -> {
-            return edit.insertNode(ms, req);
+            return create.insertNode(ms, req);
         });
     }
 
@@ -522,7 +522,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
         return callProc.run("deleteProperties", true, true, req, session, ms -> {
-            return edit.deleteProperties(ms, req);
+            return delete.deleteProperties(ms, req);
         });
     }
 

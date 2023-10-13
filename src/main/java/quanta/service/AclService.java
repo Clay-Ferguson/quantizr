@@ -1,5 +1,6 @@
 package quanta.service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -16,24 +16,28 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import jakarta.servlet.http.HttpServletResponse;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
+import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.MongoPrincipal;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddPrivilegeRequest;
 import quanta.request.CopySharingRequest;
+import quanta.request.CreateSubNodeRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.RemovePrivilegeRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.request.SetUnpublishedRequest;
 import quanta.response.AddPrivilegeResponse;
 import quanta.response.CopySharingResponse;
+import quanta.response.CreateSubNodeResponse;
 import quanta.response.GetNodePrivilegesResponse;
 import quanta.response.RemovePrivilegeResponse;
 import quanta.response.SetCipherKeyResponse;
@@ -435,5 +439,29 @@ public class AclService extends ServiceBase {
         if (node == null)
             return false;
         return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
+    }
+
+    public void inheritSharingFromParent(MongoSession ms, CreateSubNodeRequest req, CreateSubNodeResponse res,
+            SubNode nodeBeingRepliedTo, SubNode newNode) {
+        // we always determine the access controls from the parent for any new nodes
+        auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
+
+        if (AclService.isPublic(nodeBeingRepliedTo)) {
+            acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+        }
+
+        if (req.getBoosterUserId() != null) {
+            newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
+        }
+        // inherit UNPUBLISHED prop from parent, if we own the parent
+        if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
+                && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
+            newNode.set(NodeProp.UNPUBLISHED, true);
+        }
+        String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
+        if (cipherKey != null) {
+            res.setEncrypt(true);
+        }
     }
 }

@@ -1,49 +1,31 @@
 package quanta.service.node;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import quanta.actpub.APConst;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
-import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
-import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.PrivilegeType;
-import quanta.model.client.openai.ChatCompletionResponse;
-import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
-import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.request.CreateSubNodeRequest;
-import quanta.request.DeletePropertyRequest;
 import quanta.request.GetNodeJsonRequest;
-import quanta.request.InsertNodeRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
 import quanta.request.SaveNodeJsonRequest;
@@ -51,13 +33,8 @@ import quanta.request.SaveNodeRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
-import quanta.request.SubGraphHashRequest;
-import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateFriendNodeRequest;
-import quanta.response.CreateSubNodeResponse;
-import quanta.response.DeletePropertyResponse;
 import quanta.response.GetNodeJsonResponse;
-import quanta.response.InsertNodeResponse;
 import quanta.response.LikeNodeResponse;
 import quanta.response.LinkNodesResponse;
 import quanta.response.SaveNodeJsonResponse;
@@ -65,8 +42,6 @@ import quanta.response.SaveNodeResponse;
 import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SetExpandedResponse;
 import quanta.response.SplitNodeResponse;
-import quanta.response.SubGraphHashResponse;
-import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateFriendNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.service.AclService;
@@ -76,7 +51,6 @@ import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import quanta.util.val.IntVal;
 import quanta.util.val.Val;
 
 /**
@@ -87,291 +61,6 @@ import quanta.util.val.Val;
 @Component
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-    /*
-     * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
-     * by the controller that accepts a node being created by the GUI/user
-     */
-    public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
-        CreateSubNodeResponse res = new CreateSubNodeResponse();
-        boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
-        String nodeId = req.getNodeId();
-        boolean makePublicWritable = false;
-        boolean allowSharing = true;
-        boolean forceInheritSharing = false;
-
-        /*
-         * note: parentNode and nodeBeingReplied to are not necessarily the same. 'parentNode' is the node
-         * that will HOLD the reply, but may not always be WHAT is being replied to.
-         */
-        SubNode parentNode = null;
-        SubNode nodeBeingRepliedTo = null;
-        if (req.isReply()) {
-            nodeBeingRepliedTo = read.getNode(ms, nodeId);
-        }
-        /*
-         * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
-         * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
-         * user's POSTS node.
-         */
-        if (nodeId == null && !linkBookmark) {
-            parentNode = read.getUserNodeByType(ms, null, null,
-                    "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
-                    Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
-
-            if (parentNode != null) {
-                nodeId = parentNode.getIdStr();
-                makePublicWritable = true;
-            }
-        }
-
-        /* Node still null, then try other ways of getting it */
-        if (parentNode == null && !linkBookmark) {
-            if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
-                parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null,
-                        null, false);
-            } else {
-                parentNode = read.getNode(ms, nodeId);
-            }
-        }
-
-        // lets the type override the location where the node is created.
-        TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
-        if (plugin != null) {
-            Val<SubNode> vcNode = new Val<>(parentNode);
-            plugin.preCreateNode(ms, vcNode, req, linkBookmark);
-            parentNode = vcNode.getVal();
-        }
-        if (parentNode == null) {
-            throw new RuntimeException("unable to locate parent for insert");
-        }
-
-        // if user is adding a node under one of their parent nodes then we inherit the sharing
-        if (parentNode.getOwner().equals(ms.getUserNodeId())) {
-            forceInheritSharing = true;
-        }
-
-        ChatCompletionResponse aiAnswer = null;
-        String typeToCreate = req.getTypeName();
-        if (req.isOpenAiQuestion()) {
-            // if this is a regular node and not an openai reply node, then we are asking the text on this
-            // existing node as a new question.
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                aiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
-                res.setGptCredit(aiAnswer.userCredit);
-                typeToCreate = NodeType.OPENAI_ANSWER.s();
-            }
-        }
-
-        auth.writeAuth(ms, parentNode);
-        parentNode.adminUpdate = true;
-        // note: redundant security
-        if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
-            throw new ForbiddenException();
-        }
-        CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-        SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
-                null, true, true);
-        if (req.isPendingEdit()) {
-            mongoUtil.setPendingPath(newNode, true);
-        }
-
-        if (aiAnswer != null) {
-            newNode.setContent(oai.formatAnswer(aiAnswer, true));
-            newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
-        } else {
-            newNode.setContent(req.getContent() != null ? req.getContent() : "");
-        }
-        newNode.touch();
-
-        // NOTE: Be sure to get nodeId off 'req' here, instead of the var
-        if (req.isReply() && req.getNodeId() != null) {
-            newNode.set(NodeProp.INREPLYTO, req.getNodeId());
-        }
-
-        if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
-            newNode.set(NodeProp.TARGET_ID, req.getNodeId());
-            // adding bookmark should disallow sharing.
-            allowSharing = false;
-        }
-
-        if (req.isTypeLock()) {
-            newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-        }
-
-        // if we never set 'nodeBeingRepliedTo' by now that means it's the parent that we're replying to.
-        if (nodeBeingRepliedTo == null) {
-            nodeBeingRepliedTo = parentNode;
-        }
-
-        if (allowSharing && aiAnswer == null) {
-            // if a user to share to (a Direct Message) is provided, add it.
-            if (req.getShareToUserId() != null) {
-                HashMap<String, AccessControl> ac = new HashMap<>();
-                ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
-                newNode.setAc(ac);
-            } else if (req.isReply() || forceInheritSharing) {
-                inheritSharingFromParent(ms, req, res, nodeBeingRepliedTo, newNode);
-            }
-
-            /* Always make public if we're replying to public node or posting under our POSTs node */
-            if (!req.isDirectMessage()
-                    && (makePublicWritable || (req.isReply() && AclService.isPublic(nodeBeingRepliedTo))
-                            || parentNode.isType(NodeType.POSTS))) {
-                acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-            }
-        }
-
-        if (!StringUtils.isEmpty(req.getBoostTarget())) {
-            /* If the node being boosted is itself a boost then boost the original boost instead */
-            SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
-            if (nodeToBoost != null) {
-                String innerBoost = nodeToBoost.getStr(NodeProp.BOOST);
-                newNode.set(NodeProp.BOOST, innerBoost != null ? innerBoost : req.getBoostTarget());
-            }
-        }
-        openGraph.parseNode(newNode, true);
-
-        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
-            // if parent is a calendar node, then we need to set the date on this new node
-            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
-            newNode.set(NodeProp.DURATION, "01:00");
-        }
-
-        update.save(ms, newNode);
-
-        if (req.isOpenAiQuestion() && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
-            insertAnswerToQuestion(ms, newNode, req, res);
-        }
-
-        /*
-         * if this is a boost node being saved, then immediately run processAfterSave, because we won't be
-         * expecting any final 'saveNode' to ever get called (like when user clicks "Save" in node editor),
-         * because this node will already be final and the user won't be editing it. It's done and ready to
-         * publish out to foreign servers
-         */
-        if (!req.isPendingEdit() && req.getBoostTarget() != null) {
-            processAfterSave(ms, newNode, parentNode);
-        }
-        res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null,
-                false));
-        return res;
-    }
-
-    private void inheritSharingFromParent(MongoSession ms, CreateSubNodeRequest req, CreateSubNodeResponse res,
-            SubNode nodeBeingRepliedTo, SubNode newNode) {
-        // we always determine the access controls from the parent for any new nodes
-        auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
-
-        if (AclService.isPublic(nodeBeingRepliedTo)) {
-            acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-        }
-
-        if (req.getBoosterUserId() != null) {
-            newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
-        }
-        // inherit UNPUBLISHED prop from parent, if we own the parent
-        if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
-                && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
-            newNode.set(NodeProp.UNPUBLISHED, true);
-        }
-        String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
-        if (cipherKey != null) {
-            res.setEncrypt(true);
-        }
-    }
-
-    // Assumes node is a question, and inserts the answer to is under it as a subnode
-    public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
-            CreateSubNodeResponse res) {
-        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
-        res.setGptCredit(aiAnswer.userCredit);
-
-        SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
-                null, null, true, true);
-
-        newNode.setContent(oai.formatAnswer(aiAnswer, true));
-        newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
-
-        newNode.touch();
-        newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-        inheritSharingFromParent(ms, req, res, node, newNode);
-        update.save(ms, newNode);
-    }
-
-    /*
-     * Creates a new node that is a sibling (same parent) of and at the same ordinal position as the
-     * node specified in the request. Should ONLY be called by the controller that accepts a node being
-     * created by the GUI/user
-     */
-    public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
-        InsertNodeResponse res = new InsertNodeResponse();
-        String parentNodeId = req.getParentId();
-        log.debug("Inserting under parent: " + parentNodeId);
-        SubNode parentNode = read.getNode(ms, parentNodeId);
-        if (parentNode == null) {
-            throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
-        }
-        auth.writeAuth(ms, parentNode);
-        parentNode.adminUpdate = true;
-        // note: redundant security
-        if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
-            throw new ForbiddenException();
-        }
-        SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-                CreateNodeLocation.ORDINAL, null, null, true, true);
-        if (req.getInitialValue() != null) {
-            newNode.setContent(req.getInitialValue());
-        } else {
-            newNode.setContent("");
-        }
-        newNode.touch();
-        // '/r/p/' = pending (nodes not yet published, being edited created by users)
-        if (req.isPendingEdit()) {
-            mongoUtil.setPendingPath(newNode, true);
-        }
-        boolean allowSharing = true;
-        if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
-            // adding bookmark should disallow sharing.
-            allowSharing = false;
-        }
-        if (allowSharing) {
-            // If we're inserting a node under the POSTS it should be public, rather than inherit.
-            // Note: some logic may be common between this insertNode() and the createSubNode()
-            if (parentNode.isType(NodeType.POSTS)) {
-                acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-            } else {
-                // we always copy the access controls from the parent for any new nodes
-                auth.setDefaultReplyAcl(parentNode, newNode);
-                // inherit UNPUBLISHED prop from parent, if we own the parent
-                if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
-                    newNode.set(NodeProp.UNPUBLISHED, true);
-                }
-            }
-        }
-
-        // createNode might have altered 'hasChildren', so we save if dirty
-        update.saveIfDirty(ms, parentNode);
-        // We save this right away, before calling convertToNodeInfo in case that method does any Db related
-        // stuff where it's expecting the node to exist.
-        openGraph.parseNode(newNode, true);
-
-        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
-            // if parent is a calendar node, then we need to set the date on this new node
-            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
-            newNode.set(NodeProp.DURATION, "01:00");
-        }
-
-        update.save(ms, newNode);
-        res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null, false));
-
-        return res;
-    }
 
     public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
@@ -464,7 +153,7 @@ public class NodeEditService extends ServiceBase {
         auth.ownerAuth(ms, node);
         read.forceCheckHasChildren(ms, node);
         // remove orphaned attachments
-        removeDeletedAttachments(ms, node, req.getNode().getAttachments());
+        attach.removeDeletedAttachments(ms, node, req.getNode().getAttachments());
         // set new attachments
         node.setAttachments(req.getNode().getAttachments());
         attach.fixAllAttachmentMimes(node);
@@ -618,32 +307,6 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-
-    // Removes all attachments from 'node' that are not on 'newAttrs'
-    /**
-     * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make sure this block
-     * cannot ever be entered)
-     */
-    public void removeDeletedAttachments(MongoSession ms, SubNode node, HashMap<String, Attachment> newAtts) {
-        if (node.getAttachments() == null)
-            return;
-        // we need toDelete as separate list to avoid "concurrent modification exception" by deleting
-        // from the attachments set during iterating it.
-        List<String> toDelete = new LinkedList<>();
-        node.getAttachments().forEach((key, att) -> {
-            if (newAtts == null || !newAtts.containsKey(key)) {
-                toDelete.add(key);
-            }
-        });
-        // run these actual deletes in a separate async thread
-        arun.run(as -> {
-            for (String key : toDelete) {
-                attach.deleteBinary(ms, key, node, null, false);
-            }
-            return null;
-        });
-    }
-
     // 'parent' (of 'node') can be passed in if already known, or else null can be passed for
     // parent and we get the parent automatically in here
     public void processAfterSave(MongoSession ms, SubNode node, SubNode parent) {
@@ -687,79 +350,9 @@ public class NodeEditService extends ServiceBase {
                 }
             }
             if (AclService.isPublic(node) && !StringUtils.isEmpty(node.getName())) {
-                saveNodeToMFS(ms, node);
+                ipfs.saveNodeToMFS(ms, node);
             }
             return null;
-        });
-    }
-
-    /*
-     * Save PUBLIC nodes to IPFS/MFS
-     */
-    public void saveNodeToMFS(MongoSession ms, SubNode node) {
-        if (!ThreadLocals.getSC().allowWeb3()) {
-            return;
-        }
-        // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
-        String userNodeId = ThreadLocals.getSC().getUserNodeId();
-        exec.run(() -> {
-            arun.run(as -> {
-                SubNode ownerNode = read.getNode(as, node.getOwner());
-                // only write out files if user has MFS enabled in their UserProfile
-                if (!ownerNode.getBool(NodeProp.MFS_ENABLE)) {
-                    return null;
-                }
-                if (ownerNode == null) {
-                    throw new RuntimeException("Unable to find owner node.");
-                }
-                String pathBase = "/" + userNodeId;
-                // **** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files,
-                // for a tree on a user's MFS area
-                // but what we do instead is take the NAME of the node, and use that is the filename, and write
-                // directly into '[user]/posts/[name]' loation
-                // // make the path of the node relative to the owner by removing the part of the path that is
-                // // the user's root node path
-                // String path = node.getPath().replace(ownerNode.getPath(), "");
-                // path = folderizePath(path);
-                // If this gets to be too many files for IPFS to handle, we can always include a year and month, and
-                // that would probably
-                // at least create a viable system, proof-of-concept
-                String path = "/" + node.getName() + ".txt";
-                String mfsPath = pathBase + "/posts" + path;
-                // save values for finally block
-                String mcid = node.getMcid();
-                String prevMcid = node.getPrevMcid();
-                try {
-                    // intentionally not using setters here (because of dirty flag)
-                    node.mcid = null;
-                    node.prevMcid = null;
-                    if ("".equals(node.getTags())) {
-                        node.setTags(null);
-                    }
-                    // for now let's just write text
-                    // ipfsFiles.addFile(as, mfsPath, MediaType.APPLICATION_JSON_VALUE, XString.prettyPrint(node));
-                    ipfsFiles.addFile(as, mfsPath, MediaType.TEXT_PLAIN_VALUE, node.getContent());
-                } finally {
-                    // retore values after done with json serializing (do NOT use setter methods here)
-                    node.mcid = mcid;
-                    node.prevMcid = prevMcid;
-                }
-                IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
-                if (pathStat != null) {
-                    log.debug("File PathStat: " + XString.prettyPrint(pathStat));
-                    node.setPrevMcid(mcid);
-                    node.setMcid(pathStat.getHash());
-                }
-                // pathStat = ipfsFiles.pathStat(pathBase);
-                // if (ok(pathStat)) {
-                // log.debug("Parent Folder PathStat " + pathBase + ": " + XString.prettyPrint(pathStat));
-                // }
-                // IPFSDir dir = ipfsFiles.getDir(pathBase);
-                // if (ok(dir)) {
-                // log.debug("Parent Folder Listing " + pathBase + ": " + XString.prettyPrint(dir));
-                // }
-                return null;
-            });
         });
     }
 
@@ -809,22 +402,6 @@ public class NodeEditService extends ServiceBase {
                 }
             }
         }
-    }
-
-    /*
-     * Removes the property specified in the request from the node specified in the request
-     */
-    public DeletePropertyResponse deleteProperties(MongoSession ms, DeletePropertyRequest req) {
-        DeletePropertyResponse res = new DeletePropertyResponse();
-        String nodeId = req.getNodeId();
-        SubNode node = read.getNode(ms, nodeId);
-        auth.ownerAuth(node);
-
-        for (String propName : req.getPropNames()) {
-            node.delete(propName);
-        }
-        update.save(ms, node);
-        return res;
     }
 
     /*
@@ -899,224 +476,6 @@ public class NodeEditService extends ServiceBase {
         }
         crypto.signNodesById(ms, sigDirtyNodes);
         return res;
-    }
-
-    /*
-     * This method will eventually use push+recieve to send node data down to the browser, but I'm
-     * putting here for now the ability to use it (temporarily) as a SHA-256 hash generator that
-     * generates the hash of all subnodes, and will just stick thas hash into a property on the top
-     * parent node (req.nodeId)
-     */
-    public SubGraphHashResponse subGraphHash(MongoSession ms, SubGraphHashRequest req) {
-        SubGraphHashResponse res = new SubGraphHashResponse();
-        String nodeId = req.getNodeId();
-        SubNode node = read.getNode(ms, nodeId);
-        auth.ownerAuth(ms, node);
-        String prevHash = null;
-        String newHash = null;
-        try {
-            long totalBytes = 0;
-            long nodeCount = 0;
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            if (req.isRecursive()) {
-                StringBuilder sb = new StringBuilder();
-
-                for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false, false,
-                        null)) {
-                    nodeCount++;
-                    sb.append(n.getPath());
-                    sb.append("-");
-                    sb.append(n.getOwner().toHexString());
-                    sb.append(StringUtils.isNotEmpty(n.getContent()) + "-" + n.getContent());
-                    List<Attachment> atts = n.getOrderedAttachments();
-                    if (atts != null && atts.size() > 0) {
-                        for (Attachment att : atts) {
-                            if (att.getBin() != null) {
-                                sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bin" + att.getBin());
-                            }
-                            if (att.getBinData() != null) {
-                                sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + att.getBinData());
-                            }
-                        }
-                    }
-                    if (sb.length() > 4096) {
-                        byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
-                        totalBytes += b.length;
-                        digest.update(b);
-                        sb.setLength(0);
-                    }
-                }
-                if (sb.length() > 0) {
-                    byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
-                    totalBytes += b.length;
-                    digest.update(b);
-                }
-            }
-            byte[] encodedHash = digest.digest();
-            newHash = String.valueOf(nodeCount) + " nodes, " + String.valueOf(totalBytes) + " bytes: "
-                    + bytesToHex(encodedHash);
-            prevHash = node.getStr(NodeProp.SUBGRAPH_HASH);
-            node.set(NodeProp.SUBGRAPH_HASH, newHash);
-        } catch (Exception e) {
-            res.error("Failed generating hash");
-            return res;
-        }
-        boolean hashChanged = prevHash != null && !prevHash.equals(newHash);
-        res.setMessage(
-                (hashChanged ? "Hash CHANGED: " : (prevHash == null ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
-        return res;
-    }
-
-    // todo-2: Move to utils class.
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(255 & hash[i]);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-
-    // todo-2: need to be doing a bulk update in here.
-    public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {
-        TransferNodeResponse res = new TransferNodeResponse();
-        // make sure only admin will be allowed to specify some arbitrary "fromUser"
-        if (!ms.isAdmin()) {
-            req.setFromUser(null);
-        }
-        IntVal ops = new IntVal(0);
-        String nodeId = req.getNodeId();
-        // get and auth node being transfered
-        log.debug("Transfer node: " + nodeId + " operation=" + req.getOperation());
-        // we do allowAuth below, not here
-        SubNode node = read.getNode(ms, nodeId, false, null);
-        if (node == null) {
-            throw new RuntimeEx("Node not found: " + nodeId);
-        }
-        // get user node of person being transfered to
-        SubNode toUserNode = null;
-        if (req.getOperation().equals("transfer")) {
-            toUserNode = read.getAccountByUserName(null, req.getToUser(), false);
-            if (toUserNode == null) {
-                throw new RuntimeEx("User not found: " + req.getToUser());
-            }
-        }
-        // get account node of person doing the transfer
-        SubNode fromUserNode = null;
-        if (!StringUtils.isEmpty(req.getFromUser())) {
-            fromUserNode = read.getAccountByUserName(null, req.getFromUser(), false);
-            if (fromUserNode == null) {
-                throw new RuntimeEx("User not found: " + req.getFromUser());
-            }
-        }
-        transferNode(ms, req.getOperation(), node, fromUserNode, toUserNode, ops);
-        if (req.isRecursive()) {
-            // todo-2: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
-            // but leave as ALL node for the admin who might specify the 'from'?
-            for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
-                transferNode(ms, req.getOperation(), n, fromUserNode, toUserNode, ops);
-            }
-        }
-        if (ops.getVal() > 0) {
-            arun.run(as -> {
-                update.saveSession(as);
-                return null;
-            });
-        }
-        res.setMessage(String.valueOf(ops.getVal()) + " nodes were affected.");
-        return res;
-    }
-
-    public void transferNode(MongoSession ms, String op, SubNode node, SubNode fromUserNode, SubNode toUserNode,
-            IntVal ops) {
-        if (node.getContent() != null && node.getContent().startsWith(Constant.ENC_TAG.s())) {
-            // for now we silently ignore encrypted nodes during transfers. This needs some more thought
-            // (todo-2)
-            return;
-        }
-        /*
-         * if we're transferring only from a specific user (will only be admin able to do this) then we
-         * simply return without doing anything if this node in't owned by the person we're transferring
-         * from
-         */
-        if (fromUserNode != null && !fromUserNode.getOwner().equals(node.getOwner())) {
-            return;
-        }
-        if (op.equals("transfer")) {
-            // if we don't happen do own this node, do nothing.
-            if (!ms.getUserNodeId().equals(node.getOwner())) {
-                return;
-            }
-            SubNode ownerAccnt = (SubNode) arun.run(as -> read.getNode(as, node.getOwner()));
-            ObjectId fromOwnerId = node.getOwner();
-            node.setOwner(toUserNode.getOwner());
-            node.setTransferFrom(fromOwnerId);
-            // now we ensure that the original owner (before the transfer request) is shared to so they can
-            // still see the node
-            if (ownerAccnt != null) {
-                acl.addPrivilege(ms, null, node, null, ownerAccnt,
-                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-            }
-            node.adminUpdate = true;
-            ops.inc();
-        } //
-        else if (op.equals("accept")) { //
-            // if we don't happen do own this node, do nothing.
-            if (!ms.getUserNodeId().equals(node.getOwner())) {
-                return;
-            }
-            if (node.getTransferFrom() != null) {
-                // get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
-                SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getTransferFrom()));
-                if (frmUsrNode != null) {
-                    acl.addPrivilege(ms, null, node, null, frmUsrNode,
-                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-                }
-                node.setTransferFrom(null);
-                node.adminUpdate = true;
-                ops.inc();
-            }
-        } //
-        else if (op.equals("reject")) { //
-            // if we don't happen do own this node, do nothing.
-            if (!ms.getUserNodeId().equals(node.getOwner())) {
-                return;
-            }
-            if (node.getTransferFrom() != null) {
-                // get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
-                SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getOwner()));
-                node.setOwner(node.getTransferFrom());
-                node.setTransferFrom(null);
-                if (frmUsrNode != null) {
-                    acl.addPrivilege(ms, null, node, null, frmUsrNode,
-                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-                }
-                node.adminUpdate = true;
-                ops.inc();
-            }
-        } //
-        else if (op.equals("reclaim")) { //
-            if (node.getTransferFrom() != null) {
-                // if we're reclaiming just make sure the transferFrom was us
-                if (!ms.getUserNodeId().equals(node.getTransferFrom())) {
-                    // skip nodes that don't apply
-                    return;
-                }
-                SubNode frmUsrNode = (SubNode) arun.run(as -> read.getNode(as, node.getOwner()));
-                node.setOwner(node.getTransferFrom());
-                node.setTransferFrom(null);
-                if (frmUsrNode != null) {
-                    acl.addPrivilege(ms, null, node, null, frmUsrNode,
-                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-                }
-                node.adminUpdate = true;
-                ops.inc();
-            }
-        }
     }
 
     public LinkNodesResponse linkNodes(MongoSession ms, LinkNodesRequest req) {

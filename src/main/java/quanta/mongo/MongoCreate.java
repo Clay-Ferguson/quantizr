@@ -1,6 +1,10 @@
 package quanta.mongo;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,12 +15,28 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import quanta.actpub.APConst;
+import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.exception.ForbiddenException;
 import quanta.model.PropertyInfo;
+import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.openai.ChatCompletionResponse;
+import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
+import quanta.request.CreateSubNodeRequest;
+import quanta.request.InsertNodeRequest;
+import quanta.response.CreateSubNodeResponse;
+import quanta.response.InsertNodeResponse;
+import quanta.service.AclService;
+import quanta.types.TypeBase;
 import quanta.util.Const;
+import quanta.util.Convert;
+import quanta.util.ThreadLocals;
+import quanta.util.val.Val;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
@@ -192,5 +212,248 @@ public class MongoCreate extends ServiceBase {
             bops.execute();
         }
         return newOrdinal;
+    }
+
+    /*
+     * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
+     * by the controller that accepts a node being created by the GUI/user
+     */
+    public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
+        CreateSubNodeResponse res = new CreateSubNodeResponse();
+        boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
+        String nodeId = req.getNodeId();
+        boolean makePublicWritable = false;
+        boolean allowSharing = true;
+        boolean forceInheritSharing = false;
+
+        /*
+         * note: parentNode and nodeBeingReplied to are not necessarily the same. 'parentNode' is the node
+         * that will HOLD the reply, but may not always be WHAT is being replied to.
+         */
+        SubNode parentNode = null;
+        SubNode nodeBeingRepliedTo = null;
+        if (req.isReply()) {
+            nodeBeingRepliedTo = read.getNode(ms, nodeId);
+        }
+        /*
+         * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
+         * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
+         * user's POSTS node.
+         */
+        if (nodeId == null && !linkBookmark) {
+            parentNode = read.getUserNodeByType(ms, null, null,
+                    "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
+                    Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
+
+            if (parentNode != null) {
+                nodeId = parentNode.getIdStr();
+                makePublicWritable = true;
+            }
+        }
+
+        /* Node still null, then try other ways of getting it */
+        if (parentNode == null && !linkBookmark) {
+            if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
+                parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null,
+                        null, false);
+            } else {
+                parentNode = read.getNode(ms, nodeId);
+            }
+        }
+
+        // lets the type override the location where the node is created.
+        TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
+        if (plugin != null) {
+            Val<SubNode> vcNode = new Val<>(parentNode);
+            plugin.preCreateNode(ms, vcNode, req, linkBookmark);
+            parentNode = vcNode.getVal();
+        }
+        if (parentNode == null) {
+            throw new RuntimeException("unable to locate parent for insert");
+        }
+
+        // if user is adding a node under one of their parent nodes then we inherit the sharing
+        if (parentNode.getOwner().equals(ms.getUserNodeId())) {
+            forceInheritSharing = true;
+        }
+
+        ChatCompletionResponse aiAnswer = null;
+        String typeToCreate = req.getTypeName();
+        if (req.isOpenAiQuestion()) {
+            // if this is a regular node and not an openai reply node, then we are asking the text on this
+            // existing node as a new question.
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                aiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
+                res.setGptCredit(aiAnswer.userCredit);
+                typeToCreate = NodeType.OPENAI_ANSWER.s();
+            }
+        }
+
+        auth.writeAuth(ms, parentNode);
+        parentNode.adminUpdate = true;
+        // note: redundant security
+        if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
+            throw new ForbiddenException();
+        }
+        CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
+        SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
+                null, true, true);
+        if (req.isPendingEdit()) {
+            mongoUtil.setPendingPath(newNode, true);
+        }
+
+        if (aiAnswer != null) {
+            newNode.setContent(oai.formatAnswer(aiAnswer, true));
+            newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+        } else {
+            newNode.setContent(req.getContent() != null ? req.getContent() : "");
+        }
+        newNode.touch();
+
+        // NOTE: Be sure to get nodeId off 'req' here, instead of the var
+        if (req.isReply() && req.getNodeId() != null) {
+            newNode.set(NodeProp.INREPLYTO, req.getNodeId());
+        }
+
+        if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+            newNode.set(NodeProp.TARGET_ID, req.getNodeId());
+            // adding bookmark should disallow sharing.
+            allowSharing = false;
+        }
+
+        if (req.isTypeLock()) {
+            newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+        }
+
+        // if we never set 'nodeBeingRepliedTo' by now that means it's the parent that we're replying to.
+        if (nodeBeingRepliedTo == null) {
+            nodeBeingRepliedTo = parentNode;
+        }
+
+        if (allowSharing && aiAnswer == null) {
+            // if a user to share to (a Direct Message) is provided, add it.
+            if (req.getShareToUserId() != null) {
+                HashMap<String, AccessControl> ac = new HashMap<>();
+                ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
+                newNode.setAc(ac);
+            } else if (req.isReply() || forceInheritSharing) {
+                acl.inheritSharingFromParent(ms, req, res, nodeBeingRepliedTo, newNode);
+            }
+
+            /* Always make public if we're replying to public node or posting under our POSTs node */
+            if (!req.isDirectMessage()
+                    && (makePublicWritable || (req.isReply() && AclService.isPublic(nodeBeingRepliedTo))
+                            || parentNode.isType(NodeType.POSTS))) {
+                acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
+                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+            }
+        }
+
+        if (!StringUtils.isEmpty(req.getBoostTarget())) {
+            /* If the node being boosted is itself a boost then boost the original boost instead */
+            SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
+            if (nodeToBoost != null) {
+                String innerBoost = nodeToBoost.getStr(NodeProp.BOOST);
+                newNode.set(NodeProp.BOOST, innerBoost != null ? innerBoost : req.getBoostTarget());
+            }
+        }
+        openGraph.parseNode(newNode, true);
+
+        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
+            // if parent is a calendar node, then we need to set the date on this new node
+            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
+            newNode.set(NodeProp.DURATION, "01:00");
+        }
+
+        update.save(ms, newNode);
+
+        if (req.isOpenAiQuestion() && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
+            oai.insertAnswerToQuestion(ms, newNode, req, res);
+        }
+
+        /*
+         * if this is a boost node being saved, then immediately run processAfterSave, because we won't be
+         * expecting any final 'saveNode' to ever get called (like when user clicks "Save" in node editor),
+         * because this node will already be final and the user won't be editing it. It's done and ready to
+         * publish out to foreign servers
+         */
+        if (!req.isPendingEdit() && req.getBoostTarget() != null) {
+            edit.processAfterSave(ms, newNode, parentNode);
+        }
+        res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
+                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null,
+                false));
+        return res;
+    }
+
+    /*
+     * Creates a new node that is a sibling (same parent) of and at the same ordinal position as the
+     * node specified in the request. Should ONLY be called by the controller that accepts a node being
+     * created by the GUI/user
+     */
+    public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
+        InsertNodeResponse res = new InsertNodeResponse();
+        String parentNodeId = req.getParentId();
+        log.debug("Inserting under parent: " + parentNodeId);
+        SubNode parentNode = read.getNode(ms, parentNodeId);
+        if (parentNode == null) {
+            throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
+        }
+        auth.writeAuth(ms, parentNode);
+        parentNode.adminUpdate = true;
+        // note: redundant security
+        if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
+            throw new ForbiddenException();
+        }
+        SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
+                CreateNodeLocation.ORDINAL, null, null, true, true);
+        if (req.getInitialValue() != null) {
+            newNode.setContent(req.getInitialValue());
+        } else {
+            newNode.setContent("");
+        }
+        newNode.touch();
+        // '/r/p/' = pending (nodes not yet published, being edited created by users)
+        if (req.isPendingEdit()) {
+            mongoUtil.setPendingPath(newNode, true);
+        }
+        boolean allowSharing = true;
+        if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+            // adding bookmark should disallow sharing.
+            allowSharing = false;
+        }
+        if (allowSharing) {
+            // If we're inserting a node under the POSTS it should be public, rather than inherit.
+            // Note: some logic may be common between this insertNode() and the createSubNode()
+            if (parentNode.isType(NodeType.POSTS)) {
+                acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
+                        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+            } else {
+                // we always copy the access controls from the parent for any new nodes
+                auth.setDefaultReplyAcl(parentNode, newNode);
+                // inherit UNPUBLISHED prop from parent, if we own the parent
+                if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
+                    newNode.set(NodeProp.UNPUBLISHED, true);
+                }
+            }
+        }
+
+        // createNode might have altered 'hasChildren', so we save if dirty
+        update.saveIfDirty(ms, parentNode);
+        // We save this right away, before calling convertToNodeInfo in case that method does any Db related
+        // stuff where it's expecting the node to exist.
+        openGraph.parseNode(newNode, true);
+
+        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
+            // if parent is a calendar node, then we need to set the date on this new node
+            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
+            newNode.set(NodeProp.DURATION, "01:00");
+        }
+
+        update.save(ms, newNode);
+        res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null, false));
+
+        return res;
     }
 }

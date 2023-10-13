@@ -27,8 +27,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
+import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.ipfs.dag.MerkleLink;
+import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
@@ -373,4 +375,75 @@ public class IPFSService extends ServiceBase {
         }
         return ret;
     }
+
+    /*
+     * Save PUBLIC nodes to IPFS/MFS
+     */
+    public void saveNodeToMFS(MongoSession ms, SubNode node) {
+        if (!ThreadLocals.getSC().allowWeb3()) {
+            return;
+        }
+        // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
+        String userNodeId = ThreadLocals.getSC().getUserNodeId();
+        exec.run(() -> {
+            arun.run(as -> {
+                SubNode ownerNode = read.getNode(as, node.getOwner());
+                // only write out files if user has MFS enabled in their UserProfile
+                if (!ownerNode.getBool(NodeProp.MFS_ENABLE)) {
+                    return null;
+                }
+                if (ownerNode == null) {
+                    throw new RuntimeException("Unable to find owner node.");
+                }
+                String pathBase = "/" + userNodeId;
+                // **** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files,
+                // for a tree on a user's MFS area
+                // but what we do instead is take the NAME of the node, and use that is the filename, and write
+                // directly into '[user]/posts/[name]' loation
+                // // make the path of the node relative to the owner by removing the part of the path that is
+                // // the user's root node path
+                // String path = node.getPath().replace(ownerNode.getPath(), "");
+                // path = folderizePath(path);
+                // If this gets to be too many files for IPFS to handle, we can always include a year and month, and
+                // that would probably
+                // at least create a viable system, proof-of-concept
+                String path = "/" + node.getName() + ".txt";
+                String mfsPath = pathBase + "/posts" + path;
+                // save values for finally block
+                String mcid = node.getMcid();
+                String prevMcid = node.getPrevMcid();
+                try {
+                    // intentionally not using setters here (because of dirty flag)
+                    node.mcid = null;
+                    node.prevMcid = null;
+                    if ("".equals(node.getTags())) {
+                        node.setTags(null);
+                    }
+                    // for now let's just write text
+                    // ipfsFiles.addFile(as, mfsPath, MediaType.APPLICATION_JSON_VALUE, XString.prettyPrint(node));
+                    ipfsFiles.addFile(as, mfsPath, MediaType.TEXT_PLAIN_VALUE, node.getContent());
+                } finally {
+                    // retore values after done with json serializing (do NOT use setter methods here)
+                    node.mcid = mcid;
+                    node.prevMcid = prevMcid;
+                }
+                IPFSDirStat pathStat = ipfsFiles.pathStat(mfsPath);
+                if (pathStat != null) {
+                    log.debug("File PathStat: " + XString.prettyPrint(pathStat));
+                    node.setPrevMcid(mcid);
+                    node.setMcid(pathStat.getHash());
+                }
+                // pathStat = ipfsFiles.pathStat(pathBase);
+                // if (ok(pathStat)) {
+                // log.debug("Parent Folder PathStat " + pathBase + ": " + XString.prettyPrint(pathStat));
+                // }
+                // IPFSDir dir = ipfsFiles.getDir(pathBase);
+                // if (ok(dir)) {
+                // log.debug("Parent Folder Listing " + pathBase + ": " + XString.prettyPrint(dir));
+                // }
+                return null;
+            });
+        });
+    }
+
 }

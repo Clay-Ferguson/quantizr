@@ -30,7 +30,9 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
+import quanta.request.DeletePropertyRequest;
 import quanta.response.DeleteNodesResponse;
+import quanta.response.DeletePropertyResponse;
 import quanta.util.Const;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -724,5 +726,21 @@ public class MongoDelete extends ServiceBase {
         } else {
             return delete.deleteNodes(ms, req.getNodeIds());
         }
+    }
+
+    /*
+     * Removes the property specified in the request from the node specified in the request
+     */
+    public DeletePropertyResponse deleteProperties(MongoSession ms, DeletePropertyRequest req) {
+        DeletePropertyResponse res = new DeletePropertyResponse();
+        String nodeId = req.getNodeId();
+        SubNode node = read.getNode(ms, nodeId);
+        auth.ownerAuth(node);
+
+        for (String propName : req.getPropNames()) {
+            node.delete(propName);
+        }
+        update.save(ms, node);
+        return res;
     }
 }

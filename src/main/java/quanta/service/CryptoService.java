@@ -3,6 +3,7 @@ package quanta.service;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.RSAPublicKeySpec;
@@ -15,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -29,11 +31,13 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignNodesRequest;
 import quanta.request.SignSubGraphRequest;
+import quanta.request.SubGraphHashRequest;
 import quanta.response.NodeSigData;
 import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
 import quanta.response.SignNodesResponse;
 import quanta.response.SignSubGraphResponse;
+import quanta.response.SubGraphHashResponse;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
@@ -361,5 +365,71 @@ public class CryptoService extends ServiceBase {
             sc.setPubSigKeyJson(json);
         }
         return json;
+    }
+
+    /*
+     * This method will eventually use push+recieve to send node data down to the browser, but I'm
+     * putting here for now the ability to use it (temporarily) as a SHA-256 hash generator that
+     * generates the hash of all subnodes, and will just stick thas hash into a property on the top
+     * parent node (req.nodeId)
+     */
+    public SubGraphHashResponse subGraphHash(MongoSession ms, SubGraphHashRequest req) {
+        SubGraphHashResponse res = new SubGraphHashResponse();
+        String nodeId = req.getNodeId();
+        SubNode node = read.getNode(ms, nodeId);
+        auth.ownerAuth(ms, node);
+        String prevHash = null;
+        String newHash = null;
+        try {
+            long totalBytes = 0;
+            long nodeCount = 0;
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            if (req.isRecursive()) {
+                StringBuilder sb = new StringBuilder();
+
+                for (SubNode n : read.getSubGraph(ms, node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false, false,
+                        null)) {
+                    nodeCount++;
+                    sb.append(n.getPath());
+                    sb.append("-");
+                    sb.append(n.getOwner().toHexString());
+                    sb.append(StringUtils.isNotEmpty(n.getContent()) + "-" + n.getContent());
+                    List<Attachment> atts = n.getOrderedAttachments();
+                    if (atts != null && atts.size() > 0) {
+                        for (Attachment att : atts) {
+                            if (att.getBin() != null) {
+                                sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bin" + att.getBin());
+                            }
+                            if (att.getBinData() != null) {
+                                sb.append(StringUtils.isNotEmpty(n.getContent()) + "-bindat" + att.getBinData());
+                            }
+                        }
+                    }
+                    if (sb.length() > 4096) {
+                        byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
+                        totalBytes += b.length;
+                        digest.update(b);
+                        sb.setLength(0);
+                    }
+                }
+                if (sb.length() > 0) {
+                    byte[] b = sb.toString().getBytes(StandardCharsets.UTF_8);
+                    totalBytes += b.length;
+                    digest.update(b);
+                }
+            }
+            byte[] encodedHash = digest.digest();
+            newHash = String.valueOf(nodeCount) + " nodes, " + String.valueOf(totalBytes) + " bytes: "
+                    + Util.bytesToHex(encodedHash);
+            prevHash = node.getStr(NodeProp.SUBGRAPH_HASH);
+            node.set(NodeProp.SUBGRAPH_HASH, newHash);
+        } catch (Exception e) {
+            res.error("Failed generating hash");
+            return res;
+        }
+        boolean hashChanged = prevHash != null && !prevHash.equals(newHash);
+        res.setMessage(
+                (hashChanged ? "Hash CHANGED: " : (prevHash == null ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
+        return res;
     }
 }

@@ -1261,4 +1261,29 @@ public class AttachmentService extends ServiceBase {
             }
         }
     }
+
+    // Removes all attachments from 'node' that are not on 'newAttrs'
+    /**
+     * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make sure this block
+     * cannot ever be entered)
+     */
+    public void removeDeletedAttachments(MongoSession ms, SubNode node, HashMap<String, Attachment> newAtts) {
+        if (node.getAttachments() == null)
+            return;
+        // we need toDelete as separate list to avoid "concurrent modification exception" by deleting
+        // from the attachments set during iterating it.
+        List<String> toDelete = new LinkedList<>();
+        node.getAttachments().forEach((key, att) -> {
+            if (newAtts == null || !newAtts.containsKey(key)) {
+                toDelete.add(key);
+            }
+        });
+        // run these actual deletes in a separate async thread
+        arun.run(as -> {
+            for (String key : toDelete) {
+                attach.deleteBinary(ms, key, node, null, false);
+            }
+            return null;
+        });
+    }
 }
