@@ -1,20 +1,15 @@
 package quanta.service;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,13 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import quanta.actpub.model.APODID;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APObj;
 import quanta.config.NodeName;
@@ -48,7 +41,6 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
-import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -65,7 +57,6 @@ import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.LoginRequest;
 import quanta.request.ResetPasswordRequest;
-import quanta.request.SavePublicKeyRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
 import quanta.request.SignupRequest;
@@ -82,9 +73,7 @@ import quanta.response.GetUserAccountInfoResponse;
 import quanta.response.GetUserProfileResponse;
 import quanta.response.LoginResponse;
 import quanta.response.LogoutResponse;
-import quanta.response.PushPageMessage;
 import quanta.response.ResetPasswordResponse;
-import quanta.response.SavePublicKeyResponse;
 import quanta.response.SaveUserPreferencesResponse;
 import quanta.response.SaveUserProfileResponse;
 import quanta.response.SignupResponse;
@@ -94,7 +83,6 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import quanta.util.val.LongVal;
 import quanta.util.val.Val;
 
 /**
@@ -265,31 +253,6 @@ public class UserManagerService extends ServiceBase {
         sc.setUserNodeId(userNodeId.toHexString());
     }
 
-    public void authSig() {
-        SessionContext sc = ThreadLocals.getSC();
-        if (sc == null) {
-            throw new RuntimeException("Unable to get SessionContext to check token.");
-        }
-
-        if (!prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
-            return;
-        }
-
-        String sig = ThreadLocals.getReqSig();
-        if (StringUtils.isEmpty(sig)) {
-            throw new RuntimeException("Request failed. No signature.");
-        }
-
-        String pkJson = crypto.getPubSigKeyJson(sc);
-        boolean verified = crypto.sigVerify(crypto.parseJWK(pkJson), Util.hexStringToBytes(sig),
-                sc.getUserName().getBytes(StandardCharsets.UTF_8));
-
-        if (!verified) {
-            throw new RuntimeException(
-                    "Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
-        }
-    }
-
     public void ensureUserHomeNodeExists(MongoSession ms, String userName, String content, String type, String name) {
         SubNode userNode = read.getAccountByUserName(ms, userName, false);
         if (userNode != null) {
@@ -365,32 +328,10 @@ public class UserManagerService extends ServiceBase {
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
         ThreadLocals.getSC().setPubSigKeyJson(null);
         res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
-        ensureValidCryptoKeys(userNode);
+        crypto.ensureValidCryptoKeys(userNode);
 
         SubNode notesNode = user.getNotesNode(ms, userName, userNode);
         update.save(ms, userNode);
-    }
-
-    /*
-     * Creates crypto key properties if not already existing
-     *
-     * no longer used.
-     */
-    public void ensureValidCryptoKeys(SubNode userNode) {
-        try {
-            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
-            if (publicKey == null) {
-                KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-                kpg.initialize(2048);
-                KeyPair pair = kpg.generateKeyPair();
-                publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
-                String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
-                userNode.set(NodeProp.CRYPTO_KEY_PUBLIC, publicKey);
-                userNode.set(NodeProp.CRYPTO_KEY_PRIVATE, privateKey);
-            }
-        } catch (Exception e) {
-            log.error("failed creating crypto keys", e);
-        }
     }
 
     public CloseAccountResponse closeAccount(CloseAccountRequest req, HttpSession session) {
@@ -421,18 +362,6 @@ public class UserManagerService extends ServiceBase {
                 log.debug("Node not found by key: " + key);
             }
         });
-    }
-
-    public long getTotalAttachmentBytes(MongoSession ms, SubNode node) {
-        LongVal totalBytes = new LongVal();
-        if (node != null && node.getAttachments() != null) {
-            node.getAttachments().forEach((String key, Attachment att) -> {
-                if (att.getSize() > 0L) {
-                    totalBytes.add(att.getSize());
-                }
-            });
-        }
-        return totalBytes.getVal();
     }
 
     /*
@@ -593,28 +522,6 @@ public class UserManagerService extends ServiceBase {
         prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
     }
 
-    public SavePublicKeyResponse savePublicKeys(SavePublicKeyRequest req) {
-        SavePublicKeyResponse res = new SavePublicKeyResponse();
-        String userName = ThreadLocals.getSC().getUserName();
-        arun.run(as -> {
-            SubNode userNode = read.getAccountByUserName(as, userName, false);
-            if (userNode != null) {
-                if (!StringUtils.isEmpty(req.getAsymEncKey())) {
-                    userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
-                }
-                if (!StringUtils.isEmpty(req.getSigKey())) {
-                    // force pubSigKey to regenerate as needed by setting to null
-                    ThreadLocals.getSC().setPubSigKeyJson(null);
-                    userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
-                }
-            } else {
-                log.debug("savePublicKey failed to find userName: " + userName);
-            }
-            return null;
-        });
-        return res;
-    }
-
     public GetUserAccountInfoResponse getUserAccountInfo(GetUserAccountInfoRequest req) {
         GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
         String userName = ThreadLocals.getSC().getUserName();
@@ -758,7 +665,7 @@ public class UserManagerService extends ServiceBase {
                 // sessionContext.setUserName(req.getUserName());
                 update.save(as, userNode);
                 if (req.isPublish()) {
-                    writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
+                    ipfs.writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
                 }
                 edit.processAfterSave(as, userNode, null);
             }
@@ -780,60 +687,6 @@ public class UserManagerService extends ServiceBase {
         ArrayList<String> wordsList = new ArrayList<>(wordsSet);
         wordsList.sort((a, b) -> a.compareTo(b));
         return String.join("\n", wordsList);
-    }
-
-    public void writeProfileToIPNS(SessionContext sc, String userName, String bio, String displayName) {
-        if (!ThreadLocals.getSC().allowWeb3()) {
-            return;
-        }
-        // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
-        String userNodeId = ThreadLocals.getSC().getUserNodeId();
-        exec.run(() -> {
-            arun.run(as -> {
-                SubNode userNode = read.getNode(as, userNodeId, false, null);
-                String key = userNode.getStr(NodeProp.USER_IPFS_KEY);
-                // If we didn't already generate the key for this user, then generate one.
-                if (!sc.getRootId().equals(key)) {
-                    // make sure there is an IPFS key with same name as user's root ID.
-                    Map<String, Object> keyGenResult = ipfsKey.gen(as, sc.getRootId());
-                    if (keyGenResult == null) {
-                        log.debug("Unable to generate IPFS Key for Name " + sc.getRootId());
-                    } else {
-                        userNode.set(NodeProp.USER_IPFS_KEY, sc.getRootId());
-                        log.debug("Key Gen Result: " + XString.prettyPrint(keyGenResult));
-                    }
-                }
-                APODID did = new APODID(userName + "@" + prop.getMetaHost());
-                did.put("bio", bio);
-                did.put("displayName", displayName);
-                String didPayload = XString.prettyPrint(did);
-                String cid = null;
-                log.debug("Writing UserProfile of " + userName + " to IPNS: " + didPayload);
-                // make a folder for this user
-                String folderName = "/" + userNodeId;
-                // put identity file in this folder
-                String fileName = folderName + "/identity.json";
-                log.debug("identity file: " + fileName);
-                // Instead let's wrap in a MFS folder type for now. This is all experimental so far.
-                ipfsFiles.addFile(as, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
-                // Now we have to read the file we just wrote to get it's CID so we can publish it.
-                IPFSDirStat pathStat = ipfsFiles.pathStat(folderName);
-                if (pathStat == null) {
-                    push.pushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED", true, "note"));
-                    return null;
-                }
-                log.debug("Parent Folder PathStat " + folderName + ": " + XString.prettyPrint(pathStat));
-                // IPFSDir dir = ipfsFiles.getDir(folderName);
-                cid = pathStat.getHash();
-                log.debug("Publishing CID (root folder): " + cid);
-                Map<String, Object> ret = ipfsName.publish(as, sc.getRootId(), cid);
-                log.debug("Publishing complete!");
-                userNode.set(NodeProp.USER_DID_IPNS, ret.get("Name"));
-                update.save(as, userNode);
-                push.pushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete.", false, "note"));
-                return null;
-            });
-        });
     }
 
     /* The code pattern here is very similar to addFriendInternal */

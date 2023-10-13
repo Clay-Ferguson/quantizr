@@ -48,7 +48,7 @@ public class CallProcessor extends ServiceBase {
          * needs to be tested and more well thought out.
          */
         if (authSig && sc.isAdmin()) {
-            user.authSig();
+            crypto.authSig();
         }
 
         logRequest(command, req, httpSession);

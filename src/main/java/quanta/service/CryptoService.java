@@ -3,6 +3,8 @@ package quanta.service;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -27,14 +29,17 @@ import quanta.config.SessionContext;
 import quanta.model.Jwk;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
+import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.request.SavePublicKeyRequest;
 import quanta.request.SignNodesRequest;
 import quanta.request.SignSubGraphRequest;
 import quanta.request.SubGraphHashRequest;
 import quanta.response.NodeSigData;
 import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
+import quanta.response.SavePublicKeyResponse;
 import quanta.response.SignNodesResponse;
 import quanta.response.SignSubGraphResponse;
 import quanta.response.SubGraphHashResponse;
@@ -431,5 +436,74 @@ public class CryptoService extends ServiceBase {
         res.setMessage(
                 (hashChanged ? "Hash CHANGED: " : (prevHash == null ? "New Hash: " : "Hash MATCHED!: ")) + newHash);
         return res;
+    }
+
+    /*
+     * Creates crypto key properties if not already existing
+     *
+     * no longer used.
+     */
+    public void ensureValidCryptoKeys(SubNode userNode) {
+        try {
+            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
+            if (publicKey == null) {
+                KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+                kpg.initialize(2048);
+                KeyPair pair = kpg.generateKeyPair();
+                publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
+                String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
+                userNode.set(NodeProp.CRYPTO_KEY_PUBLIC, publicKey);
+                userNode.set(NodeProp.CRYPTO_KEY_PRIVATE, privateKey);
+            }
+        } catch (Exception e) {
+            log.error("failed creating crypto keys", e);
+        }
+    }
+
+    public SavePublicKeyResponse savePublicKeys(SavePublicKeyRequest req) {
+        SavePublicKeyResponse res = new SavePublicKeyResponse();
+        String userName = ThreadLocals.getSC().getUserName();
+        arun.run(as -> {
+            SubNode userNode = read.getAccountByUserName(as, userName, false);
+            if (userNode != null) {
+                if (!StringUtils.isEmpty(req.getAsymEncKey())) {
+                    userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());
+                }
+                if (!StringUtils.isEmpty(req.getSigKey())) {
+                    // force pubSigKey to regenerate as needed by setting to null
+                    ThreadLocals.getSC().setPubSigKeyJson(null);
+                    userNode.set(NodeProp.USER_PREF_PUBLIC_SIG_KEY, req.getSigKey());
+                }
+            } else {
+                log.debug("savePublicKey failed to find userName: " + userName);
+            }
+            return null;
+        });
+        return res;
+    }
+
+    public void authSig() {
+        SessionContext sc = ThreadLocals.getSC();
+        if (sc == null) {
+            throw new RuntimeException("Unable to get SessionContext to check token.");
+        }
+
+        if (!prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
+            return;
+        }
+
+        String sig = ThreadLocals.getReqSig();
+        if (StringUtils.isEmpty(sig)) {
+            throw new RuntimeException("Request failed. No signature.");
+        }
+
+        String pkJson = crypto.getPubSigKeyJson(sc);
+        boolean verified = crypto.sigVerify(crypto.parseJWK(pkJson), Util.hexStringToBytes(sig),
+                sc.getUserName().getBytes(StandardCharsets.UTF_8));
+
+        if (!verified) {
+            throw new RuntimeException(
+                    "Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
+        }
     }
 }

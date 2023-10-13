@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import org.slf4j.Logger;
@@ -19,8 +20,11 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletResponse;
 import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.AccessControlInfo;
+import quanta.model.PrivilegeInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
@@ -464,4 +468,51 @@ public class AclService extends ServiceBase {
             res.setEncrypt(true);
         }
     }
+
+    public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
+        List<AccessControlInfo> ret = null;
+        HashMap<String, AccessControl> ac = node.getAc();
+        if (ac == null)
+            return null;
+
+        for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
+            String principalId = entry.getKey();
+            AccessControl acval = entry.getValue();
+            /* lazy create list */
+            if (ret == null) {
+                ret = new LinkedList<>();
+            }
+            AccessControlInfo acInfo = convertToAccessControlInfo(sc, node, principalId, acval);
+            ret.add(acInfo);
+        }
+        return ret;
+    }
+
+    public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId,
+            AccessControl ac) {
+        AccessControlInfo acInfo = new AccessControlInfo();
+        acInfo.setPrincipalNodeId(principalId);
+        if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
+            acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.READ.s()));
+        }
+        if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+            acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.WRITE.s()));
+        }
+        if (principalId != null) {
+            arun.run(s -> {
+                // todo-2: if the actual user account has been delete we can get here and end up with null user name
+                // I think. Look into it.
+                if (PrincipalName.PUBLIC.s().equals(principalId)) {
+                    acInfo.setPrincipalName(PrincipalName.PUBLIC.s());
+                    acInfo.setDisplayName(PrincipalName.PUBLIC.s());
+                } else {
+                    acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
+                    acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
+                }
+                return null;
+            });
+        }
+        return acInfo;
+    }
+
 }

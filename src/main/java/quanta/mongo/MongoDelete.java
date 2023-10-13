@@ -522,7 +522,7 @@ public class MongoDelete extends ServiceBase {
                  * todo-2: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
                  * grant them back the space, so this would rob users of some space. Need to fix that.
                  */
-                long totalBytes = user.getTotalAttachmentBytes(ms, node);
+                long totalBytes = attach.getTotalAttachmentBytes(ms, node);
                 user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
             }
 

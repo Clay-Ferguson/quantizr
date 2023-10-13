@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,14 +23,12 @@ import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
 import quanta.model.AccessControlInfo;
 import quanta.model.NodeInfo;
-import quanta.model.PrivilegeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
@@ -71,11 +68,13 @@ public class Convert extends ServiceBase {
         // this can be enabled/disabled easily by admin
         if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
                 (sig == null || sigFail) && !sc.isAdmin()) {
-            // todo-1: This is designed to silently fail here and not show the nodes where a signature is
-            // failing and a possible database hack, however on a
-            // clean install when an anon user visits the site and the 'home' node is not yet signed
-            // we get this error with no explaination of why. We need to throw an actual error if
-            // this is a 'page root' node that's failing rather than a contained node.
+            /*
+             * todo-1: This is designed to silently fail here and not show the nodes where a signature is
+             * failing and a possible database hack, however on a clean install when an anon user visits the
+             * site and the 'home' node is not yet signed we get this error with no explaination of why. We need
+             * to throw an actual error if this is a 'page root' node that's failing rather than a contained
+             * node.
+             */
 
             log.error("Bad Signature on Admin Node: " + node.getIdStr());
             // todo-2: we need a special global counter for when this happens, so the server info can show it.
@@ -105,7 +104,7 @@ public class Convert extends ServiceBase {
 
         boolean hasChildren = read.hasChildren(ms, node);
         List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
-        List<AccessControlInfo> acList = buildAccessControlList(sc, node);
+        List<AccessControlInfo> acList = acl.buildAccessControlList(sc, node);
         if (node.getOwner() == null) {
             throw new RuntimeException("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
         }
@@ -325,9 +324,7 @@ public class Convert extends ServiceBase {
                     }
                 }
             } //
-            else if ( // Mention // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>#<span>" + shortTok +
-                      // "</span></a>"); // sb.append("<a class='mention hashtag' href='" + href + // //
-            tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2
+            else if (tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2
                     && Character.isLetterOrDigit(tok.charAt(1))) {
                 APObj tag = tags.get(tok);
                 if (tag instanceof APOMention) {
@@ -346,9 +343,6 @@ public class Convert extends ServiceBase {
                     }
                 }
             }
-            // sb.append("<span class='h-card'><a class='u-url mention' href='" + href + //
-            // "' rel='" + Const.REL_FOREIGN_LINK + "' target='_blank'>@<span>" + shortTok
-            // + "</span></a></span>");
             if (!formatted) {
                 sb.append(tok);
             }
@@ -398,52 +392,6 @@ public class Convert extends ServiceBase {
             props.sort((a, b) -> a.getName().compareTo(b.getName()));
         }
         return props;
-    }
-
-    public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
-        List<AccessControlInfo> ret = null;
-        HashMap<String, AccessControl> ac = node.getAc();
-        if (ac == null)
-            return null;
-
-        for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
-            String principalId = entry.getKey();
-            AccessControl acval = entry.getValue();
-            /* lazy create list */
-            if (ret == null) {
-                ret = new LinkedList<>();
-            }
-            AccessControlInfo acInfo = convertToAccessControlInfo(sc, node, principalId, acval);
-            ret.add(acInfo);
-        }
-        return ret;
-    }
-
-    public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId,
-            AccessControl ac) {
-        AccessControlInfo acInfo = new AccessControlInfo();
-        acInfo.setPrincipalNodeId(principalId);
-        if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
-            acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.READ.s()));
-        }
-        if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
-            acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.WRITE.s()));
-        }
-        if (principalId != null) {
-            arun.run(s -> {
-                // todo-2: if the actual user account has been delete we can get here and end up with null user name
-                // I think. Look into it.
-                if (PrincipalName.PUBLIC.s().equals(principalId)) {
-                    acInfo.setPrincipalName(PrincipalName.PUBLIC.s());
-                    acInfo.setDisplayName(PrincipalName.PUBLIC.s());
-                } else {
-                    acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
-                    acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
-                }
-                return null;
-            });
-        }
-        return acInfo;
     }
 
     public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,

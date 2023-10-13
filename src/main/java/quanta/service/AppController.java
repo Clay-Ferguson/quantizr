@@ -377,7 +377,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object savePublicKeys(@RequestBody SavePublicKeyRequest req, HttpSession session) {
         return callProc.run("savePublicKeys", true, false, req, session, ms -> {
-            return user.savePublicKeys(req);
+            return crypto.savePublicKeys(req);
         });
     }
 

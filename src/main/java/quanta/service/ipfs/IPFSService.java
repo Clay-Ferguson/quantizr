@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +25,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import jakarta.servlet.http.HttpServletResponse;
+import quanta.actpub.model.APODID;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
@@ -39,6 +42,7 @@ import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.PublishNodeToIpfsRequest;
 import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.response.PublishNodeToIpfsResponse;
+import quanta.response.PushPageMessage;
 import quanta.service.exports.ExportIpfsFile;
 import quanta.service.mfs.SyncFromMFSService;
 import quanta.service.mfs.SyncToMFSService;
@@ -446,4 +450,57 @@ public class IPFSService extends ServiceBase {
         });
     }
 
+    public void writeProfileToIPNS(SessionContext sc, String userName, String bio, String displayName) {
+        if (!ThreadLocals.getSC().allowWeb3()) {
+            return;
+        }
+        // Note: we need to access the current thread, because the rest of the logic runs in a damon thread.
+        String userNodeId = ThreadLocals.getSC().getUserNodeId();
+        exec.run(() -> {
+            arun.run(as -> {
+                SubNode userNode = read.getNode(as, userNodeId, false, null);
+                String key = userNode.getStr(NodeProp.USER_IPFS_KEY);
+                // If we didn't already generate the key for this user, then generate one.
+                if (!sc.getRootId().equals(key)) {
+                    // make sure there is an IPFS key with same name as user's root ID.
+                    Map<String, Object> keyGenResult = ipfsKey.gen(as, sc.getRootId());
+                    if (keyGenResult == null) {
+                        log.debug("Unable to generate IPFS Key for Name " + sc.getRootId());
+                    } else {
+                        userNode.set(NodeProp.USER_IPFS_KEY, sc.getRootId());
+                        log.debug("Key Gen Result: " + XString.prettyPrint(keyGenResult));
+                    }
+                }
+                APODID did = new APODID(userName + "@" + prop.getMetaHost());
+                did.put("bio", bio);
+                did.put("displayName", displayName);
+                String didPayload = XString.prettyPrint(did);
+                String cid = null;
+                log.debug("Writing UserProfile of " + userName + " to IPNS: " + didPayload);
+                // make a folder for this user
+                String folderName = "/" + userNodeId;
+                // put identity file in this folder
+                String fileName = folderName + "/identity.json";
+                log.debug("identity file: " + fileName);
+                // Instead let's wrap in a MFS folder type for now. This is all experimental so far.
+                ipfsFiles.addFile(as, fileName, MediaType.APPLICATION_JSON_VALUE, didPayload);
+                // Now we have to read the file we just wrote to get it's CID so we can publish it.
+                IPFSDirStat pathStat = ipfsFiles.pathStat(folderName);
+                if (pathStat == null) {
+                    push.pushInfo(sc, new PushPageMessage("Decentralized Identity Publish FAILED", true, "note"));
+                    return null;
+                }
+                log.debug("Parent Folder PathStat " + folderName + ": " + XString.prettyPrint(pathStat));
+                // IPFSDir dir = ipfsFiles.getDir(folderName);
+                cid = pathStat.getHash();
+                log.debug("Publishing CID (root folder): " + cid);
+                Map<String, Object> ret = ipfsName.publish(as, sc.getRootId(), cid);
+                log.debug("Publishing complete!");
+                userNode.set(NodeProp.USER_DID_IPNS, ret.get("Name"));
+                update.save(as, userNode);
+                push.pushInfo(sc, new PushPageMessage("Decentralized Identity Publish Complete.", false, "note"));
+                return null;
+            });
+        });
+    }
 }

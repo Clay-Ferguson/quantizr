@@ -79,6 +79,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.LongVal;
 import quanta.util.val.Val;
 
 /**
@@ -915,7 +916,7 @@ public class AttachmentService extends ServiceBase {
              * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
              * deducted from
              */
-            long totalBytes = user.getTotalAttachmentBytes(ms, node);
+            long totalBytes = attach.getTotalAttachmentBytes(ms, node);
             user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
         }
 
@@ -1112,7 +1113,7 @@ public class AttachmentService extends ServiceBase {
                     // unshared nodes.
                     if (node.getAc() == null || node.getAc().size() == 0) {
                         user.authBearer();
-                        user.authSig();
+                        crypto.authSig();
                     }
                     String _gid = gid;
                     // if no cachebuster gid was on url then redirect to a url that does have the gid
@@ -1214,4 +1215,18 @@ public class AttachmentService extends ServiceBase {
             return null;
         });
     }
+
+    public long getTotalAttachmentBytes(MongoSession ms, SubNode node) {
+        LongVal totalBytes = new LongVal();
+        if (node != null && node.getAttachments() != null) {
+            node.getAttachments().forEach((String key, Attachment att) -> {
+                if (att.getSize() > 0L) {
+                    totalBytes.add(att.getSize());
+                }
+            });
+        }
+        return totalBytes.getVal();
+    }
+
+
 }

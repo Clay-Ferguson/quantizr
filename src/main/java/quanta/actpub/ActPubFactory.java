@@ -295,7 +295,7 @@ public class ActPubFactory extends ServiceBase {
 
         try {
             String userName = userNode.getStr(NodeProp.USER);
-            user.ensureValidCryptoKeys(userNode);
+            crypto.ensureValidCryptoKeys(userNode);
             String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
             String displayName = userNode.getStr(NodeProp.DISPLAY_NAME);
             String avatarMime = null;
