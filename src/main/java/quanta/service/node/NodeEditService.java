@@ -273,7 +273,7 @@ public class NodeEditService extends ServiceBase {
             processAfterSave(ms, node, parent);
         }
 
-        NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
+        NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
                 Convert.LOGICAL_ORDINAL_GENERATE, req.isReturnInlineChildren(), false, false, true, true, null, false);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
@@ -301,7 +301,7 @@ public class NodeEditService extends ServiceBase {
         sc.getNodeExpandStates().put(req.getNodeId(), expanded);
         read.forceCheckHasChildren(ms, node);
 
-        NodeInfo newNodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
+        NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
                 Convert.LOGICAL_ORDINAL_GENERATE, expanded, false, false, true, true, null, false);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
@@ -696,7 +696,7 @@ public class NodeEditService extends ServiceBase {
             res.error("Node not found.");
             return res;
         }
-        NodeInfo nodeInfo = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
+        NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
                 Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, null, false);
         res.setNodeInfo(nodeInfo);
         return res;

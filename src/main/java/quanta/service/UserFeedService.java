@@ -465,8 +465,8 @@ public class UserFeedService extends ServiceBase {
             }
 
             try {
-                NodeInfo info = convert.convertToNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false,
-                        true, true, boostedNodeVal, false);
+                NodeInfo info = convert.toNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, true,
+                        true, boostedNodeVal, false);
                 if (info != null) {
                     searchResults.add(info);
                     if (searchResults.size() >= MAX_FEED_ITEMS) {

@@ -774,8 +774,8 @@ public class ActPubUtil extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         if (node == null)
             return res;
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false);
+        NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE,
+                false, false, false, true, true, null, false);
         nodes.add(info);
         String apReplies = node.getStr(NodeProp.ACT_PUB_REPLIES);
         if (apReplies != null) {
@@ -818,7 +818,7 @@ public class ActPubUtil extends ServiceBase {
                  */
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
                 if (!topNode) {
-                    info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
+                    info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
                             Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, true);
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
@@ -829,7 +829,7 @@ public class ActPubUtil extends ServiceBase {
                         for (SubNode child : iter) {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
+                                children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
                                         Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false));
                             }
                         }
@@ -853,7 +853,7 @@ public class ActPubUtil extends ServiceBase {
                         for (SubNode child : iter) {
                             // if we didn't already add above, add now
                             if (!childIds.contains(child.getIdStr())) {
-                                children.add(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
+                                children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
                                         Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false));
                             }
                         }
@@ -930,15 +930,15 @@ public class ActPubUtil extends ServiceBase {
         if (node == null) {
             throw new RuntimeException("Unable to load: " + url);
         }
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false);
+        NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE,
+                false, false, false, true, true, null, false);
         return info;
     }
 
     public NodeInfo loadObjectNodeInfoFromObj(MongoSession ms, String userDoingAction, APObj obj) {
         SubNode node = loadObjectFromObj(ms, userDoingAction, obj);
-        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false);
+        NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE,
+                false, false, false, true, true, null, false);
         return info;
     }
 

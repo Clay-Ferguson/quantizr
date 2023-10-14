@@ -169,7 +169,7 @@ public class NodeRenderService extends ServiceBase {
         // then here we indicate to the caller this happened and return immediately.
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
             res.setRssNode(true);
-            NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+            NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
                     Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true, null, false);
             res.setNode(nodeInfo);
             return res;
@@ -195,7 +195,7 @@ public class NodeRenderService extends ServiceBase {
         /* If only the single node was requested return that */
         if (req.isSingleNode()) {
             // that loads these all asynchronously.
-            NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+            NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
                     Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, true, null, false);
             res.setNode(nodeInfo);
             return res;
@@ -272,7 +272,7 @@ public class NodeRenderService extends ServiceBase {
 
     public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
             SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
-        NodeInfo nodeInfo = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
+        NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
                 level > 0, false, false, true, true, null, false);
         if (nodeInfo == null) {
             return null;

@@ -379,7 +379,7 @@ public class MongoCreate extends ServiceBase {
         if (!req.isPendingEdit() && req.getBoostTarget() != null) {
             edit.processAfterSave(ms, newNode, parentNode);
         }
-        res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
+        res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null,
                 false));
         return res;
@@ -450,7 +450,7 @@ public class MongoCreate extends ServiceBase {
         }
 
         update.save(ms, newNode);
-        res.setNewNode(convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
+        res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null, false));
 
         return res;

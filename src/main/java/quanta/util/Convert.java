@@ -51,7 +51,7 @@ public class Convert extends ServiceBase {
      * browser/client to encapsulate the data for a given node which is used by the browser to render
      * the node.
      */
-    public NodeInfo convertToNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
+    public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
             boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild,
             boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal,
             boolean attachLinkedNodes) {
@@ -230,8 +230,8 @@ public class Convert extends ServiceBase {
                 }
             }
             if (boostedNode != null) {
-                NodeInfo info = convertToNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE,
-                        false, false, false, false, false, null, false);
+                NodeInfo info = toNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
+                        false, false, false, false, null, false);
                 if (info != null) {
                     nodeInfo.setBoostedNode(info);
                 }
@@ -267,7 +267,7 @@ public class Convert extends ServiceBase {
                 }
                 SubNode n = iterator.next();
 
-                NodeInfo info = convertToNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, allowInlineChildren,
+                NodeInfo info = toNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, allowInlineChildren,
                         lastChild, false, loadLikes, false, null, false);
                 if (info != null) {
                     nodeInfo.safeGetChildren().add(info);

@@ -106,8 +106,8 @@ public class NodeSearchService extends ServiceBase {
         SubNode node = read.getNode(ms, req.getRootId());
 
         for (SubNode n : nodes) {
-            NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false,
-                    false, false, false, true, null, false);
+            NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
+                    false, false, true, null, false);
             if (info != null) {
                 if (truncates.contains(n.getIdStr())) {
                     info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
@@ -138,8 +138,8 @@ public class NodeSearchService extends ServiceBase {
         if ("node.id".equals(req.getSearchProp())) {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
-                        false, false, false, false, true, null, false);
+                NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
+                        false, false, false, true, null, false);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -156,8 +156,8 @@ public class NodeSearchService extends ServiceBase {
             }
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
-                        false, false, false, false, true, null, false);
+                NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
+                        false, false, false, true, null, false);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -202,7 +202,7 @@ public class NodeSearchService extends ServiceBase {
                             req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority(),
                             req.isRequireAttachment(), req.isRequireDate())) {
                         try {
-                            NodeInfo info = convert.convertToNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
+                            NodeInfo info = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
                                     counter + 1, false, false, false, false, true, null, false);
                             if (info != null) {
                                 searchResults.add(info);
@@ -221,8 +221,8 @@ public class NodeSearchService extends ServiceBase {
         int counter = 0;
         for (SubNode node : read.getLinkedNodes(ms, req.getNodeId(), req.getSearchText())) {
             try {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
-                        false, false, false, false, true, null, false);
+                NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
+                        false, false, false, true, null, false);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -236,8 +236,8 @@ public class NodeSearchService extends ServiceBase {
         int counter = 0;
         for (SubNode node : read.getRdfSubjects(ms, req.getNodeId())) {
             try {
-                NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
-                        false, false, false, false, true, null, false);
+                NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
+                        false, false, false, true, null, false);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -268,8 +268,8 @@ public class NodeSearchService extends ServiceBase {
              */
             for (SubNode node : accountNodes.getVal()) {
                 try {
-                    NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1,
-                            false, false, false, false, false, null, false);
+                    NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
+                            false, false, false, false, null, false);
                     if (info != null) {
                         searchResults.add(info);
                     }
@@ -292,7 +292,7 @@ public class NodeSearchService extends ServiceBase {
                 SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false, true);
                 if (userNode != null) {
                     try {
-                        NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), as, userNode, false,
+                        NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), as, userNode, false,
                                 counter + 1, false, false, false, false, false, null, false);
                         if (info != null) {
                             searchResults.add(info);
@@ -353,8 +353,8 @@ public class NodeSearchService extends ServiceBase {
                     }
                 }
             }
-            NodeInfo info = convert.convertToNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                    false, false, false, true, null, false);
+            NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
+                    false, false, true, null, false);
             if (info != null) {
                 searchResults.add(info);
             }
