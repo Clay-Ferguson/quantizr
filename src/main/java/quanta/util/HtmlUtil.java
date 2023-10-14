@@ -1,5 +1,8 @@
 package quanta.util;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 public class HtmlUtil {
     public static String htmlH(int level, String heading) {
         return "<h" + String.valueOf(level) + " class='marginTop'>\n" + heading + "</h" + String.valueOf(level) + ">\n";
@@ -35,5 +38,32 @@ public class HtmlUtil {
             sb.append(htmlTh(header));
         }
         return htmlTr(sb.toString());
+    }
+
+    public static String formatTableRows(List<Object[]> results) {
+        StringBuilder rows = new StringBuilder();
+
+        // iterate over the results
+        for (Object[] row : results) {
+            StringBuilder r = new StringBuilder();
+
+            // iterate over the columns
+            for (Object col : row) {
+                // string columns left justify
+                if (col instanceof String) {
+                    r.append(htmlTd(String.valueOf(col)));
+                }
+                // date columns left justify and format
+                else if (col instanceof Timestamp t) {
+                    r.append(htmlTd(DateUtil.standardFormatDateFromUTC(t.getTime())));
+                }
+                // anything else is numeric and right justified
+                else {
+                    r.append(htmlTdRt(String.valueOf(col)));
+                }
+            }
+            rows.append(htmlTr(r.toString()));
+        }
+        return rows.toString();
     }
 }

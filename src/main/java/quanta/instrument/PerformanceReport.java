@@ -1,10 +1,10 @@
 package quanta.instrument;
 
 import static quanta.util.HtmlUtil.htmlH;
+import static quanta.util.HtmlUtil.htmlHeader;
 import static quanta.util.HtmlUtil.htmlTable;
 import static quanta.util.HtmlUtil.htmlTd;
 import static quanta.util.HtmlUtil.htmlTdRt;
-import static quanta.util.HtmlUtil.htmlTh;
 import static quanta.util.HtmlUtil.htmlTr;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -64,9 +64,7 @@ public class PerformanceReport {
 
         if (!rows.isEmpty()) {
             sb.append(htmlH(3, "Slow Ops"));
-            sb.append(htmlTable(
-                    htmlTr(htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id"))
-                            + rows));
+            sb.append(htmlTable(htmlHeader("user", "Event", "Time", "Root Id", "Event Id") + rows));
         }
         // calculate totals per person
         HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
@@ -91,7 +89,7 @@ public class PerformanceReport {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(String.valueOf(se.totalCalls)));
         }
         if (!rows.isEmpty()) {
-            sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Count")) + rows));
+            sb.append(htmlTable(htmlHeader("user", "Count") + rows));
         }
         // -------------------------------------------
         upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
@@ -102,7 +100,7 @@ public class PerformanceReport {
             rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime, true)));
         }
         if (!rows.isEmpty()) {
-            sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Total Time")) + rows));
+            sb.append(htmlTable(htmlHeader("user", "Total Time") + rows));
         }
         // -------------------------------------------
         upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
@@ -114,7 +112,7 @@ public class PerformanceReport {
                     htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
         }
         if (!rows.isEmpty()) {
-            sb.append(htmlTable(htmlTr(htmlTh("user") + htmlTh("Avg Time")) + rows));
+            sb.append(htmlTable(htmlHeader("user", "Avg Time") + rows));
         }
         sb.append(getTimesPerCategory());
         return sb.toString();
@@ -141,8 +139,7 @@ public class PerformanceReport {
         }
         List<MethodStat> orderedStats = new ArrayList<>(stats.values());
         orderedStats.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCount - s1.totalTime / s1.totalCount));
-        String table = htmlTr(htmlTh("Category") + htmlTh("Count") + htmlTh("Avg. Time") + //
-                htmlTh("Time"));
+        String table = htmlHeader("Category", "Count", "Avg. Time", "Time");
 
         for (MethodStat stat : orderedStats) {
             table += htmlTr(htmlTd(stat.category) + htmlTdRt(String.valueOf(stat.totalCount))
@@ -174,9 +171,8 @@ public class PerformanceReport {
                     }
                 }
                 if (!rows.isEmpty()) {
-                    set += "<br>" + htmlTable(htmlTr(
-                            htmlTh("user") + htmlTh("Event") + htmlTh("Time") + htmlTh("Root Id") + htmlTh("Event Id"))
-                            + rows) + "<br>";
+                    set += "<br>" + htmlTable(htmlTr(htmlHeader("user", "Event", "Time", "Root Id", "Event Id")) + rows)
+                            + "<br>";
                 }
             }
         }
