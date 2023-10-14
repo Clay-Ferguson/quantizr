@@ -92,7 +92,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class AttachmentService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
     @Autowired
@@ -115,8 +114,7 @@ public class AttachmentService extends ServiceBase {
                 LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
                 String mkdown = mail.convertEmailToMarkdown(limitedIs);
                 payloads.add(mkdown);
-            } catch ( //
-            Exception e) {
+            } catch (Exception e) {
                 throw ExUtil.wrapEx(e);
             }
         }
@@ -126,7 +124,7 @@ public class AttachmentService extends ServiceBase {
     /*
      * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
      */
-    public ResponseBase uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] uploadFiles,
+    public ResponseBase uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] files,
             boolean explodeZips, boolean toIpfs) {
         if (toIpfs) {
             checkIpfs();
@@ -171,7 +169,7 @@ public class AttachmentService extends ServiceBase {
              *
              * Also we only do this check if not admin. Admin can upload unlimited amounts.
              */
-            if (!ms.isAdmin() && uploadFiles.length > 1) {
+            if (!ms.isAdmin() && files.length > 1) {
                 SubNode userNode = read.getAccountByUserName(null, null, false);
                 // get how many bytes of storage the user currently holds
                 Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
@@ -181,8 +179,8 @@ public class AttachmentService extends ServiceBase {
                 // get max amount user is allowed
                 Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA);
 
-                for (MultipartFile uploadFile : uploadFiles) {
-                    binTotal += uploadFile.getSize();
+                for (MultipartFile file : files) {
+                    binTotal += file.getSize();
                     // check if user went over max and fail the API call if so.
                     if (binTotal > userQuota) {
                         throw new OutOfSpaceException();
@@ -190,16 +188,16 @@ public class AttachmentService extends ServiceBase {
                 }
             }
 
-            for (MultipartFile uploadFile : uploadFiles) {
-                String fileName = uploadFile.getOriginalFilename();
-                String contentType = uploadFile.getContentType();
+            for (MultipartFile file : files) {
+                String fileName = file.getOriginalFilename();
+                String contentType = file.getContentType();
                 if (contentType.startsWith("image/")) {
                     imageCount++;
                 }
-                long size = uploadFile.getSize();
+                long size = file.getSize();
                 if (!StringUtils.isEmpty(fileName)) {
                     log.debug("Uploading file: " + fileName + " contentType=" + contentType);
-                    LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
+                    LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(file.getInputStream(), maxFileSize);
                     // attaches AND closes the stream.
                     attachBinaryFromStream(ms, false, attName, node, nodeId, fileName, size, limitedIs, contentType, -1,
                             -1, explodeZips, toIpfs, true, true, true, null, allowEmailParse);
@@ -252,8 +250,8 @@ public class AttachmentService extends ServiceBase {
             /*
              * This is a prototype-scope bean, with state for processing one import at a time
              */
-            ImportZipService importZipStreamService = (ImportZipService) context.getBean(ImportZipService.class);
-            importZipStreamService.importFromStream(ms, is, node, false);
+            ImportZipService importSvc = (ImportZipService) context.getBean(ImportZipService.class);
+            importSvc.importFromStream(ms, is, node, false);
         } //
         else {
             saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
@@ -385,7 +383,6 @@ public class AttachmentService extends ServiceBase {
 
     public String getNextAttachmentKey(SubNode node) {
         int imgIdx = 1;
-
         while (node.getAttachment("img" + String.valueOf(imgIdx), false, false) != null) {
             imgIdx++;
         }
@@ -748,13 +745,13 @@ public class AttachmentService extends ServiceBase {
         auth.ownerAuth(node);
         String attKey = getNextAttachmentKey(node);
         if (!storeLocally) {
-            int maxAttOrdinal = getMaxAttachmentOrdinal(node);
+            int maxOrd = getMaxAttachmentOrdinal(node);
             Attachment att = node.getAttachment(attKey, true, true);
             if (mimeType != null) {
                 att.setMime(mimeType);
             }
             att.setUrl(sourceUrl);
-            att.setOrdinal(maxAttOrdinal + 1);
+            att.setOrdinal(maxOrd + 1);
             return;
         }
 
@@ -1023,11 +1020,11 @@ public class AttachmentService extends ServiceBase {
                         /* Get which nodeId owns this grid file */
                         ObjectId id = (ObjectId) meta.get("nodeId");
                         if (id != null) {
-                            SubNode subNode = read.getNode(as, id);
+                            SubNode node = read.getNode(as, id);
                             /*
                              * If the node doesn't exist then this grid file is an orphan and should go away
                              */
-                            if (subNode == null) {
+                            if (node == null) {
                                 log.debug("Grid Orphan Delete: " + id.toHexString());
                                 // Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
 
@@ -1042,11 +1039,11 @@ public class AttachmentService extends ServiceBase {
                              * else update the UserStats by adding the file length to the total for this user
                              */
                             else {
-                                UserStats stats = statsMap.get(subNode.getOwner());
+                                UserStats stats = statsMap.get(node.getOwner());
                                 if (stats == null) {
                                     stats = new UserStats();
                                     stats.binUsage = file.getLength();
-                                    statsMap.put(subNode.getOwner(), stats);
+                                    statsMap.put(node.getOwner(), stats);
                                 } else {
                                     stats.binUsage = stats.binUsage.longValue() + file.getLength();
                                 }
@@ -1056,18 +1053,18 @@ public class AttachmentService extends ServiceBase {
                 }
             }
 
-            Iterable<SubNode> accountNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
+            Iterable<SubNode> accntNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
             /*
              * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
              * amount).
              */
-            for (SubNode accountNode : accountNodes) {
-                log.debug("Processing Account Node: id=" + accountNode.getIdStr());
-                UserStats stats = statsMap.get(accountNode.getOwner());
+            for (SubNode accntNode : accntNodes) {
+                log.debug("Processing Account Node: id=" + accntNode.getIdStr());
+                UserStats stats = statsMap.get(accntNode.getOwner());
                 if (stats == null) {
                     stats = new UserStats();
                     stats.binUsage = 0L;
-                    statsMap.put(accountNode.getOwner(), stats);
+                    statsMap.put(accntNode.getOwner(), stats);
                 }
             }
             log.debug(String.valueOf(delCount) + " grid orphans deleted.");
@@ -1107,10 +1104,11 @@ public class AttachmentService extends ServiceBase {
                     if (node == null) {
                         throw new RuntimeException("Node not found.");
                     }
-                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow
-                    // access.
-                    // This is for good fediverse interoperability but still with a level of privacy for completely
-                    // unshared nodes.
+                    /*
+                     * if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
+                     * This is for good fediverse interoperability but still with a level of privacy for completely
+                     * unshared nodes.
+                     */
                     if (node.getAc() == null || node.getAc().size() == 0) {
                         user.authBearer();
                         crypto.authSig();
@@ -1192,24 +1190,20 @@ public class AttachmentService extends ServiceBase {
     }
 
     // Removes all attachments from 'node' that are not on 'newAttrs'
-    /**
-     * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make sure this block
-     * cannot ever be entered)
-     */
     public void removeDeletedAttachments(MongoSession ms, SubNode node, HashMap<String, Attachment> newAtts) {
         if (node.getAttachments() == null)
             return;
         // we need toDelete as separate list to avoid "concurrent modification exception" by deleting
         // from the attachments set during iterating it.
-        List<String> toDelete = new LinkedList<>();
+        List<String> toDel = new LinkedList<>();
         node.getAttachments().forEach((key, att) -> {
             if (newAtts == null || !newAtts.containsKey(key)) {
-                toDelete.add(key);
+                toDel.add(key);
             }
         });
         // run these actual deletes in a separate async thread
         arun.run(as -> {
-            for (String key : toDelete) {
+            for (String key : toDel) {
                 attach.deleteBinary(ms, key, node, null, false);
             }
             return null;
@@ -1227,6 +1221,4 @@ public class AttachmentService extends ServiceBase {
         }
         return totalBytes.getVal();
     }
-
-
 }

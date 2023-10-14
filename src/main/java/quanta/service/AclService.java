@@ -424,10 +424,14 @@ public class AclService extends ServiceBase {
         // if no privileges exist at all just add the one we need to add
         if (node.getAc() == null) {
             node.putAc(key, new AccessControl(null, prvs));
-        } else { // otherwise first check to see if it's already added
+        }
+        // otherwise first check to see if it's already added
+        else {
             AccessControl ac = node.getAc().get(key);
             if (ac != null && ac.getPrvs().equals(prvs)) {
-            } else { // else need to add it. // already had the correct ac, nothing to do here
+            }
+            // else need to add it.
+            else {
                 node.putAc(key, new AccessControl(null, prvs));
             }
         }
@@ -482,14 +486,13 @@ public class AclService extends ServiceBase {
             if (ret == null) {
                 ret = new LinkedList<>();
             }
-            AccessControlInfo acInfo = convertToAccessControlInfo(sc, node, principalId, acval);
+            AccessControlInfo acInfo = convertToAcInfo(sc, node, principalId, acval);
             ret.add(acInfo);
         }
         return ret;
     }
 
-    public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId,
-            AccessControl ac) {
+    public AccessControlInfo convertToAcInfo(SessionContext sc, SubNode node, String principalId, AccessControl ac) {
         AccessControlInfo acInfo = new AccessControlInfo();
         acInfo.setPrincipalNodeId(principalId);
         if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
@@ -514,5 +517,4 @@ public class AclService extends ServiceBase {
         }
         return acInfo;
     }
-
 }

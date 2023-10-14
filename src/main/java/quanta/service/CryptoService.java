@@ -53,8 +53,8 @@ import quanta.util.val.Val;
 
 @Component
 public class CryptoService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(CryptoService.class);
+
     public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
     private static final Random rand = new Random();
     private static boolean debugSigning = false;
