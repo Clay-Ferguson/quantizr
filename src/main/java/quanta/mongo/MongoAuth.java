@@ -40,7 +40,6 @@ import quanta.util.XString;
  */
 @Component
 public class MongoAuth extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoAuth.class);
     private static final boolean verbose = false;
     private static final Object adminSessionLck = new Object();

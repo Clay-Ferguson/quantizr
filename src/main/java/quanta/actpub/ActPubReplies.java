@@ -21,7 +21,6 @@ import quanta.service.AclService;
  */
 @Component
 public class ActPubReplies extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubReplies.class);
 
     /**

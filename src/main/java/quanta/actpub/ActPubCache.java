@@ -23,7 +23,6 @@ import quanta.util.DateUtil;
  */
 @Component
 public class ActPubCache extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubCache.class);
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once

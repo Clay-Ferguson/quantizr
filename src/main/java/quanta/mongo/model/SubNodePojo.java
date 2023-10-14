@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 @JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER,
         SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS,})
 public class SubNodePojo {
-
     private static Logger log = LoggerFactory.getLogger(SubNodePojo.class);
 
     @JsonProperty(SubNode.ID)

@@ -33,7 +33,6 @@ import quanta.util.StreamUtil;
  */
 @Component
 public class FileSearcher {
-
     private static Logger log = LoggerFactory.getLogger(FileSearcher.class);
 
     @Autowired

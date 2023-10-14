@@ -10,7 +10,6 @@ import quanta.config.ServiceBase;
 
 @Component
 public class TypePluginMgr extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(TypePluginMgr.class);
     private static HashMap<String, TypeBase> types = new HashMap<>();
 

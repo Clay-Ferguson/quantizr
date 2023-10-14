@@ -49,7 +49,6 @@ import quanta.util.XString;
 @Component
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
     private MongoSession session;
     private String shortFileName;

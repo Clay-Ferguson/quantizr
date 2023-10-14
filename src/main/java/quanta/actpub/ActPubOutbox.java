@@ -37,7 +37,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class ActPubOutbox extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
 
     // For actual WEB CRAWLER we'd set this larger but for now

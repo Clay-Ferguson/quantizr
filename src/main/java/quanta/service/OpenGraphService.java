@@ -25,7 +25,6 @@ import quanta.util.XString;
 public class OpenGraphService extends ServiceBase {
 
     Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)", Pattern.CASE_INSENSITIVE);
-
     private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
     public final LRUMap<String, OpenGraph> ogCache = new LRUMap(1000);
     public static final String BROWSER_USER_AGENT =

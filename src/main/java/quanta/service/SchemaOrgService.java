@@ -24,7 +24,6 @@ import quanta.util.XString;
 
 @Component
 public class SchemaOrgService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
     public static HashMap<String, Object> schema = null;
     /*

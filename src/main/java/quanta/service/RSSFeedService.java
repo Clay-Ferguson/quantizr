@@ -67,7 +67,6 @@ import reactor.core.publisher.Mono;
 /* Proof of Concept RSS Publishing */
 @Component
 public class RSSFeedService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(RSSFeedService.class);
     private static boolean refreshingCache = false;
     private static final Object policyLock = new Object();

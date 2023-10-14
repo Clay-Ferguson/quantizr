@@ -43,7 +43,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class MongoCreate extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoCreate.class);
     /*
      * this large top reserve size means the "insert at top" will always be done with out multiple node

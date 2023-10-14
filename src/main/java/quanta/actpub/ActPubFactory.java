@@ -40,7 +40,6 @@ import quanta.util.DateUtil;
  */
 @Component
 public class ActPubFactory extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
     public APObj newUpdateForPerson(String userDoingAction, HashSet<String> toUserNames, String fromActor,

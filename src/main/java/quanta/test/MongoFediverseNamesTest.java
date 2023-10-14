@@ -15,7 +15,6 @@ import quanta.mongo.model.FediverseName;
 
 @Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
-
     private static Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
 
     @Override

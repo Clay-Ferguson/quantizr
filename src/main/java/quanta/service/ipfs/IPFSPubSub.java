@@ -38,7 +38,6 @@ import quanta.util.XString;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 @Component
 public class IPFSPubSub extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";

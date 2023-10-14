@@ -41,7 +41,6 @@ import quanta.util.ThreadLocals;
  *                   prop.getProtocolHostAndPort();
  */
 public class Instrument {
-
     private static Logger log = LoggerFactory.getLogger(Instrument.class);
     public static final int CAPTURE_THRESHOLD = 10; // 10 for prod
     private static final int MAX_EVENTS = 10000;

@@ -37,7 +37,6 @@ import quanta.util.val.Val;
 
 @Component
 public class UserFeedService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(UserFeedService.class);
     static final int MAX_FEED_ITEMS = 25;
 

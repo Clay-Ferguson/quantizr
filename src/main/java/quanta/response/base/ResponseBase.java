@@ -7,7 +7,6 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 
 public class ResponseBase {
-
     private static Logger log = LoggerFactory.getLogger(ResponseBase.class);
 
     private String message;

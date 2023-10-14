@@ -24,7 +24,6 @@ import quanta.util.XString;
 // See AppConfiguration.java for Bean Registration
 @Component
 public class UtilFilter extends GenericFilterBean {
-
     private static Logger log = LoggerFactory.getLogger(UtilFilter.class);
     public static boolean debug = false;
 

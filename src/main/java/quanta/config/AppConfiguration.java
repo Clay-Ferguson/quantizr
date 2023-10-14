@@ -35,7 +35,6 @@ import quanta.service.UtilFilter;
 @Configuration
 @EnableAsync
 public class AppConfiguration implements WebMvcConfigurer {
-
     private static Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
     @Autowired

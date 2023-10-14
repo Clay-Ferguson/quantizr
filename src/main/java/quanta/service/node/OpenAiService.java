@@ -46,7 +46,6 @@ public class OpenAiService extends ServiceBase {
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
-
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
 
     /**

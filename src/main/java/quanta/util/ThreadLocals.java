@@ -24,7 +24,6 @@ import quanta.response.base.ResponseBase;
  * worker or deamon thread that isn't an actual Web Request.
  */
 public class ThreadLocals {
-
     private static Logger log = LoggerFactory.getLogger(ThreadLocals.class);
     private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
     private static final ThreadLocal<HttpServletRequest> servletRequest = new ThreadLocal<>();

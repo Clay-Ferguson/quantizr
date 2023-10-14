@@ -26,7 +26,6 @@ import quanta.util.ThreadLocals;
 @Component
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
-
     private static Logger log = LoggerFactory.getLogger(ImportZipService.class);
     private ZipArchiveInputStream zis;
 

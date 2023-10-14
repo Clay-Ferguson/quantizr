@@ -55,7 +55,6 @@ import quanta.util.XString;
  */
 @Component
 public class SystemService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(SystemService.class);
     private static final Random rand = new Random();
     private static final int replicaId = rand.nextInt(Integer.MAX_VALUE);

@@ -55,7 +55,6 @@ import reactor.core.publisher.Mono;
  */
 @Component
 public class ActPubUtil extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     private static final int MAX_THREAD_NODES = 200;

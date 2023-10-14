@@ -16,7 +16,6 @@ import quanta.util.ThreadLocals;
  */
 @Component
 public class MongoRepository extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
     /*

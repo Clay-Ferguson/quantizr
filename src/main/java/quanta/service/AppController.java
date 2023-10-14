@@ -112,7 +112,6 @@ import quanta.util.CaptchaMaker;
  */
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
-
     private static Logger log = LoggerFactory.getLogger(AppController.class);
 
     public static final String API_PATH = "/api";

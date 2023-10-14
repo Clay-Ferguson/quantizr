@@ -40,7 +40,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class Convert extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(Convert.class);
     // indicates we don't need to worry about sending back a good logicalOrdinal
     public static int LOGICAL_ORDINAL_IGNORE = -1;

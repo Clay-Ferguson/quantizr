@@ -55,7 +55,6 @@ import quanta.util.XString;
  */
 @Component
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
-
     private static Logger log = LoggerFactory.getLogger(MongoEventListener.class);
     private static final boolean verbose = false;
 

@@ -15,7 +15,6 @@ import quanta.util.ExUtil;
 @Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {
-
     private static Logger log = LoggerFactory.getLogger(ExportTarService.class);
     private TarArchiveOutputStream out = null;
     private boolean gzip = false;

@@ -23,7 +23,6 @@ import quanta.util.DateUtil;
 
 @Component
 public class RedisService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(RedisService.class);
 
     @Autowired

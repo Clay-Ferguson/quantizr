@@ -71,7 +71,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class ActPubService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;

@@ -13,7 +13,6 @@ import quanta.util.val.Val;
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
 @Component
 public abstract class TypeBase extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(TypeBase.class);
 
     public void postContruct() {

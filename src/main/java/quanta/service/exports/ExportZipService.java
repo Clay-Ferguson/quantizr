@@ -14,7 +14,6 @@ import quanta.util.ExUtil;
 @Component
 @Scope("prototype")
 public class ExportZipService extends ExportArchiveBase {
-
     private static Logger log = LoggerFactory.getLogger(ExportZipService.class);
     private ZipArchiveOutputStream out = null;
 

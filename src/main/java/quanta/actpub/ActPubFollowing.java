@@ -40,7 +40,6 @@ import quanta.util.XString;
  */
 @Component
 public class ActPubFollowing extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
     /**

@@ -28,7 +28,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class MongoUpdate extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
     public void saveObj(Object obj) {

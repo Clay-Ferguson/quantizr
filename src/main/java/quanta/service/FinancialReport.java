@@ -13,7 +13,6 @@ import quanta.util.ThreadLocals;
 
 @Component
 public class FinancialReport extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(FinancialReport.class);
 
     public String getReport() {

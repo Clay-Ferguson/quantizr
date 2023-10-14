@@ -24,7 +24,6 @@ import quanta.util.LimitedInputStream;
  */
 @Component
 public class EmailSender extends ServiceBase implements TransportListener {
-
     private static Logger log = LoggerFactory.getLogger(EmailSender.class);
 
     public static final Object lock = new Object();

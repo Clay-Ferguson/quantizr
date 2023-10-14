@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
-
     private static Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;
 

@@ -44,7 +44,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class MongoRead extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoRead.class);
     private static final Object dbRootsLock = new Object();
     private SubNode dbRoot;

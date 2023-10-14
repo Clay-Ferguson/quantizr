@@ -28,7 +28,6 @@ import quanta.util.XString;
  */
 @Component("MongoTest")
 public class MongoTest extends ServiceBase implements TestIntf {
-
     private static Logger log = LoggerFactory.getLogger(MongoTest.class);
 
     @Override

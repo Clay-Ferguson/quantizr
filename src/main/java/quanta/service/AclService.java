@@ -55,7 +55,6 @@ import quanta.util.XString;
  */
 @Component
 public class AclService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(AclService.class);
 
     /**

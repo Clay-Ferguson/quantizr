@@ -20,7 +20,6 @@ import quanta.response.base.ResponseBase;
 
 @Component
 public class CallProcessor extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(CallProcessor.class);
     private static boolean logResponses = false;
 

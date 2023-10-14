@@ -40,7 +40,6 @@ import quanta.util.val.Val;
  * have just that one export as their 'scope'
  */
 public abstract class ExportArchiveBase extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
     private String shortFileName;
     private String fullFileName;

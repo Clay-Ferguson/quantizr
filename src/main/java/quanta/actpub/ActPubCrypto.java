@@ -40,7 +40,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class ActPubCrypto extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
     public static final String SIGNATURE_ALGO = "SHA256withRSA";
     public static final String DIGEST_ALGO = "SHA-256";

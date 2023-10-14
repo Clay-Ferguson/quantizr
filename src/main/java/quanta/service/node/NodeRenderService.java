@@ -53,7 +53,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class NodeRenderService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
     public String getIndexPage(String nameOnAdminNode, String nameOnUserNode, String userName, String id, String search,

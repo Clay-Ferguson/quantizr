@@ -67,7 +67,6 @@ import quanta.util.XString;
  */
 @Component
 public class FileIndexer extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(FileIndexer.class);
 
     private IndexWriter writer;

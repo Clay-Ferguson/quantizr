@@ -23,7 +23,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({FediverseName.ID, FediverseName.NAME, FediverseName.CREATE_TIME})
 public class FediverseName {
-
     private static Logger log = LoggerFactory.getLogger(FediverseName.class);
     public static final String ID = "_id";
 

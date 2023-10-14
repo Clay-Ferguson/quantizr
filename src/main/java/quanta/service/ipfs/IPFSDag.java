@@ -25,7 +25,6 @@ import quanta.util.val.Val;
 
 @Component
 public class IPFSDag extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSDag.class);
     public static String API_DAG;
 

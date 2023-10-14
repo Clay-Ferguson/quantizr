@@ -30,7 +30,6 @@ import quanta.util.XString;
  */
 @Component
 public class AppProp {
-
     private static Logger log = LoggerFactory.getLogger(AppProp.class);
 
     @Autowired

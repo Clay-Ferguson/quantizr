@@ -25,7 +25,6 @@ import quanta.util.XString;
 /* This filter is helpful only for diagnostics. It's currently disabled by not being mentioned in */
 @Component
 public class DataTransferRateFilter extends GenericFilterBean {
-
     private static Logger log = LoggerFactory.getLogger(DataTransferRateFilter.class);
     public static double totalBytesSent = 0;
     public static double totalTime = 0; // nano seconds

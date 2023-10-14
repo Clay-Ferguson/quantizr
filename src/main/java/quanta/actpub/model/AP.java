@@ -20,7 +20,6 @@ import quanta.util.val.Val;
  * properties in this object.
  */
 public class AP {
-
     private static Logger log = LoggerFactory.getLogger(AP.class);
 
     public static boolean apHasProps(Object obj) {

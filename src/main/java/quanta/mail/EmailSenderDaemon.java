@@ -18,7 +18,6 @@ import quanta.mongo.model.SubNode;
  */
 @Component
 public class EmailSenderDaemon extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
     private int runCounter = 0;
     public static final int INTERVAL_SECONDS = 10;

@@ -31,7 +31,6 @@ import quanta.util.XString;
  */
 @Component
 public class ActPubFollower extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
     /**

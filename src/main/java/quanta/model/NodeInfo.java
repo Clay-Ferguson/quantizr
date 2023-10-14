@@ -20,7 +20,6 @@ import quanta.util.DateUtil;
  */
 @JsonInclude(Include.NON_NULL)
 public class NodeInfo {
-
     private static Logger log = LoggerFactory.getLogger(NodeInfo.class);
     private String id;
     private String path;

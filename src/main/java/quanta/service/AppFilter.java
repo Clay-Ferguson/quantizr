@@ -36,7 +36,6 @@ import quanta.util.XString;
 // See AppConfiguration.java for Bean Registration
 @Component
 public class AppFilter extends GenericFilterBean {
-
     private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";
     public static String SESSION_LOCK_NAME = "sLock";

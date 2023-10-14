@@ -91,7 +91,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class UserManagerService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
     private static final Random rand = new Random();

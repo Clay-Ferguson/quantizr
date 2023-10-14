@@ -16,7 +16,6 @@ import quanta.config.ServiceBase;
  */
 @Component
 public class AsyncExec extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(AsyncExec.class);
 
     @Autowired

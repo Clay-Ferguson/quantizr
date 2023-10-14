@@ -10,7 +10,6 @@ import quanta.util.XString;
 
 @Component
 public class IPFSConfig extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSConfig.class);
     public String API_CONFIG;
 

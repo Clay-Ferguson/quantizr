@@ -17,7 +17,6 @@ import quanta.util.Util;
 
 @Component
 public class IPFSKey extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSKey.class);
     public static String API_NAME;
 

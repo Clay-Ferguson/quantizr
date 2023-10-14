@@ -25,7 +25,6 @@ import quanta.util.ExUtil;
 @EnableScheduling
 @ServletComponentScan
 public class AppServer extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(AppServer.class);
     private static boolean shuttingDown;
     private static boolean enableScheduling;

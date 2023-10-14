@@ -12,7 +12,6 @@ import quanta.util.Util;
 
 @Component
 public class IPFSCat extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSCat.class);
     public static String API_CAT;
 

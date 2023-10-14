@@ -58,7 +58,6 @@ import quanta.util.val.Val;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 @Component
 public class IPFSService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSService.class);
     public static String API_ID;
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();

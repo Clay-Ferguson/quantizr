@@ -25,7 +25,6 @@ import quanta.exception.base.RuntimeEx;
 
 @Component
 public class FileUtils extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(FileUtils.class);
     /*
      * Creates the set of file extensions that we allow user to edit
@@ -166,16 +165,15 @@ public class FileUtils extends ServiceBase {
             throw new RuntimeEx("Folder doesn't exist: " + folder);
         }
         /* First read folders and sort them */
-        File[] folders = directory.listFiles(
-                new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
-                            return false;
-                        }
-                        return file.isDirectory() && !file.getName().startsWith(".");
-                    }
-                });
+        File[] folders = directory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
+                    return false;
+                }
+                return file.isDirectory() && !file.getName().startsWith(".");
+            }
+        });
         if (folders != null) {
             Arrays.sort(folders, NameFileComparator.NAME_COMPARATOR);
         }
@@ -188,16 +186,15 @@ public class FileUtils extends ServiceBase {
             throw new RuntimeEx("Folder doesn't exist: " + folder);
         }
         /* Then read files and sort them */
-        File[] files = directory.listFiles(
-                new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
-                            return false;
-                        }
-                        return file.isFile() && (file.getName().equals(".meta-fs") || !file.getName().startsWith("."));
-                    }
-                });
+        File[] files = directory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (exclusions != null && exclusions.contains(file.getAbsolutePath())) {
+                    return false;
+                }
+                return file.isFile() && (file.getName().equals(".meta-fs") || !file.getName().startsWith("."));
+            }
+        });
         if (files != null) {
             Arrays.sort(files, NameFileComparator.NAME_COMPARATOR);
         }

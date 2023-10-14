@@ -20,7 +20,6 @@ import quanta.config.ServiceBase;
 
 @Component
 public class EnglishDictionary extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
     private static final HashSet<String> dictWords = new HashSet<>();
     private static final HashSet<String> stopWords = new HashSet<>();

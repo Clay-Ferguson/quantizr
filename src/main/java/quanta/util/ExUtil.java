@@ -14,7 +14,6 @@ import quanta.exception.base.RuntimeEx;
  * done to begin with.
  */
 public class ExUtil {
-
     private static Logger log = LoggerFactory.getLogger(ExUtil.class);
 
     public static void run(Runnable runnable) {

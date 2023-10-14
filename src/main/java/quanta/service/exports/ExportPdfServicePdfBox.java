@@ -41,7 +41,6 @@ import quanta.util.XString;
 @Component
 @Scope("prototype")
 public class ExportPdfServicePdfBox extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
     private MongoSession session;
     private String shortFileName;

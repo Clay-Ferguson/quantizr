@@ -18,7 +18,6 @@ import quanta.util.XString;
 
 @Component
 public class IPFSPin extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSPin.class);
     public static String API_PIN;
 

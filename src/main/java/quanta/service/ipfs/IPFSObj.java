@@ -21,7 +21,6 @@ import quanta.util.XString;
 
 @Component
 public class IPFSObj extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSObj.class);
     public static String API_OBJECT;
 

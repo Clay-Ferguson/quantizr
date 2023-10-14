@@ -20,7 +20,6 @@ import quanta.util.XString;
 
 @Component
 public class GraphNodesService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(GraphNodesService.class);
     static int guid = 0;
 

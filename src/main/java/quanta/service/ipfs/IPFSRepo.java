@@ -10,7 +10,6 @@ import quanta.util.XString;
 
 @Component
 public class IPFSRepo extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSRepo.class);
     public static String API_REPO;
 

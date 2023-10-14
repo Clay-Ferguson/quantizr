@@ -36,7 +36,6 @@ import quanta.util.Util;
 @Configuration
 @EnableMongoRepositories(basePackages = "quanta.mongo")
 public class MongoAppConfig extends AbstractMongoClientConfiguration {
-
     private static Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
     public static final String databaseName = "database";
     private MongoTemplate ops;

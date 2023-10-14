@@ -9,7 +9,6 @@ import quanta.util.XString;
 
 @Component("ActPubTest")
 public class ActPubTest extends ServiceBase implements TestIntf {
-
     private static Logger log = LoggerFactory.getLogger(ActPubTest.class);
 
     @Override

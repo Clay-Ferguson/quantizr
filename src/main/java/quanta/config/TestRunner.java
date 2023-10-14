@@ -13,7 +13,6 @@ import quanta.test.TestIntf;
 
 @Component
 public class TestRunner {
-
     private static Logger log = LoggerFactory.getLogger(TestRunner.class);
 
     @Autowired

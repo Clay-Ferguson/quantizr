@@ -12,7 +12,6 @@ import quanta.util.XString;
 
 @Component("IPFSTest")
 public class IPFSTest extends ServiceBase implements TestIntf {
-
     private static Logger log = LoggerFactory.getLogger(IPFSTest.class);
 
     @Override

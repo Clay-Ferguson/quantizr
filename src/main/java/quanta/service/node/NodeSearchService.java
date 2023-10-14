@@ -59,7 +59,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class NodeSearchService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(NodeSearchService.class);
     public static Object trendingFeedInfoLock = new Object();
     public static GetNodeStatsResponse apTrendingFeedInfo;

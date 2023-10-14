@@ -20,7 +20,6 @@ import quanta.util.XString;
 
 @Component
 public class IPFSSwarm extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSSwarm.class);
     public static String API_SWARM;
 

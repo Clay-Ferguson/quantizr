@@ -27,7 +27,6 @@ import quanta.util.val.Val;
 
 @Component
 public class IPFSFiles extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(IPFSFiles.class);
     public static String API_FILES;
 

@@ -51,7 +51,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class MongoUtil extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoUtil.class);
     private static HashSet<String> testAccountNames = new HashSet<>();
     private static final Random rand = new Random();

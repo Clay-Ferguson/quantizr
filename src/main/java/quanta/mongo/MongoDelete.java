@@ -45,7 +45,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class MongoDelete extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
     public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {

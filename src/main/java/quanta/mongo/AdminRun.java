@@ -15,7 +15,6 @@ import quanta.util.ThreadLocals;
  */
 @Component
 public class AdminRun extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(AdminRun.class);
 
     // Runs 'runner' using 'ms' if not null, or falls back to using 'admin' if ms is null

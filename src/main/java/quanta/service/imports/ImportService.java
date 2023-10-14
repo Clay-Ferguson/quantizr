@@ -18,7 +18,6 @@ import quanta.util.ThreadLocals;
 
 @Component
 public class ImportService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
     public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {

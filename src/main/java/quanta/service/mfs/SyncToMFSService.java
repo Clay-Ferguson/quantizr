@@ -35,7 +35,6 @@ import quanta.util.XString;
 @Component
 @Scope("prototype")
 public class SyncToMFSService extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(SyncToMFSService.class);
     MongoSession session;
     HashSet<String> allNodePaths = new HashSet<>();

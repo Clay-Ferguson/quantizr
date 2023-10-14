@@ -32,7 +32,6 @@ import quanta.util.XString;
  */
 @Controller
 public class ActPubController extends ServiceBase {
-
     private static Logger log = LoggerFactory.getLogger(ActPubController.class);
 
     /**

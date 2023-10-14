@@ -18,7 +18,6 @@ import quanta.util.ThreadLocals;
 @Component
 @Scope("prototype")
 public class ImportTarService extends ImportArchiveBase {
-
     private static Logger log = LoggerFactory.getLogger(ImportTarService.class);
     private TarArchiveInputStream zis;
 
