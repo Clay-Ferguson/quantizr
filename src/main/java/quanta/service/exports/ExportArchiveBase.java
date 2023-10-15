@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -27,7 +28,6 @@ import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.TreeNode;
 import quanta.util.XString;
 import quanta.util.val.Val;
 

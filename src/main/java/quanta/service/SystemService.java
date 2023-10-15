@@ -23,6 +23,7 @@ import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
+import quanta.model.TreeNode;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.ipfs.file.IPFSObjectStat;
@@ -47,7 +48,6 @@ import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.TreeNode;
 import quanta.util.XString;
 
 /**

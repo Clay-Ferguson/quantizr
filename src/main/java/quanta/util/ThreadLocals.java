@@ -34,21 +34,25 @@ public class ThreadLocals {
     private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
     private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
+
     /*
      * Each thread will set this when a root event is created and any other events that get created,
      * will be added as top level children under it. Currently we don't do a hierarchy, but just one
      * level of containment
      */
     private static final ThreadLocal<PerfMonEvent> rootEvent = new ThreadLocal<>();
+
     /*
      * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
      * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
      * every object that is touched during the processing of a thread/request.
      */
     private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
+
     // We judiciously add only *some* nodes to this cache that we know are safe to cache because
     // they're able to be treated as readonly during the context of the thread.
     private static final ThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new ThreadLocal<>();
+
     /*
      * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
      * nodes that should be all self contained as an acyclical-directed graph (i.e. tree) and there's no

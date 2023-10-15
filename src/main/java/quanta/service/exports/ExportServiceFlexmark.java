@@ -25,6 +25,7 @@ import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import quanta.config.ServiceBase;
+import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -40,7 +41,6 @@ import quanta.util.FileUtils;
 import quanta.util.ImageUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.TreeNode;
 import quanta.util.XString;
 
 /**

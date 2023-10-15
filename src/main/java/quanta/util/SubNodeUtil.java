@@ -152,8 +152,8 @@ public class SubNodeUtil extends ServiceBase {
         if (created != null) {
             created.setVal(true);
         }
-        List<String> nameTokens = XString.tokenize(pathName, "/", true);
-        if (nameTokens == null) {
+        List<String> toks = XString.tokenize(pathName, "/", true);
+        if (toks == null) {
             return null;
         }
         SubNode parent = null;
@@ -165,8 +165,8 @@ public class SubNodeUtil extends ServiceBase {
         }
         boolean nodesCreated = false;
 
-        for (String nameToken : nameTokens) {
-            String path = fixPath(parentPath + nameToken);
+        for (String tok : toks) {
+            String path = fixPath(parentPath + tok);
             node = read.getNode(ms, path);
             /*
              * if this node is found continue on, using it as current parent to build on
@@ -175,10 +175,10 @@ public class SubNodeUtil extends ServiceBase {
                 parent = node;
             } else {
                 /* Note if parent PARAMETER here is null we are adding a root node */
-                parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null,
-                        null, true, true);
+                parent = create.createNode(ms, parent, tok, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
+                        true, true);
                 if (parent == null) {
-                    throw ExUtil.wrapEx("unable to create " + nameToken);
+                    throw ExUtil.wrapEx("unable to create " + tok);
                 }
                 nodesCreated = true;
                 if (defaultContent == null) {
@@ -187,7 +187,7 @@ public class SubNodeUtil extends ServiceBase {
                 }
                 update.save(ms, parent);
             }
-            parentPath += nameToken + "/";
+            parentPath += tok + "/";
         }
         if (nodeName != null) {
             parent.setName(nodeName);

@@ -22,6 +22,7 @@ import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
 import quanta.model.AccessControlInfo;
+import quanta.model.ImageSize;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
@@ -41,6 +42,7 @@ import quanta.util.val.Val;
 @Component
 public class Convert extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(Convert.class);
+
     // indicates we don't need to worry about sending back a good logicalOrdinal
     public static int LOGICAL_ORDINAL_IGNORE = -1;
     // indicates we need generate the correct logicalOrdinal
@@ -383,7 +385,7 @@ public class Convert extends ServiceBase {
                 if (props == null) {
                     props = new LinkedList<>();
                 }
-                PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, propMap.get(propName), initNodeEdit);
+                PropertyInfo propInfo = toPropInfo(sc, node, propName, propMap.get(propName), initNodeEdit);
                 props.add(propInfo);
             }
         }
@@ -393,7 +395,7 @@ public class Convert extends ServiceBase {
         return props;
     }
 
-    public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
+    public PropertyInfo toPropInfo(SessionContext sc, SubNode node, String propName, Object prop,
             boolean initNodeEdit) {
         try {
             Object value = null;

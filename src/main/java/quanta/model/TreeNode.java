@@ -1,4 +1,4 @@
-package quanta.util;
+package quanta.model;
 
 import java.util.LinkedList;
 import quanta.mongo.model.SubNode;
