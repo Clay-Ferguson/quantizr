@@ -25,14 +25,14 @@ public class FinancialReport extends ServiceBase {
         sb.append(htmlH(6, "Debits"));
         sb.append(getStatsTable("D"));
 
-        sb.append(htmlH(6, "All Transactions"));
+        sb.append(htmlH(6, "All Trans"));
         sb.append(getAllTransactionsTable());
 
         return sb.toString();
     }
 
     private String getAllTransactionsTable() {
-        List<Object[]> results = transactionRepository.allTransactions();
+        List<Object[]> results = tranRepository.allTrans();
         if (results == null || results.size() == 0) {
             return "No data available yet.";
         }
@@ -40,7 +40,7 @@ public class FinancialReport extends ServiceBase {
     }
 
     private String getStatsTable(String transType) {
-        List<Object[]> results = transactionRepository.findTransactionSummaryByUser(transType);
+        List<Object[]> results = tranRepository.findTranSummaryByUser(transType);
         if (results == null || results.size() == 0) {
             return "No data available yet.";
         }

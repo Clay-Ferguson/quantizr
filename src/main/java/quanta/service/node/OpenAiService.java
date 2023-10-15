@@ -30,7 +30,7 @@ import quanta.model.client.openai.Usage;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.postgres.Transaction;
+import quanta.postgres.Tran;
 import quanta.postgres.UserAccount;
 import quanta.request.AskSubGraphRequest;
 import quanta.request.CreateSubNodeRequest;
@@ -65,7 +65,7 @@ public class OpenAiService extends ServiceBase {
         if (user.initialGrant(userNode.getIdStr(), userName)) {
             balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
         } else {
-            balance = transactionRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
+            balance = tranRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
             if (balance == null) {
                 throw new RuntimeException("Sorry, you have no more OpenAI credit.");
             }
@@ -156,7 +156,7 @@ public class OpenAiService extends ServiceBase {
             user = userRepository.save(new UserAccount(userNode.getIdStr(), userName));
         }
 
-        Transaction debit = new Transaction();
+        Tran debit = new Tran();
         debit.setAmt(cost);
         debit.setTransType("D");
         debit.setTs(Timestamp.from(Instant.now()));
@@ -166,7 +166,7 @@ public class OpenAiService extends ServiceBase {
         // Eventually we will add to this information about the gpt request too. Entire Q & A
         // debit.setDetail(mapper.valueToTree(res));
 
-        transactionRepository.save(debit);
+        tranRepository.save(debit);
         res.userCredit = curBal.subtract(cost);
     }
 

@@ -26,7 +26,7 @@ public class UserAccount {
     private String userName;
 
     @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transactions;
+    private List<Tran> trans;
 
     public UserAccount() {
         // JPA requires a default constructor
@@ -61,11 +61,11 @@ public class UserAccount {
         this.userName = userName;
     }
 
-    public List<Transaction> getTransactions() {
-        return transactions;
+    public List<Tran> getTrans() {
+        return trans;
     }
 
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
+    public void setTrans(List<Tran> trans) {
+        this.trans = trans;
     }
 }

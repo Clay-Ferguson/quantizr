@@ -15,8 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "transaction")
-public class Transaction {
+@Table(name = "tran")
+public class Tran {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -31,7 +31,7 @@ public class Transaction {
     @Column(name = "ts", nullable = false)
     private Timestamp ts;
 
-    @Column(name = "trans_type")
+    @Column(name = "tran_type")
     private String transType;
 
     @Column(name = "desc_code")
@@ -41,7 +41,7 @@ public class Transaction {
     @Column(name = "detail", columnDefinition = "jsonb")
     private JsonNode detail;
 
-    public Transaction() {
+    public Tran() {
         // JPA requires a default constructor
     }
 

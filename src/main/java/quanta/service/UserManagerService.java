@@ -44,7 +44,7 @@ import quanta.model.client.UserProfile;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.postgres.Transaction;
+import quanta.postgres.Tran;
 import quanta.postgres.UserAccount;
 import quanta.request.AddCreditRequest;
 import quanta.request.AddFriendRequest;
@@ -549,13 +549,13 @@ public class UserManagerService extends ServiceBase {
             log.debug("User not found, creating...");
             user = userRepository.save(new UserAccount(userId, userName));
 
-            Transaction credit = new Transaction();
+            Tran credit = new Tran();
             credit.setAmt(new BigDecimal(INITIAL_GRANT_AMOUNT));
             credit.setTransType("C");
             credit.setDescCode("NEW");
             credit.setTs(Timestamp.from(Instant.now()));
             credit.setUserAccount(user);
-            transactionRepository.save(credit);
+            tranRepository.save(credit);
             return true;
         }
         return false;
@@ -580,16 +580,16 @@ public class UserManagerService extends ServiceBase {
             user = userRepository.save(new UserAccount(req.getUserId(), userName));
         }
 
-        Transaction credit = new Transaction();
+        Tran credit = new Tran();
         credit.setAmt(req.getAmount());
         credit.setTransType("C");
         credit.setDescCode("PAY");
         credit.setTs(Timestamp.from(Instant.now()));
         credit.setUserAccount(user);
-        transactionRepository.save(credit);
+        tranRepository.save(credit);
 
         // calculate new balance and return it.
-        res.setBalance(transactionRepository.getBalByMongoId(req.getUserId()));
+        res.setBalance(tranRepository.getBalByMongoId(req.getUserId()));
         return res;
     }
 
@@ -910,7 +910,7 @@ public class UserManagerService extends ServiceBase {
                 userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
                 userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));
 
-                BigDecimal balance = transactionRepository.getBalByMongoId(userNode.getIdStr());
+                BigDecimal balance = tranRepository.getBalByMongoId(userNode.getIdStr());
                 userProfile.setBalance(balance);
 
                 Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);

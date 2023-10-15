@@ -12,14 +12,13 @@ public class PaymentService extends ServiceBase {
 
     public String printTransactions() {
         StringBuilder sb = new StringBuilder();
-        Iterable<Transaction> transactions = transactionRepository.findAll();
+        Iterable<Tran> trans = tranRepository.findAll();
 
-        for (Transaction transaction : transactions) {
-            sb.append("Transaction ID: " + transaction.getId() + ", User ID: " + transaction.getUserAccount().getId()
-                    + ", Amount: " + transaction.getAmt() + ", Timestamp: " + transaction.getTs() + ", Service: "
-                    + transaction.getTransType() + "\n");
-            if (transaction.getDetail() != null) {
-                sb.append("Detail: " + transaction.getDetail().toString() + "\n");
+        for (Tran tran : trans) {
+            sb.append("Tran ID: " + tran.getId() + ", User ID: " + tran.getUserAccount().getId() + ", Amount: "
+                    + tran.getAmt() + ", Timestamp: " + tran.getTs() + ", Service: " + tran.getTransType() + "\n");
+            if (tran.getDetail() != null) {
+                sb.append("Detail: " + tran.getDetail().toString() + "\n");
             }
         }
         return sb.toString();

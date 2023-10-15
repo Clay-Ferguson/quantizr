@@ -34,7 +34,7 @@ import quanta.mongo.MongoUpdate;
 import quanta.mongo.MongoUtil;
 import quanta.postgres.DatabaseService;
 import quanta.postgres.PaymentService;
-import quanta.postgres.TransactionRepository;
+import quanta.postgres.TranRepository;
 import quanta.postgres.UserRepository;
 import quanta.service.AclService;
 import quanta.service.AttachmentService;
@@ -114,7 +114,7 @@ public class ServiceBase {
     static List<Runnable> postConstructs = new ArrayList<>();
     public static ApplicationContext context;
 
-    public static TransactionRepository transactionRepository;
+    public static TranRepository tranRepository;
     public static UserRepository userRepository;
     public static EventPublisher publisher;
     public static AppProp prop;
@@ -275,7 +275,7 @@ public class ServiceBase {
             roomType = getBean(ctx, RoomType.class);
             rssType = getBean(ctx, RssFeedType.class);
             mongoRepo = getBean(ctx, MongoRepository.class);
-            transactionRepository = getBean(ctx, TransactionRepository.class);
+            tranRepository = getBean(ctx, TranRepository.class);
             userRepository = getBean(ctx, UserRepository.class);
             opsw = getBean(ctx, MongoTemplateWrapper.class);
             publisher = getBean(ctx, EventPublisher.class);
