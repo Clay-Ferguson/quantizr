@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import quanta.config.ServiceBase;
+import quanta.postgres.table.UserAccount;
 import quanta.util.XString;
 
 @Component

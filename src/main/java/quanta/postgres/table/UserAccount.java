@@ -1,4 +1,4 @@
-package quanta.postgres;
+package quanta.postgres.table;
 
 import java.util.List;
 import jakarta.persistence.CascadeType;

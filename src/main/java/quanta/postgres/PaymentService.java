@@ -4,10 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.postgres.table.Tran;
+import quanta.postgres.table.UserAccount;
 
 @Component
 public class PaymentService extends ServiceBase {
-
     private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 
     public String printTransactions() {

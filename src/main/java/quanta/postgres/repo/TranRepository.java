@@ -1,10 +1,11 @@
-package quanta.postgres;
+package quanta.postgres.repo;
 
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import quanta.postgres.table.Tran;
 
 public interface TranRepository extends JpaRepository<Tran, Long> {
         @Query("SELECT count(t) FROM Tran t WHERE t.userAccount.mongoId = :mongoId")
