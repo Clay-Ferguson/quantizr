@@ -4,12 +4,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
@@ -28,10 +30,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import quanta.actpub.model.APODID;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.mongo.CreateNodeLocation;
@@ -93,7 +97,7 @@ public class IPFSService extends ServiceBase {
             return null;
         synchronized (instanceIdLock) {
             if (instanceId == null) {
-                instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
+                instanceId = toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
             }
             return instanceId;
         }
@@ -379,6 +383,17 @@ public class IPFSService extends ServiceBase {
         return ret;
     }
 
+    @SuppressWarnings("unchecked")
+    public DagNode toDagNode(Object obj) {
+        return (DagNode) obj;
+    }
+
+    /* Convert to hashmap of String to Object */
+    @SuppressWarnings("unchecked")
+    public LinkedHashMap<String, Object> toLinkedHashMap(Object obj) {
+        return (LinkedHashMap<String, Object>) obj;
+    }
+
     /*
      * Save PUBLIC nodes to IPFS/MFS
      */
@@ -502,4 +517,72 @@ public class IPFSService extends ServiceBase {
             });
         });
     }
+
+    /*
+     * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up orphans.
+     */
+    public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
+        Val<String> ret = new Val<>("failed");
+        // run as admin
+        arun.run(as -> {
+            int pinCount = 0;
+            int orphanCount = 0;
+            LinkedHashMap<String, Object> pins = toLinkedHashMap(ipfsPin.getPins());
+            if (pins != null) {
+                /*
+                 * For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
+                 * if not we remove the pin
+                 */
+                for (String pin : pins.keySet()) {
+                    log.debug("Check PIN: " + pin);
+                    boolean attachment = false;
+                    SubNode ipfsNode = read.findByIPFSPinned(as, pin);
+                    Attachment att = ipfsNode.getFirstAttachment();
+
+                    // if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
+                    if (ipfsNode != null) {
+                        /*
+                         * ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear in
+                         * the pinning system. // are // to pin it ever, so for now I'm leaving this code here, but we
+                         * don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no
+                         * matter what, so we don't need
+                         */
+                        attachment = true;
+                        pinCount++;
+                        log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId=" + ipfsNode.getIdStr());
+                        if (attachment && statsMap != null) {
+                            Long binSize = att != null ? att.getSize() : null;
+                            if (binSize == null) {
+                                // Note: If binTotal is ever zero here we SHOULD do what's in the comment above
+                                // an call objectStat to put correct amount in.
+                                binSize = 0L;
+                            }
+                            /*
+                             * Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could
+                             * be more aggressive about 'correctness' here and actually call ipfs.objectStat on each
+                             * CID, to get a more bullet proof total bytes amount, but we are safe enough trusting what
+                             * the node info holds, because it should be correct.
+                             */
+                            UserStats stats = statsMap.get(ipfsNode.getOwner());
+                            if (stats == null) {
+                                stats = new UserStats();
+                                stats.binUsage = binSize;
+                                statsMap.put(ipfsNode.getOwner(), stats);
+                            } else {
+                                stats.binUsage = stats.binUsage.longValue() + binSize;
+                            }
+                        }
+                    } else {
+                        orphanCount++;
+                        ipfsPin.remove(pin);
+                    }
+                }
+            }
+            ret.setVal("Pins in use: " + pinCount + "\nOrphan Pins removed: " + orphanCount + "\n");
+            log.debug(ret.getVal());
+            return null;
+        });
+        return ret.getVal();
+    }
+
 }

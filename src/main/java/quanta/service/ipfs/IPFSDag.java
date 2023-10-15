@@ -53,7 +53,7 @@ public class IPFSDag extends ServiceBase {
         DagNode ret = null;
         try {
             String url = API_DAG + "/get?arg=" + cid;
-            ret = Cast.toDagNode(ipfs.postForJsonReply(url, DagNode.class));
+            ret = ipfs.toDagNode(ipfs.postForJsonReply(url, DagNode.class));
         } catch (Exception e) {
             log.error("Failed in getDagNode", e);
         }
