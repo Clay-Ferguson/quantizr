@@ -165,7 +165,7 @@ public class SystemService extends ServiceBase {
         if (!prop.ipfsEnabled())
             return "IPFS Disabled.";
         String ret = ipfsRepo.gc();
-        ret += update.releaseOrphanIPFSPins(statsMap);
+        ret += ipfs.releaseOrphanIPFSPins(statsMap);
         return ret;
     }
 

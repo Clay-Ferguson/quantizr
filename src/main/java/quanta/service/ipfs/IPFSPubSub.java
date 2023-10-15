@@ -30,7 +30,6 @@ import quanta.model.client.IPSMMessage;
 import quanta.mongo.MongoRepository;
 import quanta.response.IPSMPushInfo;
 import quanta.response.ServerPushInfo;
-import quanta.util.Cast;
 import quanta.util.DateUtil;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -76,10 +75,10 @@ public class IPFSPubSub extends ServiceBase {
         LinkedHashMap<String, Object> res = null;
         // Pubsub.Router="floodsub" | "gossipsub"
         // todo-2: we can add this to the startup bash scripts along with the CORS configs?
-        res = Cast.toLinkedHashMap(
+        res = ipfs.toLinkedHashMap(
                 ipfs.postForJsonReply(ipfsConfig.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
-        res = Cast.toLinkedHashMap(ipfs.postForJsonReply(
+        res = ipfs.toLinkedHashMap(ipfs.postForJsonReply(
                 ipfsConfig.API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }

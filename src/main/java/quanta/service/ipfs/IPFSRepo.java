@@ -4,8 +4,8 @@ import java.util.LinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import javassist.expr.Cast;
 import quanta.config.ServiceBase;
-import quanta.util.Cast;
 import quanta.util.XString;
 
 @Component
@@ -25,7 +25,7 @@ public class IPFSRepo extends ServiceBase {
      */
     public String verify() {
         String url = API_REPO + "/verify";
-        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
+        LinkedHashMap<String, Object> res = ipfs.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
         return "\nIPFS Repository Verify:\n" + XString.prettyPrint(res) + "\n";
     }
 

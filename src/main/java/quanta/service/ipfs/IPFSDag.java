@@ -17,7 +17,6 @@ import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
 import quanta.request.GetIPFSFilesRequest;
-import quanta.util.Cast;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;

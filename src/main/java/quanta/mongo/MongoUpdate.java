@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -14,14 +12,10 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.model.UserStats;
-import quanta.model.client.Attachment;
 import quanta.mongo.model.SubNode;
-import quanta.util.Cast;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import quanta.util.val.Val;
 
 /**
  * Performs update (as in CRUD) operations for MongoDB

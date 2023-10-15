@@ -6,13 +6,13 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import javassist.expr.Cast;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.util.Cast;
 import quanta.util.Util;
 import quanta.util.XString;
 
@@ -59,10 +59,10 @@ public class IPFSPin extends ServiceBase {
         HashMap<String, Object> res = null;
         try {
             String url = API_PIN + "/ls?type=recursive";
-            res = Cast.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
+            res = ipfs.toLinkedHashMap(ipfs.postForJsonReply(url, LinkedHashMap.class));
             // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
             if (res != null) {
-                pins = Cast.toLinkedHashMap(res.get("Keys"));
+                pins = ipfs.toLinkedHashMap(res.get("Keys"));
             }
         } catch (Exception e) {
             log.error("Failed to get pins", e);
