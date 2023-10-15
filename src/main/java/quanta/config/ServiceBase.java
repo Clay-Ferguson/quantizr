@@ -40,6 +40,7 @@ import quanta.service.AclService;
 import quanta.service.AttachmentService;
 import quanta.service.CryptoService;
 import quanta.service.FinancialReport;
+import quanta.service.FriendService;
 import quanta.service.GraphNodesService;
 import quanta.service.LuceneService;
 import quanta.service.OpenGraphService;
@@ -136,6 +137,7 @@ public class ServiceBase {
     public static ActPubService apub;
     public static NodeRenderService render;
     public static NodeEditService edit;
+    public static FriendService friend;
     public static ActPubCache apCache;
     public static Validator validator;
     public static OutboxMgr outbox;
@@ -239,6 +241,7 @@ public class ServiceBase {
             apub = getBean(ctx, ActPubService.class);
             render = getBean(ctx, NodeRenderService.class);
             edit = getBean(ctx, NodeEditService.class);
+            friend = getBean(ctx, FriendService.class);
             apCache = getBean(ctx, ActPubCache.class);
             validator = getBean(ctx, Validator.class);
             outbox = getBean(ctx, OutboxMgr.class);

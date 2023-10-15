@@ -174,7 +174,7 @@ public class ActPubFollowing extends ServiceBase {
                     if (friendNode == null) {
                         if (!unFollow) {
                             log.trace("unable to find user node by name: " + followerUserName + " so creating.");
-                            friendNode = edit.createFriendNode(as, followerFriendList, userToFollow, null);
+                            friendNode = friend.createFriendNode(as, followerFriendList, userToFollow, null);
                         }
                     } else { // new NotificationMessage("apReply", null, contentHtml, toUserName)); //
                              // userFeed.sendServerPushInfo(localUserName,

@@ -34,7 +34,6 @@ import quanta.request.SaveNodeRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
-import quanta.request.UpdateFriendNodeRequest;
 import quanta.response.GetNodeJsonResponse;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.LikeNodeResponse;
@@ -44,7 +43,6 @@ import quanta.response.SaveNodeResponse;
 import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SetExpandedResponse;
 import quanta.response.SplitNodeResponse;
-import quanta.response.UpdateFriendNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.service.AclService;
 import quanta.types.TypeBase;
@@ -53,7 +51,6 @@ import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import quanta.util.val.Val;
 
 /**
  * Service for editing content of nodes. That is, this method updates property values of nodes. As
@@ -63,40 +60,6 @@ import quanta.util.val.Val;
 @Component
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-    public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow, String tags) {
-        // get userNode of user to follow
-        SubNode userNode = read.getAccountByUserName(ms, userToFollow, false);
-        if (userNode != null) {
-            List<PropertyInfo> properties = new LinkedList<>();
-            properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
-            properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
-            String userImgUrl = userNode.getStr(NodeProp.USER_ICON_URL);
-            if (!StringUtils.isEmpty(userImgUrl)) {
-                properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
-            }
-            SubNode friendNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
-                    CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true);
-            friendNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-
-            if (tags != null) {
-                friendNode.setTags(tags);
-            }
-
-            String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-            if (userToFollowActorId != null) {
-                friendNode.set(NodeProp.ACT_PUB_ACTOR_ID, userToFollowActorId);
-            }
-            String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
-            if (userToFollowActorUrl != null) {
-                friendNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
-            }
-            update.save(ms, friendNode);
-            return friendNode;
-        } else {
-            throw new RuntimeException("User not found: " + userToFollow);
-        }
-    }
 
     public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {
         LikeNodeResponse res = new LikeNodeResponse();
@@ -133,17 +96,6 @@ public class NodeEditService extends ServiceBase {
                 return null;
             });
         });
-        return res;
-    }
-
-    public UpdateFriendNodeResponse updateFriendNode(MongoSession ms, UpdateFriendNodeRequest req) {
-        UpdateFriendNodeResponse res = new UpdateFriendNodeResponse();
-        SubNode node = read.getNode(ms, req.getNodeId());
-        auth.ownerAuth(ms, node);
-        if (!NodeType.FRIEND.s().equals(node.getType())) {
-            throw new RuntimeException("Not a Friend node.");
-        }
-        node.setTags(req.getTags());
         return res;
     }
 
@@ -356,54 +308,6 @@ public class NodeEditService extends ServiceBase {
             }
             return null;
         });
-    }
-
-    /*
-     * Whenever a friend node is saved, we send the "following" request to the foreign ActivityPub
-     * server
-     */
-    public void updateSavedFriendNode(String userDoingAction, SubNode node) {
-        String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
-        String friendUserName = node.getStr(NodeProp.USER);
-        if (friendUserName != null) {
-            // if a foreign user, update thru ActivityPub.
-            if (friendUserName.contains("@")) {
-                log.trace("calling setFollowing=true, to post follow to foreign server.");
-                apFollowing.setFollowing(userDoingAction, friendUserName, true);
-            }
-            /*
-             * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
-             */
-            if (userNodeId == null) {
-                /*
-                 * A userName containing "@" is considered a foreign Fediverse user and will trigger a WebFinger
-                 * search of them, and a load/update of their outbox
-                 */
-                if (friendUserName.contains("@")) {
-                    exec.run(() -> {
-                        arun.run(s -> {
-                            if (!ThreadLocals.getSC().isAdmin()) {
-                                apub.getAcctNodeByForeignUserName(s, userDoingAction, friendUserName, false, true);
-                            }
-                            /*
-                             * The only time we pass true to load the user into the system is when they're being added
-                             * as a friend.
-                             */
-                            apub.userEncountered(friendUserName, true);
-                            return null;
-                        });
-                    });
-                }
-                Val<SubNode> userNode = new Val<SubNode>();
-
-                userNode.setVal(read.getAccountByUserName(null, friendUserName, false));
-
-                if (userNode.getVal() != null) {
-                    userNodeId = userNode.getVal().getIdStr();
-                    node.set(NodeProp.USER_NODE_ID, userNodeId);
-                }
-            }
-        }
     }
 
     /*

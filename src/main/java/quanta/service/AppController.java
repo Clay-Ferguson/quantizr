@@ -529,7 +529,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object updateFriendNode(@RequestBody UpdateFriendNodeRequest req, HttpSession session) {
         return callProc.run("updateFriendNode", true, true, req, session, ms -> {
-            return edit.updateFriendNode(ms, req);
+            return friend.updateFriendNode(ms, req);
         });
     }
 
@@ -840,7 +840,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
         return callProc.run("addFriend", true, true, req, session, ms -> {
-            return user.addFriend(ms, req);
+            return friend.addFriend(ms, req);
         });
     }
 
@@ -848,7 +848,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
         return callProc.run("deleteFriend", true, true, req, session, ms -> {
-            return user.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
+            return friend.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
         });
     }
 
@@ -864,7 +864,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
         return callProc.run("unblockUser", true, true, req, session, ms -> {
-            return user.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
+            return friend.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
         });
     }
 

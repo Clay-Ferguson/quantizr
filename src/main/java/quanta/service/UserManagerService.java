@@ -47,7 +47,6 @@ import quanta.mongo.model.SubNode;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
 import quanta.request.AddCreditRequest;
-import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
@@ -61,11 +60,9 @@ import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
 import quanta.request.SignupRequest;
 import quanta.response.AddCreditResponse;
-import quanta.response.AddFriendResponse;
 import quanta.response.BlockUserResponse;
 import quanta.response.ChangePasswordResponse;
 import quanta.response.CloseAccountResponse;
-import quanta.response.DeleteFriendResponse;
 import quanta.response.DeleteUserTransactionsResponse;
 import quanta.response.FriendInfo;
 import quanta.response.GetPeopleResponse;
@@ -713,26 +710,11 @@ public class UserManagerService extends ServiceBase {
         }
 
         if (userNode == null) {
-            userNode = edit.createFriendNode(ms, blockedList, userToBlock, null);
+            userNode = friend.createFriendNode(ms, blockedList, userToBlock, null);
             if (userNode != null) {
                 log.debug("Blocked user " + userToBlock);
             }
         }
-    }
-
-    public DeleteFriendResponse deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
-        DeleteFriendResponse res = new DeleteFriendResponse();
-        ms = ThreadLocals.ensure(ms);
-        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(delUserNodeId); //
-        List<SubNode> friendNodes = getSpecialNodesList(ms, null, parentType, null, false, crit);
-        if (friendNodes != null) {
-            // we run a for loop but there will only be only up to one friend node in this result set.
-            for (SubNode friendNode : friendNodes) {
-                // we delete with updateHasChildren=false, because it's more efficient
-                delete.delete(ms, friendNode, false);
-            }
-        }
-        return res;
     }
 
     public void exportPeople(MongoSession ms, HttpServletResponse response, String disposition, String listType) {
@@ -772,26 +754,6 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
-    /*
-     * Adds all the users in 'req.userName' (as a newline elimited list) as new friends of the current
-     * user
-     */
-    public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
-        AddFriendResponse res = new AddFriendResponse();
-        String userDoingAction = ThreadLocals.getSC().getUserName();
-        final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
-
-        users.forEach(u -> {
-            Val<String> userVal = new Val<>();
-            Val<String> tagsVal = new Val<>();
-
-            parseImportUser(u, userVal, tagsVal);
-            String tags = tagsVal.getVal() != null ? tagsVal.getVal() : req.getTags();
-            addFriend(ms, userDoingAction, null, userVal.getVal(), tags);
-        });
-        return res;
-    }
-
     // parses a comma-delimited 'user' string like "clay, #tag1 #tag2", and sends back the two parts
     // in userVal and tagsVal
     public void parseImportUser(String user, Val<String> userVal, Val<String> tagsVal) {
@@ -801,76 +763,6 @@ public class UserManagerService extends ServiceBase {
         }
         if (parts.size() > 1) {
             tagsVal.setVal(parts.get(1));
-        }
-    }
-
-    /*
-     * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
-     * if the user wasn't already a friend
-     */
-    public String addFriend(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
-            String userBeingFollowed, String tags) {
-        String _userToFollow = userBeingFollowed;
-        _userToFollow = XString.stripIfStartsWith(_userToFollow, "@");
-        // duplicate variable because of lambdas below
-        String userToFollow = _userToFollow;
-        if (userToFollow.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
-            return "You can't be friends with the admin.";
-        }
-        // If we don't know the account id of the person doing the follow, then look it up.
-        if (accntIdDoingFollow == null) {
-            SubNode followerAcctNode = arun.run(s -> read.getAccountByUserName(s, userDoingFollow, false));
-            if (followerAcctNode == null) {
-                throw new RuntimeException("Unable to find user: " + userDoingFollow);
-            }
-            accntIdDoingFollow = followerAcctNode.getId();
-        }
-        addFriendInternal(ThreadLocals.getMongoSession(), userDoingFollow, accntIdDoingFollow, userToFollow, tags);
-        return "Added Friend: " + userToFollow;
-    }
-
-    /* The code pattern here is very similar to 'blockUser' */
-    private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
-            String userToFollow, String tags) {
-        SubNode followerFriendList = read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(),
-                null, NodeName.FRIENDS, true);
-        if (followerFriendList == null) {
-            log.debug("Can't access Friend list for: " + userDoingFollow);
-            return;
-        }
-        /*
-         * lookup to see if this followerFriendList node already has userToFollow already under it.
-         */
-        SubNode friendNode = read.findFriendNode(ms, accntIdDoingFollow, null, userToFollow);
-        // if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
-        if (friendNode != null && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
-            delete.delete(ms, friendNode);
-            friendNode = null;
-        }
-        // if friendNode is non-null here it means we were already following the user.
-        if (friendNode != null)
-            return;
-        if (userToFollow.contains("@")) {
-            apub.loadForeignUser(userDoingFollow, userToFollow, false);
-        }
-        // the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
-        // must use arun.
-        SubNode userNode = arun.run(s -> read.getAccountByUserName(s, userToFollow, false));
-        if (userNode == null)
-            return;
-
-        // follower bot never blocks people, so we can avoid calling that if follower bot.
-        if (!userDoingFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
-            // We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
-            // the DB enforcing this.
-            deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
-        }
-        log.trace("Creating friendNode for " + userToFollow);
-        friendNode = edit.createFriendNode(ms, followerFriendList, userToFollow, tags);
-        if (friendNode != null) {
-            friendNode.set(NodeProp.USER_NODE_ID, userNode.getIdStr());
-            // updates AND sends the friend request out to the foreign server.
-            edit.updateSavedFriendNode(userDoingFollow, friendNode);
         }
     }
 
@@ -1268,7 +1160,7 @@ public class UserManagerService extends ServiceBase {
             List<FriendInfo> friends = new LinkedList<>();
 
             for (SubNode friendNode : friendNodes) {
-                FriendInfo fi = buildPersonInfoFromFriendNode(ms, friendNode);
+                FriendInfo fi = friend.buildPersonInfoFromFriendNode(ms, friendNode);
                 if (fi != null) {
                     friends.add(fi);
                 } else {
@@ -1291,40 +1183,6 @@ public class UserManagerService extends ServiceBase {
         }
         ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
         return ret;
-    }
-
-    public FriendInfo buildPersonInfoFromFriendNode(MongoSession ms, SubNode friendNode) {
-        String userName = friendNode.getStr(NodeProp.USER);
-        FriendInfo fi = null;
-        if (userName != null) {
-            fi = new FriendInfo();
-            fi.setFriendNodeId(friendNode.getIdStr());
-            fi.setUserName(userName);
-            fi.setTags(friendNode.getTags());
-            fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.USER_ICON_URL));
-            String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-            SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
-            if (friendAccountNode != null) {
-                fi.setDisplayName(getFriendlyNameFromNode(friendAccountNode));
-
-                // if a local user use BIN property on node (account node BIN property is the Avatar)
-                if (userName.indexOf("@") == -1) {
-                    Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-                    if (att != null) {
-                        fi.setAvatarVer(att.getBin());
-                    }
-                } else { // Otherwise the avatar will be specified as a remote user's Icon.
-                    // set avatar here only if we didn't set it above already
-                    if (fi.getForeignAvatarUrl() == null) {
-                        fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.USER_ICON_URL));
-                    }
-                }
-            } else {
-                return null;
-            }
-            fi.setUserNodeId(userNodeId);
-        }
-        return fi;
     }
 
     /**
