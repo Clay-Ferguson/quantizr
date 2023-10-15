@@ -40,6 +40,7 @@ export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 export MONGO_BACKUP=${DEPLOY_TARGET}/backup
 
 export POSTGRES_DATA=${DEPLOY_TARGET}/postgres
+export PGADMIN_DATA=${DEPLOY_TARGET}/pgadmin
 
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
@@ -67,6 +68,10 @@ export devEmail=somebody@someserver.com
 export adminPassword=password
 export mongoPassword=password
 export pgPassword=password
+
+export PGADMIN_PORT=5050
+export pgAdminPassword=password
+export pgAdminEmail=user@domain.com
 
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.

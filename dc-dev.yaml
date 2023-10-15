@@ -65,7 +65,7 @@ services:
                     - mongo-host-dev
        
         volumes:
-            - '${MONGO_BASE}/mongodb-data-dev:/data/db'
+            - '${MONGO_DATA}:/data/db'
             - '${MONGOD_CONF}:/etc/mongod.conf'
             - '${MONGO_BACKUP}:/backup'
 
@@ -142,21 +142,21 @@ services:
         ports:
             - '${POSTGRES_PORT}:5432'
         volumes: 
-            - '${POSTGRES_BASE}/postgres-data-dev:/var/lib/postgresql/data'
+            - '${POSTGRES_DATA}:/var/lib/postgresql/data'
 
-    # This pgadmin4 service works perfectly, but we're not using it, in order to save server resources.
-    # See '/docs/postgres.md'
-    # pgadmin4:
-    #     image: dpage/pgadmin4:latest
-    #     depends_on:
-    #         - pgdb-dev
-    #     environment:
-    #         PGADMIN_DEFAULT_EMAIL: pgadmin4@mydomain.com # replace with your email
-    #         PGADMIN_DEFAULT_PASSWORD: secret # replace with your password
-    #     ports:
-    #         - '5050:80'
-    #     networks:
-    #         - bridge
+    pgadmin4:
+        image: dpage/pgadmin4:latest
+        depends_on:
+            - pgdb-dev
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${pgAdminEmail}
+            PGADMIN_DEFAULT_PASSWORD: ${pgAdminPassword}
+        ports:
+            - '${PGADMIN_PORT}:80'
+        networks:
+            - bridge
+        volumes:
+            - '${PGADMIN_DATA}:/var/lib/pgadmin'
 
     quanta-dev:
         image: ${DOCKER_IMAGE}

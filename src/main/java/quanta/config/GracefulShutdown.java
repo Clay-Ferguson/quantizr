@@ -33,9 +33,8 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
     }
 
     /*
-     * Invoke with `0` to indicate no error or different code to indicate abnormal exit. es:
-     * shutdownManager.initiateShutdown(0);
-     **/
+     * Invoke with `0` to indicate no error or different code to indicate abnormal exit.
+     */
     public void initiateShutdown(int returnCode) {
         SpringApplication.exit(appContext, () -> returnCode);
     }

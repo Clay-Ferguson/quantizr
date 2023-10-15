@@ -24,10 +24,8 @@ Makes server avilable at http://127.0.0.1:5050
 
 Once you login to the admin console, here are the connection settings that can get you connected to a locally running (like during development) instance of the Quanta app and it's Postgres instance:
 
-Connection Host: 172.17.0.1
+Connection Host: pgdb-host-dev
 Database: quanta-pg
 User: quanta-pg
 Password: ******
-
-*Note: The 172.17.0.1 is a special docker address for the host machine as seen from inside the pgAdmin4 container. Obviously we can't just use 127.0.0.1 inside the pgAdmin4 dockerk container because that IP would point to the container itself, from inside the container, where pgAdmin4 is running.*
 

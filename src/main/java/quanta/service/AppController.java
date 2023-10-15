@@ -215,7 +215,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
             HttpSession session) {
-        return callProc.run("logout", true, true, req, session, ms -> {
+        return callProc.run("logout", true, false, req, session, ms -> {
             return user.logout(session);
         });
     }

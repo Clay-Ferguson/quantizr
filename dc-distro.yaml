@@ -94,19 +94,19 @@ services:
         volumes: 
             - '${POSTGRES_DATA}:/var/lib/postgresql/data'
 
-    # This pgadmin4 service works perfectly, but we're not using it, in order to save server resources.
-    # See '/docs/postgres.md'
-    # pgadmin4:
-    #     image: dpage/pgadmin4:latest
-    #     depends_on:
-    #         - pgdb-dev
-#     environment:
-    #         PGADMIN_DEFAULT_EMAIL: pgadmin4@mydomain.com # replace with your email
-    #         PGADMIN_DEFAULT_PASSWORD: secret # replace with your password
-    #     ports:
-    #         - '5050:80'
-    #     networks:
-    #         - bridge
+    pgadmin4:
+        image: dpage/pgadmin4:latest
+        depends_on:
+            - pgdb-distro
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${pgAdminEmail}
+            PGADMIN_DEFAULT_PASSWORD: ${pgAdminPassword}
+        ports:
+            - '${PGADMIN_PORT}:80'
+        networks:
+            - bridge
+        volumes:
+            - '${PGADMIN_DATA}/:/var/lib/pgadmin'
 
     # ipfs-distro: 
     #     # https://hub.docker.com/r/ipfs/kubo/

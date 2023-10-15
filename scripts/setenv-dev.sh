@@ -64,11 +64,14 @@ export MONGO_PORT=27016
 export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
 
 # Sets a base location for MongoDB
-export MONGO_BASE=${PRJPARENT}
+export MONGO_DATA=${PRJPARENT}/dev-vols/mongodb
 export MONGO_BACKUP=/home/clay/mongodb-dev-backup
 
-export POSTGRES_BASE=${PRJPARENT}
+export PGADMIN_DATA=${PRJPARENT}/dev-vols/pgadmin
+export POSTGRES_DATA=${PRJPARENT}/dev-vols/postgres
+
 export POSTGRES_PORT=5433
+export PGADMIN_PORT=5051
 
 # This tells our scripts where we are actually running from 
 # (The Distro Folder on this machine. The folder containing the runtime and configs)
@@ -97,6 +100,9 @@ export devEmail=somebody@someserver.com
 export adminPassword=password
 export mongoPassword=password
 export pgPassword=password
+
+export pgAdminPassword=password
+export pgAdminEmail=user@domain.com
 
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.

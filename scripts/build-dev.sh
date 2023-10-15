@@ -15,6 +15,9 @@ clear
 source ./setenv-dev.sh
 checkFunctions
 
+sudo mkdir -p ${PGADMIN_DATA}
+sudo chown -R 5050:5050 ${PGADMIN_DATA}
+
 rm -rf ${QUANTA_BASE}/log/*
 makeDirs
 

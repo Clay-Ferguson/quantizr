@@ -19,6 +19,9 @@ export adminPassword=password
 export mongoPassword=password
 export pgPassword=password
 
+export pgAdminPassword=password
+export pgAdminEmail=user@domain.com
+
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.
 export testPassword=password

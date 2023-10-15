@@ -54,6 +54,8 @@ export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
 
 export POSTGRES_DATA=${DEPLOY_TARGET}/postgres
+export PGADMIN_DATA=${DEPLOY_TARGET}/pgadmin
+export PGADMIN_PORT=5050
 
 export REDIS_HOST=redis-host-distro
 export REDIS_PORT=6379
