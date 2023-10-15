@@ -26,15 +26,17 @@ public class Util {
     private static Logger log = LoggerFactory.getLogger(Util.class);
     private static final Random rand = new Random();
 
-    public static ObjectMapper simpleMapper = new ObjectMapper();
+    public static ObjectMapper simpleMapper;
+    public static final ObjectMapper mapper;
+    public static final ObjectMapper yamlMapper;
 
-    public static final ObjectMapper mapper = new ObjectMapper();
-    {
+    static {
+        simpleMapper = new ObjectMapper();
+        mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(Include.NON_NULL);
+        yamlMapper = new ObjectMapper(new YAMLFactory());
     }
-
-    public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     public static double calculateKBps(double bytes, double nanoseconds) {
         if (nanoseconds == 0)
