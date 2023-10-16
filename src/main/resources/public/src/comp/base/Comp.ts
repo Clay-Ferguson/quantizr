@@ -151,10 +151,6 @@ export abstract class Comp implements CompIntf {
         return ++Comp.guid;
     }
 
-    static getCssPrefix(): string {
-        return `C${(++Comp.guid).toString(36)}_`;
-    }
-
     /* Schedules a function to get run whenever this element comes into existence, or will cause
      the function to run immediately of the component is already mounted */
     onMount(func: (elm: HTMLElement) => void) {
@@ -223,7 +219,6 @@ export abstract class Comp implements CompIntf {
     create = (): ReactNode => {
         return createElement(this.render, this.attribs);
     }
-
 
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {

@@ -160,13 +160,13 @@ export class EditNodeDlg extends DialogBase {
 
     createLayoutSelection = (): Selection => {
         const ast = getAs();
-        const selection: Selection = new Selection(null, "Subnode Layout", [
-            { key: "v", val: "1 column" },
-            { key: "c2", val: "2 columns" },
-            { key: "c3", val: "3 columns" },
-            { key: "c4", val: "4 columns" },
-            { key: "c5", val: "5 columns" },
-            { key: "c6", val: "6 columns" }
+        const selection: Selection = new Selection(null, "Layout", [
+            { key: "v", val: "1 col" },
+            { key: "c2", val: "2 cols" },
+            { key: "c3", val: "3 cols" },
+            { key: "c4", val: "4 cols" },
+            { key: "c5", val: "5 cols" },
+            { key: "c6", val: "6 cols" }
         ], null, "layoutSelection", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
@@ -462,7 +462,6 @@ export class EditNodeDlg extends DialogBase {
             editorOpts.nodeName || editorOpts.priority;
 
         if (hasAdvControls) {
-
             const advancedDiv = new Divc({ className: "advancedCont" }, [
                 new Divc({ className: "row align-items-end" }, [
                     editorOpts.nodeName ? nodeNameTextField : null,
