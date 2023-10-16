@@ -4,8 +4,6 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
-import { DialogMode } from "../../DialogBase";
-import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -47,81 +45,76 @@ export class NodeCompMainNode extends Div {
             return false;
         }
 
-        if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && node.id === ast.editNode.id) {
-            this.setChildren([EditNodeDlg.embedInstance || //
-                new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED)]);
+        const focusNode = S.nodeUtil.getHighlightedNode();
+        const selected: boolean = (focusNode && focusNode.id === node.id);
+        this.attribs.className = (selected ? "activeRowMain" : "inactiveRowMain") + " ui-tree-node-top";
+
+        if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
+            S.render.fadeInId = null;
+            S.render.allowFadeInId = false;
+            this.attribs.className += " fadeInRowBkgClz";
+            S.quanta.fadeStartTime = new Date().getTime();
+        }
+
+        this.attribs[C.NODE_ID_ATTR] = node.id;
+        this.attribs.onClick = S.nav.clickTreeNode;
+
+        let header: CompIntf = null;
+        let jumpButton: CompIntf = null;
+        const type = S.plugin.getType(node.type);
+
+        let allowHeader: boolean = false;
+        // special case, if node is owned by admin and we're not admin, never show header
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
+            // leave allowHeader false
         }
         else {
-            const focusNode = S.nodeUtil.getHighlightedNode();
-            const selected: boolean = (focusNode && focusNode.id === node.id);
-            this.attribs.className = (selected ? "activeRowMain" : "inactiveRowMain") + " ui-tree-node-top";
-
-            if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
-                S.render.fadeInId = null;
-                S.render.allowFadeInId = false;
-                this.attribs.className += " fadeInRowBkgClz";
-                S.quanta.fadeStartTime = new Date().getTime();
-            }
-
-            this.attribs[C.NODE_ID_ATTR] = node.id;
-            this.attribs.onClick = S.nav.clickTreeNode;
-
-            let header: CompIntf = null;
-            let jumpButton: CompIntf = null;
-            const type = S.plugin.getType(node.type);
-
-            let allowHeader: boolean = false;
-            // special case, if node is owned by admin and we're not admin, never show header
-            if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
-                // leave allowHeader false
-            }
-            else {
-                allowHeader = S.util.showMetaData(ast, node) && (type == null || type?.getAllowRowHeader())
-            }
-
-            if (allowHeader && !node.boostedNode) {
-                const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
-                const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-                header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id);
-            }
-            else {
-                const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
-                if (targetId) {
-                    jumpButton = new IconButton("fa-arrow-right", null, {
-                        onClick: () => S.view.jumpToId(targetId),
-                        title: "Jump to the Node"
-                    }, "btn-secondary float-end");
-                }
-            }
-
-            let boostComp: NodeCompRow = null;
-            if (node.boostedNode) {
-                // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                const type = S.plugin.getType(node.boostedNode.type);
-                boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, true);
-            }
-
-            // if editMode is on, an this isn't the page root node
-            if (ast.userPrefs.editMode) {
-                S.render.setNodeDropHandler(this.attribs, node);
-            }
-
-            const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, 0, false, null, null) : null;
-
-            this.setChildren([
-                S.render.renderBoostHeader(node, true),
-                S.render.renderLinkLabel(node.id),
-                header,
-                buttonBar,
-                new Clearfix(),
-                jumpButton,
-                new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, false, null),
-                boostComp,
-                S.render.renderLinks(node),
-                new NodeCompRowFooter(node),
-                new Clearfix()
-            ]);
+            allowHeader = S.util.showMetaData(ast, node) && (type == null || type?.getAllowRowHeader())
         }
+
+        if (allowHeader && !node.boostedNode) {
+            const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
+            const showJumpButton = this.tabData.id !== C.TAB_MAIN;
+            header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id);
+        }
+        else {
+            const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
+            if (targetId) {
+                jumpButton = new IconButton("fa-arrow-right", null, {
+                    onClick: () => S.view.jumpToId(targetId),
+                    title: "Jump to the Node"
+                }, "btn-secondary float-end");
+            }
+        }
+
+        let boostComp: NodeCompRow = null;
+        if (node.boostedNode) {
+            // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
+            const type = S.plugin.getType(node.boostedNode.type);
+            boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, true);
+        }
+
+        // if editMode is on, an this isn't the page root node
+        if (ast.userPrefs.editMode) {
+            S.render.setNodeDropHandler(this.attribs, node);
+        }
+
+        const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, 0, false, null, null) : null;
+
+        this.setChildren([
+            S.render.renderBoostHeader(node, true),
+            S.render.renderLinkLabel(node.id),
+            header,
+            buttonBar,
+            new Clearfix(),
+            jumpButton,
+            new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, false, null),
+            boostComp,
+            S.render.renderLinks(node),
+            new NodeCompRowFooter(node),
+            new Clearfix()
+        ]);
+
         return true;
     }
 }

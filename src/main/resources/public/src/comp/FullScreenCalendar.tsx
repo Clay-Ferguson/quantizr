@@ -94,7 +94,7 @@ export class FullScreenCalendar extends Main {
     }
 
     handleEventClick = (clickInfo: any) => {
-        S.edit.runEditNode(null, clickInfo.event.id, true, false, true, null, false, null);
+        S.edit.runEditNode(null, clickInfo.event.id, false, true, false, null);
     }
 
     override domUpdateEvent = (): void => {

@@ -17,8 +17,6 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
-import { DialogMode } from "../DialogBase";
-import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -150,18 +148,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         children.push(new Divc({ className: "tinyMarginBottom" }, topChildren));
         const childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
-        // if we're editing an existing item determine that before starting to render rows.
-        let editingExistingItem = false;
-        if (ast.editNode && ast.editNodeOnTab === C.TAB_FEED) {
-            editingExistingItem = this.data.props.feedResults.findIndex(n => n.id === ast.editNode.id) !== -1;
-        }
-
-        // if editing a new post (not a reply)
-        if (!editingExistingItem && ast.editNode && ast.editNodeOnTab === C.TAB_FEED && !ast.editNodeReplyToId) {
-            children.push(EditNodeDlg.embedInstance || //
-                new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
-        }
-
         if (this.data.props.feedLoading && childCount === 0) {
             children.push(new Diva([
                 new Divc({
@@ -206,24 +192,10 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     return;
                 }
 
-                // If we're editing this item right on the feed page, render the editor instead of the row
-                if (editingExistingItem && node.id === ast.editNode.id) {
-                    children.push(EditNodeDlg.embedInstance || //
-                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
-                }
-                // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
-                else {
-                    // console.log("FEED: node id=" + node.id + " content: " + node.content);
-                    children.push(S.srch.renderSearchResultAsListItem(node, this.data, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
-                    i++;
-                    rowCount++;
-
-                    // editing a reply inline.
-                    if (ast.editNode && ast.editNodeOnTab === C.TAB_FEED && ast.editNodeReplyToId === node.id) {
-                        children.push(EditNodeDlg.embedInstance || //
-                            new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
-                    }
-                }
+                // console.log("FEED: node id=" + node.id + " content: " + node.content);
+                children.push(S.srch.renderSearchResultAsListItem(node, this.data, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
+                i++;
+                rowCount++;
             });
 
             // only show "More" button if we aren't currently editing. Wouldn't make sense to navigate while editing.
@@ -276,7 +248,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 }, "bigMarginLeft ") : null,
                 new Divc({ className: "float-end" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
-                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, null, true, false), {
+                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, true, false), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                     }, "btn-primary")
                 ])

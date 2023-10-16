@@ -49,7 +49,6 @@ export class EditNodeDlg extends DialogBase {
     static currentInst: EditNodeDlg = null;
     static pendingUploadFile: File = null;
     public utl: EditNodeDlgUtil = new EditNodeDlgUtil();
-    static embedInstance: EditNodeDlg;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: Validator = new Validator();
     decryptFailed: boolean = false;
@@ -77,7 +76,7 @@ export class EditNodeDlg extends DialogBase {
     tagTextField: TextField;
 
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
-        super("[none]", (mode === DialogMode.EMBED ? "appEmbedContent" : "appModalCont") + " " + C.TAB_MAIN, false, mode);
+        super("[none]", "appModalCont " + C.TAB_MAIN, false, mode);
         const ast = getAs();
 
         // need a deterministic id here, that can be found across renders, for scrolling.
@@ -92,15 +91,6 @@ export class EditNodeDlg extends DialogBase {
 
         // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
         EditNodeDlg.currentInst = this;
-
-        if (mode === DialogMode.EMBED) {
-            if (EditNodeDlg.embedInstance) {
-                /* we get here if user starts editing another node and abandons the one currently being edited.
-                 for now we just let this happen, but we could have asked the user if they MEANT to do that.
-                 */
-            }
-            EditNodeDlg.embedInstance = this;
-        }
 
         this.mergeState<LS>({
             // selected props is used as a set of all 'selected' (via checkbox) property names
@@ -810,11 +800,9 @@ export class EditNodeDlg extends DialogBase {
         setTimeout(() => S.speech.stopListening(), 100);
         this.super_close();
 
-        EditNodeDlg.embedInstance = null;
         dispatch("endEditing", s => {
             s.editNode = null;
             s.afterEditJumpToId = null;
-            s.editNodeOnTab = null;
             s.editNodeReplyToId = null;
             S.quanta.newNodeTargetId = null;
             S.quanta.newNodeTargetOffset = -1;

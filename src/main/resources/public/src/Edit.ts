@@ -111,59 +111,20 @@ export class Edit {
         }
     }
 
-    public initNodeEditResponse = async (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string, afterEditJumpToId: string) => {
-        const ast = getAs();
-        if (S.util.checkSuccess("Editing node", res)) {
-            if (ast.mobileMode) forceUsePopup = true;
+    public initNodeEditResponse = async (res: J.InitNodeEditResponse, encrypt: boolean,
+        showJumpButton: boolean, afterEditJumpToId: string) => {
 
+        if (S.util.checkSuccess("Editing node", res)) {
             const editingAllowed = this.isEditAllowed(res.nodeInfo);
             if (editingAllowed) {
-
-                // these conditions determine if we want to run editing in popup, instead of inline in the page.
-                let editInPopup = forceUsePopup || ast.mobileMode ||
-                    // node not found on tree.
-                    (!S.nodeUtil.displayingOnTree(res.nodeInfo.id) &&
-                        !S.nodeUtil.displayingOnTree(S.quanta.newNodeTargetId)) ||
-                    // not currently viewing tree
-                    ast.activeTab !== C.TAB_MAIN ||
-                    S.util.fullscreenViewerActive();
-
-                if (ast.activeTab === C.TAB_DOCUMENT || //
-                    ast.activeTab === C.TAB_SEARCH || //
-                    ast.activeTab === C.TAB_TIMELINE) {
-                    editInPopup = true;
-                }
-
-                /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
-                the editor at that place rather than opening a popup now */
-                if (!editInPopup && ast.activeTab === C.TAB_FEED) {
-                    dispatch("StartEditingInFeed", s => {
-                        s.editNodeReplyToId = replyToId;
-                        s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
-                        s.editNode = res.nodeInfo;
-                        s.editShowJumpButton = showJumpButton;
-                        s.editEncrypt = encrypt;
-                    });
-                }
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
-                else if (editInPopup) {
-                    await promiseDispatch("startEditing", s => {
-                        s.editNode = res.nodeInfo;
-                        s.afterEditJumpToId = afterEditJumpToId;
-                    });
-                    const dlg = new EditNodeDlg(encrypt, showJumpButton, null);
-                    dlg.open();
-                } else {
-                    dispatch("startEditing", s => {
-                        s.editNode = res.nodeInfo;
-                        s.afterEditJumpToId = afterEditJumpToId;
-                        s.editNodeOnTab = s.mobileMode ? null : ast.activeTab;
-                        s.editShowJumpButton = showJumpButton;
-                        s.editEncrypt = encrypt;
-                    });
-                }
+                await promiseDispatch("startEditing", s => {
+                    s.editNode = res.nodeInfo;
+                    s.afterEditJumpToId = afterEditJumpToId;
+                });
+                const dlg = new EditNodeDlg(encrypt, showJumpButton, null);
+                dlg.open();
             } else {
                 S.util.showMessage("Editing not allowed on node.", "Warning");
             }
@@ -281,7 +242,7 @@ export class Edit {
                     payloadType: null,
                 });
                 if (blob) {
-                    this.createSubNodeResponse(res, false, null, afterEditJumpToId);
+                    this.createSubNodeResponse(res, afterEditJumpToId);
                 }
             }
 
@@ -319,7 +280,7 @@ export class Edit {
                     directMessage: false,
                     payloadType: null,
                 });
-                this.createSubNodeResponse(res, false, null, afterEditJumpToId);
+                this.createSubNodeResponse(res, afterEditJumpToId);
             }
         }
     }
@@ -327,18 +288,17 @@ export class Edit {
     insertNodeResponse = (res: J.InsertNodeResponse) => {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, getAs());
-            this.runEditNode(null, res.newNode.id, false, false, false, null, false, null);
+            this.runEditNode(null, res.newNode.id, false, false, false, null);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, afterEditJumpToId: string) => {
-        // console.log("createSubNode Res: " + S.util.prettyPrint(res));
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, afterEditJumpToId: string) => {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.quanta.refresh();
             }
             else {
-                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, //
+                this.runEditNode(null, res.newNode.id, res.encrypt, false, //
                     false, afterEditJumpToId);
             }
         }
@@ -760,7 +720,7 @@ export class Edit {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, false, null);
+        this.runEditNode(null, id, false, false, false, null);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -769,8 +729,8 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (overrideContent: string, id: string, forceUsePopup: boolean, encrypt: boolean,
-        showJumpButton: boolean, replyToId: string, editMyFriendNode: boolean, afterEditJumpToId: string) => {
+    runEditNode = async (overrideContent: string, id: string, encrypt: boolean,
+        showJumpButton: boolean, editMyFriendNode: boolean, afterEditJumpToId: string) => {
         if (S.quanta.config.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -797,7 +757,7 @@ export class Edit {
             res.nodeInfo.content = overrideContent;
         }
 
-        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, afterEditJumpToId);
+        this.initNodeEditResponse(res, encrypt, showJumpButton, afterEditJumpToId);
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, ast?: AppState) => {
@@ -1141,7 +1101,7 @@ export class Edit {
         });
 
         if (blob) {
-            this.createSubNodeResponse(res, false, null, null);
+            this.createSubNodeResponse(res, null);
         }
         else {
             if (msg) {
@@ -1187,7 +1147,7 @@ export class Edit {
     }
 
     addBookmark = (node: J.NodeInfo, content: string = null) => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, true, content);
+        this.createNode(node, J.NodeType.BOOKMARK, true, content);
     }
 
     addLinkBookmark = async (content: any, audioUrl: string) => {
@@ -1209,7 +1169,7 @@ export class Edit {
             reply: false,
             directMessage: false
         });
-        this.createSubNodeResponse(res, true, null, null);
+        this.createSubNodeResponse(res, null);
     }
 
     // like==false means 'unlike'
@@ -1234,7 +1194,8 @@ export class Edit {
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string, replyToId: string,
+    // todo-0: remove replyToId
+    addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string,
         boostTarget: string, fediSend: boolean, directMessage: boolean) => {
 
         // auto-enable edit mode
@@ -1264,14 +1225,14 @@ export class Edit {
         });
 
         if (!boostTarget) {
-            this.createSubNodeResponse(res, false, replyToId, null);
+            this.createSubNodeResponse(res, null);
         }
         else {
             S.util.flashMessageQuick("Post was boosted!", "Boost");
         }
     }
 
-    createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean,
+    createNode = async (node: J.NodeInfo, typeName: string,
         pendingEdit: boolean, content: string) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
@@ -1296,7 +1257,7 @@ export class Edit {
         if (!getAs().userPrefs.editMode) {
             await this.setEditMode(true);
         }
-        this.createSubNodeResponse(res, forceUsePopup, null, null);
+        this.createSubNodeResponse(res, null);
 
         // this is low priority so do it asynchronously
         setTimeout(() => {
@@ -1323,7 +1284,7 @@ export class Edit {
             directMessage: false,
             payloadType: null
         });
-        this.createSubNodeResponse(res, false, null, null);
+        this.createSubNodeResponse(res, null);
     }
 
     linkNodes = async (sourceNodeId: string, targetNodeId: string, name: string, type: string) => {
@@ -1579,7 +1540,7 @@ export class Edit {
             // when replying to a boost, we want to be able to additionally add to the sharing the person
             // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
             S.edit.addNode(boostOwnerId, nodeId, J.NodeType.COMMENT,
-                true, null, null, nodeId, null, true, false);
+                true, null, null, null, true, false);
         }
     }
 
@@ -1593,7 +1554,7 @@ export class Edit {
         if (!nodeId) return;
 
         S.edit.addNode(null, null, J.NodeType.COMMENT, false, null, null,
-            null, nodeId, false, false)
+            nodeId, false, false)
     }
 
     likeNodeClick = (evt: Event) => {

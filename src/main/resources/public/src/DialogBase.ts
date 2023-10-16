@@ -12,14 +12,12 @@ import { Validator } from "./Validator";
 export abstract class DialogBase extends Comp {
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000; // z-index
-
-    // NOTE: resolve function stays null for EMBED mode.
     resolve: (dlg: DialogBase) => void;
 
     aborted: boolean = false;
     backdrop: HTMLElement;
 
-    /* this is a slight hack so we can ignore 'close()' calls that are bogus, and doesn't apply to the EMBED mode */
+    /* this is a slight hack so we can ignore 'close()' calls that are bogus */
     opened: boolean = false;
     loaded: boolean = false;
 
@@ -57,9 +55,6 @@ export abstract class DialogBase extends Comp {
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is
     closed. */
     open = (): Promise<DialogBase> => {
-        if (this.mode === DialogMode.EMBED) {
-            return;
-        }
         this.opened = true;
 
         // We use an actual Promise and not async/await because our resolve function is held long term, and
@@ -88,7 +83,7 @@ export abstract class DialogBase extends Comp {
         });
     }
 
-    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render (excepet in EMBED mode) in case we need to
+    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
     get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data
     from the server before displaying */
     async preLoad(): Promise<any> {
@@ -106,10 +101,6 @@ export abstract class DialogBase extends Comp {
     }
 
     close = () => {
-        if (this.mode === DialogMode.EMBED) {
-            return;
-        }
-
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);
@@ -206,11 +197,8 @@ export abstract class DialogBase extends Comp {
             }, this.renderDlg())
         ]);
 
-        if (this.mode === DialogMode.EMBED) {
-            this.attribs.className = this.overrideClass;
-            ret = this.tag("div");
-        }
-        else if (this.mode === DialogMode.FULLSCREEN) {
+
+        if (this.mode === DialogMode.FULLSCREEN) {
             this.attribs.className = "appModalContFullscreen";
             ret = this.tag("div", { style: { zIndex: this.zIndex } });
         }
@@ -405,5 +393,5 @@ export abstract class DialogBase extends Comp {
 
 export enum DialogMode {
     // eslint-disable-next-line no-unused-vars
-    POPUP, EMBED, FULLSCREEN
+    POPUP, FULLSCREEN
 }

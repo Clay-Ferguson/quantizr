@@ -11,8 +11,6 @@ import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
-import { DialogMode } from "../DialogBase";
-import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
@@ -92,19 +90,13 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         let i = 0;
         results.forEach(node => {
             if (ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
-            if (ast.editNode && ast.editNode.id === node.id && ast.editNodeOnTab === this.data.id) {
-                children.push(EditNodeDlg.embedInstance || //
-                    new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
-            }
-            else {
-                const c = this.renderItem(node, i, rowCount, true);
-                if (c) {
-                    if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
-                        S.domUtil.setNodeDragHandler(c.attribs, node.id);
-                        S.domUtil.makeDropTarget(c.attribs, node.id);
-                    }
-                    children.push(c);
+            const c = this.renderItem(node, i, rowCount, true);
+            if (c) {
+                if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+                    S.domUtil.setNodeDragHandler(c.attribs, node.id);
+                    S.domUtil.makeDropTarget(c.attribs, node.id);
                 }
+                children.push(c);
             }
             i++;
             rowCount++;

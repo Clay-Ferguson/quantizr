@@ -1,6 +1,5 @@
-import { dispatch, getAs, promiseDispatch } from "../AppContext";
+import { getAs, promiseDispatch } from "../AppContext";
 import { SymKeyDataPackage } from "../Crypto";
-import { DialogMode } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
@@ -348,12 +347,6 @@ export class EditNodeDlgUtil {
                 ast.editNode.attachments = null;
             }
             S.edit.updateNode(ast.editNode);
-
-            if (dlg.mode === DialogMode.EMBED) {
-                dispatch("uploadDeleted", s => {
-                    s.editNode = ast.editNode;
-                });
-            }
             dlg.binaryDirty = true;
         }
     }

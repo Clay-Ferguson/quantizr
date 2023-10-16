@@ -281,7 +281,7 @@ export class MenuPanel extends Div {
                 }
                 typesAdded = true;
                 if (ast.isAdminUser || type.getAllowUserSelect()) {
-                    createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, true, null), //
+                    createMenuItems.push(new MenuItem(type.getName(), () => S.edit.createNode(hltNode, type.getTypeName(), true, null), //
                         onMainTab && !ast.isAnonUser && !!hltNode, null, true));
                 }
             });
@@ -294,7 +294,7 @@ export class MenuPanel extends Div {
                 const dlg = new PickNodeTypeDlg(null);
                 await dlg.open();
                 if (dlg.chosenType) {
-                    S.edit.createNode(hltNode, dlg.chosenType, true, true, null);
+                    S.edit.createNode(hltNode, dlg.chosenType, true, null);
                 }
             }, //
                 onMainTab && !ast.isAnonUser && !!hltNode, null, true));

@@ -88,6 +88,7 @@ export class AudioPlayerDlg extends DialogBase {
                 }
             }
             catch (e) {
+                // ignore
             }
         }
     }
@@ -239,7 +240,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     postComment = () => {
         const link = this.getLink();
-        S.edit.addNode(null, null, J.NodeType.COMMENT, false, "\n\n" + link, null, null, null, true, false);
+        S.edit.addNode(null, null, J.NodeType.COMMENT, false, "\n\n" + link, null, null, true, false);
     }
 
     copyToClipboard = () => {

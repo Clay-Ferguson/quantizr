@@ -3,7 +3,6 @@ import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
-import { DialogMode } from "../../DialogBase";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
@@ -44,53 +43,38 @@ export class NodeCompVerticalRowLayout extends Div {
                     boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, true);
                 }
 
-                if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
-                    comps.push(EditNodeDlg.embedInstance || //
-                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
-                }
 
-                if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && n.id === ast.editNode.id) {
-                    comps.push(EditNodeDlg.embedInstance || //
-                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                const type = S.plugin.getType(n.type);
+
+                // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
+                    // do nothing
                 }
                 else {
-                    const type = S.plugin.getType(n.type);
+                    lastNode = n;
+                    let row: Comp = null;
 
-                    // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                    if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
-                        // do nothing
+                    // experimenting: Still need this?
+                    // if (n.children && !inVerticalSpace) {
+                    //     comps.push(new Divc({ className: "verticalSpace" }));
+                    // }
+
+                    if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
+                        row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, false);
+                        rowCount++;
+                        comps.push(row);
                     }
-                    else {
-                        lastNode = n;
-                        let row: Comp = null;
-
-                        // experimenting: Still need this?
-                        // if (n.children && !inVerticalSpace) {
-                        //     comps.push(new Divc({ className: "verticalSpace" }));
-                        // }
-
-                        if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
-                            row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, false);
-                            rowCount++;
-                            comps.push(row);
-                        }
-                        // inVerticalSpace = false;
-                    }
-
-                    // if we have any children on the node they will always have been loaded to be displayed so display them
-                    // This is the linline children
-                    if (n.children) {
-                        comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-
-                        // experimenting: Still need this?
-                        // comps.push(new Divc({ className: "verticalSpace" }));
-                        // inVerticalSpace = true;
-                    }
+                    // inVerticalSpace = false;
                 }
 
-                if (ast.editNode && ast.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
-                    comps.push(EditNodeDlg.embedInstance || //
-                        new EditNodeDlg(ast.editEncrypt, ast.editShowJumpButton, DialogMode.EMBED));
+                // if we have any children on the node they will always have been loaded to be displayed so display them
+                // This is the linline children
+                if (n.children) {
+                    comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
+
+                    // experimenting: Still need this?
+                    // comps.push(new Divc({ className: "verticalSpace" }));
+                    // inVerticalSpace = true;
                 }
             }
             rowIdx++;
