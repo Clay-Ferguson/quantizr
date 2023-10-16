@@ -15,7 +15,6 @@
     padding: 4px;
     border-radius: 6px 6px 0 0;
     border: 1px solid gray;
-// background-color: darken($secondary, 10%);
     background: rgb(1, 22, 39);
     position: relative;
     top: 10px;
@@ -37,7 +36,6 @@
 }
 
 .alert {
-    // these sizes are half the default for bootstrap
     padding: .6rem;
     margin-bottom: .5rem;
 }

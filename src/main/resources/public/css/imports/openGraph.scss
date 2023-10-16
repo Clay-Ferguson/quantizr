@@ -31,14 +31,12 @@
     margin-top: 8px;
 }
 
-// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
 .openGraphImageRss {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     width: 100%;
 }
 
-// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
 .openGraphImageVert {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
@@ -47,7 +45,6 @@
     margin-bottom: 10px;
 }
 
-// WARNING: See code: if (el.className.indexOf("openGraphImage") !== -1) {
 .openGraphNoImage {
     margin-top: 8px;
     margin-right: 8px;
@@ -85,4 +82,3 @@
     cursor: pointer;
     margin-left: 8px;
 }
-

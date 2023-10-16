@@ -14,7 +14,6 @@ code {
 }
 
 .preWordWrap {
-    // overflow-x: auto; //<--- highly upvoted stack overflow didn't have this.
     white-space: pre-wrap;
     white-space: -moz-pre-wrap;
     white-space: -pre-wrap;
@@ -22,9 +21,7 @@ code {
     word-wrap: break-word;
 }
 
-.mkCont table,
-th,
-td {
+.mkCont table, th, td {
     border: 1px solid $nodeBorderBottomColor;
     border-collapse: collapse;
 }
@@ -136,8 +133,6 @@ th {
 .mkCont samp {
     width: 100%;
     margin-bottom: 5px;
-    // border: 1px solid olivedrab;
-    // background-color: $baseBgColor;
 }
 
 .txtFieldLabelShort {

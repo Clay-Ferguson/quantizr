@@ -64,10 +64,7 @@
 }
 
 .mainTabPanel {
-    //border: 1px solid black;
-    //background-color: $mainContentBackground;
-    //setting a max-width here ruins the centering horizontally on the page, my goal was
-    //to narrow the main tab content in center of page
+    //setting a max-width here ruins the centering horizontally on the page
     //WARNING: I think the bootstrap 'main' entity is what is setting the width here and it didn't work to chagne it here.
     // max-width: 750px;
 
