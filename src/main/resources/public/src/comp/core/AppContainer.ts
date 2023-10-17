@@ -6,5 +6,5 @@ import { App } from "../App";
 export default function AppContainer() {
     initDispatch();
     const app = new App();
-    return createElement(AppContext.Provider, { value: getAs() }, app.create());
+    return createElement(AppContext.Provider, { value: getAs() }, createElement(app.render, app.attribs));
 }

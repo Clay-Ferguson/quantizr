@@ -78,9 +78,9 @@ export class EditNodeDlg extends DialogBase {
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
         super("[none]", "appModalCont " + C.TAB_MAIN, false, mode);
         const ast = getAs();
+        this.attribs.id = "EditNodeDlg_" + ast.editNode.id;
+        this.attribs.key = this.attribs.key || this.attribs.id;
 
-        // need a deterministic id here, that can be found across renders, for scrolling.
-        this.setId("EditNodeDlg_" + ast.editNode.id);
         let signCheckboxVal = false;
         let encryptCheckboxVal = false;
         if (S.crypto.avail) {

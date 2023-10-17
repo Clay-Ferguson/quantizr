@@ -62,19 +62,11 @@ export abstract class Comp implements CompIntf {
         this.attribs = attribs || {};
         this.attribs.ref = createRef();
 
-        if (Comp.renderClassInDom) {
-            this.attribs.c = this.constructor.name;
-        }
-
-        if (this.attribs.title && !this.attribs.title.startsWith("*\n")) {
-            this.attribs.title = "Tip:\n\n" + this.attribs.title;
-        }
-
         // for debugging, shows classname in every dom element as an attribute.
         if (Comp.renderClassInDom) {
             // if 'c' property not defined from a higher level up define it here as class name
             if (!this.attribs.c) {
-                this.attribs = { c: this.constructor.name, ...this.attribs };
+                this.attribs.c = this.constructor.name;
             }
         }
         else {
@@ -84,9 +76,8 @@ export abstract class Comp implements CompIntf {
             }
         }
 
-        /* If an ID was specifically provided, then use it, or else generate one. We prefix with 'c' only because
-        IDs can't start with a number. */
-        this.setId(this.attribs.id || Comp.getNextId());
+        this.attribs.id = this.attribs.id || Comp.getNextId();
+        this.attribs.key = this.attribs.key || this.attribs.id;
     }
 
     setTag = (tag: any): void => {
@@ -94,7 +85,8 @@ export abstract class Comp implements CompIntf {
     }
 
     public static getNextId(): string {
-        return "c" + (++Comp.guid).toString(36);
+        // using base 36 makes the id shorter
+        return (++Comp.guid).toString(36);
     }
 
     public managesState = (): boolean => {
@@ -148,11 +140,6 @@ export abstract class Comp implements CompIntf {
 
     getId(prefix: string = null): string {
         return prefix ? prefix + this.attribs.id : this.attribs.id;
-    }
-
-    public setId(id: string) {
-        this.attribs.id = id;
-        this.attribs.key = this.attribs.key || id;
     }
 
     getCompClass = (): string => {
@@ -224,33 +211,24 @@ export abstract class Comp implements CompIntf {
         return this.children ? [first, ...this.children] : [first];
     }
 
-    getAttribs(): any {
-        return this.attribs;
-    }
-
-    create = (): ReactNode => {
-        return createElement(this.render, this.attribs);
-    }
-
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {
         if (!children || children.length === 0) return null;
 
-        return children.map((child: any) => {
+        return children.reduce((acc: any[], child: any) => {
             if (child instanceof Comp) {
                 try {
                     child.parent = this; // only done for debugging.
-                    return child.create();
+                    acc.push(createElement(child.render, child.attribs));
                 }
                 catch (e) {
                     S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
-                    return null;
                 }
+            } else if (child) {
+                acc.push(child);
             }
-            else {
-                return child;
-            }
-        }).filter(c => !!c);
+            return acc;
+        }, []);
     }
 
     focus(): void {

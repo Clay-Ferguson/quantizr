@@ -13,7 +13,6 @@ export interface CompIntf {
     getState<T = any>(): T;
 
     setClass(clazz: string): void;
-    getAttribs(): any;
     compRender(): ReactNode;
     addChild(comp: CompIntf): void;
     insertFirstChild(comp: CompIntf): void;
@@ -23,7 +22,6 @@ export interface CompIntf {
     getRef(warn: boolean): HTMLElement;
     render(props, ref): any;
     getCompClass(): string;
-    create(): ReactNode;
     reactNode(type: any, props?: object, childrenArg?: any[]): ReactNode;
     ordinalSortChildren(): void;
     preRender(): boolean;
