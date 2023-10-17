@@ -1194,7 +1194,6 @@ export class Edit {
     }
 
     /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    // todo-0: remove replyToId
     addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string,
         boostTarget: string, fediSend: boolean, directMessage: boolean) => {
 

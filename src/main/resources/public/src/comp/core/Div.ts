@@ -7,19 +7,13 @@ interface LS { // Local State
 }
 
 export class Div extends Comp {
-    constructor(public content: string = "", attribs: any = {}, children: CompIntf[] = null, private rawHtml: boolean = false) {
+    constructor(public content: string = "", attribs: any = {}, children: CompIntf[] = null) {
         super(attribs);
         this.setChildren(children);
         this.mergeState<LS>({ content });
     }
 
     override compRender = (): ReactNode => {
-        if (this.rawHtml) {
-            this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
-            return this.tag("div");
-        }
-        else {
-            return this.tag("div", null, this.getChildrenWithFirst(this.getState<LS>().content));
-        }
+        return this.tag("div", null, this.getChildrenWithFirst(this.getState<LS>().content));
     }
 }
