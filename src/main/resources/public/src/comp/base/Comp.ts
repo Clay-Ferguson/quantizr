@@ -262,11 +262,6 @@ export abstract class Comp implements CompIntf {
     Note: Tag can also be a type here, not just a string.
     */
     tag = (type: any, props?: object, childrenArg?: any[]): ReactNode => {
-        if (Array.isArray(props)) {
-            console.error("tag called with props as array in " + this.getCompClass());
-            return;
-        }
-
         props = props ? { ...this.attribs, ...props } : this.attribs;
 
         // for debugging, shows classname in every dom element as an attribute.
@@ -285,15 +280,7 @@ export abstract class Comp implements CompIntf {
             const children = this.createChildren(childrenArg);
 
             if (children?.length > 0) {
-                // special case where tbody always needs to be immediate child of table
-                // https://github.com/facebook/react/issues/5652
-                if (type === "table") {
-                    // this is just wrapping the children in a tbody and giving it a key so react won't panic.
-                    return createElement(type, props, [createElement("tbody", { key: (props as any).key + "_tbody" }, children)]);
-                }
-                else {
-                    return createElement(type, props, children);
-                }
+                return createElement(type, props, children);
             }
             else {
                 return createElement(type, props);

@@ -12,7 +12,7 @@ import { IconButton } from "../comp/core/IconButton";
 import { Spanc } from "../comp/core/Spanc";
 import { Spinner } from "../comp/core/Spinner";
 import { TextField } from "../comp/core/TextField";
-import { FilesTable } from "../comp/FilesTable";
+import { Table } from "../comp/Table";
 import { FilesTableCell } from "../comp/FilesTableCell";
 import { FilesTableRow } from "../comp/FilesTableRow";
 import { Constants as C } from "../Constants";
@@ -123,13 +123,13 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         return true;
     }
 
-    renderFilesTable = (mfsFiles: J.MFSDirEntry[]): FilesTable => {
+    renderFilesTable = (mfsFiles: J.MFSDirEntry[]): Table => {
         if (mfsFiles) {
             const mfsFolder = this.data.props.cidField.getValue();
             // mfsMode means this is a true MFS query on the local server and not a DAG query of CID which can be remote.
             const mfsMode = mfsFolder && mfsFolder.indexOf("/") === 0;
 
-            const propTable = new FilesTable({
+            const propTable = new Table({
                 border: "1",
                 className: "files-table"
             });
@@ -145,7 +145,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
         }
     }
 
-    renderItems = (propTable: FilesTable, mfsFiles: J.MFSDirEntry[], mfsFolder: any, mfsMode: boolean, foldersOnly: boolean) => {
+    renderItems = (propTable: Table, mfsFiles: J.MFSDirEntry[], mfsFolder: any, mfsMode: boolean, foldersOnly: boolean) => {
         mfsFiles.forEach(entry => {
             let iconClass: string = null;
             let isFile: boolean = false;
