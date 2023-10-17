@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
@@ -22,9 +21,8 @@ export class MenuItem extends Div {
         this.mergeState({ visible: true, enabled });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const state: LS = this.getState<LS>();
-        const enablement = state.enabled ? {} : { disabled: "disabled" };
         const enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
         let innerSpan: Comp;
@@ -49,16 +47,15 @@ export class MenuItem extends Div {
             }) : null
         ]);
 
-        return this.tag("div", {
-            ...this.attribs,
-            ...enablement,
-            ...{
-                style: { display: (state.visible ? "" : "none") },
-                className: innerClazz + " list-group-item-action " + enablementClass + "  listGroupTransparent" +
-                    (getAs().mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
-                onClick: this.onClick
-            }
-        });
+        if (state.enabled) {
+            this.attribs.disabled = "disabled";
+        }
+
+        this.attribs.style = { display: (state.visible ? "" : "none") };
+        this.attribs.className = innerClazz + " list-group-item-action " + enablementClass + "  listGroupTransparent" +
+            (getAs().mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses;
+        this.attribs.onClick = this.onClick
+        return true
     }
 
     onClick(): void {

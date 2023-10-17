@@ -14,7 +14,7 @@ export class SchemaOrgPropsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         if (this.props) {
             const comps = this.props.map(prop => {
                 if (!prop) return null;

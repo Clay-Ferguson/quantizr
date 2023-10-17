@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Li extends Comp {
@@ -6,9 +5,11 @@ export class Li extends Comp {
     constructor(public content: string = "", attribs: any = {}, children: Comp[] = null) {
         super(attribs);
         this.setChildren(children);
+        this.setTag("li");
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("li", null, this.childrenWithFirst(this.content));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.content));
+        return true;
     }
 }

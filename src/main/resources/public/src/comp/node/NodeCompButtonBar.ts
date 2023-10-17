@@ -21,7 +21,7 @@ export class NodeCompButtonBar extends Div {
         });
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
         if (!this.node) {
             this.setChildren(null);

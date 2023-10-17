@@ -28,9 +28,9 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        return this.tag("div", {
-            className: "marginAll"
-        }, [
+        this.attribs.className = "marginAll";
+
+        this.setChildren([
             createElement(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 headerToolbar: {
@@ -81,6 +81,8 @@ export class FullScreenCalendar extends Main {
                 }
             })
         ]);
+
+        return this.reactNode("div");
     }
 
     dateClick = (dateClick: DateClickArg): void => {

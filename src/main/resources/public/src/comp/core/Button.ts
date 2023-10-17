@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
 import { Tag } from "./Tag";
@@ -18,6 +17,7 @@ export class Button extends Comp {
         this.attribs.className = (this.attribs.className || "") + " btn clickable " + //
             moreClasses + (getAs().mobileMode ? " mobileButton" : "");
         this.mergeState<LS>({ text, enabled: true });
+        this.setTag("button");
     }
 
     setEnabled = (enabled: boolean) => {
@@ -28,7 +28,7 @@ export class Button extends Comp {
         this.mergeState<LS>({ text });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const text: string = this.getState<LS>().text;
 
         if (this.getState<LS>().enabled) {
@@ -38,11 +38,13 @@ export class Button extends Comp {
             this.attribs.disabled = "disabled";
         }
 
-        return this.tag("button", null, [
+        this.setChildren([
             // We use Tag("i") here instead of Icon(), because Icon renders larger in size for mobile mode and that
             // would conflict with this button already itself sizing larger for mobile
             this.iconClass ? new Tag("i", {
                 className: "fa " + this.iconClass + (text ? " buttonIconWithText" : " buttonIconNoText")
             }) : null, text]);
+
+        return true;
     }
 }

@@ -15,7 +15,7 @@ export class FriendsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         if (this.friends) {
             const friendsComps = this.friends.map(friend => {
                 if (!friend) return null;

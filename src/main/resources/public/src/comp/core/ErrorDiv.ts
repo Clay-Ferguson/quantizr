@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
@@ -13,7 +12,8 @@ export class ErrorDiv extends Comp {
         this.attribs.className = "validationError";
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("div", null, this.childrenWithFirst(this.getState<LS>().error));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.getState<LS>().error));
+        return true;
     }
 }

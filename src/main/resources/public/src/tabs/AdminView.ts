@@ -42,7 +42,7 @@ export class AdminView extends AppTab<any, AdminView> {
         return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const horzClass = "marginTop marginBottom settingsSection";
 
         this.setChildren([

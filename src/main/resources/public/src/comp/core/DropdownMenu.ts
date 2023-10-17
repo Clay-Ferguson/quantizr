@@ -1,18 +1,18 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
-import { Ul } from "./Ul";
 import { Icon } from "./Icon";
+import { Ul } from "./Ul";
 
 export class DropdownMenu extends Comp {
     constructor(private items: CompIntf[]) {
         super(null);
-        this.attribs.className = "dropdown"
+        this.attribs.className = "dropdown";
+        this.setTag("span")
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const id = "ddMenu-" + this.getId();
-        return this.tag("span", null, [
+        this.setChildren([
             new Icon({
                 className: "fa fa-ellipsis-h fa-lg clickable",
                 id,
@@ -24,5 +24,6 @@ export class DropdownMenu extends Comp {
                 "aria-labelledby": id,
             }, this.items)
         ]);
+        return true;
     }
 }

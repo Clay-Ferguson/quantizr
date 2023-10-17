@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 
@@ -16,7 +15,4 @@ export class RadioButtonGroup extends Comp {
         });
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("div");
-    }
 }

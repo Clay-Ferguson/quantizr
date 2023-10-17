@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Spinner extends Comp {
@@ -8,9 +7,5 @@ export class Spinner extends Comp {
             className: "spinner-border text-success " + extraClasses,
             role: "status"
         });
-    }
-
-    override compRender = (): ReactNode => {
-        return this.tag("div");
     }
 }

@@ -16,7 +16,7 @@ export class NodeTypeListBox extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
         const children: Comp[] = [];
         const types = S.plugin.getOrderedTypesArray(ast.showRecentProps);

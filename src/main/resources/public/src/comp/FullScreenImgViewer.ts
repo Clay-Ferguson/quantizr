@@ -13,7 +13,7 @@ export class FullScreenImgViewer extends Main {
         this.attribs.className = "fullScreenViewer customScrollBar"
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);

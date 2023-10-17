@@ -15,7 +15,7 @@ export class FullScreenGraphViewer extends Main {
     isDragging: boolean;
     mouseOverTimeoutId: any;
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         this.setChildren([new Divc({ className: "d3Graph" })]);
         return true;
     }

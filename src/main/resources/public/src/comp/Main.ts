@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
@@ -12,9 +11,11 @@ export class Main extends Comp {
         super(attribs);
         this.setChildren(children);
         this.mergeState<LS>({ content });
+        this.setTag("main");
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("main", null, this.childrenWithFirst(this.getState<LS>().content));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.getState<LS>().content));
+        return true;
     }
 }

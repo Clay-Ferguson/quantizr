@@ -17,7 +17,7 @@ export class TabPanelButtons extends Div {
         super(null);
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         this.setChildren([
             new Divc({
                 className: "tabButtonsContainer"

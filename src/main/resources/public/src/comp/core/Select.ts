@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
 import { Comp } from "../base/Comp";
 import { SelectionOption } from "./SelectionOption";
@@ -21,10 +20,11 @@ export class Select extends Comp {
         this.setChildren(this.selectionOptions.map((row: any) => {
             return new SelectionOption(row.key, row.val);
         }));
+        this.setTag("select");
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         this.attribs.value = this.getState<LS>().value;
-        return this.tag("select");
+        return true;
     }
 }

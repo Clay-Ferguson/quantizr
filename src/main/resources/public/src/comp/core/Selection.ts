@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
@@ -13,7 +12,7 @@ export class Selection extends Comp {
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const children = [];
 
         const select = new Select({
@@ -30,9 +29,7 @@ export class Selection extends Comp {
 
         children.push(select);
         this.setChildren(children);
-
-        return this.tag("div", {
-            className: this.outterClasses || ""
-        });
+        this.attribs.className = this.outterClasses || "";
+        return true;
     }
 }

@@ -1,7 +1,6 @@
-import { ReactNode } from "react";
-import { Value } from "../../Value";
 import { ValueIntf } from "../../Interfaces";
 import { State } from "../../State";
+import { Value } from "../../Value";
 import { Comp } from "../base/Comp";
 import { CheckboxInput } from "./CheckboxInput";
 import { Label } from "./Label";
@@ -12,13 +11,13 @@ export class RadioButton extends Comp {
         private layoutClass: string = null) {
         super(attribs, new State());
         valueIntf = this.valueIntf || new Value<string>(this, "val");
+        this.setTag("span");
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         let cbInput = null;
-        return this.tag("span", {
-            className: "form-check " + (this.layoutClass || "")
-        }, [
+        this.attribs.className = "form-check " + (this.layoutClass || "");
+        this.setChildren([
             cbInput = new CheckboxInput({
                 name: this.groupName,
                 type: "radio",
@@ -31,5 +30,6 @@ export class RadioButton extends Comp {
                 className: "form-check-label radioLabel"
             })
         ]);
+        return true;
     }
 }

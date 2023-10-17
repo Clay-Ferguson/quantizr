@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { PropTableCell } from "../comp/PropTableCell";
@@ -13,7 +12,7 @@ export class PropTable extends Comp {
         });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const children = [];
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {
@@ -43,8 +42,10 @@ export class PropTable extends Comp {
         if (children.length === 0) return null;
         children.sort((a, b) => a.ordinal - b.ordinal);
 
-        return this.tag("div", { className: "scrollingPropsTable" }, [
+        this.attribs.className = "scrollingPropsTable";
+        this.setChildren([
             new Table({ className: "customScrollBar smallMarginRight" }, children)
         ]);
+        return true;
     }
 }

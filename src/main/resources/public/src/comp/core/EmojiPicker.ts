@@ -1,5 +1,4 @@
 import Picker, { EmojiClickData } from "emoji-picker-react";
-import { ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
 import { Comp } from "../base/Comp";
 
@@ -12,9 +11,6 @@ export class EmojiPicker extends Comp {
             // console.log("emoji: & #x" + emojiData.unified + "; &#x" + emojiData.unified + "; ");
             this.selectionValueIntf.setValue(emojiData.emoji);
         };
-    }
-
-    override compRender = (): ReactNode => {
-        return this.tag(Picker);
+        this.setTag(Picker)
     }
 }

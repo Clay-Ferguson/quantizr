@@ -43,7 +43,7 @@ export class LeftNavPanel extends Div {
         LeftNavPanel.inst = this;
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
 
         let myMessages = ast.myNewMessageCount > 0

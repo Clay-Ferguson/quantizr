@@ -24,7 +24,7 @@ export class TimeField extends Div implements I.ValueIntf {
         return this.valState.getValue();
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         this.setChildren([
             new Divc({
                 className: this.extraClass + " timeField"

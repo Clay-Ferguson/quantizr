@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "./base/Comp";
 
 export class NavTag extends Comp {
@@ -6,9 +5,11 @@ export class NavTag extends Comp {
     constructor(public content: string = "", attribs: any = {}, children: Comp[] = null) {
         super(attribs);
         this.setChildren(children);
+        this.setTag("nav");
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("nav", null, this.childrenWithFirst(this.content));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.content));
+        return true;
     }
 }

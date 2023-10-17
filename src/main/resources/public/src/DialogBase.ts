@@ -1,13 +1,12 @@
-import { ReactNode } from "react";
 import { dispatch, getAs } from "./AppContext";
+import { S } from "./Singletons";
+import { Validator } from "./Validator";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Divc } from "./comp/core/Divc";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
-import { S } from "./Singletons";
-import { Validator } from "./Validator";
 
 export abstract class DialogBase extends Comp {
     static BACKDROP_PREFIX = "backdrop-";
@@ -136,10 +135,9 @@ export abstract class DialogBase extends Comp {
         return null;
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const ast = getAs();
         const isTopmost = this.isTopmost();
-        let ret: ReactNode = null;
 
         const width = this.genInitWidth();
         this.dlgWidth = width + "px";
@@ -200,7 +198,7 @@ export abstract class DialogBase extends Comp {
 
         if (this.mode === DialogMode.FULLSCREEN) {
             this.attribs.className = "appModalContFullscreen";
-            ret = this.tag("div", { style: { zIndex: this.zIndex } });
+            this.attribs.style = { zIndex: this.zIndex };
         }
         else {
             const clazzName = ast.mobileMode
@@ -210,25 +208,24 @@ export abstract class DialogBase extends Comp {
             // if fullscreen we render without backdrop
             if (this.mode !== DialogMode.POPUP) {
                 this.attribs.className = clazzName;
-                ret = this.tag("div");
             }
             // else wrap dialog in backdrop
             else {
-                const style: any = { zIndex: this.zIndex };
-                ret = this.tag("div", {
-                    id: this.getId(DialogBase.BACKDROP_PREFIX),
-                    className: (isTopmost ? "appModalTopBackdrop " : "appModalBackdrop ") + "customScrollbar",
-                    style,
-                    onClick: (evt: Event) => {
-                        if (this.closeByOutsideClick) {
-                            const dlgElm: any = S.domUtil.domElm(this.getId());
-                            // check if the click was outside the dialog.
-                            if (!!dlgElm && !dlgElm.contains(evt.target)) {
-                                this.close();
-                            }
+                this.attribs.id = this.getId(DialogBase.BACKDROP_PREFIX);
+                this.attribs.className = (isTopmost ? "appModalTopBackdrop " : "appModalBackdrop ") + "customScrollbar";
+                this.attribs.style = { zIndex: this.zIndex };
+                this.attribs.onClick = (evt: Event) => {
+                    if (this.closeByOutsideClick) {
+                        const dlgElm: any = S.domUtil.domElm(this.getId());
+                        // check if the click was outside the dialog.
+                        if (!!dlgElm && !dlgElm.contains(evt.target)) {
+                            this.close();
                         }
                     }
-                }, [
+                }
+
+                const children = this.getChildren();
+                this.setChildren([
                     this.dlgFrame = new Divc({
                         id: this.getId(),
                         className: clazzName,
@@ -237,7 +234,7 @@ export abstract class DialogBase extends Comp {
                             top: this.lastPosY + "px",
                             width: this.dlgWidth
                         }
-                    }, this.getChildren())
+                    }, children)
                 ]);
 
                 if (!ast.mobileMode && this.dlgFrame && this.titleDiv) {
@@ -245,7 +242,7 @@ export abstract class DialogBase extends Comp {
                 }
             }
         }
-        return ret;
+        return true;
     }
 
     checkPositionBounds = () => {

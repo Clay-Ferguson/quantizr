@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { asyncDispatch, getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -10,7 +9,7 @@ export class Menu extends Comp {
         super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const ast = getAs();
         const expanded = getAs().expandedMenus.has(this.name);
         const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");
@@ -37,6 +36,6 @@ export class Menu extends Comp {
                     className: "menuPanelItems"
                 }, this.menuItems)]) : null
         ]);
-        return this.tag("div");
+        return true;
     }
 }

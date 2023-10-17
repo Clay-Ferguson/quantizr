@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
 import { Img } from "./Img";
@@ -33,18 +32,19 @@ export class IconButton extends Comp {
         this.mergeState({ waiting: true });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const state = this.getState<LS>();
 
         // this gets activated when the user clicks an infinite scrolling button, so it turns into a spinner
         // while loading more records
         if (state.waiting) {
-            return new Spinner("bigMargin").compRender();
+            this.setTag("span");
+            this.setChildren([new Spinner("bigMargin")]);
+            return true;
         }
 
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
-
-        return this.tag("button", null, [
+        this.setChildren([
             this.imageUrl ? new Img({
                 key: this.getId("img_"),
                 src: this.imageUrl
@@ -58,5 +58,7 @@ export class IconButton extends Comp {
                 className: "iconButtonFont"
             }) : null
         ]);
+        this.setTag("button");
+        return true;
     }
 }

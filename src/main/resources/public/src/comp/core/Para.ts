@@ -1,13 +1,14 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 export class Para extends Comp {
 
     constructor(public content: string = null, attribs: any = {}) {
         super(attribs);
+        this.setTag("p");
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("p", null, [this.content]);
+    override preRender = (): boolean => {
+        this.setChildren([this.content]);
+        return true;
     }
 }

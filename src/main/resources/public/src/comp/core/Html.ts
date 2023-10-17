@@ -35,14 +35,13 @@ export class Html extends Comp {
         this.mergeState<LS>({ content });
     }
 
-    compRender(): React.ReactNode {
+    override preRender = (): boolean => {
         if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
         this.attribs.dangerouslySetInnerHTML = this.purifyHtml ? Comp.getDangerousHtml(this.getState<LS>().content)
             : { __html: this.getState<LS>().content };
-        return this.tag("div");
 
         // ************* DO NOT DELETE.
         // Method 1 and 2 both work, except #2 would need to be updated to
@@ -54,6 +53,7 @@ export class Html extends Comp {
         //
         // METHOD 2: (note: You'll need to rename this file to '.tsx' extention to use JSX here)
         // return <div>{parseEmojisAndHtml(this.getState<LS>().content)}</div>;
+        return true;
     }
 
     override domPreUpdateEvent = (): void => {

@@ -110,7 +110,7 @@ export class NodeCompMarkdown extends Comp {
     //     });
     // }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {

@@ -32,7 +32,7 @@ export class RightNavPanel extends Div {
         RightNavPanel.inst = this;
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
 
         if (!ast.mobileMode) {

@@ -14,7 +14,7 @@ export class EditPrivsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const children = [];
 
         if (this.acl) {

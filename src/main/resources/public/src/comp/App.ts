@@ -29,7 +29,7 @@ export class App extends Main {
         super(null, { id: "appPanelId", role: "main" });
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
 
         if (!ast.appInitComplete) {

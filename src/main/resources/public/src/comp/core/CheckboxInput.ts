@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { ValueIntf } from "../../Interfaces";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
@@ -18,10 +17,11 @@ export class CheckboxInput extends Comp {
         if (this.valueIntf) {
             this.mergeState<LS>({ checked: !!valueIntf.getValue() })
         }
+        this.setTag("input");
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         this.attribs.checked = this.getState<LS>().checked;
-        return this.tag("input");
+        return true;
     }
 }

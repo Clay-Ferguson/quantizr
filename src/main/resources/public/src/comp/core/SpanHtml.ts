@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -9,10 +8,11 @@ export class SpanHtml extends Comp {
     constructor(public content: string = "", attribs: any = null) {
         super(attribs);
         this.mergeState<LS>({ content });
+        this.setTag("span");
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
-        return this.tag("span");
+        return true;
     }
 }

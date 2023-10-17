@@ -148,7 +148,7 @@ export class MenuPanel extends Div {
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signSubGraph = () => S.view.signSubGraph();
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
 
         const hltNode = S.nodeUtil.getHighlightedNode();

@@ -31,7 +31,7 @@ export class NodeCompMainNode extends Div {
         }
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
         const node = ast.node;
 

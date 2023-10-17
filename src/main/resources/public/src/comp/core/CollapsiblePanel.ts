@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { Divc } from "./Divc";
 import { Span } from "./Span";
@@ -19,19 +18,20 @@ export class CollapsiblePanel extends Comp {
         private extraToggleButtonClass = "",
         private extraDivStyleExpanded: string = "",
         private extraDivStyleCollapsed: string = "",
-        private elementName: string = "div") {
+        elementName: string = "div") {
         super(attribs);
         this.setChildren(children);
         this.collapsedButtonText = collapsedButtonText || "More ";
         this.expandedButtonText = expandedButtonText || "Less ";
         this.mergeState<LS>({ expanded });
+        this.setTag(elementName);
     }
 
     setExpanded(expanded: boolean) {
         this.mergeState<LS>({ expanded });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const state = this.getState<LS>();
         const style = this.textLink ? "collapsePanelLink" : "btn btn-primary ";
         const collapseClass = state.expanded ? "expand" : "collapse";
@@ -39,9 +39,9 @@ export class CollapsiblePanel extends Comp {
         /* If the component is expanded we render the button INSIDE the main area,
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
-            return this.tag(this.elementName, {
-                className: this.extraDivStyleExpanded
-            }, [
+            this.attribs.className = this.extraDivStyleExpanded;
+            const children = this.getChildren();
+            this.setChildren([
                 // This div and it's children holds the actual collapsible content.
                 new Divc({
                     className: collapseClass
@@ -53,14 +53,14 @@ export class CollapsiblePanel extends Comp {
                         "data-bs-toggle": collapseClass,
                         onClick: this.onToggle
                     }),
-                    ...this.getChildren()
+                    ...children
                 ])
             ]);
         }
         else {
-            return this.tag(this.elementName, {
-                className: this.extraDivStyleCollapsed
-            }, [
+            this.attribs.className = this.extraDivStyleCollapsed;
+            const children = this.getChildren();
+            this.setChildren([
                 // This span is the expande/collapse button itself
                 new Span(this.collapsedButtonText === "n/a" ? null : (this.collapsedButtonText + "   "), {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " iconUp" : " iconDown"),
@@ -73,9 +73,10 @@ export class CollapsiblePanel extends Comp {
                 new Divc({
                     className: collapseClass
                 },
-                    this.getChildren())
+                    children)
             ]);
         }
+        return true;
     }
 
     onToggle = () => {

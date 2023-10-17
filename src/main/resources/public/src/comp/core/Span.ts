@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -9,9 +8,11 @@ export class Span extends Comp {
     constructor(public content: string = "", attribs: any = {}) {
         super(attribs);
         this.mergeState<LS>({ content });
+        this.setTag("span");
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("span", null, this.childrenWithFirst(this.content));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.content));
+        return true;
     }
 }

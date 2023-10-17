@@ -23,7 +23,7 @@ export class EditAttachmentsPanel extends Div {
         super(null, { className: "binaryEditorSection" });
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         if (!this.node.attachments) return null;
         this.setChildren([]);
         let isFirst = true;

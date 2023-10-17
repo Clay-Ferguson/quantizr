@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { getAs } from "../../AppContext";
 import { Constants as C } from "../../Constants";
 import { PubSub } from "../../PubSub";
@@ -14,7 +13,8 @@ export class AppNavLink extends Comp {
         }
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("div", null, this.childrenWithFirst(this.content));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.content));
+        return true;
     }
 }

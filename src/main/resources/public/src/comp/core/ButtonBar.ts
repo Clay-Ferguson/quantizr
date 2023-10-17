@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import { Divc } from "./Divc";
 
@@ -13,20 +12,21 @@ export class ButtonBar extends Comp {
         this.setChildren(buttons);
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const props = {
             className: "btn-group btnGroup flex-wrap " + (this.extraClass ? this.extraClass : ""),
             role: "group"
         };
 
         if (this.wrapperClass) {
-            return this.tag("div", {
-                className: this.wrapperClass
-            },
-                [new Divc(props, this.getChildren())]);
+            const children = this.getChildren();
+            this.setChildren([new Divc(props, children)]);
+            this.attribs.className = this.wrapperClass;
         }
         else {
-            return this.tag("div", props);
+            this.attribs.className = props.className;
+            this.attribs.role = props.role;
         }
+        return true;
     }
 }

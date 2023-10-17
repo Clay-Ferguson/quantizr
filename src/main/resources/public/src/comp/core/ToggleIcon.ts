@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -14,6 +13,7 @@ export class ToggleIcon extends Comp {
             className: this.attribs.className,
             toggle: false
         });
+        this.setTag("i");
     }
 
     toggleClass = () => {
@@ -21,9 +21,9 @@ export class ToggleIcon extends Comp {
         this.mergeState<LS>({ toggle: !state.toggle });
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         const state = this.getState<LS>();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
-        return this.tag("i");
+        return true;
     }
 }

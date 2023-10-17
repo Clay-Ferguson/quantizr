@@ -157,7 +157,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const state = this.getState<LS>();
         const ast = getAs();
         if (state.loading || !state.og) {

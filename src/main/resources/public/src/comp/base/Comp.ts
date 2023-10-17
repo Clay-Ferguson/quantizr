@@ -16,6 +16,10 @@ export abstract class Comp implements CompIntf {
     public debug: boolean = false;
     public mounted: boolean = false;
     public rendered: boolean = false;
+
+    // tag can be a string *or* a react functional component
+    public tag: any = "div";
+
     private static guid: number = 0;
 
     // this option allows the ability to use the DOM explorer in browsers to see the class name of every element
@@ -58,6 +62,10 @@ export abstract class Comp implements CompIntf {
         this.attribs = attribs || {};
         this.attribs.ref = createRef();
 
+        if (Comp.renderClassInDom) {
+            this.attribs.c = this.constructor.name;
+        }
+
         if (this.attribs.title && !this.attribs.title.startsWith("*\n")) {
             this.attribs.title = "Tip:\n\n" + this.attribs.title;
         }
@@ -79,6 +87,10 @@ export abstract class Comp implements CompIntf {
         /* If an ID was specifically provided, then use it, or else generate one. We prefix with 'c' only because
         IDs can't start with a number. */
         this.setId(this.attribs.id || Comp.getNextId());
+    }
+
+    setTag = (tag: any): void => {
+        this.tag = tag;
     }
 
     public static getNextId(): string {
@@ -199,7 +211,7 @@ export abstract class Comp implements CompIntf {
         return this.children?.some(child => !!child);
     }
 
-    setChildren(comps: CompIntf[]) {
+    setChildren(comps: any[]) {
         this.children = comps;
     }
 
@@ -258,32 +270,24 @@ export abstract class Comp implements CompIntf {
         return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
     }
 
-    /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph
+    /* Renders this node to a specific tag, including support for non-React children 
     Note: Tag can also be a type here, not just a string.
     */
-    tag = (type: any, props?: object, childrenArg?: any[]): ReactNode => {
-        props = props ? { ...this.attribs, ...props } : this.attribs;
-
-        // for debugging, shows classname in every dom element as an attribute.
-        if (Comp.renderClassInDom) {
-            props = { c: this.constructor.name, ...props };
-        }
+    reactNode = (type: any): ReactNode => {
 
         // If this is a raw HTML component just render using 'attribs', which is what react expects.
-        if ((props as any).dangerouslySetInnerHTML) {
-            return createElement(type, props);
+        if (this.attribs.dangerouslySetInnerHTML) {
+            return createElement(type, this.attribs);
         }
 
-        childrenArg = childrenArg || this.children;
-
         try {
-            const children = this.createChildren(childrenArg);
+            const children = this.createChildren(this.children);
 
             if (children?.length > 0) {
-                return createElement(type, props, children);
+                return createElement(type, this.attribs, children);
             }
             else {
-                return createElement(type, props);
+                return createElement(type, this.attribs);
             }
         }
         catch (e) {
@@ -369,7 +373,8 @@ export abstract class Comp implements CompIntf {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
-            if (!this.preRender()) {
+            // we allow preRender to not return a value and that's the same as true
+            if (this.preRender() === false) {
                 this.preRenderRejected = true;
                 return null;
             }
@@ -436,8 +441,10 @@ export abstract class Comp implements CompIntf {
     }
 
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
-    // managemnt aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
-    abstract compRender(): ReactNode;
+    // management aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
+    compRender = (): ReactNode => {
+        return this.reactNode(this.tag);
+    }
 
     scrollDomAddEvent = () => {
         if (C.DEBUG_SCROLLING) {

@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -11,7 +10,8 @@ export class Div extends Comp {
         this.mergeState<LS>({ content });
     }
 
-    override compRender = (): ReactNode => {
-        return this.tag("div", null, this.childrenWithFirst(this.getState<LS>().content));
+    override preRender = (): boolean => {
+        this.setChildren(this.childrenWithFirst(this.getState<LS>().content));
+        return true;
     }
 }

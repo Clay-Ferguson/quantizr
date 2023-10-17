@@ -39,7 +39,7 @@ export class NodeCompContent extends Div {
         });
     }
 
-    override preRender(): boolean {
+    override preRender = (): boolean => {
         const ast = getAs();
 
         if (!this.node) {

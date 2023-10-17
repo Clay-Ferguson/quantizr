@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { Validator } from "../../Validator";
 import { Comp, ScrollPos } from "../base/Comp";
 
@@ -15,6 +14,7 @@ export class TextareaTag extends Comp {
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
+        this.setTag("textarea");
     }
 
     splitLines = (str: string): string[] => {
@@ -62,7 +62,7 @@ export class TextareaTag extends Comp {
         this.scrollPos?.setVal(pos);
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         this.attribs.value = this.getState<LS>().value;
         if (this.dynamicRows) {
             this.attribs.rows = "" + this.calcRows(this.attribs.value);
@@ -79,6 +79,6 @@ export class TextareaTag extends Comp {
             }
         };
 
-        return this.tag("textarea");
+        return true;
     }
 }

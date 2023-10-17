@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
@@ -14,10 +13,11 @@ export class Input extends Comp {
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
+        this.setTag("input");
     }
 
-    override compRender = (): ReactNode => {
+    override preRender = (): boolean => {
         this.attribs.value = this.getState<LS>().value || "";
-        return this.tag("input");
+        return true;
     }
 }
