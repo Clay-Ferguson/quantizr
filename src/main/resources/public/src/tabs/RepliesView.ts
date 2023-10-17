@@ -31,7 +31,6 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         let i = 0;
         const children: CompIntf[] = [
             this.headingBar = new TabHeading([
-                new Div(this.data.name, { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {
                         const ast = getAs();
@@ -48,7 +47,8 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
                         }
                     },
                     title: "Go back..."
-                }, "bigMarginLeft ")
+                }, "marginRight"),
+                new Div(this.data.name, { className: "tabTitle" }),
             ]),
             this.data.props.description ? new Div(this.data.props.description) : null
         ];

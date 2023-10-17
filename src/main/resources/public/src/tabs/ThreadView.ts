@@ -36,7 +36,6 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         let i = 0;
         const children: CompIntf[] = [
             this.headingBar = new TabHeading([
-                new Div(this.data.name, { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {
                         const ast = getAs();
@@ -55,7 +54,8 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                         }
                     },
                     title: "Go back..."
-                }, "bigMarginLeft "),
+                }, "marginRight"),
+                new Div(this.data.name, { className: "tabTitle" }),
                 !this.data.props.endReached ? new Button("More History...", () => { this.moreHistory() },
                     { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
 

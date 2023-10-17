@@ -54,9 +54,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
         const children: CompIntf[] = [
             this.headingBar = new TabHeading([
-                // include back button if we have a central node this panel is about.
-                this.renderHeading(),
-
                 (ast.searchViewFromTab || this.data.props.node) && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
                         onClick: () => {
@@ -74,7 +71,9 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                             }
                         },
                         title: "Back to Folders View"
-                    }, "bigMarginLeft") : null,
+                    }, "marginRight") : null,
+                // include back button if we have a central node this panel is about.
+                this.renderHeading(),
                 this.data.props.description ? new Span(this.data.props.description, { className: "float-end smallMarginTop" }) : null,
                 this.getFloatRightHeaderComp(),
                 new Clearfix()

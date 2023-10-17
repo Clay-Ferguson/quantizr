@@ -103,11 +103,11 @@ export class RSSView extends AppTab<any, RSSView> {
 
         this.setChildren([
             this.headingBar = new TabHeading([
-                new Div("RSS Feed", { className: "tabTitle" }),
                 new IconButton("fa-arrow-left", "", {
                     onClick: () => S.view.jumpToId(ast.rssNode.id),
                     title: "Back to Folders View"
-                }, "bigMarginLeft"),
+                }, "marginRight"),
+                new Div("RSS Feed", { className: "tabTitle" }),
                 new Checkbox("Headlines Only", {
                     className: "float-end"
                 }, {

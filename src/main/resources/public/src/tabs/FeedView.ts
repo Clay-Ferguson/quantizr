@@ -241,11 +241,11 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         this.setChildren([
             this.headingBar = new TabHeading([
-                this.renderHeading(),
                 this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
                     onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                     title: "Back to Folders View"
-                }, "bigMarginLeft ") : null,
+                }, "marginRight") : null,
+                this.renderHeading(),
                 new Divc({ className: "float-end" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
                     ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, true, false), {
