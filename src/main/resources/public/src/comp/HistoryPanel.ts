@@ -9,6 +9,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
+import { SpanHtml } from "./core/SpanHtml";
 
 export class HistoryPanel extends Div {
 
@@ -68,7 +69,7 @@ export class HistoryPanel extends Div {
                 ...dragProps
             }, [
                 parentIcon,
-                new Span(h.content, null, null, true)
+                new SpanHtml(h.content)
             ]));
 
             S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);

@@ -9,7 +9,7 @@ import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
-import { Span } from "../comp/core/Span";
+import { Spanc } from "../comp/core/Spanc";
 import { Spinner } from "../comp/core/Spinner";
 import { TextField } from "../comp/core/TextField";
 import { FilesTable } from "../comp/FilesTable";
@@ -92,7 +92,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
             children.push(new Heading(5, "Listing: " + (mfsMode ? "Mutable File System" : "Hierarchy (DAG)")))
 
             children.push(new Diva([
-                new Span(null, { className: "float-end marginBottom" }, [
+                new Spanc({ className: "float-end marginBottom" }, [
                     new Checkbox("List CIDs", null, {
                         setValue: (checked: boolean) => {
                             dispatch("setListCids", _s => {

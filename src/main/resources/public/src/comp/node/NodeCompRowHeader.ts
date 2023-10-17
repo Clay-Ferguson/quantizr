@@ -15,6 +15,8 @@ import { Button } from "../core/Button";
 import { Divc } from "../core/Divc";
 import { DropdownMenu } from "../core/DropdownMenu";
 import { Li } from "../core/Li";
+import { Spanc } from "../core/Spanc";
+import { SpanHtml } from "../core/SpanHtml";
 import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompRowHeader extends Div {
@@ -81,12 +83,12 @@ export class NodeCompRowHeader extends Div {
                 displayName = "PENDING XFER -> " + displayName;
             }
 
-            children.push(new Span(displayName, {
+            children.push(new SpanHtml(displayName, {
                 className: (this.node.transferFromId ? "transferPending" : (isMine ? "createdByMe" : "createdByOther")),
                 title: "Show Profile:\n\n" + this.node.owner,
                 [C.USER_ID_ATTR]: this.node.ownerId,
                 onClick: S.nav.clickToOpenUserProfile
-            }, null, true));
+            }));
         }
 
         const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);
@@ -357,7 +359,7 @@ export class NodeCompRowHeader extends Div {
             else if (S.props.isShared(this.node)) {
                 const shareComps = S.nodeUtil.getSharingNames(this.node, null);
                 floatUpperRightDiv.addChildren([
-                    new Span(null, {
+                    new Spanc({
                         className: "rowHeaderSharingNames"
                     }, [
                         new Icon({

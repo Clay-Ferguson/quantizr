@@ -3,6 +3,7 @@ import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
+import { Spanc } from "./comp/core/Spanc";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import * as J from "./JavaIntf";
@@ -261,7 +262,7 @@ export class NodeUtil {
         const ret: Comp[] = [];
         if (S.props.isPublic(node)) {
             ret.push(
-                new Span(null, {
+                new Spanc({
                     title: "Shared to Public (Everyone)\n\nClick to remove Public Sharing",
                     className: "sharingNamePublic marginLeftIfNotFirst",
                     onClick: () => this.removePublicShare(node, editorDlg)

@@ -6,11 +6,11 @@ import { Checkbox } from "../../comp/core/Checkbox";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
-import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Spanc } from "../core/Spanc";
 
 export class NodeCompButtonBar extends Div {
 
@@ -39,7 +39,7 @@ export class NodeCompButtonBar extends Div {
         let moveNodeDownIcon: Icon;
         let deleteNodeIcon: Icon;
         let askDelDiv: Div;
-        let pasteSpan: Span;
+        let pasteSpan: Spanc;
 
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
         const type = S.plugin.getType(this.node.type);
@@ -227,7 +227,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (!!ast.nodesToMove && userCanPaste) {
-                pasteSpan = new Span(null, { className: "float-end marginLeft" }, [
+                pasteSpan = new Spanc({ className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton"),
 
@@ -292,7 +292,7 @@ export class NodeCompButtonBar extends Div {
 
         let floatEndSpan = null;
         if (spanArray.some(c => !!c)) {
-            floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
+            floatEndSpan = new Spanc({ className: "float-end" }, spanArray);
         }
 
         let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan

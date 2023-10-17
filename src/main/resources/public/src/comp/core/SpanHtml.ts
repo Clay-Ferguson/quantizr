@@ -5,13 +5,14 @@ interface LS { // Local State
     content?: string;
 }
 
-export class Span extends Comp {
-    constructor(public content: string = "", attribs: any = {}) {
+export class SpanHtml extends Comp {
+    constructor(public content: string = "", attribs: any = null) {
         super(attribs);
         this.mergeState<LS>({ content });
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("span", null, this.childrenWithFirst(this.content));
+        this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
+        return this.tag("span");
     }
 }
