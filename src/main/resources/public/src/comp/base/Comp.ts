@@ -207,7 +207,7 @@ export abstract class Comp implements CompIntf {
         return this.children;
     }
 
-    getChildrenWithFirst(first: any): any[] {
+    childrenWithFirst(first: any): any[] {
         if (!first) return this.children;
         return this.children ? [first, ...this.children] : [first];
     }

@@ -8,6 +8,6 @@ export class Anchor extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("a", null, this.getChildrenWithFirst(this.content || this.url));
+        return this.tag("a", null, this.childrenWithFirst(this.content || this.url));
     }
 }

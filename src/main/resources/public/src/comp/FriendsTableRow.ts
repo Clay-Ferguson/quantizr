@@ -67,7 +67,7 @@ export class FriendsTableRow extends ListBoxRow {
                     ])
                 ]),
 
-                new Div(null, {
+                new Divc({
                     className: "marginLeft marginTop",
                     [C.USER_ID_ATTR]: this.friend.userNodeId,
                     onClick: S.nav.clickToOpenUserProfile,

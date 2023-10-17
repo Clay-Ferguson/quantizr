@@ -87,7 +87,7 @@ export class LeftNavPanel extends Div {
 
         let scrollDiv = null;
         this.setChildren([
-            scrollDiv = new Div(null, { className: "leftNavPanel customScrollbar" }, [
+            scrollDiv = new Divc({ className: "leftNavPanel customScrollbar" }, [
                 new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
                     new Img({
                         className: "leftNavLogoImg",

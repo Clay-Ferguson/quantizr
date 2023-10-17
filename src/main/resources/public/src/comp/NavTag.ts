@@ -9,6 +9,6 @@ export class NavTag extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("nav", null, this.getChildrenWithFirst(this.content));
+        return this.tag("nav", null, this.childrenWithFirst(this.content));
     }
 }

@@ -9,6 +9,6 @@ export class Li extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("li", null, this.getChildrenWithFirst(this.content));
+        return this.tag("li", null, this.childrenWithFirst(this.content));
     }
 }

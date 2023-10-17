@@ -149,7 +149,7 @@ export class RightNavPanel extends Div {
         const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCreditDiv() : null;
 
         this.setChildren([
-            scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
+            scrollDiv = new Divc({ className: "rightNavPanel customScrollbar" }, [
                 new Divc({ className: "float-left" }, [
                     new FlexRowLayout([
                         avatarImg,

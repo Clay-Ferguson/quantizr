@@ -565,7 +565,7 @@ export class Render {
     }
 
     newUserAccountTips = (): Div => {
-        return new Div(null, { className: "bigMargin alert alert-info" }, [
+        return new Divc({ className: "bigMargin alert alert-info" }, [
             new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "bigMarginBottom" }),
             new Button("View User Guide", () => S.nav.openContentNode(":user-guide", false))
         ]);
@@ -845,7 +845,7 @@ export class Render {
         });
 
         const attrs = classes ? { className: classes } : null;
-        return new Div(null, attrs, [
+        return new Divc(attrs, [
             new Divc({ className: "inlineBlock" }, [
                 new Divc({
                     className: "tagsFlexContainer"

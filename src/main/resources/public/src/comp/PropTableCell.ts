@@ -9,6 +9,6 @@ export class PropTableCell extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("td", null, this.getChildrenWithFirst(this.content));
+        return this.tag("td", null, this.childrenWithFirst(this.content));
     }
 }

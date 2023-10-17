@@ -19,7 +19,7 @@ export class Span extends Comp {
             return this.tag("span");
         }
         else {
-            return this.tag("span", null, this.getChildrenWithFirst(this.content));
+            return this.tag("span", null, this.childrenWithFirst(this.content));
         }
     }
 }

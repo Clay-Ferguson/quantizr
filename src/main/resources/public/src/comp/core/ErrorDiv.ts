@@ -14,6 +14,6 @@ export class ErrorDiv extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("div", null, this.getChildrenWithFirst(this.getState<LS>().error));
+        return this.tag("div", null, this.childrenWithFirst(this.getState<LS>().error));
     }
 }

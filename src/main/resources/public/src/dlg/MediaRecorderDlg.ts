@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
+import { Divc } from "../comp/core/Divc";
 import { Selection } from "../comp/core/Selection";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
 import { Constants as C } from "../Constants";
@@ -188,7 +189,7 @@ export class MediaRecorderDlg extends DialogBase {
                     new Button(this.allowSave ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ]),
                 this.videoMode ? this.videoPlayer : null,
-                new Div("", { className: "marginTop" }, [audioSelect, videoSelect])
+                new Divc({ className: "marginTop" }, [audioSelect, videoSelect])
             ])
         ];
     }

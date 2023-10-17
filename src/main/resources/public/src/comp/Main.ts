@@ -15,6 +15,6 @@ export class Main extends Comp {
     }
 
     override compRender = (): ReactNode => {
-        return this.tag("main", null, this.getChildrenWithFirst(this.getState<LS>().content));
+        return this.tag("main", null, this.childrenWithFirst(this.getState<LS>().content));
     }
 }

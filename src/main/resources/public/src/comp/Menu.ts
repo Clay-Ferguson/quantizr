@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { asyncDispatch, getAs } from "../AppContext";
 import { S } from "../Singletons";
-import { Div } from "../comp/core/Div";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 import { Divc } from "./core/Divc";
@@ -17,7 +16,7 @@ export class Menu extends Comp {
         const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");
 
         this.setChildren([
-            new Div(this.name, {
+            new Divc({
                 className: clazz + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
                 id: this.getId("heading"),
                 onClick: () => {
@@ -27,7 +26,7 @@ export class Menu extends Comp {
                     }
                 }
             }
-                , [expanded ? this.floatRightComp : null]),
+                , [this.name, expanded ? this.floatRightComp : null]),
 
             expanded ? new Divc({
                 id: this.getId("itemsCont"),
