@@ -170,51 +170,40 @@ export class Props {
     hasImage = (node: J.NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
-        return (target && target.startsWith("image/"));
+        return target?.startsWith("image/");
     }
 
     hasAudio = (node: J.NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
-        return (target && target.startsWith("audio/"));
+        return target?.startsWith("audio/");
     }
 
     hasVideo = (node: J.NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
-        return (target && target.startsWith("video/"));
+        return target?.startsWith("video/");
     }
 
-    /*
-     * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
-     * (PropertyInfo.java) with name matching propertyName, else null.
-     */
     getProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
-        if (!node || !node.properties) {
-            return null;
-        }
-
-        return node.properties.find(p => p.name === propName);
+        return node?.properties?.find(p => p.name === propName);
     }
 
     getPropStr = (propertyName: string, node: J.NodeInfo): string => {
-        const prop = this.getProp(propertyName, node);
-        return prop ? prop.value : null;
+        return this.getProp(propertyName, node)?.value;
     }
 
     getPropObj = (propertyName: string, node: J.NodeInfo): any => {
-        const prop = this.getProp(propertyName, node);
-        return prop ? prop.value : null;
+        return this.getProp(propertyName, node)?.value;
     }
 
     getClientPropStr = (propertyName: string, node: J.NodeInfo): string => {
-        const prop = this.getClientProp(propertyName, node);
-        return prop ? prop.value : null;
+        return this.getClientProp(propertyName, node)?.value;
     }
 
     getAttachment = (name: string, node: J.NodeInfo): J.Attachment => {
         if (!name) name = J.Constant.ATTACHMENT_PRIMARY;
-        return node && node.attachments ? node.attachments[name] : null;
+        return node?.attachments ? node.attachments[name] : null;
     }
 
     setPropVal = (propertyName: string, node: J.NodeInfo, val: any) => {
@@ -316,7 +305,6 @@ export class Props {
             case J.NodeProp.IN_PENDING_PATH:
             case J.NodeProp.TRUNCATED:
                 return true;
-
             default:
                 return prop.indexOf(":") !== -1;
         }

@@ -75,7 +75,7 @@ export class Nav {
         this.navUpLevel(false);
     }
 
-    navUpLevel = async (processingDelete: boolean): Promise<void> => {
+    navUpLevel = async (processingDelete: boolean) => {
         const ast = getAs();
         if (!ast.node) return null;
 
@@ -163,7 +163,6 @@ export class Nav {
             });
             return;
         }
-
         this.navPageNodeResponse(res);
     }
 
@@ -184,7 +183,6 @@ export class Nav {
                 else {
                     S.props.setPropVal(J.NodeProp.INLINE_CHILDREN, node, "1");
                 }
-
                 await S.edit.saveNode(node, true);
             }
             else {
@@ -291,7 +289,6 @@ export class Nav {
                 jumpToRss: false
             });
             S.nodeUtil.processInboundNode(res.node);
-
             this.navPageNodeResponse(res);
         }
     }
@@ -755,19 +752,22 @@ export class Nav {
     }
 
     changeMenuExpansion = (ast: AppState, op: string, menuName: string) => {
-        if (op === "toggle") {
-            if (ast.expandedMenus.has(menuName)) {
-                ast.expandedMenus.delete(menuName);
-            }
-            else {
+        switch (op) {
+            case "toggle":
+                if (ast.expandedMenus.has(menuName)) {
+                    ast.expandedMenus.delete(menuName);
+                }
+                else {
+                    ast.expandedMenus.add(menuName);
+                }
+                break;
+            case "expand":
                 ast.expandedMenus.add(menuName);
-            }
-        }
-        else if (op === "expand") {
-            ast.expandedMenus.add(menuName);
-        }
-        else if (op === "collapse") {
-            ast.expandedMenus.delete(menuName);
+                break;
+            case "collapse":
+                ast.expandedMenus.delete(menuName);
+                break;
+            default: break
         }
     }
 

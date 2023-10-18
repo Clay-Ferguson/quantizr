@@ -64,10 +64,6 @@ export class NodeCompMarkdown extends Comp {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);
-
-        // #inline-image-rendering
-        // val = this.replaceOgImgFileNames(val); // <-- DO NOT DELETE
-
         val = S.util.insertActPubTags(val, node);
         val = this.translateLaTex(val);
         val = this.insertMarkdownLinks(urls, val);
@@ -91,24 +87,6 @@ export class NodeCompMarkdown extends Comp {
         val = val.replaceAll("\\]", "$$");
         return val;
     }
-
-    // DO NOT DELETE (#inline-image-rendering)
-    // replaceOgImgFileNames = (val: string): string => {
-    //     // find all the urls in the val, and remove the ones that we know are doing go
-    //     // be rendered as plain Images when OpenGraph rendering is complete.
-    //     return val.replace(NodeCompMarkdown.urlRegex, (url: string) => {
-    //         if (S.quanta.imageUrls.has(url)) {
-    //             // todo-2: we can add 'click to expand' functionality here.
-    //             // It's probably better to render the image but LEAVE the 'url' in front of it
-    //             // because that's addative to the page, and the scrollbars will behave much better
-    //             // in cases where the page is only growing and nothing ever shifts UP.
-    //             return url + `<img src='${url}' class='insImgInRow'>`;
-    //         }
-    //         else {
-    //             return url;
-    //         }
-    //     });
-    // }
 
     override preRender = (): boolean => {
         const state: LS = this.getState<LS>();

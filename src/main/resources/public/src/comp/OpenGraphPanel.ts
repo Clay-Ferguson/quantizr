@@ -62,19 +62,6 @@ export class OpenGraphPanel extends Div {
         await this.loadNext();
     }
 
-    // DO NOT DELETE (#inline-image-rendering)
-    // This can support injecting images directly into the location where they're mentioned in
-    // the text but we're not doing this for now because we have a cleaner way to render images by having
-    // them all be at the end of the content just like normal non-Image OpenGraph does.
-    // processOgImage = (url: string, og: J.OpenGraph) => {
-    //     if (og.mime?.startsWith("image/")) {
-    //         if (!S.quanta.imageUrls.has(url)) {
-    //             S.quanta.imageUrls.add(url);
-    //             S.render.forceRender = true;
-    //         }
-    //     }
-    // }
-
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
     performance optimization to help the user experience and is not a core part of the logic for
      'correct' functioning, but it does offer an extremely nice smooth experience when scrolling down thru content
@@ -167,7 +154,6 @@ export class OpenGraphPanel extends Div {
             return true;
         }
 
-        // see #inline-image-rendering
         if (state.og.mime?.startsWith("image/")) {
             this.setChildren([new Img({ src: this.url, className: "insImgInRow" })]);
             return true;

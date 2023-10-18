@@ -42,13 +42,7 @@ export class MenuPanel extends Div {
 
     // leaving for reference how to open this.
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES, false);
-
-    static editFriends = () => {
-        // DO NOT DELETE (This is good know as the way to access raw friends nodes)
-        // S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-        const friendsDlg = new FriendsDlg("Friends", null, true);
-        friendsDlg.open();
-    };
+    static editFriends = () => { new FriendsDlg("Friends", null, true).open(); };
 
     static openBookmarksNode = () => {
         S.util.setUserPreferences(true);
@@ -65,28 +59,16 @@ export class MenuPanel extends Div {
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
     // which can be slow in JS.
 
-    static showBlockedUsers = () => {
-        const dlg = new BlockedUsersDlg("Blocked");
-        dlg.open();
-    }
-
-    static toggleEditMode = () => {
-        S.edit.setEditMode(!getAs().userPrefs.editMode);
-
-    }
-    static toggleInfoMode = () => {
-        S.edit.setShowMetaData(!getAs().userPrefs.showMetaData);
-    }
-
+    static showBlockedUsers = () => { new BlockedUsersDlg("Blocked").open(); }
+    static toggleEditMode = () => { S.edit.setEditMode(!getAs().userPrefs.editMode); }
+    static toggleInfoMode = () => { S.edit.setShowMetaData(!getAs().userPrefs.showMetaData); }
     static userProfile = () => { new UserProfileDlg(null).open(); }
-
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
     static openHomeNode = () => S.nav.openContentNode(":" + getAs().userName + ":home", false);
     static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, false);
     static openUsersNode = () => S.nav.openContentNode("/r/usr", false);
-
     static transferNode = () => { new TransferNodeDlg("transfer").open(); };
     static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };
     static rejectTransfer = () => { new TransferNodeDlg("reject").open(); };
@@ -296,7 +278,7 @@ export class MenuPanel extends Div {
                 if (dlg.chosenType) {
                     S.edit.createNode(hltNode, dlg.chosenType, true, null);
                 }
-            }, //
+            },
                 onMainTab && !ast.isAnonUser && !!hltNode, null, true));
 
             children.push(new Menu("Create", createMenuItems, null, null, "ui-menu-create"));
@@ -315,19 +297,12 @@ export class MenuPanel extends Div {
 
                 new MenuItemSeparator(), //
 
-                new MenuItem("Shared Nodes", MenuPanel.showAllShares, //
-                    !ast.isAnonUser && !!hltNode),
-
-                new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, //
-                    !ast.isAnonUser && !!hltNode),
-
-                new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, //
-                    !ast.isAnonUser && !!hltNode),
-
+                new MenuItem("Shared Nodes", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
+                new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
+                new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
                 new MenuItemSeparator(), //
 
-                new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, //
-                    !ast.isAnonUser && !!hltNode)
+                new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode)
 
                 // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
                 //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })

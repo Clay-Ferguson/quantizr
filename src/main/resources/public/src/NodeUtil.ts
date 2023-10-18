@@ -90,7 +90,6 @@ export class NodeUtil {
         // this highlightNodeId is only really used to ensure state change happens, but really everything always
         // keys off parentIdToFocusNodeMap actually reading the value.
         dispatch("highlightNode", s => s.highlightNodeId = node.id);
-
         S.quanta.parentIdToFocusNodeMap.set(ust.node.id, node.id);
 
         if (scroll) {
@@ -130,7 +129,6 @@ export class NodeUtil {
         }
         return null;
     }
-
 
     getNodeByName = (node: J.NodeInfo, name: string, ust: AppState): J.NodeInfo => {
         if (!node) return null;
@@ -207,7 +205,6 @@ export class NodeUtil {
         if (S.props.isEncrypted(node)) {
             content = "[Encrypted]";
         }
-
         return content.trim();
     }
 
@@ -344,7 +341,6 @@ export class NodeUtil {
         if (showMore) {
             ret.push(new Span(`${moreCount} more...`, { className: "sharingName", title: "Also shared to...\n" + showMore }));
         }
-
         return ret;
     }
 
@@ -364,7 +360,6 @@ export class NodeUtil {
                     if (p.privilegeName.indexOf(J.PrivilegeType.WRITE) !== -1) {
                         val += " +R";
                     }
-                    // val += p.privilegeName;
                 }
                 break;
             }
@@ -399,4 +394,3 @@ export class NodeUtil {
         }
     }
 }
-

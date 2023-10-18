@@ -39,18 +39,6 @@ export class Render {
     fadeInId: string;
     allowFadeInId: boolean = false;
 
-    // DO NOT DELETE: #inline-image-rendering
-    // There's another part of the code
-    // (see forceRender) that I want to be ABLE to bring back
-    // which relies on this code
-    // forceRender = false;
-    // backgroundQueue = setInterval(() => {
-    //     if (this.forceRender) {
-    //         this.forceRender = false;
-    //         dispatch("forceRender", s => { })
-    //     }
-    // }, 500);
-
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         // note: this is only here to get the markdown renderer to have padding in plain text, but also
         // it means we can leave off the language type and get a plaintext as default
@@ -278,16 +266,16 @@ export class Render {
         //         onClick: () => this.showLink(rssFeed)
         //     }));
 
-        const attachmentComps: Comp[] = [];
+        const attComps: Comp[] = [];
         if (node.attachments) {
             const atts: J.Attachment[] = S.props.getOrderedAtts(node);
-            attachmentComps.push(new Heading(3, "Attachments"));
+            attComps.push(new Heading(3, "Attachments"));
             for (const att of atts) {
-                attachmentComps.push(new Tag("hr"));
+                attComps.push(new Tag("hr"));
                 const bin = att ? att.b : null;
                 if (bin) {
-                    attachmentComps.push(new Divc({ className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
-                    attachmentComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
+                    attComps.push(new Divc({ className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
+                    attComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
                     const linkGroup = new Divc({ className: "attachmentLinkGroup" });
 
                     const attByIdUrl = window.location.origin + "/f/id/" + node.id;
@@ -344,12 +332,12 @@ export class Render {
                         ]);
                     }
 
-                    attachmentComps.push(linkGroup);
+                    attComps.push(linkGroup);
                 }
             }
 
-            if (attachmentComps.length > 0) {
-                children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (exp: boolean) => {
+            if (attComps.length > 0) {
+                children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attComps, false, (exp: boolean) => {
                     dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
                 }, getAs().linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
             }
@@ -449,7 +437,6 @@ export class Render {
                                 targetNodeId = targetNode.id;
                             }
                         }
-
                         this.fadeInId = targetNodeId;
                         S.quanta.pendingLocationHash = null;
                     }
