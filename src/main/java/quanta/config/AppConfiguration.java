@@ -220,7 +220,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public ClassLoaderTemplateResolver templateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setPrefix("public/dist/");
-        templateResolver.setCacheable(!"dev".equals(appProp.getProfileName()));
+        templateResolver.setCacheable(!appProp.isDevEnv());
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");

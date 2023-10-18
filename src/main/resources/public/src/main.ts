@@ -8,7 +8,7 @@ import { S } from "./Singletons";
 import AppContainer from "./comp/core/AppContainer";
 
 if (bootstrap) {
-    console.log("bootstrap js loaded ok(b)");
+    console.log("bootstrap js loaded ok");
 }
 
 // we have this as the first import for troubleshooting how browsers are

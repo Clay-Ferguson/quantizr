@@ -183,6 +183,10 @@ public class AppProp {
         return env.getProperty("profileName");
     }
 
+    public boolean isDevEnv() {
+        return "dev".equals(getProfileName());
+    }
+
     public String getInstanceId() {
         return env.getProperty("instanceId");
     }
@@ -325,7 +329,7 @@ public class AppProp {
     }
 
     public String getAppVersion() {
-        return "3.0.4"; // env.getProperty("QUANTA_VER");
+        return env.getProperty("QUANTA_VER");
     }
 
     public String getSwarmTaskId() {

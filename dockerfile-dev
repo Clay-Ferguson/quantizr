@@ -8,8 +8,8 @@ ARG PORT_DEBUG
 ARG XMS
 ARG XMX
 
-RUN mkdir -p /dev-resource-base
-RUN echo "dummy" > /dev-resource-base/dummy.txt
+# RUN mkdir -p /dev-resource-base
+# RUN echo "dummy" > /dev-resource-base/dummy.txt
 
 RUN mkdir -p /loader-path
 RUN echo "dummy" > /loader-path/dummy.txt
