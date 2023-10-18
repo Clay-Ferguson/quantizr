@@ -1,5 +1,5 @@
 import { Comp } from "../comp/base/Comp";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -19,6 +19,6 @@ export class IPFSNodeType extends TypeBase {
 
     override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const cid = S.props.getPropStr(J.NodeProp.IPFS_CID, node) || "";
-        return new Diva([new Heading(6, "CID: " + cid, { className: "ipfsText" })]);
+        return new Div(null, null, [new Heading(6, "CID: " + cid, { className: "ipfsText" })]);
     }
 }

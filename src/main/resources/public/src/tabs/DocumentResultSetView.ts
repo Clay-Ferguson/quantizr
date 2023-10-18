@@ -1,7 +1,7 @@
 import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { Constants as C } from "../Constants";
 import { DocumentRSInfo } from "../DocumentRSInfo";
@@ -53,7 +53,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
 
     override getFloatRightHeaderComp = (): Comp => {
         const ast = getAs();
-        return new Divc({ className: "float-end" }, [
+        return new Div(null, { className: "float-end" }, [
             ast.mobileMode ? null : new Checkbox("Indent", {
                 className: "bigMarginLeft",
                 title: "Indent the Document based on content hierarchy"

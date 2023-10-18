@@ -5,7 +5,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -31,7 +30,7 @@ export class SharingDlg extends DialogBase {
         const numShares: number = ast.editNode.ac?.length;
 
         return [
-            new Diva([
+            new Div(null, null, [
                 numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
                 new EditPrivsTable((userName: string, allowAppends: boolean) => {
                     this.shareNodeToUser(userName, allowAppends);

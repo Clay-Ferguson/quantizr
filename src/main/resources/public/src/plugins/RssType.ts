@@ -1,7 +1,7 @@
 import { dispatch } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { EditorOptions } from "../Interfaces";
 import { TabIntf } from "../intf/TabIntf";
@@ -52,7 +52,7 @@ export class RssType extends TypeBase {
     super_render = this.render;
     override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
-        return new Diva([
+        return new Div(null, null, [
             new Button("View Feed", () => {
                 dispatch("LoadingFeed", s => {
                     s.rssNode = node;

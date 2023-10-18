@@ -1,5 +1,5 @@
 import { Comp } from "../base/Comp";
-import { Divc } from "./Divc";
+import { Div } from "./Div";
 import { Span } from "./Span";
 
 interface LS { // Local State
@@ -43,7 +43,7 @@ export class CollapsiblePanel extends Comp {
             const children = this.getChildren();
             this.setChildren([
                 // This div and it's children holds the actual collapsible content.
-                new Divc({
+                new Div(null, {
                     className: collapseClass
                 }, [
                     // This span is the expande/collapse button itself
@@ -70,7 +70,7 @@ export class CollapsiblePanel extends Comp {
                 }),
 
                 // This div and it's children holds the actual collapsible content.
-                new Divc({
+                new Div(null, {
                     className: collapseClass
                 },
                     children)

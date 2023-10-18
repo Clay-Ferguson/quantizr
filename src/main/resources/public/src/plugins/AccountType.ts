@@ -1,7 +1,7 @@
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
@@ -32,7 +32,7 @@ export class AccountType extends TypeBase {
 
     override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const name = S.nodeUtil.getDisplayName(node);
-        return new Divc({
+        return new Div(null, {
             className: "systemNodeContent"
         }, [
             new Heading(4, "User: " + name, {

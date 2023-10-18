@@ -2,7 +2,6 @@ import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
@@ -35,18 +34,18 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 new Div("Settings", { className: "tabTitle" })
             ]),
 
-            new Divc({ className: "settingsPanel" }, [
+            new Div(null, { className: "settingsPanel" }, [
                 // -----------------------
                 this.sectionTitle("Account"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Logout", S.user.logout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
                         ast.userProfile?.balance ? this.settingsLink("ChatGPT Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Clear Browser Storage", async () => {
                             await S.localDB.clearStores();
                             S.util.showMessage("Browser Storage cleared successfully");
@@ -60,7 +59,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("View Options"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         new Checkbox("Sensitive Content", { className: "bigMarginLeft" }, {
                             setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.nsfw = checked),
                             getValue: (): boolean => ast.userPrefs.nsfw
@@ -72,7 +71,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         })
                     ]),
 
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         new Checkbox("Properties", { className: "bigMarginLeft" }, {
                             setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
                             getValue: (): boolean => ast.userPrefs.showProps
@@ -99,11 +98,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Tools"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Test Microphone", () => new MediaRecorderDlg(false, false).open()), //
                         this.settingsLink("Test Web Cam", () => new MediaRecorderDlg(true, false).open())
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("My GEO Location", S.nav.geoLocation), //
                         this.settingsLink("About Browser", S.util.showBrowserInfo)
                     ])
@@ -112,10 +111,10 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("Danger Zone"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Bulk Delete", S.edit.bulkDelete)
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Close Account", S.user.closeAccount)
                     ])
                 ], horzClass)

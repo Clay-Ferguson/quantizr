@@ -1,10 +1,8 @@
 import { dispatch, getAs } from "../AppContext";
-import { ScrollPos } from "../comp/base/Comp";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -21,7 +19,7 @@ export class EditTagsDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new Div("Enter custom hashtags, each on a separate line below. Hashtags must start with #."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([

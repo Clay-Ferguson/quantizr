@@ -1,5 +1,4 @@
 import { dispatch, getAs } from "../../AppContext";
-import { Diva } from "../../comp/core/Diva";
 import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "../../dlg/EditNodeDlg";
@@ -11,7 +10,6 @@ import { NodeCompBinary } from "../node/NodeCompBinary";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
-import { Divc } from "./Divc";
 import { FlexRowLayout } from "./FlexRowLayout";
 import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
@@ -135,7 +133,7 @@ export class EditAttachmentsPanel extends Div {
             imgPositionSelection,
             fileNameField,
             pinCheckbox,
-            new Diva([
+            new Div(null, null, [
                 !firstAttachment ? new Icon({
                     className: "fa fa-lg fa-arrow-up clickable marginLeft",
                     title: "Move Attachment Up",
@@ -154,7 +152,7 @@ export class EditAttachmentsPanel extends Div {
 
         let bottomBinRow = null;
         if (ipfsLink) {
-            bottomBinRow = new Divc({ className: "smallMarginTop marginBottom" }, [
+            bottomBinRow = new Div(null, { className: "smallMarginTop marginBottom" }, [
                 ipfsLink ? new Div(`IPFS CID: ${ipfsLink}`, {
                     className: "clickable",
                     title: "Click -> Copy to clipboard",
@@ -185,7 +183,7 @@ export class EditAttachmentsPanel extends Div {
             }
         }
 
-        return new Divc({ className: "binaryEditorItem" }, [
+        return new Div(null, { className: "binaryEditorItem" }, [
             topBinRow, fileNameTagTip, bottomBinRow
         ]);
     }

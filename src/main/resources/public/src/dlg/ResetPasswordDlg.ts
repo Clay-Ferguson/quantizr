@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -26,7 +26,7 @@ export class ResetPasswordDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextContent("Enter your user name and email address to receive a reset link."),
                 new TextField({ label: "User Name", val: this.userState }),
                 new TextField({ label: "Email Address", val: this.emailState }),

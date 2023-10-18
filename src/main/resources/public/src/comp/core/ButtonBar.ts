@@ -1,5 +1,5 @@
 import { Comp } from "../base/Comp";
-import { Divc } from "./Divc";
+import { Div } from "./Div";
 
 export class ButtonBar extends Comp {
 
@@ -20,7 +20,7 @@ export class ButtonBar extends Comp {
 
         if (this.wrapperClass) {
             const children = this.getChildren();
-            this.setChildren([new Divc(props, children)]);
+            this.setChildren([new Div(null, props, children)]);
             this.attribs.className = this.wrapperClass;
         }
         else {

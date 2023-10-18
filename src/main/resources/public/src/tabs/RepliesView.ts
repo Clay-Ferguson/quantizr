@@ -2,7 +2,6 @@ import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
@@ -72,7 +71,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
                         subComps.push(c);
                     }
                 });
-                children.push(new Diva(subComps));
+                children.push(new Div(null, null, subComps));
             }
 
             i++;

@@ -6,7 +6,6 @@ import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Divc } from "../core/Divc";
 import { NodeCompRow } from "./NodeCompRow";
 
 export class NodeCompTableRowLayout extends Div {
@@ -18,7 +17,7 @@ export class NodeCompTableRowLayout extends Div {
     override preRender = (): boolean => {
         const ast = getAs();
         const nodesToMove = ast.nodesToMove;
-        let curRow = new Divc({ className: "nodeGridRow" });
+        let curRow = new Div(null, { className: "nodeGridRow" });
         const children: Comp[] = [];
         const childCount: number = this.node.children.length;
         let rowCount: number = 0;
@@ -70,7 +69,7 @@ export class NodeCompTableRowLayout extends Div {
 
                     // experimenting: Still need this?
                     // if (n.children && !inVerticalSpace) {
-                    //     comps.push(new Divc({ className: "verticalSpace" }));
+                    //     comps.push(new Div(null, { className: "verticalSpace" }));
                     // }
                     const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, false, null, false);
                     // inVerticalSpace = false;
@@ -84,12 +83,12 @@ export class NodeCompTableRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
 
                     // experimenting: Still need this?
-                    // comps.push(new Divc({ className: "verticalSpace" }));
+                    // comps.push(new Div(null, { className: "verticalSpace" }));
 
                     // inVerticalSpace = true;
                 }
 
-                const curCol = new Divc({
+                const curCol = new Div(null, {
                     className: "nodeGridCell",
                     style: {
                         width: cellWidth + "%",
@@ -101,7 +100,7 @@ export class NodeCompTableRowLayout extends Div {
 
                 if (++curCols === maxCols) {
                     children.push(curRow);
-                    curRow = new Divc({ className: "tableRow" });
+                    curRow = new Div(null, { className: "tableRow" });
                     curCols = 0;
                 }
             }

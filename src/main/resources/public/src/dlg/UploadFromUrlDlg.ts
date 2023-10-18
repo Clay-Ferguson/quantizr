@@ -2,8 +2,7 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -25,9 +24,9 @@ export class UploadFromUrlDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextField({ label: "Upload from URL", val: this.urlState }),
-                new Divc({ className: "marginTop" }, [
+                new Div(null, { className: "marginTop" }, [
                     new Checkbox("Store a copy on this server", null, {
                         setValue: (checked: boolean) => UploadFromUrlDlg.storeLocally = checked,
                         getValue: (): boolean => UploadFromUrlDlg.storeLocally

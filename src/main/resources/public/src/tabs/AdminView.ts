@@ -1,7 +1,6 @@
 import { promiseDispatch } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { TabHeading } from "../comp/core/TabHeading";
@@ -50,16 +49,16 @@ export class AdminView extends AppTab<any, AdminView> {
                 new Div("Admin Console", { className: "tabTitle" })
             ]),
 
-            new Divc({ className: "marginLeft" }, [
+            new Div(null, { className: "marginLeft" }, [
                 this.sectionTitle("Analytics"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         // /// new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                         this.settingsLink("Server Info", () => S.view.runServerCommand("getServerInfo", null, "Info View", null)), //
                         this.settingsLink("Redis PubSub Test", () => S.view.runServerCommand("redisPubSubTest", null, "Redis PubSub Test", null)), //
                         this.settingsLink("Transactions Report", () => S.view.runServerCommand("transactionsReport", null, "Transactions Report", null)),
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Performance Report", () => S.view.runServerCommand("performanceReport", null, "Performance Report", null)), //
                         this.settingsLink("Clear Performance Data", () => S.view.runServerCommand("clearPerformanceData", null, "Clear Performance Data", null)), //
                     ]),
@@ -67,12 +66,12 @@ export class AdminView extends AppTab<any, AdminView> {
 
                 this.sectionTitle("Utils"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Create User", () => { new SignupDlg(true).open(); }), //
                         this.settingsLink("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", null, "Toggle Daemons", null)), //
                         this.settingsLink("Toggle AuditFilter", () => S.view.runServerCommand("toggleAuditFilter", null, "Toggle AuditFilter", null)), //
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //
                         this.settingsLink("Refresh Trending Cache", () => S.view.runServerCommand("refreshTrendingCache", null, "Refresh Trending Cache", null))
                     ])
@@ -80,13 +79,13 @@ export class AdminView extends AppTab<any, AdminView> {
 
                 this.sectionTitle("Database"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Cache Admin Content", () => S.view.runServerCommand("cacheAdminContent", null, "Cache Admin Content", null)), //
                         this.settingsLink("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
                         this.settingsLink("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
                         this.settingsLink("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null)), //
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null)), //
                         this.settingsLink("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null)), //
                         this.settingsLink("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null)),
@@ -96,11 +95,11 @@ export class AdminView extends AppTab<any, AdminView> {
 
                 this.sectionTitle("ActivityPub"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
                         this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL)
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null)), //
                         this.settingsLink("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null)), //
                         this.settingsLink("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null)),
@@ -109,13 +108,13 @@ export class AdminView extends AppTab<any, AdminView> {
 
                 this.sectionTitle("Testing"),
                 new FlexRowLayout([
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
                         this.settingsLink("Send Email", S.util.sendTestEmail),
                         this.settingsLink("Server Log Text", S.util.sendLogText),
                         this.settingsLink("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
                     ]),
-                    new Divc({ className: "settingsCol" }, [
+                    new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("WebCrypto Encryption", async () => {
                             await S.crypto.encryptionTest();
                             S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);

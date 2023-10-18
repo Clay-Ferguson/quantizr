@@ -1,6 +1,5 @@
 import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { EditNodeDlg } from "../dlg/EditNodeDlg";
@@ -9,7 +8,6 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Divc } from "./core/Divc";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
 import { Span } from "./core/Span";
@@ -126,7 +124,7 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Divc({ className: "float-end" }, [
+        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "float-end" }, [
             // Not showing login on this panel in mobileMode, because it's shown at top of page instead
             new Span("Login", {
                 className: "signupLinkText ui-login",
@@ -149,12 +147,12 @@ export class RightNavPanel extends Div {
         const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCreditDiv() : null;
 
         this.setChildren([
-            scrollDiv = new Divc({ className: "rightNavPanel customScrollbar" }, [
-                new Divc({ className: "float-left" }, [
+            scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
+                new Div(null, { className: "float-left" }, [
                     new FlexRowLayout([
                         avatarImg,
-                        new Diva([
-                            new Divc({ className: "marginBottom" }, [
+                        new Div(null, null, [
+                            new Div(null, { className: "marginBottom" }, [
                                 !ast.isAnonUser ? new Span(displayName, {
                                     className: "clickable marginRight",
                                     onClick: () => {
@@ -165,14 +163,14 @@ export class RightNavPanel extends Div {
                             ]),
                             loginSignupDiv,
                         ]),
-                        new Divc({ className: "flexFloatRight" }, [
+                        new Div(null, { className: "flexFloatRight" }, [
                             textToSpeech,
                             clipboardPasteButton,
                             addNoteButton
                         ]),
                     ], "fullWidth"),
                     gptCreditDiv,
-                    // new Divc({ className: "marginBottom" }, [
+                    // new Div(null, { className: "marginBottom" }, [
                     //     new ButtonBar([
                     //         clipboardPasteButton,
                     //         addNoteButton,

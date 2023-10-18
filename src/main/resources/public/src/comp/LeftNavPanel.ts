@@ -8,7 +8,6 @@ import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { FeedTab } from "../tabs/data/FeedTab";
 import { TabPanelButtons } from "./TabPanelButtons";
-import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
 import { RadioButton } from "./core/RadioButton";
 import { RadioButtonGroup } from "./core/RadioButtonGroup";
@@ -88,8 +87,8 @@ export class LeftNavPanel extends Div {
 
         let scrollDiv = null;
         this.setChildren([
-            scrollDiv = new Divc({ className: "leftNavPanel customScrollbar" }, [
-                new Divc({ id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
+            scrollDiv = new Div(null, { className: "leftNavPanel customScrollbar" }, [
+                new Div(null, { id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
                     new Img({
                         className: "leftNavLogoImg",
                         src: "/branding/logo-50px-tr.jpg",

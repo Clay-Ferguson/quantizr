@@ -1,4 +1,5 @@
 import { getAs } from "../AppContext";
+import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
@@ -6,11 +7,9 @@ import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "../dlg/SelectTagsDlg";
-import { Constants as C } from "../Constants";
 import { ListBoxRow } from "./ListBoxRow";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
-import { Divc } from "./core/Divc";
 import { FlexLayout } from "./core/FlexLayout";
 import { Icon } from "./core/Icon";
 
@@ -53,8 +52,8 @@ export class FriendsTableRow extends ListBoxRow {
                     getValue: (): boolean => this.dlg.getState<FriendsDlgState>().selections.has(this.friend.userName)
                 }) : null,
 
-                new Divc({ className: "friendListImgDivCont" }, [
-                    new Divc({
+                new Div(null, { className: "friendListImgDivCont" }, [
+                    new Div(null, {
                         className: "friendListImgDiv centerChild",
                         [C.USER_ID_ATTR]: this.friend.userNodeId,
                         onClick: S.nav.clickToOpenUserProfile,
@@ -67,7 +66,7 @@ export class FriendsTableRow extends ListBoxRow {
                     ])
                 ]),
 
-                new Divc({
+                new Div(null, {
                     className: "marginLeft marginTop",
                     [C.USER_ID_ATTR]: this.friend.userNodeId,
                     onClick: S.nav.clickToOpenUserProfile,

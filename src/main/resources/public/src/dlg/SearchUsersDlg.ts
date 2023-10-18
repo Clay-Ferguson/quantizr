@@ -6,7 +6,7 @@ import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField } from "../comp/core/TextField";
@@ -60,7 +60,7 @@ export class SearchUsersDlg extends DialogBase {
         ], "marginBottom marginTop");
 
         return [
-            new Diva([
+            new Div(null, null, [
                 this.searchTextField = new TextField({ label: "User", enter: this.search, val: this.searchTextState }),
                 adminOptions,
                 new ButtonBar([

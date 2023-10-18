@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { Validator } from "../Validator";
@@ -22,7 +22,7 @@ export class AddCreditDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Divc({ className: "marginBottom" }, [
+            new Div(null, { className: "marginBottom" }, [
                 new TextField({ label: "Amount", val: this.amtState }),
                 new ButtonBar([
                     new Button("Add Credit", this.close, null, "btn-primary"),

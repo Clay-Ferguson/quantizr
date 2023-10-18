@@ -2,7 +2,7 @@ import { DialogBase } from "../DialogBase";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { Markdown } from "../comp/core/Markdown";
 
 export class GptAnswerDlg extends DialogBase {
@@ -13,7 +13,7 @@ export class GptAnswerDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new Markdown(this.answer),
                 new ButtonBar([
                     new Button("Close", this.close, null, "btn-secondary")

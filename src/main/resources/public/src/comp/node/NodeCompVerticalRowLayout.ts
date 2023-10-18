@@ -7,7 +7,6 @@ import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Divc } from "../core/Divc";
 import { NodeCompRow } from "./NodeCompRow";
 
 export class NodeCompVerticalRowLayout extends Div {
@@ -55,7 +54,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
                     // experimenting: Still need this?
                     // if (n.children && !inVerticalSpace) {
-                    //     comps.push(new Divc({ className: "verticalSpace" }));
+                    //     comps.push(new Div(null, { className: "verticalSpace" }));
                     // }
 
                     if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
@@ -72,7 +71,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
 
                     // experimenting: Still need this?
-                    // comps.push(new Divc({ className: "verticalSpace" }));
+                    // comps.push(new Div(null, { className: "verticalSpace" }));
                     // inVerticalSpace = true;
                 }
             }
@@ -97,7 +96,7 @@ export class NodeCompVerticalRowLayout extends Div {
                 let insertButton: Button = null;
                 // 2: this button should have same enablement as "new" button, on the page root
                 // Note: this is the very last "+" button at the bottom, to insert below last child
-                comps.push(new Divc({ className: (ast.userPrefs.editMode ? "nodeTableRowEdit" : "nodeTableRow") }, [
+                comps.push(new Div(null, { className: (ast.userPrefs.editMode ? "nodeTableRowEdit" : "nodeTableRow") }, [
                     insertButton = new Button(null, () => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, ast);

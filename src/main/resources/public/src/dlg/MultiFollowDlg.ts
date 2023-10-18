@@ -1,8 +1,7 @@
-import { ScrollPos } from "../comp/base/Comp";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
@@ -23,7 +22,7 @@ export class MultiFollowDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextContent("Enter Fediverse Usernames (one per line)"),
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new TextField({ label: "Tags (optional)", val: this.tagState }),

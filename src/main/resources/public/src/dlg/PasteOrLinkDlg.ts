@@ -2,14 +2,14 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { LS as SelectTagsDlgLS, SelectTagsDlg } from "./SelectTagsDlg";
+import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 
 export class PasteOrLinkDlg extends DialogBase {
     yes: boolean = false;
@@ -22,7 +22,7 @@ export class PasteOrLinkDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Divc({ className: "dragTargetDlgSection" }, [
+            new Div(null, { className: "dragTargetDlgSection" }, [
                 new Heading(6, "Paste"),
                 new ButtonBar([
                     new Button("Inside", () => {
@@ -35,7 +35,7 @@ export class PasteOrLinkDlg extends DialogBase {
                     })
                 ], "marginTop")
             ]),
-            new Divc({ className: "dragTargetDlgSection" }, [
+            new Div(null, { className: "dragTargetDlgSection" }, [
                 new Heading(6, "Link Nodes"),
                 new TextField({ label: "Link Name", val: this.nameState }),
                 new ButtonBar([

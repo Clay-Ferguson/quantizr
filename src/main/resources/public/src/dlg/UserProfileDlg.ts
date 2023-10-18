@@ -6,14 +6,11 @@ import { NodeType } from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { ScrollPos } from "../comp/base/Comp";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Img } from "../comp/core/Img";
@@ -99,26 +96,26 @@ export class UserProfileDlg extends DialogBase {
                 }));
             }
 
-            web3Div = new Diva(web3Comps);
+            web3Div = new Div(null, null, web3Comps);
         }
 
         const children = [
-            new Diva([
-                profileHeaderImg ? new Diva([
-                    new Diva([
+            new Div(null, null, [
+                profileHeaderImg ? new Div(null, null, [
+                    new Div(null, null, [
                         profileHeaderImg
                     ])
                 ]) : null,
 
                 new FlexRowLayout([
                     profileImg,
-                    new Divc({ className: "userDisplayName" }, [
-                        new Divc({ className: "marginLeft" }, [
+                    new Div(null, { className: "userDisplayName" }, [
+                        new Div(null, { className: "marginLeft" }, [
                             this.readOnly
                                 ? new Heading(4, state.userProfile.displayName || "")
                                 : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
                         ]),
-                        new Divc({ className: "float-end" }, [
+                        new Div(null, { className: "float-end" }, [
                             state.userProfile.blocked ? new Span("You Blocked", {
                                 className: "blockingText",
                                 onClick: this.unblockUser,

@@ -11,8 +11,6 @@ import { Button } from "./comp/core/Button";
 import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
-import { Diva } from "./comp/core/Diva";
-import { Divc } from "./comp/core/Divc";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Heading } from "./comp/core/Heading";
 import { IconButton } from "./comp/core/IconButton";
@@ -274,9 +272,9 @@ export class Render {
                 attComps.push(new Tag("hr"));
                 const bin = att ? att.b : null;
                 if (bin) {
-                    attComps.push(new Divc({ className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
+                    attComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
                     attComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
-                    const linkGroup = new Divc({ className: "attachmentLinkGroup" });
+                    const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
 
                     const attByIdUrl = window.location.origin + "/f/id/" + node.id;
                     linkGroup.addChildren([
@@ -363,7 +361,7 @@ export class Render {
                 }));
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Diva(children), false, 0, null);
+        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
         dlgHolder.dlg.open();
     }
 
@@ -551,7 +549,7 @@ export class Render {
     }
 
     newUserAccountTips = (): Div => {
-        return new Divc({ className: "bigMargin alert alert-info" }, [
+        return new Div(null, { className: "bigMargin alert alert-info" }, [
             new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "bigMarginBottom" }),
             new Button("View User Guide", () => S.nav.openContentNode(":user-guide", false))
         ]);
@@ -682,7 +680,7 @@ export class Render {
         const tags = node.tags.split(" ");
         const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
 
-        return new Divc({
+        return new Div(null, {
             title: "Click to copy to clipboard",
             onClick: () => {
                 S.util.copyToClipboard(node.tags);
@@ -706,12 +704,12 @@ export class Render {
         if (className) attribs.className = className;
         const tagsDiv = this.renderTagsDiv(node, "microMarginBottom");
 
-        return new Divc(attribs, [
+        return new Div(null, attribs, [
             new FlexRowLayout([
-                new Divc({ className: "friendLhs" }, [
+                new Div(null, { className: "friendLhs" }, [
                     img
                 ]),
-                new Divc({ className: "friendRhs" }, [
+                new Div(null, { className: "friendRhs" }, [
 
                     // I'm removing this because we can click on the image and to these thru the Profile Dialog of the user.
                     // new ButtonBar([
@@ -730,7 +728,7 @@ export class Render {
                     new Div(displayName, {
                         className: "userName"
                     }),
-                    new Diva([
+                    new Div(null, null, [
                         // we use a span because the div stretches across empty space and does a mouse click
                         // when you didn't intend to click the actual name sometimes.
                         new Span("@" + user, {
@@ -770,7 +768,7 @@ export class Render {
                 }
             });
         }
-        return linkComps.length > 0 ? new Divc({ className: "linksPanel" }, linkComps) : null;
+        return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 
     buildCustomLinks = (configArray: any): Comp[] => {
@@ -831,9 +829,9 @@ export class Render {
         });
 
         const attrs = classes ? { className: classes } : null;
-        return new Divc(attrs, [
-            new Divc({ className: "inlineBlock" }, [
-                new Divc({
+        return new Div(null, attrs, [
+            new Div(null, { className: "inlineBlock" }, [
+                new Div(null, {
                     className: "tagsFlexContainer"
                 }, spans)
             ]),
@@ -859,7 +857,7 @@ export class Render {
     makeDeleteQuestionDiv = (): Div => {
         const ast = getAs();
         const question = ast.nodesToDel.length === 1 ? "Delete" : "Delete " + ast.nodesToDel.length + " nodes";
-        return new Divc({ className: "deleteQuestion" }, [
+        return new Div(null, { className: "deleteQuestion" }, [
             new Span(question, {
                 className: "alert alert-danger askDeleteQuestion",
                 onClick: () => S.edit.immediateDeleteSelNodes(getAs().nodesToDel)

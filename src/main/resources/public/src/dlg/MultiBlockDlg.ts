@@ -4,11 +4,10 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
-import { ScrollPos } from "../comp/base/Comp";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { TextContent } from "../comp/core/TextContent";
 
@@ -23,7 +22,7 @@ export class MultiBlockDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextContent("Enter Fediverse Usernames (one per line)"),
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new ButtonBar([

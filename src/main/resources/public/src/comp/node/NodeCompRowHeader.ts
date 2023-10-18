@@ -12,7 +12,6 @@ import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
 import { Button } from "../core/Button";
-import { Divc } from "../core/Divc";
 import { DropdownMenu } from "../core/DropdownMenu";
 import { Li } from "../core/Li";
 import { SpanHtml } from "../core/SpanHtml";
@@ -297,7 +296,7 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        const floatUpperRightDiv: Div = new Divc({
+        const floatUpperRightDiv: Div = new Div(null, {
             className: "float-end floatRightHeaderDiv"
         });
 

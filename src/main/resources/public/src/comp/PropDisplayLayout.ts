@@ -2,7 +2,6 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./core/Div";
-import { Divc } from "./core/Divc";
 
 export class PropDisplayLayout extends Div {
 
@@ -35,7 +34,7 @@ export class PropDisplayLayout extends Div {
                 const propType = type.getType(prop.name);
                 const displayVal = S.util.formatProperty(prop.value, propType, propConfig) || "?";
 
-                const tableRow = new Divc(attrs, [
+                const tableRow = new Div(null, attrs, [
                     new Div(label, { className: "fieldDisplayLabel" }),
                     new Div(displayVal, { className: "fieldDisplayVal" })
                 ]);
@@ -43,7 +42,7 @@ export class PropDisplayLayout extends Div {
                 children.push(tableRow);
             });
         }
-        const innerDiv = new Divc({ className: "flexPropsDisplayPanel" }, children)
+        const innerDiv = new Div(null, { className: "flexPropsDisplayPanel" }, children)
         innerDiv.ordinalSortChildren();
         this.setChildren([innerDiv]);
         return true;

@@ -9,7 +9,7 @@ import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Divc } from "./core/Divc";
+import { Div } from "./core/Div";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
 import { Span } from "./core/Span";
@@ -66,7 +66,7 @@ export class App extends Main {
             }
 
             this.setChildren([
-                new Divc({
+                new Div(null, {
                     className: "row mainAppRow",
                     id: "appMainContainer"
                 }, [
@@ -137,7 +137,7 @@ export class App extends Main {
                 onClick: S.user.userSignup
             }) : null;
 
-            const floatRightDiv = new Divc({ className: "float-end" }, [
+            const floatRightDiv = new Div(null, { className: "float-end" }, [
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Span(ast.userName, {
                     className: "clickable",
@@ -153,7 +153,7 @@ export class App extends Main {
                 title: "Main application Landing Page"
             });
 
-            return new Divc({ className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
+            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
         }
         return null;
     }

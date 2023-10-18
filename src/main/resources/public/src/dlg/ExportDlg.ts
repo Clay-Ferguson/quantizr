@@ -5,8 +5,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
@@ -50,7 +48,7 @@ export class ExportDlg extends DialogBase {
             }) : null,
 
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
-            S.quanta.cfg.ipfsEnabled ? new Diva([
+            S.quanta.cfg.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
             new ButtonBar([
@@ -62,7 +60,7 @@ export class ExportDlg extends DialogBase {
 
     makeArchiveOptions = (): Div => {
         const ast = getAs();
-        return new Divc({ className: "bigMarginLeft bigMarginBottom" }, [
+        return new Div(null, { className: "bigMarginLeft bigMarginBottom" }, [
 
             new Heading(5, "Files to Include", { className: "bigMarginTop" }),
             new Checkbox("HTML", null, {

@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
@@ -17,7 +17,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextArea("Key JWK", { rows: 15 }, this.keyState, null, false),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),

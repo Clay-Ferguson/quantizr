@@ -12,8 +12,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -120,7 +118,7 @@ export class BlockedUsersDlg extends DialogBase {
         });
 
         return [
-            new Diva([
+            new Div(null, null, [
                 !message ? new FlexRowLayout([
                     (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",
@@ -132,7 +130,7 @@ export class BlockedUsersDlg extends DialogBase {
                     })),
 
                     // This div wrapper is to keep the button from stretching wrong
-                    new Divc({ className: "friendSearchButtonDiv" }, [
+                    new Div(null, { className: "friendSearchButtonDiv" }, [
                         new IconButton("fa-search", null, {
                             onClick: this.userSearch,
                             title: "Search"

@@ -3,11 +3,10 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
-import { ScrollPos } from "../comp/base/Comp";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { GptAnswerDlg } from "./GptAnswerDlg";
 
@@ -26,7 +25,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 this.textArea = new TextArea("Ask a Question...", { rows: 15 }, this.questionState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Submit", this.askQuestion, null, "btn-primary"),

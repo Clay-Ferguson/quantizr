@@ -5,9 +5,10 @@ interface LS { // Local State
 }
 
 export class Div extends Comp {
-    constructor(public content: string = "", attribs: any = {}) {
+    constructor(public content: string = null, attribs: any = {}, children: any[] = null) {
         super(attribs);
         this.mergeState<LS>({ content });
+        this.setChildren(children);
     }
 
     override preRender = (): boolean => {

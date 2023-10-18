@@ -1,7 +1,6 @@
 import * as I from "../../Interfaces";
 import { Validator } from "../../Validator";
 import { Div } from "./Div";
-import { Divc } from "./Divc";
 import { Input } from "./Input";
 
 export class DateField extends Div implements I.ValueIntf {
@@ -25,7 +24,7 @@ export class DateField extends Div implements I.ValueIntf {
 
     override preRender = (): boolean => {
         this.setChildren([
-            new Divc({
+            new Div(null, {
                 className: "dateField"
             }, [
                 this.input = new Input({

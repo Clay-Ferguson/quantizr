@@ -1,15 +1,15 @@
-import { Comp } from "../comp/base/Comp";
-import { Button } from "../comp/core/Button";
-import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
-import { FlexRowLayout } from "../comp/core/FlexRowLayout";
-import { Img } from "../comp/core/Img";
-import { TextField } from "../comp/core/TextField";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
-import { Constants as C } from "../Constants";
+import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Div } from "../comp/core/Div";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
+import { Img } from "../comp/core/Img";
+import { TextField } from "../comp/core/TextField";
 
 export class SignupDlg extends DialogBase {
 
@@ -41,7 +41,7 @@ export class SignupDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextField({ label: "User Name", val: this.userNameState }),
                 new TextField({ label: "Password", inputType: "password", val: this.passwordState }),
                 new TextField({ label: "Email", val: this.emailState }),
@@ -51,7 +51,7 @@ export class SignupDlg extends DialogBase {
                         src: window.location.origin + "/api/captcha?cacheBuster=" + this.getId(),
                         className: "captchaImage"
                     }),
-                    new Diva([
+                    new Div(null, null, [
                         new TextField({ label: "Code", val: this.captchaState })
                     ])
                 ], "marginTop"),

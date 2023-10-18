@@ -3,7 +3,6 @@ import { S } from "./Singletons";
 import { Validator } from "./Validator";
 import { Comp } from "./comp/base/Comp";
 import { Div } from "./comp/core/Div";
-import { Divc } from "./comp/core/Divc";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 
@@ -153,7 +152,7 @@ export abstract class DialogBase extends Comp {
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
 
-            new Divc({ className: "dlgModalTitleCloseIcon float-end" }, [
+            new Div(null, { className: "dlgModalTitleCloseIcon float-end" }, [
                 new Icon({
                     className: "fa fa-times",
                     onClick: () => {
@@ -180,16 +179,16 @@ export abstract class DialogBase extends Comp {
 
         this.setChildren([
             // It's tricky but 'closeByOutsideClick' means this is a "menu", so, no title.
-            this.title && !this.closeByOutsideClick ? (this.titleDiv = new Divc({
+            this.title && !this.closeByOutsideClick ? (this.titleDiv = new Div(null, {
                 className: (this.mode === DialogMode.POPUP ? "appModalTitlePopup " : "appModalTitleNormal ") +
                     extraTitleClass
             },
                 [
-                    new Divc({ className: "dlgTitleContent" }, titleChildren),
-                    this.mode === DialogMode.POPUP ? new Divc({ className: "line" }) : null
+                    new Div(null, { className: "dlgTitleContent" }, titleChildren),
+                    this.mode === DialogMode.POPUP ? new Div(null, { className: "line" }) : null
                 ]
             )) : null,
-            new Divc({
+            new Div(null, {
                 className: contentAreaClass
             }, this.renderDlg())
         ]);
@@ -225,7 +224,7 @@ export abstract class DialogBase extends Comp {
 
                 const children = this.getChildren();
                 this.setChildren([
-                    this.dlgFrame = new Divc({
+                    this.dlgFrame = new Div(null, {
                         id: this.getId(),
                         className: clazzName,
                         style: {

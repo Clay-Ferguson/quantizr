@@ -10,7 +10,6 @@ import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { FullScreenType } from "../../Interfaces";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Divc } from "../core/Divc";
 import { FlexRowLayout } from "../core/FlexRowLayout";
 import { Img } from "../core/Img";
 import { Span } from "../core/Span";
@@ -228,7 +227,7 @@ export class NodeCompBinary extends Div {
             }
 
             const titleSuffix = `File Size:${fileSize}\n\nType:${fileType}`;
-            this.setChildren([new Divc({
+            this.setChildren([new Div(null, {
                 className: "binary-link"
             }, [
                 new Icon({

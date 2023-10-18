@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { EmojiPicker } from "../comp/core/EmojiPicker";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
@@ -28,7 +28,7 @@ export class EmojiPickerDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new EmojiPicker(this.selectionValueIntf),
                 new ButtonBar([
                     new Button("Cancel", this.close)

@@ -13,9 +13,9 @@ export class CheckboxInput extends Comp {
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ checked: evt.target.checked });
             this.valueIntf?.setValue(evt.target.checked);
-        };
+        }
         if (this.valueIntf) {
-            this.mergeState<LS>({ checked: !!valueIntf.getValue() })
+            this.mergeState<LS>({ checked: !!valueIntf.getValue() });
         }
         this.setTag("input");
     }

@@ -6,7 +6,6 @@ import { S } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
@@ -59,7 +58,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             return true;
         }
 
-        const tagPanel = new Divc({ className: "trendingWordStatsArea" });
+        const tagPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
             res.topTags.forEach(word => {
@@ -71,7 +70,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
-        const mentionPanel = new Divc({ className: "trendingWordStatsArea" });
+        const mentionPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "mentions") && res.topMentions && res.topMentions.length > 0) {
             mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle alert alert-primary" }));
             res.topMentions.forEach(word => {
@@ -83,7 +82,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
-        const wordPanel = new Divc({ className: "trendingWordStatsArea" });
+        const wordPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
             wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle alert alert-primary" }));
             res.topWords.forEach(word => {

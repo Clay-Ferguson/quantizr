@@ -1,6 +1,6 @@
 import Dropzone from "dropzone";
 import { getAs } from "../AppContext";
-import { Constants } from "../Constants";
+import { Constants as C, Constants } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -9,12 +9,9 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
 import { IconButton } from "../comp/core/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
-import { Constants as C } from "../Constants";
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
@@ -40,8 +37,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         const children = [
-            new Diva([
-                this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Divc({ className: "marginBottom" }, [
+            new Div(null, null, [
+                this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Div(null, { className: "marginBottom" }, [
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
@@ -52,7 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 ]),
                 new Div("Click to Add Files (or Drag and Drop)"),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
-                this.hiddenInputContainer = new Divc({ style: { display: "none" } }),
+                this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
                     this.importMode ? null : new IconButton("fa-cloud", "Web/URL", {

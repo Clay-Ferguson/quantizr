@@ -10,7 +10,6 @@ import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Divc } from "../core/Divc";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
@@ -69,7 +68,7 @@ export class NodeCompRow extends Div {
             if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed) {
 
                 let insertButton: Button = null;
-                insertInlineButton = new Divc({ className: "marginLeft" }, [
+                insertInlineButton = new Div(null, { className: "marginLeft" }, [
                     insertButton = new Button(null, () => {
                         S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
                     }, {

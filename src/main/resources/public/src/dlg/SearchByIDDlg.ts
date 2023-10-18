@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
@@ -24,7 +24,7 @@ export class SearchByIDDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 this.searchTextField = new TextField({ label: "Node ID", enter: this.search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),

@@ -2,13 +2,11 @@ import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Divc } from "./core/Divc";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Html } from "./core/Html";
 
@@ -187,7 +185,7 @@ export class OpenGraphPanel extends Div {
 
             // if mobile portrait mode render image above (not beside) description
             if (ast.mobileMode && window.innerWidth < window.innerHeight) {
-                imgAndDesc = new Diva([
+                imgAndDesc = new Div(null, null, [
                     new Img({
                         className: "openGraphImageVert",
                         src: state.og.image
@@ -198,13 +196,13 @@ export class OpenGraphPanel extends Div {
             else {
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new FlexRowLayout([
-                    !S.quanta.brokenImages.has(state.og.image) ? new Divc({ className: "openGraphLhs" }, [
+                    !S.quanta.brokenImages.has(state.og.image) ? new Div(null, { className: "openGraphLhs" }, [
                         new Img({
                             className: this.imageClass,
                             src: state.og.image
                         })
                     ]) : null,
-                    new Divc({ className: "openGraphRhs" }, [
+                    new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])
                 ], "smallMarginBottom");
@@ -212,7 +210,7 @@ export class OpenGraphPanel extends Div {
         }
         // if no image just display the description in a div
         else {
-            imgAndDesc = new Divc({ className: "openGraphNoImage" }, [
+            imgAndDesc = new Div(null, { className: "openGraphNoImage" }, [
                 new Div(state.og.description)
             ]);
         }

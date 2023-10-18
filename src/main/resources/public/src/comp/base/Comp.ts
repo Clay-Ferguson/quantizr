@@ -35,6 +35,7 @@ export abstract class Comp {
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored
     WARNING: TypeScript is NOT enforcing that children be private here.
     */
+    // todo-0: make this any[]
     private children: Comp[];
 
     // holds queue of functions to be ran once this component exists in the DOM.

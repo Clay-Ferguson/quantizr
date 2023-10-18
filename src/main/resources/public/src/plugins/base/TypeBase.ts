@@ -7,7 +7,6 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Comp } from "../../comp/base/Comp";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
-import { Divc } from "../../comp/core/Divc";
 import { Html } from "../../comp/core/Html";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { TabIntf } from "../../intf/TabIntf";
@@ -265,7 +264,7 @@ export class TypeBase implements TypeIntf {
         // and solve this later.
         //
         // else if (node.content && node.content.startsWith(J.Constant.ENC_TAG)) {
-        //     return new Diva([
+        //     return new Div(null, null, [
         //         markdownComp = new NodeCompMarkdown(node, state),
         //         new ButtonBar([
         //             new Button("Decrypt", () => {
@@ -285,7 +284,7 @@ export class TypeBase implements TypeIntf {
             for (const o of oneOf) {
                 children.push(new Div("*  " + o.name + ` (${o.replies?.totalItems} votes)`, { className: "bigMarginLeft marginBottom" }));
             }
-            choices = new Divc({ className: "marginTop" }, children);
+            choices = new Div(null, { className: "marginTop" }, children);
         }
 
         let cont = node.renderContent || node.content;
@@ -335,7 +334,7 @@ export class TypeBase implements TypeIntf {
             });
             children.push(footerComp);
             children.push(new Clearfix());
-            return new Divc(attrs, children);
+            return new Div(null, attrs, children);
         }
         else {
             const isRoot = node.id === ast.node?.id;
@@ -352,7 +351,7 @@ export class TypeBase implements TypeIntf {
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
-                return new Divc(attrs, [
+                return new Div(null, attrs, [
                     comp,
                     choices,
                     aiConfigDiv,
@@ -363,7 +362,7 @@ export class TypeBase implements TypeIntf {
             }
             // otherwise just return the content component itself.
             else {
-                return new Divc(attrs, [comp, aiConfigDiv, choices, footerComp, new Clearfix()]);
+                return new Div(null, attrs, [comp, aiConfigDiv, choices, footerComp, new Clearfix()]);
             }
         }
     }

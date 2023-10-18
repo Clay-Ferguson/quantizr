@@ -7,8 +7,6 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { DateTimeField } from "../comp/core/DateTimeField";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
 import { EditAttachmentsPanel } from "../comp/core/EditAttachmentsPanel";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -279,8 +277,8 @@ export class EditNodeDlg extends DialogBase {
         let propEditFieldContainer: Div = null;
         const children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
-            new Diva([
-                new Divc({
+            new Div(null, null, [
+                new Div(null, {
                 }, [
                     propEditFieldContainer = new Div("", {
                     })
@@ -288,7 +286,7 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        const advFlowPanel: Div = new Divc({ className: "marginTop d-flex flex-row flex-wrap" });
+        const advFlowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
 
         if (ast.editNode.hasChildren) {
             advFlowPanel.addChild(this.createLayoutSelection());
@@ -303,18 +301,18 @@ export class EditNodeDlg extends DialogBase {
         const flexPropsEditPanel = !customProps;
         let propsParent: Div = null;
         if (!customProps) {
-            propsParent = new Divc({
+            propsParent = new Div(null, {
                 className: "editPropsTable" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
 
             propsTable = propsParent;
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
-            mainPropsTable = new Divc({
+            mainPropsTable = new Div(null, {
                 className: "marginBottom"
             });
         }
         else {
-            propsParent = new Divc({
+            propsParent = new Div(null, {
                 className: "editPropsTable marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
             mainPropsTable = propsParent;
@@ -346,7 +344,7 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        const tagsEditRow = editorOpts.tags ? new Divc({ className: "editorTagsSection float-end" }, [
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection float-end" }, [
             this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this.removeTag, this.selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
@@ -362,9 +360,9 @@ export class EditNodeDlg extends DialogBase {
 
             if (type.getAllowPropertyAdd()) {
                 const state = this.getState<LS>();
-                propsHeaderBar = new Divc({ className: "editTypesPanelHeader" }, [
+                propsHeaderBar = new Div(null, { className: "editTypesPanelHeader" }, [
                     type?.schemaOrg?.comment ? new Span(type?.schemaOrg?.comment) : null,
-                    new Divc({ className: "float-end" }, [
+                    new Div(null, { className: "float-end" }, [
                         // ADD PROP ICON
                         new Icon({
                             className: "fa fa-plus-circle fa-lg clickable marginRight tinyMarginBottom",
@@ -399,7 +397,7 @@ export class EditNodeDlg extends DialogBase {
         let sharingDivClearFix = null;
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
-            sharingDiv = new Divc({
+            sharingDiv = new Div(null, {
                 className: "float-end clickable marginBottom"
             }, [
                 new Span("Shared to: ", {
@@ -425,7 +423,7 @@ export class EditNodeDlg extends DialogBase {
 
         let propsCollapsePanel: CollapsiblePanel = null;
         let propsPanel: Div = null;
-        const propsDiv = new Divc({ className: "editPropsCont" }, [
+        const propsDiv = new Div(null, { className: "editPropsCont" }, [
             propsHeaderBar,
             propsTable
         ]);
@@ -461,8 +459,8 @@ export class EditNodeDlg extends DialogBase {
             editorOpts.nodeName || editorOpts.priority;
 
         if (hasAdvControls) {
-            const advancedDiv = new Divc({ className: "advancedCont" }, [
-                new Divc({ className: "row align-items-end" }, [
+            const advancedDiv = new Div(null, { className: "advancedCont" }, [
+                new Div(null, { className: "row align-items-end" }, [
                     editorOpts.nodeName ? nodeNameTextField : null,
                     editorOpts.priority ? this.createPrioritySelection() : null
                 ]),
@@ -478,14 +476,14 @@ export class EditNodeDlg extends DialogBase {
                     });
                 }, getAs().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
 
-            advCollapsePanelContainer = new Divc({ className: "marginBottom" }, [
+            advCollapsePanelContainer = new Div(null, { className: "marginBottom" }, [
                 advCollapsePanel
             ]);
         }
 
         // Note: for schema.org types we will have already created propsPanel and have no propsCollapsePanel.
         if (!propsPanel) {
-            propsPanel = new Diva([
+            propsPanel = new Div(null, null, [
                 propsCollapsePanel
             ]);
         }
@@ -829,7 +827,7 @@ export class EditNodeDlg extends DialogBase {
         const rowAttribs: any = { className: "marginBottom" };
         const propConfig = type.getPropConfig(propEntry.name);
         const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
-        const tableRow = new Divc(rowAttribs);
+        const tableRow = new Div(null, rowAttribs);
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const editItems: any[] = [];
@@ -1038,7 +1036,7 @@ export class EditNodeDlg extends DialogBase {
         ], "float-end microMarginBottom"));
         editItems.push(this.contentEditor as any as Comp);
 
-        return new Divc({ className: "contentEditor" }, editItems);
+        return new Div(null, { className: "contentEditor" }, editItems);
     }
 
     // NOTE: Be careful renaming this method. It's referenced in an "as any" way in one place.

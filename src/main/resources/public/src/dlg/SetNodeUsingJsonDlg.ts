@@ -1,14 +1,12 @@
 import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { ScrollPos } from "../comp/base/Comp";
-import { Comp } from "../comp/base/Comp";
+import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { TextArea } from "../comp/core/TextArea";
-import * as J from "../JavaIntf";
-import { S } from "../Singletons";
 
 export class SetNodeUsingJsonDlg extends DialogBase {
     textState: Validator = new Validator();
@@ -20,7 +18,7 @@ export class SetNodeUsingJsonDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 new Div("Enter the new JSON for the Node"),
                 new TextArea(null, { rows: 15 }, this.textState, null, false, 3, this.textScrollPos),
                 new ButtonBar([

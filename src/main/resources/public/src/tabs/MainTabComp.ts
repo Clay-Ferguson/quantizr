@@ -4,7 +4,6 @@ import { Comp } from "../comp/base/Comp";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
@@ -33,7 +32,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         else {
             const pageNodeIsCut = ast.nodesToMove && ast.nodesToMove.find(id => id === ast.node.id);
 
-            contentDiv = new Divc({
+            contentDiv = new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
@@ -44,7 +43,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 // // if we have some parents to display...
                 // ast.node.parents?.length > 0 ? new NodeCompParentNodes(this.data) : null,
 
-                new Divc({ className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
+                new Div(null, { className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, [
                     new NodeCompMainNode(this.data),
                     pageNodeIsCut ? null : new NodeCompMainList(this.data)
                 ])
@@ -56,7 +55,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
             !ast.node ? null : (this.headingBar = new TabHeading([
-                new Divc({ className: "float-end" }, [
+                new Div(null, { className: "float-end" }, [
 
                     new Icon({
                         className: "fa fa-search fa-lg buttonBarIcon",

@@ -2,8 +2,8 @@ import * as d3 from "d3";
 import { getAs } from "../AppContext";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Divc } from "./core/Divc";
 import { Main } from "./Main";
+import { Div } from "./core/Div";
 
 // https://observablehq.com/@d3/force-directed-tree
 // https://www.npmjs.com/package/d3
@@ -16,7 +16,7 @@ export class FullScreenGraphViewer extends Main {
     mouseOverTimeoutId: any;
 
     override preRender = (): boolean => {
-        this.setChildren([new Divc({ className: "d3Graph" })]);
+        this.setChildren([new Div(null, { className: "d3Graph" })]);
         return true;
     }
 

@@ -3,7 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -33,7 +33,7 @@ export class TransferNodeDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Diva([
+            new Div(null, null, [
                 this.operation === "transfer" ? new FlexRowLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
                     getAs().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState, outterClass: "marginRight" }) : null,

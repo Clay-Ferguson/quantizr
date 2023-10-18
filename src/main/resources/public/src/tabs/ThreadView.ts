@@ -4,7 +4,6 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
@@ -83,7 +82,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                         subComps.push(c);
                     }
                 });
-                children.push(new Diva(subComps));
+                children.push(new Div(null, null, subComps));
             }
 
             i++;

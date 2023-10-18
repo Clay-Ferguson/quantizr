@@ -1,7 +1,7 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Pre } from "../comp/core/Pre";
@@ -19,7 +19,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
         const ast = getAs();
 
         this.setChildren([
-            new Divc({ className: "marginTop" }, [
+            new Div(null, { className: "marginTop" }, [
 
                 ast.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
                     S.view.runServerCommand("getServerInfo", null, "Info View", null);

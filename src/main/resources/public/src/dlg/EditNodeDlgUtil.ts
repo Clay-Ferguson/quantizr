@@ -5,7 +5,6 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
 import { Span } from "../comp/core/Span";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./EditNodeDlg";
@@ -544,7 +543,7 @@ an upload has been added or removed.
                 }));
             });
         }
-        return hasLinks ? new Divc({ className: "linksPanelInEditor" }, linkComps) : null;
+        return hasLinks ? new Div(null, { className: "linksPanelInEditor" }, linkComps) : null;
     }
 
     removeNodeLink = (name: string): void => {

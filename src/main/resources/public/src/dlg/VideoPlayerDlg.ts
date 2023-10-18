@@ -1,5 +1,5 @@
 import { Comp } from "../comp/base/Comp";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
 import { DialogBase, DialogMode } from "../DialogBase";
 
@@ -15,7 +15,7 @@ export class VideoPlayerDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Divc({ className: "videoContainer" }, [
+            new Div(null, { className: "videoContainer" }, [
                 this.videoPlayer = new VideoPlayer({
                     id: this.domId + "-comp",
                     src: this.sourceUrl,

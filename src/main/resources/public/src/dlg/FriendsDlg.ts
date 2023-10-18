@@ -1,25 +1,24 @@
 import { getAs, promiseDispatch } from "../AppContext";
-import { Comp } from "../comp/base/Comp";
-import { Button } from "../comp/core/Button";
-import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
-import { Clearfix } from "../comp/core/Clearfix";
-import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { FlexRowLayout } from "../comp/core/FlexRowLayout";
-import { Selection } from "../comp/core/Selection";
-import { TextField } from "../comp/core/TextField";
-import { FriendsTable } from "../comp/FriendsTable";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { MultiFollowDlg } from "./MultiFollowDlg";
-import { Constants as C } from "../Constants";
-import { MessageDlg } from "./MessageDlg";
-import { VerticalLayout } from "../comp/core/VerticalLayout";
+import { FriendsTable } from "../comp/FriendsTable";
+import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
+import { Clearfix } from "../comp/core/Clearfix";
+import { Div } from "../comp/core/Div";
+import { FlexRowLayout } from "../comp/core/FlexRowLayout";
+import { Selection } from "../comp/core/Selection";
+import { TextField } from "../comp/core/TextField";
+import { VerticalLayout } from "../comp/core/VerticalLayout";
+import { MessageDlg } from "./MessageDlg";
+import { MultiFollowDlg } from "./MultiFollowDlg";
 
 export interface LS { // Local State
     nodeId?: string;
@@ -155,7 +154,7 @@ export class FriendsDlg extends DialogBase {
         });
 
         const ret = [
-            new Diva([
+            new Div(null, null, [
                 !message ? new FlexRowLayout([
                     (this.searchTextField = new TextField({
                         labelClass: "txtFieldLabelShort",

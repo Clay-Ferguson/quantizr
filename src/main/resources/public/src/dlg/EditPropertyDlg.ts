@@ -3,7 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { TextField } from "../comp/core/TextField";
 import { SchemaOrgPropsTable } from "../comp/SchemaOrgPropsTable";
 import { DialogBase } from "../DialogBase";
@@ -42,7 +42,7 @@ export class EditPropertyDlg extends DialogBase {
 
         return [
             !getAs().showSchemaOrgProps
-                ? new Divc({ className: "marginBottom" }, [
+                ? new Div(null, { className: "marginBottom" }, [
                     new TextField({ label: "Name", val: this.nameState })
                 ]) : null,
 

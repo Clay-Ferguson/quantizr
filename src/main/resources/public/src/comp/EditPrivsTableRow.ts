@@ -4,11 +4,9 @@ import { S } from "../Singletons";
 import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
 import { Img } from "../comp/core/Img";
 import { ListBoxRow } from "./ListBoxRow";
 import { Checkbox } from "./core/Checkbox";
-import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
 
 export class EditPrivsTableRow extends ListBoxRow {
@@ -19,11 +17,11 @@ export class EditPrivsTableRow extends ListBoxRow {
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
-        const div = new Divc({ className: "float-end tinyMarginAll" });
+        const div = new Div(null, { className: "float-end tinyMarginAll" });
 
         aclEntry.privileges.forEach(privilege => {
             div.addChild(
-                new Diva([
+                new Div(null, null, [
                     new ButtonBar([
                         new Checkbox("Allow Replies", { className: "marginRight" }, {
                             setValue: (checked: boolean) => this.shareNodeToUserFunc(this.aclEntry.principalName, checked),
@@ -54,10 +52,10 @@ export class EditPrivsTableRow extends ListBoxRow {
         const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
 
         this.setChildren([
-            new Diva([
+            new Div(null, null, [
                 this.renderAclPrivileges(this.aclEntry),
-                new Divc({ className: "friendListImgDivCont" }, [
-                    !isPublic ? new Divc({ className: "friendListImgDiv centerChild" }, [
+                new Div(null, { className: "friendListImgDivCont" }, [
+                    !isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
                         src ? new Img({
                             className: "friendListImage",
                             src,
@@ -65,14 +63,14 @@ export class EditPrivsTableRow extends ListBoxRow {
                             onClick: S.nav.clickToOpenUserProfile
                         }) : null
                     ]) : null,
-                    isPublic ? new Divc({ className: "friendListImgDiv centerChild" }, [
+                    isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
                         new Icon({
                             className: "fa fa-globe fa-3x sharingIcon marginAll",
                             title: "Node is Public"
                         })
                     ]) : null
                 ]),
-                new Divc({ className: "sharingDisplayName" }, [
+                new Div(null, { className: "sharingDisplayName" }, [
                     isPublic ? new Div("Public (Everyone)", { className: "largeFont" })
                         : new Div(displayName, {
                             className: "friendName",

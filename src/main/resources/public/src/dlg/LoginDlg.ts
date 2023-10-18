@@ -2,7 +2,7 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Divc } from "../comp/core/Divc";
+import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
@@ -24,10 +24,10 @@ export class LoginDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Divc({ c: "LoginContainerDiv" }, [
+            new Div(null, { c: "LoginContainerDiv" }, [
                 new TextField({ label: "User", enter: this.login, val: this.userState }),
                 new TextField({ label: "Password", inputType: "password", enter: this.login, val: this.pwdState }),
-                new Divc({ className: "marginTop marginBottom" }, [
+                new Div(null, { className: "marginTop marginBottom" }, [
                     new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword }),
                     new Clearfix()
                 ])

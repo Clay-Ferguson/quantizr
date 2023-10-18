@@ -4,8 +4,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Diva } from "../comp/core/Diva";
-import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
@@ -84,7 +82,7 @@ export class SelectTagsDlg extends DialogBase {
         }
 
         return [
-            new Diva([
+            new Div(null, null, [
                 new TextField({
                     label: "Tag",
                     outterClass: "noPaddingRight marginBottom",
@@ -182,7 +180,7 @@ export class SelectTagsDlg extends DialogBase {
         let div: Div = null;
 
         if (state.tags?.length > 0) {
-            div = new Divc({ className: "marginBottom" });
+            div = new Div(null, { className: "marginBottom" });
 
             state.tags.forEach(tagObj => this.processAddCheckboxOrHeading(div, tagObj));
 
@@ -232,7 +230,7 @@ export class SelectTagsDlg extends DialogBase {
                 },
                 getValue: (): boolean => this.getState<LS>().selectedTags.has(tagObj.tag)
             });
-            div.addChild(new Divc({ className: this.indenting ? "tagIndent" : "" }, [checkbox]));
+            div.addChild(new Div(null, { className: this.indenting ? "tagIndent" : "" }, [checkbox]));
         }
     }
 

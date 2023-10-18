@@ -8,7 +8,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
-import { Diva } from "../comp/core/Diva";
+import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
@@ -70,8 +70,8 @@ export class SearchContentDlg extends DialogBase {
         }
 
         return [
-            new Diva([
-                new Diva([
+            new Div(null, null, [
+                new Div(null, null, [
                     this.searchTextField = new TextField({ enter: () => this.search(false), val: this.searchTextState })
                 ]),
                 this.createSearchFieldIconButtons(),
@@ -147,7 +147,7 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): string => this.getState<LS>().searchRoot
                     }),
-                    new Diva([
+                    new Div(null, null, [
                         new Selection(null, "Sort by", [
                             { key: "mtm", val: "Modify Time" },
                             { key: "ctm", val: "Create Time" },
@@ -174,7 +174,7 @@ export class SearchContentDlg extends DialogBase {
                             getValue: (): string => this.getState<LS>().sortField
                         })
                     ]),
-                    new Diva([
+                    new Div(null, null, [
                         requirePriorityCheckbox
                     ])
                 ], "bigMarginBottom"),

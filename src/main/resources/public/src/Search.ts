@@ -3,7 +3,6 @@ import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
 import { Div } from "./comp/core/Div";
-import { Divc } from "./comp/core/Divc";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
@@ -617,7 +616,7 @@ export class Search {
             if (isFeed) {
                 allowBoostFooter = true;
             }
-            boostComp = new Divc({
+            boostComp = new Div(null, {
                 onClick: async () => {
                     S.histUtil.updateNodeHistory(node.boostedNode, true);
 
@@ -647,7 +646,7 @@ export class Search {
         //         if (isFeed) {
         //             allowFooter = ast.showAllRowDetails.has(n.id);
         //         }
-        //         linkedNodesComp = new Divc({ className: "boostRow" }, [
+        //         linkedNodesComp = new Div(null, { className: "boostRow" }, [
         //             allowHeader ? new NodeCompRowHeader(n, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
         //             linkContent,
         //             allowFooter ? new NodeCompRowFooter(n) : null,
@@ -679,7 +678,7 @@ export class Search {
             allowHeader = false;
         }
 
-        const itemDiv = new Divc(attrs, [
+        const itemDiv = new Div(null, attrs, [
             S.render.renderBoostHeader(node, false),
             allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete, tabData.id) : null,
             allowHeader && !node.boostedNode ? new Clearfix() : null,

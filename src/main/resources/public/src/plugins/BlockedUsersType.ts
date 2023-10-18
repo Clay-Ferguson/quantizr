@@ -1,6 +1,5 @@
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
-import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
@@ -23,7 +22,7 @@ export class BlockedUsersType extends TypeBase {
     }
 
     override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
-        return new Divc({ className: "systemNodeContent" }, [
+        return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
             new Div("These are the people you've blocked. Delete from this list to unblock.", { className: "marginLeft" })
         ]);

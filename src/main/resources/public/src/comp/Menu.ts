@@ -1,7 +1,7 @@
 import { asyncDispatch, getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Divc } from "./core/Divc";
+import { Div } from "./core/Div";
 
 export class Menu extends Comp {
     constructor(public name: string, public menuItems: Comp[], private func: () => void = null, private floatRightComp: Comp = null, private moreClasses: string = "", private subMenu: boolean = false) {
@@ -14,7 +14,7 @@ export class Menu extends Comp {
         const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");
 
         this.setChildren([
-            new Divc({
+            new Div(null, {
                 className: clazz + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
                 id: this.getId("heading"),
                 onClick: () => {
@@ -26,11 +26,11 @@ export class Menu extends Comp {
             }
                 , [this.name, expanded ? this.floatRightComp : null]),
 
-            expanded ? new Divc({
+            expanded ? new Div(null, {
                 id: this.getId("itemsCont"),
                 className: "menuCardBody"
             }, [
-                new Divc({
+                new Div(null, {
                     id: this.getId("items"),
                     className: "menuPanelItems"
                 }, this.menuItems)]) : null
