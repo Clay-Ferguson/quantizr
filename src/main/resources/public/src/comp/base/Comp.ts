@@ -35,8 +35,7 @@ export abstract class Comp {
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored
     WARNING: TypeScript is NOT enforcing that children be private here.
     */
-    // todo-0: make this any[]
-    private children: Comp[];
+    private children: any[];
 
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
@@ -186,19 +185,19 @@ export abstract class Comp {
         this.attribs.className = clazz;
     }
 
-    insertFirstChild(comp: Comp): void {
+    insertFirstChild(comp: any): void {
         if (!comp) return;
         this.children = this.children || [];
         this.children.unshift(comp);
     }
 
-    addChild(comp: Comp): void {
+    addChild(comp: any): void {
         if (!comp) return;
         this.children = this.children || [];
         this.children.push(comp);
     }
 
-    addChildren(comps: Comp[]): void {
+    addChildren(comps: any[]): void {
         if (!comps || comps.length === 0) return;
         this.children = this.children || [];
         this.children.push.apply(this.children, comps);
@@ -213,7 +212,7 @@ export abstract class Comp {
         this.children = comps;
     }
 
-    getChildren(): Comp[] {
+    getChildren(): any[] {
         return this.children;
     }
 
