@@ -1,6 +1,5 @@
 import { dispatch, getAs } from "../AppContext";
 import { Comp, ScrollPos } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -183,7 +182,7 @@ export class EditNodeDlg extends DialogBase {
         ], null, "col-3", new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
     }
 
-    override getTitleIconComp(): CompIntf {
+    override getTitleIconComp(): Comp {
         const ast = getAs();
         let span: Span = null;
 
@@ -236,8 +235,8 @@ export class EditNodeDlg extends DialogBase {
         return span;
     }
 
-    override getExtraTitleBarComps(): CompIntf[] {
-        let comps: CompIntf[] = null;
+    override getExtraTitleBarComps(): Comp[] {
+        let comps: Comp[] = null;
 
         if (this.getState<LS>().signCheckboxVal) {
             comps = comps || [];
@@ -260,7 +259,7 @@ export class EditNodeDlg extends DialogBase {
         return comps;
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const state = this.getState<LS>();
         const ast = getAs();
         const hasAttachment: boolean = S.props.hasBinary(ast.editNode);
@@ -559,7 +558,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* returns true if props table is not empty. */
-    buildPropsEditPanel = (_: { propsParent: CompIntf, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean => {
+    buildPropsEditPanel = (_: { propsParent: Comp, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean => {
         let ret = false;
         const ast = getAs();
 
@@ -701,7 +700,7 @@ export class EditNodeDlg extends DialogBase {
         S.edit.askOpenAiQuestion(getAs().editNode.id);
     }
 
-    renderButtons(): CompIntf {
+    renderButtons(): Comp {
         const ast = getAs();
         // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
@@ -850,7 +849,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         this.addPropCheckboxOrLabel(allowCheckbox, label, propEntry, editItems);
-        let valEditor: CompIntf = null;
+        let valEditor: Comp = null;
         const multiLine = rows > 1;
 
         // We have the one special case that a property named 'date' is assumed to be a "Date" type always

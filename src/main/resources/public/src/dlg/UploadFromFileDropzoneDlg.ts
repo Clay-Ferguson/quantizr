@@ -4,7 +4,7 @@ import { Constants } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -38,7 +38,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         super(importMode ? "Import File" : "Upload File");
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const children = [
             new Diva([
                 this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Divc({ className: "marginBottom" }, [

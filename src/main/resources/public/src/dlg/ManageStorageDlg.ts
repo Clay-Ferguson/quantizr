@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Html } from "../comp/core/Html";
@@ -25,7 +25,7 @@ export class ManageStorageDlg extends DialogBase {
         return state.title || "Storage Space";
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const state: any = this.getState<LS>();
 
         let data = null;

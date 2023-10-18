@@ -1,5 +1,5 @@
 import { getAs } from "../AppContext";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -47,7 +47,7 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(customTitle: string, private customSubTitle: string, private customDiv: CompIntf, private sourceUrl: string, private startTimePendingOverride: number) {
+    constructor(customTitle: string, private customSubTitle: string, private customDiv: Comp, private sourceUrl: string, private startTimePendingOverride: number) {
         super(customTitle || "Audio Player");
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
@@ -93,7 +93,7 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const children = [
             new Diva([
                 this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,

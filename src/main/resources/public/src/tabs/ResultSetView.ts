@@ -1,7 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -52,7 +51,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
             content = this.data.props.node ? S.nodeUtil.getShortContent(this.data.props.node) : null;
         }
 
-        const children: CompIntf[] = [
+        const children: Comp[] = [
             this.headingBar = new TabHeading([
                 (ast.searchViewFromTab || this.data.props.node) && this.showContentHeading
                     ? new IconButton("fa-arrow-left", "", {
@@ -107,14 +106,14 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(): CompIntf {
+    renderHeading(): Comp {
         return new Div(this.data.name, { className: "tabTitle" });
     }
 
     /* overridable (don't use arrow function) */
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
     // it's essentially to support DOM finding.
-    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): CompIntf {
+    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
         const ast = getAs();
         const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data,
@@ -122,7 +121,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
             "userFeedItemHighlight", null);
     }
 
-    addPaginationBar = (children: CompIntf[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
+    addPaginationBar = (children: Comp[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
         let moreButton: IconButton = null;
         if (!this.data.props.endReached && allowMoreButton) {
             moreButton = new IconButton("fa-angle-right", "More", {

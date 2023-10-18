@@ -10,7 +10,7 @@ import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { CompIntf } from "../base/CompIntf";
+import { Comp } from "../base/Comp";
 import { Button } from "../core/Button";
 import { Divc } from "../core/Divc";
 import { DropdownMenu } from "../core/DropdownMenu";
@@ -33,7 +33,7 @@ export class NodeCompRowHeader extends Div {
 
     override preRender = (): boolean => {
         const ast = getAs();
-        const ddItems: CompIntf[] = [];
+        const ddItems: Comp[] = [];
 
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();

@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -24,7 +24,7 @@ export class SearchAndReplaceDlg extends DialogBase {
         this.validatedStates = [this.searchState, this.replaceState];
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 new TextField({ label: "Search for", val: this.searchState }),

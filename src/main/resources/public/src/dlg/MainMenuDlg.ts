@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { DialogBase, DialogMode } from "../DialogBase";
 import { MenuPanel } from "../MenuPanel";
 
@@ -8,7 +8,7 @@ export class MainMenuDlg extends DialogBase {
         super(null, "appModalMenu", true, DialogMode.POPUP, true);
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new MenuPanel()
         ];

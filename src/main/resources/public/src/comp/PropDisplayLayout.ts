@@ -1,6 +1,6 @@
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
 import { Div } from "./core/Div";
 import { Divc } from "./core/Divc";
 
@@ -13,7 +13,7 @@ export class PropDisplayLayout extends Div {
     }
 
     override preRender = (): boolean => {
-        const children: CompIntf[] = [];
+        const children: Comp[] = [];
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {
             this.node.properties.forEach(prop => {

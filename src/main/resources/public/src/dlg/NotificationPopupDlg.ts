@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 
@@ -11,7 +11,7 @@ export class NotificationPopupDlg extends DialogBase {
         super(title);
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new TextContent(this.message)
         ];

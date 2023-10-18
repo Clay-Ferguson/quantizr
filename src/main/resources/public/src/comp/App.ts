@@ -8,7 +8,7 @@ import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
 import { Divc } from "./core/Divc";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
@@ -91,7 +91,7 @@ export class App extends Main {
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
     };
 
-    getFullScreenViewer = (): CompIntf => {
+    getFullScreenViewer = (): Comp => {
         switch (getAs().fullScreenConfig.type) {
             case FullScreenType.IMAGE:
                 return new FullScreenImgViewer();
@@ -104,7 +104,7 @@ export class App extends Main {
         }
     }
 
-    getTopMobileBar = (): CompIntf => {
+    getTopMobileBar = (): Comp => {
         const ast = getAs();
         if (ast.mobileMode) {
             // DO NOT DELETE:

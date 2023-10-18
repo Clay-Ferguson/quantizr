@@ -3,7 +3,7 @@ import { SymKeyDataPackage } from "../Crypto";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Divc } from "../comp/core/Divc";
 import { Span } from "../comp/core/Span";
@@ -532,7 +532,7 @@ an upload has been added or removed.
         if (!ast.editNode.links) return null;
 
         let hasLinks = false;
-        const linkComps: CompIntf[] = [];
+        const linkComps: Comp[] = [];
         if (ast.editNode.links) {
             linkComps.push(new Span("RDF: ", { className: "linksPrompt" }));
             ast.editNode.links.forEach((link: J.NodeLink) => {

@@ -1,6 +1,5 @@
 import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FollowersRSInfo } from "../FollowersRSInfo";
@@ -27,7 +26,7 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
         S.srch.showFollowers(page, this.data.props.showingFollowersOfUser);
     }
 
-    override renderHeading(): CompIntf {
+    override renderHeading(): Comp {
         const text = this.data.props.showingFollowersOfUser === getAs().userName //
             ? "Your Followers" //
             : "Followers of @" + this.data.props.showingFollowersOfUser;
@@ -40,7 +39,7 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
     This node needs to share as much implementation for item rendering as possible with what's done in the, FriendType
     Probably need a static method on FriendType itself which can do everything based on input parameters only.
     */
-    override renderItem(node: J.NodeInfo, _i: number, _rowCount: number, _jumpButton: boolean): CompIntf {
+    override renderItem(node: J.NodeInfo, _i: number, _rowCount: number, _jumpButton: boolean): Comp {
         // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         // let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);

@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
@@ -8,11 +8,11 @@ import { DialogBase } from "../DialogBase";
 export class ConfirmDlg extends DialogBase {
     yes: boolean = false;
 
-    constructor(private text: string, title: string, private yesButtonClass: string=null, private textClass: string=null, private showNoButton: boolean = true) {
+    constructor(private text: string, title: string, private yesButtonClass: string = null, private textClass: string = null, private showNoButton: boolean = true) {
         super(title, "appModalContNarrowWidth");
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 new TextContent(this.text, this.textClass),

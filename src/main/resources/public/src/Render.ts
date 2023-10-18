@@ -6,7 +6,6 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { Comp } from "./comp/base/Comp";
-import { CompIntf } from "./comp/base/CompIntf";
 import { AppNavLink } from "./comp/core/AppNavLink";
 import { Button } from "./comp/core/Button";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -767,7 +766,7 @@ export class Render {
     renderLinks = (node: J.NodeInfo): Div => {
         if (!node.links) return null;
 
-        const linkComps: CompIntf[] = [];
+        const linkComps: Comp[] = [];
         if (node.links) {
             const nameSet: Set<string> = new Set();
             node.links.forEach((link: J.NodeLink) => {
@@ -787,8 +786,8 @@ export class Render {
         return linkComps.length > 0 ? new Divc({ className: "linksPanel" }, linkComps) : null;
     }
 
-    buildCustomLinks = (configArray: any): CompIntf[] => {
-        const items: CompIntf[] = [];
+    buildCustomLinks = (configArray: any): Comp[] => {
+        const items: Comp[] = [];
 
         if (configArray) {
             for (const menuItem of configArray) {

@@ -1,9 +1,8 @@
 import { Comp } from "../base/Comp";
-import { CompIntf } from "../base/CompIntf";
 
 export class Ul extends Comp {
 
-    constructor(content: string = "", attribs: any = {}, children: CompIntf[] = null) {
+    constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
         super(attribs);
         this.setChildren(children);
         this.setTag("ul");

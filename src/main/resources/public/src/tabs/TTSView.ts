@@ -1,6 +1,6 @@
 import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -105,7 +105,7 @@ export class TTSView extends AppTab<any, TTSView> {
             heading = "Ready to Speak";
         }
 
-        let paraComps: CompIntf[];
+        let paraComps: Comp[];
         if (S.speech.queuedSpeech?.length > 0) {
             paraComps = [];
             let curDiv = new Divc({ className: "ttsPara" });

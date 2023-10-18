@@ -1,10 +1,10 @@
 import { getAs } from "../../AppContext";
-import { CompIntf } from "../base/CompIntf";
+import { Comp } from "../base/Comp";
 import { Div } from "./Div";
 
 export class TabHeading extends Div {
 
-    constructor(children: CompIntf[]) {
+    constructor(children: Comp[]) {
         super();
         this.setChildren(children);
         this.attribs.className = getAs().mobileMode ? "headingBarMobile" : "headingBar";

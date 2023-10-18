@@ -1,5 +1,5 @@
 import { getAs } from "../../AppContext";
-import { CompIntf } from "../../comp/base/CompIntf";
+import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
@@ -165,7 +165,7 @@ export class NodeCompRow extends Div {
         }
 
         let header: NodeCompRowHeader = null;
-        let jumpButton: CompIntf = null;
+        let jumpButton: Comp = null;
 
         if (allowHeader && !this.node.boostedNode) {
             // slight special case for now until Document View knows how to delete all the subchilren and not

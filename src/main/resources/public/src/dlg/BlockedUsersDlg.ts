@@ -6,7 +6,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { FriendsTable } from "../comp/FriendsTable";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -68,7 +68,7 @@ export class BlockedUsersDlg extends DialogBase {
         });
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const state: LS = this.getState();
         const ast = getAs();
         let message = null;

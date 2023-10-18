@@ -4,7 +4,6 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -57,7 +56,7 @@ export class SearchContentDlg extends DialogBase {
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const ast = getAs();
         let requirePriorityCheckbox = null;
         if (this.getState<LS>().sortField === J.NodeProp.PRIORITY_FULL) {

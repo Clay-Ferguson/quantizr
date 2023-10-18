@@ -2,7 +2,6 @@ import { dispatch, getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -462,7 +461,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
     otherwise we can get rediculously large images. */
-    domPreUpdateFunction(parent: CompIntf): void {
+    domPreUpdateFunction(parent: Comp): void {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
 

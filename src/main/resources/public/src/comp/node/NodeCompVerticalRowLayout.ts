@@ -7,7 +7,6 @@ import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { CompIntf } from "../base/CompIntf";
 import { Divc } from "../core/Divc";
 import { NodeCompRow } from "./NodeCompRow";
 
@@ -21,7 +20,7 @@ export class NodeCompVerticalRowLayout extends Div {
     override preRender = (): boolean => {
         const ast = getAs();
         const childCount: number = this.node.children.length;
-        const comps: CompIntf[] = [];
+        const comps: Comp[] = [];
         const allowInsert = S.props.isWritableByMe(this.node);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;

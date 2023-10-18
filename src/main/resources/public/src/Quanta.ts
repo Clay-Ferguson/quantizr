@@ -1,7 +1,6 @@
 import { dispatch, getAs } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
-import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
@@ -26,14 +25,14 @@ export class Quanta {
     newNodeTargetOffset: number;
     audioPlaying = false;
 
-    app: CompIntf;
+    app: Comp;
     appInitialized: boolean = false;
     curUrlPath: string = window.location.pathname + window.location.search;
 
     // This holds the currently highlighted node (the val) for the given page parent node (the key)
     parentIdToFocusNodeMap: Map<string, string> = new Map<string, string>();
 
-    curHighlightNodeCompRow: CompIntf = null;
+    curHighlightNodeCompRow: Comp = null;
 
     private static lastKeyDownTime: number = 0;
 

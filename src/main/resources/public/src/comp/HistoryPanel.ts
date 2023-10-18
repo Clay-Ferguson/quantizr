@@ -7,7 +7,7 @@ import { Span } from "../comp/core/Span";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
 import { Divc } from "./core/Divc";
 import { SpanHtml } from "./core/SpanHtml";
 
@@ -42,7 +42,7 @@ export class HistoryPanel extends Div {
 
         ast.nodeHistory.forEach(h => {
             if (!h.content) return;
-            let parentDropTarg: CompIntf;
+            let parentDropTarg: Comp;
             let parentIcon: Icon;
 
             const type = S.plugin.getType(h.type);

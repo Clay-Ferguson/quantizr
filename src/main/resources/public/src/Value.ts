@@ -1,9 +1,9 @@
 import { ValueIntf } from "./Interfaces";
-import { CompIntf } from "./comp/base/CompIntf";
+import { Comp } from "./comp/base/Comp";
 
 // encapsulates setting and getting a component state variable on behalf of a component
 export class Value<T> implements ValueIntf {
-    constructor(private comp: CompIntf, public propName: string) {
+    constructor(private comp: Comp, public propName: string) {
     }
 
     setValue(val: T): void {

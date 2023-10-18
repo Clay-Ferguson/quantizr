@@ -1,5 +1,5 @@
 import { asyncDispatch, getAs, promiseDispatch } from "./AppContext";
-import { CompIntf } from "./comp/base/CompIntf";
+import { Comp } from "./comp/base/Comp";
 import { Div } from "./comp/core/Div";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
@@ -269,7 +269,7 @@ export class MenuPanel extends Div {
             ], null));
         }
 
-        const createMenuItems: CompIntf[] = [];
+        const createMenuItems: Comp[] = [];
         const types = S.plugin.getAllTypes();
         const recentTypes = ast.userProfile && ast.userProfile.recentTypes ? ast.userProfile.recentTypes.split(",") : null;
         let typesAdded = false;
@@ -474,7 +474,7 @@ export class MenuPanel extends Div {
         return ret;
     }
 
-    appendMenuItemFromConfig = (cfgItem: any, items: CompIntf[]): void => {
+    appendMenuItemFromConfig = (cfgItem: any, items: Comp[]): void => {
         if (cfgItem.name === "separator") {
             items.push(new MenuItemSeparator());
         }

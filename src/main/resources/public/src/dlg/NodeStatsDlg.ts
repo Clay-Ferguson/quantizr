@@ -1,5 +1,5 @@
 import { getAs } from "../AppContext";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Divc } from "../comp/core/Divc";
@@ -18,7 +18,7 @@ export class NodeStatsDlg extends DialogBase {
         super(trending ? "Trending (Top 100s)" : "SubNode Statistics");
     }
 
-    renderDlg = (): CompIntf[] => {
+    renderDlg = (): Comp[] => {
         const tagPanel = new Divc({ className: "wordStatsArea" });
         const ast = getAs();
 

@@ -1,7 +1,6 @@
 import { dispatch, getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -259,7 +258,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(): CompIntf {
+    renderHeading(): Comp {
         return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 

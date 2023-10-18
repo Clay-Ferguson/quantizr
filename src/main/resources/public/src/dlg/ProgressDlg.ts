@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Divc } from "../comp/core/Divc";
 import { Spinner } from "../comp/core/Spinner";
 import { DialogBase } from "../DialogBase";
@@ -9,7 +9,7 @@ export class ProgressDlg extends DialogBase {
         super("Loading... " + msg, "appModalContTinyWidth");
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Divc({ className: "progressSpinner" }, [new Spinner()])
         ];

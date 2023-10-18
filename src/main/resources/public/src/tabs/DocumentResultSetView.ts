@@ -1,6 +1,5 @@
 import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Divc } from "../comp/core/Divc";
 import { Icon } from "../comp/core/Icon";
@@ -22,7 +21,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         this.pagingContainerClass = "float-end";
     }
 
-    override renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): CompIntf {
+    override renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
 
         const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either

@@ -2,7 +2,6 @@ import { dispatch, getAs } from "./AppContext";
 import { S } from "./Singletons";
 import { Validator } from "./Validator";
 import { Comp } from "./comp/base/Comp";
-import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/core/Div";
 import { Divc } from "./comp/core/Divc";
 import { Icon } from "./comp/core/Icon";
@@ -120,14 +119,14 @@ export abstract class DialogBase extends Comp {
     preUnmount(): any {
     }
 
-    abstract renderDlg(): CompIntf[];
+    abstract renderDlg(): Comp[];
 
     /* Can be overridden to customize content (normally icons) in title bar */
-    getExtraTitleBarComps(): CompIntf[] {
+    getExtraTitleBarComps(): Comp[] {
         return null;
     }
 
-    getTitleIconComp(): CompIntf {
+    getTitleIconComp(): Comp {
         return null;
     }
 
@@ -149,7 +148,7 @@ export abstract class DialogBase extends Comp {
         let useTitle = this.getTitleText() || this.title;
         if (useTitle === "[none]") useTitle = null;
 
-        const titleChildren: CompIntf[] = [
+        const titleChildren: Comp[] = [
             this.getTitleIconComp(),
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here

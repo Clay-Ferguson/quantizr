@@ -2,13 +2,13 @@ import { getAs, promiseDispatch } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { AppTab } from "./AppTab";
-import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
 import { Divc } from "./core/Divc";
 
 export class TabPanel extends Div {
     static inst: TabPanel;
 
-    constructor(private customTopComp: CompIntf = null) {
+    constructor(private customTopComp: Comp = null) {
         super(null, { id: C.ID_TAB });
         TabPanel.inst = this;
         const ast = getAs();

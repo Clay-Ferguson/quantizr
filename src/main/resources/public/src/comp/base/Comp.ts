@@ -1,9 +1,8 @@
 import DOMPurify from "dompurify";
-import { createElement, ReactNode, useEffect, useLayoutEffect, forwardRef, createRef } from "react";
+import { ReactNode, createElement, createRef, forwardRef, useEffect, useLayoutEffect } from "react";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
 import { State } from "../../State";
-import { CompIntf } from "./CompIntf";
 
 export type Attribs = { [k: string]: any };
 
@@ -11,7 +10,7 @@ export type Attribs = { [k: string]: any };
  * Base class for all components which encapsulates a lot of React functionality so that our implementation
  * code can ignore those details.
  */
-export abstract class Comp implements CompIntf {
+export abstract class Comp {
     private parent: Comp = null; // only used for debug logging (can be deleted without impacting app)
     static renderCounter: number = 0;
     static focusElmId: string = null;
@@ -36,7 +35,7 @@ export abstract class Comp implements CompIntf {
     /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored
     WARNING: TypeScript is NOT enforcing that children be private here.
     */
-    private children: CompIntf[];
+    private children: Comp[];
 
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
@@ -186,13 +185,13 @@ export abstract class Comp implements CompIntf {
         this.attribs.className = clazz;
     }
 
-    insertFirstChild(comp: CompIntf): void {
+    insertFirstChild(comp: Comp): void {
         if (!comp) return;
         this.children = this.children || [];
         this.children.unshift(comp);
     }
 
-    addChild(comp: CompIntf): void {
+    addChild(comp: Comp): void {
         if (!comp) return;
         this.children = this.children || [];
         this.children.push(comp);
@@ -213,7 +212,7 @@ export abstract class Comp implements CompIntf {
         this.children = comps;
     }
 
-    getChildren(): CompIntf[] {
+    getChildren(): Comp[] {
         return this.children;
     }
 

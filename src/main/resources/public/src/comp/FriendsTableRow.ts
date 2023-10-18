@@ -8,7 +8,7 @@ import { LS as FriendsDlgState } from "../dlg/FriendsDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "../dlg/SelectTagsDlg";
 import { Constants as C } from "../Constants";
 import { ListBoxRow } from "./ListBoxRow";
-import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
 import { Divc } from "./core/Divc";
 import { FlexLayout } from "./core/FlexLayout";
@@ -16,7 +16,7 @@ import { Icon } from "./core/Icon";
 
 export class FriendsTableRow extends ListBoxRow {
 
-    constructor(public friend: FriendInfo, private selectableRows: boolean, private dlg: CompIntf) {
+    constructor(public friend: FriendInfo, private selectableRows: boolean, private dlg: Comp) {
         super(null, null, null);
         this.attribs.className = "personsListItem";
     }
@@ -50,7 +50,7 @@ export class FriendsTableRow extends ListBoxRow {
                         }
                         this.dlg.mergeState(state);
                     },
-                    getValue: (): boolean => this.dlg.getState().selections.has(this.friend.userName)
+                    getValue: (): boolean => this.dlg.getState<FriendsDlgState>().selections.has(this.friend.userName)
                 }) : null,
 
                 new Divc({ className: "friendListImgDivCont" }, [

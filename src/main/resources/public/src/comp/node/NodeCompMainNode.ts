@@ -1,5 +1,5 @@
 import { getAs } from "../../AppContext";
-import { CompIntf } from "../../comp/base/CompIntf";
+import { Comp } from "../../comp/base/Comp";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
@@ -59,8 +59,8 @@ export class NodeCompMainNode extends Div {
         this.attribs[C.NODE_ID_ATTR] = node.id;
         this.attribs.onClick = S.nav.clickTreeNode;
 
-        let header: CompIntf = null;
-        let jumpButton: CompIntf = null;
+        let header: Comp = null;
+        let jumpButton: Comp = null;
         const type = S.plugin.getType(node.type);
 
         let allowHeader: boolean = false;

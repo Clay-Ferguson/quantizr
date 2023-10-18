@@ -7,7 +7,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { ScrollPos } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -60,7 +60,7 @@ export class UserProfileDlg extends DialogBase {
         return userName;
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const state = this.getState<LS>();
         const ast = getAs();
         if (!state.userProfile) {
@@ -74,7 +74,7 @@ export class UserProfileDlg extends DialogBase {
         const web3Enabled = ast.allowedFeatures?.indexOf("web3") !== -1;
 
         if (S.quanta.cfg.ipfsEnabled && web3Enabled) {
-            const web3Comps: CompIntf[] = [];
+            const web3Comps: Comp[] = [];
 
             if (state.userProfile.didIPNS) {
                 web3Comps.push(new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
@@ -389,7 +389,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    makeProfileImg(_hasHeaderImg: boolean): CompIntf {
+    makeProfileImg(_hasHeaderImg: boolean): Comp {
         let src: string = null;
         const state: LS = this.getState<LS>();
 
@@ -448,7 +448,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    makeProfileHeaderImg(): CompIntf {
+    makeProfileHeaderImg(): Comp {
         let src: string = null;
         const state: any = this.getState<LS>();
 

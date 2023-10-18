@@ -1,6 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -34,7 +34,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
          */
         let rowCount = 0;
         let i = 0;
-        const children: CompIntf[] = [
+        const children: Comp[] = [
             this.headingBar = new TabHeading([
                 new IconButton("fa-arrow-left", null, {
                     onClick: () => {
@@ -76,7 +76,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             }
 
             if (node.children) {
-                const subComps: CompIntf[] = [];
+                const subComps: Comp[] = [];
                 node.children.forEach(child => {
                     const c = this.renderItem(child, i, rowCount, jumpButton, "threadFeedSubItem", "threadFeedItemHighlight");
                     if (c) {
@@ -99,7 +99,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): CompIntf {
+    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): Comp {
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, true, true, false, clazz, highlightClazz, null);
     }
 }

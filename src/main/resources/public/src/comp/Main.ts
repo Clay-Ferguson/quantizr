@@ -1,5 +1,4 @@
 import { Comp } from "./base/Comp";
-import { CompIntf } from "./base/CompIntf";
 
 interface LS { // Local State
     content?: string;
@@ -7,7 +6,7 @@ interface LS { // Local State
 
 export class Main extends Comp {
 
-    constructor(content: string = "", attribs: any = {}, children: CompIntf[] = null) {
+    constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
         super(attribs);
         this.setChildren(children);
         this.mergeState<LS>({ content });

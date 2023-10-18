@@ -1,6 +1,5 @@
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Divc } from "../comp/core/Divc";
@@ -31,7 +30,7 @@ export class IPSMView extends AppTab<any, IPSMView> {
     }
 
     /* overridable (don't use arrow function) */
-    renderHeading(): CompIntf {
+    renderHeading(): Comp {
         return new Div("IPSM Console", { className: "tabTitle" });
     }
 }

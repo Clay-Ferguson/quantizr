@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { RightNavPanel } from "../comp/RightNavPanel";
 import { Constants as C } from "../Constants";
 import { DialogBase, DialogMode } from "../DialogBase";
@@ -11,7 +11,7 @@ export class NavPanelDlg extends DialogBase {
         NavPanelDlg.inst = this;
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [new RightNavPanel()];
     }
 }

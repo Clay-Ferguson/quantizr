@@ -1,5 +1,5 @@
 import { getAs } from "../../AppContext";
-import { CompIntf } from "../../comp/base/CompIntf";
+import { Comp } from "../../comp/base/Comp";
 import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
@@ -14,7 +14,7 @@ import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
 
 export class NodeCompContent extends Div {
-    domPreUpdateFunc: (parent: CompIntf) => void;
+    domPreUpdateFunc: (parent: Comp) => void;
     static PRE_PREFIX = "nc_";
 
     constructor(public node: J.NodeInfo,
@@ -47,7 +47,7 @@ export class NodeCompContent extends Div {
             return false;
         }
 
-        const children: CompIntf[] = [];
+        const children: Comp[] = [];
         let type = S.plugin.getType(this.node.type);
         type = type || S.plugin.getType(J.NodeType.NONE);
         this.domPreUpdateFunc = type.domPreUpdateFunction;
@@ -97,7 +97,7 @@ export class NodeCompContent extends Div {
         }
 
         if (S.props.hasBinary(this.node) && !isAccountNode) {
-            const attComps: CompIntf[] = [];
+            const attComps: Comp[] = [];
             const attachments = S.props.getOrderedAtts(this.node);
             attachments.forEach(att => {
                 // having 'att.key' is a client-side only hack, and only generated during the ordering,
@@ -120,7 +120,7 @@ export class NodeCompContent extends Div {
         return true;
     }
 
-    renderActPubUrls = (children: CompIntf[], node: J.NodeInfo) => {
+    renderActPubUrls = (children: Comp[], node: J.NodeInfo) => {
         const urls: J.APObjUrl[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
         let div: Div = null;
         if (urls?.forEach) {
@@ -141,7 +141,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    renderActPubIcons = (children: CompIntf[], node: J.NodeInfo) => {
+    renderActPubIcons = (children: Comp[], node: J.NodeInfo) => {
         const icons: J.APObjIcon[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
         let div: Div = null;
         if (icons?.forEach) {
@@ -159,7 +159,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    maybeRenderDateTime = (children: CompIntf[], propName: string, node: J.NodeInfo) => {
+    maybeRenderDateTime = (children: Comp[], propName: string, node: J.NodeInfo) => {
         const timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
             const dateVal: Date = new Date(parseInt(timestampVal));

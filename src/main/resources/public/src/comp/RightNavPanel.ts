@@ -8,7 +8,7 @@ import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { CompIntf } from "./base/CompIntf";
+import { Comp } from "./base/Comp";
 import { Divc } from "./core/Divc";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
@@ -198,7 +198,7 @@ export class RightNavPanel extends Div {
         return true;
     }
 
-    makeRHSAvatarDiv = (): CompIntf => {
+    makeRHSAvatarDiv = (): Comp => {
         const ast = getAs();
         let src: string = null;
         if (!ast.userProfile) return null;

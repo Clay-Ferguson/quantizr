@@ -1,6 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -26,7 +26,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
     override preRender = (): boolean => {
         const ast = getAs();
 
-        let contentDiv: CompIntf = null;
+        let contentDiv: Comp = null;
         if (!ast.node) {
             contentDiv = null;
         }

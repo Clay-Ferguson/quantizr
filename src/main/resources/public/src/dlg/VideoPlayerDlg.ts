@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Divc } from "../comp/core/Divc";
 import { VideoPlayer } from "../comp/core/VideoPlayer";
 import { DialogBase, DialogMode } from "../DialogBase";
@@ -13,7 +13,7 @@ export class VideoPlayerDlg extends DialogBase {
         super(mediaTitle || "Video", null, false, dialogMode);
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Divc({ className: "videoContainer" }, [
                 this.videoPlayer = new VideoPlayer({

@@ -1,5 +1,4 @@
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { ConfigProp, EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { TabIntf } from "./TabIntf";
@@ -17,7 +16,7 @@ export interface TypeIntf {
     getAllowRowHeader(): boolean;
     getAutoExpandProps(): boolean;
     allowPropertyEdit(typeName: string): boolean;
-    domPreUpdateFunction(parent: CompIntf): void;
+    domPreUpdateFunction(parent: Comp): void;
 
     // if this returns a list of props, then these props are all the EditNodeDlg is allowed to show AND
     // they will all be put outside the collapsible panel if they'd normally be inside he collapse panel

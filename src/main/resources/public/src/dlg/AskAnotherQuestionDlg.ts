@@ -4,7 +4,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
 import { ScrollPos } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
@@ -24,7 +24,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
         this.onMount(() => { this.textArea?.focus(); });
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 this.textArea = new TextArea("Ask a Question...", { rows: 15 }, this.questionState, null, false, 3, this.textScrollPos),

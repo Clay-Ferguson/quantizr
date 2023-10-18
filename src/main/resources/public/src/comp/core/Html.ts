@@ -1,5 +1,4 @@
 import { Comp } from "../base/Comp";
-import { CompIntf } from "../base/CompIntf";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 
 // see: https://www.npmjs.com/package/react-emoji-render
@@ -25,7 +24,7 @@ interface LS { // Local State
 export class Html extends Comp {
     public purifyHtml = true;
 
-    constructor(content: string = "", attribs: any = {}, children: CompIntf[] = null) {
+    constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
         super(attribs);
         this.setChildren(children);
         this.setText(content);

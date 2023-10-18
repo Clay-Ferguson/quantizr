@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Divc } from "../comp/core/Divc";
@@ -20,7 +20,7 @@ export class AddCreditDlg extends DialogBase {
         this.mergeState<LS>({ amount: null });
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Divc({ className: "marginBottom" }, [
                 new TextField({ label: "Amount", val: this.amtState }),

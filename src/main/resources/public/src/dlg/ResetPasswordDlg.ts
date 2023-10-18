@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
@@ -24,7 +24,7 @@ export class ResetPasswordDlg extends DialogBase {
         this.validatedStates = [this.userState, this.emailState];
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 new TextContent("Enter your user name and email address to receive a reset link."),

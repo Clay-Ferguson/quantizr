@@ -1,5 +1,4 @@
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { FollowingRSInfo } from "../FollowingRSInfo";
 import { TabIntf } from "../intf/TabIntf";
@@ -26,7 +25,7 @@ export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSe
         S.srch.showFollowing(page, this.data.props.showingFollowingOfUser);
     }
 
-    override renderHeading(): CompIntf {
+    override renderHeading(): Comp {
         return new Div("@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "tabTitle" });
     }
 

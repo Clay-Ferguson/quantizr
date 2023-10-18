@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
@@ -18,7 +18,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
         this.validatedStates = [this.nameState];
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 new TextField({ label: "Predicate", val: this.nameState })

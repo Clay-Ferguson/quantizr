@@ -1,5 +1,5 @@
 import { getAs } from "../AppContext";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
@@ -192,7 +192,7 @@ export class OpenGraphPanel extends Div {
             state.og.description = state.og.description.substring(0, 800) + "...";
         }
 
-        let imgAndDesc: CompIntf = null;
+        let imgAndDesc: Comp = null;
         if (state.og.image && this.includeImage) {
             // According to my test results this can cause a scrolling glitch, where the browser throws an error and somehow
             // apparently that interfered with rendering. Wasn't able to repro on localhost because of using http I think, so

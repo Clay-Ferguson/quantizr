@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -20,7 +20,7 @@ export class PasteOrLinkDlg extends DialogBase {
         super("Select Action", "appModalContNarrowWidth");
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Divc({ className: "dragTargetDlgSection" }, [
                 new Heading(6, "Paste"),

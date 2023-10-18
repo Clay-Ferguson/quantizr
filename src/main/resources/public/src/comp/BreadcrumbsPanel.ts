@@ -1,11 +1,10 @@
 import { getAs } from "../AppContext";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { Diva } from "../comp/core/Diva";
 import { Span } from "../comp/core/Span";
-import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { CompIntf } from "./base/CompIntf";
-import * as J from "../JavaIntf";
 
 export class BreadcrumbsPanel extends Div {
     constructor(public breadcrumbs: J.BreadcrumbInfo[]) {
@@ -20,7 +19,7 @@ export class BreadcrumbsPanel extends Div {
     }
 
     createBreadcrumbs = (): Comp => {
-        let children: CompIntf[] = [];
+        let children: Comp[] = [];
 
         const ast = getAs();
         if (this.breadcrumbs?.length > 0) {

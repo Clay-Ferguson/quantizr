@@ -1,5 +1,4 @@
 import { Comp } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { TextContent } from "../comp/core/TextContent";
@@ -23,7 +22,7 @@ export class MessageDlg extends DialogBase {
         }
     }
 
-    renderDlg = (): CompIntf[] => {
+    renderDlg = (): Comp[] => {
         return [
             this.message ? new TextContent(this.message, null, this.preformatted) : null,
             this.customWidget,

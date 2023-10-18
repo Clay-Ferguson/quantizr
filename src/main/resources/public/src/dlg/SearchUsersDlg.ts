@@ -3,7 +3,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
@@ -31,7 +31,7 @@ export class SearchUsersDlg extends DialogBase {
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const adminOptions = new RadioButtonGroup([
             getAs().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean) => {

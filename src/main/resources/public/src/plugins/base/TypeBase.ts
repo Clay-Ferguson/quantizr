@@ -5,7 +5,6 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Comp } from "../../comp/base/Comp";
-import { CompIntf } from "../../comp/base/CompIntf";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { Divc } from "../../comp/core/Divc";
@@ -255,7 +254,7 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    // todo-1: need to rename this because it's easy to confuse with CompIntf render
+    // todo-1: need to rename this because it's easy to confuse with Comp render
     render = (node: J.NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
@@ -294,7 +293,7 @@ export class TypeBase implements TypeIntf {
             cont = cont.trim();
         }
 
-        let comp: CompIntf = null;
+        let comp: Comp = null;
         let urls: Set<string> = null;
         const containerClass = this.getExtraMarkdownClass();
         const footerComp: Div = this.getCustomFooter();
@@ -317,7 +316,7 @@ export class TypeBase implements TypeIntf {
         dispatch which causes a new render
         */
         if (urls) {
-            const children: CompIntf[] = [comp, choices];
+            const children: Comp[] = [comp, choices];
             let count = 0;
 
             // todo-1: add this limit of 50 into where we do the parsing also.
@@ -379,7 +378,7 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
-    domPreUpdateFunction(_parent: CompIntf): void {
+    domPreUpdateFunction(_parent: Comp): void {
     }
 
     ensureStringPropExists(node: J.NodeInfo, propName: string) {

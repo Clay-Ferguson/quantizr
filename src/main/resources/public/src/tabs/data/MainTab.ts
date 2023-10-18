@@ -1,6 +1,6 @@
 import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
-import { CompIntf } from "../../comp/base/CompIntf";
+import { Comp } from "../../comp/base/Comp";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { Divc } from "../../comp/core/Divc";
@@ -74,7 +74,7 @@ export class MainTab implements TabIntf<any> {
 
     // Put these directly here on main page for non-logged in users, because we definitely cannot expect these users to click hru to
     // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
-    customAnonRHSLinks = (): CompIntf[] => {
+    customAnonRHSLinks = (): Comp[] => {
         // if not anon user return empty items
         if (!getAs().isAnonUser) return [];
 

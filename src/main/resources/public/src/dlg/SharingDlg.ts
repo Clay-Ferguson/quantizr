@@ -1,5 +1,5 @@
 import { getAs } from "../AppContext";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -24,7 +24,7 @@ export class SharingDlg extends DialogBase {
         this.mergeState<LS>({ recursive: false });
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const ast = getAs();
         const isPublic = S.props.isPublic(ast.editNode);
         const state: LS = this.getState<LS>();

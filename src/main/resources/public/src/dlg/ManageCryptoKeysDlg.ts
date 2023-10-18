@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Selection } from "../comp/core/Selection";
@@ -20,7 +20,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
         this.mergeState({ keyType: "sig" });
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const state: LS = this.getState<LS>();
         return [
             new Selection(null, "Select Key", [

@@ -1,5 +1,5 @@
 import { FriendInfo } from "../JavaIntf";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { FriendsTableRow } from "./FriendsTableRow";
 import { ListBox } from "./ListBox";
 import { Div } from "./core/Div";
@@ -7,7 +7,7 @@ import { Div } from "./core/Div";
 export class FriendsTable extends ListBox {
     static scrollPos: number = 0;
 
-    constructor(public friends: FriendInfo[], private selectableRows: boolean, private dlg: CompIntf) {
+    constructor(public friends: FriendInfo[], private selectableRows: boolean, private dlg: Comp) {
         super();
 
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;

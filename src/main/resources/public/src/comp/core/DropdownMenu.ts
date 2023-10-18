@@ -1,10 +1,9 @@
 import { Comp } from "../base/Comp";
-import { CompIntf } from "../base/CompIntf";
 import { Icon } from "./Icon";
 import { Ul } from "./Ul";
 
 export class DropdownMenu extends Comp {
-    constructor(private items: CompIntf[]) {
+    constructor(private items: Comp[]) {
         super(null);
         this.attribs.className = "dropdown";
         this.setTag("span")

@@ -1,5 +1,5 @@
 import { dispatch, getAs } from "../AppContext";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -31,7 +31,7 @@ export class ExportDlg extends DialogBase {
         this.fileNameState.setValue(node.name);
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         const ast = getAs();
         const exportType = ast.exportSettings.exportType
         return [

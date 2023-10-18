@@ -1,4 +1,4 @@
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Diva } from "../comp/core/Diva";
@@ -23,7 +23,7 @@ export class SearchFileSystemDlg extends DialogBase {
         this.validatedStates = [this.searchTextState];
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 new TextContent("Enter text to find. Only content text will be searched. All sub-nodes under the selected node are included in the search."),

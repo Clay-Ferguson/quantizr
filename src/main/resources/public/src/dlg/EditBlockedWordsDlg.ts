@@ -1,6 +1,6 @@
 import { dispatch, getAs } from "../AppContext";
 import { ScrollPos } from "../comp/base/Comp";
-import { CompIntf } from "../comp/base/CompIntf";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
@@ -19,7 +19,7 @@ export class EditBlockedWordsDlg extends DialogBase {
         super("Blocked Words", "appModalContMediumWidth");
     }
 
-    renderDlg(): CompIntf[] {
+    renderDlg(): Comp[] {
         return [
             new Diva([
                 new Div("Content containing these will be filtered from your feed."),
