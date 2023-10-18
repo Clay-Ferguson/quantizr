@@ -5,7 +5,7 @@ import { Divc } from "./Divc";
 import { ErrorDiv } from "./ErrorDiv";
 import { Input } from "./Input";
 import { Label } from "./Label";
-import { Spanc } from "./Spanc";
+import { Span } from "./Span";
 import { Tag } from "./Tag";
 import { ToggleIcon } from "./ToggleIcon";
 
@@ -95,7 +95,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
             id: this.getId("inputId_")
         }, this.cfg.val.v);
 
-        const passwordEye = this.cfg.inputType === "password" ? new Spanc({
+        const passwordEye = this.cfg.inputType === "password" ? new Span(null, {
             className: "input-group-addon"
         }, [
             new Anchor(null, null, {

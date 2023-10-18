@@ -1,5 +1,12 @@
 import { dispatch } from "../AppContext";
+import { Constants as C } from "../Constants";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { S } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
+import { FilesTableCell } from "../comp/FilesTableCell";
+import { FilesTableRow } from "../comp/FilesTableRow";
+import { Table } from "../comp/Table";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -9,18 +16,11 @@ import { Divc } from "../comp/core/Divc";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
-import { Spanc } from "../comp/core/Spanc";
+import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
 import { TextField } from "../comp/core/TextField";
-import { Table } from "../comp/Table";
-import { FilesTableCell } from "../comp/FilesTableCell";
-import { FilesTableRow } from "../comp/FilesTableRow";
-import { Constants as C } from "../Constants";
 import { ConfirmDlg } from "../dlg/ConfirmDlg";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { S } from "../Singletons";
 import { IPFSFilesViewProps } from "./IPFSFilesViewProps";
 
 export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
@@ -92,7 +92,7 @@ export class IPFSFilesView extends AppTab<IPFSFilesViewProps, IPFSFilesView> {
             children.push(new Heading(5, "Listing: " + (mfsMode ? "Mutable File System" : "Hierarchy (DAG)")))
 
             children.push(new Diva([
-                new Spanc({ className: "float-end marginBottom" }, [
+                new Span(null, { className: "float-end marginBottom" }, [
                     new Checkbox("List CIDs", null, {
                         setValue: (checked: boolean) => {
                             dispatch("setListCids", _s => {

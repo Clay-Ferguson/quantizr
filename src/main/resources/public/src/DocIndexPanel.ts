@@ -29,8 +29,8 @@ export class DocIndexPanel extends Div {
         for (const node of info.results) {
             if (node.hasChildren) {
                 const level = S.util.countChars(node.path, "/") - baseSlashCount;
-                const clazz = ast.indexHighlightNode == node.id ? "docIndexLinkHighlight" : "docIndexLink";
-                index += `<div style="margin-left: ${level * 12}px" class="${clazz}" onClick="S.view.jumpToIdFromIndexPanel('${node.id}')">${this.getLevelBullet(level)}&nbsp;${this.getShortContent(node)}</div>`;
+                const clazz = ast.indexHighlightNode == node.id ? "docIdxLnkHighlight" : "docIdxLnk";
+                index += `<div style="margin-left: ${level * 12}px" class="${clazz}" onClick="S.view.clkIdx('${node.id}')">${this.getLevelBullet(level)}&nbsp;${this.getShortContent(node)}</div>`;
                 count++;
             }
         }

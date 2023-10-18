@@ -106,7 +106,7 @@ export class ExportDlg extends DialogBase {
     }
 
     radioButton = (name: string, exportType: string) => {
-        return new Span(null, [
+        return new Span(null, null, [
             new RadioButton(name, false, "exportTypeGroup", null, {
                 setValue: (checked: boolean) => {
                     if (checked) {

@@ -12,7 +12,6 @@ import { Divc } from "./core/Divc";
 import { Icon } from "./core/Icon";
 import { RadioButton } from "./core/RadioButton";
 import { RadioButtonGroup } from "./core/RadioButtonGroup";
-import { Spanc } from "./core/Spanc";
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
@@ -58,9 +57,10 @@ export class LeftNavPanel extends Div {
         }
 
         let showDocIndex = S.util.willRenderDocIndex();
+        console.log("showDocIndex=" + showDocIndex);
 
         const docIndexToggle = showDocIndex ? new RadioButtonGroup([
-            new Span(null, [
+            new Span(null, null, [
                 new RadioButton("Doc Index", false, "docIndexToggle", null, {
                     setValue: (_checked: boolean) => {
                         dispatch("ToggleMenuIndex", s => {
@@ -70,7 +70,7 @@ export class LeftNavPanel extends Div {
                     getValue: (): boolean => getAs().menuIndexToggle == "index"
                 }, "form-check-inline marginRight")
             ]),
-            new Span(null, [
+            new Span(null, null, [
                 new RadioButton("Menu", false, "docIndexToggle", null, {
                     setValue: (_checked: boolean) => {
                         dispatch("ToggleMenuIndex", s => {
@@ -80,7 +80,7 @@ export class LeftNavPanel extends Div {
                     getValue: (): boolean => getAs().menuIndexToggle == "menu"
                 }, "form-check-inline marginRight")
             ])
-        ], "marginTop") : null;
+        ], "marginTop testRadioButtonGroup") : null;
 
         if (showDocIndex) {
             showDocIndex = ast.menuIndexToggle == "index";
@@ -99,7 +99,7 @@ export class LeftNavPanel extends Div {
 
                     // todo-2: need to add a similar message over to the 'logoText' that's active for mobile
                     // which is in a different class.
-                    new Spanc({ className: "float-end" }, [
+                    new Span(null, { className: "float-end" }, [
                         myMessages ? new Span(myMessages, {
                             className: "newMessagesNote",
                             onClick: S.nav.showMyNewMessages,

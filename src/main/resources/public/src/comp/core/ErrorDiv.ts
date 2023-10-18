@@ -13,7 +13,7 @@ export class ErrorDiv extends Comp {
     }
 
     override preRender = (): boolean => {
-        this.setChildren(this.childrenWithFirst(this.getState<LS>().error));
+        this.setContent(this.getState<LS>().error);
         return true;
     }
 }

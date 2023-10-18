@@ -17,7 +17,6 @@ import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
-import { Spanc } from "../comp/core/Spanc";
 import { Spinner } from "../comp/core/Spinner";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
@@ -451,7 +450,7 @@ export class RSSView extends AppTab<any, RSSView> {
         const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
         children.push(new Diva([
-            new Spanc({ className: "float-end" }, [
+            new Span(null, { className: "float-end" }, [
                 footerSpan, postIcon, linkIcon, bookmarkIcon
             ]),
             // is this clearfix needed now that we wrapped this stuff in this div?

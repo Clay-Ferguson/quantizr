@@ -15,7 +15,6 @@ import { Button } from "../core/Button";
 import { Divc } from "../core/Divc";
 import { DropdownMenu } from "../core/DropdownMenu";
 import { Li } from "../core/Li";
-import { Spanc } from "../core/Spanc";
 import { SpanHtml } from "../core/SpanHtml";
 import { NodeCompContent } from "./NodeCompContent";
 
@@ -359,7 +358,7 @@ export class NodeCompRowHeader extends Div {
             else if (S.props.isShared(this.node)) {
                 const shareComps = S.nodeUtil.getSharingNames(this.node, null);
                 floatUpperRightDiv.addChildren([
-                    new Spanc({
+                    new Span(null, {
                         className: "rowHeaderSharingNames"
                     }, [
                         new Icon({

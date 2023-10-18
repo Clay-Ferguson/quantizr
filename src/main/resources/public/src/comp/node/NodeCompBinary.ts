@@ -3,7 +3,6 @@ import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
-import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
 import { DialogMode } from "../../DialogBase";
 import { AudioPlayerDlg } from "../../dlg/AudioPlayerDlg";
@@ -14,7 +13,7 @@ import { S } from "../../Singletons";
 import { Divc } from "../core/Divc";
 import { FlexRowLayout } from "../core/FlexRowLayout";
 import { Img } from "../core/Img";
-import { Spanc } from "../core/Spanc";
+import { Span } from "../core/Span";
 
 interface LS {
     node: J.NodeInfo;
@@ -190,7 +189,7 @@ export class NodeCompBinary extends Div {
                             new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
                         }
                     }, "btn-primary marginRight"),
-                    new Spanc({
+                    new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
@@ -204,7 +203,7 @@ export class NodeCompBinary extends Div {
                             new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0).open();
                         }
                     }, "btn-primary marginRight"),
-                    new Spanc({
+                    new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
@@ -235,7 +234,7 @@ export class NodeCompBinary extends Div {
                 new Icon({
                     className: "fa fa-file fa-lg smallMarginRight"
                 }),
-                new Span(null, [
+                new Span(null, null, [
                     new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {
                         className: "downloadLink marginRight",
                         title: "Click to download attachment\n\n" + titleSuffix

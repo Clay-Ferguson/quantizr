@@ -12,7 +12,7 @@ declare const BUILDTIME: string;
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    jumpToIdFromIndexPanel = async (id: string) => {
+    clkIdx = async (id: string) => {
         await promiseDispatch("highlightNode", s => s.indexHighlightNode = id);
         const activeTab = S.tabUtil.getActiveTabComp();
         if (activeTab) {

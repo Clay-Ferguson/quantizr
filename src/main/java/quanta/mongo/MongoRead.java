@@ -1409,8 +1409,8 @@ public class MongoRead extends ServiceBase {
         // first scan to build up the nodes list and nodeMap
         for (SubNode n : getSubGraph(ms, rootNode, null, 0, false, true, criteria)) {
             nodeMap.put(n.getPath(), new TreeNode(n));
-            if (nodeMap.size() > 5000 && !ms.isAdmin()) {
-                throw new RuntimeException("Too much data to return. Max is 5000 nodes.");
+            if (nodeMap.size() > 2000) {
+                throw new RuntimeException("Too much data to return. Max is 2000 nodes.");
             }
         }
 

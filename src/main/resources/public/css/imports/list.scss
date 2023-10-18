@@ -1,11 +1,11 @@
-.docIndexLink {
+.docIdxLnk {
     cursor: pointer;
     white-space: nowrap;
     padding-left: 5px;
     border: 2px transparent;
 }
 
-.docIndexLinkHighlight {
+.docIdxLnkHighlight {
     cursor: pointer;
     white-space: nowrap;
     padding-left: 5px;
@@ -16,7 +16,7 @@
     border: 2px solid purple;
 }
 
-.docIndexLink:hover {
+.docIndxLnk:hover {
     background-color: $primary;
 }
 

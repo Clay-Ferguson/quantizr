@@ -5,6 +5,8 @@ import { S } from "../../Singletons";
 import { State } from "../../State";
 import { CompIntf } from "./CompIntf";
 
+export type Attribs = { [k: string]: any };
+
 /**
  * Base class for all components which encapsulates a lot of React functionality so that our implementation
  * code can ignore those details.
@@ -19,11 +21,12 @@ export abstract class Comp implements CompIntf {
 
     // tag can be a string *or* a react functional component
     public tag: any = "div";
+    public firstContent: string = null;
 
     private static guid: number = 0;
 
     // this option allows the ability to use the DOM explorer in browsers to see the class name of every element
-    private static renderClassInDom: boolean = false;
+    private static renderClassInDom: boolean = true;
 
     // this is a global flag for overriding/disabling scroll setting which we need to do in some cases.
     static allowScrollSets = true;
@@ -56,6 +59,10 @@ export abstract class Comp implements CompIntf {
         if (typeof attribs === "string") {
             throw new Error("string was passed for 'attribs' in " + this.constructor.name);
         }
+        if (Array.isArray(attribs)) {
+            throw new Error("array was passed for 'attribs' in " + this.constructor.name);
+        }
+
         if (this.debug) {
             console.log("construct: " + this.constructor.name);
         }
@@ -82,6 +89,10 @@ export abstract class Comp implements CompIntf {
 
     setTag = (tag: any): void => {
         this.tag = tag;
+    }
+
+    setContent = (cont: string): void => {
+        this.firstContent = cont;
     }
 
     public static getNextId(): string {
@@ -195,7 +206,7 @@ export abstract class Comp implements CompIntf {
 
     /* Returns true if there are any non-null children */
     hasChildren(): boolean {
-        return this.children?.some(child => !!child);
+        return !!this.firstContent || this.children?.some(child => !!child);
     }
 
     setChildren(comps: any[]) {
@@ -206,29 +217,28 @@ export abstract class Comp implements CompIntf {
         return this.children;
     }
 
-    childrenWithFirst(first: any): any[] {
-        if (!first) return this.children;
-        return this.children ? [first, ...this.children] : [first];
-    }
-
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {
-        if (!children || children.length === 0) return null;
+        if (!this.firstContent && (!children || children.length === 0)) return null;
 
-        return children.reduce((acc: any[], child: any) => {
-            if (child instanceof Comp) {
-                try {
-                    child.parent = this; // only done for debugging.
-                    acc.push(createElement(child.render, child.attribs));
+        let arr = this.firstContent ? [this.firstContent] : [];
+        if (children) {
+            arr = children.reduce((acc: any[], child: any) => {
+                if (child instanceof Comp) {
+                    try {
+                        child.parent = this; // only done for debugging.
+                        acc.push(createElement(child.render, child.attribs));
+                    }
+                    catch (e) {
+                        S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
+                    }
+                } else if (child) {
+                    acc.push(child);
                 }
-                catch (e) {
-                    S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
-                }
-            } else if (child) {
-                acc.push(child);
-            }
-            return acc;
-        }, []);
+                return acc;
+            }, arr);
+        }
+        return arr;
     }
 
     focus(): void {
