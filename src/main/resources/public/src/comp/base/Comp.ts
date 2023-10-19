@@ -68,6 +68,10 @@ export abstract class Comp {
         this.attribs = attribs || {};
         this.attribs.ref = createRef();
 
+        if (this.attribs.title) {
+            this.attribs.title = "Tip:\n\n" + this.attribs.title;
+        }
+
         // for debugging, shows classname in every dom element as an attribute.
         if (Comp.renderClassInDom) {
             // if 'c' property not defined from a higher level up define it here as class name
