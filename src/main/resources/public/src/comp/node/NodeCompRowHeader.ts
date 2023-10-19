@@ -11,6 +11,7 @@ import * as J from "../../JavaIntf";
 import { NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
+import { Anchor } from "../core/Anchor";
 import { Button } from "../core/Button";
 import { DropdownMenu } from "../core/DropdownMenu";
 import { Li } from "../core/Li";
@@ -286,6 +287,8 @@ export class NodeCompRowHeader extends Div {
             ]));
         }
 
+        this.addOriginalLinks(ddItems);
+
         if (ddItems.length > 0) {
             children.push(new DropdownMenu(ddItems));
         }
@@ -456,6 +459,39 @@ export class NodeCompRowHeader extends Div {
 
         this.setChildren(children);
         return true;
+    }
+
+    addOriginalLinks = (ddItems: Comp[]) => {
+        if (this.node.owner.indexOf("@") !== -1) {
+            const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
+            if (inReplyTo) {
+                // if this is a URL and not our own host then show the Remote Parent link
+                if (inReplyTo.indexOf(":") !== -1 && inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
+                    ddItems.push(new Li(null, null, [
+                        new Anchor(inReplyTo, "Original Post Parent", {
+                            className: "dropdown-item",
+                            target: "_blank",
+                            title: "Go to post's parent on it's home Fediverse instance"
+                        })
+                    ]));
+                }
+            }
+
+            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
+            if (objUrl) {
+                // check to see if it's a link to our server, and don't show 'foreign link' link if so.
+                // todo-3: we should make a util.ts method for this.
+                if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
+                    ddItems.push(new Li(null, null, [
+                        new Anchor(objUrl, "Original Post", {
+                            className: "dropdown-item",
+                            target: "_blank",
+                            title: "Go to Original Post/Instance"
+                        })
+                    ]));
+                }
+            }
+        }
     }
 
     getTextContent = (): string => {

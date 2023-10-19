@@ -10,7 +10,6 @@ import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRow } from "./NodeCompRow";
-import { NodeCompRowFooter } from "./NodeCompRowFooter";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
@@ -110,9 +109,7 @@ export class NodeCompMainNode extends Div {
             jumpButton,
             new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, false, null),
             boostComp,
-            S.render.renderLinks(node),
-            new NodeCompRowFooter(node),
-            new Clearfix()
+            S.render.renderLinks(node)
         ]);
 
         return true;

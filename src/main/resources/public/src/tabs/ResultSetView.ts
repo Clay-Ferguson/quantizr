@@ -19,7 +19,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
-    allowFooter: boolean = true;
     showContentHeading: boolean = true;
     pagingContainerClass: string = "marginBottom marginTop";
 
@@ -116,8 +115,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
         const ast = getAs();
         const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
-        return S.srch.renderSearchResultAsListItem(node, this.data,
-            jumpButton, allowHeader, this.allowFooter, true, "userFeedItem",
+        return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, true, "userFeedItem",
             "userFeedItemHighlight", null);
     }
 

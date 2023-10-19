@@ -43,8 +43,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
             style = indentLevel > 0 ? { marginLeft: "" + (indentLevel * 25) + "px" } : null;
         }
-
-        return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, this.allowFooter, true, itemClass, itemClassHighlight, style);
+        return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, true, itemClass, itemClassHighlight, style);
     }
 
     override pageChange(_delta: number): void {

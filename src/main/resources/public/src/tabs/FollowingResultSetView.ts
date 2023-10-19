@@ -10,7 +10,6 @@ export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSe
     constructor(data: TabIntf<PT, FollowingResultSetView<PT>>) {
         super(data);
         this.allowHeader = false;
-        this.allowFooter = false;
         data.inst = this;
         this.showContentHeading = false;
     }

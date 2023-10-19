@@ -190,7 +190,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 }
 
                 // console.log("FEED: node id=" + node.id + " content: " + node.content);
-                children.push(S.srch.renderSearchResultAsListItem(node, this.data, true, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
+                children.push(S.srch.renderSearchResultAsListItem(node, this.data, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
                 i++;
                 rowCount++;
             });

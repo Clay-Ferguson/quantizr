@@ -12,7 +12,6 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
-import { NodeCompRowFooter } from "./NodeCompRowFooter";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompRow extends Div {
@@ -199,9 +198,7 @@ export class NodeCompRow extends Div {
             jumpButton,
             new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, this.isLinkedNode, null),
             this.internalComp,
-            S.render.renderLinks(this.node),
-            this.allowHeaders ? new NodeCompRowFooter(this.node) : null,
-            this.allowHeaders ? new Clearfix() : null
+            S.render.renderLinks(this.node)
         ]);
         return true;
     }

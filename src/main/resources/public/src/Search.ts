@@ -4,7 +4,6 @@ import { Comp } from "./comp/base/Comp";
 import { Clearfix } from "./comp/core/Clearfix";
 import { Div } from "./comp/core/Div";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
-import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
@@ -580,7 +579,7 @@ export class Search {
      * Renders a single line of search results on the search results page
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, jumpButton: boolean, allowHeader: boolean,
-        allowFooter: boolean, showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
+        showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
         extraStyle: any): Comp => {
         const ast = getAs();
         if (!node) return;
@@ -593,10 +592,6 @@ export class Search {
 
         // render with info bar, etc always, if this is a threaview or freed tab.
         const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED || tabData.id === C.TAB_REPLIES;
-        if (isFeed && allowFooter) {
-            allowFooter = true;
-        }
-
         const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
         let clazz = isFeed ? "feedNode" : "resultsNode";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
@@ -611,11 +606,6 @@ export class Search {
         let boostComp: Div = null;
         if (node.boostedNode) {
             const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feedBoost");
-
-            let allowBoostFooter = isFeed;
-            if (isFeed) {
-                allowBoostFooter = true;
-            }
             boostComp = new Div(null, {
                 onClick: async () => {
                     S.histUtil.updateNodeHistory(node.boostedNode, true);
@@ -627,9 +617,7 @@ export class Search {
             }, [
                 allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete, tabData.id) : null,
                 allowHeader ? new Clearfix() : null,
-                boostContent,
-                allowBoostFooter ? new NodeCompRowFooter(node.boostedNode) : null,
-                allowBoostFooter ? new Clearfix() : null
+                boostContent
             ])
         }
 
@@ -641,16 +629,9 @@ export class Search {
         //     // all the styles etc in here need to be changed from boost to nodeLinks
         //     node.linkedNodes.forEach(n => {
         //         const linkContent = new NodeCompContent(n, tabData, true, true, prefix + "-boost", true, false, true, "feedBoost");
-
-        //         let allowFooter = isFeed;
-        //         if (isFeed) {
-        //             allowFooter = ast.showAllRowDetails.has(n.id);
-        //         }
         //         linkedNodesComp = new Div(null, { className: "boostRow" }, [
         //             allowHeader ? new NodeCompRowHeader(n, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
-        //             linkContent,
-        //             allowFooter ? new NodeCompRowFooter(n) : null,
-        //             allowFooter ? new Clearfix() : null
+        //             linkContent
         //         ])
         //     });
         // }
@@ -684,9 +665,7 @@ export class Search {
             allowHeader && !node.boostedNode ? new Clearfix() : null,
             content,
             boostComp,
-            S.render.renderLinks(node),
-            allowFooter ? new NodeCompRowFooter(node) : null,
-            allowFooter ? new Clearfix() : null
+            S.render.renderLinks(node)
         ]);
 
         return itemDiv;
