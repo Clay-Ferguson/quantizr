@@ -1,4 +1,4 @@
-package test;
+package quanta.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +8,9 @@ import quanta.config.ServiceBase;
 import quanta.util.XString;
 
 @Component("ActPubTest")
-public class ActPubTest extends ServiceBase implements TestIntf {
+public class ActPubTest extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ActPubTest.class);
 
-    @Override
     public void test() throws Exception {
         try {
             log.debug("Running ActPubTest: Host " + prop.getHostAndPort());

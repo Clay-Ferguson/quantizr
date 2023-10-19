@@ -1,4 +1,4 @@
-package test;
+package quanta.test;
 
 import java.util.Map;
 import org.slf4j.Logger;
@@ -11,10 +11,9 @@ import quanta.model.ipfs.dag.MerkleNode;
 import quanta.util.XString;
 
 @Component("IPFSTest")
-public class IPFSTest extends ServiceBase implements TestIntf {
+public class IPFSTest extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(IPFSTest.class);
 
-    @Override
     public void test() throws Exception {
         log.debug("IPFSTest.test() running.");
         // testUploadDirectory();

@@ -80,7 +80,7 @@
 					<resource>
 						<directory>src/main/java</directory>
 						<excludes>
-							<exclude>test/**</exclude>
+							<exclude>quanta/test/**</exclude>
 						</excludes>
 					</resource>
 				</resources>
@@ -361,7 +361,7 @@
 					<resource>
 						<directory>src/main/java</directory>
 						<excludes>
-							<exclude>test/**</exclude>
+							<exclude>quanta/test/**</exclude>
 						</excludes>
 					</resource>
 				</resources>

@@ -11,7 +11,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import test.TestIntf;
 
 @Component
 public class RunJUnit extends ServiceBase {
@@ -32,16 +31,7 @@ public class RunJUnit extends ServiceBase {
     }
 
     public static void runTests() {
-        runTest("test.MyTest");
-    }
-
-    public static void runBeanTest(String testClass) {
-        try {
-            TestIntf testInst = (TestIntf) context.getBean(testClass);
-            testInst.test();
-        } catch (Exception e) {
-            log.error("Error running test bean: " + testClass, e);
-        }
+        runTest("quanta.test.MongoTest");
     }
 
     private static void runTest(String className) {

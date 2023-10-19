@@ -1,4 +1,4 @@
-package test;
+package quanta.test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,13 +26,11 @@ import quanta.util.XString;
  * This is actually where I just run various experiments related to MongoDB, and this is not
  * supposed to be any thing like a unit test for the mongo stuff.
  */
-@Component("MongoTest")
-public class MongoTest extends ServiceBase implements TestIntf {
-    private static Logger log = LoggerFactory.getLogger(MongoTest.class);
+@Component("MongoTestService")
+public class MongoTestService extends ServiceBase {
+    private static Logger log = LoggerFactory.getLogger(MongoTestService.class);
 
-    @Override
     public void test() throws Exception {
-        log.debug("*****************************************************************************************");
         log.debug("MongoTest Running!");
         // testDocOrderQuery();
         // testComplexProperties();
@@ -73,7 +71,6 @@ public class MongoTest extends ServiceBase implements TestIntf {
         // }
         // runBinaryTests(adminSession);
         log.debug("Mongo Test Ok.");
-        log.debug("*****************************************************************************************");
     }
 
     // "name": ":catjam:",

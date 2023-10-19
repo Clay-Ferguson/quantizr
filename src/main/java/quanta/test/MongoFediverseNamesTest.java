@@ -1,4 +1,4 @@
-package test;
+package quanta.test;
 
 import com.mongodb.client.result.DeleteResult;
 import java.util.Calendar;
@@ -14,12 +14,10 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.FediverseName;
 
 @Component("MongoFediverseNamesTest")
-public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
+public class MongoFediverseNamesTest extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
 
-    @Override
     public void test() throws Exception {
-        log.debug("*****************************************************************************************");
         log.debug("MongoFediverseNamesTest Running!");
         removeAll();
         opsw.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
@@ -39,7 +37,6 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
         }
         dump();
         log.debug("MongoFediverseNamesTest Ok.");
-        log.debug("*****************************************************************************************");
     }
 
     private void dump() {
