@@ -1,4 +1,4 @@
-package quanta.test;
+package test;
 
 public interface TestIntf {
     public void test() throws Exception;

@@ -54,6 +54,14 @@
 					<version>1.0</version>
 					<type>pom</type>
 				</dependency>
+
+				<dependency>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+					<version>4.13.2</version>
+					<scope>compile</scope>
+				</dependency>
+
 			</dependencies>
 
 			<build>
@@ -64,25 +72,16 @@
 				<resources>
 					<resource>
 						<directory>src/main/resources</directory>
-
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
-							<exclude>public/node/**</exclude>
+							<exclude>public/src/**</exclude>
 						</excludes>
-
-						<!-- I have resource filtering disabled for now because i don't need it, but
-						if you turn it back on don't forget
-				to add 'resources:resources' to the maven command for inside<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.8.0</version>
-						<configuration>
-							<source>9</source>
-							<target>9</target>
-						</configuration>
-					</plugin> VSCode AND also your prod builder shell script!!!
-				<filtering>true</filtering>
-				-->
+					</resource>
+					<resource>
+						<directory>src/main/java</directory>
+						<excludes>
+							<exclude>test/**</exclude>
+						</excludes>
 					</resource>
 				</resources>
 
@@ -140,6 +139,7 @@
 							<layout>ZIP</layout>
 						</configuration>
 					</plugin>
+
 					<!-- 
 				WARNING: It appears that only ONE exec-maven-plugin runs. Having two of these plugins won't work,
 					because it ends up 
@@ -233,23 +233,9 @@
 
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
-							<!-- what is using publi/node? -->
-							<exclude>public/node/**</exclude>
+							<exclude>public/src/**</exclude>
 						</excludes>
 
-						<!-- I have resource filtering disabled for now because i don't need it, but
-						if you turn it back on don't forget
-				to add 'resources:resources' to the maven command for inside<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.8.0</version>
-						<configuration>
-							<source>9</source>
-							<target>9</target>
-						</configuration>
-					</plugin> VSCode AND also your prod builder shell script!!!
-				<filtering>true</filtering>
-				-->
 					</resource>
 				</resources>
 
@@ -299,7 +285,6 @@
 							<noFileComment>true</noFileComment>
 						</configuration>
 					</plugin>
-
 					<!--
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -368,18 +353,16 @@
 				<resources>
 					<resource>
 						<directory>src/main/resources</directory>
-
 						<excludes>
 							<exclude>public/node_modules/**</exclude>
-							<exclude>public/node/**</exclude>
+							<exclude>public/src/**</exclude>
 						</excludes>
-
-						<!-- I have resource filtering disabled for now because i don't need it, but
-						if you turn it back on don't forget
-				to add 'resources:resources' to the maven command for inside VSCode AND also your prod builder
-						shell script!!!
-				<filtering>true</filtering>
-				-->
+					</resource>
+					<resource>
+						<directory>src/main/java</directory>
+						<excludes>
+							<exclude>test/**</exclude>
+						</excludes>
 					</resource>
 				</resources>
 

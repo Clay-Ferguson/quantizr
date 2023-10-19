@@ -1,4 +1,4 @@
-package quanta.test;
+package test;
 
 import java.util.Map;
 import org.slf4j.Logger;

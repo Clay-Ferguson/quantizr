@@ -164,17 +164,6 @@ public class AppProp {
         return timeoutVal;
     }
 
-    public List<String> getRunTests() {
-        List<String> ret = null;
-        String runTests = env.getProperty("runTests");
-        if (!StringUtils.isEmpty(runTests)) {
-            ret = XString.tokenize(runTests, ",", true);
-        } else {
-            ret = new LinkedList<>();
-        }
-        return ret;
-    }
-
     public String getServerPort() {
         return env.getProperty("server.port");
     }

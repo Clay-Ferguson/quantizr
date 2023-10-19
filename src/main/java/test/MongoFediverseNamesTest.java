@@ -1,4 +1,4 @@
-package quanta.test;
+package test;
 
 import com.mongodb.client.result.DeleteResult;
 import java.util.Calendar;

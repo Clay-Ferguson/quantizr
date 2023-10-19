@@ -1,4 +1,4 @@
-package quanta.test;
+package test;
 
 import java.io.File;
 import java.io.FileInputStream;
