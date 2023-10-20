@@ -19,8 +19,5 @@ public class MongoTest {
         } catch (Exception e) {
             log.error("MongoTest Failed", e);
         }
-        // int a = 5;
-        // int b = 10;
-        // assertEquals(16, a + b);
     }
 }

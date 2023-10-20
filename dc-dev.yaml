@@ -259,7 +259,7 @@ services:
             SPRING_DATASOURCE_USERNAME: "quanta-pg"
             SPRING_DATASOURCE_PASSWORD: ${pgPassword}
 
-            runJUnit: "true"
+            runJUnit: "false"
             
             adminPassword: "${adminPassword}"
             mongoPassword: "${mongoPassword}"

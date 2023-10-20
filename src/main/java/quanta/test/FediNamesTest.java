@@ -13,9 +13,9 @@ import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.FediverseName;
 
-@Component("MongoFediverseNamesTest")
-public class MongoFediverseNamesTest extends ServiceBase {
-    private static Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
+@Component("FediNamesTest")
+public class FediNamesTest extends ServiceBase {
+    private static Logger log = LoggerFactory.getLogger(FediNamesTest.class);
 
     public void test() throws Exception {
         log.debug("MongoFediverseNamesTest Running!");

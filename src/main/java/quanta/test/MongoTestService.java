@@ -32,7 +32,6 @@ public class MongoTestService extends ServiceBase {
 
     public void test() throws Exception {
         log.debug("MongoTest Running!");
-        // testDocOrderQuery();
         // testComplexProperties();
         // testDirtyReads();
         // testPathRegex();
@@ -71,41 +70,6 @@ public class MongoTestService extends ServiceBase {
         // }
         // runBinaryTests(adminSession);
         log.debug("Mongo Test Ok.");
-    }
-
-    // "name": ":catjam:",
-    // "updated": "2020-08-25T14:05:01Z",
-    // "icon": {
-    // "type": "Image",
-    // "mediaType": "image/gif",
-    // "url":
-    // "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"
-    // }
-    // Verify we can read-write these kinds of properties
-    public void testComplexProperties() {
-        String nodeId = "61bffa8a0e86eb44d1f04dc6";
-        MongoSession as = asUser(PrincipalName.ADMIN.s());
-        SubNode node = opsw.findById(null, new ObjectId(nodeId));
-        // APObj payload = new APObj().put("tag", new APList().val(new APObj().put("propname", "propval")));
-        node.set(NodeProp.ACT_PUB_TAG, new APList().val( //
-                                                         //
-                new APObj().put("name", ":catjam:").put("icon", //
-                        new APObj().put("url",
-                                "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"))));
-        log.debug("Complex Object: " + XString.prettyPrint(node));
-        update.saveSession(as);
-    }
-
-    public void testDirtyReads() {
-        String nodeId = "61bcdd5b47596e66a7a11ce5";
-        SubNode node1 = opsw.findById(null, new ObjectId(nodeId));
-        node1.setContent("content from MongoTest.testDirtyReads");
-        log.debug("node1: hashCode=" + node1.hashCode());
-        // This will verify that the MongoEventListener is capable of detecting the dirty read and
-        // logging a warning about it.
-        SubNode node2 = opsw.findById(null, new ObjectId(nodeId));
-        log.debug("node2: hashCode=" + node2.hashCode());
-        // update.saveSession(ms);
     }
 
     public void authTest() {
