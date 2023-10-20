@@ -18,18 +18,14 @@ import { SettingsTab } from "./tabs/data/SettingsTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class Nav {
-    displayingHome = (): boolean => {
+    parentVisibleToUser = (): boolean => {
         const ast = getAs();
         if (!ast.node) return false;
         if (ast.isAnonUser) {
-            return ast.node.id === ast.anonUserLandingPageNode;
+            return true;
         } else {
-            return ast.node.id === ast.userProfile?.homeNodeId;
+            return ast.node.id !== ast.userProfile?.userNodeId;
         }
-    }
-
-    parentVisibleToUser = (): boolean => {
-        return !this.displayingHome();
     }
 
     upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean) => {

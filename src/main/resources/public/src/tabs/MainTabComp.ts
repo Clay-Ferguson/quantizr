@@ -91,11 +91,12 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         onClick: S.nav.navToNext
                     }),
 
-                    new IconButton("fa-folder", "Up", {
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.navUpLevelClick,
-                        title: "Go to Parent Node"
-                    }, "btn-primary")
+                    S.nav.parentVisibleToUser() ?
+                        new IconButton("fa-folder", "Up", {
+                            [C.NODE_ID_ATTR]: ast.node.id,
+                            onClick: S.nav.navUpLevelClick,
+                            title: "Go to Parent Node"
+                        }, "btn-primary") : null
                 ]),
                 header = new Div(S.quanta.config.brandingAppName, {
                     className: "tabTitle headerUploadPanel",

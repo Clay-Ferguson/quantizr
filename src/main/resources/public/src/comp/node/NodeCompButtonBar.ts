@@ -237,26 +237,6 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        // let upLevelButton: IconButton;
-        const isMine = S.props.isMine(this.node);
-
-        // Note we only allow 'Up Level' on home node if we're the admin.
-        if (isPageRootNode &&
-            (
-                ((isMine || this.node.type !== J.NodeType.POSTS) && this.node.name !== "home") ||
-                ast.isAdminUser
-            )) {
-            if (S.nav.parentVisibleToUser()) {
-
-                // todo-1: leaving this here until I'm sure I like it on top of page instead
-                // upLevelButton = new IconButton("fa-folder", "Up", {
-                //     [C.NODE_ID_ATTR]: this.node.id,
-                //     onClick: S.nav.navUpLevelClick,
-                //     title: "Go to Parent Node"
-                // }, "btn-primary");
-            }
-        }
-
         // ---------------------------
         // DO NOT DELETE
         // These buttons were moved to the main tree header bar, BUT if we ever decide to bring these back
