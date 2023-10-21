@@ -120,7 +120,7 @@ export abstract class Comp {
         });
     }
 
-    public getRef = (warn: boolean = true): HTMLElement => {
+    public getRef = (): HTMLElement => {
         if (this.preRenderRejected) {
             // console.warn("getRef was called on id " + this.getId() + " (class: " + this.getCompClass() + ") which will return null because of preRenderRejected");
             return null;
@@ -132,23 +132,6 @@ export abstract class Comp {
             ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
         }
 
-        if (!ret) {
-            const elm: HTMLElement = document.getElementById(this.getId());
-            if (elm) {
-                console.log("Repaired ref: " + this.getId() + "\n" + (new Error().stack));
-
-                // I tried to simply "repair" the 'ref' in this oddball case, but the message below is shown
-                // if I do, so for now I'm just setting the return value leaving attribs alone.
-                // Warning: Unexpected ref object provided for div. Use either a ref-setter function or React.createRef().
-                // this.attribs.ref = elm;
-                ret = elm;
-            }
-        }
-
-        if (!ret && warn && this.mounted) {
-            console.log("getRef failed on " + this.getCompClass() + " mounted=" + this.mounted +
-                "\nELEMENTS Stack: " + this.getAncestry());
-        }
         return ret;
     }
 
@@ -170,7 +153,7 @@ export abstract class Comp {
         if (!func) return;
         // If we happen to already have the ref, we can run the 'func' immediately and be done
         // or else we add 'func' to the queue of functions to call when component does get mounted.
-        const elm = this.getRef(false);
+        const elm = this.getRef();
         if (elm) {
             func(elm);
             return;
@@ -404,7 +387,7 @@ export abstract class Comp {
 
     private domAdd = (): void => {
         // console.log("domAddEvent: " + this.getCompClass());
-        const elm = this.getRef(false);
+        const elm = this.getRef();
         if (!elm) {
             return;
         }

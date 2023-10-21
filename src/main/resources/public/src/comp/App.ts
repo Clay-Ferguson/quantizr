@@ -159,7 +159,7 @@ export class App extends Main {
     }
 
     override domPreUpdateEvent = (): void => {
-        const elm = this.getRef(false);
+        const elm = this.getRef();
         if (!elm) return;
 
         const ast = getAs();
