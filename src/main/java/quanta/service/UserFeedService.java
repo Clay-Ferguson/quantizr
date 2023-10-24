@@ -61,7 +61,7 @@ public class UserFeedService extends ServiceBase {
         // This pattern is what is required when you have multiple conditions added to a single field.
         // .andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
         // Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()));
-        SubNode searchRoot = read.getNode(ms, sc.getRootId());
+        SubNode searchRoot = read.getNode(ms, sc.getUserNodeId());
         if (searchRoot == null) {
             return res;
         }
@@ -141,7 +141,7 @@ public class UserFeedService extends ServiceBase {
         }
         // includes shares TO me (but not in the context of a 'bidirectional' query)
         else if (req.getToMe()) {
-            myAcntNode = read.getNode(ms, sc.getRootId());
+            myAcntNode = read.getNode(ms, sc.getUserNodeId());
             if (myAcntNode != null) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
                 SubNode _myAcntNode = myAcntNode;
@@ -229,7 +229,7 @@ public class UserFeedService extends ServiceBase {
         else {
             SubNode toUserNode = read.getAccountByUserName(ms, req.getToUser(), false);
             if (myAcntNode == null) {
-                myAcntNode = read.getNode(ms, sc.getRootId());
+                myAcntNode = read.getNode(ms, sc.getUserNodeId());
             }
             if (myAcntNode != null) {
                 // sharing from us to the other user.where node is owned by us and the node has any sharing on it.
@@ -245,7 +245,7 @@ public class UserFeedService extends ServiceBase {
 
         if (req.getFromMe()) {
             if (myAcntNode == null) {
-                myAcntNode = read.getNode(ms, sc.getRootId());
+                myAcntNode = read.getNode(ms, sc.getUserNodeId());
             }
             if (myAcntNode != null) {
                 // where node is owned by us. and the node has any sharing on it.

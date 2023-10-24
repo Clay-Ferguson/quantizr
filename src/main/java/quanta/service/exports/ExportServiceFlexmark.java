@@ -177,7 +177,7 @@ public class ExportServiceFlexmark extends ServiceBase {
                         // res.setIpfsCid(ret.getHash());
                         // ---------------
                         // But let's write to MFS now instead!
-                        String mfsPath = "/" + ThreadLocals.getSC().getRootId() + "/exports/" + shortFileName;
+                        String mfsPath = "/" + ThreadLocals.getSC().getUserNodeId() + "/exports/" + shortFileName;
                         ipfsFiles.addFileFromStream(ms, mfsPath, is, mime, null);
                         res.setIpfsCid("/exports/" + shortFileName);
                         // ----------------------------------------------------

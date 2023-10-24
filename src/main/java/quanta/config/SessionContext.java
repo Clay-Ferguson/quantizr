@@ -20,8 +20,6 @@ public class SessionContext {
     private String pubSigKeyJson;
     private boolean live = true;
 
-    // todo-0: this is the same as userNodeId, so remove it.
-    private String rootId;
     /*
      * When the user does a "Timeline" search we store the path of the node the timeline was done on so
      * that with a simple substring search, we can detect any time a new node is added that would've
@@ -78,7 +76,6 @@ public class SessionContext {
     public void forceAnonymous() {
         userToken = null;
         userName = PrincipalName.ANON.s();
-        rootId = null;
         userNodeId = null;
         timelinePath = null;
         watchingPath = null;
@@ -126,14 +123,6 @@ public class SessionContext {
 
     public void setTimeZoneAbbrev(String timeZoneAbbrev) {
         this.timeZoneAbbrev = timeZoneAbbrev;
-    }
-
-    public String getRootId() {
-        return rootId;
-    }
-
-    public void setRootId(String rootId) {
-        this.rootId = rootId;
     }
 
     public UserPreferences getUserPreferences() {

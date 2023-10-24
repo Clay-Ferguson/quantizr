@@ -474,13 +474,13 @@ public class IPFSService extends ServiceBase {
                 SubNode userNode = read.getNode(as, userNodeId, false, null);
                 String key = userNode.getStr(NodeProp.USER_IPFS_KEY);
                 // If we didn't already generate the key for this user, then generate one.
-                if (!sc.getRootId().equals(key)) {
+                if (!sc.getUserNodeId().equals(key)) {
                     // make sure there is an IPFS key with same name as user's root ID.
-                    Map<String, Object> keyGenResult = ipfsKey.gen(as, sc.getRootId());
+                    Map<String, Object> keyGenResult = ipfsKey.gen(as, sc.getUserNodeId());
                     if (keyGenResult == null) {
-                        log.debug("Unable to generate IPFS Key for Name " + sc.getRootId());
+                        log.debug("Unable to generate IPFS Key for Name " + sc.getUserNodeId());
                     } else {
-                        userNode.set(NodeProp.USER_IPFS_KEY, sc.getRootId());
+                        userNode.set(NodeProp.USER_IPFS_KEY, sc.getUserNodeId());
                         log.debug("Key Gen Result: " + XString.prettyPrint(keyGenResult));
                     }
                 }
@@ -507,7 +507,7 @@ public class IPFSService extends ServiceBase {
                 // IPFSDir dir = ipfsFiles.getDir(folderName);
                 cid = pathStat.getHash();
                 log.debug("Publishing CID (root folder): " + cid);
-                Map<String, Object> ret = ipfsName.publish(as, sc.getRootId(), cid);
+                Map<String, Object> ret = ipfsName.publish(as, sc.getUserNodeId(), cid);
                 log.debug("Publishing complete!");
                 userNode.set(NodeProp.USER_DID_IPNS, ret.get("Name"));
                 update.save(as, userNode);

@@ -246,7 +246,6 @@ public class MongoTestService extends ServiceBase {
         SessionContext sc = new SessionContext();
         sc.setUserName(userName);
         sc.setUserNodeId(userNode.getIdStr());
-        sc.setRootId(userNode.getIdStr());
         ThreadLocals.setSC(sc);
 
         MongoSession ms = new MongoSession(userName, userNode.getId());

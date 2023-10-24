@@ -151,8 +151,8 @@ public class Convert extends ServiceBase {
          * put in cipherKey, so send back so the user can decrypt the node.
          */
         String cipherKey = null;
-        if (!ownerId.equals(sc.getRootId()) && node.getAc() != null) {
-            AccessControl ac = node.getAc().get(sc.getRootId());
+        if (!ownerId.equals(sc.getUserNodeId()) && node.getAc() != null) {
+            AccessControl ac = node.getAc().get(sc.getUserNodeId());
             if (ac != null) {
                 cipherKey = ac.getKey();
                 if (cipherKey != null) {

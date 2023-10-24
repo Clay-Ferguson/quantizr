@@ -182,7 +182,7 @@ public class NodeSearchService extends ServiceBase {
                 SubNode searchRoot = null;
 
                 if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRoot())) {
-                    searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
+                    searchRoot = read.getNode(ms, ThreadLocals.getSC().getUserNodeId());
                 } else {
                     searchRoot = read.getNode(ms, req.getNodeId());
                 }
@@ -318,7 +318,7 @@ public class NodeSearchService extends ServiceBase {
          */
         // SubNode searchRoot = api.getNode(session, req.getNodeId());
         // search under account root only
-        SubNode searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
+        SubNode searchRoot = read.getNode(ms, ThreadLocals.getSC().getUserNodeId());
         /*
          * todo-2: Eventually we want two ways of searching here.
          *

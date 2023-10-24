@@ -85,7 +85,7 @@ public class PushService extends ServiceBase {
         // We don't include isPublic here, because we want don't want every message that comes into the
         // server to show up right away on the feed. We expect user to 'refresh' for that.
         // isPublic || // node is public
-        node.getOwner().toHexString().equals(sc.getRootId()) // is my node
+        node.getOwner().toHexString().equals(sc.getUserNodeId()) // is my node
                 || (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath()))
                 || (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath()))
                 || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName()))) {

@@ -253,7 +253,7 @@ public class MongoAuth extends ServiceBase {
             }
         } else {
             // if we have a person/account get their account node first
-            myAcntNode = read.getNode(ms, sc.getRootId());
+            myAcntNode = read.getNode(ms, sc.getUserNodeId());
 
             // if unknown person then again only a condition for public what we want
             if (myAcntNode == null) {
@@ -358,7 +358,7 @@ public class MongoAuth extends ServiceBase {
 
     public boolean ownedByThreadUser(SubNode node) {
         return node != null && node.getOwner() != null
-                && node.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId());
+                && node.getOwner().toHexString().equals(ThreadLocals.getSC().getUserNodeId());
     }
 
     /*

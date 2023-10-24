@@ -161,7 +161,7 @@ public class NodeRenderService extends ServiceBase {
         SubNode node = read.getNode(ms, targetId);
 
         if (node == null && !sc.isAnonUser()) {
-            node = read.getNode(ms, sc.getRootId());
+            node = read.getNode(ms, sc.getUserNodeId());
         }
         adminOnly = acl.isAdminOwned(node);
 
