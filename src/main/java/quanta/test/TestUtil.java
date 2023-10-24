@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
 @Component
-public class RunJUnit extends ServiceBase {
-    private static Logger log = LoggerFactory.getLogger(RunJUnit.class);
+public class TestUtil extends ServiceBase {
+    private static Logger log = LoggerFactory.getLogger(TestUtil.class);
+    public StringBuilder testResults = new StringBuilder();
 
     @Autowired
     private Environment env;
@@ -30,21 +31,31 @@ public class RunJUnit extends ServiceBase {
         }
     }
 
-    public static void runTests() {
+    private void runTests() {
         runTest("quanta.test.MongoTest");
     }
 
-    private static void runTest(String className) {
+    private void runTest(String className) {
         try {
             Class<?> testClass = Class.forName(className);
-            log.debug("Running test class: " + testClass.getName());
+            log("Running test class: " + testClass.getName());
             Result result = JUnitCore.runClasses(testClass);
-            for (Failure failure : result.getFailures()) {
-                log.debug(failure.toString());
+            if (result.getFailureCount() > 0) {
+                for (Failure failure : result.getFailures()) {
+                    log("TEST FAILED: " + failure.toString());
+                }
+            } else {
+                log("All tests passed!");
             }
-            log.debug("Tests Success: " + result.wasSuccessful());
+
         } catch (Exception e) {
             log.error("Error running test class: " + className, e);
         }
+    }
+
+    public void log(String msg) {
+        log.debug("TestUtil: " + msg);
+        testResults.append(msg);
+        testResults.append("\n");
     }
 }

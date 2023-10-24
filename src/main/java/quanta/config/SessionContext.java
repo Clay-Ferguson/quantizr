@@ -19,6 +19,8 @@ public class SessionContext {
     private String command;
     private String pubSigKeyJson;
     private boolean live = true;
+
+    // todo-0: this is the same as userNodeId, so remove it.
     private String rootId;
     /*
      * When the user does a "Timeline" search we store the path of the node the timeline was done on so

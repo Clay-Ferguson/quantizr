@@ -61,6 +61,7 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Performance Report", () => S.view.runServerCommand("performanceReport", null, "Performance Report", null)), //
                         this.settingsLink("Clear Performance Data", () => S.view.runServerCommand("clearPerformanceData", null, "Clear Performance Data", null)), //
+                        this.settingsLink("Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null))
                     ]),
                 ], horzClass),
 

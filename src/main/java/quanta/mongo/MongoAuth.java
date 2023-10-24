@@ -243,7 +243,7 @@ public class MongoAuth extends ServiceBase {
                 throw new RuntimeException("Unable to build writable query by unknown session context");
             }
 
-            // if we have no 'ands', just tack on to existing criterial
+            // if we have no 'ands', just tack on to existing criteria
             if (ands == null) {
                 // if unknown person the simple requirement is to be public
                 return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);

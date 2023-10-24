@@ -307,6 +307,7 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeException("userNode id is null for user: " + userName);
         }
         sc.setRootId(id);
+        // sc.setUserNodeId(id); // todo-0: do this. remove setRootId
         sc.setAllowedFeatures(userNode.getStr(NodeProp.ALLOWED_FEATURES));
         res.setAllowedFeatures(sc.getAllowedFeatures());
         UserPreferences userPreferences = getUserPreferences(userName, userNode);

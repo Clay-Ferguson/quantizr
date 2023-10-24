@@ -70,6 +70,7 @@ import quanta.service.node.NodeMoveService;
 import quanta.service.node.NodeRenderService;
 import quanta.service.node.NodeSearchService;
 import quanta.service.node.OpenAiService;
+import quanta.test.TestUtil;
 import quanta.types.AIAnswerType;
 import quanta.types.BookmarkType;
 import quanta.types.FriendType;
@@ -115,6 +116,7 @@ public class ServiceBase {
     static List<Runnable> postConstructs = new ArrayList<>();
     public static ApplicationContext context;
 
+    public static TestUtil testUtil;
     public static TranRepository tranRepository;
     public static UserRepository userRepository;
     public static EventPublisher publisher;
@@ -222,6 +224,7 @@ public class ServiceBase {
                 return;
             }
             log.debug("Setting ServiceBase Proxy Instances...");
+            testUtil = getBean(ctx, TestUtil.class);
             prop = getBean(ctx, AppProp.class);
             userFeed = getBean(ctx, UserFeedService.class);
             convert = getBean(ctx, Convert.class);

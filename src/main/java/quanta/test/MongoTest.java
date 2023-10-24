@@ -12,12 +12,13 @@ public class MongoTest {
     private static Logger log = LoggerFactory.getLogger(MongoTest.class);
 
     @Test
-    public void test() {
+    public void test() throws Exception {
         try {
             MongoTestService mts = ServiceBase.context.getBean(MongoTestService.class);
             mts.test();
         } catch (Exception e) {
             log.error("MongoTest Failed", e);
+            throw e;
         }
     }
 }
