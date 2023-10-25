@@ -60,8 +60,7 @@ export class AdminView extends AppTab<any, AdminView> {
                     ]),
                     new Div(null, { className: "settingsCol" }, [
                         this.settingsLink("Performance Report", () => S.view.runServerCommand("performanceReport", null, "Performance Report", null)), //
-                        this.settingsLink("Clear Performance Data", () => S.view.runServerCommand("clearPerformanceData", null, "Clear Performance Data", null)), //
-                        this.settingsLink("Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null))
+                        this.settingsLink("Clear Performance Data", () => S.view.runServerCommand("clearPerformanceData", null, "Clear Performance Data", null)) //
                     ]),
                 ], horzClass),
 
@@ -110,12 +109,15 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.sectionTitle("Testing"),
                 new FlexRowLayout([
                     new Div(null, { className: "settingsCol" }, [
+                        this.settingsLink("Run JUnit Tests", () => S.view.runServerCommand("getTestResults", "run", "Test Results", null)),
+                        this.settingsLink("Show Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null)),
                         this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
                         this.settingsLink("Send Email", S.util.sendTestEmail),
                         this.settingsLink("Server Log Text", S.util.sendLogText),
-                        this.settingsLink("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
                     ]),
                     new Div(null, { className: "settingsCol" }, [
+                        this.settingsLink("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
+
                         this.settingsLink("WebCrypto Encryption", async () => {
                             await S.crypto.encryptionTest();
                             S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);

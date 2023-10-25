@@ -259,6 +259,8 @@ services:
             SPRING_DATASOURCE_USERNAME: "quanta-pg"
             SPRING_DATASOURCE_PASSWORD: ${pgPassword}
 
+            # Instead of setting this flag, it may be easier to just click 
+            # "Run JUnit Tests" in the Admin Console of the app
             runJUnit: "false"
             
             adminPassword: "${adminPassword}"

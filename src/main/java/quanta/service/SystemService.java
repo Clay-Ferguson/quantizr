@@ -374,6 +374,10 @@ public class SystemService extends ServiceBase {
         log.debug("Command: " + req.getCommand());
         switch (req.getCommand()) {
             case "getTestResults":
+                if ("run".equals(req.getParameter())) {
+                    testUtil.testResults = new StringBuilder();
+                    testUtil.runTests();
+                }
                 res.getMessages().add(new InfoMessage(testUtil.testResults.toString(), null));
                 break;
             case "redisPubSubTest":

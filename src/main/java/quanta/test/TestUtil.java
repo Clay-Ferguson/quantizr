@@ -25,14 +25,15 @@ public class TestUtil extends ServiceBase {
         super.handleContextRefresh(event);
 
         if ("true".equals(env.getProperty("runJUnit"))) {
-            log.debug("*************** Running JUnit tests ***************");
             runTests();
-            log.debug("***************************************************");
         }
     }
 
-    private void runTests() {
+    public void runTests() {
+        testResults.setLength(0);
+        log("*************** Running JUnit tests (t=" + String.valueOf(System.currentTimeMillis()) + ")");
         runTest("quanta.test.MongoTest");
+        log.debug("***************************************************");
     }
 
     private void runTest(String className) {
