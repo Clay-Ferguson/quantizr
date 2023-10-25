@@ -119,6 +119,12 @@ public class MongoUtil extends ServiceBase {
          * regardless of any existing ones
          */
         if (!path.endsWith("/") && pathIsAvailable(path)) {
+            // we must proactively delete any orphaned nodes that might be existing and would be 'ressurected'
+            // which would be BAD!
+            long orphans = delete.simpleDeleteUnderPath(null, path);
+            if (orphans > 0) {
+                log.debug("New Path Found: " + path + " deleted " + orphans + " orphans");
+            }
             return path;
         }
         int tries = 0;
@@ -145,6 +151,12 @@ public class MongoUtil extends ServiceBase {
                 path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
             }
             if (pathIsAvailable(path)) {
+                // we must proactively delete any orphaned nodes that might be existing and would be 'ressurected'
+                // which would be BAD!
+                long orphans = delete.simpleDeleteUnderPath(null, path);
+                if (orphans > 0) {
+                    log.debug("New Path Found: " + path + " deleted " + orphans + " orphans");
+                }
                 return path;
             }
             tries++;
