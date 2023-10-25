@@ -183,9 +183,16 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         }
         if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled()
                 && (isNew || node.verifyParentPath)) {
-            read.checkParentExists(null, node.getPath());
+            try {
+                read.checkParentExists(null, node.getPath());
+            } catch (Exception e) {
+                dbObj.put(SubNode.ID, null);
+                node.setId(null);
+                log.error("Parent path did not exist: " + node.getPath(), e);
+                throw e;
+            }
         }
-        saveAuthByThread(node, isNew);
+        saveAuthByThread(node, dbObj, isNew);
 
         /* Node name not allowed to contain : or ~ */
         String nodeName = node.getName();
@@ -297,7 +304,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     }
 
     /* To save a node you must own the node and have WRITE access to it's parent */
-    public void saveAuthByThread(SubNode node, boolean isNew) {
+    public void saveAuthByThread(SubNode node, Document dbObj, boolean isNew) {
         // during server init no auth is required.
         if (!MongoRepository.fullInit) {
             return;
@@ -306,6 +313,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             return;
         if (verbose)
             log.trace("saveAuth in MongoListener");
+
         MongoSession ms = ThreadLocals.getMongoSession();
         if (ms != null) {
             if (ms.isAdmin())
@@ -315,10 +323,27 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             // only if this is creating a new node do we need to check that the parent will allow it
             if (isNew) {
                 SubNode parent = read.getParent(ms, node);
-                if (parent == null)
+                if (parent == null) {
+
+                    log.debug("This SAVE should've been rejected: " + XString.prettyPrint(node));
+
+                    /*
+                     * Make MongoDB fail to save this bp sabatoging the ID here. It's the only way to abort the save.
+                     * Supposedly throwing the Exception which we do below, is supposed to abort saves but it's not
+                     * working where as nullifying the ID does indeed abort the save.
+                     */
+                    dbObj.put(SubNode.ID, null);
+                    node.setId(null);
+
                     throw new RuntimeException("unable to get node parent: " + node.getParentPath());
+                }
+
                 auth.writeAuth(ms, parent);
                 if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
+                    // ditto note above about aborting the save
+                    dbObj.put(SubNode.ID, null);
+                    node.setId(null);
+
                     throw new ForbiddenException();
                 }
             }

@@ -42,7 +42,7 @@ public class MongoUpdate extends ServiceBase {
         if (node == null)
             return;
         arun.run(as -> {
-            SubNode parent = read.findNodeByPath(null, node.getParentPath(), false);
+            SubNode parent = read.findNodeByPath(as, node.getParentPath(), false);
             if (parent != null) {
                 parent.setHasChildren(true);
             }

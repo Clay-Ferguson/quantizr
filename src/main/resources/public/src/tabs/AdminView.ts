@@ -64,6 +64,43 @@ export class AdminView extends AppTab<any, AdminView> {
                     ]),
                 ], horzClass),
 
+                this.sectionTitle("Testing"),
+                new FlexRowLayout([
+                    new Div(null, { className: "settingsCol" }, [
+                        this.settingsLink("Run JUnit Tests", () => S.view.runServerCommand("getTestResults", "run", "Test Results", null)),
+                        this.settingsLink("Show Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null)),
+                        this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
+                        this.settingsLink("Send Email", S.util.sendTestEmail),
+                        this.settingsLink("Server Log Text", S.util.sendLogText),
+                    ]),
+                    new Div(null, { className: "settingsCol" }, [
+                        this.settingsLink("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
+
+                        this.settingsLink("WebCrypto Encryption", async () => {
+                            await S.crypto.encryptionTest();
+                            S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
+                        }),
+                        this.settingsLink("WebCrypto Signatures", async () => {
+                            await S.crypto.signatureTest();
+                            S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
+                        }),
+                        this.settingsLink("Text to Speech", async () => {
+                            const tts = window.speechSynthesis;
+                            // /// let voices = tts.getVoices();
+                            // /// for (let i = 0; i < voices.length; i++) {
+                            // ///     let voice = voices[i];
+                            // ///     // Google UK English Female (en-GB)
+                            // ///     console.log("Voice: " + voice.name + " (" + voice.lang + ") " + (voice.default ? "<-- Default" : ""));
+                            // /// }
+
+                            /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
+                            on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
+                            const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
+                            tts.speak(sayThis);
+                        })
+                    ])
+                ], horzClass),
+
                 this.sectionTitle("Utils"),
                 new FlexRowLayout([
                     new Div(null, { className: "settingsCol" }, [
@@ -104,44 +141,7 @@ export class AdminView extends AppTab<any, AdminView> {
                         this.settingsLink("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null)), //
                         this.settingsLink("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null)),
                     ])
-                ], horzClass),
-
-                this.sectionTitle("Testing"),
-                new FlexRowLayout([
-                    new Div(null, { className: "settingsCol" }, [
-                        this.settingsLink("Run JUnit Tests", () => S.view.runServerCommand("getTestResults", "run", "Test Results", null)),
-                        this.settingsLink("Show Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null)),
-                        this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
-                        this.settingsLink("Send Email", S.util.sendTestEmail),
-                        this.settingsLink("Server Log Text", S.util.sendLogText),
-                    ]),
-                    new Div(null, { className: "settingsCol" }, [
-                        this.settingsLink("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
-
-                        this.settingsLink("WebCrypto Encryption", async () => {
-                            await S.crypto.encryptionTest();
-                            S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
-                        }),
-                        this.settingsLink("WebCrypto Signatures", async () => {
-                            await S.crypto.signatureTest();
-                            S.util.showMessage("Crypto Test Complete. Check browser console for output.", "Note", true);
-                        }),
-                        this.settingsLink("Text to Speech", async () => {
-                            const tts = window.speechSynthesis;
-                            // /// let voices = tts.getVoices();
-                            // /// for (let i = 0; i < voices.length; i++) {
-                            // ///     let voice = voices[i];
-                            // ///     // Google UK English Female (en-GB)
-                            // ///     console.log("Voice: " + voice.name + " (" + voice.lang + ") " + (voice.default ? "<-- Default" : ""));
-                            // /// }
-
-                            /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
-                            on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
-                            const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
-                            tts.speak(sayThis);
-                        })
-                    ])
-                ], horzClass),
+                ], horzClass)
             ])
         ]);
         return true;

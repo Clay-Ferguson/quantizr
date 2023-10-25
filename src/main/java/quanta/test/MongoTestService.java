@@ -1,5 +1,8 @@
 package quanta.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -18,6 +21,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
+import quanta.util.XString;
 
 /**
  * This is actually where I just run various experiments related to MongoDB, and this is not
@@ -80,9 +84,7 @@ public class MongoTestService extends ServiceBase {
     public void authTest() {
         MongoSession as = asUser(PrincipalName.ADMIN.s());
         SubNode adminNode = read.getAccountByUserName(as, PrincipalName.ADMIN.s(), false);
-        if (adminNode == null) {
-            throw new RuntimeEx("Unable to find admin user node.");
-        }
+        assertNotNull("Checking adminNode existed", adminNode);
 
         // root for all testing. Note: '?' indicates to find any available path (generates a new path)
         SubNode testingRoot = create.createNode(as, "/r/?");
@@ -90,10 +92,10 @@ public class MongoTestService extends ServiceBase {
         update.save(as, testingRoot);
 
         // Insert a test node
-        SubNode adminsNode = create.createNode(as, testingRoot.getPath() + "/?");
-        adminsNode.setContent("admin's test node " + System.currentTimeMillis());
-        update.save(as, adminsNode);
-        ObjectId insertedId = adminsNode.getId();
+        SubNode adminsChild = create.createNode(as, testingRoot.getPath() + "/?");
+        adminsChild.setContent("admin's test node " + System.currentTimeMillis());
+        update.save(as, adminsChild);
+        ObjectId insertedId = adminsChild.getId();
         testUtil.log("admin inserted a node: " + insertedId.toString());
 
         // login as adam
@@ -101,8 +103,8 @@ public class MongoTestService extends ServiceBase {
 
         // adam tries to set the path on adminsNode
         try {
-            adminsNode.setPath(adminsNode.getPath() + "abc");
-            update.save(adamSession, adminsNode);
+            adminsChild.setPath(adminsChild.getPath() + "abc");
+            update.save(adamSession, adminsChild);
             throw new RuntimeException("failed to block path alter.");
         } catch (ForbiddenException e) {
             testUtil.log("Successful path alter blocked.");
@@ -121,44 +123,48 @@ public class MongoTestService extends ServiceBase {
         try {
             testUtil.log("Test reject for being invalid root insert.");
             SubNode adamsNode = create.createNode(adamSession, testingRoot.getPath() + "/?");
-            adamsNode.setContent("adam's test node " + System.currentTimeMillis());
+            adamsNode.setContent("adam's test node (should not save 1) " + System.currentTimeMillis());
             update.save(adamSession, adamsNode);
         } catch (Exception e) {
+            log.debug("Caught expected exception: " + e);
             success = true;
             testUtil.log("successfully blocked invalid create (in root)");
         }
-        if (!success)
-            throw new RuntimeException("allowed node in secure area");
+        assertTrue("rejected invalid insert", success);
+
+        long childCount = read.getChildCountRecursive(as, testingRoot.getPath());
+        assertEquals("childCount Check", childCount, 1);
 
         // adam attempts and fails to create a node under adminsNode
         success = false;
         try {
-            testUtil.log("Insecure insert test (under adminsNode)");
-            SubNode adamsNode = create.createNode(adamSession, adminsNode.getPath() + "/?");
-            adamsNode.setContent("adam's test node " + System.currentTimeMillis());
+            testUtil.log("Insecure insert test (under adminsChild)");
+            SubNode adamsNode = create.createNode(adamSession, adminsChild.getPath() + "/?");
+            adamsNode.setContent("adam's test node (should not save 2)" + System.currentTimeMillis());
             update.save(adamSession, adamsNode);
         } catch (Exception e) {
             success = true;
             testUtil.log("successfully blocked invalid create (in an admin node)");
         }
-        if (!success) {
-            throw new RuntimeException("allowed node in secure area");
-        }
+        assertTrue("disallowed insert text", success);
+
+        childCount = read.getChildCountRecursive(as, testingRoot.getPath());
+        assertEquals(childCount, 1);
 
         // adam successfully inserts node in his root
         SubNode adamsNode = null;
         SubNode adamsRootNode = read.getAccountByUserName(adamSession, "adam", false);
-        if (adamsRootNode != null) {
-            adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
-            adamsNode.setContent("adam's test node " + System.currentTimeMillis());
-            update.save(adamSession, adamsNode);
-            insertedId = adamsNode.getId();
-            testUtil.log("adam inserted a node: " + insertedId.toString());
-        }
+        assertTrue(adamsRootNode != null);
+
+        adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
+        adamsNode.setContent("adam's test node (should save ok)" + System.currentTimeMillis());
+        update.save(adamSession, adamsNode);
+        insertedId = adamsNode.getId();
+        testUtil.log("adam inserted a node: " + insertedId.toString());
 
         // admin tries to save a duplicated path
         as = asUser(PrincipalName.ADMIN.s());
-        adamsNode.setPath(adminsNode.getPath());
+        adamsNode.setPath(adminsChild.getPath());
         success = false;
         try {
             ThreadLocals.setMongoSession(as);
@@ -167,9 +173,8 @@ public class MongoTestService extends ServiceBase {
             success = true;
             testUtil.log("Successfully rejected key dup.");
         }
-        if (!success) {
-            throw new RuntimeException("failed to detect keydup.");
-        }
+        adamsNode = null; // set to null now that we monkeyed with the path
+        assertTrue("reject dup key", success);
 
         // adam tries and fails to save adminsNode
         adamSession = asUser("adam");
@@ -177,45 +182,50 @@ public class MongoTestService extends ServiceBase {
         try {
             testUtil.log("Attempting save by wrong user.");
             ThreadLocals.setMongoSession(adamSession);
-            update.save(adamSession, adminsNode);
+            update.save(adamSession, adminsChild);
         } catch (ForbiddenException e) {
             success = true;
             testUtil.log("Successfully blocked save by wrong user.");
         }
-        if (!success) {
-            throw new RuntimeException("failed to block.");
-        }
+        assertTrue("wrong user insert", success);
+
+        as = asUser(PrincipalName.ADMIN.s());
+        childCount = read.getChildCount(as, testingRoot.getPath());
+        assertEquals("childCount Check", 1, childCount);
+
+        String testingRootPath = testingRoot.getPath();
+        long delCount = delete.delete(as, testingRoot, false);
+        testUtil.log("Deleted " + delCount + " nodes by deleting " + testingRootPath);
+
+        childCount = read.getChildCountRecursive(as, testingRootPath);
+        assertEquals("childCount after test root Del: ", 0, childCount);
     }
 
     public void testPathRegex() {
         // Direct Children Test
         String dc = mongoUtil.regexChildren("/abc");
-        verify("/abc/def".matches(dc));
-        verify("/abc/abc".matches(dc));
-        verify(!"/abc/def/x".matches(dc));
-        verify(!"/abc/def/x/".matches(dc));
-        verify(!"/abc/def/".matches(dc));
-        verify(!"/abc/def/abc".matches(dc));
-        verify(!"/arq/def/abc".matches(dc));
-        verify(!"/abc/def/abc/".matches(dc));
-        verify(!"/abc/abc/abc/".matches(dc));
-        verify(!"/abcx".matches(dc));
+        assertTrue("/abc/def".matches(dc));
+        assertTrue("/abc/abc".matches(dc));
+        assertTrue(!"/abc/def/x".matches(dc));
+        assertTrue(!"/abc/def/x/".matches(dc));
+        assertTrue(!"/abc/def/".matches(dc));
+        assertTrue(!"/abc/def/abc".matches(dc));
+        assertTrue(!"/arq/def/abc".matches(dc));
+        assertTrue(!"/abc/def/abc/".matches(dc));
+        assertTrue(!"/abc/abc/abc/".matches(dc));
+        assertTrue(!"/abcx".matches(dc));
+
         // Recursive Children Test
         String rc = mongoUtil.regexSubGraph("/abc");
-        verify("/abc/x".matches(rc));
-        verify("/abc/def".matches(rc));
-        verify("/abc/def/x".matches(rc));
-        verify("/abc/def/xyz/nop".matches(rc));
-        verify(!"/abcx".matches(rc));
-        // the final slash is built into the query.
-        verify(!"/abc".matches(rc));
-        testUtil.log("All REGEX Path tests ok.");
-    }
+        assertTrue("/abc/x".matches(rc));
+        assertTrue("/abc/def".matches(rc));
+        assertTrue("/abc/def/x".matches(rc));
+        assertTrue("/abc/def/xyz/nop".matches(rc));
+        assertTrue(!"/abcx".matches(rc));
 
-    public void verify(boolean val) {
-        if (!val) {
-            throw new RuntimeException("Assertion failed.");
-        }
+        // the final slash is built into the query.
+        assertTrue(!"/abc".matches(rc));
+        testUtil.log("All REGEX Path tests ok.");
     }
 
     public void runBinaryTests(MongoSession ms) {
@@ -249,11 +259,7 @@ public class MongoTestService extends ServiceBase {
         ThreadLocals.setSC(sc);
 
         MongoSession ms = new MongoSession(userName, userNode.getId());
-        asSession(ms);
-        return ms;
-    }
-
-    private void asSession(MongoSession ms) {
         ThreadLocals.setMongoSession(ms);
+        return ms;
     }
 }

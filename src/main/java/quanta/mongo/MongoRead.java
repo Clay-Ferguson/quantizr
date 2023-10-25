@@ -144,6 +144,18 @@ public class MongoRead extends ServiceBase {
         return opsw.count(ms, q);
     }
 
+    public long getChildCountRecursive(MongoSession ms, String path) {
+        // statistically I think it pays off to always try the faster way and then assume worst case is that
+        // we might have warmed up the MongoDb for what the following query will need.
+        if (noChildren(ms, path))
+            return 0;
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path));
+        crit = auth.addReadSecurity(ms, crit);
+        q.addCriteria(crit);
+        return opsw.count(ms, q);
+    }
+
     /*
      * we only update the hasChildren if allowAuth is false, because allowAuth would be a
      * person-specific exact query, unlike what the hasChildren represents which is a global

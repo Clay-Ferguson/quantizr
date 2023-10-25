@@ -158,6 +158,13 @@ public class MongoDelete extends ServiceBase {
         return res.getDeletedCount();
     }
 
+    public long simpleDeleteUnderPath(MongoSession ms, String path) {
+        Query q = new Query();
+        q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
+        DeleteResult res = opsw.remove(ms, q);
+        return res.getDeletedCount();
+    }
+
     // deletes without checking any security
     public void adminDelete(ObjectId id) {
         MongoSession as = auth.getAdminSession();
