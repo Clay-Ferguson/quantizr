@@ -859,16 +859,7 @@ public class MongoUtil extends ServiceBase {
      */
     public String regexChildren(String path) {
         path = XString.stripIfEndsWith(path, "/");
-        // NOTES:
-        // - The leftmost caret (^) matches path to first part of the string (i.e. starts with 'path')
-        // - The caret inside the ([]) means "not" containing the '/' char.
-        // - \\/ is basically just '/' (escaped properly)
-        // - The '*' means we match the "not /" condition one or more times.
-        // legacy version (asterisk ouside group)
-        return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
-        // This version also works (node the '*' location), but testing didn't show any performance
-        // difference
-        // return "^" + Pattern.quote(path) + "\\/([^\\/]*)$";
+        return "^" + Pattern.quote(path) + "\\/[^\\/]+$";
     }
 
     /*
@@ -880,21 +871,16 @@ public class MongoUtil extends ServiceBase {
      */
     public String regexSubGraph(String path) {
         path = XString.stripIfEndsWith(path, "/");
-        // Based on this page:
-        // https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use
-        // It looks like this might be the best performance here:
-        return "^" + Pattern.quote(path) + "\\/";
-        // Legacy implementation
-        // return "^" + Pattern.quote(path) + "\\/(.+)$";
+        return "^" + Pattern.quote(path) + "\\/.+$";
+    }
+
+    public String regexSubGraphAndRoot(String path) {
+        path = XString.stripIfEndsWith(path, "/");
+        return "^" + Pattern.quote(path) + "(\\/.+)?$";
     }
 
     public boolean isChildOf(SubNode parent, SubNode child) {
         return child.getParentPath().equals(parent.getPath());
-    }
-
-    public String regexRecursiveChildrenOfPathIncludeRoot(String path) {
-        path = XString.stripIfEndsWith(path, "/");
-        return "^" + Pattern.quote(path) + "\\/|^" + Pattern.quote(path) + "$";
     }
 
     public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated,

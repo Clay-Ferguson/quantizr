@@ -673,4 +673,20 @@ public class MongoAuth extends ServiceBase {
             node.setAc(ac);
         }
     }
+
+    public MongoSession asUser(String userName) {
+        SubNode userNode = read.getAccountByUserName(null, userName, false);
+        if (userNode == null) {
+            throw new RuntimeException("UserNode not found for userName " + userName);
+        }
+
+        SessionContext sc = new SessionContext();
+        sc.setUserName(userName);
+        sc.setUserNodeId(userNode.getIdStr());
+        ThreadLocals.setSC(sc);
+
+        MongoSession ms = new MongoSession(userName, userNode.getId());
+        ThreadLocals.setMongoSession(ms);
+        return ms;
+    }
 }

@@ -1,27 +1,24 @@
 package quanta.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
-import quanta.exception.base.RuntimeEx;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.LimitedInputStreamEx;
+import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.XString;
 
 /**
  * This is actually where I just run various experiments related to MongoDB, and this is not
@@ -37,9 +34,7 @@ public class MongoTestService extends ServiceBase {
         testUtil.log("MongoTest Running");
 
         authTest();
-
-        // testDirtyReads();
-        // testPathRegex();
+        testPathRegex();
 
         // // Verify we can lookup the node we just inserted, by ObjectId
         // SubNode nodeFoundById = read.getNode(adminSession, node.getId());
@@ -73,7 +68,7 @@ public class MongoTestService extends ServiceBase {
         // if (!uniqueViolationCaught) {
         // throw new RuntimeEx("Failed to catch unique constraint violation.");
         // }
-        // runBinaryTests(adminSession);
+
         testUtil.log("Mongo Test Completed.");
     }
 
@@ -82,7 +77,7 @@ public class MongoTestService extends ServiceBase {
      * several kinds of operations he should not be allowed to do, and then some he should be allowed to
      */
     public void authTest() {
-        MongoSession as = asUser(PrincipalName.ADMIN.s());
+        MongoSession as = auth.asUser(PrincipalName.ADMIN.s());
         SubNode adminNode = read.getAccountByUserName(as, PrincipalName.ADMIN.s(), false);
         assertNotNull("Checking adminNode existed", adminNode);
 
@@ -99,7 +94,7 @@ public class MongoTestService extends ServiceBase {
         testUtil.log("admin inserted a node: " + insertedId.toString());
 
         // login as adam
-        MongoSession adamSession = asUser("adam");
+        MongoSession adamSession = auth.asUser("adam");
 
         // adam tries to set the path on adminsNode
         try {
@@ -163,7 +158,7 @@ public class MongoTestService extends ServiceBase {
         testUtil.log("adam inserted a node: " + insertedId.toString());
 
         // admin tries to save a duplicated path
-        as = asUser(PrincipalName.ADMIN.s());
+        as = auth.asUser(PrincipalName.ADMIN.s());
         adamsNode.setPath(adminsChild.getPath());
         success = false;
         try {
@@ -177,7 +172,7 @@ public class MongoTestService extends ServiceBase {
         assertTrue("reject dup key", success);
 
         // adam tries and fails to save adminsNode
-        adamSession = asUser("adam");
+        adamSession = auth.asUser("adam");
         success = false;
         try {
             testUtil.log("Attempting save by wrong user.");
@@ -189,7 +184,7 @@ public class MongoTestService extends ServiceBase {
         }
         assertTrue("wrong user insert", success);
 
-        as = asUser(PrincipalName.ADMIN.s());
+        as = auth.asUser(PrincipalName.ADMIN.s());
         childCount = read.getChildCount(as, testingRoot.getPath());
         assertEquals("childCount Check", 1, childCount);
 
@@ -205,61 +200,62 @@ public class MongoTestService extends ServiceBase {
         // Direct Children Test
         String dc = mongoUtil.regexChildren("/abc");
         assertTrue("/abc/def".matches(dc));
-        assertTrue("/abc/abc".matches(dc));
-        assertTrue(!"/abc/def/x".matches(dc));
-        assertTrue(!"/abc/def/x/".matches(dc));
-        assertTrue(!"/abc/def/".matches(dc));
-        assertTrue(!"/abc/def/abc".matches(dc));
-        assertTrue(!"/arq/def/abc".matches(dc));
-        assertTrue(!"/abc/def/abc/".matches(dc));
-        assertTrue(!"/abc/abc/abc/".matches(dc));
-        assertTrue(!"/abcx".matches(dc));
+        assertTrue("/abc/de".matches(dc));
+        assertTrue("/abc/d".matches(dc));
+        assertFalse("/abc".matches(dc));
+        assertFalse("/abc/".matches(dc));
+        assertFalse("/abc/def/x".matches(dc));
+        assertFalse("/abc/def/x/".matches(dc));
+        assertFalse("/abc/def/".matches(dc));
+        assertFalse("/abc/def/abc".matches(dc));
+        assertFalse("/arq/def/abc".matches(dc));
+        assertFalse("/abc/def/abc/".matches(dc));
+        assertFalse("/abc/abc/abc/".matches(dc));
+        assertFalse("/abcx".matches(dc));
+        assertFalse("/abcx/".matches(dc));
 
         // Recursive Children Test
         String rc = mongoUtil.regexSubGraph("/abc");
+        assertFalse("/abc".matches(rc));
         assertTrue("/abc/x".matches(rc));
         assertTrue("/abc/def".matches(rc));
         assertTrue("/abc/def/x".matches(rc));
         assertTrue("/abc/def/xyz/nop".matches(rc));
-        assertTrue(!"/abcx".matches(rc));
+        assertFalse("/abcx".matches(rc));
 
-        // the final slash is built into the query.
-        assertTrue(!"/abc".matches(rc));
+        rc = mongoUtil.regexSubGraphAndRoot("/abc");
+        assertTrue("/abc".matches(rc));
+        assertTrue("/abc/x".matches(rc));
+        assertTrue("/abc/def".matches(rc));
+        assertTrue("/abc/def/x".matches(rc));
+        assertTrue("/abc/def/xyz/nop".matches(rc));
+        assertFalse("/abcx".matches(rc));
+
         testUtil.log("All REGEX Path tests ok.");
     }
 
-    public void runBinaryTests(MongoSession ms) {
+    public void runBinaryTests(MongoSession ms) throws Exception {
         testUtil.log("Running binaries tests.");
+        MongoSession as = auth.asUser(PrincipalName.ADMIN.s());
+
+        // root for all testing. Note: '?' indicates to find any available path (generates a new path)
+        SubNode testingRoot = create.createNode(as, "/r/?");
+        testingRoot.setContent("Root for Upload Testing");
+        update.save(as, testingRoot);
+
+        InputStream is = null;
+        String resourceName = "classpath:/public/branding/logo-50px-tr.jpg";
         try {
-            SubNode node = create.createNode(ms, "/binaries");
-            update.save(ms, node);
+            Resource resource = context.getResource(resourceName);
+            is = resource.getInputStream();
+
             long maxFileSize = user.getUserStorageRemaining(ms);
-            attach.writeStream(ms, false, "", node,
-                    new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null,
-                    "image/png", null);
-            update.save(ms, node);
+            attach.writeStream(ms, false, "", testingRoot, new LimitedInputStreamEx(is, maxFileSize), null, "image/png",
+                    null);
+            update.save(ms, testingRoot);
             testUtil.log("inserted root for binary testing.");
-            InputStream inStream = attach.getStream(ms, "", node, true);
-            FileUtils.copyInputStreamToFile(inStream, new File("/home/clay/test-image2.png"));
-            testUtil.log("completed reading back the file, and writing out a copy.");
-        } catch (Exception e) {
-            throw new RuntimeEx(e);
+        } finally {
+            StreamUtil.close(is);
         }
-    }
-
-    private MongoSession asUser(String userName) {
-        SubNode userNode = read.getAccountByUserName(null, userName, false);
-        if (userNode == null) {
-            throw new RuntimeException("UserNode not found for userName " + userName);
-        }
-
-        SessionContext sc = new SessionContext();
-        sc.setUserName(userName);
-        sc.setUserNodeId(userNode.getIdStr());
-        ThreadLocals.setSC(sc);
-
-        MongoSession ms = new MongoSession(userName, userNode.getId());
-        ThreadLocals.setMongoSession(ms);
-        return ms;
     }
 }
