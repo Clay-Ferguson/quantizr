@@ -20,10 +20,6 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
-/**
- * This is actually where I just run various experiments related to MongoDB, and this is not
- * supposed to be any thing like a unit test for the mongo stuff.
- */
 @Component("MongoTestService")
 public class MongoTestService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoTestService.class);
@@ -36,39 +32,6 @@ public class MongoTestService extends ServiceBase {
         authTest();
         testPathRegex();
         runBinaryTests();
-
-        // // Verify we can lookup the node we just inserted, by ObjectId
-        // SubNode nodeFoundById = read.getNode(adminSession, node.getId());
-        // if (no(nodeFoundById )) {
-        // throw new RuntimeEx("Unable to find node by id.");
-        // }
-        // // Verify a lookup by hex string
-        // SubNode nodeFoundByStrId = read.getNode(adminSession,
-        // node.getIdStr());
-        // if (no(nodeFoundByStrId )) {
-        // throw new RuntimeEx("Unable to find node by id: " +
-        // node.getIdStr());
-        // }
-        // // Set a property on the node and save the node
-        // node.setProp("testKeyA", "tesetValA");
-        // update.save(adminSession, node);
-        // testUtil.log("updated first node.");
-        // String newGuyName = "newguy";
-        // SubNode stuffOwnerNode = util.createUser(adminSession, newGuyName, "",
-        // "passy", true);
-        // MongoSession session = MongoSession.createFromNode(stuffOwnerNode);
-        // // ----------Verify an attempt to write a duplicate 'path' fails
-        // boolean uniqueViolationCaught = false;
-        // try {
-        // SubNode dupNode = create.createNode(adminSession, "/usrx");
-        // update.save(adminSession, dupNode);
-        // }
-        // catch (Exception e) {
-        // uniqueViolationCaught = true;
-        // }
-        // if (!uniqueViolationCaught) {
-        // throw new RuntimeEx("Failed to catch unique constraint violation.");
-        // }
 
         testUtil.log("Mongo Test Completed.");
     }
