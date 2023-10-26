@@ -870,6 +870,8 @@ public class AttachmentService extends ServiceBase {
          */
         att.setBin(id);
         att.setSize(streamCount);
+        att.setMime(mimeType);
+
         if (importMode) {
             log.debug("Setting attachment id to " + id + " on subNode " + att.getOwnerNode().getIdStr());
         }

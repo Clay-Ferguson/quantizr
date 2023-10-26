@@ -35,6 +35,7 @@ public class MongoTestService extends ServiceBase {
 
         authTest();
         testPathRegex();
+        runBinaryTests();
 
         // // Verify we can lookup the node we just inserted, by ObjectId
         // SubNode nodeFoundById = read.getNode(adminSession, node.getId());
@@ -234,7 +235,7 @@ public class MongoTestService extends ServiceBase {
         testUtil.log("All REGEX Path tests ok.");
     }
 
-    public void runBinaryTests(MongoSession ms) throws Exception {
+    public void runBinaryTests() throws Exception {
         testUtil.log("Running binaries tests.");
         MongoSession as = auth.asUser(PrincipalName.ADMIN.s());
 
@@ -249,11 +250,13 @@ public class MongoTestService extends ServiceBase {
             Resource resource = context.getResource(resourceName);
             is = resource.getInputStream();
 
-            long maxFileSize = user.getUserStorageRemaining(ms);
-            attach.writeStream(ms, false, "", testingRoot, new LimitedInputStreamEx(is, maxFileSize), null, "image/png",
-                    null);
-            update.save(ms, testingRoot);
+            long maxFileSize = user.getUserStorageRemaining(as);
+            attach.writeStream(as, false, "att-name", testingRoot, new LimitedInputStreamEx(is, maxFileSize),
+                    "file-name", "image/jpeg", null);
+            update.save(as, testingRoot);
             testUtil.log("inserted root for binary testing.");
+
+            delete.delete(as, testingRoot, false);
         } finally {
             StreamUtil.close(is);
         }
