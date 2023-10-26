@@ -48,8 +48,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     })
                 ]),
                 new Div("Click to Add Files (or Drag and Drop)"),
-                this.dropzoneDiv = new Div("", { className: "dropzone" }),
-                this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
+
+                // WARNING: Keep these static IDs here, because when the page rerenders dropzone knows these IDs
+                // and dropzone will malfunction if these IDs change.
+                this.dropzoneDiv = new Div("", { id: "dropzone", className: "dropzone" }),
+                this.hiddenInputContainer = new Div(null, { id: "dropzoneInput", style: { display: "none" } }),
+
                 this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
                     this.importMode ? null : new IconButton("fa-cloud", "Web/URL", {
