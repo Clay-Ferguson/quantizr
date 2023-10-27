@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APOOrderedCollection;
@@ -21,6 +20,7 @@ import quanta.service.AclService;
  */
 @Component
 public class ActPubReplies extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(ActPubReplies.class);
 
     /**

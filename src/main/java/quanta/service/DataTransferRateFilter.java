@@ -109,6 +109,8 @@ public class DataTransferRateFilter extends GenericFilterBean {
 
         private ServletOutputStream original;
         private AtomicLong count = new AtomicLong();
+
+        @SuppressWarnings("unused")
         private WriteListener writeListener;
 
         public CountingServletOutputStream(ServletOutputStream original) {

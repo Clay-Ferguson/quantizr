@@ -826,7 +826,7 @@ public class ActPubService extends ServiceBase {
         String inReplyTo = apStr(obj, APObj.inReplyTo);
         String replyToId = null;
         /* This will say null unless inReplyTo is used to get an id to lookup */
-        SubNode nodeBeingRepliedTo = null;
+
         /*
          * Detect if inReplyTo is formatted like this: 'https://quanta.wiki?id=xxxxx' (proprietary URL
          * format for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
@@ -838,40 +838,45 @@ public class ActPubService extends ServiceBase {
                 replyToId = inReplyTo.substring(lastIdx + 1);
             }
         }
-        /*
-         * DO NOT DELETE (THIS MAY COME BACK)
-         *
-         * by removing this line, we change the design to where inbound replies always go into user's POSTS
-         * node, rather than underneath the node they're replying to. I'm leaving this line here in case
-         * there are scenarios in the future where we might want this old functionality back where replies
-         * go in to subnodes under the thing bring replied to,.
-         * 
-         * nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
-         *
-         * If a foreign user is replying to a specific node, we put the reply under that node
-         *
-         * NOTE: yes this is code path is intentionally disabled by commenting out the setting of
-         * nodeBeingRepliedTo above (see note above: do not delete this dead block of code)
-         */
-        if (nodeBeingRepliedTo != null) {
-            log.trace("foreign actor replying to a quanta node.");
-            saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null, encodedKey, true,
-                    replyToId);
-        } else /*
-                * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
-                * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that this new
-                * node will show up in those people's FEEDs
-                */ {
-            log.trace("not reply to existing Quanta node.");
-            // get actor's account node from their actorUrl
-            SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
-            if (actorAccountNode != null) {
-                String userName = actorAccountNode.getStr(NodeProp.USER);
-                SubNode postsNode = user.getPostsNode(as, userName, actorAccountNode);
-                saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey,
-                        true, replyToId);
-            }
+
+        // /*
+        // * DO NOT DELETE (THIS MAY COME BACK)
+        // *
+        // * by removing this line, we change the design to where inbound replies always go into user's
+        // POSTS
+        // * node, rather than underneath the node they're replying to. I'm leaving this line here in case
+        // * there are scenarios in the future where we might want this old functionality back where replies
+        // * go in to subnodes under the thing bring replied to,.
+        // *
+        // * nodeBeingRepliedTo = read.getNode(as, replyToId, false, null);
+        // *
+        // * If a foreign user is replying to a specific node, we put the reply under that node
+        // *
+        // * NOTE: yes this is code path is intentionally disabled by commenting out the setting of
+        // * nodeBeingRepliedTo above (see note above: do not delete this dead block of code)
+        // */
+        // if (nodeBeingRepliedTo != null) {
+        // log.trace("foreign actor replying to a quanta node.");
+        // saveInboundForeignObj(as, null, null, nodeBeingRepliedTo, obj, activity.getType(), null,
+        // encodedKey, true,
+        // replyToId);
+        // }
+        // /*
+        // * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
+        // * on our server, and then we add 'sharing' to it for each person in the 'to/cc' so that this new
+        // * node will show up in those people's FEEDs
+        // */
+        // else {
+        log.trace("not reply to existing Quanta node.");
+        // get actor's account node from their actorUrl
+        SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
+        if (actorAccountNode != null) {
+            String userName = actorAccountNode.getStr(NodeProp.USER);
+            SubNode postsNode = user.getPostsNode(as, userName, actorAccountNode);
+            saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey,
+                    true, replyToId);
         }
+        // }
     }
 
     /*

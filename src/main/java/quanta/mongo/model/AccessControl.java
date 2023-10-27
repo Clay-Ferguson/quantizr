@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @TypeAlias("ac")
 @JsonInclude(Include.NON_NULL)
 public class AccessControl {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(AccessControl.class);
     public static final String FIELD_PRVS = "prvs";
 

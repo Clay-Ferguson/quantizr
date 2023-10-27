@@ -981,6 +981,7 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
+    @SuppressWarnings("unused")
     public int getGridItemCount() {
         return arun.run(as -> {
             int count = 0;

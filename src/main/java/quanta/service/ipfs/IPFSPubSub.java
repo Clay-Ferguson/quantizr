@@ -52,6 +52,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     @EventListener
+    @SuppressWarnings("unused")
     public void handleContextRefresh(ContextRefreshedEvent event) {
         super.handleContextRefresh(event);
         log.debug("ContextRefreshedEvent");
@@ -213,6 +214,7 @@ public class IPFSPubSub extends ServiceBase {
     private void processInboundPayload(String payload) {
         if (payload == null)
             return;
+        @SuppressWarnings("unused")
         ServerPushInfo pushInfo = null;
         payload = payload.trim();
         if (payload.startsWith("{") && payload.endsWith("}")) {
@@ -266,6 +268,7 @@ public class IPFSPubSub extends ServiceBase {
     // https://www.npmjs.com/package/node-rsa
     // Default signature scheme: 'pkcs1-sha256'
     public boolean verifySignature(IPSMMessage msg) {
+        @SuppressWarnings("unused")
         String strDat = String.valueOf(msg.getTs()) + XString.compactPrint(msg.getContent());
         return true;
     }

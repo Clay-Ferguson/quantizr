@@ -736,7 +736,8 @@ public class SubNode {
 
     @Transient
     @JsonIgnore
-    public synchronized <T> T getTypedObj(String key, TypeReference ref) {
+    @SuppressWarnings("unchecked")
+    public synchronized <T> T getTypedObj(String key, TypeReference<?> ref) {
         if (props == null)
             return null;
         try {

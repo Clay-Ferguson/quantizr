@@ -71,6 +71,7 @@ public class MongoTestService extends ServiceBase {
 
         // let adam try and fail to access insertedId
         try {
+            @SuppressWarnings("unused")
             SubNode updateNode = read.getNode(adamSession, insertedId);
             throw new RuntimeException("failed to block.");
         } catch (ForbiddenException e) {

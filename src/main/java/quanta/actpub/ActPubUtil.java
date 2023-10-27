@@ -738,6 +738,7 @@ public class ActPubUtil extends ServiceBase {
             // if no apId exists this isn't a foreign node, nothing to do here.
             return;
         }
+        @SuppressWarnings("unchecked")
         Map<String, Object> repliesObj = node.getObj(NodeProp.ACT_PUB_REPLIES.s(), Map.class);
         if (repliesObj == null)
             return;

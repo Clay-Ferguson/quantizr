@@ -301,6 +301,7 @@ public class IPFSService extends ServiceBase {
         }
     }
 
+    @SuppressWarnings("unused")
     public InputStream getStream(MongoSession ms, String hash) {
         // todo-1: Spring 3 took away HttpClient
         if (true) {
@@ -382,7 +383,6 @@ public class IPFSService extends ServiceBase {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
     public DagNode toDagNode(Object obj) {
         return (DagNode) obj;
     }
@@ -396,6 +396,7 @@ public class IPFSService extends ServiceBase {
     /*
      * Save PUBLIC nodes to IPFS/MFS
      */
+    @SuppressWarnings("unused")
     public void saveNodeToMFS(MongoSession ms, SubNode node) {
         if (!ThreadLocals.getSC().allowWeb3()) {
             return;
@@ -409,6 +410,7 @@ public class IPFSService extends ServiceBase {
                 if (!ownerNode.getBool(NodeProp.MFS_ENABLE)) {
                     return null;
                 }
+
                 if (ownerNode == null) {
                     throw new RuntimeException("Unable to find owner node.");
                 }

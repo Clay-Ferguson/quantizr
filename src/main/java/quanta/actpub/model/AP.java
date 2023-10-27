@@ -20,6 +20,7 @@ import quanta.util.val.Val;
  * properties in this object.
  */
 public class AP {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(AP.class);
 
     public static boolean apHasProps(Object obj) {
@@ -30,7 +31,7 @@ public class AP {
      * Looks in all elements of list, to find all elements that are Objects, and returns the value of
      * the first one containing the prop val as a property of it
      */
-    public static Object apParseList(List list, String prop) {
+    public static Object apParseList(List<?> list, String prop) {
         if (list == null)
             return null;
 

@@ -41,7 +41,7 @@ public class UtilFilter extends GenericFilterBean {
             if (httpReq.getQueryString() != null) {
                 url += " q=" + httpReq.getQueryString();
             }
-            Map params = httpReq.getParameterMap();
+            Map<?, ?> params = httpReq.getParameterMap();
             if (params != null && params.size() > 0) {
                 url += "\n    Params: " + XString.prettyPrint(httpReq.getParameterMap());
             }

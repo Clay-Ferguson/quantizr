@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MimeTypeUtils {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(MimeTypeUtils.class);
     private static final Tika tika = new Tika();
     private static Map<String, String> mimeMap;

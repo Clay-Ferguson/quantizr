@@ -4,12 +4,12 @@ import java.util.LinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import javassist.expr.Cast;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
 
 @Component
 public class IPFSRepo extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(IPFSRepo.class);
     public static String API_REPO;
 

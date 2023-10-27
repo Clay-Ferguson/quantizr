@@ -23,7 +23,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import quanta.mongo.MongoRepository;
 
 public class Util {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(Util.class);
+
     private static final Random rand = new Random();
 
     public static ObjectMapper simpleMapper;

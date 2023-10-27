@@ -444,75 +444,76 @@ public class RSSFeedService extends ServiceBase {
         return true;
     }
 
-    private void processModules(SyndFeed entry, RssFeed e) {
-        if (entry.getModules() != null) {
-            for (Module m : entry.getModules()) {
-                if (m instanceof MediaEntryModuleImpl mm) {
-                    if (mm.getMediaContents() != null) {
-                        // put new list on return object
-                        List<RssFeedMediaContent> mediaContent = new LinkedList<>();
-                        // add mediaContent to RssFeed ?
-                        // e.setMediaContent(mediaContent);
-                        // process all media contents
-                        for (MediaContent mc : mm.getMediaContents()) {
-                            RssFeedMediaContent rfmc = new RssFeedMediaContent();
-                            rfmc.setType(mc.getType());
-                            rfmc.setUrl(mc.getReference().toString());
-                            rfmc.setMedium(mc.getMedium());
-                            mediaContent.add(rfmc);
-                        }
-                    }
-                    if (mm.getMediaGroups() != null) {
-                        for (MediaGroup mg : mm.getMediaGroups()) {
-                            Metadata md = mg.getMetadata();
-                            if (md != null) {
-                                if (md.getDescription() != null) {
-                                    e.setDescription(sanitizeHtml(md.getDescription()));
-                                }
-                                if (md.getEmbed() != null) {
-                                    log.debug("Metadata Embed Url: " + md.getEmbed().getUrl());
-                                }
-                                if (md.getThumbnail() != null) {
-                                    for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
-                                        e.setImage(tn.getUrl().toASCIIString());
-                                    }
-                                }
-                            } else {
-                                log.debug("MediaGroup has no metadata.");
-                            }
-                        }
-                    } else {
-                        log.debug("media has no groups.");
-                    }
-                } //
-                else if (m instanceof ContentModuleImpl) {
-                    //
-                } else if (m instanceof EntryInformationImpl itunesMod) {
-                    if (itunesMod.getImage() != null) {
-                        try {
-                            e.setImage(itunesMod.getImage().toURI().toString());
-                        } catch (Exception e1) {
-                        }
-                    } else { // ignore
-                        e.setImage(itunesMod.getImageUri());
-                    }
-                    if (!StringUtils.isEmpty(itunesMod.getTitle())) {
-                        e.setTitle(itunesMod.getTitle());
-                    }
-                    // e.setSubTitle(itunesMod.getSubtitle());
-                    if (!StringUtils.isEmpty(itunesMod.getSummary())) {
-                        e.setDescription(sanitizeHtml(itunesMod.getSummary()));
-                    }
-                } //
-                else if (m instanceof DCModuleImpl) {
-                } else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String dcSource =
-                         // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
-                         // DCModuleImpl dm = (DCModuleImpl) m;
-                    log.debug("Unknown module type: " + m.getClass().getName());
-                }
-            }
-        }
-    }
+    // private void processModules(SyndFeed entry, RssFeed e) {
+    // if (entry.getModules() != null) {
+    // for (Module m : entry.getModules()) {
+    // if (m instanceof MediaEntryModuleImpl mm) {
+    // if (mm.getMediaContents() != null) {
+    // // put new list on return object
+    // List<RssFeedMediaContent> mediaContent = new LinkedList<>();
+    // // add mediaContent to RssFeed ?
+    // // e.setMediaContent(mediaContent);
+    // // process all media contents
+    // for (MediaContent mc : mm.getMediaContents()) {
+    // RssFeedMediaContent rfmc = new RssFeedMediaContent();
+    // rfmc.setType(mc.getType());
+    // rfmc.setUrl(mc.getReference().toString());
+    // rfmc.setMedium(mc.getMedium());
+    // mediaContent.add(rfmc);
+    // }
+    // }
+    // if (mm.getMediaGroups() != null) {
+    // for (MediaGroup mg : mm.getMediaGroups()) {
+    // Metadata md = mg.getMetadata();
+    // if (md != null) {
+    // if (md.getDescription() != null) {
+    // e.setDescription(sanitizeHtml(md.getDescription()));
+    // }
+    // if (md.getEmbed() != null) {
+    // log.debug("Metadata Embed Url: " + md.getEmbed().getUrl());
+    // }
+    // if (md.getThumbnail() != null) {
+    // for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
+    // e.setImage(tn.getUrl().toASCIIString());
+    // }
+    // }
+    // } else {
+    // log.debug("MediaGroup has no metadata.");
+    // }
+    // }
+    // } else {
+    // log.debug("media has no groups.");
+    // }
+    // } //
+    // else if (m instanceof ContentModuleImpl) {
+    // //
+    // } else if (m instanceof EntryInformationImpl itunesMod) {
+    // if (itunesMod.getImage() != null) {
+    // try {
+    // e.setImage(itunesMod.getImage().toURI().toString());
+    // } catch (Exception e1) {
+    // }
+    // } else { // ignore
+    // e.setImage(itunesMod.getImageUri());
+    // }
+    // if (!StringUtils.isEmpty(itunesMod.getTitle())) {
+    // e.setTitle(itunesMod.getTitle());
+    // }
+    // // e.setSubTitle(itunesMod.getSubtitle());
+    // if (!StringUtils.isEmpty(itunesMod.getSummary())) {
+    // e.setDescription(sanitizeHtml(itunesMod.getSummary()));
+    // }
+    // } //
+    // else if (m instanceof DCModuleImpl) {
+    // } else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String
+    // dcSource =
+    // // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
+    // // DCModuleImpl dm = (DCModuleImpl) m;
+    // log.debug("Unknown module type: " + m.getClass().getName());
+    // }
+    // }
+    // }
+    // }
 
     private void processModules(SyndEntry entry, RssFeedEntry e) {
         if (entry.getModules() != null) {

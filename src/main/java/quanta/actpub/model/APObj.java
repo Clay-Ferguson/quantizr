@@ -64,6 +64,7 @@ public class APObj extends HashMap<String, Object> {
 
     public APObj() {}
 
+    @SuppressWarnings("unchecked")
     public APObj(Map<?, ?> obj) {
         if (obj != null) {
             this.putAll((Map<String, Object>) obj);

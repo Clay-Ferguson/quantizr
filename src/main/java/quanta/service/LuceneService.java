@@ -15,6 +15,7 @@ import quanta.util.ThreadLocals;
  */
 @Component
 public class LuceneService extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(LuceneService.class);
 
     /*

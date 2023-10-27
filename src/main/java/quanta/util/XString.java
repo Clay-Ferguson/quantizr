@@ -25,6 +25,7 @@ import quanta.exception.base.RuntimeEx;
  * lines, strip, stripLeading, stripTrailing, and repeat.
  */
 public class XString {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(XString.class);
 
     private static ObjectWriter jsonPrettyWriter = Util.mapper.writerWithDefaultPrettyPrinter();

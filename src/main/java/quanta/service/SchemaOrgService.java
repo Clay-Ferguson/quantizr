@@ -65,7 +65,7 @@ public class SchemaOrgService extends ServiceBase {
     }
 
     private void parseSchema() {
-        List graph = (List) schema.get("@graph"); // will be ArrayList<Object>
+        List<?> graph = (List<?>) schema.get("@graph"); // will be ArrayList<Object>
         if (graph == null)
             return;
         // first scan graph to build classes
@@ -114,7 +114,7 @@ public class SchemaOrgService extends ServiceBase {
         }
     }
 
-    private void setupClass(HashMap mitem) {
+    private void setupClass(HashMap<?, ?> mitem) {
         Object id = mitem.get("@id");
         if (id instanceof String sid) {
             SchemaOrgClass soc = new SchemaOrgClass();
@@ -148,7 +148,7 @@ public class SchemaOrgService extends ServiceBase {
         return slabel;
     }
 
-    private void setupProperty(HashMap prop) {
+    private void setupProperty(HashMap<?, ?> prop) {
         SchemaOrgProp sop = new SchemaOrgProp();
         setupDomainIncludes(sop, prop);
         setupRangeIncludes(sop, prop);
@@ -160,7 +160,7 @@ public class SchemaOrgService extends ServiceBase {
         prop.remove("schema:source");
     }
 
-    private void setupDomainIncludes(SchemaOrgProp sop, HashMap prop) {
+    private void setupDomainIncludes(SchemaOrgProp sop, HashMap<?, ?> prop) {
         Object domains = prop.get("schema:domainIncludes");
         // handle if object
         if (domains instanceof HashMap) {
@@ -179,7 +179,7 @@ public class SchemaOrgService extends ServiceBase {
         prop.remove("schema:domainIncludes");
     }
 
-    private void setupRangeIncludes(SchemaOrgProp sop, HashMap prop) {
+    private void setupRangeIncludes(SchemaOrgProp sop, HashMap<?, ?> prop) {
         Object ranges = prop.get("schema:rangeIncludes");
         // handle if object
         if (ranges instanceof HashMap) {
@@ -198,8 +198,8 @@ public class SchemaOrgService extends ServiceBase {
         prop.remove("schema:domainIncludes");
     }
 
-    private void setupDomainObj(SchemaOrgProp sop, HashMap prop, Object domain) {
-        HashMap mdomain = (HashMap) domain;
+    private void setupDomainObj(SchemaOrgProp sop, HashMap<?, ?> prop, Object domain) {
+        HashMap<?, ?> mdomain = (HashMap<?, ?>) domain;
         Object domainId = mdomain.get("@id");
         if (domainId instanceof String sdomainId) {
             SchemaOrgClass soc = classMap.get(sdomainId);
@@ -216,8 +216,8 @@ public class SchemaOrgService extends ServiceBase {
         }
     }
 
-    private void setupRangeObj(SchemaOrgProp sop, HashMap prop, Object range) {
-        HashMap mrange = (HashMap) range;
+    private void setupRangeObj(SchemaOrgProp sop, HashMap<?, ?> prop, Object range) {
+        HashMap<?, ?> mrange = (HashMap<?, ?>) range;
         Object rangeId = mrange.get("@id");
         if (rangeId instanceof String srangeId) {
             sop.getRanges().add(new SchemaOrgRange(srangeId.replace("schema:", "")));

@@ -9,6 +9,7 @@ import quanta.postgres.table.UserAccount;
 
 @Component
 public class PaymentService extends ServiceBase {
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
 
     public String printTransactions() {

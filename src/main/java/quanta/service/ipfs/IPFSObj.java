@@ -17,7 +17,6 @@ import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.util.Util;
-import quanta.util.XString;
 
 @Component
 public class IPFSObj extends ServiceBase {

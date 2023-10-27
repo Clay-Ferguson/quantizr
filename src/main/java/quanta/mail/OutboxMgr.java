@@ -18,6 +18,7 @@ import quanta.mongo.model.SubNode;
  */
 @Component
 public class OutboxMgr extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(OutboxMgr.class);
     private String mailBatchSize = "10";
     private static SubNode outboxNode = null;

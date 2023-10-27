@@ -9,6 +9,7 @@ import quanta.util.XString;
 
 @Component
 public class IPFSConfig extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(IPFSConfig.class);
     public String API_CONFIG;
 
@@ -41,11 +42,11 @@ public class IPFSConfig extends ServiceBase {
         LinkedHashMap<String, Object> res = null;
         if (prop.ipfsEnabled()) {
             res = ipfs.toLinkedHashMap(
-                    ipfs.postForJsonReply(ipfsRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
+                    ipfs.postForJsonReply(IPFSRepo.API_REPO + "/stat?human=true", LinkedHashMap.class));
             sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
             res = ipfs.toLinkedHashMap(ipfs.postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
             sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
-            res = ipfs.toLinkedHashMap(ipfs.postForJsonReply(ipfs.API_ID, LinkedHashMap.class));
+            res = ipfs.toLinkedHashMap(ipfs.postForJsonReply(IPFSService.API_ID, LinkedHashMap.class));
             sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
         } else {
             sb.append("\nIPFS Repository Status: ipfsEnabled=false\n\n");

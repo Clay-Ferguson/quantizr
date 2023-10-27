@@ -20,7 +20,7 @@ public class APOOrderedCollection extends APObj {
     }
 
     /* Constructor for wrapping actual embedded item content */
-    public APOOrderedCollection(String id, Collection items) {
+    public APOOrderedCollection(String id, Collection<?> items) {
         this();
         put(APObj.id, id);
         put(APObj.totalItems, items.size());

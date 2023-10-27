@@ -284,7 +284,7 @@ public class NodeEditService extends ServiceBase {
                     String userDoingAction = ThreadLocals.getSC().getUserName();
                     apub.importUsers(ms, tags, userDoingAction);
                     auth.saveMentionsToACL(tags, s, node);
-                    node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList(tags.values())));
+                    node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList<>(tags.values())));
                     update.save(ms, node);
                 }
             }

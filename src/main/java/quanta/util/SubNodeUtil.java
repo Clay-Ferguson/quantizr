@@ -30,6 +30,7 @@ import quanta.util.val.Val;
  */
 @Component
 public class SubNodeUtil extends ServiceBase {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
     public void removeUnwantedPropsForIPFS(SubNode node) {

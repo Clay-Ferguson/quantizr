@@ -16,6 +16,7 @@ import quanta.config.SessionContext;
 
 @Configuration
 public class RedisConfiguration {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(RedisConfiguration.class);
 
     @Autowired

@@ -19,6 +19,7 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
 public class PerformanceReport {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(PerformanceReport.class);
     // Any calls that complete faster than this time, are not even considered. They're not a problem.
     public static final int REPORT_THRESHOLD = 1300; // 1300 for prod

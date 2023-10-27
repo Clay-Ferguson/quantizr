@@ -326,6 +326,7 @@ public class UserManagerService extends ServiceBase {
         res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
         crypto.ensureValidCryptoKeys(userNode);
 
+        @SuppressWarnings("unused")
         SubNode notesNode = user.getNotesNode(ms, userName, userNode);
         update.save(ms, userNode);
     }
