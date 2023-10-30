@@ -64,7 +64,6 @@ export class MainTab implements TabIntf<any> {
         const ast = getAs();
         return new Div(null, { className: "tabSubOptions" }, [
             !ast.isAnonUser ? new AppNavLink("My Account", S.nav.navToMyAccntRoot, "ui-my-account") : null,
-            !ast.isAnonUser ? new AppNavLink("My Home", () => S.nav.openContentNode(":" + ast.userName + ":home", false)) : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
             ...this.customAnonRHSLinks(),
             ...S.render.buildCustomLinks(S.quanta.cfg.rhsLinks)

@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import jakarta.servlet.http.HttpServletResponse;
-import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
@@ -62,7 +62,7 @@ public class NodeRenderService extends ServiceBase {
 
         // Node Names are identified using a colon in front of it, to make it detectable
         if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
-            if ("home".equalsIgnoreCase(nameOnUserNode)) {
+            if (Const.HOME_NODE_NAME.equalsIgnoreCase(nameOnUserNode)) {
                 isHomeNodeRequest = true;
             }
             id = ":" + userName + ":" + nameOnUserNode;
@@ -82,7 +82,7 @@ public class NodeRenderService extends ServiceBase {
         if (id != null) {
             hasUrlId = true;
         } else {
-            id = ":home";
+            id = NodePath.PUBLIC_HOME;
         }
 
         String _id = id;
@@ -301,10 +301,6 @@ public class NodeRenderService extends ServiceBase {
         Sort sort = null;
         if (!StringUtils.isEmpty(orderBy)) {
             sort = parseOrderBy(orderBy);
-        } else { // if this is a user's POSTS node show in revchron always.
-            if (NodeName.POSTS.equals(node.getName())) {
-                sort = Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME);
-            }
         }
         boolean isOrdinalOrder = false;
         if (sort == null) {

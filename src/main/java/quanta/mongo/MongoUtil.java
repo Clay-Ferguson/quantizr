@@ -1,6 +1,5 @@
 package quanta.mongo;
 
-import com.mongodb.bulk.BulkWriteResult;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +24,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import quanta.config.NodeName;
+import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
@@ -889,10 +889,9 @@ public class MongoUtil extends ServiceBase {
         if (userNode != null) {
             throw new RuntimeException("User already existed: " + newUserName);
         }
-        // if (PrincipalName.ADMIN.s().equals(user)) {
-        // throw new RuntimeEx("createUser should not be called fror admin
-        // user.");
-        // }
+        if (PrincipalName.ADMIN.s().equals(newUserName)) {
+            throw new RuntimeEx("createUser should not be called for admin user.");
+        }
         auth.requireAdmin(ms);
         // todo-2: is user validated here (no invalid characters, etc. and invalid
         // flowpaths tested?)
@@ -918,6 +917,7 @@ public class MongoUtil extends ServiceBase {
             userNode.set(NodeProp.SIGNUP_PENDING, true);
         }
         update.save(ms, userNode);
+
         // ensure we've pre-created this node.
         SubNode postsNode = user.getPostsNode(ms, null, userNode);
         if (postsNodeVal != null) {
@@ -942,8 +942,8 @@ public class MongoUtil extends ServiceBase {
         String adminUser = prop.getMongoAdminUserName();
         SubNode adminNode = read.getAccountByUserName(ms, adminUser, false);
         if (adminNode == null) {
-            adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true,
-                    null, null);
+            adminNode =
+                    snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(), true, null, null);
             adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
             adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
             adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
@@ -956,23 +956,23 @@ public class MongoUtil extends ServiceBase {
             ms.setUserNodeId(adminNode.getId());
         }
         allUsersRootNode =
-                snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
+                snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, "Users", null, true, null, null);
         ensureUsersLocalAndRemotePath(ms);
         createPublicNodes(ms);
     }
 
     public void ensureUsersLocalAndRemotePath(MongoSession ms) {
-        localUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, null, "Local Users", null,
-                true, null, null);
-        remoteUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, null, "Remote Users", null,
-                true, null, null);
+        localUsersNode =
+                snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, "Local Users", null, true, null, null);
+        remoteUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, "Remote Users", null, true,
+                null, null);
     }
 
     public void createPublicNodes(MongoSession ms) {
         log.debug("creating Public Nodes");
         Val<Boolean> created = new Val<>(Boolean.FALSE);
-        SubNode publicNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.PUBLIC, null, "Public", null,
-                true, null, created);
+        SubNode publicNode =
+                snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.PUBLIC, "Public", null, true, null, created);
         if (created.getVal()) {
             acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), null,
                     Arrays.asList(PrivilegeType.READ.s()), null);
@@ -980,12 +980,12 @@ public class MongoUtil extends ServiceBase {
         /////////////////////////////////////////////////////////
         created = new Val<>(Boolean.FALSE);
         // create home node (admin owned node named 'home').
-        snUtil.ensureNodeExists(ms, NodePath.PENDING_PATH, null, null, "Pending Edits", null, true, null, created);
+        snUtil.ensureNodeExists(ms, NodePath.PENDING_PATH, null, "Pending Edits", null, true, null, created);
         /////////////////////////////////////////////////////////
         created = new Val<>(Boolean.FALSE);
-        // create home node (admin owned node named 'home').
-        SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, NodeName.HOME,
-                NodeName.HOME, "Public Home", null, true, null, created);
+        // create admin home node
+        SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, "home",
+                "Public Home", null, true, null, created);
         // make node public
         acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()),
                 null);

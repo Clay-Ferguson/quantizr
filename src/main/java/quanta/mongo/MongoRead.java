@@ -1,6 +1,5 @@
 package quanta.mongo;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -387,7 +385,7 @@ public class MongoRead extends ServiceBase {
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
-            ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, null, false);
+            ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, false);
         } //
         else if (identifier.startsWith(":")) { // Node name lookups are done by prefixing the search with a colon (:)
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
@@ -1011,7 +1009,7 @@ public class MongoRead extends ServiceBase {
      * have it, to avoid a DB query.
      */
     public SubNode getUserNodeByType(MongoSession ms, String userName, SubNode userNode, String content, String type,
-            List<String> publicPrivs, String defaultName, boolean autoCreate) {
+            List<String> publicPrivs, boolean autoCreate) {
         if (userNode == null) {
             if (userName == null) {
                 userName = ThreadLocals.getSC().getUserName();
@@ -1032,25 +1030,12 @@ public class MongoRead extends ServiceBase {
             }
             node.setContent(content);
             node.touch();
-            if (defaultName != null) {
-                node.setName(defaultName);
-            }
             if (publicPrivs != null) {
                 acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), null, publicPrivs, null);
             }
             update.save(ms, node);
         }
 
-        /*
-         * todo-2: fix this? Ensure if "sn:posts" node type does exist that it's also named 'posts' this is
-         * a retrofit (data repair) here, and not the standard flow.
-         */
-        if (node != null && NodeType.POSTS.s().equals(type) && !NodeName.POSTS.equals(node.getName())) {
-            node.setName(NodeName.POSTS);
-            acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()),
-                    null);
-            update.save(ms, node);
-        }
         return node;
     }
 

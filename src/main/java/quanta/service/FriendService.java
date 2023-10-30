@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
-import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
@@ -169,8 +168,8 @@ public class FriendService extends ServiceBase {
     /* The code pattern here is very similar to 'blockUser' */
     private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
             String userToFollow, String tags) {
-        SubNode followerFriendList = read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(),
-                null, NodeName.FRIENDS, true);
+        SubNode followerFriendList =
+                read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(), null, true);
         if (followerFriendList == null) {
             log.debug("Can't access Friend list for: " + userDoingFollow);
             return;

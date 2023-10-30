@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -30,6 +29,7 @@ import quanta.request.CheckMessagesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
+import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -329,12 +329,6 @@ public class UserFeedService extends ServiceBase {
         if (orCriteria.size() > 0) {
             ands.add(new Criteria().orOperator(orCriteria));
         }
-        /*
-         * exclude all user's home nodes from appearing in the results. When a user signs up they'll get
-         * something like a node with text "Clay's Node" created and it will be empty, and we don't need
-         * them showing up in the feeds.
-         */
-        ands.add(Criteria.where(SubNode.NAME).ne(NodeName.HOME));
 
         TextCriteria textCriteria = null;
         // Add 'Blocked Words' criteria only if we're not doing a "From Me" or "From Friends" kind of feed.

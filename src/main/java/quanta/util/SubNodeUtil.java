@@ -130,21 +130,15 @@ public class SubNodeUtil extends ServiceBase {
      * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
      * provides), by creating said node if not already existing or leaving it as is if it does exist.
      */
-    public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName,
-            String defaultContent, String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props,
-            Val<Boolean> created) {
-        if (nodeName != null) {
-            SubNode nodeByName = read.getNodeByName(ms, nodeName);
-            if (nodeByName != null) {
-                return nodeByName;
-            }
-        }
+    public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String defaultContent,
+            String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props, Val<Boolean> created) {
+
         if (!parentPath.endsWith("/")) {
             parentPath += "/";
         }
         SubNode node = read.getNode(ms, fixPath(parentPath + pathName));
         // if we found the node and it's name matches (if provided)
-        if (node != null && (nodeName == null || nodeName.equals(node.getName()))) {
+        if (node != null) {
             if (created != null) {
                 created.setVal(false);
             }
@@ -190,9 +184,7 @@ public class SubNodeUtil extends ServiceBase {
             }
             parentPath += tok + "/";
         }
-        if (nodeName != null) {
-            parent.setName(nodeName);
-        }
+
         if (defaultContent != null) {
             parent.setContent(defaultContent);
             parent.touch();

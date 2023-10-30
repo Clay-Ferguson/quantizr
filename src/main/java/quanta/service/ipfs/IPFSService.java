@@ -243,8 +243,8 @@ public class IPFSService extends ServiceBase {
     public void writeIpfsExportNode(MongoSession ms, String cid, String mime, String fileName,
             List<ExportIpfsFile> childrenFiles) {
         checkIpfs();
-        SubNode exportParent = read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(),
-                null, null, false);
+        SubNode exportParent =
+                read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, false);
         if (exportParent != null) {
             SubNode node = create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
                     null, null, true, true);

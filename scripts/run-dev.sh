@@ -13,11 +13,6 @@ rm -rf ${QUANTA_BASE}/log/*
 mkdir -p ${QUANTA_BASE}/log
 cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
 
-sudo mkdir -p ${PGADMIN_DATA}
-sudo chown -R 5050:5050 ${PGADMIN_DATA}
-
-read -p "done?"
-
 # To see all the substitution variables in the file.
 # docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 

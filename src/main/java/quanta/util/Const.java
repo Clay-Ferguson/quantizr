@@ -16,4 +16,5 @@ public class Const {
     public static final boolean debugFilterEntry = false;
 
     public static String BEARER_TOKEN = "token";
+    public static String HOME_NODE_NAME = "home";
 }

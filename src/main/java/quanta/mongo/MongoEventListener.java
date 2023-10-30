@@ -24,6 +24,7 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
 import quanta.service.SystemService;
+import quanta.util.Const;
 import quanta.util.EventPublisher;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
@@ -111,8 +112,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             node.setAc(null);
             dbObj.remove(SubNode.AC);
         }
-        // home nodes are always unpublished
-        if ("home".equalsIgnoreCase(node.getName())) {
+
+        if (Const.HOME_NODE_NAME.equalsIgnoreCase(node.getName())) {
             node.set(NodeProp.UNPUBLISHED, true);
             dbObj.put(SubNode.PROPS, node.getProps());
         }
@@ -274,7 +275,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             node.setAc(null);
         }
         // home nodes are always unpublished
-        if ("home".equalsIgnoreCase(node.getName())) {
+        if (Const.HOME_NODE_NAME.equalsIgnoreCase(node.getName())) {
             node.set(NodeProp.UNPUBLISHED, true);
         }
         node.fixAttachments();

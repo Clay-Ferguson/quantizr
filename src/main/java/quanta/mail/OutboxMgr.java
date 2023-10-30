@@ -149,9 +149,9 @@ public class OutboxMgr extends ServiceBase {
             if (OutboxMgr.outboxNode != null) {
                 return OutboxMgr.outboxNode;
             }
-            snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX, null, "Outbox", null, true, null, null);
+            snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX, "Outbox", null, true, null, null);
             OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH,
-                    NodePath.OUTBOX + "/" + NodePath.SYSTEM, null, "System Messages", null, true, null, null);
+                    NodePath.OUTBOX + "/" + NodePath.SYSTEM, "System Messages", null, true, null, null);
             return OutboxMgr.outboxNode;
         }
     }

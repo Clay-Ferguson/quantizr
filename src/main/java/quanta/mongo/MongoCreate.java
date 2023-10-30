@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
-import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
 import quanta.model.PropertyInfo;
@@ -242,7 +241,7 @@ public class MongoCreate extends ServiceBase {
         if (nodeId == null && !linkBookmark) {
             parentNode = read.getUserNodeByType(ms, null, null,
                     "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
-                    Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS, true);
+                    Arrays.asList(PrivilegeType.READ.s()), true);
 
             if (parentNode != null) {
                 nodeId = parentNode.getIdStr();
@@ -254,7 +253,7 @@ public class MongoCreate extends ServiceBase {
         if (parentNode == null && !linkBookmark) {
             if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
                 parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null,
-                        null, false);
+                        false);
             } else {
                 parentNode = read.getNode(ms, nodeId);
             }

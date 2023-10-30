@@ -54,7 +54,8 @@ export class User {
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState === "0" || !callUsr) {
             if (!S.quanta.config.initialNodeId) {
-                S.quanta.config.initialNodeId = ":home";
+                // todo-1: Java has constants for this.
+                S.quanta.config.initialNodeId = "/r/public/home";
             }
             return;
         }
@@ -74,6 +75,8 @@ export class User {
                 asymEncKey: S.crypto.asymEncKey
             }, false, true);
             S.quanta.authToken = res.authToken;
+
+            console.log("Login response: " + S.util.prettyPrint(res));
 
             if (res?.code == C.RESPONSE_CODE_OK) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
