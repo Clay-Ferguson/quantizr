@@ -260,6 +260,7 @@ services:
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "${MONGO_HOST}"
             mongodb.port: "${MONGO_PORT}" 
+            actPubRetentionMonths: 3
 
             instanceId: "prod"
             profileName: "prod"

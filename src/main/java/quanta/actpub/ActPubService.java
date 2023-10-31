@@ -1667,7 +1667,7 @@ public class ActPubService extends ServiceBase {
             return "ActivityPub not enabled";
         return arun.run(as -> {
             log.debug("Starting ActPub cleanup...");
-            long delCount = delete.deleteOldActPubPosts(4, as);
+            long delCount = delete.deleteOldActPubPosts(prop.getActPubRetentioMonths(), as);
             String message = "AP Maintenance Complete. Deleted " + String.valueOf(delCount) + " old posts.";
             log.debug(message);
             return message;
