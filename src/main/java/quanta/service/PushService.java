@@ -39,7 +39,9 @@ public class PushService extends ServiceBase {
             HashSet<String> usersSharedToSet = new HashSet<>();
 
             List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
-            usersSharedToSet.addAll(usersSharedTo);
+            if (usersSharedTo != null) {
+                usersSharedToSet.addAll(usersSharedTo);
+            }
 
             // if not public or shared to anyone we're done.
             if (!isPublic && usersSharedToSet.size() == 0)
