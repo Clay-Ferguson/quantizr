@@ -70,7 +70,11 @@ the file. -->
         <appender-ref ref="Console" />
     </logger>
 
-    <!-- this isn't working. Still loggs. Haven't figured out why yet. -->
+    <logger name="org.hibernate.resource" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
     <logger name="reactor.util" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
