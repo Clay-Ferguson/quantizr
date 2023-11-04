@@ -94,7 +94,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                         // nullify name because we don't want to blow up indexes
                         n.setName(null);
                         n.setOwner(ownerId);
-                        log.debug("IMPORT NODE: " + XString.prettyPrint(n));
+                        // log.debug("IMPORT NODE: " + XString.prettyPrint(n));
                         return n;
                     } catch (Exception e) {
                         log.error("Failed unmarshalling node: " + json);

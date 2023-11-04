@@ -71,7 +71,12 @@ the file. -->
     </logger>
 
     <!-- this isn't working. Still loggs. Haven't figured out why yet. -->
-    <logger name="reactor.util.Loggers" level="warn" additivity="false">
+    <logger name="reactor.util" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="com.zaxxer.hikari" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
