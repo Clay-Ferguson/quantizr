@@ -63,8 +63,9 @@ public class ActPubController extends ServiceBase {
      * NOTE: This is returning the HTML of the HOME, not a JSON value
      */
     @RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
-    public void mastodonGetUser(@PathVariable(value = "userName", required = true) String userName,
-            HttpServletRequest req, HttpServletResponse res) throws Exception {
+    public void mastodonGetUser(//
+            @PathVariable(value = "userName", required = true) String userName, HttpServletRequest req,
+            HttpServletResponse res) throws Exception {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return;
         String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
@@ -77,7 +78,8 @@ public class ActPubController extends ServiceBase {
      */
     @RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
             produces = {APConst.CTYPE_HTML})
-    public void getHTMLForUserId(@PathVariable(value = "userName", required = true) String userName, //
+    public void getHTMLForUserId(//
+            @PathVariable(value = "userName", required = true) String userName, //
             HttpServletRequest req, HttpServletResponse res) throws Exception {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return;
@@ -92,7 +94,9 @@ public class ActPubController extends ServiceBase {
     @RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
             produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
     @ResponseBody
-    public Object actor(@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
+    public Object actor(//
+            @PathVariable(value = "userName", required = true) String userName, //
+            HttpServletRequest req) {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return null;
         log.trace("getActor: " + userName);
@@ -131,8 +135,10 @@ public class ActPubController extends ServiceBase {
     @RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
             produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
     @ResponseBody
-    public Object inboxPost(@RequestBody byte[] body,
-            @PathVariable(value = "userName", required = true) String userName, HttpServletRequest httpReq) {
+    public Object inboxPost(//
+            @RequestBody byte[] body, //
+            @PathVariable(value = "userName", required = true) String userName, //
+            HttpServletRequest httpReq) {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
             return null;
         try {
@@ -150,7 +156,9 @@ public class ActPubController extends ServiceBase {
     @RequestMapping(value = {"/"}, method = RequestMethod.GET,
             produces = {APConst.CTYPE_LD_JSON, APConst.CTYPE_ACT_JSON})
     @ResponseBody
-    public Object getJsonObj(HttpServletRequest req, @RequestParam(value = "id", required = false) String id) {
+    public Object getJsonObj(//
+            HttpServletRequest req, //
+            @RequestParam(value = "id", required = false) String id) {
         try {
             APObj ret = apOutbox.getResource(req, id);
             if (ret != null) {
@@ -211,7 +219,8 @@ public class ActPubController extends ServiceBase {
     @RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
             produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
     @ResponseBody
-    public Object getFollowers(@PathVariable(value = "userName", required = false) String userName,
+    public Object getFollowers(//
+            @PathVariable(value = "userName", required = false) String userName,
             @RequestParam(value = "min_id", required = false) String minId,
             @RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName.trim()))
@@ -267,7 +276,8 @@ public class ActPubController extends ServiceBase {
             produces = {APConst.CTYPE_ACT_JSON, APConst.CTYPE_LD_JSON})
     @ResponseBody
     public Object getReplies( //
-            @PathVariable(value = "nodeId", required = true) String nodeId, HttpServletRequest req) {
+            @PathVariable(value = "nodeId", required = true) String nodeId, //
+            HttpServletRequest req) {
         APObj ret = apReplies.generateReplies(nodeId);
         if (ret != null) {
             HttpHeaders hdr = new HttpHeaders();
