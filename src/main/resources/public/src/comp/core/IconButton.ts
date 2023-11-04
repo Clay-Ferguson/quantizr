@@ -39,7 +39,7 @@ export class IconButton extends Comp {
         // while loading more records
         if (state.waiting) {
             this.setTag("span");
-            this.setChildren([new Spinner("bigMargin")]);
+            this.setChildren([new Spinner()]);
             return true;
         }
 
