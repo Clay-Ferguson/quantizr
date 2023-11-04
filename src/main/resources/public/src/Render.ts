@@ -218,7 +218,7 @@ export class Render {
         children.push(new Heading(6, "By ID"), //
             new Div(byIdUrl, {
                 className: "linkDisplay",
-                title: "Click -> Copy to clipboard",
+                title: "Copy to clipboard",
                 onClick: () => this.copyLinkToClipboard(byIdUrl)
             }));
 
@@ -226,7 +226,7 @@ export class Render {
         children.push(new Heading(6, "By ID (Markdown)"), //
             new Div(markdownByIdUrl, {
                 className: "linkDisplay",
-                title: "Click -> Copy to clipboard",
+                title: "Copy to clipboard",
                 onClick: () => this.copyLinkToClipboard(markdownByIdUrl)
             }));
 
@@ -235,15 +235,23 @@ export class Render {
             children.push(new Heading(6, "By Name"), //
                 new Div(byNameUrl, {
                     className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
+                    title: "Copy to clipboard",
                     onClick: () => this.copyLinkToClipboard(byNameUrl)
+                }));
+
+            const docViewByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node) + "?view=doc";
+            children.push(new Heading(6, "Doc View By Name"), //
+                new Div(byNameUrl, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => this.copyLinkToClipboard(docViewByNameUrl)
                 }));
 
             const markdownByNameUrl = "[Link](" + S.nodeUtil.getPathPartForNamedNode(node) + ")";
             children.push(new Heading(6, "By Name (Markdown)"), //
                 new Div(markdownByNameUrl, {
                     className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
+                    title: "Copy to clipboard",
                     onClick: () => this.copyLinkToClipboard(markdownByNameUrl)
                 }));
         }
@@ -251,7 +259,7 @@ export class Render {
         children.push(new Heading(6, "Thread View"), //
             new Div(byIdUrlThreadView, {
                 className: "linkDisplay",
-                title: "Click -> Copy to clipboard",
+                title: "Copy to clipboard",
                 onClick: () => this.copyLinkToClipboard(byIdUrlThreadView)
             }));
 
@@ -260,7 +268,7 @@ export class Render {
         // children.push(new Heading(5, "Node RSS Feed"), //
         //     new Div(rssFeed, {
         //         className: "linkDisplay",
-        //         title: "Click -> Copy to clipboard",
+        //         title: "Copy to clipboard",
         //         onClick: () => this.showLink(rssFeed)
         //     }));
 
@@ -281,7 +289,7 @@ export class Render {
                         new Heading(6, "View By Id"), //
                         new Div(attByIdUrl, {
                             className: "linkDisplay",
-                            title: "Click -> Copy to clipboard",
+                            title: "Copy to clipboard",
                             onClick: () => this.copyLinkToClipboard(attByIdUrl)
                         })
                     ]);
@@ -291,7 +299,7 @@ export class Render {
                         new Heading(6, "Download By Id"), //
                         new Div(downloadAttByIdUrl, {
                             className: "linkDisplay",
-                            title: "Click -> Copy to clipboard",
+                            title: "Copy to clipboard",
                             onClick: () => this.copyLinkToClipboard(downloadAttByIdUrl)
                         })
                     ]);
@@ -302,7 +310,7 @@ export class Render {
                             new Heading(6, "View By Name"), //
                             new Div(attByNameUrl, {
                                 className: "linkDisplay",
-                                title: "Click -> Copy to clipboard",
+                                title: "Copy to clipboard",
                                 onClick: () => this.copyLinkToClipboard(attByNameUrl)
                             })
                         ]);
@@ -312,7 +320,7 @@ export class Render {
                             new Heading(6, "Download By Name"), //
                             new Div(downloadAttByNameUrl, {
                                 className: "linkDisplay",
-                                title: "Click -> Copy to clipboard",
+                                title: "Copy to clipboard",
                                 onClick: () => this.copyLinkToClipboard(downloadAttByNameUrl)
                             })
                         ]);
@@ -324,7 +332,7 @@ export class Render {
                             new Heading(6, "IPFS LINK"), //
                             new Div("ipfs://" + att.il, {
                                 className: "linkDisplay",
-                                title: "Click -> Copy to clipboard",
+                                title: "Copy to clipboard",
                                 onClick: () => this.copyLinkToClipboard("ipfs://" + att.il)
                             })
                         ]);
@@ -346,7 +354,7 @@ export class Render {
             children.push(new Heading(6, "IPFS CID"), //
                 new Div("ipfs://" + ipfsCid, {
                     className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
+                    title: "Copy to clipboard",
                     onClick: () => this.copyLinkToClipboard(ipfsCid)
                 }));
         }
@@ -356,7 +364,7 @@ export class Render {
             children.push(new Heading(6, "IPNS Name"), //
                 new Div("ipns://" + ipnsCid, {
                     className: "linkDisplay",
-                    title: "Click -> Copy to clipboard",
+                    title: "Copy to clipboard",
                     onClick: () => this.copyLinkToClipboard("ipns://" + ipnsCid)
                 }));
         }
