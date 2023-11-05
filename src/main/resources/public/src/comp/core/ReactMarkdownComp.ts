@@ -1,10 +1,14 @@
 import { createElement, forwardRef } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeKatex from "rehype-katex";
+// import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
+// import remarkMath from "remark-math";
+
+// NOTE: I'm commenting out the math/katex because there's apparently no way to get the sanitizer
+// not to break them. We may need to move to a different Markdown renderer if we ever really need the math
+// but for now we'll just have to do without LaTex support.
 
 // ======================================================
 // DO NOT DELETE (KEEP EXAMPLE), this code works, but the default schema is already perfect.
@@ -27,7 +31,7 @@ const ReactMarkdownComp = forwardRef((props, ref) => {
     return createElement(ReactMarkdown as any, {
         ...props,
         ref,
-        remarkPlugins: [remarkMath, remarkGfm],
+        remarkPlugins: [/* remarkMath, */ remarkGfm],
 
         // NOTE: The order of these plugins is significant. Each id doing a modification of the chain, and can
         // affect what comes downstream. For example of your sanitizer filters out any tags Katex needs, that
@@ -38,7 +42,7 @@ const ReactMarkdownComp = forwardRef((props, ref) => {
         // rehypePlugins: [rehypeRaw, [rehypeSanitize, { schema }], rehypeKatex],
         // ======================================================
 
-        rehypePlugins: [rehypeRaw, rehypeSanitize, rehypeKatex],
+        rehypePlugins: [rehypeRaw, rehypeSanitize /* , rehypeKatex*/],
     });
 });
 
