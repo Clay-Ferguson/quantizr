@@ -259,6 +259,7 @@ export abstract class Comp {
     }
 
     public static getDangerousHtml = (content: string) => {
+        // todo-0: get rid DOMPurify and use the other sanitizer we have in ReactMarkdownComp in all cases
         return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
     }
 
@@ -275,7 +276,10 @@ export abstract class Comp {
         try {
             const children = this.createChildren(this.children);
 
-            if (children?.length > 0) {
+            if (children?.length == 1) {
+                return createElement(type, this.attribs, children[0]);
+            }
+            else if (children?.length > 0) {
                 return createElement(type, this.attribs, children);
             }
             else {
