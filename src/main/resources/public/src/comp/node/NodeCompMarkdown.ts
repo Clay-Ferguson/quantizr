@@ -126,7 +126,7 @@ export class NodeCompMarkdown extends Comp {
         const match = /language-(\w+)/.exec(className || "");
         const language = match ? match[1] : "txt";
         return !inline ? (
-            createElement("div", null, [
+            createElement("div", { className: "smallMarginBottom" }, [
                 createElement("div", { className: "codeDivHeader" }, [
                     createElement("span", {
                         key: "code-div-" + this.getId(),
