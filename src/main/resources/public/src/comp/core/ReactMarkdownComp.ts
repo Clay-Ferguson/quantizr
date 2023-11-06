@@ -33,9 +33,9 @@ const ReactMarkdownComp = forwardRef((props, ref) => {
         ref,
         remarkPlugins: [/* remarkMath, */ remarkGfm],
 
-        // NOTE: The order of these plugins is significant. Each id doing a modification of the chain, and can
+        // NOTE: The order of these plugins is significant. Each is doing a modification of the chain, and can
         // affect what comes downstream. For example of your sanitizer filters out any tags Katex needs, that
-        // would obviously break rehypeKatex if it"s the last thing in the array here.
+        // would obviously break rehypeKatex if it's the last thing in the array here.
 
         // ======================================================
         // DO NOT DELETE (see note above, this is how we would pass "schema to rehypeSanitize" if needed)
