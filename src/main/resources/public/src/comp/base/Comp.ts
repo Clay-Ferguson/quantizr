@@ -259,7 +259,6 @@ export abstract class Comp {
     }
 
     public static getDangerousHtml = (content: string) => {
-        // todo-0: get rid DOMPurify and use the other sanitizer we have in ReactMarkdownComp in all cases
         return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
     }
 

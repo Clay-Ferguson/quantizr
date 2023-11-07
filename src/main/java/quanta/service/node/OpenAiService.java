@@ -150,8 +150,10 @@ public class OpenAiService extends ServiceBase {
                 .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
         /*
-         * todo-0: without maxTokens we get comically short answers, so I'm not sure what to do about if or
-         * how end users should be able to tweak this.
+         * Without maxTokens we get comically short answers (like not even the complete first sentence of
+         * the response, but a sentence frament), so I'm not sure what to do about if or how end users
+         * should be able to tweak this. Before switching to gpt-4-vision we were getting sensible response
+         * lengths without having to provide a maxTokens value
          */
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), 2000);
