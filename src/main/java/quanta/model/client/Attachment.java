@@ -26,7 +26,7 @@ public class Attachment {
     private String url;
     private String ipfsLink;
     private String ipfsRef;
-
+    private String aiPrompt;
     private SubNode ownerNode;
 
     // key in the SubNode hashmap that points to this. May be null unless retrieved
@@ -178,6 +178,16 @@ public class Attachment {
     @JsonProperty("o")
     public void setOrdinal(Integer ordinal) {
         this.ordinal = ordinal;
+    }
+
+    @JsonProperty("ai")
+    public String getAiPrompt() {
+        return aiPrompt;
+    }
+
+    @JsonProperty("ai")
+    public void setAiPrompt(String aiPrompt) {
+        this.aiPrompt = aiPrompt;
     }
 
     @Transient

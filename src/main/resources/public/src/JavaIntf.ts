@@ -33,6 +33,7 @@ export interface Attachment {
     u: string;
     il: string;
     ir: string;
+    ai: string;
 }
 
 export interface Bookmark {
@@ -214,6 +215,23 @@ export interface Choice {
     message: ChatMessage;
     finishProbability: number;
     index: number;
+}
+
+export interface GptImageData {
+    revised_prompt: string;
+    url: string;
+}
+
+export interface ImageGenRequest {
+    model: string;
+    prompt: string;
+    size: string;
+    n: number;
+}
+
+export interface ImageResponse {
+    created: number;
+    data: GptImageData[];
 }
 
 export interface SystemConfig {
@@ -712,6 +730,7 @@ export interface UploadFromUrlRequest extends RequestBase {
     storeLocally: boolean;
     nodeId: string;
     sourceUrl: string;
+    openAiPrompt: string;
 }
 
 export interface RequestBase {

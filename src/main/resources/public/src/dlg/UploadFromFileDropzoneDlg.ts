@@ -60,6 +60,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         onClick: this.uploadFromUrl,
                         title: "Upload from Web/URL"
                     }),
+                    this.importMode ? null : new IconButton("fa-magic", "Image by AI", {
+                        onClick: this.uploadFromAiGen,
+                        title: "Create an AI Generated Image"
+                    }),
 
                     this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
 
@@ -113,6 +117,15 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     uploadFromUrl = () => {
         S.attachment.openUploadFromUrlDlg(this.nodeId, () => {
+            this.close();
+            if (this.afterUploadFunc) {
+                this.afterUploadFunc();
+            }
+        });
+    }
+
+    uploadFromAiGen = () => {
+        S.attachment.openUploadFromAiGenDlg(this.nodeId, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();

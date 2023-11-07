@@ -200,7 +200,7 @@ public class AttachmentService extends ServiceBase {
                     LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(file.getInputStream(), maxFileSize);
                     // attaches AND closes the stream.
                     attachBinaryFromStream(ms, false, attName, node, nodeId, fileName, size, limitedIs, contentType, -1,
-                            -1, explodeZips, toIpfs, true, true, true, null, allowEmailParse);
+                            -1, explodeZips, toIpfs, true, true, true, null, allowEmailParse, null);
                 }
             }
 
@@ -228,7 +228,7 @@ public class AttachmentService extends ServiceBase {
     public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
             String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
             boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
-            String sourceUrl, boolean allowEmailParse) {
+            String sourceUrl, boolean allowEmailParse, String aiPrompt) {
         /*
          * If caller already has 'node' it can pass node, and avoid looking up node again
          */
@@ -255,7 +255,7 @@ public class AttachmentService extends ServiceBase {
         } //
         else {
             saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
-                    calcImageSize, closeStream, storeLocally, sourceUrl);
+                    calcImageSize, closeStream, storeLocally, sourceUrl, aiPrompt);
         }
     }
 
@@ -280,7 +280,7 @@ public class AttachmentService extends ServiceBase {
     public void saveBinaryStreamToNode(MongoSession ms, boolean importMode, String attName,
             LimitedInputStreamEx inputStream, String mimeType, String fileName, long size, int width, int height,
             SubNode node, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
-            String sourceUrl) {
+            String sourceUrl, String aiPrompt) {
         /*
          * NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
          * everything EXCEPT calculate the image size
@@ -304,6 +304,7 @@ public class AttachmentService extends ServiceBase {
             int maxAttOrdinal = getMaxAttachmentOrdinal(node);
             att = node.getAttachment(attName, true, true);
             att.setOrdinal(maxAttOrdinal + 1);
+            att.setAiPrompt(aiPrompt);
         }
 
         if (ImageUtil.isImageMime(mimeType)) {
@@ -362,7 +363,7 @@ public class AttachmentService extends ServiceBase {
             try {
                 att.setSize((long) imageBytes.length);
                 if (storeLocally) {
-                    if (fileName != null) {
+                    if (fileName != null && aiPrompt == null) {
                         att.setFileName(fileName);
                     }
                     is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
@@ -689,7 +690,15 @@ public class AttachmentService extends ServiceBase {
      */
     public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
         UploadFromUrlResponse res = new UploadFromUrlResponse();
-        readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally());
+        if (req.getOpenAiPrompt() != null) {
+            req.setSourceUrl(oai.generateImage(ms, req.getOpenAiPrompt()));
+            req.setStoreLocally(true);
+        }
+
+        if (req.getSourceUrl() != null) {
+            readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally(),
+                    req.getOpenAiPrompt());
+        }
         return res;
     }
 
@@ -729,7 +738,7 @@ public class AttachmentService extends ServiceBase {
      * NOTE: If 'node' is already available caller should pass it, or else can pass nodeId.
      */
     public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
-            String mimeType, int maxFileSize, boolean storeLocally) {
+            String mimeType, int maxFileSize, boolean storeLocally, String aiPrompt) {
 
         if (mimeType == null) {
             mimeType = Util.getMimeTypeFromUrl(sourceUrl);
@@ -774,7 +783,7 @@ public class AttachmentService extends ServiceBase {
 
                 // insert 0L for size now, because we don't know it yet
                 attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
-                        false, false, true, true, storeLocally, sourceUrl, false);
+                        false, false, true, true, storeLocally, sourceUrl, false, aiPrompt);
             }
             /*
              * if not an image extension, we can just stream directly into the database, but we want to try to
@@ -787,7 +796,7 @@ public class AttachmentService extends ServiceBase {
 
                     // insert 0L for size now, because we don't know it yet
                     attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-                            false, true, true, storeLocally, sourceUrl, false);
+                            false, true, true, storeLocally, sourceUrl, false, aiPrompt);
                 }
             }
         } catch (Exception e) {
@@ -827,7 +836,7 @@ public class AttachmentService extends ServiceBase {
                     is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
                     attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType,
                             bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally,
-                            sourceUrl, false);
+                            sourceUrl, false, null);
                     return true;
                 }
             }

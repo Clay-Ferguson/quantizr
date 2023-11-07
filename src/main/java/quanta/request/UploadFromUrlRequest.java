@@ -8,31 +8,40 @@ public class UploadFromUrlRequest extends RequestBase {
 	private boolean storeLocally;
 	private String nodeId;
 	private String sourceUrl;
-	
+	private String openAiPrompt;
+
+	public UploadFromUrlRequest() {}
+
 	public boolean isStoreLocally() {
 		return this.storeLocally;
 	}
-	
+
 	public String getNodeId() {
 		return this.nodeId;
 	}
-	
+
 	public String getSourceUrl() {
 		return this.sourceUrl;
 	}
-	
+
 	public void setStoreLocally(final boolean storeLocally) {
 		this.storeLocally = storeLocally;
 	}
-	
+
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-	
+
 	public void setSourceUrl(final String sourceUrl) {
 		this.sourceUrl = sourceUrl;
 	}
 
-	public UploadFromUrlRequest() {
+	public String getOpenAiPrompt() {
+		return openAiPrompt;
 	}
+
+	public void setOpenAiPrompt(String openAiPrompt) {
+		this.openAiPrompt = openAiPrompt;
+	}
+
 }

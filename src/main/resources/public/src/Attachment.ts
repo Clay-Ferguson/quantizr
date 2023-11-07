@@ -1,3 +1,4 @@
+import { UploadAIGenImgDlg } from "./dlg/UploadAIGenImgDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
@@ -32,6 +33,19 @@ export class Attachment {
         }
 
         new UploadFromUrlDlg(nodeId, onUploadFunc).open();
+    };
+
+    openUploadFromAiGenDlg = (nodeId: string, onUploadFunc: () => void) => {
+        if (!nodeId) {
+            const node = S.nodeUtil.getHighlightedNode();
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+                return;
+            }
+            nodeId = node.id;
+        }
+
+        new UploadAIGenImgDlg(nodeId, onUploadFunc).open();
     };
 
     openUploadFromIPFSDlg = (nodeId: string, onUploadFunc: () => void) => {

@@ -1289,7 +1289,7 @@ public class ActPubService extends ServiceBase {
             String mediaType = apStr(att, APObj.mediaType);
             String url = apStr(att, APObj.url);
             if (mediaType != null && url != null) {
-                attach.readFromUrl(ms, url, node, node.getIdStr(), mediaType, mediaType, -1, false);
+                attach.readFromUrl(ms, url, node, node.getIdStr(), mediaType, mediaType, -1, false, null);
             }
         }
     }

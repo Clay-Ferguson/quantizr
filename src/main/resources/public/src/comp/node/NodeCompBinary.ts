@@ -71,7 +71,14 @@ export class NodeCompBinary extends Div {
             }
         }
 
-        const imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
+        let imgTitleSuffix = "";
+        if (att.ai) {
+            imgTitleSuffix = att.ai ? "\n\n" + att.ai + "\n\n(" + att.m + ")" : "";
+        }
+        else {
+            imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
+        }
+
         const className = this.isFullScreenEmbed ? "fullScreenImg" : (this.isEditorEmbed ? "imgInEditor" : "imgInRow");
         const img = new Img();
         const imgAttrs: any = {

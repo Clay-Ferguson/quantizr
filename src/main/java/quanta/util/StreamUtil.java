@@ -3,6 +3,7 @@ package quanta.util;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.InputStream;
+import java.net.URI;
 import java.time.Duration;
 import javax.imageio.ImageReader;
 import org.slf4j.Logger;
@@ -21,16 +22,17 @@ public class StreamUtil {
             final ExchangeStrategies strategies = ExchangeStrategies.builder()
                     .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(maxFileSize)).build();
 
-            WebClient webClient = WebClient.builder().exchangeStrategies(strategies).baseUrl(sourceUrl)
+            WebClient webClient = WebClient.builder().exchangeStrategies(strategies)
                     .defaultHeader(HttpHeaders.USER_AGENT, Const.FAKE_USER_AGENT).build();
 
-            Mono<ByteArrayResource> result =
-                    webClient.get().retrieve().bodyToMono(ByteArrayResource.class).timeout(Duration.ofSeconds(timeout));
+            Mono<ByteArrayResource> result = webClient.get().uri(URI.create(sourceUrl)).retrieve()
+                    .bodyToMono(ByteArrayResource.class).timeout(Duration.ofSeconds(timeout));
 
             ByteArrayResource resource = result.block();
             InputStream is = resource.getInputStream();
             return is;
         } catch (Exception e) {
+            log.error("Failed Reading: " + sourceUrl);
             throw ExUtil.wrapEx(e);
         }
     }

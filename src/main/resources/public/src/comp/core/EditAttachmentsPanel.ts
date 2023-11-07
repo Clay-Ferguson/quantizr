@@ -183,8 +183,10 @@ export class EditAttachmentsPanel extends Div {
             }
         }
 
+        const aiPrompt = att.ai ? new Div("AI Prompt: " + att.ai, { className: "smallMarginTop" }) : null;
+
         return new Div(null, { className: "binaryEditorItem" }, [
-            topBinRow, fileNameTagTip, bottomBinRow
+            topBinRow, fileNameTagTip, bottomBinRow, aiPrompt
         ]);
     }
 

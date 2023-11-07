@@ -855,7 +855,6 @@ export class Render {
 
     buildGptCreditDiv = (): Div => {
         const ast = getAs();
-        debugger;
         if (ast.userProfile?.balance) {
             return new Div("GPT Credit: $" + getAs().userProfile.balance.toFixed(6), { className: "gptCredit float-end" });
         }

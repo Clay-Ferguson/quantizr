@@ -29,6 +29,8 @@ import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatGPTTextModerationItem;
 import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
+import quanta.model.client.openai.ImageGenRequest;
+import quanta.model.client.openai.ImageResponse;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.client.openai.Usage;
 import quanta.mongo.CreateNodeLocation;
@@ -50,9 +52,46 @@ import reactor.core.publisher.Mono;
 public class OpenAiService extends ServiceBase {
     String OPENAI_MOD_URL = "https://api.openai.com/v1/moderations";
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
+    String OPENAI_IMAGE_GEN_URL = "https://api.openai.com/v1/images/generations";
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
+
+    public String generateImage(MongoSession ms, String prompt) {
+        SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
+        if (userNode == null) {
+            throw new RuntimeException("Unknown user.");
+        }
+        BigDecimal balance = getBalance(ms, userNode);
+
+        WebClient webClient = WebClient.builder().baseUrl(OPENAI_IMAGE_GEN_URL)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
+
+        // WARNING: If you alter the size of the image, you will need to update the pricing calculations
+        ImageGenRequest request = new ImageGenRequest("dall-e-3", prompt, 1, "1024x1024");
+        // log.debug("GPT generateImage: " + XString.prettyPrint(request));
+
+        Mono<ImageResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+                .retrieve().bodyToMono(ImageResponse.class);
+        ImageResponse res = mono.block();
+
+        // log.debug("Image RESPONSE: " + XString.prettyPrint(res));
+
+        // NOTE: DO NOT DELETE. Useful for troubleshooting.
+        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
+        // log.debug("Image RESPONSE: " + response);
+
+        if (res.getData() != null && res.getData().size() > 0) {
+            return res.getData().get(0).getUrl();
+        }
+
+        // https://openai.com/pricing
+        BigDecimal cost = new BigDecimal(0.00765);
+        updateUserCredit(userNode, balance, cost);
+        return null;
+    }
 
     /**
      * Queries OpenAI using the 'node.content' as the question to ask.
@@ -66,20 +105,7 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Unknown user.");
         }
 
-        BigDecimal balance = null;
-        String userName = userNode.getStr(NodeProp.USER);
-        if (user.initialGrant(userNode.getIdStr(), userName)) {
-            balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
-        } else {
-            balance = tranRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
-            if (balance == null) {
-                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
-            }
-            int comparisonResult = balance.compareTo(BigDecimal.ZERO);
-            if (comparisonResult <= 0) {
-                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
-            }
-        }
+        BigDecimal balance = getBalance(ms, userNode);
 
         // this will hold all the prior chat history
         List<ChatMessage> messages = new ArrayList<>();
@@ -131,19 +157,6 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Sorry, the AI would reject that question.");
         }
 
-        // DO NOT DELETE (yet)
-        // switch (system.getModel().toLowerCase()) {
-        // case "gpt-4":
-        // case "gpt-4-vision-preview":
-        // break;
-        // case "gpt-3.5-turbo":
-        // break;
-        // default:
-        // throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported: " +
-        // system.getModel()
-        // + " is not supported.");
-        // }
-
         webClient = WebClient.builder().baseUrl(OPENAI_COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
@@ -169,7 +182,8 @@ public class OpenAiService extends ServiceBase {
                 .retrieve().bodyToMono(ChatCompletionResponse.class);
 
         ChatCompletionResponse res = mono.block();
-        updateUserCredit(userNode, balance, res);
+        BigDecimal cost = new BigDecimal(calculateCost(res));
+        res.userCredit = updateUserCredit(userNode, balance, cost);
         log.debug("GPT Res: " + XString.prettyPrint(res));
         return res;
 
@@ -179,6 +193,24 @@ public class OpenAiService extends ServiceBase {
         // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
         // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
         // log.debug("RESPONSE: " + response);
+    }
+
+    private BigDecimal getBalance(MongoSession ms, SubNode userNode) {
+        BigDecimal balance = null;
+        String userName = userNode.getStr(NodeProp.USER);
+        if (user.initialGrant(userNode.getIdStr(), userName)) {
+            balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
+        } else {
+            balance = tranRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
+            if (balance == null) {
+                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+            }
+            int comparisonResult = balance.compareTo(BigDecimal.ZERO);
+            if (comparisonResult <= 0) {
+                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+            }
+        }
+        return balance;
     }
 
     private boolean messageListHasImages(List<ChatMessage> messages) {
@@ -220,9 +252,8 @@ public class OpenAiService extends ServiceBase {
         }
     }
 
-    // updates the user's credit and returns the cost of the transaction
-    private void updateUserCredit(SubNode userNode, BigDecimal curBal, ChatCompletionResponse res) {
-        BigDecimal cost = new BigDecimal(calculateCost(res));
+    // updates the user's credit, and returns new balance
+    private BigDecimal updateUserCredit(SubNode userNode, BigDecimal curBal, BigDecimal cost) {
         UserAccount user = userRepository.findByMongoId(userNode.getIdStr());
 
         if (user == null) {
@@ -243,7 +274,7 @@ public class OpenAiService extends ServiceBase {
         // debit.setDetail(mapper.valueToTree(res));
 
         tranRepository.save(debit);
-        res.userCredit = curBal.subtract(cost);
+        return curBal.subtract(cost);
     }
 
     private boolean moderationFailed(ChatGPTModerationResponse modResponse) {
@@ -375,7 +406,6 @@ public class OpenAiService extends ServiceBase {
         return sb.toString();
     }
 
-    // todo-0: these prices are out of date. We need to update them.
     private double calculateCost(ChatCompletionResponse res) {
         Usage usage = res.getUsage();
 
@@ -387,15 +417,10 @@ public class OpenAiService extends ServiceBase {
         // We detect using startsWith, because the actual model used will be slightly different than the one
         // specified
         if (model.startsWith("gpt-4")) {
-            if (usage.getPromptTokens() < 8000) {
-                inputPpk = 0.03;
-                outputPpk = 0.06;
-            } else {
-                inputPpk = 0.06;
-                outputPpk = 0.12;
-            }
+            // https://openai.com/pricing
+            inputPpk = 0.01;
+            outputPpk = 0.03;
         }
-        //
         // else if (model.startsWith("gpt-3.5")) {
         // if (usage.getPromptTokens() < 4000) {
         // inputPpk = 0.0015;
