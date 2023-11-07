@@ -32,7 +32,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private attName: string, private toIpfs: boolean, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: () => void) {
-        super(importMode ? "Import File" : "Upload File");
+        super(importMode ? "Import File" : "Attach File");
     }
 
     renderDlg(): Comp[] {
@@ -47,20 +47,19 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         getValue: (): boolean => this.toIpfs
                     })
                 ]),
-                new Div("Click to Add Files (or Drag and Drop)"),
 
-                // WARNING: Keep these static IDs here, because when the page rerenders dropzone knows these IDs
-                // and dropzone will malfunction if these IDs change.
-                this.dropzoneDiv = new Div("", { id: "dropzone", className: "dropzone" }),
-                this.hiddenInputContainer = new Div(null, { id: "dropzoneInput", style: { display: "none" } }),
-
-                this.importMode ? null : new Div("From other sources..."),
+                this.importMode ? null : new Div("From Sources..."),
                 new ButtonBar([
-                    this.importMode ? null : new IconButton("fa-cloud", "Web/URL", {
+                    this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
+                        onClick: this.uploadFromClipboard,
+                        title: "Upload from Clipboard"
+                    }),
+
+                    this.importMode ? null : new IconButton("fa-cloud", "URL", {
                         onClick: this.uploadFromUrl,
                         title: "Upload from Web/URL"
                     }),
-                    this.importMode ? null : new IconButton("fa-magic", "Image by AI", {
+                    this.importMode ? null : new IconButton("fa-magic", "AI Generated", {
                         onClick: this.uploadFromAiGen,
                         title: "Create an AI Generated Image"
                     }),
@@ -75,7 +74,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     //     title: "Upload from Clipboard"
                     // }),
 
-                    this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
+                    this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", "Mic", {
                         onClick: async () => {
                             const dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
                             await dlg.open();
@@ -88,7 +87,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         title: "Record Audio as Attachment"
                     }),
 
-                    this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
+                    this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", "Web Cam", {
                         onClick: async () => {
                             const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
                             await dlg.open();
@@ -103,6 +102,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         title: "Record Video as Attachment"
                     })
                 ]),
+
+                new Div("From your Computer (Click or Drag-n-Drop)", { className: "bigMarginTop" }),
+
+                // WARNING: Keep these static IDs here, because when the page rerenders dropzone knows these IDs
+                // and dropzone will malfunction if these IDs change.
+                this.dropzoneDiv = new Div("", { id: "dropzone", className: "dropzone" }),
+                this.hiddenInputContainer = new Div(null, { id: "dropzoneInput", style: { display: "none" } }),
+
                 new ButtonBar([
                     this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
@@ -113,6 +120,25 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
+    }
+
+    uploadFromClipboard = async () => {
+        const blob = await S.util.readClipboardFile();
+        if (blob) {
+            this.immediateUploadFiles([blob]);
+        }
+        else {
+            S.util.showMessage("Unable to get Clipboard content.", "Warning");
+        }
+    }
+
+    immediateUploadFiles = async (files: File[]) => {
+        const ast = getAs();
+        await S.domUtil.uploadFilesToNode(files, ast.editNode.id, false);
+        this.close();
+        if (this.afterUploadFunc) {
+            this.afterUploadFunc();
+        }
     }
 
     uploadFromUrl = () => {

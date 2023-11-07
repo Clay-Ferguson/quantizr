@@ -729,10 +729,6 @@ export class EditNodeDlg extends DialogBase {
                 title: "Upload file attachment"
             }) : null,
 
-            allowUpload && S.util.clipboardReadable() ? new IconButton("fa-clipboard", null, {
-                onClick: () => this.utl.uploadFromClipboard(this),
-                title: "Upload from Clipboard"
-            }) : null,
 
             allowShare ? new IconButton("fa-share-alt", null, {
                 onClick: () => this.utl.share(this),
