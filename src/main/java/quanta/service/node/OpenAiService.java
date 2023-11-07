@@ -94,14 +94,6 @@ public class OpenAiService extends ServiceBase {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
 
-        /*
-         * OpenAI very cleverly changed their API model so that the prior versions are different. So if we
-         * wanted to keep supporting gpt-3.5 we'd have to do a lot of work to support both. So for now we
-         * just force all gpt-4 calls to use the vision model, and we can probably remove the user option to
-         * select too.
-         */
-        system.setModel("gpt-4-vision-preview");
-
         String input = node != null ? node.getContent() : question;
         List<ChatContent> sysContent = new ArrayList<>();
         sysContent.add(new ChatContent("text", system.getPrompt(), null));
@@ -111,6 +103,13 @@ public class OpenAiService extends ServiceBase {
         content.add(new ChatContent("text", input, null));
         addAttachments(content, node);
         messages.add(new ChatMessage("user", content));
+
+        // Select gpt-4 model based on whether the question contains images
+        if (messageListHasImages(messages)) {
+            system.setModel("gpt-4-vision-preview");
+        } else {
+            system.setModel("gpt-4-1106-preview");
+        }
 
         /* Moderate Call before submitting */
         String contentToModerate = concatenateContent(messages);
@@ -182,11 +181,28 @@ public class OpenAiService extends ServiceBase {
         // log.debug("RESPONSE: " + response);
     }
 
+    private boolean messageListHasImages(List<ChatMessage> messages) {
+        for (ChatMessage cm : messages) {
+            if (chatContentHasImages(cm.getContent())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean chatContentHasImages(List<ChatContent> content) {
+        for (ChatContent cc : content) {
+            if ("image_url".equals(cc.getType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void addAttachments(List<ChatContent> content, SubNode node) {
         if (node.getAttachments() != null) {
             node.getAttachments().forEach((String key, Attachment att) -> {
                 if (att.getMime().startsWith("image")) {
-
                     // add url if the attachment is a simple url
                     if (att.getUrl() != null) {
                         content.add(new ChatContent("image_url", null, att.getUrl()));
@@ -359,6 +375,7 @@ public class OpenAiService extends ServiceBase {
         return sb.toString();
     }
 
+    // todo-0: these prices are out of date. We need to update them.
     private double calculateCost(ChatCompletionResponse res) {
         Usage usage = res.getUsage();
 
@@ -379,17 +396,18 @@ public class OpenAiService extends ServiceBase {
             }
         }
         //
-        else if (model.startsWith("gpt-3.5")) {
-            if (usage.getPromptTokens() < 4000) {
-                inputPpk = 0.0015;
-                outputPpk = 0.002;
-            } else {
-                inputPpk = 0.003;
-                outputPpk = 0.004;
-            }
-        } else {
-            throw new RuntimeException(
-                    "Only gpt-4 and gpt-3.5-turbo are currently supported. " + res.getModel() + " is not supported.");
+        // else if (model.startsWith("gpt-3.5")) {
+        // if (usage.getPromptTokens() < 4000) {
+        // inputPpk = 0.0015;
+        // outputPpk = 0.002;
+        // } else {
+        // inputPpk = 0.003;
+        // outputPpk = 0.004;
+        // }
+        // }
+        //
+        else {
+            throw new RuntimeException("Only gpt-4-* is currently supported. " + res.getModel() + " is not supported.");
         }
 
         return (usage.getPromptTokens() * inputPpk / 1000) + (usage.getCompletionTokens() * outputPpk / 1000);

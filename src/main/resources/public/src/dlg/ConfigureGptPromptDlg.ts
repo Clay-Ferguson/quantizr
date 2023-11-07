@@ -6,9 +6,7 @@ import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
-import { TextField } from "../comp/core/TextField";
 
 export class ConfigureGptPromptDlg extends DialogBase {
     modelState: Validator = new Validator();
@@ -26,12 +24,12 @@ export class ConfigureGptPromptDlg extends DialogBase {
                     rows: 15,
                     placeholder: "You are a helpful assistant."
                 }, this.promptState, null, false, 3, this.textScrollPos),
-                new TextField({
-                    label: "ChatGPT Model",
-                    val: this.modelState,
-                    placeholder: "gpt-4"
-                }),
-                new Span("Example Models: gpt-4, gpt-3.5-turbo, etc."),
+                // new TextField({
+                //     label: "ChatGPT Model",
+                //     val: this.modelState,
+                //     placeholder: "gpt-4"
+                // }),
+                // new Span("Example Models: gpt-4, gpt-3.5-turbo, etc."),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
                     new Button("Reset", this.reset, null, "btn-secondary"),
