@@ -123,6 +123,10 @@ export class NodeCompMarkdown extends Comp {
     }
 
     code = ({ node, inline, className, children, ...props }) => {
+        const childrenStr = String(children);
+
+        // After upgrading to latest version 'inline' is undefined so we set it ourselves.
+        inline = !childrenStr.includes("\n");
         const match = /language-(\w+)/.exec(className || "");
         const language = match ? match[1] : "txt";
         return !inline ? (
@@ -151,7 +155,7 @@ export class NodeCompMarkdown extends Comp {
                         className: "codeDivBody",
                         language,
                         PreTag: "div"
-                    }, String(children).replace(/\n$/, ""))
+                    }, childrenStr.replace(/\n$/, ""))
                 )
             ])
         ) : (
