@@ -14,11 +14,13 @@ public class ChatGPTRequest {
 
     public ChatGPTRequest() {}
 
-    public ChatGPTRequest(String model, List<ChatMessage> messages, double temperature, String user) {
+    public ChatGPTRequest(String model, List<ChatMessage> messages, double temperature, String user,
+            Integer maxTokens) {
         this.model = model;
         this.messages = messages;
         this.temperature = temperature;
         this.user = user;
+        this.maxTokens = maxTokens;
     }
 
     public String getUser() {

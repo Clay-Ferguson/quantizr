@@ -1,6 +1,8 @@
 package quanta.service.node;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.Instant;
@@ -16,9 +18,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
+import quanta.model.client.openai.ChatContent;
 import quanta.model.client.openai.ChatGPTModerationRequest;
 import quanta.model.client.openai.ChatGPTModerationResponse;
 import quanta.model.client.openai.ChatGPTRequest;
@@ -36,7 +40,9 @@ import quanta.request.AskSubGraphRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.response.AskSubGraphResponse;
 import quanta.response.CreateSubNodeResponse;
+import quanta.service.AppController;
 import quanta.service.UserManagerService;
+import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
@@ -88,13 +94,23 @@ public class OpenAiService extends ServiceBase {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
 
-        if (StringUtils.isEmpty(system.getModel())) {
-            system.setModel("gpt-4");
-        }
+        /*
+         * OpenAI very cleverly changed their API model so that the prior versions are different. So if we
+         * wanted to keep supporting gpt-3.5 we'd have to do a lot of work to support both. So for now we
+         * just force all gpt-4 calls to use the vision model, and we can probably remove the user option to
+         * select too.
+         */
+        system.setModel("gpt-4-vision-preview");
 
         String input = node != null ? node.getContent() : question;
-        messages.add(0, new ChatMessage("system", system.getPrompt()));
-        messages.add(new ChatMessage("user", input));
+        List<ChatContent> sysContent = new ArrayList<>();
+        sysContent.add(new ChatContent("text", system.getPrompt(), null));
+        messages.add(0, new ChatMessage("system", sysContent));
+
+        List<ChatContent> content = new ArrayList<>();
+        content.add(new ChatContent("text", input, null));
+        addAttachments(content, node);
+        messages.add(new ChatMessage("user", content));
 
         /* Moderate Call before submitting */
         String contentToModerate = concatenateContent(messages);
@@ -116,32 +132,74 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Sorry, the AI would reject that question.");
         }
 
-        switch (system.getModel().toLowerCase()) {
-            case "gpt-4":
-            case "gpt-3.5-turbo":
-                break;
-            default:
-                throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported: " + system.getModel()
-                        + " is not supported.");
-        }
+        // DO NOT DELETE (yet)
+        // switch (system.getModel().toLowerCase()) {
+        // case "gpt-4":
+        // case "gpt-4-vision-preview":
+        // break;
+        // case "gpt-3.5-turbo":
+        // break;
+        // default:
+        // throw new RuntimeException("Only gpt-4 and gpt-3.5-turbo are currently supported: " +
+        // system.getModel()
+        // + " is not supported.");
+        // }
 
         webClient = WebClient.builder().baseUrl(OPENAI_COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
+        /*
+         * todo-0: without maxTokens we get comically short answers, so I'm not sure what to do about if or
+         * how end users should be able to tweak this.
+         */
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString());
+                ms.getUserNodeId().toHexString(), 2000);
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(request)).retrieve()
-                .bodyToMono(ChatCompletionResponse.class);
+        /*
+         * Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request' here
+         * instead of the stringified version of it. I haven't tried to figure out why the non-stringified
+         * fails, but it does fail.
+         */
+        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+                .retrieve().bodyToMono(ChatCompletionResponse.class);
 
         ChatCompletionResponse res = mono.block();
         updateUserCredit(userNode, balance, res);
         log.debug("GPT Res: " + XString.prettyPrint(res));
         return res;
+
+        // ================================
+        // DO NOT DELETE:
+        // We can use this for debugging to see the raw request and response
+        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
+        // log.debug("RESPONSE: " + response);
+    }
+
+    private void addAttachments(List<ChatContent> content, SubNode node) {
+        if (node.getAttachments() != null) {
+            node.getAttachments().forEach((String key, Attachment att) -> {
+                if (att.getMime().startsWith("image")) {
+
+                    // add url if the attachment is a simple url
+                    if (att.getUrl() != null) {
+                        content.add(new ChatContent("image_url", null, att.getUrl()));
+                    }
+                    // otherwise build the link to our server if the image is stored on the server DB
+                    else if (att.getBin() != null) {
+                        String path = AppController.API_PATH + "/bin/" + att.getBin() + "?nodeId=" + node.getIdStr()
+                                + "&token="
+                                + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
+                        String src = prop.getProtocolHostAndPort() + path;
+                        content.add(new ChatContent("image_url", null, src));
+                    }
+                }
+            });
+        }
     }
 
     // updates the user's credit and returns the cost of the transaction
@@ -190,7 +248,7 @@ public class OpenAiService extends ServiceBase {
             if (i > 0) {
                 result.append(", ");
             }
-            result.append(messages.get(i).getContent());
+            result.append(messages.get(i).getTextContent());
         }
 
         return result.toString();
@@ -213,7 +271,9 @@ public class OpenAiService extends ServiceBase {
         while (parent != null) {
             if (NodeType.OPENAI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
-                messages.add(0, new ChatMessage("assistant", parent.getContent()));
+                List<ChatContent> content = new ArrayList<>();
+                content.add(new ChatContent("text", parent.getContent(), null));
+                messages.add(0, new ChatMessage("assistant", content));
             } else {
                 nonAnswerCounter++;
                 parseAISystemFromContent(parent, system);
@@ -224,7 +284,10 @@ public class OpenAiService extends ServiceBase {
                     break;
                 }
 
-                messages.add(0, new ChatMessage("user", parent.getContent()));
+                List<ChatContent> content = new ArrayList<>();
+                content.add(new ChatContent("text", parent.getContent(), null));
+                addAttachments(content, parent);
+                messages.add(0, new ChatMessage("user", content));
             }
 
             // walk up the tree. get parent of parent.
@@ -282,7 +345,7 @@ public class OpenAiService extends ServiceBase {
             if (counter > 0) {
                 sb.append("\n\n");
             }
-            sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getContent());
+            sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getTextContent());
 
             // Since we store the answer text in the content of the node and also store the answer object
             // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.

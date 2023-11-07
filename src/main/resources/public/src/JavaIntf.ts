@@ -175,6 +175,12 @@ export interface ChatCompletionResponse {
     userCredit: number;
 }
 
+export interface ChatContent {
+    type: string;
+    text: string;
+    image_url: string;
+}
+
 export interface ChatGPTModerationRequest {
     input: string;
 }
@@ -201,7 +207,7 @@ export interface ChatGPTTextModerationItem {
 
 export interface ChatMessage {
     role: string;
-    content: string;
+    content: ChatContent[];
 }
 
 export interface Choice {
