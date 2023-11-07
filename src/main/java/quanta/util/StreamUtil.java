@@ -32,6 +32,9 @@ public class StreamUtil {
             InputStream is = resource.getInputStream();
             return is;
         } catch (Exception e) {
+            // todo-0: this can happen when user runs out of storage space.
+            // Need to send back a message like this: You might be out of server storage. Check your usage at
+            // "Menu -> Account -> Settings -> Server Storage Space"
             log.error("Failed Reading: " + sourceUrl);
             throw ExUtil.wrapEx(e);
         }
