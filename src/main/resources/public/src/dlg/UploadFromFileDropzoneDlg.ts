@@ -103,7 +103,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     })
                 ]),
 
-                new Div("From your Computer (Click or Drag-n-Drop)", { className: "bigMarginTop" }),
+                new Div("From your Computer (Click or Drag-n-Drop)", { className: "marginTop" }),
 
                 // WARNING: Keep these static IDs here, because when the page rerenders dropzone knows these IDs
                 // and dropzone will malfunction if these IDs change.
