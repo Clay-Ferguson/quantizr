@@ -241,7 +241,7 @@ export class Render {
 
             const docViewByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node) + "?view=doc";
             children.push(new Heading(6, "Doc View By Name"), //
-                new Div(byNameUrl, {
+                new Div(docViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
                     onClick: () => this.copyLinkToClipboard(docViewByNameUrl)
