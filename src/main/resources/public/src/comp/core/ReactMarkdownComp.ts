@@ -6,7 +6,7 @@ import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { S } from "../../Singletons";
-import SyntaxHighlighterComp from "./SyntaxHighlighterComp";
+import { Prism } from "react-syntax-highlighter";
 
 // Good styles are: a11yDark, nightOwl, oneLight
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -72,16 +72,18 @@ const codeFunc = ({ node, inline, className, children, ...props }) => {
                 })
             ]),
 
-            createElement("div", null,
-                createElement(SyntaxHighlighterComp as any, {
-                    // key: "code-mk-" + this.getId(),
-                    ...props,
-                    style: highlightStyle,
-                    className: "codeDivBody",
-                    language,
-                    PreTag: "div"
-                }, childrenStr.replace(/\n$/, ""))
-            )
+            // createElement("div", null, //<---- not needed right? Leaving here for now just in case.
+            // Note: We used to have SyntaxHighlighterComp here, but switched to raw Prism. Once this is fully tested
+            // we can remove the SyntaxHighlighterComp.ts file.
+            createElement(Prism as any, {
+                // key: "code-mk-" + this.getId(),
+                ...props,
+                style: highlightStyle,
+                className: "codeDivBody",
+                language,
+                PreTag: "div"
+            }, childrenStr.replace(/\n$/, ""))
+            // )
         ])
     ) : (
         createElement("code", { ...props, className }, children)
