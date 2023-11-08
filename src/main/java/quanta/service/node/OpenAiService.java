@@ -7,7 +7,9 @@ import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +24,6 @@ import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
-import quanta.model.client.openai.ChatContent;
 import quanta.model.client.openai.ChatGPTModerationRequest;
 import quanta.model.client.openai.ChatGPTModerationResponse;
 import quanta.model.client.openai.ChatGPTRequest;
@@ -121,12 +122,18 @@ public class OpenAiService extends ServiceBase {
         }
 
         String input = node != null ? node.getContent() : question;
-        List<ChatContent> sysContent = new ArrayList<>();
-        sysContent.add(new ChatContent("text", system.getPrompt(), null));
+        List<Map> sysContent = new ArrayList<>();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("type", "text");
+        map.put("text", system.getPrompt());
+        sysContent.add(map);
         messages.add(0, new ChatMessage("system", sysContent));
 
-        List<ChatContent> content = new ArrayList<>();
-        content.add(new ChatContent("text", input, null));
+        List<Map> content = new ArrayList<>();
+        map = new HashMap<>();
+        map.put("type", "text");
+        map.put("text", input);
+        content.add(map);
         addAttachments(content, node);
         messages.add(new ChatMessage("user", content));
 
@@ -222,22 +229,33 @@ public class OpenAiService extends ServiceBase {
         return false;
     }
 
-    private boolean chatContentHasImages(List<ChatContent> content) {
-        for (ChatContent cc : content) {
-            if ("image_url".equals(cc.getType())) {
-                return true;
+    // Object will be "string" or {type, text, image_url}
+    private boolean chatContentHasImages(Object content) {
+        if (content instanceof String) {
+            return false;
+        }
+        if (content instanceof List contentList) {
+            for (Object c : contentList) {
+                if (c instanceof Map cMap) {
+                    if ("image_url".equals(cMap.get("type"))) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
     }
 
-    private void addAttachments(List<ChatContent> content, SubNode node) {
+    private void addAttachments(List<Map> content, SubNode node) {
         if (node.getAttachments() != null) {
             node.getAttachments().forEach((String key, Attachment att) -> {
                 if (att.getMime().startsWith("image")) {
                     // add url if the attachment is a simple url
                     if (att.getUrl() != null) {
-                        content.add(new ChatContent("image_url", null, att.getUrl()));
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("type", "image_url");
+                        map.put("image_url", att.getUrl());
+                        content.add(map);
                     }
                     // otherwise build the link to our server if the image is stored on the server DB
                     else if (att.getBin() != null) {
@@ -245,7 +263,10 @@ public class OpenAiService extends ServiceBase {
                                 + "&token="
                                 + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
                         String src = prop.getProtocolHostAndPort() + path;
-                        content.add(new ChatContent("image_url", null, src));
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("type", "image_url");
+                        map.put("image_url", src);
+                        content.add(map);
                     }
                 }
             });
@@ -320,8 +341,11 @@ public class OpenAiService extends ServiceBase {
         while (parent != null) {
             if (NodeType.OPENAI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
-                List<ChatContent> content = new ArrayList<>();
-                content.add(new ChatContent("text", parent.getContent(), null));
+                List<Map> content = new ArrayList<>();
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("type", "text");
+                map.put("text", parent.getContent());
+                content.add(map);
                 messages.add(0, new ChatMessage("assistant", content));
             } else {
                 nonAnswerCounter++;
@@ -333,8 +357,11 @@ public class OpenAiService extends ServiceBase {
                     break;
                 }
 
-                List<ChatContent> content = new ArrayList<>();
-                content.add(new ChatContent("text", parent.getContent(), null));
+                List<Map> content = new ArrayList<>();
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("type", "text");
+                map.put("text", parent.getContent());
+                content.add(map);
                 addAttachments(content, parent);
                 messages.add(0, new ChatMessage("user", content));
             }

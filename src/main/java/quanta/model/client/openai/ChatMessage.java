@@ -1,25 +1,21 @@
 package quanta.model.client.openai;
 
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import quanta.util.ChatContentDeserializer;
 
 public class ChatMessage {
     private static Logger log = LoggerFactory.getLogger(ChatMessage.class);
 
     private String role;
-
-    // This custom deserializer ensures we can read both a single string and an array of ChatContent
-    @JsonDeserialize(using = ChatContentDeserializer.class)
-    private List<ChatContent> content;
+    private Object content; // {type, text, image_url} or String
 
     public ChatMessage() {}
 
-    public ChatMessage(String role, List<ChatContent> content) {
+    public ChatMessage(String role, Object content) {
         this.role = role;
         this.content = content;
     }
@@ -32,29 +28,39 @@ public class ChatMessage {
         this.role = role;
     }
 
-    public List<ChatContent> getContent() {
+    public Object getContent() {
         return content;
     }
 
-    public void setContent(List<ChatContent> content) {
+    public void setContent(Object content) {
         this.content = content;
     }
 
     @Transient
     @JsonIgnore
     public String getTextContent() {
-        if (content == null || content.isEmpty()) {
-            return null;
+        if (content instanceof String) {
+            return (String) content;
         }
-        StringBuilder sb = new StringBuilder();
-        for (ChatContent c : content) {
-            if ("text".equals(c.getType())) {
-                if (sb.length() > 0) {
-                    sb.append("\n");
+        if (content instanceof List contentList) {
+            StringBuilder sb = new StringBuilder();
+            for (Object c : contentList) {
+                if (c instanceof Map cMap) {
+                    if ("text".equals(cMap.get("type"))) {
+                        if (sb.length() > 0) {
+                            sb.append("\n");
+                        }
+                        sb.append(cMap.get("text"));
+                    }
+                } else if (c instanceof String cString) {
+                    if (sb.length() > 0) {
+                        sb.append("\n");
+                    }
+                    sb.append(cString);
                 }
-                sb.append(c.getText());
             }
+            return sb.toString();
         }
-        return sb.toString();
+        return null;
     }
 }
