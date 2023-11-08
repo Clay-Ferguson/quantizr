@@ -90,5 +90,4 @@ const codeFunc = ({ node, inline, className, children, ...props }) => {
     );
 }
 
-
 export default ReactMarkdownComp;
