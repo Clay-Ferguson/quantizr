@@ -727,6 +727,7 @@ export interface UploadFromUrlRequest extends RequestBase {
     sourceUrl: string;
     openAiPrompt: string;
     highDef: boolean;
+    size: string;
 }
 
 export interface RequestBase {

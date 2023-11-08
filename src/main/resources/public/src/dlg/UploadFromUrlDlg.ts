@@ -50,7 +50,8 @@ export class UploadFromUrlDlg extends DialogBase {
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue(),
             openAiPrompt: null,
-            highDef: false
+            highDef: false,
+            size: null
         });
         this.uploadFromUrlResponse(res);
     }

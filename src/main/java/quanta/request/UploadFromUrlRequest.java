@@ -10,6 +10,7 @@ public class UploadFromUrlRequest extends RequestBase {
 	private String sourceUrl;
 	private String openAiPrompt;
 	private boolean highDef;
+	private String size;
 
 	public UploadFromUrlRequest() {}
 
@@ -51,5 +52,13 @@ public class UploadFromUrlRequest extends RequestBase {
 
 	public void setHighDef(boolean highDef) {
 		this.highDef = highDef;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
 	}
 }

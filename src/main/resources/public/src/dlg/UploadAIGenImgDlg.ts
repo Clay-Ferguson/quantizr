@@ -8,9 +8,11 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
+import { Selection } from "../comp/core/Selection";
 
 interface LS { // Local State
-    highDef: boolean;
+    highDef?: boolean;
+    size?: string;
 }
 
 export class UploadAIGenImgDlg extends DialogBase {
@@ -26,7 +28,7 @@ export class UploadAIGenImgDlg extends DialogBase {
     constructor(private nodeId: string, private onUploadFunc: () => void) {
         super("Generate Image with AI");
         this.validatedStates = [this.descriptState];
-        this.mergeState<LS>({ highDef: null });
+        this.mergeState<LS>({ highDef: null, size: "1024x1024" });
     }
 
     renderDlg(): Comp[] {
@@ -36,7 +38,15 @@ export class UploadAIGenImgDlg extends DialogBase {
                     new Checkbox("High Definition", null, {
                         setValue: (checked: boolean) => this.mergeState<LS>({ highDef: checked }),
                         getValue: (): boolean => this.getState<LS>().highDef
-                    })
+                    }),
+                    new Selection(null, null, [
+                        { key: "1024x1024", val: "Square: 1024x1024" },
+                        { key: "1794x1024", val: "Landscape: 1792x1024" },
+                        { key: "1024x1792", val: "Portrait: 1024x1792" },
+                    ], null, "aiImageGenSize float-end", {
+                        setValue: (val: string) => this.mergeState<LS>({ size: val }),
+                        getValue: (): string => this.getState<LS>().size
+                    }),
                 ]),
                 new TextArea("Describe Image", { rows: 10 }, this.descriptState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
@@ -57,7 +67,8 @@ export class UploadAIGenImgDlg extends DialogBase {
             nodeId: this.nodeId,
             sourceUrl: null,
             openAiPrompt: this.descriptState.getValue(),
-            highDef: this.getState<LS>().highDef
+            highDef: this.getState<LS>().highDef,
+            size: this.getState<LS>().size
         });
         this.uploadFromUrlResponse(res);
     }
