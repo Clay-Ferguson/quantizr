@@ -518,7 +518,7 @@ public class OpenAiService extends ServiceBase {
 
         newNode.touch();
         newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-        acl.inheritSharingFromParent(ms, req, res, node, newNode);
+        acl.inheritSharingFromParent(ms, req.getBoosterUserId(), res, node, newNode);
         update.save(ms, newNode);
     }
 }

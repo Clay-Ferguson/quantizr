@@ -335,7 +335,7 @@ public class MongoCreate extends ServiceBase {
                 ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
                 newNode.setAc(ac);
             } else if (req.isReply() || forceInheritSharing) {
-                acl.inheritSharingFromParent(ms, req, res, nodeBeingRepliedTo, newNode);
+                acl.inheritSharingFromParent(ms, req.getBoosterUserId(), res, nodeBeingRepliedTo, newNode);
             }
 
             /* Always make public if we're replying to public node or posting under our POSTs node */
@@ -427,12 +427,7 @@ public class MongoCreate extends ServiceBase {
                 acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
                         Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
             } else {
-                // we always copy the access controls from the parent for any new nodes
-                auth.setDefaultReplyAcl(parentNode, newNode);
-                // inherit UNPUBLISHED prop from parent, if we own the parent
-                if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
-                    newNode.set(NodeProp.UNPUBLISHED, true);
-                }
+                acl.inheritSharingFromParent(ms, null, res, parentNode, newNode);
             }
         }
 

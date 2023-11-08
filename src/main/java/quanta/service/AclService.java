@@ -46,6 +46,7 @@ import quanta.response.GetNodePrivilegesResponse;
 import quanta.response.RemovePrivilegeResponse;
 import quanta.response.SetCipherKeyResponse;
 import quanta.response.SetUnpublishedResponse;
+import quanta.response.base.ResponseBase;
 import quanta.util.Const;
 import quanta.util.XString;
 
@@ -448,27 +449,29 @@ public class AclService extends ServiceBase {
         return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
     }
 
-    public void inheritSharingFromParent(MongoSession ms, CreateSubNodeRequest req, CreateSubNodeResponse res,
-            SubNode nodeBeingRepliedTo, SubNode newNode) {
+    public void inheritSharingFromParent(MongoSession ms, String boosterUserId, ResponseBase res, SubNode parentNode,
+            SubNode childNode) {
         // we always determine the access controls from the parent for any new nodes
-        auth.setDefaultReplyAcl(nodeBeingRepliedTo, newNode);
+        auth.setDefaultReplyAcl(parentNode, childNode);
 
-        if (AclService.isPublic(nodeBeingRepliedTo)) {
-            acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
+        if (AclService.isPublic(parentNode)) {
+            acl.addPrivilege(ms, null, childNode, PrincipalName.PUBLIC.s(), null,
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         }
 
-        if (req.getBoosterUserId() != null) {
-            newNode.safeGetAc().put(req.getBoosterUserId(), new AccessControl(null, APConst.RDWR));
+        if (boosterUserId != null) {
+            childNode.safeGetAc().put(boosterUserId, new AccessControl(null, APConst.RDWR));
         }
         // inherit UNPUBLISHED prop from parent, if we own the parent
-        if (nodeBeingRepliedTo.getBool(NodeProp.UNPUBLISHED)
-                && nodeBeingRepliedTo.getOwner().equals(ms.getUserNodeId())) {
-            newNode.set(NodeProp.UNPUBLISHED, true);
+        if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
+            childNode.set(NodeProp.UNPUBLISHED, true);
         }
-        String cipherKey = nodeBeingRepliedTo.getStr(NodeProp.ENC_KEY);
+
+        String cipherKey = parentNode.getStr(NodeProp.ENC_KEY);
         if (cipherKey != null) {
-            res.setEncrypt(true);
+            if (res instanceof CreateSubNodeResponse _res) {
+                _res.setEncrypt(true);
+            }
         }
     }
 
