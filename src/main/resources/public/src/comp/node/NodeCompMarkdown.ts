@@ -122,6 +122,7 @@ export class NodeCompMarkdown extends Comp {
         return true;
     }
 
+    // This and all other methods that SHOULD be in the core markdown component should be moved there.
     code = ({ node, inline, className, children, ...props }) => {
         const childrenStr = String(children);
 
@@ -140,7 +141,7 @@ export class NodeCompMarkdown extends Comp {
                         key: "code-i-" + this.getId(),
                         className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon codeIcon",
                         onClick: () => {
-                            S.util.copyToClipboard(children[0]);
+                            S.util.copyToClipboard(children.concat());
                             // todo-1: move flashMessage into copyToClipboard
                             S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
                         }
