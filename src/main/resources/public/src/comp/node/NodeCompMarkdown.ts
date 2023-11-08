@@ -1,14 +1,10 @@
 import { ReactNode, createElement } from "react";
-
-// Good styles are: a11yDark, nightOwl, oneLight
-import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getAs } from "../../AppContext";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { TabIntf } from "../../intf/TabIntf";
 import { Comp } from "../base/Comp";
 import ReactMarkdownComp from "../core/ReactMarkdownComp";
-import SyntaxHighlighterComp from "../core/SyntaxHighlighterComp";
 
 interface LS {
     content: string;
@@ -122,58 +118,8 @@ export class NodeCompMarkdown extends Comp {
         return true;
     }
 
-    // This and all other methods that SHOULD be in the core markdown component should be moved there.
-    code = ({ node, inline, className, children, ...props }) => {
-        const childrenStr = String(children);
-
-        // After upgrading to latest version 'inline' is undefined so we set it ourselves.
-        inline = !childrenStr.includes("\n");
-        const match = /language-(\w+)/.exec(className || "");
-        const language = match ? match[1] : "txt";
-        return !inline ? (
-            createElement("div", { className: "smallMarginBottom" }, [
-                createElement("div", { className: "codeDivHeader" }, [
-                    createElement("span", {
-                        key: "code-div-" + this.getId(),
-                        className: "markdownLanguage"
-                    }, language === "txt" ? "" : language),
-                    createElement("i", {
-                        key: "code-i-" + this.getId(),
-                        className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon codeIcon",
-                        onClick: () => {
-                            S.util.copyToClipboard(children.concat());
-                            // todo-1: move flashMessage into copyToClipboard
-                            S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
-                        }
-                    })
-                ]),
-
-                createElement("div", null,
-                    createElement(SyntaxHighlighterComp as any, {
-                        key: "code-mk-" + this.getId(),
-                        ...props,
-                        style: highlightStyle,
-                        className: "codeDivBody",
-                        language,
-                        PreTag: "div"
-                    }, childrenStr.replace(/\n$/, ""))
-                )
-            ])
-        ) : (
-            createElement("code", { ...props, className }, children)
-        );
-    }
-
     override compRender = (): ReactNode => {
         const state = this.getState<LS>();
-
-        this.attribs.components = {
-            code: this.code
-        }
-
-        this.attribs.components.a = (props: any) => {
-            return createElement("a", { href: props.href, target: "blank" }, props.children);
-        }
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
