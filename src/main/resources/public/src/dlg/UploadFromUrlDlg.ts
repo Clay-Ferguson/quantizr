@@ -49,7 +49,8 @@ export class UploadFromUrlDlg extends DialogBase {
             storeLocally: UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue(),
-            openAiPrompt: null
+            openAiPrompt: null,
+            highDef: false
         });
         this.uploadFromUrlResponse(res);
     }

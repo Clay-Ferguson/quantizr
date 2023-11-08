@@ -220,6 +220,7 @@ export interface ImageGenRequest {
     model: string;
     prompt: string;
     size: string;
+    quality: string;
     n: number;
 }
 
@@ -725,6 +726,7 @@ export interface UploadFromUrlRequest extends RequestBase {
     nodeId: string;
     sourceUrl: string;
     openAiPrompt: string;
+    highDef: boolean;
 }
 
 export interface RequestBase {

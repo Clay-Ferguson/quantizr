@@ -1,6 +1,7 @@
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
@@ -8,8 +9,13 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
 
+interface LS { // Local State
+    highDef: boolean;
+}
+
 export class UploadAIGenImgDlg extends DialogBase {
 
+    static highDef: boolean = true;
     static storeLocally: boolean = false;
     textScrollPos = new ScrollPos();
 
@@ -20,12 +26,19 @@ export class UploadAIGenImgDlg extends DialogBase {
     constructor(private nodeId: string, private onUploadFunc: () => void) {
         super("Generate Image with AI");
         this.validatedStates = [this.descriptState];
+        this.mergeState<LS>({ highDef: null });
     }
 
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new TextArea("Describe Image", { rows: 15 }, this.descriptState, null, false, 3, this.textScrollPos),
+                new Div(null, null, [
+                    new Checkbox("High Definition", null, {
+                        setValue: (checked: boolean) => this.mergeState<LS>({ highDef: checked }),
+                        getValue: (): boolean => this.getState<LS>().highDef
+                    })
+                ]),
+                new TextArea("Describe Image", { rows: 10 }, this.descriptState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Create", this.upload, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
@@ -43,7 +56,8 @@ export class UploadAIGenImgDlg extends DialogBase {
             storeLocally: true,
             nodeId: this.nodeId,
             sourceUrl: null,
-            openAiPrompt: this.descriptState.getValue()
+            openAiPrompt: this.descriptState.getValue(),
+            highDef: this.getState<LS>().highDef
         });
         this.uploadFromUrlResponse(res);
     }

@@ -9,6 +9,7 @@ public class UploadFromUrlRequest extends RequestBase {
 	private String nodeId;
 	private String sourceUrl;
 	private String openAiPrompt;
+	private boolean highDef;
 
 	public UploadFromUrlRequest() {}
 
@@ -44,4 +45,11 @@ public class UploadFromUrlRequest extends RequestBase {
 		this.openAiPrompt = openAiPrompt;
 	}
 
+	public boolean isHighDef() {
+		return highDef;
+	}
+
+	public void setHighDef(boolean highDef) {
+		this.highDef = highDef;
+	}
 }

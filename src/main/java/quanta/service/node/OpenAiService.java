@@ -58,24 +58,30 @@ public class OpenAiService extends ServiceBase {
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
 
-    public String generateImage(MongoSession ms, String prompt) {
+    public String generateImage(MongoSession ms, String prompt, boolean highDef) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
         BigDecimal balance = getBalance(ms, userNode);
+        ImageResponse res = null;
 
-        WebClient webClient = WebClient.builder().baseUrl(OPENAI_IMAGE_GEN_URL)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
+        try {
+            WebClient webClient = WebClient.builder().baseUrl(OPENAI_IMAGE_GEN_URL)
+                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
-        // WARNING: If you alter the size of the image, you will need to update the pricing calculations
-        ImageGenRequest request = new ImageGenRequest("dall-e-3", prompt, 1, "1024x1024");
-        // log.debug("GPT generateImage: " + XString.prettyPrint(request));
+            // WARNING: If you alter the size of the image, you will need to update the pricing calculations
+            ImageGenRequest request = new ImageGenRequest("dall-e-3", prompt, 1, "1024x1024", highDef ? "hd" : null);
+            // log.debug("GPT generateImage: " + XString.prettyPrint(request));
 
-        Mono<ImageResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(ImageResponse.class);
-        ImageResponse res = mono.block();
+            Mono<ImageResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+                    .retrieve().bodyToMono(ImageResponse.class);
+            res = mono.block();
+        } catch (Exception e) {
+            log.error("Error generating image: " + e.getMessage());
+            throw e;
+        }
 
         // log.debug("Image RESPONSE: " + XString.prettyPrint(res));
 

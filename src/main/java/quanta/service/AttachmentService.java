@@ -691,7 +691,7 @@ public class AttachmentService extends ServiceBase {
     public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
         UploadFromUrlResponse res = new UploadFromUrlResponse();
         if (req.getOpenAiPrompt() != null) {
-            req.setSourceUrl(oai.generateImage(ms, req.getOpenAiPrompt()));
+            req.setSourceUrl(oai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef()));
             req.setStoreLocally(true);
         }
 
