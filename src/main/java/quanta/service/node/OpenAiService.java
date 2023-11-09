@@ -63,6 +63,7 @@ public class OpenAiService extends ServiceBase {
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
+
         BigDecimal balance = getBalance(ms, userNode);
         ImageResponse res = null;
 
@@ -94,10 +95,22 @@ public class OpenAiService extends ServiceBase {
             return res.getData().get(0).getUrl();
         }
 
-        // https://openai.com/pricing
-        BigDecimal cost = new BigDecimal(0.00765);
+        BigDecimal cost = getImageCost(size);
         updateUserCredit(userNode, balance, cost);
         return null;
+    }
+
+    // https://openai.com/pricing
+    private BigDecimal getImageCost(String size) {
+        switch (size) {
+            case "1024x1792":
+            case "1792x1024":
+                return new BigDecimal(0.01105);
+            case "1024x1024":
+                return new BigDecimal(0.00765);
+            default:
+                throw new RuntimeException("Unsupported image size: " + size);
+        }
     }
 
     /**
