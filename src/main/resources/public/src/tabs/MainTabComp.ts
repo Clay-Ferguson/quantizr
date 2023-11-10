@@ -71,18 +71,20 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         onClick: S.nav.runTimeline
                     }),
 
-                    new Icon({
+                    // save screen space for mobile
+                    !ast.mobileMode ? new Icon({
                         className: "fa fa-book fa-lg buttonBarIcon",
                         title: "Show Document View\n\n(All content on a single page)",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.openDocumentView
-                    }),
+                    }) : null,
 
-                    new Icon({
+                    // save screen space for mobile
+                    !ast.mobileMode ? new Icon({
                         className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
                         title: "Previous Sibling Node",
                         onClick: S.nav.navToPrev
-                    }),
+                    }) : null,
 
                     new Icon({
                         className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
