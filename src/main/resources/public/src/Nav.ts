@@ -21,6 +21,10 @@ export class Nav {
     parentVisibleToUser = (): boolean => {
         const ast = getAs();
         if (!ast.node) return false;
+
+        // If any non-admin user viewing home node we know parent won't be visible to them.
+        if (!ast.isAdminUser && ast.node.path === "/r/public/home") return false
+
         if (ast.isAnonUser) {
             return true;
         } else {
