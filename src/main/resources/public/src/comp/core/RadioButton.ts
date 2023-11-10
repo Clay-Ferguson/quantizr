@@ -22,7 +22,7 @@ export class RadioButton extends Comp {
                 name: this.groupName,
                 type: "radio",
                 label: this.label,
-                value: this.getId("val-"),
+                value: "val-" + this.getId(),
                 className: "form-check-input clickable"
             }, null, this.valueIntf),
             new Label(this.label || "", {

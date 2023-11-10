@@ -46,15 +46,15 @@ export class IconButton extends Comp {
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
         this.setChildren([
             this.imageUrl ? new Img({
-                key: this.getId("img_"),
+                key: "img_" + this.getId(),
                 src: this.imageUrl
             }) : null,
             new Italic({
-                key: this.getId("i_"),
+                key: "i_" + this.getId,
                 className: "fa " + this.iconClass + (this.toggle === "on" ? " iconToggleOn" : " iconToggleOff")
             }),
             this.text ? new Span(this.text, {
-                key: this.getId("t_"),
+                key: "t_" + this.getId(),
                 className: "iconButtonFont"
             }) : null
         ]);

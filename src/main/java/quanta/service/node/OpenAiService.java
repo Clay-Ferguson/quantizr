@@ -158,7 +158,7 @@ public class OpenAiService extends ServiceBase {
 
         // Select gpt-4 model based on whether the question contains images
         if (messageListHasImages(messages)) {
-            system.setModel("gpt-4-vision-preview");
+            system.setModel("gpt-4-1106-vision-preview");
         } else {
             system.setModel("gpt-4-1106-preview");
         }
@@ -190,7 +190,7 @@ public class OpenAiService extends ServiceBase {
         /*
          * Without maxTokens we get comically short answers (like not even the complete first sentence of
          * the response, but a sentence frament), so I'm not sure what to do about if or how end users
-         * should be able to tweak this. Before switching to gpt-4-vision we were getting sensible response
+         * should be able to tweak this. Before switching to gpt-4 vision we were getting sensible response
          * lengths without having to provide a maxTokens value
          */
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
@@ -466,18 +466,7 @@ public class OpenAiService extends ServiceBase {
             // https://openai.com/pricing
             inputPpk = 0.01;
             outputPpk = 0.03;
-        }
-        // else if (model.startsWith("gpt-3.5")) {
-        // if (usage.getPromptTokens() < 4000) {
-        // inputPpk = 0.0015;
-        // outputPpk = 0.002;
-        // } else {
-        // inputPpk = 0.003;
-        // outputPpk = 0.004;
-        // }
-        // }
-        //
-        else {
+        } else {
             throw new RuntimeException("Only gpt-4-* is currently supported. " + res.getModel() + " is not supported.");
         }
 

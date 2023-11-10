@@ -323,7 +323,7 @@ export class TypeBase implements TypeIntf {
                 // allow max of 50 urls.
                 if (count++ < 50) {
                     // console.log("OG: id=" + node.id + " url=" + url);
-                    const og = new OpenGraphPanel(tabData, comp.getId("og" + count + "_"), url,
+                    const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), url,
                         isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 

@@ -7,7 +7,6 @@ import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 
 export abstract class DialogBase extends Comp {
-    static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000; // z-index
     resolve: (dlg: DialogBase) => void;
 
@@ -38,7 +37,7 @@ export abstract class DialogBase extends Comp {
     which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
     experimental overrideClass used for testing was "embedded-dlg"
     */
-    constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: boolean = false, public mode: DialogMode = null, public forceMode: boolean = false) {
+    constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: string = null, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
         const ast = getAs();
         this.title = this.title || "Message";
@@ -209,12 +208,11 @@ export abstract class DialogBase extends Comp {
             }
             // else wrap dialog in backdrop
             else {
-                this.attribs.id = this.getId(DialogBase.BACKDROP_PREFIX);
                 this.attribs.className = (isTopmost ? "appModalTopBackdrop " : "appModalBackdrop ") + "customScrollbar";
                 this.attribs.style = { zIndex: this.zIndex };
                 this.attribs.onClick = (evt: Event) => {
                     if (this.closeByOutsideClick) {
-                        const dlgElm: any = S.domUtil.domElm(this.getId());
+                        const dlgElm: any = S.domUtil.domElm(this.closeByOutsideClick);
                         // check if the click was outside the dialog.
                         if (!!dlgElm && !dlgElm.contains(evt.target)) {
                             this.close();

@@ -83,16 +83,16 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         const state = this.getState<LS>();
 
         const label = this.cfg.label ? new Label(this.cfg.label, {
-            key: this.getId("label_"),
+            key: "label_" + this.getId(),
             className: this.cfg.labelClass || "txtFieldLabel",
-            htmlFor: this.getId("inputId_")
+            htmlFor: "inputId_" + this.getId()
         }) : null;
 
         this.input = new Input({
             placeholder: this.cfg.placeholder || "",
             className: "form-control preTextField " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
-            id: this.getId("inputId_")
+            id: "inputId_" + this.getId()
         }, this.cfg.val.v);
 
         const passwordEye = this.cfg.inputType === "password" ? new Span(null, {

@@ -153,8 +153,8 @@ export abstract class Comp {
         return ret;
     }
 
-    getId(prefix: string = null): string {
-        return prefix ? prefix + this.attribs.id : this.attribs.id;
+    getId(): string {
+        return this.attribs.id;
     }
 
     getCompClass = (): string => {

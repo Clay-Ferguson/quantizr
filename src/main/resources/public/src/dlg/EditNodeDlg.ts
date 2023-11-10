@@ -73,7 +73,7 @@ export class EditNodeDlg extends DialogBase {
     tagTextField: TextField;
 
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
-        super("[none]", "appModalCont " + C.TAB_MAIN, false, mode);
+        super("[none]", "appModalCont " + C.TAB_MAIN, null, mode);
         const ast = getAs();
         this.attribs.id = "EditNodeDlg_" + ast.editNode.id;
         this.attribs.key = this.attribs.key || this.attribs.id;

@@ -10,7 +10,7 @@ export class VideoPlayerDlg extends DialogBase {
     videoPlayer: VideoPlayer;
 
     constructor(private domId: string, private sourceUrl: string, mediaTitle: string, dialogMode: DialogMode) {
-        super(mediaTitle || "Video", null, false, dialogMode);
+        super(mediaTitle || "Video", null, null, dialogMode);
     }
 
     renderDlg(): Comp[] {

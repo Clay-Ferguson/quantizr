@@ -113,6 +113,7 @@
     margin-left: $microGap;
     border: 1px solid gray;
     display: inline-block;
+    border-radius: $border-radius;
 }
 
 .createdByMe {
@@ -203,6 +204,7 @@
     background-color: darken($secondary, 10%);
     padding: 4px 4px 4px $smallGap;
     margin-bottom: $tinyGap;
+    border-radius: $border-radius;
 }
 
 .rowFooter {

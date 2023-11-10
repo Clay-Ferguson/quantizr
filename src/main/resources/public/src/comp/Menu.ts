@@ -16,7 +16,7 @@ export class Menu extends Comp {
         this.setChildren([
             new Div(null, {
                 className: clazz + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
-                id: this.getId("heading"),
+                id: "heading" + this.getId(),
                 onClick: () => {
                     asyncDispatch("ToggleExpansion", s => S.nav.changeMenuExpansion(s, "toggle", this.name));
                     if (this.func) {
@@ -27,11 +27,11 @@ export class Menu extends Comp {
                 , [this.name, expanded ? this.floatRightComp : null]),
 
             expanded ? new Div(null, {
-                id: this.getId("itemsCont"),
+                id: "itemsCont-" + this.getId(),
                 className: "menuCardBody"
             }, [
                 new Div(null, {
-                    id: this.getId("items"),
+                    id: "items-" + this.getId(),
                     className: "menuPanelItems"
                 }, this.menuItems)]) : null
         ]);
