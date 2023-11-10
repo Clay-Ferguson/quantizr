@@ -194,6 +194,11 @@ export class EditNodeDlgUtil {
             value: "01:00"
         });
 
+        const tags = dlg.tagsState.getValue();
+        if (!tags || tags.indexOf("todo") === -1) {
+            dlg.tagsState.setValue(tags ? (tags + " #todo") : "#todo");
+        }
+
         dlg.mergeState<EditNodeDlgState>(state);
     }
 

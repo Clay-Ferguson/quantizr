@@ -76,7 +76,7 @@ export class User {
             }, false, true);
             S.quanta.authToken = res.authToken;
 
-            console.log("Login response: " + S.util.prettyPrint(res));
+            // console.log("Login response: " + S.util.prettyPrint(res));
 
             if (res?.code == C.RESPONSE_CODE_OK) {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");

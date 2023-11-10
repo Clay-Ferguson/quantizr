@@ -146,53 +146,64 @@ export class RightNavPanel extends Div {
         let scrollDiv = null;
         const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCreditDiv() : null;
 
-        this.setChildren([
-            scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
-                new Div(null, { className: "float-left" }, [
-                    new FlexRowLayout([
-                        avatarImg,
-                        new Div(null, null, [
-                            new Div(null, { className: "marginBottom" }, [
-                                !ast.isAnonUser ? new Span(displayName, {
-                                    className: "clickable marginRight",
-                                    onClick: () => {
-                                        PubSub.pub(C.PUBSUB_closeNavPanel);
-                                        new UserProfileDlg(null).open();
-                                    }
-                                }) : null,
-                            ]),
-                            loginSignupDiv,
-                        ]),
-                        new Div(null, { className: "flexFloatRight" }, [
-                            textToSpeech,
-                            clipboardPasteButton,
-                            addNoteButton
-                        ]),
-                    ], "fullWidth"),
-                    gptCreditDiv,
-                    // new Div(null, { className: "marginBottom" }, [
-                    //     new ButtonBar([
-                    //         clipboardPasteButton,
-                    //         addNoteButton,
-                    //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
-                    //             title: "Go to your Account Root Node",
-                    //             onClick: e => S.nav.navHome(state)
-                    //         }) : null
-                    //     ])
-                    // ]),
-                    !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
+        const rightNavDiv = new Div(null, { className: "float-left" }, [
+            new FlexRowLayout([
+                avatarImg,
+                new Div(null, null, [
+                    new Div(null, { className: "marginBottom" }, [
+                        !ast.isAnonUser ? new Span(displayName, {
+                            className: "clickable marginRight",
+                            onClick: () => {
+                                PubSub.pub(C.PUBSUB_closeNavPanel);
+                                new UserProfileDlg(null).open();
+                            }
+                        }) : null,
+                    ]),
+                    loginSignupDiv,
+                ]),
+                new Div(null, { className: "flexFloatRight" }, [
+                    textToSpeech,
+                    clipboardPasteButton,
+                    addNoteButton
+                ]),
+            ], "fullWidth"),
+            gptCreditDiv,
+            // new Div(null, { className: "marginBottom" }, [
+            //     new ButtonBar([
+            //         clipboardPasteButton,
+            //         addNoteButton,
+            //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+            //             title: "Go to your Account Root Node",
+            //             onClick: e => S.nav.navHome(state)
+            //         }) : null
+            //     ])
+            // ]),
+            !ast.isAnonUser || ast.mobileMode ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
 
-                    ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
-                ])
-            ])
+            ast.nodeHistory?.length > 0 && !ast.isAnonUser ? new HistoryPanel() : null
         ]);
-        scrollDiv.getScrollPos = (): number => {
-            return RightNavPanel.scrollPos;
+
+        if (ast.mobileMode) {
+            this.setChildren([
+                rightNavDiv
+            ]);
+        }
+        else {
+            this.setChildren([
+                scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
+                    rightNavDiv
+                ])
+            ]);
+
+            scrollDiv.getScrollPos = (): number => {
+                return RightNavPanel.scrollPos;
+            }
+
+            scrollDiv.setScrollPos = (pos: number): void => {
+                RightNavPanel.scrollPos = pos;
+            }
         }
 
-        scrollDiv.setScrollPos = (pos: number): void => {
-            RightNavPanel.scrollPos = pos;
-        }
         return true;
     }
 

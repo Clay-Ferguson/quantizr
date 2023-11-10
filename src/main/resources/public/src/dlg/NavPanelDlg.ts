@@ -7,7 +7,7 @@ import { PubSub } from "../PubSub";
 export class NavPanelDlg extends DialogBase {
     static inst: NavPanelDlg = null;
     constructor() {
-        super("Navigation", "appModalNavPanel", null, DialogMode.POPUP, true);
+        super("Navigation", "appModalNavPanel", C.ID_RHS, DialogMode.POPUP, true);
         NavPanelDlg.inst = this;
     }
 

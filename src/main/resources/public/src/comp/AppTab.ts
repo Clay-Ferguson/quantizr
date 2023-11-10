@@ -24,7 +24,7 @@ export class AppTab<PT = any, TT = any> extends Div {
 
     getClass = (): string => {
         const ast = getAs();
-        const className = (ast.mobileMode ? "appTabPaneMobile " : "appTabPane ") + "customScrollbar " +
+        const className = "appTabPane customScrollbar " +
             (ast.userPrefs.editMode && this.extraEditModeClass ? (this.extraEditModeClass) : "") +
             (ast.activeTab === this.getId() ? " visible" : " invisible");
         return className;

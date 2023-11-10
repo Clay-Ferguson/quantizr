@@ -32,11 +32,6 @@
     padding-bottom: 20px;
 }
 
-.appTabPaneMobile {
-    @extend .appTabPane;
-    padding: 0px !important;
-}
-
 // This padding is what makes room for the '+' buttons to the right of the rows during editing
 .appTabPaneEditMode {
     padding-right: 50px;
