@@ -1001,7 +1001,7 @@ public class AppController extends ServiceBase implements ErrorController {
         return system.serverPush(token);
     }
 
-    @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_GIF_VALUE)
     @ResponseBody
     public byte[] captcha(HttpSession session) {
         return (byte[]) callProc.run("captcha", false, false, null, session, ms -> {
