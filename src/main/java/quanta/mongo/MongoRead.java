@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -1071,17 +1072,22 @@ public class MongoRead extends ServiceBase {
         return userName.substring(0, atIdx);
     }
 
-    public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal) {
-        return getLocalUserNodeByProp(ms, propName, propVal, true);
-    }
-
-    public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean allowAuth) {
+    public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean caseSensitive,
+            boolean allowAuth) {
         if (StringUtils.isEmpty(propVal))
             return null;
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
-                .and(SubNode.PROPS + "." + propName).is(propVal).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
+        Criteria crit;
+        if (caseSensitive) {
+            // Case sensitive query
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
+                    .and(SubNode.PROPS + "." + propName).is(propVal);
+        } else {
+            // Case insensitive query
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
+                    .and(SubNode.PROPS + "." + propName).regex("^" + Pattern.quote(propVal) + "$", "i");
+        }
 
         if (allowAuth) {
             crit = auth.addReadSecurity(ms, crit);

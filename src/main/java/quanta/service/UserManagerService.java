@@ -445,7 +445,7 @@ public class UserManagerService extends ServiceBase {
         arun.run(as -> {
             String userName = req.getUserName().trim();
             String password = req.getPassword().trim();
-            String email = req.getEmail();
+            String email = req.getEmail().trim();
             log.debug("Signup: userName=" + userName + " email=" + email);
 
             String userError = validator.checkUserName(userName);
@@ -461,6 +461,14 @@ public class UserManagerService extends ServiceBase {
             String emailError = validator.checkEmail(email);
             if (emailError != null) {
                 res.setEmailError(emailError);
+                res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
+            }
+
+            // we disallow dupliate emails via this codepath, but by design we do allow them in the DB, and
+            // even all the 'test accounts' will normally have the same email address.
+            SubNode ownerNode = read.getLocalUserNodeByProp(as, NodeProp.EMAIL.s(), email, false, false);
+            if (ownerNode != null) {
+                res.setEmailError("Email already in use.");
                 res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
             }
 
