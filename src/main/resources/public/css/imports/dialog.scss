@@ -180,3 +180,9 @@
     padding: 3px 4px 3px 4px;
     cursor: pointer;
 }
+
+.captchaPanel {
+    border-radius: $border-radius;
+    border: 2px solid $modal-content-border-color;
+    padding: $smallGap;
+}

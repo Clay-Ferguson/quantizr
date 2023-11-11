@@ -48,13 +48,14 @@ export class SignupDlg extends DialogBase {
 
                 this.adminCreatingUser ? null : new FlexRowLayout([
                     new Img({
-                        src: window.location.origin + "/api/captcha?cacheBuster=" + this.getId(),
+                        // cb=cache buster
+                        src: window.location.origin + "/api/captcha?cb=" + new Date().getTime(),
                         className: "captchaImage"
                     }),
                     new Div(null, null, [
-                        new TextField({ label: "Code", val: this.captchaState })
+                        new TextField({ label: "Captcha", val: this.captchaState })
                     ])
-                ], "marginTop"),
+                ], "captchaPanel marginTop"),
                 new ButtonBar([
                     new Button("Create Account", this.signup, null, "btn-primary"),
                     new Button("Cancel", this.close, { className: "float-end" })
