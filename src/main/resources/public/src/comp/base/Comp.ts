@@ -1,4 +1,5 @@
-import DOMPurify from "dompurify";
+// DO NOT DELETE UNTIL WE'RE SURE WE DON'T NEED DOMPurify ANYMORE
+// import DOMPurify from "dompurify";
 import { ReactNode, createElement, createRef, forwardRef, useEffect, useLayoutEffect } from "react";
 import { Constants as C } from "../../Constants";
 import { S } from "../../Singletons";
@@ -51,8 +52,10 @@ export abstract class Comp {
 
     // we have the 'target' here to make our purifier keep those rendered
     // see also: #onclick-security-note
-    static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
+    // DO NOT DELETE UNTIL WE'RE SURE WE DON'T NEED DOMPurify ANYMORE
+    // static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
     public ordinal: number;
+
 
     constructor(attribs?: any, private stateMgr?: State) {
         if (typeof attribs === "string") {
@@ -259,7 +262,10 @@ export abstract class Comp {
     }
 
     public static getDangerousHtml = (content: string) => {
-        return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
+        return { __html: S.domUtil.sanitizeHtml(content) };
+
+        // DO NOT DELETE UNTIL WE'RE SURE WE DON'T NEED DOMPurify ANYMORE
+        // return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
     }
 
     /* Renders this node to a specific tag, including support for non-React children 

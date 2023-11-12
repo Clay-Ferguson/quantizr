@@ -30,13 +30,20 @@ export class DocIndexPanel extends Div {
             if (node.hasChildren) {
                 const level = S.util.countChars(node.path, "/") - baseSlashCount;
                 const clazz = ast.indexHighlightNode == node.id ? "docIdxLnkHighlight" : "docIdxLnk";
-                index += `<div style="margin-left: ${level * 12}px" class="${clazz}" onClick="S.view.clkIdx('${node.id}')">${this.getLevelBullet(level)}&nbsp;${this.getShortContent(node)}</div>`;
+                index += `<div style="margin-left: ${level * 12}px" class="${clazz}" ${C.NODE_ID_ATTR}="${node.id}">${this.getLevelBullet(level)}&nbsp;${this.getShortContent(node)}</div>`;
                 count++;
             }
         }
         if (count < 2) return false;
-        const html = new Html(index);
-        html.purifyHtml = false;
+
+        const html = new Html(index, null,
+            // click function to jump to node that's clicked on
+            (evt: Event) => {
+                const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+                if (nodeId) {
+                    S.view.clkIdx(nodeId);
+                }
+            });
 
         let backToDocLink = null;
         if (ast.activeTab != C.TAB_DOCUMENT) {

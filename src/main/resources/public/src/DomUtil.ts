@@ -4,6 +4,53 @@ import { Constants as C } from "./Constants";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
 import { UploadResponse } from "./JavaIntf";
 import { S } from "./Singletons";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypeStringify from "rehype-stringify";
+import { visit } from 'unist-util-visit';
+
+const addBlankTargetToAnchors = () => {
+    return (tree: any) => {
+        visit(tree, 'element', (node: any) => {
+            if (node.tagName === 'a') {
+                // Ensure the properties object exists
+                node.properties = node.properties || {};
+                // Set the target attribute to "_blank"
+                node.properties.target = '_blank';
+                // Add rel="noopener noreferrer" for security reasons
+                node.properties.rel = 'noopener noreferrer';
+            }
+        });
+    };
+};
+
+// Create a schema configuration that extends the default schema
+// to allow 'style' and 'class' attributes on all elements
+const schema = {
+    ...defaultSchema,
+    attributes: {
+        ...defaultSchema.attributes, // Spread existing attributes
+        "*": [
+            ...(defaultSchema.attributes["*"] || []), // Spread existing global attributes
+
+            // NOTE: Even though the HTML contains "class" and not "className" we still have to use
+            // "clasName" here in order for this to work.
+            "className",
+            "style",
+            // ditto same reason as above. CamelCase is required here, even thought HTML is not camel case
+            C.NODE_ID_ATTR_CamelCase
+        ],
+    },
+};
+
+// Initialize the processor once
+const sanitizerProcessor = unified()
+    .use(rehypeParse, { fragment: true }) // parse the HTML as a fragment
+    .use(rehypeSanitize, schema) // sanitize using default schema
+    .use(addBlankTargetToAnchors) // Modify all anchor tags to open in a new tab
+    .use(rehypeStringify)
+
 
 export class DomUtil {
     imgCache: Map<string, string> = new Map<string, string>();
@@ -22,6 +69,13 @@ export class DomUtil {
         ["`", "&#x60;"],
         ["=", "&#x3D;"]
     ]);
+
+    sanitizeHtml = (html: string): string => {
+        const sanitizedHtml = sanitizerProcessor
+            .processSync(html) // process the input HTML synchronously
+            .toString(); // convert the sanitized HTML to a string
+        return sanitizedHtml;
+    }
 
     getPropFromDom = (evt: Event, prop: string): string => {
         let val = null;

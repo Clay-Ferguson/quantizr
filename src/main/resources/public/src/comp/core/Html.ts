@@ -1,5 +1,6 @@
 import { Comp } from "../base/Comp";
 import { NodeCompBinary } from "../node/NodeCompBinary";
+import { Constants as C } from "../../Constants";
 
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq
@@ -22,11 +23,11 @@ interface LS { // Local State
 }
 
 export class Html extends Comp {
-    public purifyHtml = true;
+    private purifyHtml = true;
+    private hasEnlargableImg = false;
 
-    constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
+    constructor(content: string = "", attribs: any = {}, private onClick: (evt: Event) => void = null) {
         super(attribs);
-        this.setChildren(children);
         this.setText(content);
     }
 
@@ -36,11 +37,14 @@ export class Html extends Comp {
 
     override preRender = (): boolean => {
         if (this.hasChildren()) {
-            console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
+            console.error("Html component had children. This is always a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
-        this.attribs.dangerouslySetInnerHTML = this.purifyHtml ? Comp.getDangerousHtml(this.getState<LS>().content)
-            : { __html: this.getState<LS>().content };
+        const content = this.getState<LS>().content;
+        this.hasEnlargableImg = content.indexOf("enlargableImg") >= 0;
+
+        this.attribs.dangerouslySetInnerHTML = this.purifyHtml ? Comp.getDangerousHtml(content)
+            : { __html: content };
 
         // ************* DO NOT DELETE.
         // Method 1 and 2 both work, except #2 would need to be updated to
@@ -59,14 +63,16 @@ export class Html extends Comp {
         const elm = this.getRef();
         if (!elm) return;
 
-        // make all "a" tags inside this div to have a target=_blank
-        elm.querySelectorAll("a").forEach(e => e.setAttribute("target", "_blank"));
+        if (this.onClick) {
+            elm.addEventListener("click", this.onClick);
+        }
 
-        // adds the click handler function to all .enlargableImg images
-        elm.querySelectorAll(".enlargableImg").forEach((e: Element) => {
-            e.addEventListener("click", (evt: any) => {
-                NodeCompBinary.clickOnImage(e as HTMLImageElement, evt, e.getAttribute("data-nodeid"), e.getAttribute("data-attkey"), false, false);
+        if (this.hasEnlargableImg) {
+            elm.querySelectorAll(".enlargableImg").forEach((e: Element) => {
+                e.addEventListener("click", (evt: any) => {
+                    NodeCompBinary.clickOnImage(e as HTMLImageElement, evt, e.getAttribute(C.NODE_ID_ATTR), e.getAttribute("data-attkey"), false, false);
+                });
             });
-        });
+        }
     }
 }

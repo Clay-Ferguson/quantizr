@@ -72,7 +72,7 @@ export class Render {
                 const imgUrl = S.attachment.getUrlForNodeAttachment(node, key, false);
 
                 // todo-1: the sanitizer is wiping out both the class and style here, and I haven't found out why yet.
-                val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" style="margin-bottom: 12px" width="${imgSize}" src="${imgUrl}" data-nodeid="${node.id}" data-attkey="${key}">\n\n`);
+                val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" style="margin-bottom: 12px" width="${imgSize}" src="${imgUrl}" ${C.NODE_ID_ATTR}="${node.id}" data-attkey="${key}">\n\n`);
             }
         }
 

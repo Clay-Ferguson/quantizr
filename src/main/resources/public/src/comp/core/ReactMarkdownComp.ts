@@ -16,12 +16,12 @@ import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/st
 // so we're not tweaking the schema at all. If we ever need to, this is how we would do it.
 // import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 // const schema = JSON.parse(JSON.stringify(defaultSchema));
-// // schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "data-nodeid", "data-attkey"];
+// // schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "data-nid", "data-attkey"];
 // // schema.attributes["img"].push("class");
 // NOTE: I never got the sanitizer to leave classnames alone.
 // schema.attributes["*"].push("class");
 // schema.attributes["*"].push("className");
-// schema.attributes["*"].push("data-nodeid");
+// schema.attributes["*"].push("data-nid");
 // schema.attributes["*"].push("data-attkey");
 // custom filter CAN be done here;
 // schema.tagNames = schema.tagNames.filter((tagName) => {!["body", "html", "script"].includes(tagName));
