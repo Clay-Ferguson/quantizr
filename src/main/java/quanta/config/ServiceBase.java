@@ -73,6 +73,7 @@ import quanta.service.node.OpenAiService;
 import quanta.test.TestUtil;
 import quanta.types.AIAnswerType;
 import quanta.types.BookmarkType;
+import quanta.types.CalendarType;
 import quanta.types.FriendType;
 import quanta.types.RoomType;
 import quanta.types.RssFeedType;
@@ -172,6 +173,7 @@ public class ServiceBase {
     public static MimeUtil mimeUtil;
     public static MongoAppConfig mac;
     public static BookmarkType bookmarkType;
+    public static CalendarType calendarType;
     public static AIAnswerType aiAnswerType;
     public static FriendType friendType;
     public static RoomType roomType;
@@ -276,6 +278,7 @@ public class ServiceBase {
             fileUtil = getBean(ctx, FileUtils.class);
             mimeUtil = getBean(ctx, MimeUtil.class);
             bookmarkType = getBean(ctx, BookmarkType.class);
+            calendarType = getBean(ctx, CalendarType.class);
             aiAnswerType = getBean(ctx, AIAnswerType.class);
             friendType = getBean(ctx, FriendType.class);
             roomType = getBean(ctx, RoomType.class);

@@ -17,11 +17,12 @@ public class TypePluginMgr extends ServiceBase {
     public void handleContextRefresh(ContextRefreshedEvent event) {
         super.handleContextRefresh(event);
         log.debug("ContextRefreshedEvent");
-        bookmarkType.postContruct();
-        friendType.postContruct();
-        roomType.postContruct();
-        rssType.postContruct();
-        aiAnswerType.postContruct();
+        bookmarkType.postConstruct();
+        calendarType.postConstruct();
+        friendType.postConstruct();
+        roomType.postConstruct();
+        rssType.postConstruct();
+        aiAnswerType.postConstruct();
     }
 
     public static void addType(TypeBase type) {

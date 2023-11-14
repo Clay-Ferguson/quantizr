@@ -7,7 +7,6 @@ import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.CreateSubNodeRequest;
 import quanta.util.val.Val;
 
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
@@ -16,7 +15,11 @@ public abstract class TypeBase extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(TypeBase.class);
 
-    public void postContruct() {
+    public TypeBase() {
+        super();
+    }
+
+    public void postConstruct() {
         TypePluginMgr.addType(this);
     }
 
@@ -26,7 +29,10 @@ public abstract class TypeBase extends ServiceBase {
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, SubNode ownerAccntNode,
             boolean getFollowers) {}
 
-    public void preCreateNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
+    public void preCreateNode(MongoSession ms, Val<SubNode> parentNode, Val<String> vcContent, boolean linkBookmark) {}
+
+    // runs whenever this type 'node' has a child created under it
+    public void childCreated(MongoSession ms, Val<SubNode> node, Val<SubNode> childNode) {}
 
     public void beforeSaveNode(MongoSession ms, SubNode node) {}
 

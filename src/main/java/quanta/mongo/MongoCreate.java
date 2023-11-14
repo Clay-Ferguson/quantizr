@@ -1,7 +1,6 @@
 package quanta.mongo;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -261,11 +260,15 @@ public class MongoCreate extends ServiceBase {
 
         // lets the type override the location where the node is created.
         TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
+        TypeBase parentPlugin = typePluginMgr.getPluginByType(parentNode.getType());
         if (plugin != null) {
             Val<SubNode> vcNode = new Val<>(parentNode);
-            plugin.preCreateNode(ms, vcNode, req, linkBookmark);
+            Val<String> vcContent = new Val<>(req.getContent());
+            plugin.preCreateNode(ms, vcNode, vcContent, linkBookmark);
+            req.setContent(vcContent.getVal());
             parentNode = vcNode.getVal();
         }
+
         if (parentNode == null) {
             throw new RuntimeException("unable to locate parent for insert");
         }
@@ -357,10 +360,8 @@ public class MongoCreate extends ServiceBase {
         }
         openGraph.parseNode(newNode, true);
 
-        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
-            // if parent is a calendar node, then we need to set the date on this new node
-            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
-            newNode.set(NodeProp.DURATION, "01:00");
+        if (parentPlugin != null) {
+            parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
 
         update.save(ms, newNode);
@@ -437,10 +438,17 @@ public class MongoCreate extends ServiceBase {
         // stuff where it's expecting the node to exist.
         openGraph.parseNode(newNode, true);
 
-        if (NodeType.CALENDAR.s().equals(parentNode.getType())) {
-            // if parent is a calendar node, then we need to set the date on this new node
-            newNode.set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
-            newNode.set(NodeProp.DURATION, "01:00");
+        TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
+        if (plugin != null) {
+            Val<SubNode> vcNode = new Val<>(parentNode);
+            plugin.preCreateNode(ms, vcNode, null, false);
+            parentNode = vcNode.getVal();
+        }
+
+        TypeBase parentPlugin = typePluginMgr.getPluginByType(parentNode.getType());
+
+        if (parentPlugin != null) {
+            parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
 
         update.save(ms, newNode);

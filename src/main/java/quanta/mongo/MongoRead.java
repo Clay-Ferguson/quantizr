@@ -775,7 +775,7 @@ public class MongoRead extends ServiceBase {
     /**
      * prop is optional and if non-null means we should search only that one field.
      *
-     * timeRangeType: futureOnly, pastOnly, all
+     * timeRangeType: futureOnly, pastOnly, pastDue, all
      */
     public Iterable<SubNode> searchSubGraph(MongoSession ms, SubNode node, String prop, String text, String sortField,
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType,
@@ -866,7 +866,12 @@ public class MongoRead extends ServiceBase {
                 } //
                 else if ("pastOnly".equals(timeRangeType)) { //
                     ands.add(Criteria.where(sortField).lt(new Date().getTime()));
-                } // prop on the node // if showing all dates the condition here is that there at least IS a 'date'
+                } //
+                else if ("pastDue".equals(timeRangeType)) { //
+                    ands.add(Criteria.where(sortField).lt(new Date().getTime()));
+                    ands.add(Criteria.where(SubNode.TAGS).regex("#due", "i"));
+                }
+                // prop on the node // if showing all dates the condition here is that there at least IS a 'date'
                 else if ("all".equals(timeRangeType)) {
                     ands.add(Criteria.where(sortField).ne(null));
                 }

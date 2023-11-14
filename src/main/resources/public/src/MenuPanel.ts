@@ -93,6 +93,7 @@ export class MenuPanel extends Div {
     static showCalendar = () => S.render.showCalendar(null);
     static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+    static calendarPastDueDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastDueOnly", "Past Due calendar dates (Newest at the top)", 0, true);
     static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "all", "All calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
@@ -326,6 +327,7 @@ export class MenuPanel extends Div {
                 new MenuItemSeparator(), //
                 new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
+                new MenuItem("Past Due", MenuPanel.calendarPastDueDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
             ]));
         }

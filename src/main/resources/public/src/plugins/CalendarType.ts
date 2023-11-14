@@ -27,6 +27,9 @@ export class CalendarType extends TypeBase {
                 new Button("Past", () => {
                     S.srch.timeline(node, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
                 }, null),
+                new Button("Past Due", () => {
+                    S.srch.timeline(node, J.NodeProp.DATE_FULL, "pastDue", "Past Due calendar dates (Newest at the top)", 0, true);
+                }, null),
                 new Button("Future", () => {
                     S.srch.timeline(node, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
                 }, null),

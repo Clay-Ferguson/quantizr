@@ -195,8 +195,8 @@ export class EditNodeDlgUtil {
         });
 
         const tags = dlg.tagsState.getValue();
-        if (!tags || tags.indexOf("todo") === -1) {
-            dlg.tagsState.setValue(tags ? (tags + " #todo") : "#todo");
+        if (!tags || tags.indexOf("due") === -1) {
+            dlg.tagsState.setValue(tags ? (tags + " #due") : "#due");
         }
 
         dlg.mergeState<EditNodeDlgState>(state);
