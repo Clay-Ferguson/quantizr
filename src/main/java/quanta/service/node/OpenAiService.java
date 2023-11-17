@@ -54,6 +54,8 @@ public class OpenAiService extends ServiceBase {
     String OPENAI_MOD_URL = "https://api.openai.com/v1/moderations";
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
     String OPENAI_IMAGE_GEN_URL = "https://api.openai.com/v1/images/generations";
+    String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
+    String OPENAI_MODEL_COMPLETION = "gpt-4-1106-preview";
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
@@ -158,9 +160,9 @@ public class OpenAiService extends ServiceBase {
 
         // Select gpt-4 model based on whether the question contains images
         if (messageListHasImages(messages)) {
-            system.setModel("gpt-4-vision-preview");
+            system.setModel(OPENAI_MODEL_VISION);
         } else {
-            system.setModel("gpt-4-1106-preview");
+            system.setModel(OPENAI_MODEL_COMPLETION);
         }
 
         /* Moderate Call before submitting */
