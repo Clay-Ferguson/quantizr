@@ -158,7 +158,7 @@ public class OpenAiService extends ServiceBase {
 
         // Select gpt-4 model based on whether the question contains images
         if (messageListHasImages(messages)) {
-            system.setModel("gpt-4-1106-vision-preview");
+            system.setModel("gpt-4-vision-preview");
         } else {
             system.setModel("gpt-4-1106-preview");
         }
