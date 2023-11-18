@@ -307,7 +307,7 @@ public class AttachmentService extends ServiceBase {
             att.setAiPrompt(aiPrompt);
         }
 
-        if (ImageUtil.isImageMime(mimeType)) {
+        if (!importMode && ImageUtil.isImageMime(mimeType)) {
             // default image to be 100% size
             att.setCssSize("100%");
             if (calcImageSize) {
@@ -337,6 +337,7 @@ public class AttachmentService extends ServiceBase {
             }
         }
         att.setMime(mimeType);
+
         SubNode userNode = read.getNode(ms, node.getOwner());
         if (imageBytes == null) {
             try {
