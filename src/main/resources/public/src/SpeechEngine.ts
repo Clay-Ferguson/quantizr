@@ -412,10 +412,22 @@ export class SpeechEngine {
     getVoices = () => {
         if (this.voices) return this.voices;
         this.voices = this.tts.getVoices();
+        this.filterVoices();
         this.tts.onvoiceschanged = () => {
             this.voices = this.tts.getVoices();
-            console.log("VoicesChanged ran. Now we have " + this.voices?.length + " voices.");
+            this.filterVoices();
         };
+    }
+
+    filterVoices = () => {
+        // console.log("TTS: " + this.voices?.length + " voices.");
+
+        // filter out voices that don't have english language
+        this.voices = this.voices.filter(v => v.lang.startsWith("en"));
+
+        for (const voice of this.voices) {
+            console.log("    Voice: " + voice.name + " (" + voice.lang + ")");
+        }
     }
 
     preProcessText = (text: string): string => {

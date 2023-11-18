@@ -56,7 +56,6 @@ export class LeftNavPanel extends Div {
         }
 
         let showDocIndex = S.util.willRenderDocIndex();
-        console.log("showDocIndex=" + showDocIndex);
 
         const docIndexToggle = showDocIndex ? new RadioButtonGroup([
             new Span(null, null, [

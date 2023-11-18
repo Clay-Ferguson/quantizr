@@ -173,7 +173,7 @@ export class TTSView extends AppTab<any, TTSView> {
         const data: any[] = [];
         let idx = 0;
         S.speech.getVoices()?.forEach(voice => {
-            data.push({ key: "" + idx, val: voice.name + " " + voice.lang + (voice.default ? " -- DEFAULT" : "") });
+            data.push({ key: "" + idx, val: voice.name });
             idx++;
         });
 
