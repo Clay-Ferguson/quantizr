@@ -302,7 +302,11 @@ export class TypeBase implements TypeIntf {
         // todo-1: tricky hack to detect if this is all HTML
         if (cont?.startsWith("<") && cont?.endsWith(">")) {
             urls = this.parseUrlsFromHtml(node);
-            comp = new Html(cont, { className: "marginLeft marginTop" });
+
+            // The reason we don't sanitize for admin users is mainly because we need the code containing the
+            // donations link to work, but there may also be other times we want the admin allowed to embed raw HTML
+            const sanitize = node.owner !== J.PrincipalName.ADMIN;
+            comp = new Html(cont, { className: "marginLeft marginTop" }, null, sanitize);
         }
         // else render as markdown
         else {

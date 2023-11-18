@@ -26,7 +26,7 @@ export abstract class Comp {
     private static guid: number = 0;
 
     // this option allows the ability to use the DOM explorer in browsers to see the class name of every element
-    private static renderClassInDom: boolean = true;
+    private static renderClassInDom: boolean = false;
 
     // this is a global flag for overriding/disabling scroll setting which we need to do in some cases.
     static allowScrollSets = true;

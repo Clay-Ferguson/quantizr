@@ -23,10 +23,9 @@ interface LS { // Local State
 }
 
 export class Html extends Comp {
-    private purifyHtml = true;
     private hasEnlargableImg = false;
 
-    constructor(content: string = "", attribs: any = {}, private onClick: (evt: Event) => void = null) {
+    constructor(content: string = "", attribs: any = {}, private onClick: (evt: Event) => void = null, private sanitize: boolean = false) {
         super(attribs);
         this.setText(content);
     }
@@ -43,7 +42,7 @@ export class Html extends Comp {
         const content = this.getState<LS>().content;
         this.hasEnlargableImg = content.indexOf("enlargableImg") >= 0;
 
-        this.attribs.dangerouslySetInnerHTML = this.purifyHtml ? Comp.getDangerousHtml(content)
+        this.attribs.dangerouslySetInnerHTML = this.sanitize ? Comp.getDangerousHtml(content)
             : { __html: content };
 
         // ************* DO NOT DELETE.
