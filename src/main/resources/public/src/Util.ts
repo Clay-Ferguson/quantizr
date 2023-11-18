@@ -499,12 +499,14 @@ export class Util {
         return allowed;
     }
 
-    copyToClipboard = (text: string) => {
-        (<any>navigator)?.clipboard?.writeText(text).then(() => {
-            console.log("Copied to clipboard successfully!");
-        }, () => {
-            this.showMessage("Unable to write to clipboard.", "Warning");
-        });
+    copyToClipboard = async (text: string): Promise<void> => {
+        try {
+            // Use the Clipboard API to write text
+            await navigator?.clipboard?.writeText(text);
+            // console.log("Text copied to clipboard");
+        } catch (err) {
+            console.error("Failed to copy text to clipboard", err);
+        }
     }
 
     formatProperty(val: any, type: string, configProp?: ConfigProp): string {
