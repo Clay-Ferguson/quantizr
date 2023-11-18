@@ -273,7 +273,7 @@ public class NodeMoveService extends ServiceBase {
                      * if a parent node is attempting to be pasted into one of it's children that's an impossible move
                      * so we reject the attempt.
                      */
-                    if (parentToPasteInto.getPath().startsWith(node.getPath())) {
+                    if (parentToPasteInto.getPath().startsWith(node.getPath() + "/")) {
                         throw new RuntimeException("Impossible node move requested.");
                     }
                     // find any new Path available under the paste target location 'parentPath'
