@@ -131,7 +131,9 @@ export class App extends Main {
                 onClick: S.user.userLogin
             }) : null;
 
-            const signupButton = ast.isAnonUser ? new Span("Signup", {
+            // for mobile mode don't try to fit the signup button in the header bar, because the header bar needs
+            // to be fixed height and signup won't fit. There's a signup button on the Login so users can signup
+            const signupButton = ast.isAnonUser && !ast.mobileMode ? new Span("Signup", {
                 className: "marginLeft clickable",
                 id: "loginButton",
                 onClick: S.user.userSignup
