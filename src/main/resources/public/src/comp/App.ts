@@ -1,7 +1,6 @@
 import { getAs } from "../AppContext";
 import { Clearfix } from "../comp/core/Clearfix";
 import { IconButton } from "../comp/core/IconButton";
-import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { DialogMode } from "../DialogBase";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
@@ -110,23 +109,23 @@ export class App extends Main {
             // DO NOT DELETE:
             // Currently we have no need to show the menu to anonymous users, but I want to keep
             // this here for future purposes in case we eventually do need this menu.
-            const menuButton = new IconButton("fa-bars", null, {
+            const menuButton = new IconButton("fa-bars fa-lg", null, {
                 onClick: S.nav.showMainMenu,
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
 
-            const navButton = new IconButton("fa-sitemap", null, {
+            const navButton = new IconButton("fa-sitemap fa-lg", null, {
                 onClick: () => new NavPanelDlg().open(),
                 id: "navMenu"
             }, "btn-primary menuButton", "off");
 
-            const feedButton = new IconButton("fa-globe", null, {
+            const feedButton = new IconButton("fa-globe fa-lg", null, {
                 onClick: S.nav.messagesFediverse,
                 id: "feedMenu"
             }, "btn-primary menuButton", "off");
 
             const loginButton = ast.isAnonUser ? new Span("Login", {
-                className: "marginLeft clickable",
+                className: "marginRight clickable",
                 id: "loginButton",
                 onClick: S.user.userLogin
             }) : null;
@@ -134,7 +133,7 @@ export class App extends Main {
             // for mobile mode don't try to fit the signup button in the header bar, because the header bar needs
             // to be fixed height and signup won't fit. There's a signup button on the Login so users can signup
             const signupButton = ast.isAnonUser && !ast.mobileMode ? new Span("Signup", {
-                className: "marginLeft clickable",
+                className: "marginRight clickable",
                 id: "loginButton",
                 onClick: S.user.userSignup
             }) : null;
@@ -148,15 +147,7 @@ export class App extends Main {
                 }) : null
             ]);
 
-            // show the logo on mobile mode only if in landscape mode (else it won't fit)
-            const logo = window.innerWidth > window.innerHeight ? new Img({
-                className: "smallLogoButton",
-                src: "/branding/logo-50px-tr.jpg",
-                onClick: () => S.nav.navPublicHome(),
-                title: "Main application Landing Page"
-            }) : null;
-
-            return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
+            return new Div(null, { className: "mobileHeaderBar" }, [menuButton, navButton, feedButton, floatRightDiv]);
         }
         return null;
     }
