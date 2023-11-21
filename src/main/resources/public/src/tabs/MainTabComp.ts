@@ -50,7 +50,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             ]);
         }
 
-        let header: Div = null;
+        // let header: Div = null;
         this.setChildren([
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
@@ -100,25 +100,25 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                             title: "Go to Parent Node"
                         }, "btn-primary") : null
                 ]),
-                header = new Div(S.quanta.config.brandingAppName, {
-                    className: "tabTitle headerUploadPanel",
-                    title: "Drop Files here to upload"
-                })
+                // header = new Div(S.quanta.config.brandingAppName, {
+                //     className: "tabTitle headerUploadPanel",
+                //     title: "Drop Files here to upload"
+                // })
             ])),
             contentDiv
         ]);
 
-        if (header) {
-            S.domUtil.setDropHandler(header.attribs, (evt: DragEvent) => {
-                if (evt.dataTransfer.files) {
-                    S.domUtil.uploadFilesToNode([...evt.dataTransfer.files], "[auto]", true);
-                }
-            });
-        }
-        // if we're not showing the header we do at least need some margin at the top
-        else {
-            this.attribs.className += " mediumPaddingTop";
-        }
+        // if (header) {
+        //     S.domUtil.setDropHandler(header.attribs, (evt: DragEvent) => {
+        //         if (evt.dataTransfer.files) {
+        //             S.domUtil.uploadFilesToNode([...evt.dataTransfer.files], "[auto]", true);
+        //         }
+        //     });
+        // }
+        // // if we're not showing the header we do at least need some margin at the top
+        // else {
+        //     this.attribs.className += " mediumPaddingTop";
+        // }
         return true;
     }
 }

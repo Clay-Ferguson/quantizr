@@ -11,7 +11,7 @@ body {
 }
 
 .mobileHeaderBar {
-    padding: 10px;
+    padding-right: 10px;
     position: absolute;
     top: 0;
     left: 0;
@@ -219,13 +219,12 @@ body {
 // WARNING: Don't put ANY margin at top, becasue that makes the stickyness not perfect.
 .headingBar {
     padding-top: 8px;
-    margin-bottom: 8px;
-    border-bottom: 8px solid $nodeBorderBottomColor;
+    border-bottom: 2px solid $nodeBorderBottomColor;
     background-color: $body-bg;
     position: sticky;
     top: 0;
     z-index: 100;
-    min-height: 4em;
+    min-height: 3rem;
 }
 
 .headingBarMobile {
@@ -233,7 +232,7 @@ body {
     margin-bottom: 8px;
     border-bottom: 8px solid $nodeBorderBottomColor;
     background-color: $body-bg;
-    min-height: 4em;
+    min-height: 4rem;
 }
 
 .rowHeaderSharingNames {

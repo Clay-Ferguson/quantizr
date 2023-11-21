@@ -150,7 +150,7 @@ export class App extends Main {
 
             // show the logo on mobile mode only if in landscape mode (else it won't fit)
             const logo = window.innerWidth > window.innerHeight ? new Img({
-                className: "marginRight smallLogoButton",
+                className: "smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
                 onClick: () => S.nav.navPublicHome(),
                 title: "Main application Landing Page"
