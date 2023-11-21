@@ -6,22 +6,13 @@ brandingMetaContent: "Quanta: Content Manager and Social Media Micro-blogging Pl
 #
 # Links here can be full url, or node names, or "tab:tabName"
 
-rhsAnonLinks:
+rhsLinks:
   - name: "About Quanta"
-    link: ":home"
-  - name: "Explore Features"
-    link: ":features"
-
-# These links will show up under MAIN section
-# rhsLinks:
-#   - name: "separator"
-#     link: ""
-#   - name: "News"
-#     link: ":quanta-news"
+    link: "/r/public/home"
 
 systemFolderLinks:
-  - name: "Portal Home"
-    link: ":home"
+  - name: "About Quanta"
+    link: "/r/public/home"
 
 # NOTE: These entries have an interface in the typescript called 'ConfigProp' in 'interfaces.ts'
 props:

@@ -148,12 +148,13 @@ export class App extends Main {
                 }) : null
             ]);
 
-            const logo = new Img({
+            // show the logo on mobile mode only if in landscape mode (else it won't fit)
+            const logo = window.innerWidth > window.innerHeight ? new Img({
                 className: "marginRight smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
                 onClick: () => S.nav.navPublicHome(),
                 title: "Main application Landing Page"
-            });
+            }) : null;
 
             return new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, navButton, feedButton, floatRightDiv]);
         }

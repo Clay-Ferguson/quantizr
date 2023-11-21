@@ -1,6 +1,5 @@
 import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
-import { Comp } from "../../comp/base/Comp";
 import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
@@ -65,17 +64,7 @@ export class MainTab implements TabIntf<any> {
         return new Div(null, { className: "tabSubOptions" }, [
             !ast.isAnonUser ? new AppNavLink("My Account", S.nav.navToMyAccntRoot, "ui-my-account") : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
-            ...this.customAnonRHSLinks(),
             ...S.render.buildCustomLinks(S.quanta.cfg.rhsLinks)
         ]);
     };
-
-    // Put these directly here on main page for non-logged in users, because we definitely cannot expect these users to click hru to
-    // the help menu to find these at least until they've signed up, but once signed up having these here becomes an annoyance.
-    customAnonRHSLinks = (): Comp[] => {
-        // if not anon user return empty items
-        if (!getAs().isAnonUser) return [];
-
-        return S.render.buildCustomLinks(S.quanta.cfg.rhsAnonLinks);
-    }
 }
