@@ -20,10 +20,8 @@ export class RightNavPanel extends Div {
     public static inst: RightNavPanel = null;
 
     constructor() {
-        const ast = getAs();
         super(null, {
             id: C.ID_RHS,
-            className: ast.mobileMode ? "mobileRHSPanel" : null,
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });
@@ -58,14 +56,14 @@ export class RightNavPanel extends Div {
             displayName = displayName || ast.node.owner;
         }
 
-        const clipboardPasteButton = new Icon({
+        const clipboardPasteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
             className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES, "Saved in Notes Folder");
             },
             title: "Save clipboard"
-        });
+        }) : null;
 
         const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
             className: "fa fa-sticky-note stickyNote fa-lg marginRight clickable",

@@ -86,12 +86,12 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                         onClick: S.nav.navToPrev
                     }) : null,
 
-                    new Icon({
+                    !ast.mobileMode ? new Icon({
                         className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
                         title: "Next Sibling Node",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.navToNext
-                    }),
+                    }) : null,
 
                     S.nav.parentVisibleToUser() ?
                         new IconButton("fa-folder", "Up", {

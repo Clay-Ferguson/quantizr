@@ -29,7 +29,7 @@ export class MenuPanel extends Div {
         super(null, {
             id: C.ID_MENU,
             role: "tablist",
-            className: (getAs().mobileMode ? "menuPanelMobile" : "menuPanel")
+            className: "menuPanel"
         });
         if (!MenuPanel.initialized) {
             // if anon user keep the page very clean and don't show this.
