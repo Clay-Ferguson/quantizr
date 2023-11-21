@@ -33,6 +33,7 @@ export class AppState {
     docIndent: boolean = false;
 
     mobileMode: boolean = clientInfo.isMobileOrTablet;
+    // mobileMode: boolean = true;
 
     // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile
     // showIpfsTab: boolean;

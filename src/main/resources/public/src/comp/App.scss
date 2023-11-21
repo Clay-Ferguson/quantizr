@@ -228,11 +228,10 @@ body {
 }
 
 .headingBarMobile {
-    padding-top: 8px;
-    margin-bottom: 8px;
-    border-bottom: 8px solid $nodeBorderBottomColor;
+    padding-bottom: 8px;
+    border-bottom: 2px solid $nodeBorderBottomColor;
     background-color: $body-bg;
-    min-height: 4rem;
+    min-height: 3.5rem;
 }
 
 .rowHeaderSharingNames {
