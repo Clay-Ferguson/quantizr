@@ -8,6 +8,7 @@ import { Span } from "./comp/core/Span";
 
 export abstract class DialogBase extends Comp {
     static backdropZIndex: number = 16000000; // z-index
+    static scrollPos: any = {};
     resolve: (dlg: DialogBase) => void;
 
     aborted: boolean = false;
@@ -153,7 +154,7 @@ export abstract class DialogBase extends Comp {
 
             new Div(null, { className: "dlgModalTitleCloseIcon float-end" }, [
                 new Icon({
-                    className: "fa fa-times",
+                    className: "fa fa-times fa-lg",
                     onClick: () => {
                         this.closeByUser();
                         this.close();
@@ -183,7 +184,7 @@ export abstract class DialogBase extends Comp {
                     extraTitleClass
             },
                 [
-                    new Div(null, { className: "dlgTitleContent" }, titleChildren),
+                    new Div(null, { className: ast.mobileMode ? "dlgTitleContentMobile" : "dlgTitleContent" }, titleChildren),
                     this.mode === DialogMode.POPUP ? new Div(null, { className: "line" }) : null
                 ]
             )) : null,
@@ -381,6 +382,14 @@ export abstract class DialogBase extends Comp {
             console.log("validate()=false in " + this.getCompClass());
         }
         return valid;
+    }
+
+    override getScrollPos = (): number => {
+        return DialogBase.scrollPos[this.zIndex] || 0;
+    }
+
+    override setScrollPos = (pos: number): void => {
+        DialogBase.scrollPos[this.zIndex] = pos;
     }
 }
 

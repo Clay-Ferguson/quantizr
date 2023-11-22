@@ -149,7 +149,7 @@ export class RightNavPanel extends Div {
                 avatarImg,
                 new Div(null, null, [
                     new Div(null, { className: "marginBottom" }, [
-                        !ast.isAnonUser ? new Span(displayName, {
+                        !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
                             className: "clickable marginRight",
                             onClick: () => {
                                 PubSub.pub(C.PUBSUB_closeNavPanel);
