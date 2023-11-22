@@ -46,7 +46,7 @@ export class RightNavPanel extends Div {
             this.attribs.className = "col-" + rightCols + (ast.tour ? " appColumnTourActive" : " appColumn");
         }
 
-        const avatarImg = this.makeRHSAvatarDiv();
+        const avatarImg = ast.mobileMode ? null : this.makeRHSAvatarDiv();
         let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
         if (displayName && ast.node) {

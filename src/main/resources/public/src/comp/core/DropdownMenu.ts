@@ -3,9 +3,9 @@ import { Icon } from "./Icon";
 import { Ul } from "./Ul";
 
 export class DropdownMenu extends Comp {
-    constructor(private items: Comp[]) {
+    constructor(private items: Comp[], moreClasses: string = "") {
         super(null);
-        this.attribs.className = "dropdown";
+        this.attribs.className = "dropdown " + moreClasses;
         this.setTag("span")
     }
 

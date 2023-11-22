@@ -113,29 +113,59 @@ export class NodeCompRowHeader extends Div {
         // WARNING: Mastodon can't cope with the concept of replying to the actual booster node but only the booseted node,
         // do don't allow replying to boosts.
         if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
-            const iconProps = {
-                title: "Reply to this Post",
-                className: "fa fa-reply fa-lg rowHeaderIcon",
-                [C.NODE_ID_ATTR]: this.node.id,
-                onClick: S.edit.replyToNode
-            }
+            if (ast.mobileMode) {
+                const iconProps = {
+                    title: "Reply to this Post",
+                    className: "dropdown-item",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.replyToNode
+                }
 
-            if (this.boostingNode?.ownerId) {
-                iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
+                if (this.boostingNode?.ownerId) {
+                    iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
+                }
+                ddItems.push(new Li(null, null, [
+                    new Span("Reply", iconProps)
+                ]));
             }
+            else {
+                const iconProps = {
+                    title: "Reply to this Post",
+                    className: "fa fa-reply fa-lg rowHeaderIcon",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.replyToNode
+                }
 
-            children.push(new Icon(iconProps));
+                if (this.boostingNode?.ownerId) {
+                    iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
+                }
+                children.push(new Icon(iconProps));
+            }
         }
 
         if (showInfo) {
             // Don't allow boosting a node that is itself a boost. This would confuse Mastodon.
             if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode) {
-                children.push(new Icon({
-                    title: "Boost this Node",
-                    className: "fa fa-retweet fa-lg rowHeaderIcon",
-                    [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.edit.boostNode
-                }));
+                if (ast.mobileMode) {
+                    const iconProps = {
+                        title: "Boost this Node",
+                        className: "dropdown-item",
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.edit.boostNode
+                    }
+
+                    ddItems.push(new Li(null, null, [
+                        new Span("Boost", iconProps)
+                    ]));
+                }
+                else {
+                    children.push(new Icon({
+                        title: "Boost this Node",
+                        className: "fa fa-retweet fa-lg rowHeaderIcon",
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.edit.boostNode
+                    }));
+                }
             }
 
             const hasNonPublicShares = S.props.hasNonPublicShares(this.node);
@@ -153,12 +183,26 @@ export class NodeCompRowHeader extends Div {
 
             // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
             if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser) {
-                children.push(new Icon({
-                    title: likeDisplay ? likeDisplay : "Like this Node",
-                    className: "fa fa-star fa-lg rowHeaderIcon " + (youLiked ? "likedByMeIcon" : ""),
-                    [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.edit.likeNodeClick
-                }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
+                if (ast.mobileMode) {
+                    const iconProps = {
+                        title: likeDisplay ? likeDisplay : "Like this Node",
+                        className: "dropdown-item",
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.edit.likeNodeClick
+                    }
+
+                    ddItems.push(new Li(null, null, [
+                        new Span("Like " + (this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""), iconProps)
+                    ]));
+                }
+                else {
+                    children.push(new Icon({
+                        title: likeDisplay ? likeDisplay : "Like this Node",
+                        className: "fa fa-star fa-lg rowHeaderIcon " + (youLiked ? "likedByMeIcon" : ""),
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.edit.likeNodeClick
+                    }, this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""));
+                }
             }
 
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
@@ -205,12 +249,26 @@ export class NodeCompRowHeader extends Div {
             const adminNode = this.node.owner === J.PrincipalName.ADMIN;
 
             if (!adminNode && showInfo && this.showThreadButton && (slashCount > 4 || !!inReplyTo)) {
-                children.push(new Icon({
-                    className: "fa fa-th-list fa-lg rowHeaderIcon",
-                    title: "Show Thread History",
-                    [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.showThread
-                }));
+                if (ast.mobileMode) {
+                    const iconProps = {
+                        title: likeDisplay ? likeDisplay : "Show Thread",
+                        className: "dropdown-item",
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.nav.showThread
+                    }
+
+                    ddItems.push(new Li(null, null, [
+                        new Span("Show Thread", iconProps)
+                    ]));
+                }
+                else {
+                    children.push(new Icon({
+                        className: "fa fa-th-list fa-lg rowHeaderIcon",
+                        title: "Show Thread History",
+                        [C.NODE_ID_ATTR]: this.node.id,
+                        onClick: S.nav.showThread
+                    }));
+                }
             }
 
             const repliesProp: string = S.props.getPropStr(J.NodeProp.ACT_PUB_REPLIES, this.node);
@@ -228,14 +286,19 @@ export class NodeCompRowHeader extends Div {
             // because the content is likely to be loaded with HTML
             // and won't read well by TTS, whereas local posts will be JSON and should read ok.
             if (!ast.isAnonUser && allowWideViewIcons) {
-                children.push(new Icon({
-                    className: "fa fa-volume-up fa-lg rowHeaderIcon",
-                    title: "Speech-to-Text (Read Aloud)",
-                    onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-                    onMouseOut: () => { S.quanta.selectedForTts = null; },
-                    [C.DOM_ID_ATTR]: this.getContentDomId(),
-                    onClick: S.nav.ttsClick
-                }));
+                if (ast.mobileMode) {
+                    // for now let's not have tts on mobile.
+                }
+                else {
+                    children.push(new Icon({
+                        className: "fa fa-volume-up fa-lg rowHeaderIcon",
+                        title: "Speech-to-Text (Read Aloud)",
+                        onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+                        onMouseOut: () => { S.quanta.selectedForTts = null; },
+                        [C.DOM_ID_ATTR]: this.getContentDomId(),
+                        onClick: S.nav.ttsClick
+                    }));
+                }
             }
         }
 

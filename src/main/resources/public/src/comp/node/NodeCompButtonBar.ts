@@ -10,6 +10,8 @@ import { Constants as C } from "../../Constants";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { DropdownMenu } from "../core/DropdownMenu";
+import { Li } from "../core/Li";
 import { Span } from "../core/Span";
 
 export class NodeCompButtonBar extends Div {
@@ -168,6 +170,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
+            const iconClazz = ast.mobileMode ? "" : "buttonBarIcon";
 
             if (editingAllowed) {
                 if (editableNode && !specialAccountNode) {
@@ -179,7 +182,7 @@ export class NodeCompButtonBar extends Div {
 
                 if (this.node.type !== J.NodeType.REPO_ROOT && !ast.nodesToMove) {
                     cutNodeIcon = new Icon({
-                        className: "fa fa-cut fa-lg buttonBarIcon",
+                        className: "fa fa-cut fa-lg " + iconClazz,
                         title: "Cut selected Node(s) to paste elsewhere.",
                         [C.NODE_ID_ATTR]: this.node.id,
                         onClick: S.edit.cutSelNodes
@@ -193,7 +196,7 @@ export class NodeCompButtonBar extends Div {
 
                     if (this.node.logicalOrdinal > 0) {
                         moveNodeUpIcon = new Icon({
-                            className: "fa fa-lg fa-arrow-up buttonBarIcon",
+                            className: "fa fa-lg fa-arrow-up " + iconClazz,
                             title: "Move Node Up",
                             [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.moveNodeUp
@@ -202,7 +205,7 @@ export class NodeCompButtonBar extends Div {
 
                     if (!this.node.lastChild && ast.node.children && ast.node.children.length > 1) {
                         moveNodeDownIcon = new Icon({
-                            className: "fa fa-lg fa-arrow-down buttonBarIcon",
+                            className: "fa fa-lg fa-arrow-down " + iconClazz,
                             title: "Move Node Down",
                             [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.moveNodeDown
@@ -217,7 +220,7 @@ export class NodeCompButtonBar extends Div {
                     askDelDiv = this.node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
                     if (!askDelDiv) {
                         deleteNodeIcon = new Icon({
-                            className: "fa fa-trash fa-lg buttonBarIcon",
+                            className: "fa fa-trash fa-lg " + iconClazz,
                             title: "Delete node(s)",
                             [C.NODE_ID_ATTR]: this.node.id,
                             onClick: S.edit.deleteSelNodes
@@ -265,14 +268,31 @@ export class NodeCompButtonBar extends Div {
         // }
         // ---------------------------
 
-        const spanArray = [moveNodeUpIcon, //
-            moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, askDelDiv, //
-            /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */
-            pasteSpan];
-
         let floatEndSpan = null;
-        if (spanArray.some(c => !!c)) {
-            floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
+
+        if (ast.mobileMode) {
+            const focusNode = S.nodeUtil.getHighlightedNode();
+            const selected: boolean = (focusNode && focusNode.id === this.node.id);
+            if (selected) {
+                floatEndSpan = new DropdownMenu([
+                    moveNodeUpIcon ? new Li(null, null, [moveNodeUpIcon, new Span("Move Up", { className: "marginLeft" })]) : null,
+                    moveNodeDownIcon ? new Li(null, null, [moveNodeDownIcon, new Span("Move Down")]) : null,
+                    cutNodeIcon ? new Li(null, null, [cutNodeIcon, new Span("Cut")]) : null,
+                    deleteNodeIcon ? new Li(null, null, [deleteNodeIcon, new Span("Delete")]) : null,
+                    new Li(null, null, [askDelDiv]),
+                    new Li(null, null, [pasteSpan])
+                ], "float-end clickable");
+            }
+        }
+        else {
+            const spanArray = [moveNodeUpIcon, //
+                moveNodeDownIcon, cutNodeIcon, deleteNodeIcon, askDelDiv, //
+                /* DO NOT DELETE: docIcon, searchIcon, timelineIcon, */
+                pasteSpan];
+
+            if (spanArray.some(c => !!c)) {
+                floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
+            }
         }
 
         let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan
