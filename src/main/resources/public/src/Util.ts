@@ -665,6 +665,28 @@ export class Util {
         this.showMessage("Send Test Email Initiated.", "Note");
     }
 
+    // Send emial using the user's default email client
+    sendEmail = (recipient: string, subject: string, body: string, html: boolean = false) => {
+        if (html) {
+            body = encodeURIComponent(`<!DOCTYPE html><html><body>${body}</body></html>`);
+        }
+
+        // Create the mailto link
+        const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        // Open the mailto link in a new browser tab
+        window.open(mailtoLink, "_blank");
+    }
+
+    // Send emial using the user's default email client
+    sendTextMessage = (phone: string, body: string) => {
+        // Create the mailto link
+        const mailtoLink = `sms:${phone}?body=${encodeURIComponent(body)}`;
+
+        // Open the mailto link in a new browser tab
+        window.open(mailtoLink, "_blank");
+    }
+
     // Used to sent a message to the server simply to log into the log file as DEBUG, INFO, TRACE, for the purpose of
     // either checking that logging is working, after a live edit of the logger config file or as a text marker
     // for identifying when specific things are happening by injecting into log file some notes or text.

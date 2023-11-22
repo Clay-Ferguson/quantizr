@@ -5,6 +5,8 @@ import { ButtonBar } from "./comp/core/ButtonBar";
 import { Heading } from "./comp/core/Heading";
 import { VerticalLayout } from "./comp/core/VerticalLayout";
 import { Constants as C } from "./Constants";
+import { AskForEmail } from "./dlg/AskForEmailDlg";
+import { AskForPhoneNumber } from "./dlg/AskForPhoneNumber";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -240,14 +242,32 @@ export class Nav {
                 new MessageDlg("Your current location...", "GEO Location", null,
                     new VerticalLayout([
                         new Heading(3, "Lat/Lon: " + location.coords.latitude + "," + location.coords.longitude),
-                        new Heading(5, "Accuracy: +/- " + location.coords.accuracy + " meters (" + (location.coords.accuracy * 0.000621371).toFixed(1) + " miles)"),
+                        new Heading(5, "Accuracy: " + (location.coords.accuracy * 0.000621371).toFixed(1) + " miles"),
                         new ButtonBar([
-                            new Button("Show on Google Maps", () => {
+                            new Button("Google Map", () => {
                                 window.open(googleUrl, "_blank");
                             }),
-                            new Button("Copy Google Link to Clipboard", () => {
+                            new Button("Copy Link", () => {
                                 S.util.copyToClipboard(googleUrl);
                                 S.util.flashMessage("Copied to Clipboard: " + googleUrl, "Clipboard", true);
+                            }),
+                            new Button("Send via Email", async () => {
+                                const dlg = new AskForEmail();
+                                await dlg.open();
+                                const email = AskForEmail.emailState.getValue();
+                                if (email) {
+                                    const body = `<p>My current location: <a href="${googleUrl}">Google Map Link (LAT/LON)</a></p>`;
+                                    S.util.sendEmail(email, "My current location", body, true);
+                                }
+                            }),
+                            new Button("Send via SMS", async () => {
+                                const dlg = new AskForPhoneNumber();
+                                await dlg.open();
+                                const phone = AskForPhoneNumber.phoneState.getValue();
+                                if (phone) {
+                                    const body = `My current location: ${googleUrl}`;
+                                    S.util.sendTextMessage(phone, body);
+                                }
                             })
                         ])
                     ]), false, 0, null
