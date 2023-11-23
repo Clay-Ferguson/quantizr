@@ -184,7 +184,7 @@ export class OpenGraphPanel extends Div {
             state.og.image = state.og.image.replaceAll("http://", "https://");
 
             // if mobile portrait mode render image above (not beside) description
-            if (ast.mobileMode && window.innerWidth < window.innerHeight) {
+            if (ast.mobileMode && !S.quanta.isLandscapeOrientation()) {
                 imgAndDesc = new Div(null, null, [
                     new Img({
                         className: "openGraphImageVert",

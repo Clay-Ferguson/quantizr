@@ -46,6 +46,7 @@
 
 .mobileIcon {
     padding: 8px;
+    width: 2.5rem;
 }
 
 .appNavTab {
@@ -62,13 +63,6 @@
     border-radius: 0 !important;
     border: 1px solid slategrey;
     cursor: pointer !important;
-}
-
-/* Media query for screens smaller than 768px (Bootstrap's small devices breakpoint) */
-@media (max-width: 767.98px) {
-    .btn {
-        padding: 6px 10px 6px 10px !important;
-    }
 }
 
 .btn[disabled] {

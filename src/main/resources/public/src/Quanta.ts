@@ -324,6 +324,7 @@ export class Quanta {
         });
     }
 
+    // landscape v.s. portrait
     isLandscapeOrientation = () => {
         return window.innerWidth > window.innerHeight;
     }
