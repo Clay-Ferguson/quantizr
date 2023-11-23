@@ -26,6 +26,11 @@ export class AppState {
         console.log("Constructing AppState");
     }
 
+    // this will be true only if screen width greater than 1024px. In desktop mode we have the RHS
+    // panel in a popup, and if this var is false that means we're allowing the RHS only in this popup panel
+    // that can be triggered by the sitemap button on the upper left. For mobile mode this is always true.
+    showRhs = true;
+
     appInitComplete = false;
     tabPanelVisible: boolean = true;
     stateId: number = 0;
@@ -33,7 +38,7 @@ export class AppState {
     docIndent: boolean = false;
 
     mobileMode: boolean = clientInfo.isMobileOrTablet;
-    //mobileMode: boolean = true;
+    // mobileMode: boolean = true;
 
     // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile
     // showIpfsTab: boolean;

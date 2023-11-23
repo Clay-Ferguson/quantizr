@@ -3,6 +3,7 @@ import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { AppTab } from "./AppTab";
 import { Comp } from "./base/Comp";
+import { RightNavPanel } from "./RightNavPanel";
 
 export class TabPanel extends Div {
     static inst: TabPanel;
@@ -16,7 +17,10 @@ export class TabPanel extends Div {
             this.attribs.className = "col-12 tabPanelMobile";
         }
         else {
-            const panelCols = ast.userPrefs.mainPanelCols || 6;
+            let panelCols = ast.userPrefs.mainPanelCols || 6;
+            if (!ast.showRhs) {
+                panelCols += RightNavPanel.calcWidthCols();
+            }
             this.attribs.className = "col-" + panelCols + " tabPanel" + (ast.tour ? " appColumnTourActive" : " appColumn");
         }
     }

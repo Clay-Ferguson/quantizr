@@ -59,6 +59,11 @@
     display: none;
 }
 
+.appModalContentAreaEmbedMobile {
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+}
+
 .appModalContentAreaEmbed {
     padding: 0px 12px 12px 0px;
     border-bottom-left-radius: $border-radius;

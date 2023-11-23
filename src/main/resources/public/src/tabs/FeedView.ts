@@ -77,7 +77,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
 
         const topChildren: Comp[] = [
-            new Div(null, null, [
+            new Div(null, { className: "float-end" }, [
                 ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                     val: this.data.props.searchTextState,
                     placeholder: "Search for...",
@@ -142,7 +142,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         // }
 
         const children: Comp[] = [];
-        children.push(new Div(null, { className: "tinyMarginBottom" }, topChildren));
+        children.push(new Div(null, null, topChildren));
         const childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
         if (this.data.props.feedLoading && childCount === 0) {

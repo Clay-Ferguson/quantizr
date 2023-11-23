@@ -6,9 +6,11 @@ import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
+import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { FeedTab } from "../tabs/data/FeedTab";
 import { TabPanelButtons } from "./TabPanelButtons";
 import { Icon } from "./core/Icon";
+import { IconButton } from "./core/IconButton";
 import { RadioButton } from "./core/RadioButton";
 import { RadioButtonGroup } from "./core/RadioButtonGroup";
 
@@ -111,7 +113,11 @@ export class LeftNavPanel extends Div {
                                 })
                             },
                             title: "Show Menu"
-                        }) : null
+                        }) : null,
+                        !ast.showRhs ? new IconButton("fa-sitemap fa-lg", null, {
+                            onClick: () => new NavPanelDlg().open(),
+                            id: "navMenu"
+                        }, "btn-primary menuButton", "off") : null
                     ])
                 ]),
                 ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,

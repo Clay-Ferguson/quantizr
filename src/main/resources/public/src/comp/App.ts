@@ -11,7 +11,6 @@ import { Comp } from "./base/Comp";
 import { Div } from "./core/Div";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
-import { Span } from "./core/Span";
 import { TourPanel } from "./core/TourPanel";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
@@ -72,7 +71,7 @@ export class App extends Main {
                     ast.tour ? new TourPanel() : null,
                     ast.mobileMode ? null : new LeftNavPanel(),
                     new TabPanel(mobileTopBar),
-                    ast.mobileMode ? null : new RightNavPanel()
+                    ast.mobileMode || !ast.showRhs ? null : new RightNavPanel()
                 ])
             ]);
         }
@@ -119,35 +118,30 @@ export class App extends Main {
                 id: "navMenu"
             }, "btn-primary menuButton", "off");
 
-            const feedButton = new IconButton("fa-globe fa-lg", null, {
-                onClick: S.nav.messagesFediverse,
-                id: "feedMenu"
-            }, "btn-primary menuButton", "off");
-
-            const loginButton = ast.isAnonUser ? new Span("Login", {
-                className: "marginRight clickable",
+            const loginButton = ast.isAnonUser ? new Div("Login", {
+                className: "marginTop marginRight clickable",
                 id: "loginButton",
                 onClick: S.user.userLogin
             }) : null;
 
             // for mobile mode don't try to fit the signup button in the header bar, because the header bar needs
             // to be fixed height and signup won't fit. There's a signup button on the Login so users can signup
-            const signupButton = ast.isAnonUser && !ast.mobileMode ? new Span("Signup", {
-                className: "marginRight clickable",
+            const signupButton = ast.isAnonUser && !ast.mobileMode ? new Div("Signup", {
+                className: "marginTop marginRight clickable",
                 id: "loginButton",
                 onClick: S.user.userSignup
             }) : null;
 
             const floatRightDiv = new Div(null, { className: "float-end" }, [
                 loginButton, signupButton,
-                !ast.isAnonUser ? new Span(ast.userName, {
-                    className: "clickable",
+                !ast.isAnonUser ? new Div(ast.userName, {
+                    className: "clickable marginRight marginTop",
                     // NOTE: No data attribute here. Null opens our own profile
                     onClick: S.nav.clickToOpenUserProfile
                 }) : null
             ]);
 
-            return new Div(null, { className: "mobileHeaderBar" }, [menuButton, navButton, feedButton, floatRightDiv]);
+            return new Div(null, { className: "mobileHeaderBar" }, [menuButton, navButton, floatRightDiv]);
         }
         return null;
     }

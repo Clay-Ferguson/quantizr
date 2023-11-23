@@ -28,22 +28,31 @@ export class RightNavPanel extends Div {
         RightNavPanel.inst = this;
     }
 
+    static calcWidthCols = (): number => {
+        let panelCols = getAs().userPrefs.mainPanelCols || 6;
+        if (panelCols < 4) panelCols = 4;
+        if (panelCols > 8) panelCols = 8;
+        let cols = 4;
+
+        if (panelCols >= 6) {
+            cols--;
+        }
+        if (panelCols >= 8) {
+            cols--;
+        }
+        return cols;
+    }
+
     override preRender = (): boolean => {
         const ast = getAs();
 
         if (!ast.mobileMode) {
-            let panelCols = ast.userPrefs.mainPanelCols || 6;
-            if (panelCols < 4) panelCols = 4;
-            if (panelCols > 8) panelCols = 8;
-            let rightCols = 4;
-
-            if (panelCols >= 6) {
-                rightCols--;
+            if (!ast.showRhs) {
+                this.attribs.className = ast.tour ? "appColumnTourActive" : "appColumn";
             }
-            if (panelCols >= 8) {
-                rightCols--;
+            else {
+                this.attribs.className = "col-" + RightNavPanel.calcWidthCols() + (ast.tour ? " appColumnTourActive" : " appColumn");
             }
-            this.attribs.className = "col-" + rightCols + (ast.tour ? " appColumnTourActive" : " appColumn");
         }
 
         const avatarImg = ast.mobileMode ? null : this.makeRHSAvatarDiv();
@@ -188,7 +197,7 @@ export class RightNavPanel extends Div {
         }
         else {
             this.setChildren([
-                scrollDiv = new Div(null, { className: "rightNavPanel customScrollbar" }, [
+                scrollDiv = new Div(null, { className: ast.showRhs ? "rightNavPanel customScrollbar" : "rightNavPanelPopup" }, [
                     rightNavDiv
                 ])
             ]);

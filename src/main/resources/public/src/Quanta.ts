@@ -14,6 +14,9 @@ export class Quanta {
     // initialized in main.ts
     config: J.ClientConfig = null;
 
+    screenWidth = window.innerWidth;
+    screenHeight = window.innerHeight;
+
     // this is a convenience var pointing to Quanta.config.config
     cfg: { [index: string]: any };
 
@@ -186,10 +189,18 @@ export class Quanta {
             });
 
             // not used. do not delete.
-            // window.addEventListener("resize", () => {
-            //     deviceWidth = window.innerWidth;
-            //     deviceHeight = window.innerHeight;
-            // });
+            window.addEventListener("resize", () => {
+                // for mobile mode we leave showRhs true always
+                if (getAs().mobileMode) return;
+
+                if ((window.innerWidth < 1024 && this.screenWidth >= 1024) ||
+                    (window.innerWidth >= 1024 && this.screenWidth < 1024)) {
+                    dispatch("browserResize", s => {
+                        s.showRhs = window.innerWidth >= 1024;
+                    });
+                }
+                this.screenWidth = window.innerWidth;
+            });
 
             // This works, but is not needed. do not delete.
             // window.addEventListener("hashchange", function () {
