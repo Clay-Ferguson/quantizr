@@ -189,7 +189,6 @@ export class NodeCompButtonBar extends Div {
                     todo-1: consider allowing moving up/down on all nodes
                 */
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove && this.level < 2) {
-
                     if (this.node.logicalOrdinal > 0) {
                         addMoveUp = true;
                     }
@@ -253,74 +252,76 @@ export class NodeCompButtonBar extends Div {
         let floatEndSpan = null;
         let spanArray = [];
 
-        if (ast.mobileMode) {
-            if (addMoveUp || addMoveDown || addCut || addDelete) {
-                spanArray.push(new DropdownMenu([
-                    addMoveUp ? new Li(null, {
-                        title: "Move Node Up",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.moveNodeUp
-                    }, [
-                        new Icon({
-                            className: "fa fa-lg fa-arrow-up " + iconClazz,
-                        }), new Span("Move Up")
-                    ]) : null,
+        if (ast.mobileMode && (addMoveUp || addMoveDown || addCut || addDelete)) {
 
-                    addMoveDown ? new Li(null, {
-                        title: "Move Node Down",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.moveNodeDown
-                    }, [
-                        new Icon({
-                            className: "fa fa-lg fa-arrow-down " + iconClazz,
-                        }), new Span("Move Down")
-                    ]) : null,
+            spanArray.push(new DropdownMenu([
+                addMoveUp ? new Li(null, {
+                    title: "Move Node Up",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.moveNodeUp
+                }, [
+                    new Icon({
+                        className: "fa fa-lg fa-arrow-up " + iconClazz,
+                    }), new Span("Move Up")
+                ]) : null,
 
-                    addCut ? new Li(null, {
-                        title: "Cut selected Node(s) to paste elsewhere.",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.cutSelNodes
-                    }, [
-                        new Icon({
-                            className: "fa fa-cut fa-lg " + iconClazz,
-                        }), new Span("Cut")
-                    ]) : null,
+                addMoveDown ? new Li(null, {
+                    title: "Move Node Down",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.moveNodeDown
+                }, [
+                    new Icon({
+                        className: "fa fa-lg fa-arrow-down " + iconClazz,
+                    }), new Span("Move Down")
+                ]) : null,
 
-                    addDelete ? new Li(null, {
-                        title: "Delete node(s)",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.deleteSelNodes
-                    }, [
-                        new Icon({
-                            className: "fa fa-trash fa-lg " + iconClazz,
-                        }), new Span("Delete")
-                    ]) : null
-                ], "float-end clickable"));
-            }
+                addCut ? new Li(null, {
+                    title: "Cut selected Node(s) to paste elsewhere.",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.cutSelNodes
+                }, [
+                    new Icon({
+                        className: "fa fa-cut fa-lg " + iconClazz,
+                    }), new Span("Cut")
+                ]) : null,
+
+                addDelete ? new Li(null, {
+                    title: "Delete node(s)",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.edit.deleteSelNodes
+                }, [
+                    new Icon({
+                        className: "fa fa-trash fa-lg " + iconClazz,
+                    }), new Span("Delete")
+                ]) : null
+            ], "float-end clickable"));
         }
         else {
             spanArray = [
-                new Icon({
+                addMoveUp ? new Icon({
                     className: "fa fa-lg fa-arrow-up " + iconClazz,
                     title: "Move Node Up",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.moveNodeUp
-                }), new Icon({
+                }) : null,
+                addMoveDown ? new Icon({
                     className: "fa fa-lg fa-arrow-down " + iconClazz,
                     title: "Move Node Down",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.moveNodeDown
-                }), new Icon({
+                }) : null,
+                addCut ? new Icon({
                     className: "fa fa-cut fa-lg " + iconClazz,
                     title: "Cut selected Node(s) to paste elsewhere.",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.cutSelNodes
-                }), new Icon({
+                }) : null,
+                addDelete ? new Icon({
                     className: "fa fa-trash fa-lg " + iconClazz,
                     title: "Delete node(s)",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.deleteSelNodes
-                })
+                }) : null
             ];
         }
 
