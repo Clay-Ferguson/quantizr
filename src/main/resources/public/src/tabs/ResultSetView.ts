@@ -89,7 +89,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
             if (ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
             const c = this.renderItem(node, i, rowCount, true);
             if (c) {
-                if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+                if (ast.userPrefs.editMode && !ast.editNode) {
                     S.domUtil.setNodeDragHandler(c.attribs, node.id);
                     S.domUtil.makeDropTarget(c.attribs, node.id);
                 }

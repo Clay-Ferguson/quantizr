@@ -25,7 +25,7 @@ export class NodeCompMainNode extends Div {
         const type = S.plugin.getType(J.NodeType.NONE);
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode) {
             S.domUtil.setNodeDragHandler(this.attribs, ast.node.id)
         }
     }
@@ -98,7 +98,7 @@ export class NodeCompMainNode extends Div {
             S.render.setNodeDropHandler(this.attribs, node);
         }
 
-        const buttonBar = !ast.inlineEditId ? new NodeCompButtonBar(node, false, 0, false, null, null) : null;
+        const buttonBar = new NodeCompButtonBar(node, false, 0, false, null, null);
 
         this.setChildren([
             S.render.renderBoostHeader(node, true),

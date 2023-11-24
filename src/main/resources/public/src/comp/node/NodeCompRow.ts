@@ -34,7 +34,7 @@ export class NodeCompRow extends Div {
 
         const ast = getAs();
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode) {
             S.domUtil.setNodeDragHandler(this.attribs, node.id)
         }
     }
@@ -89,7 +89,7 @@ export class NodeCompRow extends Div {
         }
 
         let buttonBar = null;
-        if (this.allowHeaders && NodeCompRow.showButtonBar && !ast.inlineEditId) {
+        if (this.allowHeaders && NodeCompRow.showButtonBar) {
             buttonBar = new NodeCompButtonBar(this.node, this.isTableCell, this.level, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
         }
 

@@ -58,9 +58,6 @@ export class AppState {
     otherAccountNodesExpanded: boolean = false;
     linksToAttachmentsExpanded: boolean = false;
 
-    inlineEditId: string;
-    inlineEditVal: string;
-
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
     displayName: string = "";

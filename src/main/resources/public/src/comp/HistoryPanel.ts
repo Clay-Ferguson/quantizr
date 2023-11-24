@@ -55,7 +55,7 @@ export class HistoryPanel extends Div {
             }
 
             const dragProps = {};
-            if (ast.userPrefs.editMode && !ast.editNode && !ast.inlineEditId) {
+            if (ast.userPrefs.editMode && !ast.editNode) {
                 S.domUtil.setNodeDragHandler(dragProps, h.id);
             }
 
