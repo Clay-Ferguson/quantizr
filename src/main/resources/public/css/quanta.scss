@@ -26,6 +26,8 @@ $fa-font-path: "../fonts/fa";
 @import "../node_modules/font-awesome/scss/font-awesome";
 
 @import "bootswatch.scss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
 $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
 
 // This does work (border around focused edit fields) but we don't need it.

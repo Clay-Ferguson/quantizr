@@ -135,11 +135,11 @@ export class NodeCompButtonBar extends Div {
         if (ast.userPrefs.editMode) {
             if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode) {
                 dragIcon = new Icon({
-                    className: "fa fa-crosshairs fa-lg rowIcon",
+                    className: "bi bi-grip-vertical bi-lg dragIcon",
                     title: "Drag to move this node"
                 });
 
-                S.domUtil.setNodeDragHandler(dragIcon.attribs, this.node.id, false)
+                S.domUtil.setNodeDragHandler(dragIcon.attribs, this.node.id, false);
             }
 
             const checkboxForEdit = editingAllowed && (ast.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node));
