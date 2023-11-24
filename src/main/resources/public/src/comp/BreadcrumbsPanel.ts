@@ -37,7 +37,10 @@ export class BreadcrumbsPanel extends Div {
                         onClick: () => S.view.jumpToId(bc.id),
                         className: "breadcrumbItem"
                     });
-                    S.domUtil.makeDropTarget(span.attribs, bc.id);
+
+                    if (!ast.mobileMode) {
+                        S.domUtil.makeDropTarget(span.attribs, bc.id);
+                    }
                     return span;
                 }
                 else {

@@ -34,6 +34,7 @@ export class NodeCompButtonBar extends Div {
         let openButton: IconButton;
         let expnButton: IconButton;
         let selCheckbox: Checkbox;
+        let dragIcon: Icon;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
         let addCut: boolean = false;
@@ -132,6 +133,15 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (ast.userPrefs.editMode) {
+            if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode) {
+                dragIcon = new Icon({
+                    className: "fa fa-crosshairs fa-lg rowIcon",
+                    title: "Drag to move this node"
+                });
+
+                S.domUtil.setNodeDragHandler(dragIcon.attribs, this.node.id, false)
+            }
+
             const checkboxForEdit = editingAllowed && (ast.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node));
             const checkboxForDelete = ast.isAdminUser || deleteAllowed;
 
@@ -346,8 +356,8 @@ export class NodeCompButtonBar extends Div {
             buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
         }
 
-        if (selCheckbox || sharedIcon || buttonBar) {
-            this.setChildren([selCheckbox, sharedIcon, buttonBar]);
+        if (dragIcon || selCheckbox || sharedIcon || buttonBar) {
+            this.setChildren([dragIcon, selCheckbox, sharedIcon, buttonBar]);
             return true;
         }
         return false;

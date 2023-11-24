@@ -55,7 +55,7 @@ export class HistoryPanel extends Div {
             }
 
             const dragProps = {};
-            if (ast.userPrefs.editMode && !ast.editNode) {
+            if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
                 S.domUtil.setNodeDragHandler(dragProps, h.id);
             }
 
@@ -70,7 +70,9 @@ export class HistoryPanel extends Div {
                 new SpanHtml(h.content)
             ]));
 
-            S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
+            if (!ast.mobileMode) {
+                S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
+            }
         });
         this.setChildren(children);
         return true;

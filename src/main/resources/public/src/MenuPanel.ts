@@ -172,7 +172,10 @@ export class MenuPanel extends Div {
                 ast.bookmarks.forEach(bookmark => {
                     const nodeId = bookmark.id || bookmark.selfId;
                     const mi = new MenuItem(bookmark.name, () => S.view.jumpToId(nodeId), true, null);
-                    S.domUtil.makeDropTarget(mi.attribs, nodeId);
+
+                    if (!ast.mobileMode) {
+                        S.domUtil.makeDropTarget(mi.attribs, nodeId);
+                    }
                     bookmarkItems.push(mi);
                 });
             }

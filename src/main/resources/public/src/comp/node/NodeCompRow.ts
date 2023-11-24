@@ -31,12 +31,6 @@ export class NodeCompRow extends Div {
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });
-
-        const ast = getAs();
-        /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode) {
-            S.domUtil.setNodeDragHandler(this.attribs, node.id)
-        }
     }
 
     override preRender = (): boolean => {

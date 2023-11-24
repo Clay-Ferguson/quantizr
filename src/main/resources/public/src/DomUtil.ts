@@ -210,6 +210,7 @@ export class DomUtil {
 
     escapeHtml = (str: string): string => {
         if (!str) return str;
+        // todo-1: I think we don't need the String() method here right? just 'str' will work?
         return String(str).replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);
     }
 
@@ -226,7 +227,7 @@ export class DomUtil {
         delete attribs.onDrop;
     }
 
-    setNodeDragHandler = (attribs: any, nodeId: string) => {
+    setNodeDragHandler = (attribs: any, nodeId: string, backgroundImage: boolean = true) => {
         if (!nodeId) {
             return;
         }
@@ -241,7 +242,10 @@ export class DomUtil {
             S.quanta.dragElm = ev.target;
             S.quanta.draggingId = nodeId;
             ev.dataTransfer.setData(C.DND_TYPE_NODEID, nodeId);
-            ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
+
+            if (backgroundImage) {
+                ev.dataTransfer.setDragImage(S.quanta.dragImg, 0, 0);
+            }
         };
 
         attribs.onDragEnd = function (ev: any) {
