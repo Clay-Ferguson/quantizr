@@ -203,6 +203,7 @@
     border: 1px solid gray;
     background-color: darken($secondary, 10%);
     padding: 4px;
+    margin-top: 4px;
     margin-bottom: $tinyGap;
     border-radius: $border-radius;
 }
@@ -327,7 +328,6 @@ i'm backing out for now
     border-left: $highlightBorderSize solid $primary;
     border-bottom: $highlightBorderSize solid $primary;
     padding-top: 8px;
-    margin-bottom: 5px;
 }
 
 .activeRowMain:hover {
@@ -338,7 +338,6 @@ i'm backing out for now
     border-left: $highlightBorderSize solid transparent;
     border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
     padding-top: 8px;
-    margin-bottom: 5px;
 }
 
 .inactiveRowMain:hover {

@@ -44,6 +44,8 @@
     font-size: 1.5rem;
     vertical-align: middle;
     cursor: pointer;
+    display: inline-block;
+    margin-right: $tinyGap;
 }
 
 .rowTypeIcon {

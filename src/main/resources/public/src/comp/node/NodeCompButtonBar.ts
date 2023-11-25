@@ -161,7 +161,7 @@ export class NodeCompButtonBar extends Div {
                         });
                     },
                     getValue: (): boolean => ast.selectedNodes.has(this.node.id)
-                }, "float-start");
+                }, "formCheckInlineNoMargin");
             }
 
             let insertAllowed = true;
@@ -353,7 +353,7 @@ export class NodeCompButtonBar extends Div {
 
         let buttonBar = null;
         if (btnArray.some(c => !!c)) {
-            buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
+            buttonBar = new ButtonBar(btnArray);
         }
 
         if (dragIcon || selCheckbox || sharedIcon || buttonBar) {
