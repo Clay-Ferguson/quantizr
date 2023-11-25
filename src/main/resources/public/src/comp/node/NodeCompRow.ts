@@ -84,7 +84,7 @@ export class NodeCompRow extends Div {
 
         let buttonBar = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar) {
-            buttonBar = new NodeCompButtonBar(this.node, this.isTableCell, this.level, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null);
+            buttonBar = new NodeCompButtonBar(this.node, this.isTableCell, this.level, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null, this.tabData);
         }
 
         let layoutClass = this.isTableCell ? "nodeGridItem" //

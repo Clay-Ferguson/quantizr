@@ -753,7 +753,7 @@ export class EditNodeDlg extends DialogBase {
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive()
                 ? new Button("Delete", () => {
-                    S.edit.deleteSelNodes(null, ast.editNode.id);
+                    S.edit.deleteOneNode(null, ast.editNode.id);
                     this.close();
                 }) : null,
 

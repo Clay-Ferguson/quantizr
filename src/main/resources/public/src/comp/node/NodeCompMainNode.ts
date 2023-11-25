@@ -90,7 +90,7 @@ export class NodeCompMainNode extends Div {
             S.render.setNodeDropHandler(this.attribs, node);
         }
 
-        const buttonBar = new NodeCompButtonBar(node, false, 0, false, null, null);
+        const buttonBar = new NodeCompButtonBar(node, false, 0, false, null, null, this.tabData);
 
         this.setChildren([
             S.render.renderBoostHeader(node, true),

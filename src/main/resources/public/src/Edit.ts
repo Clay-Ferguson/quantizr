@@ -910,6 +910,17 @@ export class Edit {
         }
     }
 
+    // clears selections before deleting so only the id passed or the id on the event can be deleted.
+    // This is because non-tree views don't have the checkbox for even multiselecting
+    deleteOneNode = async (evt: Event = null, id: string = null) => {
+        await promiseDispatch("ClearSelectNode", s => {
+            s.selectedNodes.clear();
+        });
+
+        // now we can run this method and we know it will only delete one node.
+        this.deleteSelNodes(evt, id);
+    }
+
     /*
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
@@ -1471,6 +1482,7 @@ export class Edit {
         dispatch("DeleteComplete", s => {
             s.nodeClickedToDel = null;
             s.nodesToDel = null;
+            s.selectedNodes.clear();
         });
     }
 

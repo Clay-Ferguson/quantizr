@@ -7,6 +7,7 @@ import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
+import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -16,7 +17,8 @@ import { Span } from "../core/Span";
 
 export class NodeCompButtonBar extends Div {
 
-    constructor(public node: J.NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean, private extraButtons: Comp[], extraClass: string) {
+    constructor(public node: J.NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean,
+        private extraButtons: Comp[], extraClass: string, public tabData: TabIntf<any>) {
         super(null, {
             id: "ncbb_" + node.id,
             className: "nodeCompButtonBar " + (extraClass || "")
@@ -298,7 +300,7 @@ export class NodeCompButtonBar extends Div {
                 addDelete ? new Li(null, {
                     title: "Delete node(s)",
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.edit.deleteSelNodes
+                    onClick: this.tabData.id == C.TAB_MAIN ? S.edit.deleteSelNodes : S.edit.deleteOneNode
                 }, [
                     new Icon({
                         className: "fa fa-trash fa-lg " + iconClazz,
@@ -330,7 +332,7 @@ export class NodeCompButtonBar extends Div {
                     className: "fa fa-trash fa-lg " + iconClazz,
                     title: "Delete node(s)",
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.edit.deleteSelNodes
+                    onClick: this.tabData.id == C.TAB_MAIN ? S.edit.deleteSelNodes : S.edit.deleteOneNode
                 }) : null
             ];
         }

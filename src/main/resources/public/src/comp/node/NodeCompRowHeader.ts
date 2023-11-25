@@ -483,7 +483,7 @@ export class NodeCompRowHeader extends Div {
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
                         [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.deleteSelNodes
+                        onClick: this.tabData.id == C.TAB_MAIN ? S.edit.deleteSelNodes : S.edit.deleteOneNode
                     }));
                 }
             }
