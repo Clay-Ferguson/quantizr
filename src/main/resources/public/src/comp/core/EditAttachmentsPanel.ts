@@ -31,8 +31,8 @@ export class EditAttachmentsPanel extends Div {
                 new IconButton("fa-trash fa-lg", "", {
                     onClick: () => this.dlg.utl.deleteUploads(this.dlg),
                     title: "Delete selected Attachments"
-                }, "delAttachmentButton")
-            ], "float-end"));
+                })
+            ], "attachmentButtonBar"));
         }
 
         S.props.getOrderedAtts(this.node).forEach(att => {

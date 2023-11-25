@@ -187,9 +187,10 @@ th {
     margin-bottom: $smallGap;
 }
 
-.delAttachmentButton {
-    margin-top: $tinyGap;
-    margin-right: $tinyGap;
+.attachmentButtonBar {
+    border-bottom: 1px solid gray;
+    padding-bottom: $tinyGap;
+    margin-bottom: $tinyGap;
 }
 
 .delAttCheckbox {

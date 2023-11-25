@@ -316,33 +316,36 @@ export class EditNodeDlgUtil {
         const confirmDlg = new ConfirmDlg("Delete the selected Attachments?", "Confirm Delete",
             "btn-danger", "alert alert-danger");
         await confirmDlg.open();
+        if (!confirmDlg.yes) return;
 
-        if (confirmDlg.yes) {
-            const ast = getAs();
-
-            let delAttKeys = "";
-            dlg.getState<EditNodeDlgState>().selectedAttachments?.forEach(prop => {
-                delete ast.editNode.attachments[prop];
-
-                if (delAttKeys) {
-                    delAttKeys += ",";
-                }
-                delAttKeys = prop;
-            });
+        const ast = getAs();
+        let delAttKeys = "";
+        dlg.getState<EditNodeDlgState>().selectedAttachments?.forEach(prop => {
+            delete ast.editNode.attachments[prop];
 
             if (delAttKeys) {
-                await S.rpcUtil.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                    nodeId: ast.editNode.id,
-                    attName: delAttKeys
-                });
+                delAttKeys += ",";
             }
+            delAttKeys = prop;
+        });
 
-            if (S.util.getPropertyCount(ast.editNode.attachments) === 0) {
-                ast.editNode.attachments = null;
-            }
-            S.edit.updateNode(ast.editNode);
-            dlg.binaryDirty = true;
+        if (delAttKeys) {
+            await S.rpcUtil.rpc<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                nodeId: ast.editNode.id,
+                attName: delAttKeys
+            });
         }
+
+        if (S.util.getPropertyCount(ast.editNode.attachments) === 0) {
+            ast.editNode.attachments = null;
+        }
+
+        dlg.mergeState<EditNodeDlgState>({
+            selectedAttachments: new Set<string>()
+        });
+
+        S.edit.updateNode(ast.editNode);
+        dlg.binaryDirty = true;
     }
 
     initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, propEntry: J.PropertyInfo) => {
