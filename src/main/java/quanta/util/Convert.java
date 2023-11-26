@@ -165,9 +165,19 @@ public class Convert extends ServiceBase {
             likes = new ArrayList<String>(node.getLikes());
         }
         String content = node.getContent();
-        String renderContent = replaceTagsWithHtml(node, true);
-        if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
-            logicalOrdinal = read.generateLogicalOrdinal(ms, node);
+        String renderContent = null;
+
+        if (prop.isActPubEnabled()) {
+            // we have a catch block becasue stuff can go wrong here, when the JSON query against ActPub servers
+            // fails
+            try {
+                renderContent = replaceTagsWithHtml(node, true);
+            } catch (Exception e) {
+                log.error("Error replacing tags with HTML: " + e.getMessage());
+            }
+            if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
+                logicalOrdinal = read.generateLogicalOrdinal(ms, node);
+            }
         }
 
         NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
