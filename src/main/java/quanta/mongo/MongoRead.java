@@ -12,8 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.AggregationSpELExpression;
+import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators;
+import org.springframework.data.mongodb.core.aggregation.StringOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
@@ -877,7 +881,7 @@ public class MongoRead extends ServiceBase {
                 }
             }
             if (!StringUtils.isEmpty(sortField)) {
-                if ("contentLength".equals(sortField)) {
+                if ("contentLength".equals(sortField) || "treeDepth".equals(sortField)) {
                     sortDir = "ASC";
                 }
                 sort = Sort.by((sortDir != null && sortDir.equalsIgnoreCase("DESC")) ? Sort.Direction.DESC
@@ -908,6 +912,34 @@ public class MongoRead extends ServiceBase {
             // calculate contentLength
             aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("strLenCP(cont)")
                     .as("contentLength"));
+            /*
+             * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
+             * with aggregates we doing a step by step pipeline of processing so we need records in the correct
+             * order before we do limit or skip and so the ordering of these 'ops' does that.
+             */
+            aggOps.add(Aggregation.sort(sort));
+            aggOps.add(Aggregation.skip((long) skip));
+            aggOps.add(Aggregation.limit(limit));
+            Aggregation agg = Aggregation.newAggregation(aggOps);
+            AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
+            return results.getMappedResults();
+        } //
+        else if ("treeDepth".equals(sortField)) {
+            List<AggregationOperation> aggOps = new LinkedList<>();
+            /*
+             * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
+             * process it first here
+             */
+            if (textCriteria != null) {
+                aggOps.add(Aggregation.match(textCriteria));
+            }
+
+            Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+            aggOps.add(Aggregation.match(c));
+
+            aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("size(split(pth, '/'))")
+                    .as("treeDepth"));
+
             /*
              * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
              * with aggregates we doing a step by step pipeline of processing so we need records in the correct

@@ -152,6 +152,7 @@ export class SearchContentDlg extends DialogBase {
                             { key: "mtm", val: "Modify Time" },
                             { key: "ctm", val: "Create Time" },
                             { key: "contentLength", val: "Text Length" },
+                            { key: "treeDepth", val: "Tree Depth" },
                             { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
                         ], null, "searchDlgOrderBy", {
                             setValue: (val: string) => {
