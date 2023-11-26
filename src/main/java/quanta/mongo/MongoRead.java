@@ -198,7 +198,7 @@ public class MongoRead extends ServiceBase {
     /*
      * This is used mainly during a delete request to verify the user is deleting what they think
      * they're deleting Specifically a rogue case where they don't think there are children under a
-     * node, because the GUI looks that way for some pathelogocial case and they attemp to delete. This
+     * node, because the GUI looks that way for some pathalogocial case and they attemp to delete. This
      * method will throw an exception if anythig about the child state of 'node' seems off.
      */
     public void hasChildrenConsistencyCheck(MongoSession ms, SubNode node) {
@@ -206,7 +206,7 @@ public class MongoRead extends ServiceBase {
         boolean childrenFound = read.directChildrenExist(ms, node.getPath());
 
         // detect inconsistency
-        if (childrenFound && (hasChildren == null || !hasChildren.booleanValue())) {
+        if (childrenFound && (hasChildren != null && !hasChildren.booleanValue())) {
 
             // repair inconsistency
             node.setHasChildren(true);
