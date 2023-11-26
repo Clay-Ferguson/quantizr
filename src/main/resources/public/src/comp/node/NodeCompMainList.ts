@@ -100,7 +100,7 @@ export class NodeCompMainList extends Div {
         }
 
         if (firstButton || prevButton || moreButton) {
-            children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginBottom text-center " + moreClasses));
+            children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginTop marginBottom text-center " + moreClasses));
         }
     }
 }
