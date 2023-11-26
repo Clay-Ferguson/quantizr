@@ -66,7 +66,7 @@ export class NodeCompMainNode extends Div {
         if (allowHeader && !node.boostedNode) {
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id);
+            header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id, 1);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);

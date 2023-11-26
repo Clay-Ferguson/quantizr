@@ -615,7 +615,8 @@ export class Search {
                 },
                 className: "boostRowOnFeed"
             }, [
-                allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete, tabData.id) : null,
+                // we use 2 as 'idx' here becasue we just want anything but 1 (which indicates 'first')
+                allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete, tabData.id, 2) : null,
                 allowHeader ? new Clearfix() : null,
                 boostContent
             ])
@@ -661,7 +662,8 @@ export class Search {
 
         const itemDiv = new Div(null, attrs, [
             S.render.renderBoostHeader(node, false),
-            allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete, tabData.id) : null,
+            // we use 2 as 'idx' here becasue we just want anything but 1 (which indicates 'first')
+            allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete, tabData.id, 2) : null,
             allowHeader && !node.boostedNode ? new Clearfix() : null,
             content,
             boostComp,

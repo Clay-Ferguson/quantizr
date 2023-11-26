@@ -22,13 +22,15 @@ export class NodeCompRowHeader extends Div {
 
     // NOTE: If boostingNode is non-null it's the node that is boosting 'node'. In other words the rendered page will show
     // node boostingNode as the top/outter level and the 'node' will be the actual node that got boosted by 'boostingNode'
+    // idx==1 for first row. (not zero offset)
     constructor(private boostingNode: J.NodeInfo, private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
-        private isBoost: boolean, private allowDelete: boolean, private prefix: string) {
+        private isBoost: boolean, private allowDelete: boolean, private prefix: string, private idx: number) {
         super(null);
 
         const ast = getAs();
-        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? "rowHeaderEdit" : "row-header";
+        this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? //
+            (this.idx == 1 ? "rowHeaderEditFirst" : "rowHeaderEdit") : "row-header";
     }
 
     override preRender = (): boolean => {

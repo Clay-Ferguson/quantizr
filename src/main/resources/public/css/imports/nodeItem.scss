@@ -193,19 +193,23 @@
 
 .row-header {
     margin-left: $smallGap;
-    min-height: 2rem; // warning: don't make this less than 2em!
+    min-height: 2rem; // warning: don't make this less than 2rem!
     margin-bottom: $tinyGap;
+}
+
+.rowHeaderEditFirst {
+    margin-left: $smallGap;
+    // min-height: 2rem; 
+    padding: 4px;
+    margin-top: 4px;
 }
 
 .rowHeaderEdit {
     margin-left: $smallGap;
-    min-height: 2rem; // warning: don't make this less than 2em!
-    border: 1px solid gray;
-    background-color: darken($secondary, 10%);
+    // min-height: 2rem; 
+    border-top: 1px solid gray;
     padding: 4px;
     margin-top: 4px;
-    margin-bottom: $tinyGap;
-    border-radius: $border-radius;
 }
 
 .rowFooter {
@@ -268,7 +272,8 @@ i'm backing out for now
 .nodeGridItem {
     height: 100%;
     width: 100%;
-    padding-right: 12px;
+    padding-right: $smallGap;
+    padding-top: $smallGap
 }
 
 .nodeGridRow {
@@ -327,7 +332,7 @@ i'm backing out for now
 .activeRowMain {
     border-left: $highlightBorderSize solid $primary;
     border-bottom: $highlightBorderSize solid $primary;
-    padding-top: 8px;
+    // padding-top: 8px;
 }
 
 .activeRowMain:hover {
@@ -337,7 +342,7 @@ i'm backing out for now
 .inactiveRowMain {
     border-left: $highlightBorderSize solid transparent;
     border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
-    padding-top: 8px;
+    // padding-top: 8px;
 }
 
 .inactiveRowMain:hover {
