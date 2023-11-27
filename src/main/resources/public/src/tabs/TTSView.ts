@@ -142,7 +142,7 @@ export class TTSView extends AppTab<any, TTSView> {
                 new Div("Text-to-Speech", { className: "tabTitle" }),
                 new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
                 new Clearfix()
-            ]),
+            ], null),
             new FlexRowLayout([
                 this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
                 S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,

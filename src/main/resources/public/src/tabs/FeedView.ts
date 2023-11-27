@@ -249,7 +249,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
                     }, "btn-primary")
                 ])
-            ]),
+            ], this.data),
             new Div(null, { className: "feedView" }, children)
         ]);
         return true;

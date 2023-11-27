@@ -33,7 +33,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Settings", { className: "tabTitle" })
-            ]),
+            ], null),
 
             new Div(null, { className: "settingsPanel" }, [
                 // -----------------------

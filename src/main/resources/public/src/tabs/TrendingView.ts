@@ -97,7 +97,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Trending", { className: "tabTitle" })
-            ]),
+            ], null),
 
             new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),
 

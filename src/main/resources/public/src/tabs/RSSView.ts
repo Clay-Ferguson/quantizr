@@ -113,7 +113,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     getValue: (): boolean => ast.userPrefs.rssHeadlinesOnly
                 }),
                 new Clearfix()
-            ]),
+            ], this.data),
             feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "float-end") : null,
             comp,
             feedContent

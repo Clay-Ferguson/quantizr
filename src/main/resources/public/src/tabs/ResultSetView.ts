@@ -1,7 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
@@ -75,9 +74,9 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                 this.data.props.description ? new Span(this.data.props.description, { className: "float-end smallMarginTop" }) : null,
                 this.getFloatRightHeaderComp(),
                 new Clearfix()
-            ]),
+            ], this.data),
             this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
-            !ast.mobileMode && this.data?.props?.breadcrumbs ? new BreadcrumbsPanel(this.data?.props?.breadcrumbs) : null
+            // !ast.mobileMode && this.data?.props?.breadcrumbs ? new BreadcrumbsPanel(this.data?.props?.breadcrumbs) : null
         ];
 
         // this shows the page number. not needed. used for debugging.

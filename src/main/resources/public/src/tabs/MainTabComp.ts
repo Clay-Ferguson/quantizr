@@ -1,7 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
-import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Html } from "../comp/core/Html";
@@ -36,7 +35,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
-                !ast.mobileMode ? new BreadcrumbsPanel(this.data.props?.breadcrumbs) : null,
+                // !ast.mobileMode ? new BreadcrumbsPanel(this.data.props?.breadcrumbs) : null,
                 ast.pageMessage ? new Html(ast.pageMessage, { className: "alert alert-info float-end" }) : null,
                 ast.pageMessage ? new Clearfix() : null,
 
@@ -56,7 +55,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
             !ast.node ? null : (this.headingBar = new TabHeading([
                 new Div(null, { className: "float-end" }, [
-
                     new Icon({
                         className: "fa fa-search fa-lg buttonBarIcon",
                         title: "Search Subnodes",
@@ -104,7 +102,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 //     className: "tabTitle headerUploadPanel",
                 //     title: "Drop Files here to upload"
                 // })
-            ])),
+            ], this.data)),
             contentDiv
         ]);
 

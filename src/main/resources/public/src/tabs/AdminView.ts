@@ -48,7 +48,7 @@ export class AdminView extends AppTab<any, AdminView> {
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Admin Console", { className: "tabTitle" })
-            ]),
+            ], null),
 
             new Div(null, { className: "marginLeft" }, [
                 this.sectionTitle("Analytics"),

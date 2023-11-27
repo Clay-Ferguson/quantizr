@@ -1,5 +1,4 @@
 .breadcrumbPanel {
-    padding-bottom: 4px;
     padding-top: 4px;
 }
 
@@ -11,9 +10,13 @@
     margin-bottom: 4px;
     white-space: nowrap;
     display: inline-block;
-    border-radius: 6px;
 }
 
 .breadcrumbItem:hover {
     border: 2px solid var(--bs-green);
+}
+
+.breadcrumbElipsis {
+    margin-right: 6px;
+    font-weight: bold;
 }

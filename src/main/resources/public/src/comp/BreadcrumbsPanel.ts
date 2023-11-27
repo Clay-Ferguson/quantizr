@@ -44,7 +44,7 @@ export class BreadcrumbsPanel extends Div {
                     return span;
                 }
                 else {
-                    return new Span("...", { className: "marginRight" });
+                    return new Span("...", { className: "breadcrumbElipsis" });
                 }
             }).filter(c => !!c);
         }

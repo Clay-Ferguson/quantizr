@@ -332,7 +332,8 @@ i'm backing out for now
 .activeRowMain {
     border-left: $highlightBorderSize solid $primary;
     border-bottom: $highlightBorderSize solid $primary;
-    // padding-top: 8px;
+    padding-top: 4px;
+    margin-bottom: 4px;
 }
 
 .activeRowMain:hover {
@@ -342,7 +343,8 @@ i'm backing out for now
 .inactiveRowMain {
     border-left: $highlightBorderSize solid transparent;
     border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
-    // padding-top: 8px;
+    padding-top: 4px;
+    margin-bottom: 4px;
 }
 
 .inactiveRowMain:hover {

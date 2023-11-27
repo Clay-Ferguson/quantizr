@@ -59,7 +59,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                     { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
 
                 new Clearfix()
-            ]),
+            ], null),
             this.data.props.description ? new Div(this.data.props.description) : null
         ];
 
