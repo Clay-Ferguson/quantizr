@@ -563,6 +563,12 @@ export interface OpenSystemFileRequest extends RequestBase {
     fileName: string;
 }
 
+export interface PasteAttachmentsRequest extends RequestBase {
+    sourceNodeId: string;
+    targetNodeId: string;
+    keys: string[];
+}
+
 export interface PingRequest extends RequestBase {
 }
 
@@ -1005,6 +1011,10 @@ export interface NotificationMessage extends ServerPushInfo {
 }
 
 export interface OpenSystemFileResponse extends ResponseBase {
+}
+
+export interface PasteAttachmentsResponse extends ResponseBase {
+    targetNode: NodeInfo;
 }
 
 export interface PingResponse extends ResponseBase {

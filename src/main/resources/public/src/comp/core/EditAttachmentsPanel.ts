@@ -13,6 +13,7 @@ import { Div } from "./Div";
 import { FlexRowLayout } from "./FlexRowLayout";
 import { Icon } from "./Icon";
 import { IconButton } from "./IconButton";
+import { Span } from "./Span";
 import { TextField } from "./TextField";
 
 export class EditAttachmentsPanel extends Div {
@@ -22,20 +23,33 @@ export class EditAttachmentsPanel extends Div {
     }
 
     override preRender = (): boolean => {
-        if (!this.node.attachments) return null;
+        const ast = getAs();
+        if (!this.node.attachments && !ast.cutAttachments) return null;
         this.setChildren([]);
         let isFirst = true;
+        const atts = this.dlg.getState<EditNodeDlgState>().selectedAttachments;
 
-        if (this.dlg.getState<EditNodeDlgState>().selectedAttachments?.size > 0) {
+        if (atts?.size > 0 || ast.cutAttachmentsFromId) {
             this.addChild(new ButtonBar([
-                new IconButton("fa-trash fa-lg", "", {
+                atts?.size > 0 ? new IconButton("fa-trash fa-lg", "", {
                     onClick: () => this.dlg.utl.deleteUploads(this.dlg),
                     title: "Delete selected Attachments"
-                })
+                }) : null,
+                !ast.cutAttachmentsFromId ? new IconButton("fa-cut fa-lg", "", {
+                    onClick: () => this.dlg.utl.cutUploads(this.dlg),
+                    title: "Cut selected Attachments"
+                }) : null,
+                ast.cutAttachmentsFromId ? new Span("Undo", { className: "clickable marginLeft", onClick: S.nodeUtil.clearCut }) : null,
+                ast.cutAttachmentsFromId && ast.editNode.id != ast.cutAttachmentsFromId ? //
+                    new Span("Paste", {
+                        className: "clickable marginLeft",
+                        onClick: () => S.nodeUtil.paste(this.dlg)
+                    }) : null
             ], "attachmentButtonBar"));
         }
 
         S.props.getOrderedAtts(this.node).forEach(att => {
+            if (S.nodeUtil.isCutAttachment(att, ast.editNode.id)) return;
             this.addChild(this.makeAttPanel(att, isFirst));
             isFirst = false;
         });

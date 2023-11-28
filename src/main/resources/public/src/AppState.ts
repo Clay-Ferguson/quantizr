@@ -207,4 +207,9 @@ export class AppState {
 
     menuIndexToggle: string = "menu";
     showGptCredit: boolean = false;
+
+    // when we 'cut' attachments this is the ID of the node we cut them from
+    cutAttachmentsFromId: string;
+    // this is the set of attachment keys that were cut
+    cutAttachments: Set<string>;
 }

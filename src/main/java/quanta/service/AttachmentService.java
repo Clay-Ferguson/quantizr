@@ -51,6 +51,7 @@ import jakarta.servlet.http.HttpSession;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.NodeInfo;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -62,14 +63,17 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteAttachmentRequest;
+import quanta.request.PasteAttachmentsRequest;
 import quanta.request.UploadFromIPFSRequest;
 import quanta.request.UploadFromUrlRequest;
 import quanta.response.DeleteAttachmentResponse;
+import quanta.response.PasteAttachmentsResponse;
 import quanta.response.UploadFromIPFSResponse;
 import quanta.response.UploadFromUrlResponse;
 import quanta.response.UploadResponse;
 import quanta.response.base.ResponseBase;
 import quanta.service.imports.ImportZipService;
+import quanta.util.Convert;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
 import quanta.util.LimitedInputStream;
@@ -1233,5 +1237,39 @@ public class AttachmentService extends ServiceBase {
             });
         }
         return totalBytes.getVal();
+    }
+
+    public PasteAttachmentsResponse pasteAttachments(MongoSession ms, PasteAttachmentsRequest req) {
+        PasteAttachmentsResponse res = new PasteAttachmentsResponse();
+        SubNode sourceNode = read.getNode(ms, req.getSourceNodeId());
+        if (sourceNode == null) {
+            throw new RuntimeEx("source node not found");
+        }
+
+        SubNode targetNode = read.getNode(ms, req.getTargetNodeId());
+        if (targetNode == null) {
+            throw new RuntimeEx("target node not found");
+        }
+
+        for (String attName : req.getKeys()) {
+            Attachment att = sourceNode.getAttachment(attName, false, false);
+            if (att == null) {
+                throw new RuntimeEx("attachment not found: " + attName);
+            }
+            String newKey = getNextAttachmentKey(targetNode);
+            att.setKey(newKey);
+            targetNode.addAttachment(att);
+            sourceNode.getAttachments().remove(attName);
+        }
+
+        update.save(ms, targetNode);
+        update.save(ms, sourceNode);
+
+        NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, targetNode, false,
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, true, null, false);
+        if (newNodeInfo != null) {
+            res.setTargetNode(newNodeInfo);
+        }
+        return res;
     }
 }

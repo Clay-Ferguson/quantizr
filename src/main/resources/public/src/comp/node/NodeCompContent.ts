@@ -62,6 +62,8 @@ export class NodeCompContent extends Div {
         if (S.props.hasBinary(this.node) && !isAccountNode) {
             const attachments = S.props.getOrderedAtts(this.node);
             attachments.forEach(att => {
+                if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
+
                 // don't process here, we process below
                 if (!att.p || att.p === "auto" || att.p === "ft") return;
                 let clazz = null;
@@ -99,6 +101,8 @@ export class NodeCompContent extends Div {
             const attComps: Comp[] = [];
             const attachments = S.props.getOrderedAtts(this.node);
             attachments.forEach(att => {
+                if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
+
                 // having 'att.key' is a client-side only hack, and only generated during the ordering,
                 // so we break a bit of type safety here.
 

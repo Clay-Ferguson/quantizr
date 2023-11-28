@@ -1,4 +1,5 @@
-import { getAs, promiseDispatch } from "../AppContext";
+import { dispatch, getAs, promiseDispatch } from "../AppContext";
+import { AppState } from "../AppState";
 import { SymKeyDataPackage } from "../Crypto";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -308,6 +309,20 @@ export class EditNodeDlgUtil {
                 dlg.pendingEncryptionChange = false;
             }
         }
+    }
+
+    cutUploads = async (dlg: EditNodeDlg) => {
+        const attSet = dlg.getState<EditNodeDlgState>().selectedAttachments;
+        if (!attSet || attSet.size === 0) return;
+
+        dispatch("cutAttachments", (s: AppState) => {
+            s.cutAttachmentsFromId = s.editNode.id;
+            s.cutAttachments = new Set(attSet);
+        });
+
+        dlg.mergeState<EditNodeDlgState>({
+            selectedAttachments: new Set<string>()
+        });
     }
 
     deleteUploads = async (dlg: EditNodeDlg) => {

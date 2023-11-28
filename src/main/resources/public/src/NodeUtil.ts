@@ -4,6 +4,7 @@ import { Comp } from "./comp/base/Comp";
 import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
+import { EditNodeDlg, LS as EditNodeDlgState } from "./dlg/EditNodeDlg";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -392,5 +393,34 @@ export class NodeUtil {
         if (node.children) {
             this.processInboundNodes(node.children);
         }
+    }
+
+    isCutAttachment = (att: J.Attachment, nodeId: string): boolean => {
+        const ast = getAs();
+        return ast.cutAttachmentsFromId === nodeId && ast.cutAttachments && ast.cutAttachments.has((att as any).key);
+    }
+
+    clearCut = (): void => {
+        dispatch("undoCutAttachments", s => {
+            s.cutAttachmentsFromId = null;
+            s.cutAttachments = null;
+        });
+    }
+
+    paste = async (dlg: EditNodeDlg) => {
+        // todo-0: if the attachments are dirty here we need to do a save, before doing this paste operation.
+        const ast = getAs();
+        const res = await S.rpcUtil.rpc<J.PasteAttachmentsRequest, J.PasteAttachmentsResponse>("pasteAttachments", {
+            sourceNodeId: ast.cutAttachmentsFromId,
+            targetNodeId: ast.editNode.id,
+            keys: Array.from(ast.cutAttachments)
+        });
+
+        ast.editNode.attachments = res.targetNode.attachments;
+        dlg.binaryDirty = true;
+        dlg.mergeState<EditNodeDlgState>({
+            rerenderAfterClose: true
+        });
+        this.clearCut();
     }
 }

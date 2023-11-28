@@ -75,6 +75,7 @@ import quanta.request.LuceneSearchRequest;
 import quanta.request.MoveNodesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.request.NodeSearchRequest;
+import quanta.request.PasteAttachmentsRequest;
 import quanta.request.PingRequest;
 import quanta.request.PublishNodeToIpfsRequest;
 import quanta.request.RemovePrivilegeRequest;
@@ -507,6 +508,14 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
         return callProc.run("moveNodes", true, true, req, session, ms -> {
             return move.moveNodes(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/pasteAttachments", method = RequestMethod.POST)
+    @ResponseBody
+    public Object moveNodes(@RequestBody PasteAttachmentsRequest req, HttpSession session) {
+        return callProc.run("pasteAttachments", true, true, req, session, ms -> {
+            return attach.pasteAttachments(ms, req);
         });
     }
 

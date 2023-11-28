@@ -36,6 +36,7 @@ export interface LS {
     speechActive?: boolean;
     signCheckboxVal?: boolean;
     encryptCheckboxVal?: boolean;
+    rerenderAfterClose?: boolean
 }
 
 /**
@@ -389,7 +390,7 @@ export class EditNodeDlg extends DialogBase {
             mainPropsTable = null;
         }
 
-        const binarySection = hasAttachment ? new EditAttachmentsPanel(ast.editNode, this) : null;
+        const binarySection = hasAttachment || ast.cutAttachments ? new EditAttachmentsPanel(ast.editNode, this) : null;
         const shareComps: Comp[] = S.nodeUtil.getSharingNames(ast.editNode, this);
         const isPublic = S.props.isPublic(ast.editNode);
 
@@ -801,6 +802,10 @@ export class EditNodeDlg extends DialogBase {
             s.editShowJumpButton = false;
             s.editEncrypt = false;
         });
+
+        if (this.getState<LS>().rerenderAfterClose) {
+            S.quanta.refresh();
+        }
     }
 
     openChangeNodeTypeDlg = async () => {
