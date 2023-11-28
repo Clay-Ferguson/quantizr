@@ -209,13 +209,11 @@ public class NodeMoveService extends ServiceBase {
      */
     private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
             MoveNodesResponse res) {
-        // log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
         // get targetNode which is node we're pasting at or into.
         SubNode targetNode = read.getNode(ms, targetId);
         SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
         auth.ownerAuth(ms, parentToPasteInto);
         String parentPath = parentToPasteInto.getPath();
-        // log.debug("targetPath (pasting into this): " + parentPath);
         Long curTargetOrdinal = null;
 
         // location==inside
@@ -257,8 +255,6 @@ public class NodeMoveService extends ServiceBase {
 
         // process all nodes being moved.
         for (SubNode node : nodesToMove) {
-            // log.debug("MovingID (and it's children): " + node.getIdStr() + "[" + node.getContent() + "] path:
-            // " + node.getPath());
             Long _targetOrdinal = curTargetOrdinal;
             SubNode _nodeParent = nodeParent;
             arun.run(as -> {
@@ -268,7 +264,6 @@ public class NodeMoveService extends ServiceBase {
                  * ordinal will change.
                  */
                 if (!_nodeParent.getPath().equals(parentToPasteInto.getPath())) {
-                    // log.debug("pasting going into DIFFERENT parent");
                     /*
                      * if a parent node is attempting to be pasted into one of it's children that's an impossible move
                      * so we reject the attempt.
@@ -288,7 +283,6 @@ public class NodeMoveService extends ServiceBase {
                             res.setSignaturesRemoved(true);
                         }
                     }
-                    // log.debug("Final AvailPath on MovingID node: " + newPath);
                     // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
                     // to verify the parent exists upon saving, because we know the path is fine.
                     node.verifyParentPath = false;
@@ -317,9 +311,6 @@ public class NodeMoveService extends ServiceBase {
     public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String oldPathPrefix, String newPathPrefix,
             MoveNodesResponse res) {
         String originalPath = graphRoot.getPath();
-        // log.debug("changePathOfSubGraph. Original graphRoot.path: " + originalPath + " oldPathPrefix=" +
-        // oldPathPrefix
-        // + " newPathPrefix" + newPathPrefix);
         BulkOperations bops = null;
         int batchSize = 0;
 
@@ -328,9 +319,8 @@ public class NodeMoveService extends ServiceBase {
                 throw new RuntimeEx(
                         "Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
             }
-            // log.debug(" PROCESSING oldPath: " + node.getPath());
+
             String newPath = node.getPath().replace(oldPathPrefix, newPathPrefix);
-            // log.debug(" SETTING new path:" + newPath);
             if (bops == null) {
                 bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
             }
