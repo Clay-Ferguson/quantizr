@@ -7,6 +7,7 @@ import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Validator, ValidatorRuleName } from "../../Validator";
 import { NodeCompBinary } from "../node/NodeCompBinary";
+import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
@@ -31,6 +32,7 @@ export class EditAttachmentsPanel extends Div {
 
         if (atts?.size > 0 || ast.cutAttachmentsFromId) {
             this.addChild(new ButtonBar([
+                new Span("Attachments ", { className: "bigMarginRight alignBottom" }),
                 atts?.size > 0 ? new IconButton("fa-trash fa-lg", "", {
                     onClick: () => this.dlg.utl.deleteUploads(this.dlg),
                     title: "Delete selected Attachments"
@@ -39,11 +41,10 @@ export class EditAttachmentsPanel extends Div {
                     onClick: () => this.dlg.utl.cutUploads(this.dlg),
                     title: "Cut selected Attachments"
                 }) : null,
-                ast.cutAttachmentsFromId ? new Span("Undo", { className: "clickable marginLeft", onClick: S.nodeUtil.clearCut }) : null,
+                ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil.clearCut, { className: "clickable marginLeft" }) : null,
                 ast.cutAttachmentsFromId && ast.editNode.id != ast.cutAttachmentsFromId ? //
-                    new Span("Paste", {
-                        className: "clickable marginLeft",
-                        onClick: () => S.nodeUtil.paste(this.dlg)
+                    new Button("Paste", () => S.nodeUtil.paste(this.dlg), {
+                        className: "clickable marginLeft"
                     }) : null
             ], "attachmentButtonBar"));
         }

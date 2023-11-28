@@ -186,6 +186,10 @@
     margin-bottom: $tinyGap;
 }
 
+.alignBottom {
+    vertical-align: bottom;
+}
+
 // see if flexRowLayout can be used here (CSS class and or TS class)
 .horizontalLayout {
     // flex will layout things all on the same horizontal row
