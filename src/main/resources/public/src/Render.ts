@@ -662,6 +662,7 @@ export class Render {
         });
 
         dispatch("ShowGraph", s => {
+            s.savedActiveTab = s.activeTab == C.TAB_GRAPH ? C.TAB_MAIN : s.activeTab;
             s.fullScreenConfig = { type: FullScreenType.GRAPH, nodeId: node.id };
             s.graphSearchText = searchText;
             s.graphData = res.rootNode;

@@ -9,6 +9,8 @@ import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
 import { Selection } from "../comp/core/Selection";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
+import { CollapsiblePanel } from "./core/CollapsiblePanel";
+import { ButtonBar } from "./core/ButtonBar";
 
 // todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
@@ -20,12 +22,13 @@ export class FullScreenControlBar extends Div {
     }
 
     override preRender = (): boolean => {
-        this.setChildren(this.getButtons());
+        this.setChildren(this.getComps());
         return true;
     }
 
-    getButtons = (): Comp[] => {
+    getComps = (): Comp[] => {
         const ast = getAs();
+        const comps = [];
         const buttons = [];
 
         if (ast.fullScreenConfig.type === FullScreenType.IMAGE && ast.activeTab === C.TAB_MAIN) {
@@ -59,14 +62,12 @@ export class FullScreenControlBar extends Div {
         }
 
         if (ast.fullScreenConfig.type === FullScreenType.GRAPH) {
-
-            buttons.push(
+            comps.push(new CollapsiblePanel("More", "Less", null, [
                 new Selection(null, null, [
                     { key: "constant", val: "Constant" },
                     { key: "linear", val: "Linear" },
                     { key: "quadratic", val: "Quadratic" },
                     { key: "cubic", val: "Cubic" }
-
                 ], null, "selectPowerFactorDropDown", {
                     setValue: (val: string) => {
                         dispatch("setPowerFactor", s => {
@@ -75,28 +76,30 @@ export class FullScreenControlBar extends Div {
                         });
                     },
                     getValue: (): string => getAs().graphPowerFactor
-                })
-            );
-
-            buttons.push(new Checkbox("Links", { title: "Show NodeLinks" }, {
-                setValue: (checked: boolean) => {
-                    dispatch("OpenDialog", s => {
-                        s.showNodeLinksInGraph = checked;
-                    });
-                },
-                getValue: (): boolean => ast.showNodeLinksInGraph
-            }, "form-switch form-check-inline"));
-
-            if (ast.showNodeLinksInGraph) {
-                buttons.push(new Checkbox("Link Forces", { title: "NodeLinks Force Attractions" }, {
+                }),
+                new Checkbox("Links", { title: "Show NodeLinks" }, {
                     setValue: (checked: boolean) => {
-                        dispatch("OpenDialog", s => {
+                        dispatch("setShowNodeLinks", s => {
+                            FullScreenGraphViewer.reset();
+                            s.showNodeLinksInGraph = checked;
+                        });
+                    },
+                    getValue: (): boolean => ast.showNodeLinksInGraph
+                }, "form-switch form-check-inline"),
+                ast.showNodeLinksInGraph ? new Checkbox("Forces", { title: "NodeLinks Force Attractions" }, {
+                    setValue: (checked: boolean) => {
+                        dispatch("setLinkForces", s => {
+                            FullScreenGraphViewer.reset();
                             s.attractionLinksInGraph = checked;
                         });
                     },
                     getValue: (): boolean => ast.attractionLinksInGraph
-                }, "form-switch form-check-inline"));
-            }
+                }, "form-switch form-check-inline") : null
+            ], true, (exp: boolean) => {
+                dispatch("ExpandFullScreenControls", s => {
+                    s.fullScreenControlsExpanded = exp;
+                });
+            }, ast.fullScreenControlsExpanded, "marginAll", "marginBottom", null, "span"));
 
             buttons.push(
                 new IconButton("fa-window-minimize fa-lg", null, {
@@ -111,6 +114,10 @@ export class FullScreenControlBar extends Div {
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 
-        return buttons;
+        if (buttons.length > 0) {
+            comps.push(new ButtonBar(buttons, "float-end"));
+        }
+
+        return comps;
     }
 }

@@ -57,6 +57,7 @@ export class AppState {
 
     otherAccountNodesExpanded: boolean = false;
     linksToAttachmentsExpanded: boolean = false;
+    fullScreenControlsExpanded: boolean = false;
 
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
@@ -71,6 +72,7 @@ export class AppState {
     nodesToMove: string[];
 
     activeTab: string = null;
+    savedActiveTab: string = null;
 
     /* data for each tab, which we DO want to keep separate from the GUI view components themselves */
     tabData: TabIntf[] = [];

@@ -10,6 +10,7 @@ import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { FollowersTab } from "./tabs/data/FollowersTab";
 import { FollowingTab } from "./tabs/data/FollowingTab";
+import { GraphTab } from "./tabs/data/GraphTab";
 import { IPFSTab } from "./tabs/data/IPFSTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { RepliesTab } from "./tabs/data/RepliesTab";
@@ -67,6 +68,7 @@ export class TabUtil {
     createAppTabs = async () => {
         await promiseDispatch("initTabs", s => {
             s.tabData = [
+                new GraphTab(),
                 new MainTab(),
                 new DocumentTab(),
                 new SearchTab(),

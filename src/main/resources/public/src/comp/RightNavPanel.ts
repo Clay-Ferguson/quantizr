@@ -1,19 +1,16 @@
-import { dispatch, getAs } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
-import { FullScreenType } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Button } from "./core/Button";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
 import { Span } from "./core/Span";
-import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { HistoryPanel } from "./HistoryPanel";
 import { TabPanelButtons } from "./TabPanelButtons";
 
@@ -156,12 +153,6 @@ export class RightNavPanel extends Div {
         let scrollDiv = null;
         const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCreditDiv() : null;
 
-        const showGraphButton = FullScreenGraphViewer.div ? new Button("Graph", () => {
-            dispatch("RestoreGraph", s => {
-                s.fullScreenConfig = { type: FullScreenType.GRAPH };
-            });
-        }) : null;
-
         const rightNavDiv = new Div(null, { className: "float-left" }, [
             new FlexRowLayout([
                 avatarImg,
@@ -180,8 +171,7 @@ export class RightNavPanel extends Div {
                 new Div(null, { className: "flexFloatRight" }, [
                     textToSpeech,
                     clipboardPasteButton,
-                    addNoteButton,
-                    showGraphButton
+                    addNoteButton
                 ]),
             ], "fullWidth"),
             gptCreditDiv,

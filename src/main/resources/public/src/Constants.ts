@@ -44,6 +44,7 @@ export class Constants {
     static TAB_SHARES: string = "sharRS";
     static TAB_TIMELINE: string = "timeRS";
     static TAB_DOCUMENT: string = "docRS";
+    static TAB_GRAPH: string = "graphTab";
     static TAB_FOLLOWERS: string = "flwrsRS";
     static TAB_FOLLOWING: string = "flwngRS";
 
