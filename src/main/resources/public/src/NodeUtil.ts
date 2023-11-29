@@ -408,7 +408,6 @@ export class NodeUtil {
     }
 
     paste = async (dlg: EditNodeDlg) => {
-        // todo-0: if the attachments are dirty here we need to do a save, before doing this paste operation.
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.PasteAttachmentsRequest, J.PasteAttachmentsResponse>("pasteAttachments", {
             sourceNodeId: ast.cutAttachmentsFromId,
