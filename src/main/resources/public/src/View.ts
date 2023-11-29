@@ -1,7 +1,8 @@
-import { promiseDispatch, dispatch, getAs } from "./AppContext";
+import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
+import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -79,6 +80,7 @@ export class View {
         // the actual RSS feed that this node defines.
         if (a.jumpToRss && res?.rssNode) {
             dispatch("LoadingFeed", s => {
+                s.fullScreenConfig = { type: FullScreenType.NONE };
                 s.rssNode = res.node;
                 s.activeTab = C.TAB_RSS;
                 S.domUtil.focusId(C.TAB_RSS);

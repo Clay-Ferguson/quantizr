@@ -8,6 +8,7 @@ import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
 import { Selection } from "../comp/core/Selection";
+import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 
 // todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
@@ -69,6 +70,7 @@ export class FullScreenControlBar extends Div {
                 ], null, "selectPowerFactorDropDown", {
                     setValue: (val: string) => {
                         dispatch("setPowerFactor", s => {
+                            FullScreenGraphViewer.reset();
                             s.graphPowerFactor = val;
                         });
                     },
@@ -95,6 +97,12 @@ export class FullScreenControlBar extends Div {
                     getValue: (): boolean => ast.attractionLinksInGraph
                 }, "form-switch form-check-inline"));
             }
+
+            buttons.push(
+                new IconButton("fa-window-minimize fa-lg", null, {
+                    onClick: () => S.nav.minimizeFullScreenViewer(),
+                    title: "Minimize Graph"
+                }, "btn-primary", "off"));
         }
 
         buttons.push(

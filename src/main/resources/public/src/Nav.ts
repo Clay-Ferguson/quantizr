@@ -4,6 +4,7 @@ import { Button } from "./comp/core/Button";
 import { ButtonBar } from "./comp/core/ButtonBar";
 import { Heading } from "./comp/core/Heading";
 import { VerticalLayout } from "./comp/core/VerticalLayout";
+import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
 import { Constants as C } from "./Constants";
 import { AskForEmail } from "./dlg/AskForEmailDlg";
 import { AskForPhoneNumber } from "./dlg/AskForPhoneNumber";
@@ -447,6 +448,13 @@ export class Nav {
         dispatch("CloseFullScreenViewer", s => {
             s.fullScreenConfig = { type: FullScreenType.NONE };
             s.graphData = null;
+            FullScreenGraphViewer.reset();
+        });
+    }
+
+    minimizeFullScreenViewer = () => {
+        dispatch("MinimizeFullScreenViewer", s => {
+            s.fullScreenConfig = { type: FullScreenType.NONE };
         });
     }
 

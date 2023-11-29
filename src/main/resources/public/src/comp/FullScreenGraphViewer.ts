@@ -3,31 +3,49 @@ import { getAs } from "../AppContext";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Main } from "./Main";
-import { Div } from "./core/Div";
 
 // https://observablehq.com/@d3/force-directed-tree
 // https://www.npmjs.com/package/d3
 // https://d3js.org/
 
 export class FullScreenGraphViewer extends Main {
-    simulation: any;
+    static div: any = null;
+    static sim: any;
+
     tooltip: any;
     isDragging: boolean;
     mouseOverTimeoutId: any;
 
-    override preRender = (): boolean => {
-        this.setChildren([new Div(null, { className: "d3Graph" })]);
-        return true;
+    static reset = () => {
+        FullScreenGraphViewer.div = null;
+        if (FullScreenGraphViewer.sim) {
+            FullScreenGraphViewer.sim.stop();
+            FullScreenGraphViewer.sim = null;
+        }
     }
 
-    override domPreUpdateEvent = () => {
-        const ast = getAs();
-        if (!ast.graphData) return;
-        const customForceDirectedTree = this.forceDirectedTree();
+    override domUpdateEvent = () => {
+        const elm: HTMLElement = this.getRef();
+        if (!elm || !elm.isConnected) return;
 
-        d3.select(".d3Graph")
-            .datum(ast.graphData)
-            .call(customForceDirectedTree);
+        let reload = false;
+        if (!FullScreenGraphViewer.div) {
+            FullScreenGraphViewer.div = document.createElement('div');
+            FullScreenGraphViewer.div.className = "d3Graph";
+            reload = true;
+        }
+
+        elm.appendChild(FullScreenGraphViewer.div);
+
+        if (reload) {
+            d3.select(".d3Graph").datum(getAs().graphData).call(this.forceDirectedTree());
+        }
+
+        if (S.view.docElm) {
+            // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just
+            // setting scrollTop on it directly like this, instead of calling 'elm.setScrollTop()'
+            S.view.docElm.scrollTop = 0;
+        }
     }
 
     forceDirectedTree = () => {
@@ -93,7 +111,7 @@ export class FullScreenGraphViewer extends Main {
                 });
             }
 
-            const simulation = d3.forceSimulation(nodes)
+            FullScreenGraphViewer.sim = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(ast.attractionLinksInGraph ? [...links, ...nodeLinks] : links) //
                     .id(function (d: any) { return d.id; }).distance(0)
                     .strength(1)
@@ -231,12 +249,17 @@ export class FullScreenGraphViewer extends Main {
                         .style("fill", "green");
 
                     if (d.data.id) {
-                        window.open(S.util.getHostAndPort() + "?id=" + d.data.id, "_blank");
+                        if (S.util.ctrlKeyCheck()) {
+                            window.open(S.util.getHostAndPort() + "?id=" + d.data.id, "_blank");
+                        }
+                        else {
+                            S.view.jumpToId(d.data.id);
+                        }
                     }
                 })
-                .call(drag(simulation));
+                .call(drag(FullScreenGraphViewer.sim));
 
-            simulation.on("tick", function () {
+            FullScreenGraphViewer.sim.on("tick", function () {
                 link
                     .attr("x1", function (d: any) { return d.source.x; })
                     .attr("y1", function (d: any) { return d.source.y; })
@@ -337,25 +360,5 @@ export class FullScreenGraphViewer extends Main {
         }
 
         this.tooltip.html(() => "<div>" + content + "</div>");
-    }
-
-    override domRemoveEvent = () => {
-        console.log("Graph stopSim");
-        this.stopSim();
-    }
-
-    override domUpdateEvent = () => {
-        if (S.view.docElm) {
-            // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just
-            // setting scrollTop on it directly like this, instead of calling 'elm.setScrollTop()'
-            S.view.docElm.scrollTop = 0;
-        }
-    }
-
-    stopSim = () => {
-        if (this.simulation) {
-            this.simulation.stop();
-            this.simulation = null;
-        }
     }
 }

@@ -26,6 +26,7 @@ import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
+import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
 
 export class Render {
     private debug: boolean = false;
@@ -390,6 +391,8 @@ export class Render {
             }
 
             await promiseDispatch("RenderPage", s => {
+                s.fullScreenConfig = { type: FullScreenType.NONE };
+
                 if (!s.activeTab || clickTab) {
                     S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN);
                     s.activeTab = C.TAB_MAIN;
@@ -662,6 +665,7 @@ export class Render {
             s.fullScreenConfig = { type: FullScreenType.GRAPH, nodeId: node.id };
             s.graphSearchText = searchText;
             s.graphData = res.rootNode;
+            FullScreenGraphViewer.reset();
         });
     }
 
