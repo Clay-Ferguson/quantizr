@@ -126,7 +126,7 @@ export class NodeCompRowHeader extends Div {
                 if (this.boostingNode?.ownerId) {
                     iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
                 }
-                ddItems.push(new Li(null, null, [
+                ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("Reply", iconProps)
                 ]));
             }
@@ -156,7 +156,7 @@ export class NodeCompRowHeader extends Div {
                         onClick: S.edit.boostNode
                     }
 
-                    ddItems.push(new Li(null, null, [
+                    ddItems.push(new Li(null, { className: "clickable" }, [
                         new Span("Boost", iconProps)
                     ]));
                 }
@@ -193,7 +193,7 @@ export class NodeCompRowHeader extends Div {
                         onClick: S.edit.likeNodeClick
                     }
 
-                    ddItems.push(new Li(null, null, [
+                    ddItems.push(new Li(null, { className: "clickable" }, [
                         new Span("Like " + (this.node.likes?.length > 0 ? this.node.likes.length.toString() : ""), iconProps)
                     ]));
                 }
@@ -210,7 +210,7 @@ export class NodeCompRowHeader extends Div {
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
             and we need to have a user identity for all the HTTP sigs for that. */
             if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
-                ddItems.push(new Li(null, null, [
+                ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("People", {
                         className: "dropdown-item",
                         [C.NODE_ID_ATTR]: this.node.id,
@@ -220,7 +220,7 @@ export class NodeCompRowHeader extends Div {
             }
 
             if (showInfo && allowWideViewIcons) {
-                ddItems.push(new Li(null, null, [
+                ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("Links", {
                         className: "dropdown-item",
                         title: "Show URLs for this node",
@@ -232,7 +232,7 @@ export class NodeCompRowHeader extends Div {
 
             // Allow bookmarking any kind of node other than bookmark nodes.
             if (showInfo && !ast.isAnonUser && this.node.type !== J.NodeType.BOOKMARK && this.node.type !== J.NodeType.BOOKMARK_LIST) {
-                ddItems.push(new Li(null, null, [
+                ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("Bookmark", {
                         className: "dropdown-item",
                         [C.NODE_ID_ATTR]: this.node.id,
@@ -259,7 +259,7 @@ export class NodeCompRowHeader extends Div {
                         onClick: S.nav.showThread
                     }
 
-                    ddItems.push(new Li(null, null, [
+                    ddItems.push(new Li(null, { className: "clickable" }, [
                         new Span("Show Thread", iconProps)
                     ]));
                 }
@@ -275,7 +275,7 @@ export class NodeCompRowHeader extends Div {
 
             const repliesProp: string = S.props.getPropStr(J.NodeProp.ACT_PUB_REPLIES, this.node);
             if (showInfo && ast.allowedFeatures?.indexOf("ap:replies") !== -1 && repliesProp) {
-                ddItems.push(new Li(null, null, [
+                ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("Show Replies", {
                         className: "dropdown-item",
                         [C.NODE_ID_ATTR]: this.node.id,
@@ -316,7 +316,7 @@ export class NodeCompRowHeader extends Div {
             }
             // for all other tabs bury the Jump to Node in the dropdown menu
             else {
-                ddItems.push(new Li(null, null, [
+                ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("Jump to Node", {
                         className: "dropdown-item",
                         [C.NODE_ID_ATTR]: this.node.id,
@@ -327,7 +327,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (ast.node) {
-            ddItems.push(new Li(null, null, [
+            ddItems.push(new Li(null, { className: "clickable" }, [
                 new Span("Search", {
                     className: "dropdown-item",
                     [C.NODE_ID_ATTR]: this.node.id,
@@ -335,7 +335,7 @@ export class NodeCompRowHeader extends Div {
                 })
             ]));
 
-            ddItems.push(new Li(null, null, [
+            ddItems.push(new Li(null, { className: "clickable" }, [
                 new Span("Timeline", {
                     className: "dropdown-item",
                     [C.NODE_ID_ATTR]: this.node.id,
@@ -343,7 +343,7 @@ export class NodeCompRowHeader extends Div {
                 })
             ]));
 
-            ddItems.push(new Li(null, null, [
+            ddItems.push(new Li(null, { className: "clickable" }, [
                 new Span("Document", {
                     className: "dropdown-item",
                     [C.NODE_ID_ATTR]: this.node.id,
@@ -532,7 +532,7 @@ export class NodeCompRowHeader extends Div {
             if (inReplyTo) {
                 // if this is a URL and not our own host then show the Remote Parent link
                 if (inReplyTo.indexOf(":") !== -1 && inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
-                    ddItems.push(new Li(null, null, [
+                    ddItems.push(new Li(null, { className: "clickable" }, [
                         new Anchor(inReplyTo, "Original Post Parent", {
                             className: "dropdown-item",
                             target: "_blank",
@@ -547,7 +547,7 @@ export class NodeCompRowHeader extends Div {
                 // check to see if it's a link to our server, and don't show 'foreign link' link if so.
                 // todo-3: we should make a util.ts method for this.
                 if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
-                    ddItems.push(new Li(null, null, [
+                    ddItems.push(new Li(null, { className: "clickable" }, [
                         new Anchor(objUrl, "Original Post", {
                             className: "dropdown-item",
                             target: "_blank",

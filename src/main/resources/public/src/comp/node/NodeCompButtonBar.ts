@@ -268,6 +268,7 @@ export class NodeCompButtonBar extends Div {
 
             spanArray.push(new DropdownMenu([
                 addMoveUp ? new Li(null, {
+                    className: "clickable",
                     title: "Move Node Up",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.moveNodeUp
@@ -278,6 +279,7 @@ export class NodeCompButtonBar extends Div {
                 ]) : null,
 
                 addMoveDown ? new Li(null, {
+                    className: "clickable",
                     title: "Move Node Down",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.moveNodeDown
@@ -288,6 +290,7 @@ export class NodeCompButtonBar extends Div {
                 ]) : null,
 
                 addCut ? new Li(null, {
+                    className: "clickable",
                     title: "Cut selected Node(s) to paste elsewhere.",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.edit.cutSelNodes
@@ -298,6 +301,7 @@ export class NodeCompButtonBar extends Div {
                 ]) : null,
 
                 addDelete ? new Li(null, {
+                    className: "clickable",
                     title: "Delete node(s)",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: this.tabData.id == C.TAB_MAIN ? S.edit.deleteSelNodes : S.edit.deleteOneNode
