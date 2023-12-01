@@ -17,6 +17,7 @@ public enum NodeType {
     CALENDAR("sn:calendar"), //
     COMMENT("sn:comment"), //
     OPENAI_ANSWER("sn:oaiAns"), //
+    HUGGINGFACE_ANSWER("sn:hfAns"), //
 
     RSS_FEED("sn:rssfeed"), //
     RSS_FEEDS("sn:rssfeeds"), //

@@ -65,6 +65,7 @@ import quanta.service.ipfs.IPFSPubSub;
 import quanta.service.ipfs.IPFSRepo;
 import quanta.service.ipfs.IPFSService;
 import quanta.service.ipfs.IPFSSwarm;
+import quanta.service.node.HuggingFaceService;
 import quanta.service.node.NodeEditService;
 import quanta.service.node.NodeMoveService;
 import quanta.service.node.NodeRenderService;
@@ -184,6 +185,7 @@ public class ServiceBase {
     public static CryptoService crypto;
     public static SchemaOrgService schema;
     public static OpenAiService oai;
+    public static HuggingFaceService huggingFace;
     public static TransferService transfer;
     public static IPFSService ipfs;
     public static IPFSCat ipfsCat;
@@ -291,6 +293,7 @@ public class ServiceBase {
             crypto = getBean(ctx, CryptoService.class);
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);
+            huggingFace = getBean(ctx, HuggingFaceService.class);
             transfer = getBean(ctx, TransferService.class);
             ipfs = getBean(ctx, IPFSService.class);
             ipfsCat = getBean(ctx, IPFSCat.class);

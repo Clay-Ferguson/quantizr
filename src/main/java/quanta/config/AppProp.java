@@ -239,6 +239,10 @@ public class AppProp {
         return env.getProperty("OPENAI_API_KEY");
     }
 
+    // todo-0: this isn't used yet
+    public String getHuggingFaceKey() {
+        return env.getProperty("HUGGINGFACE_API_KEY");
+    }
 
     public String getAdminPassword() {
         return env.getProperty("adminPassword");

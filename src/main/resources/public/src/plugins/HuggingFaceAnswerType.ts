@@ -3,19 +3,19 @@ import * as J from "../JavaIntf";
 import { Div } from "../comp/core/Div";
 import { TypeBase } from "./base/TypeBase";
 
-export class OpenAiAnswerType extends TypeBase {
+export class HuggingFaceAnswerType extends TypeBase {
     constructor() {
-        super(J.NodeType.OPENAI_ANSWER, "AI Answer", "fa-android", false);
+        super(J.NodeType.HUGGINGFACE_ANSWER, "AI Answer", "fa-android", false);
     }
 
     // For now i'm not sure how we should indicate visibly that a
     // node is a comment, so I'm just not doing it, but this code DOES work.
     override getExtraMarkdownClass(): string {
-        return "openAiAnswer";
+        return "openAiAnswer"; // todo-0: rename class to be independent of AI provider.
     }
 
     override getCustomFooter(): Div {
-        return new Div("by OpenAI", { className: "openAiAnswerFooter float-end" });
+        return new Div("by Open Source AI", { className: "openAiAnswerFooter float-end" }); // todo-0: rename class to be independent of AI provider.
     }
 
     override getEditorOptions(): EditorOptions {

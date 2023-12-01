@@ -166,6 +166,26 @@ export interface UserProfile {
     balance: number;
 }
 
+export interface HuggingFaceConversation {
+    generated_responses: string[];
+    past_user_inputs: string[];
+}
+
+export interface HuggingFaceInputs {
+    text: string;
+    past_user_inputs: string[];
+    generated_responses: string[];
+}
+
+export interface HuggingFaceRequest {
+    inputs: HuggingFaceInputs;
+}
+
+export interface HuggingFaceResponse {
+    conversation: HuggingFaceConversation;
+    generated_text: string;
+}
+
 export interface ChatCompletionResponse {
     id: string;
     object: string;
@@ -295,7 +315,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeName: string;
     createAtTop: boolean;
     directMessage: boolean;
-    openAiQuestion: boolean;
+    aiQuestion: string;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
@@ -1358,6 +1378,7 @@ export const enum NodeProp {
     OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
     OPENAI_RESPONSE = "sn:oaiRes",
+    HUGGINGFACE_RESPONSE = "sn:hfaceRes",
 }
 
 export const enum NodeType {
@@ -1374,6 +1395,7 @@ export const enum NodeType {
     CALENDAR = "sn:calendar",
     COMMENT = "sn:comment",
     OPENAI_ANSWER = "sn:oaiAns",
+    HUGGINGFACE_ANSWER = "sn:hfAns",
     RSS_FEED = "sn:rssfeed",
     RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",

@@ -22,6 +22,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
@@ -278,15 +279,24 @@ public class MongoCreate extends ServiceBase {
             forceInheritSharing = true;
         }
 
-        ChatCompletionResponse aiAnswer = null;
         String typeToCreate = req.getTypeName();
-        if (req.isOpenAiQuestion()) {
+        ChatCompletionResponse openAiAnswer = null;
+        HuggingFaceResponse huggingFaceAnswer = null;
+
+        if ("openAi".equals(req.getAiQuestion())) {
             // if this is a regular node and not an openai reply node, then we are asking the text on this
             // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
-                aiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
-                res.setGptCredit(aiAnswer.userCredit);
+                openAiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
+                res.setGptCredit(openAiAnswer.userCredit);
                 typeToCreate = NodeType.OPENAI_ANSWER.s();
+            }
+        } else if ("huggingFace".equals(req.getAiQuestion())) {
+            // if this is a regular node and not an openai reply node, then we are asking the text on this
+            // existing node as a new question.
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                huggingFaceAnswer = huggingFace.getAnswer(ms, parentNode, null);
+                typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
             }
         }
 
@@ -303,9 +313,13 @@ public class MongoCreate extends ServiceBase {
             mongoUtil.setPendingPath(newNode, true);
         }
 
-        if (aiAnswer != null) {
-            newNode.setContent(oai.formatAnswer(aiAnswer, true));
-            newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+        if (openAiAnswer != null) {
+            newNode.setContent(oai.formatAnswer(openAiAnswer, true));
+            newNode.set(NodeProp.OPENAI_RESPONSE, openAiAnswer);
+        } //
+        else if (huggingFaceAnswer != null) {
+            newNode.setContent(huggingFaceAnswer.getGeneratedText());
+            newNode.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAnswer);
         } else {
             newNode.setContent(req.getContent() != null ? req.getContent() : "");
         }
@@ -331,7 +345,7 @@ public class MongoCreate extends ServiceBase {
             nodeBeingRepliedTo = parentNode;
         }
 
-        if (allowSharing && aiAnswer == null) {
+        if (allowSharing && openAiAnswer == null) {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
@@ -366,7 +380,7 @@ public class MongoCreate extends ServiceBase {
 
         update.save(ms, newNode);
 
-        if (req.isOpenAiQuestion() && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
+        if (req.getAiQuestion() != null && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
             oai.insertAnswerToQuestion(ms, newNode, req, res);
         }
 

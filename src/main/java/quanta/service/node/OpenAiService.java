@@ -508,7 +508,7 @@ public class OpenAiService extends ServiceBase {
         return res;
     }
 
-    // Assumes node is a question, and inserts the answer to is under it as a subnode
+    // Assumes node is a question, and inserts the answer under it as a subnode
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
         ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
