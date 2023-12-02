@@ -35,7 +35,7 @@ import quanta.util.XString;
 /**
  * Exporter using PDFBox
  *
- * This was experimental code, and it not currently being used. We are using the flexbox code for
+ * This was experimental code, and is not currently being used. We are using the flexbox code for
  * exporting to PDF (see ExportServiceFlexmark.java)
  */
 @Component

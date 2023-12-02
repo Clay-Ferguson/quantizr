@@ -34,7 +34,7 @@ export class ExportDlg extends DialogBase {
         const exportType = ast.exportSettings.exportType
         return [
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
-            new Heading(5, "Type of File to Export", { className: "bigMarginTop" }),
+            new Heading(5, "File Type", { className: "bigMarginTop" }),
             new RadioButtonGroup([
                 this.radioButton("ZIP", "zip"),
                 this.radioButton("TAR", "tar"),
@@ -60,7 +60,7 @@ export class ExportDlg extends DialogBase {
 
     makeArchiveOptions = (): Div => {
         const ast = getAs();
-        return new Div(null, { className: "bigMarginLeft bigMarginBottom" }, [
+        return new Div(null, { className: "bigMarginBottom" }, [
 
             new Heading(5, "Files to Include", { className: "bigMarginTop" }),
             new Checkbox("HTML", null, {
