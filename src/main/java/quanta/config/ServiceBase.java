@@ -70,6 +70,7 @@ import quanta.service.node.NodeEditService;
 import quanta.service.node.NodeMoveService;
 import quanta.service.node.NodeRenderService;
 import quanta.service.node.NodeSearchService;
+import quanta.service.node.OobaAiService;
 import quanta.service.node.OpenAiService;
 import quanta.test.TestUtil;
 import quanta.types.AIAnswerType;
@@ -186,6 +187,7 @@ public class ServiceBase {
     public static SchemaOrgService schema;
     public static OpenAiService oai;
     public static HuggingFaceService huggingFace;
+    public static OobaAiService oobaAi;
     public static TransferService transfer;
     public static IPFSService ipfs;
     public static IPFSCat ipfsCat;
@@ -294,6 +296,7 @@ public class ServiceBase {
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);
             huggingFace = getBean(ctx, HuggingFaceService.class);
+            oobaAi = getBean(ctx, OobaAiService.class);
             transfer = getBean(ctx, TransferService.class);
             ipfs = getBean(ctx, IPFSService.class);
             ipfsCat = getBean(ctx, IPFSCat.class);

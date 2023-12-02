@@ -17,11 +17,15 @@ import quanta.mongo.model.SubNode;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
+/*
+ * HuggingFace integration was experimental and the performance (and, by that I mean intelligence)
+ * of their cloud AI was so hilariously bad (for every model I tried) I stopped using it. I get far
+ * better results from Oobabooga models run locally and OpenAI Cloud service, so I'm abandoning
+ * HuggingFace cloud services for now but leaving this code in place for the futurel
+ */
 @Component
 public class HuggingFaceService extends ServiceBase {
-    // String HUGGINGFACE_COMP_URL =
-    // "https://api-inference.huggingface.co/models/bert-large-uncased-whole-word-masking-finetuned-squad";
-    String HUGGINGFACE_COMP_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2";
+    String HUGGINGFACE_COMP_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-large";
 
     private static Logger log = LoggerFactory.getLogger(HuggingFaceService.class);
 
@@ -31,15 +35,17 @@ public class HuggingFaceService extends ServiceBase {
      * You can pass a node, or else 'text' to query about.
      */
     public HuggingFaceResponse getAnswer(MongoSession ms, SubNode node, String question) {
-        if (true)
-            throw new RuntimeException("HuggingFace currently not enabled. Work in progress");
 
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
 
+        // todo-1: The last step to finializing the HuggingFace integration is to handle defining this
+        // API key in the configs
         String apiKey = "";
+        if (apiKey == null || apiKey.isEmpty())
+            throw new RuntimeException("HuggingFace currently not enabled. No API Key");
 
         WebClient webClient = WebClient.builder().baseUrl(HUGGINGFACE_COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

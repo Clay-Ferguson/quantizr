@@ -18,6 +18,7 @@ public enum NodeType {
     COMMENT("sn:comment"), //
     OPENAI_ANSWER("sn:oaiAns"), //
     HUGGINGFACE_ANSWER("sn:hfAns"), //
+    OOBAI_ANSWER("sn:oobAns"), //
 
     RSS_FEED("sn:rssfeed"), //
     RSS_FEEDS("sn:rssfeeds"), //

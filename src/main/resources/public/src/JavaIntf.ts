@@ -186,6 +186,16 @@ export interface HuggingFaceResponse {
     generated_text: string;
 }
 
+export interface OobAiMessage {
+    role: string;
+    content: string;
+}
+
+export interface OobAiRequest {
+    messages: OobAiMessage[];
+    mode: string;
+}
+
 export interface ChatCompletionResponse {
     id: string;
     object: string;
@@ -1379,6 +1389,7 @@ export const enum NodeProp {
     TRUNCATED = "trunc",
     OPENAI_RESPONSE = "sn:oaiRes",
     HUGGINGFACE_RESPONSE = "sn:hfaceRes",
+    OOBAI_RESPONSE = "sn:oobRes",
 }
 
 export const enum NodeType {
@@ -1396,6 +1407,7 @@ export const enum NodeType {
     COMMENT = "sn:comment",
     OPENAI_ANSWER = "sn:oaiAns",
     HUGGINGFACE_ANSWER = "sn:hfAns",
+    OOBAI_ANSWER = "sn:oobAns",
     RSS_FEED = "sn:rssfeed",
     RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",

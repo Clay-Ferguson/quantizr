@@ -214,7 +214,8 @@ public enum NodeProp {
     OPEN_GRAPH("sn:og"), //
     TRUNCATED("trunc"), //
     OPENAI_RESPONSE("sn:oaiRes"), //
-    HUGGINGFACE_RESPONSE("sn:hfaceRes");
+    HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
+    OOBAI_RESPONSE("sn:oobRes");
 
     @JsonValue
     private final String value;

@@ -224,6 +224,10 @@ services:
             bridge:
                 aliases:
                     - quanta-host
+
+        # extra_hosts:
+        #     - 'host.docker.internal:host-gateway'
+
         volumes:
             - '${QUANTA_BASE}/tmp:/tmp'
             - '${QUANTA_BASE}/log:/log'
