@@ -46,6 +46,14 @@ public class FileUtils extends ServiceBase {
         imageExtensions.add("bmp");
     }
 
+    public String getParentPath(String path) {
+        File file = new File(path);
+        String ret = file.getParent();
+        if (ret == null)
+            ret = "";
+        return ret;
+    }
+
     public String genHashOfClasspathResource(String resourceName) {
         InputStream is = null;
         try {

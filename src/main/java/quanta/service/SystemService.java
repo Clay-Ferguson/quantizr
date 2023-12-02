@@ -313,6 +313,7 @@ public class SystemService extends ServiceBase {
             }
             return null;
         });
+
         if ("pdf".equalsIgnoreCase(req.getExportExt())) {
             ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
             svc.export(ms, "pdf", req, res);

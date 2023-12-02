@@ -47,6 +47,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private String rootPathParent;
     ExportRequest req;
     int baseSlashCount = 0;
+
+    private class MarkdownFile {
+        String fileName;
+
+        // used only to detect name collisions so the record number will be used for decollision
+        HashSet<String> attachmentNames = new HashSet<>();
+
+        StringBuilder content = new StringBuilder();
+
+        MarkdownFile(String fileName) {
+            this.fileName = fileName;
+        }
+    }
+
     /*
      * It's possible that nodes recursively contained under a given node can have same name, so we have
      * to detect that and number them, so we use this hashset to detect existing filenames.
@@ -55,6 +69,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private MongoSession session;
     private StringBuilder fullHtml = new StringBuilder();
     private StringBuilder fullMd = new StringBuilder();
+
+    // map of all named markdown files we've exported, using full filename as key
+    private HashSet<String> markdownFiles = new HashSet<>();
+    private MarkdownFile mdFile = null;
+
     private StringBuilder markdownToc = new StringBuilder();
     private StringBuilder htmlToc = new StringBuilder();
 
@@ -86,6 +105,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
             auth.ownerAuth(ms, node);
             ArrayList<SubNode> nodeStack = new ArrayList<>();
             nodeStack.add(node);
+
+            // process the entire exported tree here
             recurseNode("../", "", rootNode, nodeStack, 0, null);
 
             if (req.isIncludeHTML()) {
@@ -155,6 +176,26 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (noExport != null) {
             return;
         }
+
+        boolean mdFileNode = false;
+        String mdFileName = node.getStr(NodeProp.FILE_NAME);
+        if (mdFileName != null) {
+            if (mdFile != null) {
+                throw new RuntimeException(
+                        "Markdown file " + mdFile.fileName + " cannot embed another file " + mdFileName);
+            }
+
+            if (markdownFiles.contains(mdFileName)) {
+                throw new RuntimeException("Markdown file " + mdFileName + " already exists");
+            }
+
+            mdFile = new MarkdownFile(mdFileName);
+            mdFileNode = true;
+            markdownFiles.add(mdFileName);
+
+            fullMd.append("\n#### [" + mdFileName + "](" + mdFileName + ")\n");
+        }
+
         /* process the current node */
         Val<String> fileName = new Val<>();
         /*
@@ -173,6 +214,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 recurseNode(rootPath + "../", parentFolder + "/" + folder, c, nodeStack, level + 1, c.node.getIdStr());
                 nodeStack.remove(c.node);
             }
+        }
+
+        if (mdFileNode) {
+            addFileEntry(mdFile.fileName, mdFile.content.toString().getBytes(StandardCharsets.UTF_8));
+            mdFile = null;
         }
     }
 
@@ -205,6 +251,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             String fileName = nodeId;
             String content = node.getContent() != null ? node.getContent() : "";
             content = content.trim();
+
             if (req.isUpdateHeadings()) {
                 int slashCount = StringUtils.countMatches(node.getPath(), "/");
                 int lev = slashCount - baseSlashCount;
@@ -212,14 +259,24 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     lev = 6;
                 content = edit.translateHeadingsForLevel(ms, content, lev);
             }
+
             if (writeFile && req.isIncludeToc()) {
                 addToTableOfContents(level, content, nodeId);
             }
+
             List<Attachment> atts = node.getOrderedAttachments();
             // we save off the 'content' into htmlContent, because we need a copy that doesn't have
             // attachments inserted into it for the special case of inserting HTML attachments
             Val<String> htmlContent = new Val<>(content);
             Val<String> mdContent = new Val<>(content);
+            String targetFolder = null;
+
+            // if we have a markdown file, all the attachments go into that folder
+            if (mdFile != null) {
+                targetFolder = fileUtil.getParentPath(mdFile.fileName);
+            } else {
+                targetFolder = req.isAttOneFolder() ? "/attachments" : ("." + parentFolder);
+            }
 
             // Process all attachments just to insert File Tags into content
             if (atts != null) {
@@ -228,11 +285,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (!"ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(true, null, mdContent, deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), writeFile, nodeId, fileName,
-                            att);
+                    handleAttachment(true, null, mdContent, deeperPath, targetFolder, writeFile, nodeId, fileName, att);
                 }
             }
+
             if (req.isIncludeHTML()) {
                 htmlContent.setVal(formatContentToHtml(node, htmlContent.getVal()));
                 // special handling for htmlContent we have to do this File Tag injection AFTER the html escaping
@@ -243,15 +299,26 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         if (!"ft".equals(att.getPosition())) {
                             continue;
                         }
-                        handleAttachment(true, htmlContent, null, deeperPath,
-                                req.isAttOneFolder() ? "attachments" : ("." + parentFolder), writeFile, nodeId,
-                                fileName, att);
+                        handleAttachment(true, htmlContent, null, deeperPath, targetFolder, writeFile, nodeId, fileName,
+                                att);
                     }
                 }
                 fullHtml.append(htmlContent.getVal());
             }
+
             if (req.isIncludeMD()) {
-                fullMd.append("\n" + mdContent.getVal() + "\n");
+                // if appending to specific named markdown file
+                if (mdFile != null) {
+                    if (mdFile.content.length() > 0)
+                        mdFile.content.append("\n");
+                    mdFile.content.append(mdContent.getVal() + "\n");
+                }
+                // else append to main markdown file
+                else {
+                    if (fullMd.length() > 0)
+                        fullMd.append("\n");
+                    fullMd.append(mdContent.getVal() + "\n");
+                }
             }
 
             if (atts != null) {
@@ -260,11 +327,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if ("ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(false, null, null, deeperPath,
-                            req.isAttOneFolder() ? "attachments" : ("." + parentFolder), writeFile, nodeId, fileName,
-                            att);
+                    handleAttachment(false, null, null, deeperPath, targetFolder, writeFile, nodeId, fileName, att);
                 }
             }
+
             if (req.isIncludeHTML()) {
                 fullHtml.append("</div>\n");
             }
@@ -355,8 +421,23 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     return;
                 BufferedInputStream bis = new BufferedInputStream(is);
                 long length = att != null ? att.getSize() : null;
-                String binFileName = req.isAttOneFolder() ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
-                        : (parentFolder + "/" + fileName + "/" + att.getKey() + ext); //
+
+                String binFileName = null;
+                if (mdFile != null) {
+                    String shortFileName =
+                            att.getFileName() != null ? att.getFileName() : (fileName + "-" + att.getKey() + ext);
+
+                    if (!mdFile.attachmentNames.add(shortFileName)) {
+                        throw new RuntimeException("Attachment " + shortFileName + " is used twice in the same file");
+                    }
+
+                    binFileName = fileUtil.getParentPath(mdFile.fileName) + "/" + shortFileName;
+                } else {
+                    binFileName = req.isAttOneFolder() ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
+                            : (parentFolder + "/" + fileName + "/" + att.getKey() + ext);
+                }
+
+
                 if (length > 0) {
                     /* NOTE: the archive WILL fail if no length exists in this codepath */
                     addFileEntry(binFileName, bis, length);
@@ -392,17 +473,30 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
         String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
         String mimeType = att.getMime();
-        String fullUrl = parentFolder + "/" + fileName + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
+        String fullUrl = null;
+
+        if (mdFile != null) {
+            String shortFileName =
+                    att.getFileName() != null ? att.getFileName() : (fileName + "-" + att.getKey() + ext);
+
+            fullUrl = fileUtil.getParentPath(mdFile.fileName) + "/" + shortFileName;
+        } else {
+            fullUrl = parentFolder + "/" + fileName + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
+        }
+
         String relPath = writeFile ? "" : (fileName + "/");
         String url = att.getUrl();
+
         // if no exernal link, this is a local file so build path to it.
         if (url == null) {
             url = "./" + deeperPath + relPath + att.getKey() + ext;
         } else {
             binFileNameStr = "External image";
         }
+
         if (mimeType == null)
             return;
+
         if (mimeType.startsWith("image/")) {
             if (req.isIncludeHTML()) {
                 String htmlLink = appendImgLink(nodeId, binFileNameStr, fullUrl);
@@ -441,7 +535,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
         } else {
             if (req.isIncludeMD()) {
-                fullMd.append(mdLink);
+                if (mdFile != null) {
+                    mdFile.content.append(mdLink);
+                } else {
+                    fullMd.append(mdLink);
+                }
             }
         }
     }

@@ -1390,6 +1390,7 @@ export const enum NodeProp {
     OPENAI_RESPONSE = "sn:oaiRes",
     HUGGINGFACE_RESPONSE = "sn:hfaceRes",
     OOBAI_RESPONSE = "sn:oobRes",
+    FILE_NAME = "file",
 }
 
 export const enum NodeType {

@@ -215,7 +215,10 @@ public enum NodeProp {
     TRUNCATED("trunc"), //
     OPENAI_RESPONSE("sn:oaiRes"), //
     HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
-    OOBAI_RESPONSE("sn:oobRes");
+    OOBAI_RESPONSE("sn:oobRes"), //
+
+    // used to let nodes specify the path for markdown export
+    FILE_NAME("file");
 
     @JsonValue
     private final String value;
