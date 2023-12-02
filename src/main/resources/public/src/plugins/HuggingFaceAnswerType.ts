@@ -11,11 +11,11 @@ export class HuggingFaceAnswerType extends TypeBase {
     // For now i'm not sure how we should indicate visibly that a
     // node is a comment, so I'm just not doing it, but this code DOES work.
     override getExtraMarkdownClass(): string {
-        return "openAiAnswer"; // todo-0: rename class to be independent of AI provider.
+        return "openAiAnswer"; // todo-1: rename class to be independent of AI provider.
     }
 
     override getCustomFooter(): Div {
-        return new Div("by Open Source AI", { className: "openAiAnswerFooter float-end" }); // todo-0: rename class to be independent of AI provider.
+        return new Div("by Open Source AI", { className: "openAiAnswerFooter float-end" }); // todo-1: rename class to be independent of AI provider.
     }
 
     override getEditorOptions(): EditorOptions {

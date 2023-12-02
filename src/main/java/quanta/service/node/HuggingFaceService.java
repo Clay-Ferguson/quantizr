@@ -95,7 +95,7 @@ public class HuggingFaceService extends ServiceBase {
         // the tree building history.
         while (parent != null) {
 
-            // we allow either type here (todo-0: add that to the openai stuff too)
+            // we allow either type here (todo-1: add that to the openai stuff too)
             if (NodeType.OPENAI_ANSWER.s().equals(parent.getType())
                     || NodeType.HUGGINGFACE_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
