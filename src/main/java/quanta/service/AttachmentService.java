@@ -298,6 +298,10 @@ public class AttachmentService extends ServiceBase {
         if (importMode) {
             att = node.getAttachment(attName, false, false);
             fileName = att.getFileName();
+
+            if (StringUtils.isEmpty(fileName)) {
+                fileName = "file";
+            }
         }
         // if no attName given we try to use "primary", but if primary exists, we find a different name
         else {
