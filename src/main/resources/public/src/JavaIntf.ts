@@ -1391,6 +1391,7 @@ export const enum NodeProp {
     HUGGINGFACE_RESPONSE = "sn:hfaceRes",
     OOBAI_RESPONSE = "sn:oobRes",
     FILE_NAME = "file",
+    FOLDER_NAME = "folder",
 }
 
 export const enum NodeType {

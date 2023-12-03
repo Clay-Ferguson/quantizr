@@ -217,8 +217,9 @@ public enum NodeProp {
     HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
     OOBAI_RESPONSE("sn:oobRes"), //
 
-    // used to let nodes specify the path for markdown export
-    FILE_NAME("file");
+    // used to let nodes specify the files and paths for markdown export
+    FILE_NAME("file"), //
+    FOLDER_NAME("folder");
 
     @JsonValue
     private final String value;

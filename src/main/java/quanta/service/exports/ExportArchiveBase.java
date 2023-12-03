@@ -56,8 +56,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         StringBuilder content = new StringBuilder();
 
-        MarkdownFile(String fileName) {
+        MarkdownFile(String fileName, String content) {
             this.fileName = fileName;
+            this.content.append(content);
         }
     }
 
@@ -72,6 +73,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     // map of all named markdown files we've exported, using full filename as key
     private HashSet<String> markdownFiles = new HashSet<>();
+
+    // this is the stack of TreeNodes of the paths for named markdown files. Only is used as a prefix
+    // for nodes that specify 'file' property
+    private List<SubNode> mdPaths = new ArrayList<>();
     private MarkdownFile mdFile = null;
 
     private StringBuilder markdownToc = new StringBuilder();
@@ -177,23 +182,36 @@ public abstract class ExportArchiveBase extends ServiceBase {
             return;
         }
 
-        boolean mdFileNode = false;
-        String mdFileName = node.getStr(NodeProp.FILE_NAME);
-        if (mdFileName != null) {
-            if (mdFile != null) {
-                throw new RuntimeException(
-                        "Markdown file " + mdFile.fileName + " cannot embed another file " + mdFileName);
+        boolean hasFileProp = false;
+        boolean hasFolderProp = false;
+
+        if (req.isIncludeMD()) {
+            String mdFileName = node.getStr(NodeProp.FILE_NAME);
+            String folderName = node.getStr(NodeProp.FOLDER_NAME);
+
+            if (folderName != null) {
+                hasFolderProp = true;
+                mdPaths.add(node);
             }
 
-            if (markdownFiles.contains(mdFileName)) {
-                throw new RuntimeException("Markdown file " + mdFileName + " already exists");
+            if (mdFileName != null) {
+                mdFileName = buildMdPaths() + mdFileName;
+
+                if (mdFile != null) {
+                    throw new RuntimeException(
+                            "Markdown file " + mdFile.fileName + " cannot embed another file " + mdFileName);
+                }
+
+                if (markdownFiles.contains(mdFileName)) {
+                    throw new RuntimeException("Markdown file " + mdFileName + " already exists");
+                }
+
+                mdFile = new MarkdownFile(mdFileName, buildMdPathContent());
+                hasFileProp = true;
+                markdownFiles.add(mdFileName);
+
+                fullMd.append("\n#### [" + mdFileName + "](" + mdFileName + ")\n");
             }
-
-            mdFile = new MarkdownFile(mdFileName);
-            mdFileNode = true;
-            markdownFiles.add(mdFileName);
-
-            fullMd.append("\n#### [" + mdFileName + "](" + mdFileName + ")\n");
         }
 
         /* process the current node */
@@ -216,10 +234,43 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
         }
 
-        if (mdFileNode) {
+        if (hasFileProp && mdFile != null) {
             addFileEntry(mdFile.fileName, mdFile.content.toString().getBytes(StandardCharsets.UTF_8));
             mdFile = null;
         }
+
+        if (hasFolderProp) {
+            mdPaths.remove(mdPaths.size() - 1);
+        }
+    }
+
+    private String buildMdPathContent() {
+        StringBuilder sb = new StringBuilder();
+        for (SubNode node : mdPaths) {
+            if (node.getContent() == null)
+                continue;
+
+            sb.append(node.getContent());
+
+            // headings have an assumes new line
+            if (node.getContent().startsWith("#")) {
+                sb.append("\n");
+            }
+            // non-headings need a double newline
+            else {
+                sb.append("\n\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    private String buildMdPaths() {
+        StringBuilder sb = new StringBuilder();
+        for (SubNode node : mdPaths) {
+            sb.append(node.getStr(NodeProp.FOLDER_NAME));
+            sb.append("/");
+        }
+        return sb.toString();
     }
 
     private void appendHtmlBegin(String rootPath, StringBuilder html) {
