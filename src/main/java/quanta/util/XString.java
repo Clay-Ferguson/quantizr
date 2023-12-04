@@ -57,6 +57,14 @@ public class XString {
         }
     }
 
+    public static boolean isValidMarkdownHeading(String heading) {
+        // Regex to match invalid characters
+        String invalidCharactersRegex = "[^a-zA-Z0-9\\-_ ]";
+
+        // Check if the heading contains any invalid characters
+        return !heading.matches(".*" + invalidCharactersRegex + ".*");
+    }
+
     public static String getStringFromStream(InputStream inputStream) {
         try {
             StringWriter writer = new StringWriter();

@@ -63,7 +63,7 @@ export class ExportDlg extends DialogBase {
         const ast = getAs();
         return new Div(null, { className: "bigMarginBottom" }, [
 
-            new Heading(5, "Files to Include", { className: "bigMarginTop" }),
+            new Heading(5, "Content Type", { className: "bigMarginTop" }),
 
             new RadioButtonGroup([
                 this.contentTypeRadioButton("HTML", "html"),
@@ -71,9 +71,8 @@ export class ExportDlg extends DialogBase {
                 this.contentTypeRadioButton("JSON", "json")
             ], "radioButtonsBar marginTop"),
 
-            new Heading(5, "Other Options", { className: "bigMarginTop" }),
-
-            ast.exportSettings.contentType !== "json" ? new Checkbox("Attachments Folder", null, {
+            // don't show attachments option for 'md' becasue it's forced to true
+            ast.exportSettings.contentType !== "md" ? new Checkbox("Attachments Folder", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.attOneFolder = checked; }),
                 getValue: (): boolean => getAs().exportSettings.attOneFolder
             }) : null,
@@ -85,10 +84,11 @@ export class ExportDlg extends DialogBase {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
                 getValue: (): boolean => getAs().exportSettings.dividerLine
             }) : null,
-            new Checkbox("Set Headings", null, {
+            // don't show headings option for 'md' becasue it's forced to true
+            ast.exportSettings.contentType !== "md" ? new Checkbox("Set Headings", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.updateHeadings = checked; }),
                 getValue: (): boolean => getAs().exportSettings.updateHeadings
-            })
+            }) : null
         ]);
     }
 

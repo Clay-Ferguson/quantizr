@@ -52,6 +52,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
     ExportRequest req;
     int baseSlashCount = 0;
 
+    // warnings and issues will be written to 'problems.txt' if there were any issues with the export
+    StringBuilder problems = new StringBuilder();
+
     private class MarkdownLink {
         String description;
         String link;
@@ -73,6 +76,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         StringBuilder content = new StringBuilder();
         StringBuilder toc = new StringBuilder();
+        int tocCount = 0;
 
         MarkdownFile(String fileName, String content, int baseSlashCount) {
             this.fileName = fileName;
@@ -105,6 +109,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
         ms = ThreadLocals.ensure(ms);
+
+        // for markdown force updateHeadings and Attachments folder
+        if (req.getContentType().equals("md")) {
+            req.setUpdateHeadings(true);
+            req.setAttOneFolder(true);
+        }
+
         this.req = req;
         this.session = ms;
         if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
@@ -136,6 +147,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
             recurseNode("../", "", rootNode, nodeStack, 0, null);
 
             writePendingFiles();
+
+            if (problems.length() > 0) {
+                addFileEntry("export-info.txt", problems.toString().getBytes(StandardCharsets.UTF_8));
+            }
 
             if (req.getContentType().equals("html")) {
                 StringBuilder out = new StringBuilder();
@@ -291,10 +306,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         if (hasFileProp && mdFile != null) {
             // if we're at root leval and have table of contents prepend it.
-            if (mdFile.toc.length() > 0) {
-                // todo-1: this is disabled for now because it's not working correctly in VSCode (haven't tried in
-                // github viewer)
-                mdFile.content.insert(0, pathContent /* + "Table of Contents\n\n" + mdFile.toc.toString() + "\n" */);
+            if (mdFile.tocCount > 5) {
+                mdFile.content.insert(0, pathContent + mdFile.toc.toString() + "\n");
             } else {
                 mdFile.content.insert(0, pathContent);
             }
@@ -339,7 +352,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
         for (MarkdownFile mdFile : mdFiles) {
             if (sb.length() > 0)
                 sb.append(" / ");
-            sb.append(getShortNodeText(mdFile.content.toString()));
+
+            // create file name that is sure to start with slash because they are always relative to root
+            String fileName = mdFile.fileName;
+            if (!fileName.startsWith("/"))
+                fileName = "/" + fileName;
+
+            sb.append("[" + getShortNodeText(mdFile.content.toString()) + "](" + fileName + ")");
         }
 
         // put a divider between the path content and the node content
@@ -390,19 +409,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
             content = content.trim();
 
             if (req.isUpdateHeadings()) {
-                int slashCount = StringUtils.countMatches(node.getPath(), "/");
-
-                // base slash count is the number of slashes in the path of the root node, and is relative
-                // to the markdown file we're writing to if there is one.
-                int lev = slashCount - (mdFile != null ? mdFile.baseSlashCount : baseSlashCount);
-                if (lev > 6)
-                    lev = 6;
+                int lev = getHeadingLevel(node);
                 boolean isFileNode = node.getStr(NodeProp.FILE_NAME) != null;
                 content = edit.translateHeadingsForLevel(ms, content, lev, mdFile != null && isFileNode);
             }
 
             if (writeFile && req.isIncludeToc()) {
-                addToTableOfContents(level, content, nodeId);
+                addToTableOfContents(node, level, content);
             }
 
             List<Attachment> atts = node.getOrderedAttachments();
@@ -479,7 +492,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    private void addToTableOfContents(int level, String content, String nodeId) {
+    private void addToTableOfContents(SubNode node, int level, String content) {
         // add to table of contents
         if (content == null)
             return;
@@ -493,18 +506,33 @@ public abstract class ExportArchiveBase extends ServiceBase {
             int firstSpace = headerContent.indexOf(" ");
             if (firstSpace != -1) {
                 String heading = headerContent.substring(firstSpace + 1);
+                if (!XString.isValidMarkdownHeading(heading)) {
+                    problems.append("bad markdown heading: " + heading + "\n");
+                }
                 String linkHeading = heading.replace(" ", "-").toLowerCase();
                 level--;
-                String prefix = level > 0 ? "    ".repeat(level) : "";
+
                 if (mdFile != null) {
+                    int lev = getHeadingLevel(node);
+                    String prefix = lev > 0 ? "    ".repeat(lev) : "";
                     mdFile.toc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+                    mdFile.tocCount++;
                 }
+
                 String clazz = level == 0 ? "class='topLevelToc'" : "";
                 htmlToc.append(
                         "<div " + clazz + " style='margin-left: " + (25 + level * 25) + "px'><a class='tocLink' href='#"
-                                + nodeId + "'>" + StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
+                                + node.getIdStr() + "'>" + StringEscapeUtils.escapeHtml4(heading) + "</a></div>");
             }
         }
+    }
+
+    private int getHeadingLevel(SubNode node) {
+        int slashCount = StringUtils.countMatches(node.getPath(), "/");
+        int lev = slashCount - (mdFile != null ? mdFile.baseSlashCount : baseSlashCount);
+        if (lev > 6)
+            lev = 6;
+        return lev;
     }
 
     private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, Val<String> fileNameCont,
@@ -631,8 +659,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String fullUrl = null;
 
         if (mdFile != null) {
-            String attFolder = fileUtil.getParentPath(mdFile.fileName);
-            fullUrl = attFolder + "/attachments/" + attFileName;
+            fullUrl = "attachments/" + attFileName;
         } else {
             fullUrl = parentFolder + "/" + fileName + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
         }
@@ -657,7 +684,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
             }
             if (req.getContentType().equals("md")) {
-                String mdLink = "\n![" + displayName + "](" + fullUrl + ")\n";
+                String mdLink = null;
+                if (att.getCssSize() != null && (att.getCssSize().endsWith("%") || att.getCssSize().endsWith("px"))) {
+                    mdLink = "\n<img src='" + fullUrl + "' style='width:" + att.getCssSize() + "'/>\n\n";
+
+                } else {
+                    mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
+                }
                 processMdAtt(injectingTag, mdContent, att, mdLink);
             }
         } else {

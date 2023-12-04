@@ -412,8 +412,9 @@ export class NodeCompRowHeader extends Div {
                         title: "Folder for Markdown Export"
                     }));
                 }
-                const fileName = S.props.getPropStr(J.NodeProp.FILE_NAME, this.node);
+                let fileName = S.props.getPropStr(J.NodeProp.FILE_NAME, this.node);
                 if (fileName) {
+                    fileName = fileName.replace("/index.md", "/*");
                     floatUpperRightDiv.addChild(new Span(fileName, {
                         className: "nodeFileNameDisp",
                         title: "File for Markdown Export"
