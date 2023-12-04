@@ -245,7 +245,21 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 mdFileName = buildMdPaths() + mdFileName;
 
                 if (mdFile != null) {
-                    mdFile.content.append("\n### [" + mdFileName + "](" + mdFileName + ")\n");
+                    String linkName = XString.truncAfterFirst(node.getContent(), "\n");
+                    linkName = linkName.trim();
+                    linkName = XString.repeatingTrimFromFront(linkName, "#");
+                    linkName = linkName.trim();
+
+                    // DO NOT DELETE (I may go back to showing path as the link name)
+                    // String displayPath = mdFileName;
+                    // // remove '/index.md' from the end of the path if it's there
+                    // if (displayPath.endsWith("/index.md")) {
+                    // displayPath = displayPath.substring(0, mdFileName.length() - 9);
+                    // }
+                    // // only show the last part of the path
+                    // displayPath = XString.parseAfterLast(displayPath, "/");
+
+                    mdFile.content.append("\n### [" + linkName + "](" + mdFileName + ")\n");
                 }
 
                 int bsc = StringUtils.countMatches(node.getPath(), "/");

@@ -425,6 +425,22 @@ i'm backing out for now
     border-radius: $border-radius;
 }
 
+.nodeFolderNameDisp {
+    margin-right: $smallGap;
+    padding: 4px;
+    border: 1px solid gray;
+    background-color: darkgoldenrod;
+    border-radius: $border-radius;
+}
+
+.nodeFileNameDisp {
+    margin-right: $smallGap;
+    padding: 4px;
+    border: 1px solid gray;
+    background-color: darkgoldenrod;
+    border-radius: $border-radius;
+}
+
 .sharingIcon {
     color: cyan;
 }

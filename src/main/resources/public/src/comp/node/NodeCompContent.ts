@@ -86,12 +86,8 @@ export class NodeCompContent extends Div {
 
         children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode));
 
-        // if this node has File or Folder props and we own it then show the properties table.
-        const hasFileOrFolderProp = S.props.getPropStr(J.NodeProp.FILE_NAME, this.node) ||
-            S.props.getPropStr(J.NodeProp.FOLDER_NAME, this.node);
-
         if (this.node.type !== J.NodeType.ACCOUNT && //
-            ((hasFileOrFolderProp && S.props.isMine(this.node)) || ast.userPrefs.showProps || type.schemaOrg) && S.props.hasDisplayableProps(this.node)) {
+            (ast.userPrefs.showProps || type.schemaOrg) && S.props.hasDisplayableProps(this.node)) {
             if (type.schemaOrg) {
                 children.push(new PropDisplayLayout(this.node));
             }

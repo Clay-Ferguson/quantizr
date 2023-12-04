@@ -394,13 +394,32 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        if (showInfo && this.node.name) {
-            floatUpperRightDiv.addChild(new Span(this.node.name, {
-                className: "nodeNameDisp",
-                title: "Node name (Click to copy link to clipboard)",
-                [C.NODE_ID_ATTR]: this.node.id,
-                onClick: S.nav.copyNodeNameToClipboard
-            }));
+        if (showInfo) {
+            if (this.node.name) {
+                floatUpperRightDiv.addChild(new Span(this.node.name, {
+                    className: "nodeNameDisp",
+                    title: "Node name (Click to copy link to clipboard)",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.copyNodeNameToClipboard
+                }));
+            }
+
+            if (S.props.isMine(this.node)) {
+                const folderName = S.props.getPropStr(J.NodeProp.FOLDER_NAME, this.node);
+                if (folderName) {
+                    floatUpperRightDiv.addChild(new Span(folderName, {
+                        className: "nodeFolderNameDisp",
+                        title: "Folder for Markdown Export"
+                    }));
+                }
+                const fileName = S.props.getPropStr(J.NodeProp.FILE_NAME, this.node);
+                if (fileName) {
+                    floatUpperRightDiv.addChild(new Span(fileName, {
+                        className: "nodeFileNameDisp",
+                        title: "File for Markdown Export"
+                    }));
+                }
+            }
         }
 
         const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, this.node);
