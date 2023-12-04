@@ -128,11 +128,7 @@ export class ExportDlg extends DialogBase {
             includeToc: ast.exportSettings.includeToc,
             includeJypyter: ast.exportSettings.includeJypyter,
             attOneFolder: ast.exportSettings.attOneFolder,
-
-            // todo-0: make ExportRequest have 'contentType' 
-            includeJSON: ast.exportSettings.contentType === "json",
-            includeMD: ast.exportSettings.contentType === "md",
-            includeHTML: ast.exportSettings.contentType === "html",
+            contentType: ast.exportSettings.contentType,
             includeIDs: ast.exportSettings.includeIDs,
             dividerLine: ast.exportSettings.dividerLine,
             updateHeadings: ast.exportSettings.updateHeadings

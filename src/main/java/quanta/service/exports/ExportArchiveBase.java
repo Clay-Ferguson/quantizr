@@ -45,7 +45,6 @@ import quanta.util.val.Val;
  * have just that one export as their 'scope'
  */
 public abstract class ExportArchiveBase extends ServiceBase {
-    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
     private String shortFileName;
     private String fullFileName;
@@ -125,7 +124,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         boolean success = false;
         try {
             openOutputStream(fullFileName);
-            if (req.isIncludeHTML()) {
+            if (req.getContentType().equals("html")) {
                 writeRootFiles();
             }
             rootPathParent = node.getParentPath();
@@ -138,7 +137,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             writePendingFiles();
 
-            if (req.isIncludeHTML()) {
+            if (req.getContentType().equals("html")) {
                 StringBuilder out = new StringBuilder();
                 appendHtmlBegin("", out);
                 if (htmlToc.length() > 0) {
@@ -227,7 +226,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         boolean hasFolderProp = false;
         String pathContent = null;
 
-        if (req.isIncludeMD()) {
+        if (req.getContentType().equals("md")) {
             String mdFileName = node.getStr(NodeProp.FILE_NAME);
             String folderName = node.getStr(NodeProp.FOLDER_NAME);
 
@@ -245,11 +244,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 mdFileName = buildMdPaths() + mdFileName;
 
                 if (mdFile != null) {
-                    String linkName = XString.truncAfterFirst(node.getContent(), "\n");
-                    linkName = linkName.trim();
-                    linkName = XString.repeatingTrimFromFront(linkName, "#");
-                    linkName = linkName.trim();
-
                     // DO NOT DELETE (I may go back to showing path as the link name)
                     // String displayPath = mdFileName;
                     // // remove '/index.md' from the end of the path if it's there
@@ -259,7 +253,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     // // only show the last part of the path
                     // displayPath = XString.parseAfterLast(displayPath, "/");
 
-                    mdFile.content.append("\n### [" + linkName + "](" + mdFileName + ")\n");
+                    mdFile.content.append("\n### [" + getShortNodeText(node.getContent()) + "](" + mdFileName + ")\n");
                 }
 
                 int bsc = StringUtils.countMatches(node.getPath(), "/");
@@ -270,6 +264,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
         }
 
+        // if this node has a name associate it with the current mdFile
         if (mdFiles != null && StringUtils.isNotEmpty(node.getName())) {
             markdownFilesByNodeName.put(node.getName(), mdFile);
         }
@@ -314,12 +309,37 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    private String buildMdPathContent() {
+    private String getShortNodeText(String content) {
+        String linkName = XString.truncAfterFirst(content, "\n");
+        linkName = linkName.trim();
+        linkName = XString.repeatingTrimFromFront(linkName, "#");
+        linkName = linkName.trim();
+        return linkName;
+    }
+
+    // DO NOT DELETE: We're moving to a more descriptive format for this but let's keep the ability
+    // do to this if we ever need to.
+    private String buildMdPathContent_old() {
         StringBuilder sb = new StringBuilder();
         for (SubNode node : mdPaths) {
             if (sb.length() > 0)
                 sb.append("/");
             sb.append(node.getStr(NodeProp.FOLDER_NAME));
+        }
+
+        // put a divider between the path content and the node content
+        if (sb.length() > 0)
+            return "**" + sb.toString() + "**\n\n";
+
+        return "";
+    }
+
+    private String buildMdPathContent() {
+        StringBuilder sb = new StringBuilder();
+        for (MarkdownFile mdFile : mdFiles) {
+            if (sb.length() > 0)
+                sb.append(" / ");
+            sb.append(getShortNodeText(mdFile.content.toString()));
         }
 
         // put a divider between the path content and the node content
@@ -411,7 +431,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 }
             }
 
-            if (req.isIncludeHTML()) {
+            if (req.getContentType().equals("html")) {
                 htmlContent.setVal(formatContentToHtml(node, htmlContent.getVal()));
                 // special handling for htmlContent we have to do this File Tag injection AFTER the html escaping
                 // and processing that's done in the line above
@@ -428,7 +448,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 fullHtml.append(htmlContent.getVal());
             }
 
-            if (req.isIncludeMD()) {
+            if (req.getContentType().equals("md")) {
                 // if appending to specific named markdown file
                 if (mdFile != null) {
                     if (mdFile.content.length() > 0)
@@ -448,7 +468,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 }
             }
 
-            if (req.isIncludeHTML()) {
+            if (req.getContentType().equals("html")) {
                 fullHtml.append("</div>\n");
             }
             if (writeFile) {
@@ -492,7 +512,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String fileNameBase = parentFolder + "/" + fileName + "/" + fileName;
         fileNameCont.setVal(fileNameBase);
         String json = getNodeJson(node);
-        if (req.isIncludeJSON()) {
+        if (req.getContentType().equals("json")) {
             addFileEntry(fileNameBase + ".json", json.getBytes(StandardCharsets.UTF_8));
         }
         if (atts != null) {
@@ -632,20 +652,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
             return;
 
         if (mimeType.startsWith("image/")) {
-            if (req.isIncludeHTML()) {
+            if (req.getContentType().equals("html")) {
                 String htmlLink = appendImgLink(nodeId, displayName, fullUrl);
                 processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
             }
-            if (req.isIncludeMD()) {
+            if (req.getContentType().equals("md")) {
                 String mdLink = "\n![" + displayName + "](" + fullUrl + ")\n";
                 processMdAtt(injectingTag, mdContent, att, mdLink);
             }
         } else {
-            if (req.isIncludeHTML()) {
+            if (req.getContentType().equals("html")) {
                 String htmlLink = appendNonImgLink(displayName, fullUrl);
                 processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
             }
-            if (req.isIncludeMD()) {
+            if (req.getContentType().equals("md")) {
                 String mdLink = "\n[" + displayName + "](" + fullUrl + ")\n";
                 processMdAtt(injectingTag, mdContent, att, mdLink);
             }
@@ -668,7 +688,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 mdContent.setVal(insertMdLink(mdContent.getVal(), att, mdLink));
             }
         } else {
-            if (req.isIncludeMD()) {
+            if (req.getContentType().equals("md")) {
                 if (mdFile != null) {
                     mdFile.content.append(mdLink);
                 }

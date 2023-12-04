@@ -370,9 +370,7 @@ export interface ExportRequest extends RequestBase {
     toIpfs: boolean;
     includeToc: boolean;
     attOneFolder: boolean;
-    includeJSON: boolean;
-    includeMD: boolean;
-    includeHTML: boolean;
+    contentType: string;
     includeJypyter: boolean;
     includeIDs: boolean;
     dividerLine: boolean;
