@@ -39,11 +39,14 @@ export class EditPropertyDlg extends DialogBase {
     renderDlg(): Comp[] {
         const type = S.plugin.getType(this.editNode.type);
         const showSchemaOrg = getAs().showSchemaOrgProps;
-
-        return [
+        let textField: TextField = null;
+        const ret = [
             !getAs().showSchemaOrgProps
                 ? new Div(null, { className: "marginBottom" }, [
-                    new TextField({ label: "Name", val: this.nameState })
+                    textField = new TextField({
+                        label: "Name",
+                        val: this.nameState
+                    })
                 ]) : null,
 
             type?.schemaOrg?.props ? new Checkbox("Schema.org Props", { className: "marginRight" }, {
@@ -58,6 +61,9 @@ export class EditPropertyDlg extends DialogBase {
                 new Button("Cancel", this.close)
             ], "marginTop")
         ];
+
+        this.onMount(() => textField.focus());
+        return ret;
     }
 
     save = () => {

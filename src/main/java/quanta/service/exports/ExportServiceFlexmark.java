@@ -263,7 +263,7 @@ public class ExportServiceFlexmark extends ServiceBase {
             int lev = slashCount - baseSlashCount;
             if (lev > 6)
                 lev = 6;
-            content = edit.translateHeadingsForLevel(session, content, lev);
+            content = edit.translateHeadingsForLevel(session, content, lev, false);
         }
 
         content = insertPropertySubstitutions(content, node);

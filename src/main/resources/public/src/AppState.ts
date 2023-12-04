@@ -13,9 +13,7 @@ export interface ExportSettings {
     includeToc?: boolean;
     includeJypyter?: boolean;
     attOneFolder?: boolean;
-    includeJSON?: boolean;
-    includeMD?: boolean;
-    includeHTML?: boolean;
+    contentType?: string; // html, md, json
     includeIDs?: boolean;
     dividerLine?: boolean;
     updateHeadings?: boolean;
@@ -122,9 +120,7 @@ export class AppState {
         includeToc: true,
         includeJypyter: true,
         attOneFolder: false,
-        includeJSON: false,
-        includeMD: true,
-        includeHTML: true,
+        contentType: "md", // html, md, json
         includeIDs: true,
         dividerLine: true,
         updateHeadings: true

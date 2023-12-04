@@ -36,13 +36,13 @@ export class ExportDlg extends DialogBase {
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new Heading(5, "File Type", { className: "bigMarginTop" }),
             new RadioButtonGroup([
-                this.radioButton("ZIP", "zip"),
-                this.radioButton("TAR", "tar"),
-                this.radioButton("TAR.GZ", "tar.gz"),
-                this.radioButton("PDF", "pdf")
+                this.fileTypeRadioButton("ZIP", "zip"),
+                this.fileTypeRadioButton("TAR", "tar"),
+                this.fileTypeRadioButton("TAR.GZ", "tar.gz"),
+                this.fileTypeRadioButton("PDF", "pdf")
             ], "radioButtonsBar marginTop"),
 
-            exportType === "pdf" || ast.exportSettings.includeMD ? new Checkbox("Table of Contents", null, {
+            exportType === "pdf" || ast.exportSettings.contentType == "md" ? new Checkbox("Table of Contents", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
                 getValue: (): boolean => getAs().exportSettings.includeToc
             }) : null,
@@ -51,6 +51,7 @@ export class ExportDlg extends DialogBase {
             S.quanta.cfg.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
+
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
                 new Button("Close", this.close, null, "btn-secondary float-end")
@@ -63,36 +64,24 @@ export class ExportDlg extends DialogBase {
         return new Div(null, { className: "bigMarginBottom" }, [
 
             new Heading(5, "Files to Include", { className: "bigMarginTop" }),
-            new Checkbox("HTML", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeHTML = checked; }),
-                getValue: (): boolean => getAs().exportSettings.includeHTML
-            }),
-            new Checkbox("Markdown", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeMD = checked; }),
-                getValue: (): boolean => getAs().exportSettings.includeMD
-            }),
-            new Checkbox("JSON", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => {
-                    s.exportSettings.includeJSON = checked;
 
-                    // our importer doesn't currently support having attachments in the 'attachments' folder so
-                    // if we're exporting a file that can be reimported turn off the attOneFolder option
-                    s.exportSettings.attOneFolder = false;
-                }),
-                getValue: (): boolean => getAs().exportSettings.includeJSON
-            }),
+            new RadioButtonGroup([
+                this.contentTypeRadioButton("HTML", "html"),
+                this.contentTypeRadioButton("Markdown", "md"),
+                this.contentTypeRadioButton("JSON", "json")
+            ], "radioButtonsBar marginTop"),
 
             new Heading(5, "Other Options", { className: "bigMarginTop" }),
 
-            !ast.exportSettings.includeJSON ? new Checkbox("Attachments Folder", null, {
+            ast.exportSettings.contentType !== "json" ? new Checkbox("Attachments Folder", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.attOneFolder = checked; }),
                 getValue: (): boolean => getAs().exportSettings.attOneFolder
             }) : null,
-            ast.exportSettings.includeHTML ? new Checkbox("IDs", null, {
+            ast.exportSettings.contentType === "html" ? new Checkbox("IDs", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeIDs
             }) : null,
-            ast.exportSettings.includeHTML ? new Checkbox("Divider Line", null, {
+            ast.exportSettings.contentType === "html" ? new Checkbox("Divider Line", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
                 getValue: (): boolean => getAs().exportSettings.dividerLine
             }) : null,
@@ -103,7 +92,20 @@ export class ExportDlg extends DialogBase {
         ]);
     }
 
-    radioButton = (name: string, exportType: string) => {
+    contentTypeRadioButton = (name: string, exportType: string) => {
+        return new Span(null, null, [
+            new RadioButton(name, false, "contentTypeGroup", null, {
+                setValue: (checked: boolean) => {
+                    if (checked) {
+                        dispatch("exportSetting", s => s.exportSettings.contentType = exportType);
+                    }
+                },
+                getValue: (): boolean => getAs().exportSettings.contentType === exportType
+            }, "form-check-inline marginRight")
+        ]);
+    }
+
+    fileTypeRadioButton = (name: string, exportType: string) => {
         return new Span(null, null, [
             new RadioButton(name, false, "exportTypeGroup", null, {
                 setValue: (checked: boolean) => {
@@ -126,9 +128,11 @@ export class ExportDlg extends DialogBase {
             includeToc: ast.exportSettings.includeToc,
             includeJypyter: ast.exportSettings.includeJypyter,
             attOneFolder: ast.exportSettings.attOneFolder,
-            includeJSON: ast.exportSettings.includeJSON,
-            includeMD: ast.exportSettings.includeMD,
-            includeHTML: ast.exportSettings.includeHTML,
+
+            // todo-0: make ExportRequest have 'contentType' 
+            includeJSON: ast.exportSettings.contentType === "json",
+            includeMD: ast.exportSettings.contentType === "md",
+            includeHTML: ast.exportSettings.contentType === "html",
             includeIDs: ast.exportSettings.includeIDs,
             dividerLine: ast.exportSettings.dividerLine,
             updateHeadings: ast.exportSettings.updateHeadings

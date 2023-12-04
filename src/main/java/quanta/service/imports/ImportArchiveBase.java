@@ -91,8 +91,10 @@ public abstract class ImportArchiveBase extends ServiceBase {
                         // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
                         // to verify the parent exists upon saving, because we know the path is fine correct.
                         n.verifyParentPath = false;
+
                         // nullify name because we don't want to blow up indexes
-                        n.setName(null);
+                        // n.setName(null);
+
                         n.setOwner(ownerId);
                         // log.debug("IMPORT NODE: " + XString.prettyPrint(n));
                         return n;

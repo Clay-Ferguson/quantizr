@@ -414,7 +414,7 @@ public class NodeEditService extends ServiceBase {
                 int level = baseLevel + (slashCount - baseSlashCount);
                 if (level > 6)
                     level = 6;
-                String c = translateHeadingsForLevel(ms, n.getContent(), level);
+                String c = translateHeadingsForLevel(ms, n.getContent(), level, false);
                 if (c != null && !c.equals(n.getContent())) {
                     n.setContent(c);
                 }
@@ -428,7 +428,8 @@ public class NodeEditService extends ServiceBase {
         return new UpdateHeadingsResponse();
     }
 
-    public String translateHeadingsForLevel(MongoSession ms, final String nodeContent, int level) {
+    public String translateHeadingsForLevel(MongoSession ms, final String nodeContent, int level,
+            boolean markdownLevelZero) {
         if (nodeContent == null)
             return null;
         StringTokenizer t = new StringTokenizer(nodeContent, "\n", true);
@@ -453,6 +454,12 @@ public class NodeEditService extends ServiceBase {
                      */
                     switch (level) {
                         case 0:
+                            // special case for a markdown file root node we want the first line to be bold, instead of
+                            // a heading.
+                            if (markdownLevelZero && !nodeContent.startsWith("# ")) {
+                                ret.append("# " + content);
+                                continue;
+                            }
                             // this will be the root node (user selected node)
                             break;
                         case 1:
