@@ -135,7 +135,7 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (ast.userPrefs.editMode) {
-            if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && ast.userPrefs.editMode && !ast.editNode) {
+            if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && ast.userPrefs.editMode) {
                 dragIcon = new Icon({
                     className: "bi bi-grip-vertical bi-lg dragIcon",
                     title: "Drag to move this node"
