@@ -1,12 +1,12 @@
 import { createElement, forwardRef } from "react";
 import Markdown from "react-markdown";
+import { Prism } from "react-syntax-highlighter";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { S } from "../../Singletons";
-import { Prism } from "react-syntax-highlighter";
 
 // Good styles are: a11yDark, nightOwl, oneLight
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -14,10 +14,12 @@ import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/st
 // ======================================================
 // DO NOT DELETE (KEEP EXAMPLE), this code works, but the default schema is already perfect for our needs
 // so we're not tweaking the schema at all. If we ever need to, this is how we would do it.
-// import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-// const schema = JSON.parse(JSON.stringify(defaultSchema));
-// // schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "data-nid", "data-attkey"];
-// // schema.attributes["img"].push("class");
+// We need this becasue we do have code that injects images (the positional insertion option in the editor dialog),
+// and we do set both the class name and style in that code so we need to allow those attributes in this custom way
+// because by default rehypeSanitize will remove them.
+const schema = JSON.parse(JSON.stringify(defaultSchema));
+schema.attributes.img = ["src", "alt", "title", "width", "height", "className", "style", "data-nid", "data-attkey"];
+// schema.attributes["img"].push("class");
 // NOTE: I never got the sanitizer to leave classnames alone.
 // schema.attributes["*"].push("class");
 // schema.attributes["*"].push("className");
@@ -39,7 +41,7 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
         ref,
         // WARNING: The order of these plugins is significant!!! DO NOT ALTER
         remarkPlugins: [remarkGfm, remarkMath],
-        rehypePlugins: [rehypeRaw, rehypeSanitize, rehypeKatex],
+        rehypePlugins: [rehypeRaw, [rehypeSanitize, schema], rehypeKatex],
     });
 });
 
