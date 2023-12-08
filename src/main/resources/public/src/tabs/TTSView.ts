@@ -147,7 +147,7 @@ export class TTSView extends AppTab<any, TTSView> {
                 this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
                 S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
                 this.makeRateChooser(),
-                new Checkbox("Text Input", { className: "bigMarginLeft" }, {
+                new Checkbox("Text Input", { className: "bigMarginLeft marginTop" }, {
                     setValue: (checked: boolean) => dispatch("setTtsInput", s => {
                         if (!checked) {
                             TTSView.textAreaState.setValue("");

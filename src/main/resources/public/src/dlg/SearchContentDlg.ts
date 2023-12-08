@@ -95,42 +95,42 @@ export class SearchContentDlg extends DialogBase {
                             }
                         },
                         getValue: (): boolean => this.getState<LS>().blockedWords
-                    }) : null,
+                    }, "marginTop") : null,
                     new Checkbox("Substring", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState<LS>({ fuzzy: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().fuzzy
-                    }),
+                    }, "marginTop"),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.caseSensitive = checked;
                             this.mergeState<LS>({ caseSensitive: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().caseSensitive
-                    }),
+                    }, "marginTop"),
                     new Checkbox("Recursive", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.recursive = checked;
                             this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().recursive
-                    }),
+                    }, "marginTop"),
                     new Checkbox("Has Attachment", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.requireAttachment = checked;
                             this.mergeState<LS>({ requireAttachment: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().requireAttachment
-                    }),
+                    }, "marginTop"),
                     new Checkbox("Has Date", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.requireDate = checked;
                             this.mergeState<LS>({ requireDate: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().requireDate
-                    })
+                    }, "marginTop")
                 ], "marginBottom"),
 
                 new FlexRowLayout([

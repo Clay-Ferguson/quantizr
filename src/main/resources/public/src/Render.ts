@@ -96,12 +96,12 @@ export class Render {
                 links += `<div class="tourLinkDiv"><span class="tourLink ui-run-cmd" data-cmd="tour:${tour.name}">${tour.name}</span></div>`
             });
         }
-        return val.replace("{{" + cmd + "}}", links);
+        return val.replaceAll("{{" + cmd + "}}", links);
     }
 
     injectAdminLink = (val: string, cmd: string, buttonText: string) => {
         // NOTE: Our Singleton class puts a global copy of S on the browser 'window object', so that's why this script works.
-        return val.replace("{{" + cmd + "}}", `<span class="adminButton ui-run-cmd" data-cmd="${cmd}">${buttonText}</span>`);
+        return val.replaceAll("{{" + cmd + "}}", `<span class="adminButton ui-run-cmd" data-cmd="${cmd}">${buttonText}</span>`);
     }
 
     renderLinkLabel = (id: string) => {

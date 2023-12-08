@@ -331,8 +331,8 @@ export class RpcUtil {
                 if (!this.logVerbose) {
                     let trace = res.stackTrace;
                     if (trace) {
-                        trace = trace.replace("\\n", "\n");
-                        trace = trace.replace("\\t", "\t");
+                        trace = trace.replaceAll("\\n", "\n");
+                        trace = trace.replaceAll("\\t", "\t");
 
                         // remove this so the prettyPrint doesn't contain it.
                         delete res.stackTrace;

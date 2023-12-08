@@ -70,7 +70,7 @@ export class NodeCompMarkdown extends Comp {
         if (!urls || !val) return val;
         urls.forEach((url: string) => {
             if (val.indexOf("(" + url) == -1) {
-                val = val.replace(url, `[${url}](${url})`);
+                val = val.replaceAll(url, `[${url}](${url})`);
             }
         });
         return val;

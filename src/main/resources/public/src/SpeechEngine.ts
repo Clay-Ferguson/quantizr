@@ -293,11 +293,11 @@ export class SpeechEngine {
 
                         // Let's rip out all the hashtags and at symbols mainly just so we can read
                         // text full of hashtags and have it sound good.
-                        sayThis = sayThis.replace("#", " ");
+                        sayThis = sayThis.replaceAll("#", " ");
 
                         // replace backquote or else the engine will pronounce the actual word 'backquote' which we of courose
                         // do not want.
-                        sayThis = sayThis.replace("`", "\"");
+                        sayThis = sayThis.replaceAll("`", "\"");
 
                         utter = new SpeechSynthesisUtterance(sayThis);
 
@@ -433,16 +433,16 @@ export class SpeechEngine {
     preProcessText = (text: string): string => {
         if (!text) return;
         // engine will SAY the 'quote' if you leave this here.
-        text = text.replace(".\"", ".");
-        text = text.replace(".'", ".");
+        text = text.replaceAll(".\"", ".");
+        text = text.replaceAll(".'", ".");
 
-        text = text.replace("!\"", "!");
-        text = text.replace("!'", "!");
+        text = text.replaceAll("!\"", "!");
+        text = text.replaceAll("!'", "!");
 
-        text = text.replace("?\"", "?");
-        text = text.replace("?'", "?");
+        text = text.replaceAll("?\"", "?");
+        text = text.replaceAll("?'", "?");
 
-        text = text.replace(/[@#_*]/g, " ");
+        text = text.replaceAll(/[@#_*]/g, " ");
         return text;
     }
 
@@ -506,8 +506,8 @@ export class SpeechEngine {
     }
 
     splitByQuotations = (text: string): string[] => {
-        text = text.replace("“", "\"");
-        text = text.replace("”", "\"");
+        text = text.replaceAll("“", "\"");
+        text = text.replaceAll("”", "\"");
         const quoteCount = S.util.countChars(text, "\"");
 
         let ret: string[] = null;
@@ -551,7 +551,7 @@ export class SpeechEngine {
         // This is a dirty but clever hack to fix lots of initials like (J.F.K.)
         // and make them not do any sentence breaks there.
         for (const char of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-            text = text.replace(char + ".", char + " ");
+            text = text.replaceAll(char + ".", char + " ");
         }
 
         // first split into sentences.
