@@ -18,7 +18,9 @@ import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/st
 // and we do set both the class name and style in that code so we need to allow those attributes in this custom way
 // because by default rehypeSanitize will remove them.
 const schema = JSON.parse(JSON.stringify(defaultSchema));
-schema.attributes.img = ["src", "alt", "title", "width", "height", "className", "style", "data-nid", "data-attkey"];
+schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
+schema.attributes.span = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
+schema.attributes.div = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
 // schema.attributes["img"].push("class");
 // NOTE: I never got the sanitizer to leave classnames alone.
 // schema.attributes["*"].push("class");

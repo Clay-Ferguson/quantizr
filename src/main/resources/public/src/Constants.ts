@@ -33,11 +33,6 @@ export class Constants {
     static ID_RHS = "rightNavPanelId";
     static ID_MENU = "appMainMenuPanelId";
 
-    static ADMIN_COMMAND_FEDIVERSE = "fediverse";
-    static ADMIN_COMMAND_TRENDING = "trending";
-    static ADMIN_COMMAND_NEWS = "news";
-    static ADMIN_COMMAND_GUIDEDTOURS = "guided-tours";
-
     // WARNING: These must be able to be prefixes on class names.
     static TAB_MAIN: string = "mainRS";
     static TAB_SEARCH: string = "srchRS";

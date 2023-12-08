@@ -38,12 +38,11 @@ export class TourUtils {
 
     afterDispatch = () => {
         setTimeout(() => {
-            let ast = getAs();
+            const ast = getAs();
             if (!ast) return;
 
             if (ast.tour) {
-                // const allElms = document.getElementsByClassName("ui-signup");
-                let elms = document.querySelectorAll(ast.tour.steps[ast.tour.curStep].classHighlights);
+                const elms = document.querySelectorAll(ast.tour.steps[ast.tour.curStep].classHighlights);
                 if (elms.length == 0) {
                     console.warn("Didn't find elements for tour: " + ast.tour.steps[ast.tour.curStep].classHighlights);
                 }

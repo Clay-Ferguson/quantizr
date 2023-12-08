@@ -44,7 +44,6 @@ export class Render {
         val = val.replaceAll("```txt\n", "```plaintext\n");
 
         val = val.replaceAll("{{locationOrigin}}", window.location.origin);
-        val = this.injectCustomButtons(val);
 
         /* These allow us to enter into the markdown things like this:
         [My Link Test]({{url}}?id=:my-test-name)
@@ -78,30 +77,6 @@ export class Render {
         }
 
         return val;
-    }
-
-    injectCustomButtons = (val: string): string => {
-        val = this.injectAdminLink(val, C.ADMIN_COMMAND_FEDIVERSE, "Fediverse");
-        val = this.injectAdminLink(val, C.ADMIN_COMMAND_TRENDING, "Trending");
-        val = this.injectAdminLink(val, C.ADMIN_COMMAND_NEWS, "News");
-        val = this.injectGuidedTours(val, C.ADMIN_COMMAND_GUIDEDTOURS);
-        return val;
-    }
-
-    injectGuidedTours = (val: string, cmd: string) => {
-        let links = "";
-        if (!getAs().mobileMode && S.tourUtils) {
-            S.tourUtils.init();
-            S.tourUtils.tours.forEach(tour => {
-                links += `<div class="tourLinkDiv"><span class="tourLink ui-run-cmd" data-cmd="tour:${tour.name}">${tour.name}</span></div>`
-            });
-        }
-        return val.replaceAll("{{" + cmd + "}}", links);
-    }
-
-    injectAdminLink = (val: string, cmd: string, buttonText: string) => {
-        // NOTE: Our Singleton class puts a global copy of S on the browser 'window object', so that's why this script works.
-        return val.replaceAll("{{" + cmd + "}}", `<span class="adminButton ui-run-cmd" data-cmd="${cmd}">${buttonText}</span>`);
     }
 
     renderLinkLabel = (id: string) => {

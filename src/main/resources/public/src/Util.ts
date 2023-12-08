@@ -936,54 +936,6 @@ export class Util {
         }
     }
 
-    runCmd = (cmd: string) => {
-        if (cmd.startsWith("tour:")) {
-            cmd = S.util.stripIfStartsWith(cmd, "tour:");
-            this.startTour(cmd);
-            return;
-        }
-
-        switch (cmd) {
-            case C.ADMIN_COMMAND_FEDIVERSE:
-                S.nav.messagesFediverse();
-                break;
-            case C.ADMIN_COMMAND_TRENDING:
-                S.nav.showTrendingHashtags();
-                break;
-            case C.ADMIN_COMMAND_NEWS:
-                S.nav.openContentNode(":news", true);
-                break;
-            default:
-                break;
-        }
-    }
-
-    afterDispatch = () => {
-        setTimeout(() => {
-            const ast = getAs();
-            if (!ast) return;
-
-            const elms = document.querySelectorAll(".ui-run-cmd");
-            if (elms.length != 0) {
-                for (let i = 0; i < elms.length; i++) {
-                    const elm: Element = elms[i];
-
-                    if (!!elm.getAttribute("data-processed")) {
-                        continue; // already processed            
-                    }
-
-                    const cmd = elm.getAttribute("data-cmd");
-                    if (cmd) {
-                        elm.setAttribute("data-processed", "1");
-                        elm.addEventListener("click", () => {
-                            this.runCmd(cmd);
-                        });
-                    }
-                }
-            }
-        }, 1000);
-    }
-
     getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
         return ac.principalName;
     }

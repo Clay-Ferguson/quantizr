@@ -134,5 +134,4 @@ export function promiseDispatch(type: string, func: StateModFunc): Promise<void>
 
 function afterDispatch() {
     S.tourUtils.afterDispatch();
-    S.util.afterDispatch();
 }
