@@ -67,6 +67,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private class MarkdownFile {
         String fileName;
+        String title;
 
         // allows us to generate headings sizes (#, ##, ###, etc) relative to the file.
         int baseSlashCount = 0;
@@ -177,7 +178,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void writePendingFiles() {
-        pendingFileWrites.forEach(mdf -> {
+        for (int i = 0; i < pendingFileWrites.size(); i++) {
+            MarkdownFile mdf = pendingFileWrites.get(i);
             String content = mdf.content.toString();
             // translate all the links to markdown compatable links
             if (content.contains("](")) {
@@ -190,8 +192,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 }
             }
 
+            MarkdownFile nextFile = i < pendingFileWrites.size() - 1 ? pendingFileWrites.get(i + 1) : null;
+            if (nextFile != null) {
+                content += "\n\n----\n**[Next Page -> " + nextFile.title + "](" + nextFile.fileName + ")**\n";
+            }
+
             addFileEntry(mdf.fileName, content.getBytes(StandardCharsets.UTF_8));
-        });
+        }
     }
 
     private String translateToMarkdownLink(String link) {
@@ -305,7 +312,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
 
         if (hasFileProp && mdFile != null) {
-            // if we're at root leval and have table of contents prepend it.
+            mdFile.title = getShortNodeText(mdFile.content.toString());
+
+            // if we're at root level and have table of contents prepend it.
             if (mdFile.tocCount > 5) {
                 mdFile.content.insert(0, pathContent + mdFile.toc.toString() + "\n");
             } else {
@@ -729,7 +738,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    // todo-0: retest this code path
     private String insertHtmlLink(String content, Attachment att, String imgLink) {
         if ("ft".equals(att.getPosition())) {
             // This replacement is kind of tricky because we have to close out the markdown div
