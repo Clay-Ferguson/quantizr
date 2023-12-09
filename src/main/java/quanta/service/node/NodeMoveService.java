@@ -1,6 +1,7 @@
 package quanta.service.node;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -188,6 +189,7 @@ public class NodeMoveService extends ServiceBase {
         targetNode.touch();
         update.saveSession(ms);
         delete.deleteNodes(ms, delIds);
+        crypto.signNodesById(ms, new ArrayList<>(Collections.singletonList(targetNode.getIdStr())));
         return res;
     }
 
