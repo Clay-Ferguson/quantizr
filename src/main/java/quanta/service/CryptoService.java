@@ -330,7 +330,7 @@ public class CryptoService extends ServiceBase {
     private boolean waitForBrowserSentSigs(SessionContext sc, NodeSigPushInfo pushInfo) {
         sigPendingQueue.put(pushInfo.getWorkloadId(), pushInfo);
         push.pushInfo(sc, pushInfo);
-        Util.sleep(10);
+        Util.sleep(2000);
         long totalTime = 0;
         long sleepTime = 100;
         // we wait for up to 30 seconds for the browser to sign the nodes, before we will give up and

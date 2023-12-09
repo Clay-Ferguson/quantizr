@@ -216,19 +216,18 @@ public class NodeMoveService extends ServiceBase {
         String parentPath = parentToPasteInto.getPath();
         Long curTargetOrdinal = null;
 
-        // location==inside
         if (location.equalsIgnoreCase("inside")) {
             curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
         } //
-        else if (location.equalsIgnoreCase("inline")) { // enum) // location==inline (todo-2: rename this to
-                                                        // inline-below -- or better yet, do an
+        else if (location.equalsIgnoreCase("inline")) {
             curTargetOrdinal = targetNode.getOrdinal() + 1;
             create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
         } //
-        else if (location.equalsIgnoreCase("inline-above")) { // location==inline-above
+        else if (location.equalsIgnoreCase("inline-above")) {
             curTargetOrdinal = targetNode.getOrdinal();
             create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
         }
+
         String sourceParentPath = null;
         List<SubNode> nodesToMove = new ArrayList<SubNode>();
         SubNode nodeParent = null;
@@ -250,6 +249,7 @@ public class NodeMoveService extends ServiceBase {
                 nodeParent = read.getParent(ms, node);
             }
         }
+
         // make sure nodes to move are in ordinal order.
         nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 
@@ -276,6 +276,7 @@ public class NodeMoveService extends ServiceBase {
                     // log.debug("New Available Path Found: " + newPath);
                     changePathOfSubGraph(as, node, node.getPath(), newPath, res);
                     node.setPath(newPath);
+
                     // crypto sig uses path as part of it, so we just invalidated the signature.
                     if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
                         node.delete(NodeProp.CRYPTO_SIG);
@@ -302,6 +303,9 @@ public class NodeMoveService extends ServiceBase {
             });
             curTargetOrdinal++;
         }
+        exec.run(() -> {
+            crypto.signNodesById(ms, nodeIds);
+        });
     }
 
     /*
