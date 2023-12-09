@@ -380,7 +380,9 @@ public class NodeEditService extends ServiceBase {
         if (req.getSplitType().equalsIgnoreCase("children")) {
             parentForNewNodes.setHasChildren(true);
         }
-        crypto.signNodesById(ms, sigDirtyNodes);
+        exec.run(() -> {
+            crypto.signNodesById(ms, sigDirtyNodes);
+        });
         return res;
     }
 
