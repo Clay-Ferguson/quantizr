@@ -26,6 +26,8 @@ Designed to allow a more fine-grained hierarchical approach to content managemen
 
 These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, ChatGPT conversations, etc.
 
+Learn more here: [User Guide and Technical Info](/docs/index.md) 
+
 ## Take it for a Test Drive
 
 The [Quanta Dev Instance](https://quanta.wiki) is open to the public, so anyone can try it out. If you're interested in [Social Media](https://quanta.wiki/?view=feed) you might like the [Trending Tab](https://quanta.wiki/?view=trending) as well.
@@ -43,10 +45,6 @@ Quanta is a browser-based app that works on both mobile and desktop browsers, al
 * IPFS Gateway
 * ChatGPT (via OpenAI API)
 * Deployment: Docker Compose (Swarm Mode)
-
-## To Run the Server
-
-Instructions on how to build and run the app are found in the [docs folder](docs/how-to-run.md)
 
 ## Help Fund the Project
 
