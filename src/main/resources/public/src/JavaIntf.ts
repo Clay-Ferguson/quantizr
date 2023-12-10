@@ -1409,7 +1409,6 @@ export const enum NodeType {
     HUGGINGFACE_ANSWER = "sn:hfAns",
     OOBAI_ANSWER = "sn:oobAns",
     RSS_FEED = "sn:rssfeed",
-    RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",
     BLOCKED_USERS = "sn:blockedUsers",
     FRIEND = "sn:friend",

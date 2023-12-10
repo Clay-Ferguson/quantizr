@@ -20,7 +20,6 @@ import { OpenAiAnswerType } from "./plugins/OpenAiAnswerType";
 import { HuggingFaceAnswerType } from "./plugins/HuggingFaceAnswerType";
 import { PostsType } from "./plugins/PostsType";
 import { RepoRootType } from "./plugins/RepoRootType";
-import { RssFeedsType } from "./plugins/RssFeedsType";
 import { RssType } from "./plugins/RssType";
 import { SchemaOrgType } from "./plugins/SchemaOrgType";
 import { TextType } from "./plugins/TextType";
@@ -70,7 +69,6 @@ export class PluginMgr {
         so it's better to just have this one place where we define all them in the order we want */
         this.addType(ordinal++, new MarkdownType());
         this.addType(ordinal++, new TextType());
-        this.addType(ordinal++, new RssFeedsType());
         this.addType(ordinal++, new RssType());
         this.addType(ordinal++, new CalcType());
         // backing out chat room feature for now.
