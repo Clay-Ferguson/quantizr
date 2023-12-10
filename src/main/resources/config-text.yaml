@@ -10,10 +10,6 @@ rhsLinks:
   - name: "About Quanta"
     link: "/r/public/home"
 
-systemFolderLinks:
-  - name: "About Quanta"
-    link: "/r/public/home"
-
 # NOTE: These entries have an interface in the typescript called 'ConfigProp' in 'interfaces.ts'
 props:
   Person:

@@ -41,7 +41,6 @@ export class MenuPanel extends Div {
     }
 
     // leaving for reference how to open this.
-    static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES, false);
     static editFriends = () => { new FriendsDlg("Friends", null, true).open(); };
 
     static openBookmarksNode = () => {
@@ -63,11 +62,7 @@ export class MenuPanel extends Div {
     static toggleEditMode = () => { S.edit.setEditMode(!getAs().userPrefs.editMode); }
     static toggleInfoMode = () => { S.edit.setShowMetaData(!getAs().userPrefs.showMetaData); }
     static userProfile = () => { new UserProfileDlg(null).open(); }
-    static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS, false);
-    static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS, false);
     static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
-    static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, false);
-    static openUsersNode = () => S.nav.openContentNode("/r/usr", false);
     static transferNode = () => { new TransferNodeDlg("transfer").open(); };
     static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };
     static rejectTransfer = () => { new TransferNodeDlg("reject").open(); };
@@ -189,22 +184,6 @@ export class MenuPanel extends Div {
             if (hasBookmarks) {
                 children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems, null));
             }
-        }
-
-        if (!ast.isAnonUser) {
-            const systemFolderLinks = this.getSystemFolderLinks();
-
-            children.push(new Menu("Folders", [
-                new MenuItem("My Account", S.nav.navToMyAccntRoot),
-                new MenuItem("My Posts", MenuPanel.openPostsNode),
-                ast.isAdminUser ? new MenuItem("All Users", MenuPanel.openUsersNode) : null,
-                new MenuItemSeparator(),
-                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode),
-                new MenuItem("Notes", MenuPanel.openNotesNode),
-                new MenuItem("Exports", MenuPanel.openExportsNode),
-                systemFolderLinks.length > 0 ? new MenuItemSeparator() : null,
-                ...systemFolderLinks
-            ], null, null, "ui-menu-folders"));
         }
 
         if (!ast.isAnonUser) {
@@ -441,15 +420,6 @@ export class MenuPanel extends Div {
 
         this.setChildren(children);
         return true;
-    }
-
-    getSystemFolderLinks = (): MenuItem[] => {
-        const ret: MenuItem[] = [];
-        if (!S.quanta.cfg.systemFolderLinks) return ret;
-        for (const menuItem of S.quanta.cfg.systemFolderLinks) {
-            this.appendMenuItemFromConfig(menuItem, ret);
-        }
-        return ret;
     }
 
     appendMenuItemFromConfig = (cfgItem: any, items: Comp[]): void => {
