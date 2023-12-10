@@ -11,10 +11,10 @@ Platforms using block editors are becoming very popular, and include for example
 
 # Explore the Platform
 
-### [Quanta Features](/features/index.md)
+### [Quanta Features](/docs/features/index.md)
 
-### [Quanta User Guide](/user-guide/index.md)
+### [Quanta User Guide](/docs/user-guide/index.md)
 
-### [Quanta Developer Guide](/dev-guide/index.md)
+### [Quanta Developer Guide](/docs/dev-guide/index.md)
 
-### [Demo Content](/demo-content/index.md)
+### [Demo Content](/docs/demo-content/index.md)
