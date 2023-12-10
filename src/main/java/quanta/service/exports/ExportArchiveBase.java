@@ -263,7 +263,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             if (mdFileName != null) {
-                mdFileName = buildMdPaths() + mdFileName;
+                String paths = buildMdPaths();
+                if (paths.length() > 0 && mdFileName.indexOf("/") != 0) {
+                    paths += "/";
+                }
+                mdFileName = paths + mdFileName;
 
                 if (mdFile != null) {
                     // DO NOT DELETE (I may go back to showing path as the link name)
@@ -339,23 +343,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return linkName;
     }
 
-    // DO NOT DELETE: We're moving to a more descriptive format for this but let's keep the ability
-    // do to this if we ever need to.
-    private String buildMdPathContent_old() {
-        StringBuilder sb = new StringBuilder();
-        for (SubNode node : mdPaths) {
-            if (sb.length() > 0)
-                sb.append("/");
-            sb.append(node.getStr(NodeProp.FOLDER_NAME));
-        }
-
-        // put a divider between the path content and the node content
-        if (sb.length() > 0)
-            return "**" + sb.toString() + "**\n\n";
-
-        return "";
-    }
-
     private String buildMdPathContent() {
         StringBuilder sb = new StringBuilder();
         for (MarkdownFile mdFile : mdFiles) {
@@ -380,8 +367,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private String buildMdPaths() {
         StringBuilder sb = new StringBuilder();
         for (SubNode node : mdPaths) {
-            sb.append(node.getStr(NodeProp.FOLDER_NAME));
             sb.append("/");
+            sb.append(node.getStr(NodeProp.FOLDER_NAME));
         }
         return sb.toString();
     }
