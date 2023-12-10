@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta Developer Guide](/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
 * [How to Run](#how-to-run)
     * [How to Run the Quanta Server](#how-to-run-the-quanta-server)
@@ -43,4 +43,4 @@ You'll see in the setenv file that the data folder for MongoDB defaults to `${DE
 
 
 ----
-**[Next:  PostgreSQL](/dev-guide/postgres.md)**
+**[Next Page -> PostgreSQL](/docs/dev-guide/postgres.md)**

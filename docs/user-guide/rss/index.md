@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [RSS and Podcasts](#rss-and-podcasts)
     * [Create an RSS Aggregator](#create-an-rss-aggregator)
@@ -63,4 +63,4 @@ Here's a screenshot of the audio player, showing this "Post" button:
 
 
 ----
-**[Next:  Encryption](/user-guide/encryption/index.md)**
+**[Next Page -> Encryption](/docs/user-guide/encryption/index.md)**

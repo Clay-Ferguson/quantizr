@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Node Info
 
@@ -33,4 +33,4 @@ You can click on any word displayed in this dialog to automatically run a search
 
 
 ----
-**[Next:  RSS and Podcasts](/user-guide/rss/index.md)**
+**[Next Page -> RSS and Podcasts](/docs/user-guide/rss/index.md)**

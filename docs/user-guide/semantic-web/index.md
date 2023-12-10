@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Semantic Web](#semantic-web)
     * [Semantic Web Basics](#semantic-web-basics)
@@ -166,4 +166,4 @@ Recommended reading: Search for "Project Gutenberg" in WordPress online informat
 
 
 ----
-**[Next:  Account Profile and Settings](/user-guide/account-settings/index.md)**
+**[Next Page -> Account Profile and Settings](/docs/user-guide/account-settings/index.md)**

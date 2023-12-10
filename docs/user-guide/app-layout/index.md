@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Application Layout
 
@@ -29,4 +29,4 @@ In the screenshot below the `Folders Tab` is selected. `Think of the "Folders Ta
 
 
 ----
-**[Next:  Content Editing](/user-guide/editing/index.md)**
+**[Next Page -> Content Editing](/docs/user-guide/editing/index.md)**

@@ -1,4 +1,4 @@
-**[Quanta](/index.md)**
+**[Quanta](/docs/index.md)**
 
 * [Quanta Features](#quanta-features)
     * [Hierarchial CMS](#hierarchial-cms)
@@ -228,4 +228,4 @@ Tech Stack: `Java` SpringBoot (back end), `TypeScript` (front end), SPA WebApp, 
 
 
 ----
-**[Next:  About Quanta](/user-guide/about/index.md)**
+**[Next Page -> About Quanta](/docs/user-guide/about/index.md)**

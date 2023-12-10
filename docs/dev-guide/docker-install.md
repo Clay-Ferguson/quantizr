@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta Developer Guide](/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
 * [Docker Install](#docker-install)
     * [How to Install Docker Compose](#how-to-install-docker-compose)
@@ -86,4 +86,4 @@ Error response from daemon: could not choose an IP address to advertise since th
 
 
 ----
-**[Next:  How to Build](/dev-guide/how-to-build.md)**
+**[Next Page -> How to Build](/docs/dev-guide/how-to-build.md)**

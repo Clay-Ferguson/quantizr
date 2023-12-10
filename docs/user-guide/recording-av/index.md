@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Recording Audio or Video
 
@@ -13,4 +13,4 @@ The A/V recording option is available in the `File Attachment Dialog` accessible
 
 
 ----
-**[Next:  Node Info](/user-guide/node-info/index.md)**
+**[Next Page -> Node Info](/docs/user-guide/node-info/index.md)**

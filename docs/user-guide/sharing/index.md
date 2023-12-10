@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Sharing](#sharing)
     * [Node Ownership](#node-ownership)
@@ -102,4 +102,4 @@ Select `Menu -> Search -> Public Appendable` to display all the nodes you own th
 
 
 ----
-**[Next:  Social Media and Fediverse](/user-guide/activity-pub/index.md)**
+**[Next Page -> Social Media and Fediverse](/docs/user-guide/activity-pub/index.md)**

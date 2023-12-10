@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta Developer Guide](/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
 * [Troubleshooting](#troubleshooting)
     * [Healthcheck Results](#healthcheck-results)
@@ -132,4 +132,4 @@ Then that means something went wrong starting or terminating IPFS, and the emerg
 
 
 ----
-**[Next:  Quanta Developer Guide](/dev-guide/index.md)**
+**[Next Page -> Quanta Developer Guide](/docs/dev-guide/index.md)**

@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [ChatGPT AI](#chatgpt-ai)
     * [ChatGPT AI](#chatgpt-ai)
@@ -131,8 +131,8 @@ To generate images with DALL-E 3, click the upload button, then specify that you
 <img src='attachments/654ab18182df4f629959741c-bird-house-hunting.gif' style='width:100%'/>
 
 
-**[ChatGPT Example Q&A](/user-guide/addendum/index.md)**
+**[ChatGPT Example Q&A](/docs/user-guide/addendum/index.md)**
 
 
 ----
-**[Next:  Friends and Followers](/user-guide/following/index.md)**
+**[Next Page -> Friends and Followers](/docs/user-guide/following/index.md)**

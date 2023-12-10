@@ -1,4 +1,4 @@
-**[Quanta](/index.md)**
+**[Quanta](/docs/index.md)**
 
 * [Demo Content](#demo-content)
     * [ChatGPT Examples ](#chatgpt-examples-)
@@ -43,4 +43,4 @@ This node is for demonstration purposes to show how Quanta displays a node that 
 
 
 ----
-**[Next:  Quanta](index.md)**
+**[Next Page -> Quanta](/docs/index.md)**

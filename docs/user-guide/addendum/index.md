@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Addendum](#addendum)
     * [Example ChatGPT Q and A](#example-chatgpt-q-and-a)
@@ -387,4 +387,4 @@ There would be some code changes involved to build a commercial Pinning Service,
 
 
 ----
-**[Next:  Quanta User Guide](/user-guide/index.md)**
+**[Next Page -> Quanta User Guide](/docs/user-guide/index.md)**

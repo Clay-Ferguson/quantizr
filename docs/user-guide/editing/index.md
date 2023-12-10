@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Content Editing
 
@@ -65,4 +65,4 @@ The "Advanced" section contains more features/capabilities, like entering a node
 
 
 ----
-**[Next:  Tree Editing](/user-guide/adv-editing/index.md)**
+**[Next Page -> Tree Editing](/docs/user-guide/adv-editing/index.md)**

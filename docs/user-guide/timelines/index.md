@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Timelines](#timelines)
     * [Terminology](#terminology)
@@ -91,4 +91,4 @@ Displays the timeline (by node modification time) just for the direct child node
 
 
 ----
-**[Next:  Playing Audio or Video](/user-guide/audio-video/index.md)**
+**[Next Page -> Playing Audio or Video](/docs/user-guide/audio-video/index.md)**

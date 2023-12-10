@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Content Layout](#content-layout)
     * [Image Layout](#image-layout)
@@ -91,4 +91,4 @@ which will expand the subnodes on the page with their parent so that the user ca
 
 
 ----
-**[Next:  Document View](/user-guide/document-view/index.md)**
+**[Next Page -> Document View](/docs/user-guide/document-view/index.md)**

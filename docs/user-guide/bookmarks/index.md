@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Bookmarks
 
@@ -13,4 +13,4 @@ todo: This screenshot is obsolete now because the "Boomark" option has been move
 
 
 ----
-**[Next:  Semantic Web](/user-guide/semantic-web/index.md)**
+**[Next Page -> Semantic Web](/docs/user-guide/semantic-web/index.md)**

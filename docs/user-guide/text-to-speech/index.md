@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Text-to-Speech](#text-to-speech)
     * [Text-to-Speech Tab](#text-to-speech-tab)
@@ -51,4 +51,4 @@ Another way to TTS text is to enable the input area by clicking the "Text Input"
 
 
 ----
-**[Next:  Export and Import](/user-guide/import-export/index.md)**
+**[Next Page -> Export and Import](/docs/user-guide/import-export/index.md)**

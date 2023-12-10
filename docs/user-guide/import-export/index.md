@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Export and Import](#export-and-import)
     * [Export ](#export-)
@@ -80,4 +80,4 @@ The uploaded file will recreate a copy of the data that was exported, including 
 
 
 ----
-**[Next:  Bookmarks](/user-guide/bookmarks/index.md)**
+**[Next Page -> Bookmarks](/docs/user-guide/bookmarks/index.md)**

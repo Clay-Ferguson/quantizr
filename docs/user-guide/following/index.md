@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Friends and Followers
 
@@ -43,4 +43,4 @@ Here's what a filtered view of a Fediverse Feed looks like when you've selected 
 
 
 ----
-**[Next:  Content Layout](/user-guide/page-layout/index.md)**
+**[Next Page -> Content Layout](/docs/user-guide/page-layout/index.md)**

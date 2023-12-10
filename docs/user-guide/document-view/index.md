@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Document View
 
@@ -6,7 +6,7 @@ Viewing tree content as a top-to-bottom linear document.
 
 Most of the time you'll find it easier to browse the content tree using the `Folders Tab` where you can only see one section (or subbranch) of the tree at a time. However sometimes it's more convenient to view a branch of the tree as if it were actually a single-page document, and that's what the "Document View" does.
 
-[Here is a screencast](/user-guide/app-layout/index.md) demonstrating the Document View
+[Here is a screencast](/docs/user-guide/app-layout/index.md) demonstrating the Document View
 
 Use the Document Icon at the upper right of the page to display whatever you're viewing in Folders Tab as a Document View.
 
@@ -35,4 +35,4 @@ Note that in the screenshot above we had switched back to the "Menu" (via radio 
 
 
 ----
-**[Next:  Searching](/user-guide/searching/index.md)**
+**[Next Page -> Searching](/docs/user-guide/searching/index.md)**

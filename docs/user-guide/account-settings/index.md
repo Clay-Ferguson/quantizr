@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Account Profile and Settings](#account-profile-and-settings)
     * [User Profile](#user-profile)
@@ -90,4 +90,4 @@ The `Import Key` lets you update the Selected Key type, from text content that y
 
 
 ----
-**[Next:  Addendum](/user-guide/addendum/index.md)**
+**[Next Page -> Addendum](/docs/user-guide/addendum/index.md)**

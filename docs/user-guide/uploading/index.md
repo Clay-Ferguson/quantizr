@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Uploading
 
@@ -66,4 +66,4 @@ This means Quanta can effectively function as an `IPFS Pinning Service`
 
 
 ----
-**[Next:  Sharing](/user-guide/sharing/index.md)**
+**[Next Page -> Sharing](/docs/user-guide/sharing/index.md)**

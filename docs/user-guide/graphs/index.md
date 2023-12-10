@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Interactive Graphs
 
@@ -20,4 +20,4 @@ You can use the mouse wheel to zoom in and out in the graphical viewport. You ca
 
 
 ----
-**[Next:  Text-to-Speech](/user-guide/text-to-speech/index.md)**
+**[Next Page -> Text-to-Speech](/docs/user-guide/text-to-speech/index.md)**

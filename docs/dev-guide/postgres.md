@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta Developer Guide](/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
 # PostgreSQL
 
@@ -37,4 +37,4 @@ Password: ******
 
 
 ----
-**[Next:  Troubleshooting](/dev-guide/troubleshooting.md)**
+**[Next Page -> Troubleshooting](/docs/dev-guide/troubleshooting.md)**

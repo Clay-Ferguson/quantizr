@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta Developer Guide](/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
 # Backup and Restore
 
@@ -22,4 +22,4 @@ Use `docker ps` to get container id
 
 
 ----
-**[Next:  Docker Install](/dev-guide/docker-install.md)**
+**[Next Page -> Docker Install](/docs/dev-guide/docker-install.md)**

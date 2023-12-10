@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Searching](#searching)
     * [Full-Text Search](#full-text-search)
@@ -65,4 +65,4 @@ Select `Menu -> Search -> By Node ID` to search for the node that has a specific
 
 
 ----
-**[Next:  Timelines](/user-guide/timelines/index.md)**
+**[Next Page -> Timelines](/docs/user-guide/timelines/index.md)**

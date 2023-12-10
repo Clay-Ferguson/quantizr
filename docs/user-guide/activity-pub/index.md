@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Social Media and Fediverse](#social-media-and-fediverse)
     * [How to Post](#how-to-post)
@@ -61,7 +61,7 @@ Another powerful aspect of this `tree-based threading model` is how powerful it 
 
 So in general whenever you want to see what's the latest activity under any section of the tree you just run a Timeline on it (clock icon at top of page). This is explained in other sections of this User Guide in slightly more detail as well.
 
-see also: [Timelines](/user-guide/timelines/index.md)
+see also: [Timelines](/docs/user-guide/timelines/index.md)
 
 # Trending Topics
 
@@ -96,4 +96,4 @@ Your Feed View will now show search results, until you click the "Clear" button,
 
 
 ----
-**[Next:  ChatGPT AI](/user-guide/ai/index.md)**
+**[Next Page -> ChatGPT AI](/docs/user-guide/ai/index.md)**

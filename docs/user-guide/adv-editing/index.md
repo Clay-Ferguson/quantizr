@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Tree Editing](#tree-editing)
     * [Search and Replace](#search-and-replace)
@@ -184,7 +184,7 @@ Every node has a 'type', which allows the system to customize the editing and vi
 
 The most common exception to this is that the 'reply button' does automatically create a "Reply Type" node, that behaves like a markdown node but that the system can use to filter out or include "reply content" as desired by the user, and to be able to distinguish "main content" from "commentary" on large documents.
 
-[See Also - Semantic Web](/user-guide/semantic-web/index.md)
+[See Also - Semantic Web](/docs/user-guide/semantic-web/index.md)
 
 # Transfers
 
@@ -225,4 +225,4 @@ However even if the admin initiates the transfer in this way, the person on the 
 
 
 ----
-**[Next:  Uploading](/user-guide/uploading/index.md)**
+**[Next Page -> Uploading](/docs/user-guide/uploading/index.md)**

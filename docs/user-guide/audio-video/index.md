@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta User Guide](/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 # Playing Audio or Video
 
@@ -22,4 +22,4 @@ To see live examples of the Audio and Video players go here:
 
 
 ----
-**[Next:  Recording Audio or Video](/user-guide/recording-av/index.md)**
+**[Next Page -> Recording Audio or Video](/docs/user-guide/recording-av/index.md)**

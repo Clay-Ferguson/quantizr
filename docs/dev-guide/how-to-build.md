@@ -1,4 +1,4 @@
-**[Quanta](/index.md) / [Quanta Developer Guide](/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
 # How to Build
 
@@ -20,4 +20,4 @@ If you've already understood `build-dev.sh` and how it works you'll notice `buil
 
 
 ----
-**[Next:  How to Run](/dev-guide/how-to-run.md)**
+**[Next Page -> How to Run](/docs/dev-guide/how-to-run.md)**
