@@ -194,7 +194,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             MarkdownFile nextFile = i < pendingFileWrites.size() - 1 ? pendingFileWrites.get(i + 1) : null;
             if (nextFile != null) {
-                content += "\n\n----\n**[Next Page -> " + nextFile.title + "](" + nextFile.fileName + ")**\n";
+                content += "\n\n----\n**[Next: " + nextFile.title + "](" + nextFile.fileName + ")**\n";
             }
 
             addFileEntry(mdf.fileName, content.getBytes(StandardCharsets.UTF_8));
