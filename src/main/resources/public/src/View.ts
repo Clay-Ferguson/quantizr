@@ -80,6 +80,7 @@ export class View {
         // the actual RSS feed that this node defines.
         if (a.jumpToRss && res?.rssNode) {
             dispatch("LoadingFeed", s => {
+                s.savedActiveTab = s.activeTab;
                 s.fullScreenConfig = { type: FullScreenType.NONE };
                 s.rssNode = res.node;
                 s.activeTab = C.TAB_RSS;

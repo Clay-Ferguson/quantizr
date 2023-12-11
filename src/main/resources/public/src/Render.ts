@@ -163,6 +163,7 @@ export class Render {
         });
 
         dispatch("ShowCalendar", s => {
+            s.savedActiveTab = s.activeTab;
             s.fullScreenConfig = { type: FullScreenType.CALENDAR, nodeId };
             s.calendarData = S.util.buildCalendarData(res.items);
         });
@@ -637,7 +638,7 @@ export class Render {
         });
 
         dispatch("ShowGraph", s => {
-            s.savedActiveTab = s.activeTab == C.TAB_GRAPH ? C.TAB_MAIN : s.activeTab;
+            s.savedActiveTab = s.activeTab;
             s.fullScreenConfig = { type: FullScreenType.GRAPH, nodeId: node.id };
             s.graphSearchText = searchText;
             s.graphData = res.rootNode;

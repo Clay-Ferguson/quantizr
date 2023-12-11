@@ -126,6 +126,7 @@ export class NodeCompBinary extends Div {
             if (s.fullScreenConfig.type === FullScreenType.IMAGE && isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : C.FULL_SCREEN_MAX_WIDTH;
             }
+            s.savedActiveTab = s.activeTab;
             s.fullScreenConfig.type = FullScreenType.IMAGE;
 
             // if clicking this node first time.

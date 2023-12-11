@@ -455,7 +455,7 @@ export class Nav {
 
     minimizeFullScreenViewer = () => {
         dispatch("MinimizeFullScreenViewer", s => {
-            s.activeTab = s.savedActiveTab;
+            s.activeTab = s.savedActiveTab || C.TAB_MAIN;
             s.fullScreenConfig = { type: FullScreenType.NONE };
         });
     }

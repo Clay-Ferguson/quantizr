@@ -28,7 +28,7 @@ export class GraphTab implements TabIntf<any> {
 
     constructView = (_data: TabIntf) => {
         dispatch("RestoreGraph", s => {
-            s.savedActiveTab = s.activeTab == C.TAB_GRAPH ? C.TAB_MAIN : s.activeTab;
+            s.savedActiveTab = s.activeTab;
             s.fullScreenConfig = { type: FullScreenType.GRAPH };
         });
         return null;
