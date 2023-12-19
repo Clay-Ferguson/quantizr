@@ -22,6 +22,8 @@ export class TextareaTag extends Comp {
         return str.split(/\r?\n/);
     }
 
+    /* todo-1: at some point in 2024 probably the 'field-sizing' attribute of textarea elements css may be supported
+    by enough browsers to rely on instead of this caluclation approach we have here */
     calcRows(val: string): number {
         let rows = this.minRows;
         if (val) {
