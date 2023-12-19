@@ -1,7 +1,10 @@
 package quanta.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,11 +18,12 @@ import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.rometools.modules.content.ContentModuleImpl;
 import com.rometools.modules.itunes.EntryInformationImpl;
@@ -62,7 +66,6 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import reactor.core.publisher.Mono;
 
 /* Proof of Concept RSS Publishing */
 @Component
@@ -234,7 +237,6 @@ public class RSSFeedService extends ServiceBase {
             if (debug) {
                 log.debug("Reading Feed from Web: " + url);
             }
-            int timeout = 60; // seconds
 
             if (ThreadLocals.getSC() != null) {
                 push.pushInfo(ThreadLocals.getSC(), new PushPageMessage(
@@ -242,18 +244,47 @@ public class RSSFeedService extends ServiceBase {
             }
 
             long start = System.currentTimeMillis();
-            Mono<SyndFeed> inFeedMono = WebClient.create().get().uri(url).retrieve().bodyToMono(DataBuffer.class)
-                    .timeout(Duration.ofSeconds(timeout)).map(dataBuffer -> {
-                        try {
-                            SyndFeedInput input = new SyndFeedInput();
-                            return input.build(new XmlReader(
-                                    new LimitedInputStreamEx(dataBuffer.asInputStream(), 10 * Const.ONE_MB), true));
-                        } catch (Exception e) {
-                            throw new RuntimeException("Could not parse response for feed: " + url, e);
-                        }
-                    });
+            int bufferSize = 100 * Const.ONE_MB;
 
-            inFeed = inFeedMono.block();
+            WebClient webClient = WebClient.builder()
+                    .exchangeStrategies(ExchangeStrategies.builder()
+                            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(bufferSize)).build())
+                    .defaultHeader(HttpHeaders.USER_AGENT,
+                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
+                    .build();
+
+            String response = webClient.get().uri(url).retrieve() //
+                    .bodyToMono(String.class).timeout(Duration.ofSeconds(60)).block();
+            // log.debug("RSS XML: " + response);
+
+            InputStream inputStream = new LimitedInputStreamEx(
+                    new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), 100 * Const.ONE_MB);
+
+            try {
+                SyndFeedInput input = new SyndFeedInput();
+                inFeed = input.build(new XmlReader(inputStream, true));
+            } catch (Exception e) {
+                throw new RuntimeException("Could not parse response for feed: " + url, e);
+            }
+
+            // =============================
+            // DO NOT DELETE. Let's keep this old code pattern here (which was failing because
+            // it didn't have the `bufferSize` set and the default was too small) for future reference.
+            // I'm going with the above which retrieves the RSS as a string we can get access too because
+            // this code sometimes needs to be debugged in a way where we have access to the actual XML RSS.
+            // Mono<SyndFeed> inFeedMono =
+            // WebClient.create().get().uri(url).retrieve().bodyToMono(DataBuffer.class)
+            // .timeout(Duration.ofSeconds(timeout)).map(dataBuffer -> {
+            // try {
+            // SyndFeedInput input = new SyndFeedInput();
+            // return input.build(new XmlReader(
+            // new LimitedInputStreamEx(dataBuffer.asInputStream(), 10 * Const.ONE_MB), true));
+            // } catch (Exception e) {
+            // throw new RuntimeException("Could not parse response for feed: " + url, e);
+            // }
+            // });
+            // inFeed = inFeedMono.block();
+            // =============================
 
             long time = System.currentTimeMillis() - start;
             if (time > 2000) {
