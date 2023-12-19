@@ -141,7 +141,7 @@ export class RSSView extends AppTab<any, RSSView> {
                         urls,
                         page
                     }, true);
-                    console.log("returned from getMultiRssFeed");
+                    // console.log("returned from getMultiRssFeed: " + S.util.prettyPrint(res));
                 }
                 finally {
                     RSSView.loading = false;
@@ -319,13 +319,18 @@ export class RSSView extends AppTab<any, RSSView> {
 
         let anchor: Anchor = null;
         if (entry.title) {
-            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                anchor = new Anchor(entry.link, null, {
-                    className: "rssAnchor",
-                    target: "_blank",
-                    dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.title)
-                })
-            ]));
+            if (entry.link) {
+                headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                    anchor = new Anchor(entry.link, null, {
+                        className: "rssAnchor",
+                        target: "_blank",
+                        dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.title)
+                    })
+                ]));
+            }
+            else {
+                headerDivChildren.push(new Div(entry.title, { className: "marginBottom" }));
+            }
         }
 
         if (entry.subTitle) {
@@ -402,7 +407,20 @@ export class RSSView extends AppTab<any, RSSView> {
             });
         }
 
-        if (!ast.userPrefs.rssHeadlinesOnly) {
+        if (!entry.title && entry.description) {
+            if (entry.link) {
+                children.push(new Div(null, { className: "marginBottom" }, [
+                    anchor = new Anchor(entry.link, null, {
+                        className: "rssAnchor",
+                        target: "_blank",
+                        dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.description)
+                    })
+                ]));
+            } else {
+                children.push(new Div(entry.description, { className: "marginBottom" }))
+            }
+        }
+        else if (!ast.userPrefs.rssHeadlinesOnly) {
             if (entry.description) {
                 children.push(new Html(entry.description));
             }

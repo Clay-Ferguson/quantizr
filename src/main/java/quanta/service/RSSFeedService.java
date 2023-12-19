@@ -398,6 +398,7 @@ public class RSSFeedService extends ServiceBase {
             RssFeed rssFeed = convertToFeed(feed, addFeedTitles);
             res.setFeed(rssFeed);
         }
+        log.debug("FEED RES: " + XString.prettyPrint(res));
         return res;
     }
 
