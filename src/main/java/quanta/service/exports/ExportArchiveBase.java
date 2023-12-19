@@ -52,6 +52,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
     ExportRequest req;
     int baseSlashCount = 0;
 
+    /*
+     * This master toc works great, but it's a bit confusing having toc type info on each page AND in a
+     * single file because then there's more than just one obvious 'page flow' to get to any content.
+     * Also if we bring this back we probably need some way to make nodes that have child nodes that are
+     * all file be excluded from the master index because again it just kind of creates a confusing flow
+     * for the user
+     */
+    boolean useMasterToc = false;
+
     // warnings and issues will be written to 'problems.txt' if there were any issues with the export
     StringBuilder problems = new StringBuilder();
 
@@ -77,6 +86,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         StringBuilder content = new StringBuilder();
         StringBuilder toc = new StringBuilder();
+        StringBuilder mtoc = new StringBuilder(); // master toc
         int tocCount = 0;
 
         MarkdownFile(String fileName, String content, int baseSlashCount) {
@@ -107,6 +117,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private HashMap<String, MarkdownLink> markdownLinks = new HashMap<>();
 
     private StringBuilder htmlToc = new StringBuilder();
+    private SubNode node;
 
     public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
         ms = ThreadLocals.ensure(ms);
@@ -125,7 +136,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String nodeId = req.getNodeId();
 
         TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null, null);
-        SubNode node = rootNode.node;
+        node = rootNode.node;
 
         String fileName = snUtil.getExportFileName(req.getFileName(), node);
         shortFileName = fileName + "." + getFileExtension();
@@ -148,6 +159,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             recurseNode("../", "", rootNode, nodeStack, 0, null);
 
             writePendingFiles();
+            writeMarkdownMasterToc();
 
             if (problems.length() > 0) {
                 addFileEntry("export-info.txt", problems.toString().getBytes(StandardCharsets.UTF_8));
@@ -197,9 +209,33 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 content += "\n\n----\n**[Next: " + nextFile.title + "](" + nextFile.fileName + ")**\n";
             }
 
+            if (useMasterToc) {
+                String rootFolder = node.getStr(NodeProp.FOLDER_NAME);
+                if (rootFolder != null) {
+                    content = "[Table of Contents](/" + rootFolder + "/table-of-contents.md)\n\n" + content;
+                }
+            }
             addFileEntry(mdf.fileName, content.getBytes(StandardCharsets.UTF_8));
         }
     }
+
+    private void writeMarkdownMasterToc() {
+        if (!useMasterToc)
+            return;
+        String rootFolder = node.getStr(NodeProp.FOLDER_NAME);
+        if (rootFolder == null)
+            return;
+
+        StringBuilder toc = new StringBuilder();
+        for (MarkdownFile mf : pendingFileWrites) {
+            toc.append(mf.mtoc);
+            toc.append("\n");
+        }
+        if (toc.length() > 0) {
+            addFileEntry("/" + rootFolder + "/table-of-contents.md", toc.toString().getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
 
     private String translateToMarkdownLink(String link) {
         // for now this will only always work for '/n/link' type links owned by admin
@@ -287,6 +323,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 mdFile = new MarkdownFile(mdFileName, "", bsc);
                 mdFiles.add(mdFile);
                 hasFileProp = true;
+                pendingFileWrites.add(mdFile);
             }
         }
 
@@ -325,7 +362,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 mdFile.content.insert(0, pathContent);
             }
 
-            pendingFileWrites.add(mdFile);
             mdFiles.remove(mdFiles.size() - 1);
             mdFile = mdFiles.size() > 0 ? mdFiles.get(mdFiles.size() - 1) : null;
         }
@@ -512,6 +548,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     int lev = getHeadingLevel(node);
                     String prefix = lev > 0 ? "    ".repeat(lev) : "";
                     mdFile.toc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+                    if (useMasterToc) {
+                        mdFile.mtoc
+                                .append(prefix + "* [" + heading + "](" + mdFile.fileName + "#" + linkHeading + ")\n");
+                    }
                     mdFile.tocCount++;
                 }
 
