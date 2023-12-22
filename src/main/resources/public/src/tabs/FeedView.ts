@@ -44,8 +44,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             });
         }
 
-        const newItems: any = null;
-
+        // const newItems: any = null;
         // if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
         //     newItems = new Icon({
         //         className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
@@ -78,14 +77,14 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         const topChildren: Comp[] = [
             new Div(null, { className: "float-end" }, [
-                ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
-                    val: this.data.props.searchTextState,
-                    placeholder: "Search for...",
-                    enter: S.srch.refreshFeed,
-                    outterClass: "marginBottom feedSearchField"
-                }) : null,
                 new FlexRowLayout([
-                    newItems,
+                    //  newItems,
+                    ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
+                        val: this.data.props.searchTextState,
+                        placeholder: "Search for...",
+                        enter: S.srch.refreshFeed,
+                        outterClass: "feedSearchField marginRight"
+                    }) : null,
                     // we show this button just as an icon unless the search field is displaying
                     new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
                         onClick: () => {
@@ -116,7 +115,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     //     setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
                     //     getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
                     // })
-                ], "flexRowAlignBottom")
+                ], "flexRowAlignBottom tinyMarginTop tinyMarginBottom")
             ]),
             new Clearfix(),
             content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
