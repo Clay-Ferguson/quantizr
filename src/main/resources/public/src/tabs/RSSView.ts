@@ -438,10 +438,7 @@ export class RSSView extends AppTab<any, RSSView> {
         const linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
             title: "Copy RSS Item URL into clipboard",
-            onClick: () => {
-                S.util.copyToClipboard(entry.link);
-                S.util.flashMessage("Copied to Clipboard: " + entry.link, "Clipboard", true);
-            }
+            onClick: () => S.util.copyToClipboard(entry.link)
         });
 
         const postIcon = !ast.isAnonUser ? new Icon({

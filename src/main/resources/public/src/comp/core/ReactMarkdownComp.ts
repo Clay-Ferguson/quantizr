@@ -68,11 +68,7 @@ const codeFunc = ({ node, inline, className, children, ...props }) => {
                 createElement("i", {
                     // key: "code-i-" + this.getId(),
                     className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon codeIcon",
-                    onClick: () => {
-                        S.util.copyToClipboard(children.concat());
-                        // todo-1: move flashMessage into copyToClipboard
-                        S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
-                    }
+                    onClick: () => S.util.copyToClipboard(children.concat())
                 })
             ]),
 

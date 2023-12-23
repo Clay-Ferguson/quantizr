@@ -250,7 +250,6 @@ export class Nav {
                             }),
                             new Button("Copy Link", () => {
                                 S.util.copyToClipboard(googleUrl);
-                                S.util.flashMessage("Copied to Clipboard: " + googleUrl, "Clipboard", true);
                             }),
                             new Button("Send via Email", async () => {
                                 const dlg = new AskForEmail();
@@ -885,7 +884,6 @@ export class Nav {
         if (!node) return;
         const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
         S.util.copyToClipboard(byNameUrl);
-        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
     }
 
     jumpToTargetIdClick = (evt: Event) => {

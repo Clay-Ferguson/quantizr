@@ -730,8 +730,6 @@ public class MongoRead extends ServiceBase {
 
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
-     * 
-     * todo-1: look for ways to use the 'stream' way of querying this data
      */
     public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean publicOnly,
             boolean allowAuth, Criteria moreCriteria) {

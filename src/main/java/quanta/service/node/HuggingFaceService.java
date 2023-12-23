@@ -42,7 +42,7 @@ public class HuggingFaceService extends ServiceBase {
         }
 
         // todo-1: The last step to finializing the HuggingFace integration is to handle defining this
-        // API key in the configs
+        // API key in the configs (this is partially done AppProp can already hold it)
         String apiKey = "";
         if (apiKey == null || apiKey.isEmpty())
             throw new RuntimeException("HuggingFace currently not enabled. No API Key");

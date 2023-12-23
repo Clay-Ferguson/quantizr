@@ -244,7 +244,6 @@ export class AudioPlayerDlg extends DialogBase {
     copyToClipboard = () => {
         const link = this.getLink();
         S.util.copyToClipboard(link);
-        S.util.flashMessage("Copied link clipboard, with timecode.", "Clipboard", true);
     }
 
     getLink = (): string => {

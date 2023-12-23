@@ -70,8 +70,6 @@ export class Render {
 
                 const key = (a as any).key;
                 const imgUrl = S.attachment.getUrlForNodeAttachment(node, key, false);
-
-                // todo-1: the sanitizer is wiping out both the class and style here, and I haven't found out why yet.
                 val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" style="margin-bottom: 12px" width="${imgSize}" src="${imgUrl}" ${C.NODE_ID_ATTR}="${node.id}" data-attkey="${key}">\n\n`);
             }
         }
@@ -169,9 +167,9 @@ export class Render {
         });
     }
 
+    // todo-0: remove this method. not needed.
     copyLinkToClipboard = (link: string) => {
         S.util.copyToClipboard(link);
-        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
     }
 
     showNodeUrl = (node: J.NodeInfo) => {
@@ -671,10 +669,7 @@ export class Render {
 
         return new Div(null, {
             title: "Click to copy to clipboard",
-            onClick: () => {
-                S.util.copyToClipboard(node.tags);
-                S.util.flashMessage("Copied hashtags to Clipboard", "Clipboard", true);
-            },
+            onClick: () => S.util.copyToClipboard(node.tags),
             className: "clickable float-end " + moreClasses
         }, spans);
     }

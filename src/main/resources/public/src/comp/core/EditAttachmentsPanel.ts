@@ -171,10 +171,7 @@ export class EditAttachmentsPanel extends Div {
                 ipfsLink ? new Div(`IPFS CID: ${ipfsLink}`, {
                     className: "clickable",
                     title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(`ipfs://${ipfsLink}`);
-                        S.util.flashMessage("Copied IPFS link to Clipboard", "Clipboard", true);
-                    }
+                    onClick: () => S.util.copyToClipboard(`ipfs://${ipfsLink}`)
                 }) : null,
                 ipfsLink ? new Div(`Type: ${mime}`) : null
             ]);

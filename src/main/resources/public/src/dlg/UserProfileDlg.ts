@@ -77,11 +77,7 @@ export class UserProfileDlg extends DialogBase {
                 web3Comps.push(new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
                     title: "Decentralized Identity (DID) IPNS Name",
                     className: "marginTop clickable",
-                    onClick: () => {
-                        const link = "https://ipfs.io/ipns/" + state.userProfile.didIPNS;
-                        S.util.copyToClipboard(link);
-                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                    }
+                    onClick: () => S.util.copyToClipboard("https://ipfs.io/ipns/" + state.userProfile.didIPNS)
                 }));
             }
 

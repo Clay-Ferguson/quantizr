@@ -196,10 +196,9 @@ export class Util {
         return this.getFileTypeFormFileName(fileName) === "video";
     }
 
-    // todo-1: GPT-4 says this is a better method than the one we have below...
-    // function buf2hex(buffer) {
-    //     return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
-    // }
+    // note: GPT-4 says this is a better method than the one we have below...
+    // _buf2hex = (buffer: Uint8Array): string =>
+    //     buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
 
     buf2hex = (arr: Uint8Array): string => {
         let hexStr = "";
@@ -504,6 +503,7 @@ export class Util {
             // Use the Clipboard API to write text
             await navigator?.clipboard?.writeText(text);
             // console.log("Text copied to clipboard");
+            S.util.flashMessage("Copied to Clipboard: " + text, "Clipboard", true);
         } catch (err) {
             console.error("Failed to copy text to clipboard", err);
         }

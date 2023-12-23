@@ -160,10 +160,7 @@ export class ExportDlg extends DialogBase {
                     res.ipfsCid ? new Div("IPFS Location: " + res.ipfsCid, {
                         className: "ipfsCidText",
                         title: "Click -> Copy to clipboard",
-                        onClick: () => {
-                            S.util.copyToClipboard(res.ipfsCid);
-                            S.util.flashMessage("Copied to Clipboard: " + res.ipfsCid, "Clipboard", true);
-                        }
+                        onClick: () => S.util.copyToClipboard(res.ipfsCid)
                     }) : null,
                     new Anchor(downloadLink, "Download", { target: "_blank" }),
                     res.ipfsMime ? new Div("mime type: " + res.ipfsMime) : null

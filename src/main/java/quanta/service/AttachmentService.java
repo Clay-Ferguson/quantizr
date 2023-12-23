@@ -945,8 +945,6 @@ public class AttachmentService extends ServiceBase {
     /*
      * Gets the binary data attachment stream from the node regardless of wether it's from IPFS_LINK or
      * BIN.
-     *
-     * todo-1: search all calls to this and verify attName is correct.
      */
     public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean allowAuth) {
         if (allowAuth) {

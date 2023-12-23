@@ -118,7 +118,6 @@ export class NodeCompBinary extends Div {
 
         if (isEditorEmbed) {
             S.util.copyToClipboard(att.f);
-            S.util.flashMessage("Copied to Clipboard: " + att.f, "Clipboard", true);
             return;
         }
 

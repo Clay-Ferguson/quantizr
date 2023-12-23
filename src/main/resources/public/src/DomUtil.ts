@@ -210,8 +210,7 @@ export class DomUtil {
 
     escapeHtml = (str: string): string => {
         if (!str) return str;
-        // todo-1: I think we don't need the String() method here right? just 'str' will work?
-        return String(str).replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);
+        return str.replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);
     }
 
     // we have this as a separate static function just to avoid the overhead of creating a new function for every call
@@ -563,7 +562,6 @@ export class DomUtil {
 
         if (elm.parentElement.innerText) {
             S.util.copyToClipboard(elm.parentElement.innerText?.trim());
-            S.util.flashMessage("Copied to Clipboard", "Clipboard", true);
         }
     }
 

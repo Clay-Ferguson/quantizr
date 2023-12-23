@@ -239,7 +239,7 @@ public class AppProp {
         return env.getProperty("OPENAI_API_KEY");
     }
 
-    // todo-1: this isn't used yet
+    // note: this isn't used yet
     public String getHuggingFaceKey() {
         return env.getProperty("HUGGINGFACE_API_KEY");
     }

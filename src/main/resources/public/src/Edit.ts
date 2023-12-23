@@ -1040,7 +1040,7 @@ export class Edit {
             pendingEdit: false,
             nodeId,
 
-            // todo-1: Eventually we'll have a configurable way to choose which AI to use.
+            // todo-2: Eventually we'll have a configurable way to choose which AI to use.
             aiQuestion: "openAi",
             // aiQuestion: "huggingFace",
             // aiQuestion: "oobAi",
@@ -1394,7 +1394,7 @@ export class Edit {
         await sharingDlg.open();
 
         // if not all the shares are mentioned in the text ask the user about putting them the content automatically
-        // todo-1: i don't want this for now. I may never bring it back. Not sure if it even still works.
+        // todo-2: i don't want this for now. I may never bring it back. Not sure if it even still works.
         // if (!dlg.areAllSharesInContent()) {
         //     const confDlg = new ConfirmDlg("Insert Mentions into content text?", "Add Mentions ?");
         //     await confDlg.open();

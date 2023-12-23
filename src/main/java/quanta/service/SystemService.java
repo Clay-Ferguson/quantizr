@@ -146,7 +146,9 @@ public class SystemService extends ServiceBase {
             attach.gridMaintenanceScan(statsMap);
 
             if (prop.ipfsEnabled()) {
-                // todo-1: ipfs temporarily disabled due to refactoring.
+                // todo-1: ipfs temporarily disabled due to refactoring, and is not being worked on again
+                // unless/until
+                // IPFS is needed again.
                 // ret += ipfsGarbageCollect(statsMap);
             }
             arun.run(as -> {

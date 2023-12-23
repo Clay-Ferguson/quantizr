@@ -10,7 +10,6 @@ export class NodeHistoryItem {
 }
 
 export class HistoryUtil {
-    // todo-1: put all history-related code into a separate singleton
     historySaverInterval = null;
     historyDirty = false;
     static NODEHISTORY_KEY = "NodeHistoryData";

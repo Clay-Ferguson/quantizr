@@ -580,7 +580,6 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    // todo-1: move to EditNodeService.java
     public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
         InitNodeEditResponse res = new InitNodeEditResponse();
         String nodeId = req.getNodeId();

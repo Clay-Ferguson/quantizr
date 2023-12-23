@@ -54,7 +54,6 @@ export class User {
         /* if we have *known* state as logged out, then do nothing here */
         if (loginState === "0" || !callUsr) {
             if (!S.quanta.config.initialNodeId) {
-                // todo-1: Java has constants for this.
                 S.quanta.config.initialNodeId = "/r/public/home";
             }
             return;
