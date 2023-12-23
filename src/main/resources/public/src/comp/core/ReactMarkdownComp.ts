@@ -72,9 +72,6 @@ const codeFunc = ({ node, inline, className, children, ...props }) => {
                 })
             ]),
 
-            // createElement("div", null, //<---- not needed right? Leaving here for now just in case.
-            // Note: We used to have SyntaxHighlighterComp here, but switched to raw Prism. Once this is fully tested
-            // we can remove the SyntaxHighlighterComp.ts file.
             createElement(Prism as any, {
                 // key: "code-mk-" + this.getId(),
                 ...props,
@@ -83,7 +80,6 @@ const codeFunc = ({ node, inline, className, children, ...props }) => {
                 language,
                 PreTag: "div"
             }, childrenStr.replace(/\n$/, ""))
-            // )
         ])
     ) : (
         createElement("code", { ...props, className }, children)

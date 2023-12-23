@@ -241,7 +241,7 @@ export class TypeBase implements TypeIntf {
 
         if (urls) {
             urls.forEach(url => {
-                url = S.util.stripIfEndsWith(url, ")"); // todo-1: this is a hack until I fix my regex
+                url = S.util.stripIfEndsWith(url, ")");
 
                 // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
                 // and avoid doing OpenGraph rendering on them
@@ -253,7 +253,6 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    // todo-1: need to rename this because it's easy to confuse with Comp render
     render = (node: J.NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
@@ -299,8 +298,9 @@ export class TypeBase implements TypeIntf {
 
         const attrs = containerClass ? { className: containerClass } : null;
 
-        // todo-1: tricky hack to detect if this is all HTML
-        if (cont?.startsWith("<") && cont?.endsWith(">")) {
+        // todo-1: tricky hack to detect if this is all HTML. Now that our markdown renderer does supprt HTML this
+        // might not be needed, but I'm leaving it in for now.
+        if (cont && cont.startsWith("<") && cont.indexOf(">") < 20 && cont.endsWith(">")) {
             urls = this.parseUrlsFromHtml(node);
 
             // The reason we don't sanitize for admin users is mainly because we need the code containing the
@@ -322,7 +322,6 @@ export class TypeBase implements TypeIntf {
             const children: Comp[] = [comp, choices];
             let count = 0;
 
-            // todo-1: add this limit of 50 into where we do the parsing also.
             urls.forEach((url: string) => {
                 // allow max of 50 urls.
                 if (count++ < 50) {

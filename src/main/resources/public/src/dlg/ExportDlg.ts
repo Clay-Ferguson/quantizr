@@ -143,8 +143,6 @@ export class ExportDlg extends DialogBase {
         the plan is to have the export return the actual md5 of the export for use here */
 
         // disp=inline (is the other)
-        // todo-1: Need more secure way to access file than this token=url, possibly by just creating a temporary token that 
-        // can timeout faster than the user token times out.
         const downloadLink = hostAndPort + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
         // todo-3: Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, because we DO want ALL types exports to

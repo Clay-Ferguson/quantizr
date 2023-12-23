@@ -198,7 +198,7 @@ export class NodeCompButtonBar extends Div {
                 }
 
                 /* the 'level < 2' check is because we only allow moving up/down on the main children of the page for now
-                    todo-1: consider allowing moving up/down on all nodes
+                    todo-2: consider allowing moving up/down on all nodes
                 */
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove && this.level < 2) {
                     if (this.node.logicalOrdinal > 0) {

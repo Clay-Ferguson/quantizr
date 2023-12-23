@@ -158,8 +158,6 @@ export class BlockedUsersDlg extends DialogBase {
         the plan is to have the export return the actual md5 of the export for use here */
 
         // disp=inline (is the other)
-        // todo-1: Need more secure way to access file than this token=url, possibly by just creating a temporary token that 
-        // can timeout faster than the user token times out.
         const downloadLink = hostAndPort + "/f/export-blocks?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
         new MessageDlg(

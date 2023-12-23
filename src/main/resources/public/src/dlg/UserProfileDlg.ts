@@ -123,7 +123,7 @@ export class UserProfileDlg extends DialogBase {
                                 title: "Click to Unfollow user"
                             }) : null,
 
-                            // todo-1: removing follower counts until we have a user option making users have to opt in
+                            // todo-2: removing follower counts until we have a user option making users have to opt in
                             // state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
                             //     onClick: () => {
                             //         if (state.userProfile.followerCount) {
@@ -139,7 +139,7 @@ export class UserProfileDlg extends DialogBase {
                             //     className: "followCount"
                             // }) : null,
 
-                            // todo-1: removing follower counts until we have a user option making users have to opt in
+                            // todo-2: removing follower counts until we have a user option making users have to opt in
                             // state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
                             //     onClick: () => {
                             //         if (state.userProfile.followingCount) {

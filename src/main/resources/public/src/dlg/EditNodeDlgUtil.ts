@@ -150,7 +150,6 @@ export class EditNodeDlgUtil {
             ast.editNode.properties.push(prop);
 
             // this forces a rerender, even though it looks like we're doing nothing to state.
-            // todo-1: should mergeState come AFTER initPropsState ?
             dlg.mergeState<EditNodeDlgState>(state);
             this.initPropState(dlg, ast.editNode, prop);
         }
