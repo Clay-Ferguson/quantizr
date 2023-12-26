@@ -1025,6 +1025,7 @@ public class ActPubUtil extends ServiceBase {
         // "icon": [
         // "https://some.url"
         // ]
+
         if (icon != null) {
             String iconUrl = apStr(icon, APObj.url);
             if (iconUrl != null) {

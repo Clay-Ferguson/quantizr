@@ -190,17 +190,20 @@ public class ActPubOutbox extends ServiceBase {
          * PUBLIC nodes, but this is a work in progress
          */
         boolean experimental = false;
+
         if (experimental) {
             Val<String> keyId = new Val<>();
             Val<String> signature = new Val<>();
             Val<List<String>> headers = new Val<>();
             apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
+
             if (keyId.getVal() != null) {
                 log.debug("keyId=" + keyId.getVal());
                 // keyId should be like this:
                 // actorId + "#main-key"
                 String actorId = keyId.getVal().replace("#main-key", "");
                 SubNode actorAccnt = arun.run(as -> read.findNodeByProp(as, NodeProp.ACT_PUB_ACTOR_ID.s(), actorId));
+
                 if (actorAccnt != null) {
                     log.debug("got Actor: " + actorAccnt.getIdStr());
                     // create a MongoSession representing the user account we just looked up
@@ -246,6 +249,7 @@ public class ActPubOutbox extends ServiceBase {
                 return null;
             }
             final String _sharedTo = sharedTo;
+
             retItems = (APList) arun.run(as -> {
                 APList items = new APList();
                 int MAX_PER_PAGE = 25;
@@ -315,6 +319,7 @@ public class ActPubOutbox extends ServiceBase {
         // where no signature is in the header.
         boolean experimental = false;
         log.debug("getResource: " + nodeId);
+
         return (APObj) arun.run(as -> {
             SubNode node = read.getNode(as, nodeId);
             if (!(node != null)) {
@@ -338,6 +343,7 @@ public class ActPubOutbox extends ServiceBase {
                 Val<String> signature = new Val<>();
                 Val<List<String>> headers = new Val<>();
                 apCrypto.parseHttpHeaderSig(httpReq, keyId, signature, false, headers);
+
                 if (keyId.getVal() != null) {
                     // keyId should be like this:
                     // actorId + "#main-key"
