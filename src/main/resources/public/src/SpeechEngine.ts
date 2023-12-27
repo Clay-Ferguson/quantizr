@@ -256,6 +256,7 @@ export class SpeechEngine {
                 s.ttsRan = true;
             }).then(() => {
                 this.queuedSpeech = this.queuedSpeech.filter(p => p.length > 0);
+
                 if (this.queuedSpeech.length === 0) {
                     this.queuedSpeech = null;
                     return;
@@ -323,7 +324,6 @@ export class SpeechEngine {
                         }
 
                         if (!this.ttsRunning) return;
-                        // console.log("SPEAK[" + sayThis.length + "]: " + sayThis);
                         this.ttsSpeakingTime = 0;
                         this.utter = utter;
                         this.highlightByIndex(this.ttsIdx);
@@ -446,12 +446,90 @@ export class SpeechEngine {
         return text;
     }
 
+    fragmentText = (text: string, level: number): string[] => {
+        const ret: string[] = [];
+        const ast = getAs();
+        const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
+        if (text.length < maxChars) {
+            ret.push(text);
+            return ret;
+        }
+
+        let fragments = null;
+        let lenCheck = 0;
+        if (level === 0) {
+            lenCheck = 2;
+            fragments = text.split(/(?<=, )|(?=, )/);
+        }
+        else if (level === 1) {
+            lenCheck = 14;
+            // first split into 'words'. All things separated by spaces.
+            fragments = text.split(/(?<= unless | until | which | but | nor | because | although | however | therefore | nevertheless | nonetheless )|(?= unless | until | which | but | nor | because | although | however | therefore | nevertheless | nonetheless )/);
+        }
+        else if (level === 2) {
+            lenCheck = 4;
+            fragments = text.split(/(?<= to | on | in )|(?= to | on | in )/);
+        }
+        else if (level === 3) {
+            lenCheck = 5;
+            fragments = text.split(/(?<= and | or | as | at | of )|(?= and | or | as | at | of )/);
+        }
+
+        // scan each word appendingn to frag until it gets too long and then
+        // adding to ret
+        let cachedWord = "";
+        fragments?.forEach(fragment => {
+            // this number must be the longest of all the split terms
+            if (fragment.length <= lenCheck && fragment.trim().length > 1) {
+                cachedWord = fragment;
+                return;
+            }
+            if (cachedWord) {
+                fragment = cachedWord + fragment;
+                cachedWord = "";
+            }
+
+            if (fragment.length < maxChars) {
+                // if this chunk and the last chunk can combine to be less than maxChars do it.
+                if (ret.length > 0 && fragment.length + ret[ret.length - 1].length < maxChars) {
+                    ret[ret.length - 1] += fragment;
+                }
+                else {
+                    ret.push(fragment);
+                }
+            }
+            else {
+                if (level >= 3) {
+                    ret.push(...this.fragmentBySpaces(fragment));
+                }
+                else {
+                    ret.push(...this.fragmentText(fragment, level + 1));
+                }
+            }
+        });
+
+        if (cachedWord) {
+            if (ret.length > 0) {
+                ret[ret.length - 1] += cachedWord;
+            }
+            else {
+                ret.push(cachedWord);
+            }
+        }
+
+        return ret;
+    }
+
     // as a last resort we just break string at spaces to create an array of unser MAX_UTTERANCE_CHARS
-    // chunks of text
+    // chunks of text.
     fragmentBySpaces = (text: string): string[] => {
         const ret: string[] = [];
         const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
+        if (text.length < maxChars) {
+            ret.push(text);
+            return ret;
+        }
 
         // first split into 'words'. All things separated by spaces.
         const words = text.split(/[ ]+/g);
@@ -464,23 +542,20 @@ export class SpeechEngine {
                 frag += " " + word;
             }
             else {
-                ret.push(frag.trim());
+                ret.push(frag);
                 frag = word;
             }
         });
 
         if (frag.length > 0) {
-            ret.push(frag.trim());
+            ret.push(frag);
         }
-
         return ret;
     }
 
     appendTextToBuffer = (text: string) => {
         if (!text) return;
         text = this.preProcessText(text);
-        const ast = getAs();
-        const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
         // first split into sentences.
         // 1) Match a single character present in [\n\r]
@@ -490,14 +565,7 @@ export class SpeechEngine {
 
         paragraphs?.forEach(para => {
             if (para.length < 3) return;
-
-            // if entire paragraph can fit
-            if (para.length < maxChars) {
-                this.pushTextToQueue(para);
-            }
-            else {
-                this.fragmentizeSentencesToQueue(para);
-            }
+            this.fragmentizeSentencesToQueue(para);
 
             // This is a harmless trick/hack where we avoid a significant complexity jump by doing something
             // slightly anti-patternish, but is good in this case, for now
@@ -554,54 +622,16 @@ export class SpeechEngine {
             text = text.replaceAll(char + ".", char + " ");
         }
 
-        // first split into sentences.
-        // DO NOT DELETE (this example is how to NOT return punctuation)
-        // const sentences = text.split(/[.!?;]+/);
-        // This REGEX splits by the delimiters "." and includes the delimiters in the search results.
-        // NOTE: This regex for "split()" is supposed to return only the "split points" and not the text.
-        // V1: const sentences = text.split(/(?=[.!?;]+)|(?<=[.!?;]+)/g);
-        // V2: MUCH BETTER! from here:
-        // https://stackoverflow.com/questions/25735644/python-regex-for-splitting-text-into-sentences-sentence-tokenizing
-        // ------------------------------------
-        // ANALYSIS BY REGEX (below) generated by https://regex101.com:
-        //
-        // Negative Lookbehind (?<!\w\.\w.)
-        // Assert that the Regex below does not match
-
-        // \w matches any word character (equivalent to [a-zA-Z0-9_])
-        // \. matches the character . with index 4610 (2E16 or 568) literally (case sensitive)
-        // \w matches any word character (equivalent to [a-zA-Z0-9_])
-        // . matches any character (except for line terminators)
-        // Negative Lookbehind (?<![A-Z][a-z]\.)
-        // Assert that the Regex below does not match
-
-        // Match a single character present in the list below [A-Z]
-        // A-Z matches a single character in the range between A (index 65) and Z (index 90) (case sensitive)
-        // Match a single character present in the list below [a-z]
-        // a-z matches a single character in the range between a (index 97) and z (index 122) (case sensitive)
-        // \. matches the character . with index 4610 (2E16 or 568) literally (case sensitive)
-        // Positive Lookbehind (?<=\.|\?|\!)
-        // Assert that the Regex below matches
-        // 1st Alternative \.
-        // \. matches the character . with index 4610 (2E16 or 568) literally (case sensitive)
-        // 2nd Alternative \?
-        // \? matches the character ? with index 6310 (3F16 or 778) literally (case sensitive)
-        // 3rd Alternative \!
-        // \! matches the character ! with index 3310 (2116 or 418) literally (case sensitive)
-        // \s matches any whitespace character (equivalent to [\r\n\t\f\v ])
-        // Global pattern flags
-        // g modifier: global. All matches (don't return after first match)
-        // m modifier: multi line. Causes ^ and $ to match the begin/end of each line (not only begin/end of string)
-        // ------------------------------------
-        const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s/gm);
+        const delimiterRegex = /([.!?;] +)/g;
+        const sentences = text.split(delimiterRegex);
 
         // scan each sentence
         sentences?.forEach(sentence => {
-
             // Handle Punctuation
             // it's harmless to always tack on a single character to the most recent chunk, and
             // this IS how we get punctuation in at end of sentences (.!?;)
-            if (sentence.length === 1) {
+            // if (sentence.length === 1) {
+            if (sentence.match(delimiterRegex)) {
                 if (this.queuedSpeech.length > 0) {
                     this.queuedSpeech[this.queuedSpeech.length - 1] += sentence;
                     return;
@@ -615,48 +645,7 @@ export class SpeechEngine {
             }
             // Otherwise we have to break the sentence apart, so we break by commas first
             else {
-                const fragments = sentence.split(/[,]+/g);
-                let fragMerge = "";
-                fragments?.forEach(frag => {
-                    // handle the comma delimiter
-                    if (sentence.length === 1) {
-
-                        // if we're building a fragMerge, add delimiter in
-                        if (fragMerge.length > 0) {
-                            fragMerge += frag;
-                        }
-                        // otherwise et put the comma onto the end of the last known content
-                        else if (this.queuedSpeech.length > 0) {
-                            this.queuedSpeech[this.queuedSpeech.length - 1] += sentence;
-                            return;
-                        }
-                    }
-                    // if we can fit more onto the fragMerge then append.
-                    else if (fragMerge.length + frag.length < maxChars) {
-                        fragMerge += frag;
-                    }
-                    // if frag is short enough to make the new fragMerge do that.
-                    else if (frag.length < maxChars) {
-                        if (fragMerge) {
-                            this.pushTextToQueue(fragMerge);
-                        }
-                        fragMerge = frag;
-                    }
-                    // else 'frag' would would make fragMerge too large, so we commit the current
-                    // fragMerge to the queue, first, and then queue by breaking the sentence by words.
-                    else {
-                        if (fragMerge) {
-                            this.pushTextToQueue(fragMerge);
-                        }
-                        fragMerge = "";
-                        this.queuedSpeech = this.queuedSpeech.concat(this.fragmentBySpaces(frag));
-                    }
-                });
-
-                // push whatever was left.
-                if (fragMerge) {
-                    this.pushTextToQueue(fragMerge);
-                }
+                this.queuedSpeech = this.queuedSpeech.concat(this.fragmentText(sentence, 0));
             }
         });
     }
