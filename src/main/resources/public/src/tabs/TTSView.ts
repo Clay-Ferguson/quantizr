@@ -5,7 +5,6 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
-import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
@@ -93,17 +92,6 @@ export class TTSView extends AppTab<any, TTSView> {
             title: "Resume Speaking Text"
         }) : null;
 
-        let heading = null;
-        if (ast.speechSpeaking) {
-            heading = "Speaking...";
-        }
-        else if (ast.speechPaused) {
-            heading = "Speech Paused.";
-        }
-        else {
-            heading = "Ready to Speak";
-        }
-
         let paraComps: Comp[];
         if (S.speech.queuedSpeech?.length > 0) {
             paraComps = [];
@@ -160,11 +148,7 @@ export class TTSView extends AppTab<any, TTSView> {
             getAs().showTtsInputText ? new TextArea("Enter Text to Speak", {
                 rows: 3
             }, TTSView.textAreaState) : null,
-            paraComps?.length > 0
-                ? new Div(null, { className: "speechTxtArea" }, [
-                    new Heading(4, heading, { className: "speechAreaTitle alert alert-primary" }),
-                    ...paraComps
-                ]) : null
+            paraComps?.length > 0 ? new Div(null, { className: "speechTxtArea" }, paraComps) : null
         ]);
         return true;
     }
