@@ -15,13 +15,19 @@ import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
+interface LS { // Local State
+}
 export class TTSView extends AppTab<any, TTSView> {
 
     static textAreaState: Validator = new Validator();
+    static inst: TTSView = null;
+    static ttsHighlightIdx: number = -1;
 
     constructor(data: TabIntf<any, TTSView>) {
         super(data);
         data.inst = this;
+        TTSView.inst = this;
+        this.mergeState<LS>({});
     }
 
     spanClick = (evt: Event) => {
@@ -98,6 +104,7 @@ export class TTSView extends AppTab<any, TTSView> {
             let curDiv = new Div(null, { className: "ttsPara" });
 
             let idx = 0;
+            const hltIdx = TTSView.ttsHighlightIdx;
             // scan each utterance
             S.speech.queuedSpeech.forEach(utter => {
                 // if we hit a paragraph break
@@ -111,9 +118,9 @@ export class TTSView extends AppTab<any, TTSView> {
                     const utterTrim = utter.trim();
                     const isQuote = utterTrim.startsWith("\"") && utterTrim.endsWith("\"");
                     curDiv.addChild(new Span(utter + "  ", {
-                        onClick: this.spanClick, // <--- special function KNOWS how to work with no args
+                        onClick: this.spanClick,
                         id: "tts" + idx,
-                        className: "ttsSpan" + (S.speech.ttsHighlightIdx === idx ? " ttsHlt" : "") +
+                        className: "ttsSpan" + (hltIdx === idx ? " ttsHlt" : "") +
                             (isQuote ? " ttsQuote" : "")
                     }));
                 }

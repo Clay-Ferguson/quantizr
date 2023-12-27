@@ -38,7 +38,6 @@ export class SpeechEngine {
     utter: SpeechSynthesisUtterance = null;
 
     speechActive: boolean = false;
-    ttsHighlightIdx: number = 0;
     private callback: (text: string) => void;
 
     constructor() {
@@ -367,23 +366,11 @@ export class SpeechEngine {
         }
     }
 
-    removeHighlight = () => {
-        if (this.ttsHighlightIdx !== -1) {
-            const lastElm = document.getElementById("tts" + this.ttsHighlightIdx);
-            lastElm?.classList.remove("ttsHlt");
-            this.ttsHighlightIdx = -1; // keep this consistent just for best practice
-        }
-    }
-
     highlightByIndex = (idx: number) => {
-        // remove any previous highlighting
-        this.removeHighlight();
-
-        const elm = document.getElementById("tts" + idx);
-        if (elm) {
-            elm.classList.add("ttsHlt");
+        TTSView.ttsHighlightIdx = idx;
+        if (TTSView.inst) {
+            TTSView.inst.mergeState({});
         }
-        this.ttsHighlightIdx = idx;
     }
 
     parseRateValue = (rate: string) => {
@@ -677,7 +664,7 @@ export class SpeechEngine {
         if (this.utter) {
             this.utter.volume = 0;
         }
-        this.removeHighlight();
+
         this.ttsSpeakingTime = 0;
 
         await promiseDispatch("speechEngineStateChange", s => {
