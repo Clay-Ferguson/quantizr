@@ -10,6 +10,7 @@ public class ExportRequest extends RequestBase {
 	private String fileName;
 	private boolean toIpfs;
 	private boolean includeToc;
+	private boolean includeMetaComments;
 	private boolean attOneFolder;
 	private String contentType;
 	private boolean includeJypyter;
@@ -37,6 +38,14 @@ public class ExportRequest extends RequestBase {
 
 	public boolean isIncludeToc() {
 		return this.includeToc;
+	}
+
+	public boolean isIncludeMetaComments() {
+		return includeMetaComments;
+	}
+
+	public void setIncludeMetaComments(boolean includeMetaComments) {
+		this.includeMetaComments = includeMetaComments;
 	}
 
 	public boolean isAttOneFolder() {

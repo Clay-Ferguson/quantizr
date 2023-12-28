@@ -52,6 +52,11 @@ export class ExportDlg extends DialogBase {
                 getValue: (): boolean => getAs().exportSettings.includeToc
             }) : null,
 
+            ast.exportSettings.contentType == "md" ? new Checkbox("Include Metadata", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeMetaComments = checked),
+                getValue: (): boolean => getAs().exportSettings.includeMetaComments
+            }) : null,
+
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
                 new Button("Close", this.close, null, "btn-secondary float-end")
@@ -126,6 +131,7 @@ export class ExportDlg extends DialogBase {
             fileName: this.fileNameState.getValue(),
             toIpfs: ast.exportSettings.toIpfs,
             includeToc: ast.exportSettings.includeToc,
+            includeMetaComments: ast.exportSettings.includeMetaComments,
             includeJypyter: ast.exportSettings.includeJypyter,
             attOneFolder: ast.exportSettings.attOneFolder,
             contentType: ast.exportSettings.contentType,

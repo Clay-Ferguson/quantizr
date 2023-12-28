@@ -372,6 +372,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private String getShortNodeText(String content) {
+        // rip off the first line if it's an xml comment
+        int firstNLIdx = content.indexOf("\n");
+        int endXmlCommentIdx = content.indexOf("-->\n");
+        if (endXmlCommentIdx < firstNLIdx) {
+            content = content.substring(endXmlCommentIdx + 4);
+        }
+
         String linkName = XString.truncAfterFirst(content, "\n");
         linkName = linkName.trim();
         linkName = XString.repeatingTrimFromFront(linkName, "#");
@@ -498,6 +505,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 if (mdFile != null) {
                     if (mdFile.content.length() > 0)
                         mdFile.content.append("\n");
+                    if (req.isIncludeMetaComments()) {
+                        mdFile.content.append(buildMarkdownHeader(node));
+                    }
                     mdFile.content.append(mdContent.getVal() + "\n");
                 }
             }
@@ -522,6 +532,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
         }
+    }
+
+    private String buildMarkdownHeader(SubNode node) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<!-- id:" + node.getIdStr());
+        if (StringUtils.isNoneEmpty(node.getName())) {
+            sb.append(" name:" + node.getName());
+        }
+        sb.append(" -->\n");
+        return sb.toString();
     }
 
     private void addToTableOfContents(SubNode node, int level, String content) {

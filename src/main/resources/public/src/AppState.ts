@@ -11,6 +11,7 @@ export interface ExportSettings {
     exportType: string;
     toIpfs?: boolean;
     includeToc?: boolean;
+    includeMetaComments?: boolean;
     includeJypyter?: boolean;
     attOneFolder?: boolean;
     contentType?: string; // html, md, json
@@ -118,6 +119,7 @@ export class AppState {
     exportSettings: ExportSettings = {
         exportType: "zip",
         includeToc: true,
+        includeMetaComments: true,
         includeJypyter: true,
         attOneFolder: false,
         contentType: "md", // html, md, json
