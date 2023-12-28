@@ -78,14 +78,16 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 SubNode node = (SubNode) arun.run(as -> {
                     try {
                         SubNode n = Util.simpleMapper.readValue(json, SubNode.class);
+
                         // this may not be necessary but we definitely don't want this node cached now
                         // with it's currently undetermined id.
                         ThreadLocals.clean(n);
-                        // set nodeId to null right away so that as we start setting property values, it
-                        // won't cause the 'dirty' cache to start thinking this node needs to be cached
-                        // for the wrong id. We can't do any caching until we save to DB and it gets
-                        // it's new imported id value.
-                        n.setId(null);
+
+                        if (read.nodeExists(as, n.getId())) {
+                            log.debug("IMPORT NODE EXISTED (using new ID): " + n.getIdStr());
+                            n.setId(null);
+                        }
+
                         String newPath = mongoUtil.findAvailablePath(targetPath + n.getPath());
                         n.setPath(newPath);
                         // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
