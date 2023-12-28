@@ -42,15 +42,15 @@ export class ExportDlg extends DialogBase {
                 this.fileTypeRadioButton("PDF", "pdf")
             ], "radioButtonsBar marginTop"),
 
-            exportType === "pdf" || ast.exportSettings.contentType == "md" ? new Checkbox("Table of Contents", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
-                getValue: (): boolean => getAs().exportSettings.includeToc
-            }) : null,
-
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
             S.quanta.cfg.ipfsEnabled ? new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ]) : null,
+
+            exportType === "pdf" || ast.exportSettings.contentType == "md" ? new Checkbox("Table of Contents", null, {
+                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
+                getValue: (): boolean => getAs().exportSettings.includeToc
+            }) : null,
 
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
