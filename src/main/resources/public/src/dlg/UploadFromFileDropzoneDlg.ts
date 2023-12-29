@@ -59,7 +59,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         onClick: this.uploadFromUrl,
                         title: "Upload from Web/URL"
                     }),
-                    this.importMode ? null : new IconButton("fa-magic", "AI Gen", {
+                    this.importMode ? null : new IconButton("fa-magic", "AI Gen. Image", {
                         onClick: this.uploadFromAiGen,
                         title: "Create an AI Generated Image"
                     }),

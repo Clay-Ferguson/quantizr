@@ -74,7 +74,7 @@ export class UploadAIGenImgDlg extends DialogBase {
     }
 
     uploadFromUrlResponse = (res: J.UploadFromUrlResponse) => {
-        if (S.util.checkSuccess("Upload from URL", res)) {
+        if (S.util.checkSuccess("Generate Image", res)) {
             this.close();
 
             if (this.onUploadFunc) {
