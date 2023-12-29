@@ -94,10 +94,7 @@ export class Render {
 
         attribs[C.NODE_ID_ATTR] = node.id;
         S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
-            // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (const item of evt.dataTransfer.items) {
-                // console.log("DROP(a) kind=" + item.kind + " type=" + item.type);
-
                 if (item.type.startsWith("image/") && item.kind === "file") {
                     const file: File = item.getAsFile();
 
@@ -109,7 +106,10 @@ export class Render {
                     S.attachment.openUploadFromFileDlg(false, node.id, file);
                     return;
                 }
-                else if (item.type.match("^text/uri-list") && item.kind === "string") {
+            }
+
+            for (const item of evt.dataTransfer.items) {
+                if (item.type.match("^text/uri-list") && item.kind === "string") {
                     item.getAsString(s => {
                         /* Disallow dropping from our app onto our app */
                         if (s.startsWith(location.protocol + "//" + location.hostname)) {
@@ -117,8 +117,14 @@ export class Render {
                         }
                         S.attachment.openUploadFromUrlDlg(node ? node.id : null, null);
                     });
+                    return;
                 }
-                else if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
+            }
+
+            // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
+            for (const item of evt.dataTransfer.items) {
+                // console.log("DROP(a) kind=" + item.kind + " type=" + item.type);
+                if (item.type === C.DND_TYPE_NODEID && item.kind === "string") {
                     item.getAsString(s => {
                         if (!s) {
                             return;
