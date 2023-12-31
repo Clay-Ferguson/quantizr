@@ -14,6 +14,7 @@ import quanta.model.client.huggingface.HuggingFaceRequest;
 import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.Util;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
@@ -47,7 +48,7 @@ public class HuggingFaceService extends ServiceBase {
         if (apiKey == null || apiKey.isEmpty())
             throw new RuntimeException("HuggingFace currently not enabled. No API Key");
 
-        WebClient webClient = WebClient.builder().baseUrl(HUGGINGFACE_COMP_URL)
+        WebClient webClient = Util.webClientBuilder().baseUrl(HUGGINGFACE_COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + apiKey).build();
 

@@ -259,6 +259,12 @@ export interface ImageResponse {
     data: GptImageData[];
 }
 
+export interface SpeechGenRequest {
+    model: string;
+    input: string;
+    voice: string;
+}
+
 export interface SystemConfig {
     prompt: string;
     model: string;
@@ -270,6 +276,19 @@ export interface Usage {
     prompt_tokens: number;
     completion_tokens: number;
     text_generation: number;
+}
+
+export interface AIGenImageRequest extends RequestBase {
+    nodeId: string;
+    openAiPrompt: string;
+    highDef: boolean;
+    size: string;
+}
+
+export interface AIGenSpeechRequest extends RequestBase {
+    nodeId: string;
+    openAiPrompt: string;
+    voice: string;
 }
 
 export interface AddCreditRequest extends RequestBase {
@@ -760,12 +779,15 @@ export interface UploadFromUrlRequest extends RequestBase {
     storeLocally: boolean;
     nodeId: string;
     sourceUrl: string;
-    openAiPrompt: string;
-    highDef: boolean;
-    size: string;
 }
 
 export interface RequestBase {
+}
+
+export interface AIGenImageResponse extends ResponseBase {
+}
+
+export interface AIGenSpeechResponse extends ResponseBase {
 }
 
 export interface AddCreditResponse extends ResponseBase {

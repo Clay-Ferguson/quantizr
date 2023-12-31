@@ -202,7 +202,9 @@ export class Props {
     }
 
     getAttachment = (name: string, node: J.NodeInfo): J.Attachment => {
-        if (!name) name = J.Constant.ATTACHMENT_PRIMARY;
+        if (!name) {
+            name = J.Constant.ATTACHMENT_PRIMARY;
+        }
         return node?.attachments ? node.attachments[name] : null;
     }
 

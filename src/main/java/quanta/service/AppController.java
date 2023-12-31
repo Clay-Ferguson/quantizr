@@ -26,6 +26,8 @@ import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.instrument.PerfMon;
 import quanta.model.client.NodeType;
+import quanta.request.AIGenImageRequest;
+import quanta.request.AIGenSpeechRequest;
 import quanta.request.AddCreditRequest;
 import quanta.request.AddFriendRequest;
 import quanta.request.AddPrivilegeRequest;
@@ -679,11 +681,13 @@ public class AppController extends ServiceBase implements ErrorController {
     @PerfMon
     @RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
     public ResponseEntity<ResourceRegion> streamMultiPart(@PathVariable("fileName") String fileName,
-            @RequestParam("nodeId") String nodeId, @RequestParam(name = "disp", required = false) final String disp,
-            @RequestHeader HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            HttpSession session) {
+            @RequestParam("nodeId") String nodeId, //
+            @RequestParam(name = "disp", required = false) final String disp, //
+            @RequestParam(name = "att", required = false) final String attName, //
+            @RequestHeader HttpHeaders headers, //
+            HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         return (ResponseEntity<ResourceRegion>) callProc.run("stream", false, false, null, session, ms -> {
-            return attach.getStreamResource(ms, headers, nodeId);
+            return attach.getStreamResource(ms, headers, nodeId, attName);
         });
     }
 
@@ -715,6 +719,22 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
         return callProc.run("deleteAttachment", true, true, req, session, ms -> {
             return attach.deleteAttachment(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/aiGenImage", method = RequestMethod.POST)
+    @ResponseBody
+    public Object aiGenImage(@RequestBody AIGenImageRequest req, HttpSession session) {
+        return callProc.run("aiGenImage", true, true, req, session, ms -> {
+            return attach.aiGenImage(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/aiGenSpeech", method = RequestMethod.POST)
+    @ResponseBody
+    public Object aiGenSpeech(@RequestBody AIGenSpeechRequest req, HttpSession session) {
+        return callProc.run("aiGenSpeech", true, true, req, session, ms -> {
+            return attach.aiGenSpeech(ms, req);
         });
     }
 

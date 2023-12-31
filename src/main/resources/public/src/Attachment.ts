@@ -1,4 +1,5 @@
 import { UploadAIGenImgDlg } from "./dlg/UploadAIGenImgDlg";
+import { UploadAIGenSpeechDlg } from "./dlg/UploadAIGenSpeechDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
@@ -35,7 +36,7 @@ export class Attachment {
         new UploadFromUrlDlg(nodeId, onUploadFunc).open();
     };
 
-    openUploadFromAiGenDlg = (nodeId: string, onUploadFunc: () => void) => {
+    openUploadFromAiGenImageDlg = (nodeId: string, onUploadFunc: () => void) => {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (!node) {
@@ -46,6 +47,19 @@ export class Attachment {
         }
 
         new UploadAIGenImgDlg(nodeId, onUploadFunc).open();
+    };
+
+    openUploadFromAiGenSpeechDlg = (nodeId: string, onUploadFunc: () => void) => {
+        if (!nodeId) {
+            const node = S.nodeUtil.getHighlightedNode();
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+                return;
+            }
+            nodeId = node.id;
+        }
+
+        new UploadAIGenSpeechDlg(nodeId, onUploadFunc).open();
     };
 
     openUploadFromIPFSDlg = (nodeId: string, onUploadFunc: () => void) => {
@@ -65,10 +79,10 @@ export class Attachment {
         /* If this node attachment points to external URL return that url */
         const att = S.props.getAttachment(attName, node);
         if (!att) return null;
-        return this.getAttUrl(urlPart, att, node.id, downloadLink);
+        return this.getAttUrl(urlPart, att, node.id, downloadLink, attName);
     }
 
-    getAttUrl = (urlPart: string, att: J.Attachment, nodeId: string, downloadLink: boolean): string => {
+    getAttUrl = (urlPart: string, att: J.Attachment, nodeId: string, downloadLink: boolean, attName: string): string => {
         if (att.u) {
             return att.u;
         }
@@ -80,7 +94,7 @@ export class Attachment {
             if (ipfsLink) {
                 bin = "ipfs";
             }
-            let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId;
+            let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId + "&att=" + attName;
 
             if (downloadLink) {
                 ret += "&download=true";

@@ -62,10 +62,14 @@ import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.request.AIGenImageRequest;
+import quanta.request.AIGenSpeechRequest;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.PasteAttachmentsRequest;
 import quanta.request.UploadFromIPFSRequest;
 import quanta.request.UploadFromUrlRequest;
+import quanta.response.AIGenImageResponse;
+import quanta.response.AIGenSpeechResponse;
 import quanta.response.DeleteAttachmentResponse;
 import quanta.response.PasteAttachmentsResponse;
 import quanta.response.UploadFromIPFSResponse;
@@ -640,13 +644,17 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    public Object getStreamResource(MongoSession ms, HttpHeaders headers, String nodeId) {
+    public Object getStreamResource(MongoSession ms, HttpHeaders headers, String nodeId, String attName) {
         BufferedInputStream inStream = null;
         ResponseEntity<ResourceRegion> ret = null;
 
         try {
             SubNode node = read.getNode(ms, nodeId, false, null);
-            Attachment att = node.getFirstAttachment();
+            if (node == null) {
+                throw ExUtil.wrapEx("node not found.");
+            }
+
+            Attachment att = node.getAttachment(attName, false, false);
             if (att == null)
                 throw ExUtil.wrapEx("no attachment info found");
             auth.auth(ms, node, PrivilegeType.READ);
@@ -658,7 +666,7 @@ public class AttachmentService extends ServiceBase {
             if (fileName == null) {
                 fileName = "filename";
             }
-            InputStream is = getStream(ms, "", node, false);
+            InputStream is = getStream(ms, attName, node, false);
             long size = att.getSize();
             if (size == 0) {
                 throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
@@ -699,15 +707,22 @@ public class AttachmentService extends ServiceBase {
      */
     public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
         UploadFromUrlResponse res = new UploadFromUrlResponse();
-        if (req.getOpenAiPrompt() != null) {
-            req.setSourceUrl(oai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef(), req.getSize()));
-            req.setStoreLocally(true);
-        }
-
         if (req.getSourceUrl() != null) {
-            readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally(),
-                    req.getOpenAiPrompt());
+            readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally(), null);
         }
+        return res;
+    }
+
+    public AIGenImageResponse aiGenImage(MongoSession ms, AIGenImageRequest req) {
+        AIGenImageResponse res = new AIGenImageResponse();
+        String url = oai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef(), req.getSize());
+        readFromUrl(ms, url, null, req.getNodeId(), null, null, 0, true, req.getOpenAiPrompt());
+        return res;
+    }
+
+    public AIGenSpeechResponse aiGenSpeech(MongoSession ms, AIGenSpeechRequest req) {
+        AIGenSpeechResponse res = new AIGenSpeechResponse();
+        oai.generateSpeech(ms, req.getOpenAiPrompt(), req.getVoice(), req.getNodeId());
         return res;
     }
 

@@ -1,7 +1,6 @@
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
@@ -11,11 +10,10 @@ import { Validator, ValidatorRuleName } from "../Validator";
 import { Selection } from "../comp/core/Selection";
 
 interface LS { // Local State
-    highDef?: boolean;
-    size?: string;
+    voice: string;
 }
 
-export class UploadAIGenImgDlg extends DialogBase {
+export class UploadAIGenSpeechDlg extends DialogBase {
 
     static highDef: boolean = true;
     static storeLocally: boolean = false;
@@ -26,29 +24,28 @@ export class UploadAIGenImgDlg extends DialogBase {
     ]);
 
     constructor(private nodeId: string, private onUploadFunc: () => void) {
-        super("Generate Image with AI");
+        super("Generate Speech with AI");
         this.validatedStates = [this.descriptState];
-        this.mergeState<LS>({ highDef: null, size: "1024x1024" });
+        this.mergeState<LS>({ voice: "onyx" });
     }
 
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
                 new Div(null, null, [
-                    new Checkbox("High Definition", null, {
-                        setValue: (checked: boolean) => this.mergeState<LS>({ highDef: checked }),
-                        getValue: (): boolean => this.getState<LS>().highDef
-                    }),
                     new Selection(null, null, [
-                        { key: "1024x1024", val: "Square: 1024x1024" },
-                        { key: "1794x1024", val: "Landscape: 1792x1024" },
-                        { key: "1024x1792", val: "Portrait: 1024x1792" },
-                    ], null, "aiImageGenSize float-end", {
-                        setValue: (val: string) => this.mergeState<LS>({ size: val }),
-                        getValue: (): string => this.getState<LS>().size
+                        { key: "alloy", val: "Alloy" },
+                        { key: "echo", val: "Echo" },
+                        { key: "fable", val: "Fable" },
+                        { key: "onyx", val: "Onyx" },
+                        { key: "nova", val: "Nova" },
+                        { key: "shimmer", val: "Shimmer" },
+                    ], null, "aiSpeechGenVoice float-end", {
+                        setValue: (val: string) => this.mergeState<LS>({ voice: val }),
+                        getValue: (): string => this.getState<LS>().voice
                     }),
                 ]),
-                new TextArea("Describe Image", { rows: 10 }, this.descriptState, null, false, 3, this.textScrollPos),
+                new TextArea("Enter Text for Speech", { rows: 10 }, this.descriptState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Generate", this.upload, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
@@ -62,17 +59,16 @@ export class UploadAIGenImgDlg extends DialogBase {
             return;
         }
 
-        const res = await S.rpcUtil.rpc<J.AIGenImageRequest, J.AIGenImageResponse>("aiGenImage", {
+        const res = await S.rpcUtil.rpc<J.AIGenSpeechRequest, J.AIGenSpeechResponse>("aiGenSpeech", {
             nodeId: this.nodeId,
             openAiPrompt: this.descriptState.getValue(),
-            highDef: this.getState<LS>().highDef,
-            size: this.getState<LS>().size
+            voice: this.getState<LS>().voice
         });
         this.uploadFromUrlResponse(res);
     }
 
     uploadFromUrlResponse = (res: J.UploadFromUrlResponse) => {
-        if (S.util.checkSuccess("Generate Image", res)) {
+        if (S.util.checkSuccess("Generate Speech", res)) {
             this.close();
 
             if (this.onUploadFunc) {

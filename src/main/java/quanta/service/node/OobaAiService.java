@@ -16,6 +16,7 @@ import quanta.model.client.oobabooga.OobAiRequest;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /*
@@ -51,7 +52,7 @@ public class OobaAiService extends ServiceBase {
         // if (apiKey == null || apiKey.isEmpty())
         // throw new RuntimeException("Oobabooga currently not enabled. No API Key");
 
-        WebClient webClient = WebClient.builder().baseUrl(COMP_URL)
+        WebClient webClient = Util.webClientBuilder().baseUrl(COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 // .defaultHeader("Authorization", "Bearer " + apiKey) // todo-1: need API KEY
                 .build();

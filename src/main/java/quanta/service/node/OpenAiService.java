@@ -1,5 +1,6 @@
 package quanta.service.node;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -32,6 +34,7 @@ import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.ImageGenRequest;
 import quanta.model.client.openai.ImageResponse;
+import quanta.model.client.openai.SpeechGenRequest;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.client.openai.Usage;
 import quanta.mongo.CreateNodeLocation;
@@ -45,7 +48,10 @@ import quanta.response.AskSubGraphResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.service.AppController;
 import quanta.service.UserManagerService;
+import quanta.util.Const;
+import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
@@ -54,11 +60,73 @@ public class OpenAiService extends ServiceBase {
     String OPENAI_MOD_URL = "https://api.openai.com/v1/moderations";
     String OPENAI_COMP_URL = "https://api.openai.com/v1/chat/completions";
     String OPENAI_IMAGE_GEN_URL = "https://api.openai.com/v1/images/generations";
+    String OPENAI_SPEECH_GEN_URL = "https://api.openai.com/v1/audio/speech";
+
+    // Warning: If you change these, you will need to update the pricing calculations
+    String OPENAI_MODEL_TTS = "tts-1";
     String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
     String OPENAI_MODEL_COMPLETION = "gpt-4-1106-preview";
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
+
+    public String generateSpeech(MongoSession ms, String prompt, String voice, String nodeId) {
+        SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
+        if (userNode == null) {
+            throw new RuntimeException("Unknown user.");
+        }
+
+        BigDecimal balance = getBalance(ms, userNode);
+        LimitedInputStreamEx lis = null;
+        String model = OPENAI_MODEL_TTS;
+
+        try {
+            WebClient webClient = Util.webClientBuilder().baseUrl(OPENAI_SPEECH_GEN_URL)
+                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
+
+            SpeechGenRequest request = new SpeechGenRequest(model, prompt, voice);
+            // log.debug("GPT generateSpeech: " + XString.prettyPrint(request));
+
+            Mono<DataBuffer> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+                    .retrieve().bodyToMono(DataBuffer.class);
+            DataBuffer dataBuffer = mono.block();
+            if (dataBuffer != null) {
+                InputStream is = dataBuffer.asInputStream();
+
+                if (is == null) {
+                    throw new RuntimeException("Error generating speech.");
+                }
+
+                lis = new LimitedInputStreamEx(is, 100 * Const.ONE_MB);
+                try {
+                    SubNode node = read.getNode(ms, nodeId);
+                    if (node != null) {
+                        int attIdx = node.getAttachments() != null ? node.getAttachments().size() : 0;
+                        attach.saveBinaryStreamToNode(ms, false, "p" + attIdx, lis, "audio/mpeg", "file.mp3", //
+                                0L, 0, 0, node, false, false, false, //
+                                true, null, null);
+                    }
+                } finally {
+                    lis.close();
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating speech: " + e.getMessage());
+        }
+
+        // NOTE: DO NOT DELETE. Useful for troubleshooting.
+        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
+        // log.debug("Image RESPONSE: " + response);
+
+        if (lis != null) {
+            BigDecimal cost = getSpeechCost(model, prompt.length());
+            updateUserCredit(userNode, balance, cost);
+        }
+        return null;
+    }
+
 
     public String generateImage(MongoSession ms, String prompt, boolean highDef, String size) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
@@ -70,7 +138,7 @@ public class OpenAiService extends ServiceBase {
         ImageResponse res = null;
 
         try {
-            WebClient webClient = WebClient.builder().baseUrl(OPENAI_IMAGE_GEN_URL)
+            WebClient webClient = Util.webClientBuilder().baseUrl(OPENAI_IMAGE_GEN_URL)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
@@ -85,8 +153,6 @@ public class OpenAiService extends ServiceBase {
             log.error("Error generating image: " + e.getMessage());
             throw e;
         }
-
-        // log.debug("Image RESPONSE: " + XString.prettyPrint(res));
 
         // NOTE: DO NOT DELETE. Useful for troubleshooting.
         // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
@@ -112,6 +178,15 @@ public class OpenAiService extends ServiceBase {
                 return new BigDecimal(0.00765);
             default:
                 throw new RuntimeException("Unsupported image size: " + size);
+        }
+    }
+
+    private BigDecimal getSpeechCost(String model, int promptLength) {
+        switch (model) {
+            case "tts-1":
+                return new BigDecimal(0.000015 * promptLength);
+            default:
+                throw new RuntimeException("Unsupported speech model: " + model);
         }
     }
 
@@ -171,7 +246,7 @@ public class OpenAiService extends ServiceBase {
         ChatGPTModerationRequest modRequest = new ChatGPTModerationRequest(contentToModerate);
 
         WebClient webClient =
-                WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                Util.webClientBuilder().defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + prop.getOpenAiKey())
                         .baseUrl(OPENAI_MOD_URL).build();
 
@@ -185,7 +260,7 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Sorry, the AI would reject that question.");
         }
 
-        webClient = WebClient.builder().baseUrl(OPENAI_COMP_URL)
+        webClient = Util.webClientBuilder().baseUrl(OPENAI_COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 

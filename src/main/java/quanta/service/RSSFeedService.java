@@ -65,6 +65,7 @@ import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /* Proof of Concept RSS Publishing */
@@ -244,14 +245,7 @@ public class RSSFeedService extends ServiceBase {
             }
 
             long start = System.currentTimeMillis();
-            int bufferSize = 100 * Const.ONE_MB;
-
-            WebClient webClient = WebClient.builder()
-                    .exchangeStrategies(ExchangeStrategies.builder()
-                            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(bufferSize)).build())
-                    .defaultHeader(HttpHeaders.USER_AGENT,
-                            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3")
-                    .build();
+            WebClient webClient = Util.webClientBuilder().build();
 
             String response = webClient.get().uri(url).retrieve() //
                     .bodyToMono(String.class).timeout(Duration.ofSeconds(60)).block();

@@ -8,9 +8,6 @@ public class UploadFromUrlRequest extends RequestBase {
 	private boolean storeLocally;
 	private String nodeId;
 	private String sourceUrl;
-	private String openAiPrompt;
-	private boolean highDef;
-	private String size;
 
 	public UploadFromUrlRequest() {}
 
@@ -36,29 +33,5 @@ public class UploadFromUrlRequest extends RequestBase {
 
 	public void setSourceUrl(final String sourceUrl) {
 		this.sourceUrl = sourceUrl;
-	}
-
-	public String getOpenAiPrompt() {
-		return openAiPrompt;
-	}
-
-	public void setOpenAiPrompt(String openAiPrompt) {
-		this.openAiPrompt = openAiPrompt;
-	}
-
-	public boolean isHighDef() {
-		return highDef;
-	}
-
-	public void setHighDef(boolean highDef) {
-		this.highDef = highDef;
-	}
-
-	public String getSize() {
-		return size;
-	}
-
-	public void setSize(String size) {
-		this.size = size;
 	}
 }

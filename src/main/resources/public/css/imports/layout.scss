@@ -4,6 +4,13 @@
     display: inline-block;
 }
 
+.aiSpeechGenVoice {
+    width: 10rem;
+    padding-left: $bigGap;
+    display: inline-block;
+    margin-bottom: $smallGap
+}
+
 .headingDropDown {
     display: inline-block;
     width: 4rem;   

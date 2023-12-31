@@ -22,7 +22,7 @@ public class StreamUtil {
             final ExchangeStrategies strategies = ExchangeStrategies.builder()
                     .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(maxFileSize)).build();
 
-            WebClient webClient = WebClient.builder().exchangeStrategies(strategies)
+            WebClient webClient = Util.webClientBuilder().exchangeStrategies(strategies)
                     .defaultHeader(HttpHeaders.USER_AGENT, Const.FAKE_USER_AGENT).build();
 
             Mono<ByteArrayResource> result = webClient.get().uri(URI.create(sourceUrl)).retrieve()

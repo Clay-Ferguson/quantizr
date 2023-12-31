@@ -48,10 +48,7 @@ export class UploadFromUrlDlg extends DialogBase {
         const res = await S.rpcUtil.rpc<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
             storeLocally: UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
-            sourceUrl: this.urlState.getValue(),
-            openAiPrompt: null,
-            highDef: false,
-            size: null
+            sourceUrl: this.urlState.getValue()
         });
         this.uploadFromUrlResponse(res);
     }

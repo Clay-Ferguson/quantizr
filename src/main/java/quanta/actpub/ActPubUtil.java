@@ -204,7 +204,7 @@ public class ActPubUtil extends ServiceBase {
      * acceptable too. 'clazz' is optional and tells which APObj-derived class to marshall into.
      */
     public APObj getJson(String url, Class<?> clazz, MediaType mediaType, HttpHeaders headers) {
-        WebClient webClient = WebClient.builder().baseUrl(url).defaultHeaders(httpHeaders -> {
+        WebClient webClient = Util.webClientBuilder().baseUrl(url).defaultHeaders(httpHeaders -> {
             if (headers != null) {
                 httpHeaders.addAll(headers);
             } else {
