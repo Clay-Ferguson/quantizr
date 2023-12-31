@@ -12,6 +12,7 @@ import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
+import { FlexLayout } from "../comp/core/FlexLayout";
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
@@ -48,64 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     })
                 ]),
 
-                this.importMode ? null : new Div("From Sources..."),
-                new ButtonBar([
-                    this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
-                        onClick: this.uploadFromClipboard,
-                        title: "Upload from Clipboard"
-                    }),
-
-                    this.importMode ? null : new IconButton("fa-cloud", "URL", {
-                        onClick: this.uploadFromUrl,
-                        title: "Upload from Web/URL"
-                    }),
-                    this.importMode ? null : new IconButton("fa-magic", "Gen. Image", {
-                        onClick: this.uploadFromAiGenImage,
-                        title: "Create an AI Generated Image"
-                    }),
-                    this.importMode ? null : new IconButton("fa-magic", "Gen. Speech", {
-                        onClick: this.uploadFromAiGenSpeech,
-                        title: "Create an AI Generated Speech MP3"
-                    }),
-
-                    this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
-
-                    // LEAVING THIS FOR FUTURE
-                    // (Currently the clipboard upload button on the editor itself is all we need so this button
-                    // is not here since it just repliates that same functionality)
-                    // this.importMode || !S.util.clipboardReadable() ? null : new IconButton("fa-paperclip", "Clipboard", {
-                    //     onClick: this.uploadFromClipboard,
-                    //     title: "Upload from Clipboard"
-                    // }),
-
-                    this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", "Mic", {
-                        onClick: async () => {
-                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
-                            await dlg.open();
-                            if (dlg.uploadRequested) {
-                                this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
-                                this.runButtonEnablement();
-                                this.upload();
-                            }
-                        },
-                        title: "Record Audio as Attachment"
-                    }),
-
-                    this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", "Web Cam", {
-                        onClick: async () => {
-                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
-                            await dlg.open();
-                            if (dlg.uploadRequested) {
-                                // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
-                                dlg.blobType = S.util.chopAtLastChar(dlg.blobType, ";");
-                                this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
-                                this.runButtonEnablement();
-                                this.upload();
-                            }
-                        },
-                        title: "Record Video as Attachment"
-                    })
-                ]),
+                this.buildSourcesComponent(),
 
                 new Div("From your Computer (Click or Drag-n-Drop)", { className: "marginTop" }),
 
@@ -124,6 +68,82 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
+    }
+
+    buildSourcesComponent = (): Comp => {
+        if (this.importMode) return null;
+
+        return new FlexLayout([
+            new Div(null, { className: "marginRight" }, [
+                new Div("Existing Data"),
+                new ButtonBar([
+                    !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
+                        onClick: this.uploadFromClipboard,
+                        title: "Upload from Clipboard"
+                    }),
+
+                    new IconButton("fa-cloud", "URL", {
+                        onClick: this.uploadFromUrl,
+                        title: "Upload from Web/URL"
+                    }),
+                ])
+            ]),
+            new Div(null, { className: "marginRight" }, [
+                new Div("AI Generated"),
+                new ButtonBar([
+                    new IconButton("fa-magic", "Image", {
+                        onClick: this.uploadFromAiGenImage,
+                        title: "Create an AI Generated Image"
+                    }),
+                    new IconButton("fa-magic", "Speech", {
+                        onClick: this.uploadFromAiGenSpeech,
+                        title: "Create an AI Generated Speech MP3"
+                    }),
+
+                    !S.quanta.cfg.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
+
+                    // LEAVING THIS FOR FUTURE
+                    // (Currently the clipboard upload button on the editor itself is all we need so this button
+                    // is not here since it just repliates that same functionality)
+                    // !S.util.clipboardReadable() ? null : new IconButton("fa-paperclip", "Clipboard", {
+                    //     onClick: this.uploadFromClipboard,
+                    //     title: "Upload from Clipboard"
+                    // }),
+                ])
+            ]),
+            new Div(null, { className: "marginRight" }, [
+                new Div("Live Recording"),
+                new ButtonBar([
+                    !this.allowRecording ? null : new IconButton("fa-microphone", "Mic", {
+                        onClick: async () => {
+                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
+                            await dlg.open();
+                            if (dlg.uploadRequested) {
+                                this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
+                                this.runButtonEnablement();
+                                this.upload();
+                            }
+                        },
+                        title: "Record Audio as Attachment"
+                    }),
+
+                    !this.allowRecording ? null : new IconButton("fa-video-camera", "Webcam", {
+                        onClick: async () => {
+                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
+                            await dlg.open();
+                            if (dlg.uploadRequested) {
+                                // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
+                                dlg.blobType = S.util.chopAtLastChar(dlg.blobType, ";");
+                                this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
+                                this.runButtonEnablement();
+                                this.upload();
+                            }
+                        },
+                        title: "Record Video as Attachment"
+                    })
+                ])
+            ])
+        ]);
     }
 
     uploadFromClipboard = async () => {
