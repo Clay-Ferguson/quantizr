@@ -1,13 +1,15 @@
-import { Comp, ScrollPos } from "../comp/base/Comp";
-import { Button } from "../comp/core/Button";
-import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
-import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator, ValidatorRuleName } from "../Validator";
+import { Comp, ScrollPos } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
+import { Div } from "../comp/core/Div";
 import { Selection } from "../comp/core/Selection";
+import { TextArea } from "../comp/core/TextArea";
+import { EditNodeDlg } from "./EditNodeDlg";
 
 interface LS { // Local State
     voice: string;
@@ -33,28 +35,34 @@ export class UploadAIGenSpeechDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new Div(null, null, [
-                    new Selection(null, null, [
+                    new Selection(null, "Voice", [
                         { key: "alloy", val: "Alloy" },
                         { key: "echo", val: "Echo" },
                         { key: "fable", val: "Fable" },
                         { key: "onyx", val: "Onyx" },
                         { key: "nova", val: "Nova" },
                         { key: "shimmer", val: "Shimmer" },
-                    ], null, "aiSpeechGenVoice float-end", {
+                    ], null, "aiSpeechGenVoice", {
                         setValue: (val: string) => this.mergeState<LS>({ voice: val }),
                         getValue: (): string => this.getState<LS>().voice
                     }),
                 ]),
+                new Clearfix(),
                 new TextArea("Enter Text for Speech", { rows: 10 }, this.descriptState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Generate", this.upload, null, "btn-primary"),
+                    new Button("Generate", this.generate, null, "btn-primary"),
+                    new Button("Node Text", this.nodeText),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    upload = async () => {
+    nodeText = async () => {
+        this.descriptState.setValue(EditNodeDlg.currentInst.contentEditorState.getValue());
+    }
+
+    generate = async () => {
         if (!this.validate()) {
             return;
         }

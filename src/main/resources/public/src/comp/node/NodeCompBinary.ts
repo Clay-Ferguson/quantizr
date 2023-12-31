@@ -185,7 +185,7 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasVideo(node, this.attName)) {
             this.setChildren([
                 new FlexRowLayout([
-                    new IconButton("fa-play", "Play Video", {
+                    new IconButton("fa-play", "Video", {
                         onClick: () => {
                             new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
                         }
@@ -199,7 +199,7 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasAudio(node, this.attName)) {
             this.setChildren([
                 new FlexRowLayout([
-                    new IconButton("fa-play", "Play Audio", {
+                    new IconButton("fa-play", "Audio", {
                         onClick: () => {
                             new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0).open();
                         }

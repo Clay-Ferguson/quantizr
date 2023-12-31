@@ -50,14 +50,14 @@ export class UploadAIGenImgDlg extends DialogBase {
                 ]),
                 new TextArea("Describe Image", { rows: 10 }, this.descriptState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Generate", this.upload, null, "btn-primary"),
+                    new Button("Generate", this.generate, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    upload = async () => {
+    generate = async () => {
         if (!this.validate()) {
             return;
         }
