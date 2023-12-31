@@ -131,7 +131,7 @@ export class NodeCompTableRowLayout extends Div {
                     }
                 }, {
                     title: "Insert new node"
-                }, "btn-secondary marginLeft marginTop", "fa-plus"));
+                }, "btn-secondary marginLeft marginTop ui-new-node-plus", "fa-plus"));
 
                 const userCanPaste = (S.props.isMine(lastNode) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
                 if (!!ast.nodesToMove && userCanPaste) {

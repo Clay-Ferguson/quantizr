@@ -66,7 +66,7 @@ export class NodeCompRow extends Div {
                         S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
                     }, {
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
-                    }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
+                    }, "btn-secondary  ui-new-node-plus " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
                 ]);
 
                 S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {

@@ -106,7 +106,7 @@ export class NodeCompVerticalRowLayout extends Div {
                         }
                     }, {
                         title: "Insert new node"
-                    }, "btn-secondary plusButtonFloatRight", "fa-plus")
+                    }, "btn-secondary plusButtonFloatRight ui-new-node-plus", "fa-plus")
                 ]));
 
                 S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
