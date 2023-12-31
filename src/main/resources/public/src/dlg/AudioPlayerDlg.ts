@@ -99,8 +99,9 @@ export class AudioPlayerDlg extends DialogBase {
                     src: this.sourceUrl,
                     className: "audioPlayer",
                     onPause: () => { this.savePlayerInfo(this.player.src, this.player.currentTime); },
-                    onTimeUpdate: () => { this.onTimeUpdate(); },
-                    onCanPlay: () => { this.restoreStartTime(); },
+                    onTimeUpdate: this.onTimeUpdate,
+                    onCanPlay: this.restoreStartTime,
+                    onEnded: this.onEnded,
                     controls: "controls",
                     autoPlay: "autoplay",
                     preload: "auto",
@@ -264,6 +265,14 @@ export class AudioPlayerDlg extends DialogBase {
                 this.player.currentTime = this.startTimePending;
                 this.startTimePending = null;
             }
+        }
+    }
+
+    onEnded = () => {
+        if (this.player) {
+            this.player.currentTime = 0;
+            this.savePlayerInfo(this.player.src, 0);
+            this.player.pause();
         }
     }
 
