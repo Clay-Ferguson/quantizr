@@ -80,4 +80,4 @@ Importantly, these kinds of Deep Documents can also be powerful for their abilit
 
 
 ----
-**[Next Page -> Application Layout](/docs/user-guide/app-layout/index.md)**
+**[Next: Application Layout](/docs/user-guide/app-layout/index.md)**

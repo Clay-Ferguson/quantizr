@@ -387,4 +387,4 @@ There would be some code changes involved to build a commercial Pinning Service,
 
 
 ----
-**[Next Page -> Quanta User Guide](/docs/user-guide/index.md)**
+**[Next: Quanta Developer Guide](/docs/dev-guide/index.md)**

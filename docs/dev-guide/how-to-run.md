@@ -43,4 +43,4 @@ You'll see in the setenv file that the data folder for MongoDB defaults to `${DE
 
 
 ----
-**[Next Page -> PostgreSQL](/docs/dev-guide/postgres.md)**
+**[Next: PostgreSQL](/docs/dev-guide/postgres.md)**

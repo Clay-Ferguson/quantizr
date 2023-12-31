@@ -166,4 +166,4 @@ Recommended reading: Search for "Project Gutenberg" in WordPress online informat
 
 
 ----
-**[Next Page -> Account Profile and Settings](/docs/user-guide/account-settings/index.md)**
+**[Next: Account Profile and Settings](/docs/user-guide/account-settings/index.md)**

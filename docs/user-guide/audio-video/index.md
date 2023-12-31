@@ -22,4 +22,4 @@ To see live examples of the Audio and Video players go here:
 
 
 ----
-**[Next Page -> Recording Audio or Video](/docs/user-guide/recording-av/index.md)**
+**[Next: Recording Audio or Video](/docs/user-guide/recording-av/index.md)**

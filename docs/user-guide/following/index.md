@@ -43,4 +43,4 @@ Here's what a filtered view of a Fediverse Feed looks like when you've selected 
 
 
 ----
-**[Next Page -> Content Layout](/docs/user-guide/page-layout/index.md)**
+**[Next: Content Layout](/docs/user-guide/page-layout/index.md)**

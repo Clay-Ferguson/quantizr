@@ -29,4 +29,4 @@ In the screenshot below the `Folders Tab` is selected. `Think of the "Folders Ta
 
 
 ----
-**[Next Page -> Content Editing](/docs/user-guide/editing/index.md)**
+**[Next: Content Editing](/docs/user-guide/editing/index.md)**

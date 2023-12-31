@@ -65,4 +65,4 @@ Select `Menu -> Search -> By Node ID` to search for the node that has a specific
 
 
 ----
-**[Next Page -> Timelines](/docs/user-guide/timelines/index.md)**
+**[Next: Timelines](/docs/user-guide/timelines/index.md)**

@@ -132,4 +132,4 @@ Then that means something went wrong starting or terminating IPFS, and the emerg
 
 
 ----
-**[Next Page -> Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Next: Demo Content](/docs/demo-content/index.md)**

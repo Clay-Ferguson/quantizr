@@ -20,4 +20,4 @@ If you've already understood `build-dev.sh` and how it works you'll notice `buil
 
 
 ----
-**[Next Page -> How to Run](/docs/dev-guide/how-to-run.md)**
+**[Next: How to Run](/docs/dev-guide/how-to-run.md)**

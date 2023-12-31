@@ -91,4 +91,4 @@ which will expand the subnodes on the page with their parent so that the user ca
 
 
 ----
-**[Next Page -> Document View](/docs/user-guide/document-view/index.md)**
+**[Next: Document View](/docs/user-guide/document-view/index.md)**

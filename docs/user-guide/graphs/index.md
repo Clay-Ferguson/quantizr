@@ -20,4 +20,4 @@ You can use the mouse wheel to zoom in and out in the graphical viewport. You ca
 
 
 ----
-**[Next Page -> Text-to-Speech](/docs/user-guide/text-to-speech/index.md)**
+**[Next: Text-to-Speech](/docs/user-guide/text-to-speech/index.md)**

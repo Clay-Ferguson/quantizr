@@ -51,4 +51,4 @@ Another way to TTS text is to enable the input area by clicking the "Text Input"
 
 
 ----
-**[Next Page -> Export and Import](/docs/user-guide/import-export/index.md)**
+**[Next: Export and Import](/docs/user-guide/import-export/index.md)**

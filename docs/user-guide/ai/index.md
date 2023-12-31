@@ -1,24 +1,27 @@
 **[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
-* [ChatGPT AI](#chatgpt-ai)
-    * [ChatGPT AI](#chatgpt-ai)
-    * [Image-related AI Examples](#image-related-ai-examples)
-    * [ChatGPT](#chatgpt)
+* [AI - Artificial Intelligence](#ai---artificial-intelligence)
+    * [ChatGPT - Powered by OpenAI](#chatgpt---powered-by-openai)
+    * [AI Conversations](#ai-conversations)
+    * [A Node that Asks a Question to AI](#a-node-that-asks-a-question-to-ai)
     * [Asking Questions to the AI](#asking-questions-to-the-ai)
     * [Question about Content](#question-about-content)
     * [Configure GPT](#configure-gpt)
         * [System Prompt Examples](#system-prompt-examples)
+    * [Image Understanding](#image-understanding)
+    * [Image Generation](#image-generation)
+    * [Image Generation Examples](#image-generation-examples)
+    * [Speech Generation](#speech-generation)
     * [Practical Use Case - Writing a Scientific Paper](#practical-use-case---writing-a-scientific-paper)
-    * [Image and Vision Examples](#image-and-vision-examples)
 
-# ChatGPT AI
+# AI - Artificial Intelligence
 
 Converse with AI, generate images, ask questions about images.
 
-# ChatGPT AI
+# ChatGPT - Powered by OpenAI
 ----
 
-Interact with `OpenAI's ChatGPT-4, GPT-4 Vision, and Text-to-Image DALL-E 3`, by asking questions and getting answers automatically saved into the tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context".
+Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context". *Note: Quanta uses OpenAI to power all it's AI capabilities.*
 
 <img src='attachments/64ebe6bfc33eef3cdbdac756-file-p' style='width:20%'/>
 
@@ -27,19 +30,19 @@ Interact with `OpenAI's ChatGPT-4, GPT-4 Vision, and Text-to-Image DALL-E 3`, by
 
 * Get answers to general questions about anything
 * Have conversations with the AI, that you can either keep private or share publicly
-* Get assistance writing any kind of document, from research papers, to marketing materials, to fiction.
 * Ask questions about the content of any Quanta tree branch
-* Generate images via text prompt (powered by DALL-E 3 Model)
-* Ask questions about images (powered by GPT-4-Vision)
+* Generate images via text prompt
+* Ask questions about images
+* Generate Speech from text, and save as MP3 attachment
 
-<img src='attachments/64ec1778c33eef3cdbdacf51-file-p' style='width:100%'/>
+# AI Conversations
+
+The screenshot below shows how to ask a question to the AI, and get it's answer back. `Answers` are always inserted as a new node directly under the `question` node. This means AI conversations are actually a tree and not a top-to-bottom list.
+
+<img src='attachments/6591ebdbc9873822b24fa632-file-p' style='width:100%'/>
 
 
-# Image-related AI Examples
-
-* https://quanta.wiki/u/wclayf/ai-images?view=doc
-
-# ChatGPT
+# A Node that Asks a Question to AI
 
 The screenshot below shows the easiest way to ask the AI a question. You just type your question and click the `Ask GPT` button. The answer to the node content will be inserted as a subnode directly under the node containing the question.
 
@@ -95,6 +98,35 @@ Here are some other examples to give you an idea of just how flexible and intell
 
 * Convert natural language into SQL queries.
 
+# Image Understanding
+
+To use GPT-4 Vision, simply upload an image onto the node, then paste a question into the node and click the AI Button (Robot Icon).
+
+Here's an example asking questions about an image of an air conditioner unit. When you ask a question in a node that has an image attached the AI automatically assumes you're asking a question about the image itself.
+
+<img src='attachments/654ab0d182df4f62995973fd-question-about-image.gif' style='width:100%'/>
+
+
+# Image Generation
+
+To generate images with DALL-E 3, click the upload button, then specify that you want an AI Generated image, and then type a description.
+
+<img src='attachments/654ab18182df4f629959741c-bird-house-hunting.gif' style='width:100%'/>
+
+
+# Image Generation Examples
+
+* https://quanta.wiki/u/wclayf/ai-images?view=doc
+
+# Speech Generation
+
+To convert a body of text to an MP3 file of a person narrating the text, you can do that using the "Attach" button, to attach the MP3.
+
+In the screen recording below we generate an MP3 file and attaching it to the node. The GIF is silent or else you would be able to hear the sentence being read when the created MP3 was played right.
+
+<img src='attachments/6591e76fc9873822b24fa51c-ai-text-to-speech.gif' style='width:100%'/>
+
+
 # Practical Use Case - Writing a Scientific Paper
 ----
 
@@ -117,22 +149,8 @@ However more frequently you'll probably just look at how ChatGPT worded the text
 ![file-p](attachments/64f7a2a206a5b22fcf329784-file-p)
 
 
-# Image and Vision Examples
-
-To use GPT-4 Vision, simply upload an image onto the node, then paste a question into the node and click the AI Button (Robot Icon).
-
-Here's an example asking questions about an image of an air conditioner unit. When you ask a question in a node that has an image attached the AI automatically assumes you're asking a question about the image itself.
-
-<img src='attachments/654ab0d182df4f62995973fd-question-about-image.gif' style='width:100%'/>
-
-
-To generate images with DALL-E 3, click the upload button, then specify that you want an AI Generated image, and then type a description.
-
-<img src='attachments/654ab18182df4f629959741c-bird-house-hunting.gif' style='width:100%'/>
-
-
 **[ChatGPT Example Q&A](/docs/user-guide/addendum/index.md)**
 
 
 ----
-**[Next Page -> Friends and Followers](/docs/user-guide/following/index.md)**
+**[Next: Friends and Followers](/docs/user-guide/following/index.md)**

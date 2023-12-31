@@ -56,4 +56,4 @@ This is a minor limitation, and will be made easier to use in a future release o
 
 
 ----
-**[Next Page -> Interactive Graphs](/docs/user-guide/graphs/index.md)**
+**[Next: Interactive Graphs](/docs/user-guide/graphs/index.md)**

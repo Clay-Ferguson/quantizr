@@ -90,4 +90,4 @@ The `Import Key` lets you update the Selected Key type, from text content that y
 
 
 ----
-**[Next Page -> Addendum](/docs/user-guide/addendum/index.md)**
+**[Next: Addendum](/docs/user-guide/addendum/index.md)**

@@ -22,4 +22,4 @@ Use `docker ps` to get container id
 
 
 ----
-**[Next Page -> Docker Install](/docs/dev-guide/docker-install.md)**
+**[Next: Docker Install](/docs/dev-guide/docker-install.md)**

@@ -13,4 +13,4 @@ The A/V recording option is available in the `File Attachment Dialog` accessible
 
 
 ----
-**[Next Page -> Node Info](/docs/user-guide/node-info/index.md)**
+**[Next: Node Info](/docs/user-guide/node-info/index.md)**

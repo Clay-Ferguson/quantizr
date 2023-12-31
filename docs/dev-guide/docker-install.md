@@ -86,4 +86,4 @@ Error response from daemon: could not choose an IP address to advertise since th
 
 
 ----
-**[Next Page -> How to Build](/docs/dev-guide/how-to-build.md)**
+**[Next: How to Build](/docs/dev-guide/how-to-build.md)**

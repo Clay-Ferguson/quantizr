@@ -63,6 +63,10 @@ The "Advanced" section contains more features/capabilities, like entering a node
 ![file-p](attachments/6287b4e5a487d37f9989df9c-file-p)
 
 
+# Tips and Tricks
+
+* If you hold down the CTRL key when you click an insert button (the Plus '+' Icon) your clipboard text will be automatically inserted as your node content and immediately saved.
+
 
 ----
-**[Next Page -> Tree Editing](/docs/user-guide/adv-editing/index.md)**
+**[Next: Tree Editing](/docs/user-guide/adv-editing/index.md)**

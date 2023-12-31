@@ -37,4 +37,4 @@ Password: ******
 
 
 ----
-**[Next Page -> Troubleshooting](/docs/dev-guide/troubleshooting.md)**
+**[Next: Troubleshooting](/docs/dev-guide/troubleshooting.md)**

@@ -33,4 +33,4 @@ You can click on any word displayed in this dialog to automatically run a search
 
 
 ----
-**[Next Page -> RSS and Podcasts](/docs/user-guide/rss/index.md)**
+**[Next: RSS and Podcasts](/docs/user-guide/rss/index.md)**

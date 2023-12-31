@@ -225,4 +225,4 @@ However even if the admin initiates the transfer in this way, the person on the 
 
 
 ----
-**[Next Page -> Uploading](/docs/user-guide/uploading/index.md)**
+**[Next: Uploading](/docs/user-guide/uploading/index.md)**

@@ -16,7 +16,7 @@
 
 ### [Social Media and Fediverse](/docs/user-guide/activity-pub/index.md)
 
-### [ChatGPT AI](/docs/user-guide/ai/index.md)
+### [AI - Artificial Intelligence](/docs/user-guide/ai/index.md)
 
 ### [Friends and Followers](/docs/user-guide/following/index.md)
 
@@ -54,4 +54,4 @@
 
 
 ----
-**[Next Page -> Backup and Restore](/docs/dev-guide/backup-and-restore.md)**
+**[Next: About Quanta](/docs/user-guide/about/index.md)**

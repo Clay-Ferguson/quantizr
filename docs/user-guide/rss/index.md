@@ -63,4 +63,4 @@ Here's a screenshot of the audio player, showing this "Post" button:
 
 
 ----
-**[Next Page -> Encryption](/docs/user-guide/encryption/index.md)**
+**[Next: Encryption](/docs/user-guide/encryption/index.md)**

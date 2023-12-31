@@ -40,7 +40,3 @@ This node is for demonstration purposes to show how Quanta displays a node that 
 This node is for demonstration purposes to show how Quanta displays a node that has an audio file uploaded to it.
 
 [file_example_MP3_700KB.mp3](attachments/5e73d3938192e21397d41e03-file_example_MP3_700KB.mp3)
-
-
-----
-**[Next Page -> Quanta](/docs/index.md)**

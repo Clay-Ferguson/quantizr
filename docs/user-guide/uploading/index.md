@@ -66,4 +66,4 @@ This means Quanta can effectively function as an `IPFS Pinning Service`
 
 
 ----
-**[Next Page -> Sharing](/docs/user-guide/sharing/index.md)**
+**[Next: Sharing](/docs/user-guide/sharing/index.md)**

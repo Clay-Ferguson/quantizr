@@ -13,4 +13,4 @@ todo: This screenshot is obsolete now because the "Boomark" option has been move
 
 
 ----
-**[Next Page -> Semantic Web](/docs/user-guide/semantic-web/index.md)**
+**[Next: Semantic Web](/docs/user-guide/semantic-web/index.md)**

@@ -96,4 +96,4 @@ Your Feed View will now show search results, until you click the "Clear" button,
 
 
 ----
-**[Next Page -> ChatGPT AI](/docs/user-guide/ai/index.md)**
+**[Next: AI - Artificial Intelligence](/docs/user-guide/ai/index.md)**

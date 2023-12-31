@@ -78,9 +78,9 @@ Supports encryption and secure messaging, where only the owner of a node (or oth
 
 # Blogs - Notes - Wikis 
 
-Create blogs or wikis with markdown, images, videos, links, code blocks, etc. The sharing settings on each node, allow you to share content with the public at large, or with specific users of your choice.
+Create blogs or wikis with markdown, images, videos, links, code blocks, etc. or host your own instance as corporate documentation portal. The sharing settings on each node allow you to share content with the public at large, or with specific users of your choice.
 
-<img src='attachments/6018796bf5fad05e348a3831-img1' style='width:25%'/>
+<img src='attachments/6018796bf5fad05e348a3831-file-p' style='width:25%'/>
 
 
 # Advanced Editing
@@ -228,4 +228,4 @@ Tech Stack: `Java` SpringBoot (back end), `TypeScript` (front end), SPA WebApp, 
 
 
 ----
-**[Next Page -> About Quanta](/docs/user-guide/about/index.md)**
+**[Next: Quanta User Guide](/docs/user-guide/index.md)**
