@@ -373,9 +373,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private String getShortNodeText(String content) {
         // rip off the first line if it's an xml comment
+        if (content == null)
+            return "";
+        content = content.trim();
         int firstNLIdx = content.indexOf("\n");
         int endXmlCommentIdx = content.indexOf("-->\n");
-        if (endXmlCommentIdx < firstNLIdx) {
+        if (endXmlCommentIdx > 0 && firstNLIdx > 0 && endXmlCommentIdx < firstNLIdx) {
             content = content.substring(endXmlCommentIdx + 4);
         }
 
