@@ -382,6 +382,19 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
+    private class Stats {
+        long nodeCount = 0;
+        long wordCount = 0;
+        int publicCount = 0;
+        int publicWriteCount = 0;
+        int nonPublicCount = 0;
+        int adminOwnedCount = 0;
+        int userShareCount = 0;
+        int signedNodeCount = 0;
+        int unsignedNodeCount = 0;
+        int failedSigCount = 0;
+    }
+
     public GetNodeStatsResponse getNodeStats(MongoSession ms, GetNodeStatsRequest req) {
         GetNodeStatsResponse res = new GetNodeStatsResponse();
         boolean countVotes = !req.isFeed();
@@ -408,19 +421,12 @@ public class NodeSearchService extends ServiceBase {
         HashMap<String, WordStats> mentionMap = req.isGetMentions() ? new HashMap<>() : null;
         HashMap<String, WordStats> voteMap = countVotes ? new HashMap<>() : null;
 
-        long nodeCount = 0;
-        long totalWords = 0;
+        Stats stats = new Stats();
         Iterable<SubNode> iter = null;
         boolean strictFiltering = false;
-        int publicCount = 0;
-        int publicWriteCount = 0;
-        int nonPublicCount = 0;
-        int adminOwnedCount = 0;
-        int userShareCount = 0;
-        int signedNodeCount = 0;
-        int unsignedNodeCount = 0;
-        int failedSigCount = 0;
         boolean trending = req.isTrending();
+        SubNode searchRoot = null;
+
         /*
          * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
          * a bunch of options but just the public feed query
@@ -472,17 +478,17 @@ public class NodeSearchService extends ServiceBase {
          */
         else {
             ms = ThreadLocals.ensure(ms);
-            SubNode searchRoot = read.getNode(ms, req.getNodeId());
+            searchRoot = read.getNode(ms, req.getNodeId());
             if (req.isSignatureVerify()) {
                 String sig = searchRoot.getStr(NodeProp.CRYPTO_SIG);
                 if (sig != null) {
-                    signedNodeCount++;
+                    stats.signedNodeCount++;
                     if (!crypto.nodeSigVerify(searchRoot, sig)) {
-                        failedSigCount++;
+                        stats.failedSigCount++;
                     }
                 } else {
                     // log.debug("UNSIGNED: " + XString.prettyPrint(searchRoot));
-                    unsignedNodeCount++;
+                    stats.unsignedNodeCount++;
                 }
             }
             Sort sort = null;
@@ -496,146 +502,15 @@ public class NodeSearchService extends ServiceBase {
         HashSet<String> uniqueUsersSharedTo = new HashSet<>();
         HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
 
+        // for tree stats we need to process the root node as well because our query only gets children
+        if (searchRoot != null) {
+            processStatsForNode(searchRoot, req, stats, uniqueVoters, strictFiltering, trending, uniqueUsersSharedTo,
+                    countVotes, blockTerms, wordMap, tagMap, mentionMap, voteMap);
+        }
+
         for (SubNode node : iter) {
-            nodeCount++;
-            if (req.isSignatureVerify()) {
-                String sig = node.getStr(NodeProp.CRYPTO_SIG);
-                if (sig != null) {
-                    signedNodeCount++;
-                    if (!crypto.nodeSigVerify(node, sig)) {
-                        failedSigCount++;
-                    }
-                } else {
-                    // log.debug("UNSIGNED: " + XString.prettyPrint(node));
-                    unsignedNodeCount++;
-                }
-            }
-
-            // PART 1: Process sharing info
-            HashMap<String, AccessControl> aclEntry = node.getAc();
-            boolean isPublic = false;
-            if (aclEntry != null) {
-                for (String key : aclEntry.keySet()) {
-                    AccessControl ac = aclEntry.get(key);
-                    if (PrincipalName.PUBLIC.s().equals(key)) {
-                        isPublic = true;
-                        publicCount++;
-                        if (ac != null && ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
-                            publicWriteCount++;
-                        }
-                    } else {
-                        userShareCount++;
-                        uniqueUsersSharedTo.add(key);
-                    }
-                }
-            }
-
-            if (!isPublic) {
-                nonPublicCount++;
-            }
-
-            if (acl.isAdminOwned(node)) {
-                adminOwnedCount++;
-            }
-
-            // PART 2: process 'content' text.
-            if (node.getContent() == null)
-                continue;
-            String content = node.getContent();
-            if (node.getTags() != null) {
-                content += " " + node.getTags();
-            }
-            // if strict content filtering ignore non-english or bad words posts completely
-            if (strictFiltering && (!english.isEnglish(content) || english.hasBadWords(content))) {
-                continue;
-            }
-            HashSet<String> knownTokens = null;
-            StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
-
-            while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
-                // todo-a: temporary hack to fix bug where "### quanta.service.UserManagerService@40226788's Node"
-                // was getting processed by lots of nodes
-                if ("node".equalsIgnoreCase(token) || "service".equalsIgnoreCase(token)
-                        || "quanta".equalsIgnoreCase(token)) {
-                    continue;
-                }
-                if (!english.isStopWord(token)) {
-                    String lcToken = token.toLowerCase();
-                    // if word is a mention.
-                    if (token.startsWith("@")) {
-                        if (token.length() < 3)
-                            continue;
-                        // lazy create and update knownTokens
-                        if (knownTokens == null) {
-                            knownTokens = new HashSet<>();
-                        }
-                        knownTokens.add(lcToken);
-                        if (mentionMap != null) {
-                            WordStats ws = mentionMap.get(lcToken);
-                            if (ws == null) {
-                                ws = new WordStats(token);
-                                mentionMap.put(lcToken, ws);
-                            }
-                            ws.inc(node, trending);
-                        }
-                    } //
-                    else if (token.startsWith("#")) { // if word is a hashtag.
-                        if (token.endsWith("#") || token.length() < 4)
-                            continue;
-                        String tokSearch = token.replace("#", "").toLowerCase();
-                        if (blockTerms != null && blockTerms.contains(tokSearch))
-                            continue;
-                        // ignore stuff like #1 #23
-                        String numCheck = token.substring(1);
-                        if (StringUtils.isNumeric(numCheck))
-                            continue;
-                        // lazy create and update knownTokens
-                        if (knownTokens == null) {
-                            knownTokens = new HashSet<>();
-                        }
-                        knownTokens.add(lcToken);
-                        if (tagMap != null) {
-                            WordStats ws = tagMap.get(lcToken);
-                            if (ws == null) {
-                                ws = new WordStats(token);
-                                tagMap.put(lcToken, ws);
-                            }
-                            ws.inc(node, trending);
-                        }
-                    } else { // ordinary word
-                        if (!StringUtils.isAlpha(token) || token.length() < 3) {
-                            continue;
-                        }
-                        if (blockTerms != null && blockTerms.contains(token.toLowerCase()))
-                            continue;
-                        if (wordMap != null) {
-                            WordStats ws = wordMap.get(lcToken);
-                            if (ws == null) {
-                                ws = new WordStats(token);
-                                wordMap.put(lcToken, ws);
-                            }
-                            ws.inc(node, trending);
-                        }
-                    }
-                }
-                totalWords++;
-            }
-            extractTagsAndMentions(node, knownTokens, tagMap, mentionMap, blockTerms, trending);
-            if (countVotes) {
-                String vote = node.getStr(NodeProp.VOTE.s());
-                if (vote != null) {
-                    // 'add' returns true if we are encountering this ID for the first time, so we can tally it's vote
-                    if (uniqueVoters.add(node.getId())) {
-                        WordStats ws = voteMap.get(vote);
-                        if (ws == null) {
-                            ws = new WordStats(vote);
-                            voteMap.put(vote, ws);
-                        }
-                        ws.inc(node, trending);
-                    }
-                }
-            }
+            processStatsForNode(node, req, stats, uniqueVoters, strictFiltering, trending, uniqueUsersSharedTo,
+                    countVotes, blockTerms, wordMap, tagMap, mentionMap, voteMap);
         }
 
         List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
@@ -653,8 +528,8 @@ public class NodeSearchService extends ServiceBase {
             voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Node count: " + nodeCount + "\n");
-        sb.append("Total Words: " + totalWords + "\n");
+        sb.append("Node count: " + stats.nodeCount + "\n");
+        sb.append("Total Words: " + stats.wordCount + "\n");
         if (wordList != null) {
             sb.append("Unique Words: " + wordList.size() + "\n");
         }
@@ -662,15 +537,15 @@ public class NodeSearchService extends ServiceBase {
             sb.append("Unique Votes: " + voteList.size() + "\n");
         }
 
-        sb.append("Non-Public: " + nonPublicCount + "\n");
-        sb.append("Public: " + publicCount + "\n");
-        sb.append("Public Writable: " + publicWriteCount + "\n");
-        sb.append("Admin Owned: " + adminOwnedCount + "\n");
-        sb.append("User Shares: " + userShareCount + "\n");
+        sb.append("Non-Public: " + stats.nonPublicCount + "\n");
+        sb.append("Public: " + stats.publicCount + "\n");
+        sb.append("Public Writable: " + stats.publicWriteCount + "\n");
+        sb.append("Admin Owned: " + stats.adminOwnedCount + "\n");
+        sb.append("User Shares: " + stats.userShareCount + "\n");
         sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
         if (req.isSignatureVerify()) {
-            sb.append("Signed: " + signedNodeCount + ", Unsigned: " + unsignedNodeCount + ", FAILED SIGS: "
-                    + failedSigCount);
+            sb.append("Signed: " + stats.signedNodeCount + ", Unsigned: " + stats.unsignedNodeCount + ", FAILED SIGS: "
+                    + stats.failedSigCount);
         }
 
         res.setStats(sb.toString());
@@ -727,6 +602,153 @@ public class NodeSearchService extends ServiceBase {
         }
 
         return res;
+    }
+
+    private void processStatsForNode(SubNode node, GetNodeStatsRequest req, Stats stats, //
+            HashSet<ObjectId> uniqueVoters, boolean strictFiltering, boolean trending,
+            HashSet<String> uniqueUsersSharedTo, boolean countVotes, HashSet<String> blockTerms,
+            HashMap<String, WordStats> wordMap, HashMap<String, WordStats> tagMap,
+            HashMap<String, WordStats> mentionMap, HashMap<String, WordStats> voteMap) {
+        stats.nodeCount++;
+        if (req.isSignatureVerify()) {
+            String sig = node.getStr(NodeProp.CRYPTO_SIG);
+            if (sig != null) {
+                stats.signedNodeCount++;
+                if (!crypto.nodeSigVerify(node, sig)) {
+                    stats.failedSigCount++;
+                }
+            } else {
+                // log.debug("UNSIGNED: " + XString.prettyPrint(node));
+                stats.unsignedNodeCount++;
+            }
+        }
+
+        // PART 1: Process sharing info
+        HashMap<String, AccessControl> aclEntry = node.getAc();
+        boolean isPublic = false;
+        if (aclEntry != null) {
+            for (String key : aclEntry.keySet()) {
+                AccessControl ac = aclEntry.get(key);
+                if (PrincipalName.PUBLIC.s().equals(key)) {
+                    isPublic = true;
+                    stats.publicCount++;
+                    if (ac != null && ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+                        stats.publicWriteCount++;
+                    }
+                } else {
+                    stats.userShareCount++;
+                    uniqueUsersSharedTo.add(key);
+                }
+            }
+        }
+
+        if (!isPublic) {
+            stats.nonPublicCount++;
+        }
+
+        if (acl.isAdminOwned(node)) {
+            stats.adminOwnedCount++;
+        }
+
+        // PART 2: process 'content' text.
+        if (node.getContent() == null)
+            return;
+        String content = node.getContent();
+        if (node.getTags() != null) {
+            content += " " + node.getTags();
+        }
+        // if strict content filtering ignore non-english or bad words posts completely
+        if (strictFiltering && (!english.isEnglish(content) || english.hasBadWords(content))) {
+            return;
+        }
+        HashSet<String> knownTokens = null;
+        StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
+
+        while (tokens.hasMoreTokens()) {
+            String token = tokens.nextToken().trim();
+            // todo-a: temporary hack to fix bug where "### quanta.service.UserManagerService@40226788's Node"
+            // was getting processed by lots of nodes
+            if ("node".equalsIgnoreCase(token) || "service".equalsIgnoreCase(token)
+                    || "quanta".equalsIgnoreCase(token)) {
+                continue;
+            }
+            if (!english.isStopWord(token)) {
+                String lcToken = token.toLowerCase();
+                // if word is a mention.
+                if (token.startsWith("@")) {
+                    if (token.length() < 3)
+                        continue;
+                    // lazy create and update knownTokens
+                    if (knownTokens == null) {
+                        knownTokens = new HashSet<>();
+                    }
+                    knownTokens.add(lcToken);
+                    if (mentionMap != null) {
+                        WordStats ws = mentionMap.get(lcToken);
+                        if (ws == null) {
+                            ws = new WordStats(token);
+                            mentionMap.put(lcToken, ws);
+                        }
+                        ws.inc(node, trending);
+                    }
+                } //
+                else if (token.startsWith("#")) { // if word is a hashtag.
+                    if (token.endsWith("#") || token.length() < 4)
+                        continue;
+                    String tokSearch = token.replace("#", "").toLowerCase();
+                    if (blockTerms != null && blockTerms.contains(tokSearch))
+                        continue;
+                    // ignore stuff like #1 #23
+                    String numCheck = token.substring(1);
+                    if (StringUtils.isNumeric(numCheck))
+                        continue;
+                    // lazy create and update knownTokens
+                    if (knownTokens == null) {
+                        knownTokens = new HashSet<>();
+                    }
+                    knownTokens.add(lcToken);
+                    if (tagMap != null) {
+                        WordStats ws = tagMap.get(lcToken);
+                        if (ws == null) {
+                            ws = new WordStats(token);
+                            tagMap.put(lcToken, ws);
+                        }
+                        ws.inc(node, trending);
+                    }
+                } else { // ordinary word
+                    if (!StringUtils.isAlpha(token) || token.length() < 3) {
+                        continue;
+                    }
+                    if (blockTerms != null && blockTerms.contains(token.toLowerCase()))
+                        continue;
+                    if (wordMap != null) {
+                        WordStats ws = wordMap.get(lcToken);
+                        if (ws == null) {
+                            ws = new WordStats(token);
+                            wordMap.put(lcToken, ws);
+                        }
+                        ws.inc(node, trending);
+                    }
+                }
+            }
+            stats.wordCount++;
+        }
+        extractTagsAndMentions(node, knownTokens, tagMap, mentionMap, blockTerms, trending);
+
+        if (countVotes) {
+            String vote = node.getStr(NodeProp.VOTE.s());
+            if (vote != null) {
+                // 'add' returns true if we are encountering this ID for the first time, so we can tally it's vote
+                if (uniqueVoters.add(node.getId())) {
+                    WordStats ws = voteMap.get(vote);
+                    if (ws == null) {
+                        ws = new WordStats(vote);
+                        voteMap.put(vote, ws);
+                    }
+                    ws.inc(node, trending);
+                }
+            }
+        }
     }
 
     private HashSet<String> getAdminBlockedWords(GetNodeStatsRequest req) {
