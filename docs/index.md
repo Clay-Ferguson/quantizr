@@ -13,6 +13,8 @@ Quanta is `Fediverse-enabled (aka Mastodon)`, so you can follow people and/or po
 
 # Explore the Platform
 
+Read the docs on `quanta.wiki` or in the [GitHub Docs Folder](https://github.com/Clay-Ferguson/quantizr/blob/master/docs/index.md)
+
 ### [Quanta Features](/docs/features/index.md)
 
 ### [Quanta User Guide](/docs/user-guide/index.md)
