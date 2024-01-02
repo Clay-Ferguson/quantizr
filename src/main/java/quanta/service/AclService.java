@@ -415,6 +415,11 @@ public class AclService extends ServiceBase {
         return node != null && node.getAc() != null && node.getAc().containsKey(PrincipalName.PUBLIC.s());
     }
 
+    public static boolean isWritable(SubNode node) {
+        return node != null && node.getAc() != null && node.getAc().containsKey(PrincipalName.PUBLIC.s())
+                && node.getAc().get(PrincipalName.PUBLIC.s()).getPrvs().contains(PrivilegeType.WRITE.s());
+    }
+
     public void makePublicAppendable(MongoSession ms, SubNode node) {
         setKeylessPriv(ms, node, PrincipalName.PUBLIC.s(), APConst.RDWR);
     }
@@ -449,14 +454,20 @@ public class AclService extends ServiceBase {
         return node.getOwner().equals(auth.getAdminSession().getUserNodeId());
     }
 
+    /**
+     * Sets the default reply ACL on the child node to be the same as the parent node. This is used when
+     * creating a new node, and we want to inherit the parent's ACL.
+     */
     public void inheritSharingFromParent(MongoSession ms, String boosterUserId, ResponseBase res, SubNode parentNode,
             SubNode childNode) {
         // we always determine the access controls from the parent for any new nodes
         auth.setDefaultReplyAcl(parentNode, childNode);
 
         if (AclService.isPublic(parentNode)) {
-            acl.addPrivilege(ms, null, childNode, PrincipalName.PUBLIC.s(), null,
-                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+            List<String> prvList = AclService.isWritable(parentNode) ? //
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s())
+                    : Arrays.asList(PrivilegeType.READ.s());
+            acl.addPrivilege(ms, null, childNode, PrincipalName.PUBLIC.s(), null, prvList, null);
         }
 
         if (boosterUserId != null) {
@@ -475,6 +486,10 @@ public class AclService extends ServiceBase {
         }
     }
 
+    /**
+     * Builds a list of AccessControlInfo objects from the ACL on the node. This is used when returning
+     * ACL information to the client.
+     */
     public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
         List<AccessControlInfo> ret = null;
         HashMap<String, AccessControl> ac = node.getAc();

@@ -1287,6 +1287,15 @@ public class AttachmentService extends ServiceBase {
         if (newNodeInfo != null) {
             res.setTargetNode(newNodeInfo);
         }
+
+        List<String> sigDirtyNodes = new LinkedList<>();
+        sigDirtyNodes.add(targetNode.getIdStr());
+        sigDirtyNodes.add(sourceNode.getIdStr());
+
+        exec.run(() -> {
+            crypto.signNodesById(ms, sigDirtyNodes);
+        });
+
         return res;
     }
 }
