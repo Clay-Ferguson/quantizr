@@ -121,7 +121,6 @@ export class User {
         await S.localDB.setUser(J.PrincipalName.ANON);
         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
-
         window.location.href = window.location.origin;
     }
 
