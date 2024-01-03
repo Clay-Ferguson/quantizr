@@ -81,6 +81,7 @@ import quanta.request.PasteAttachmentsRequest;
 import quanta.request.PingRequest;
 import quanta.request.PublishNodeToIpfsRequest;
 import quanta.request.RemovePrivilegeRequest;
+import quanta.request.RemoveSignaturesRequest;
 import quanta.request.RenderCalendarRequest;
 import quanta.request.RenderDocumentRequest;
 import quanta.request.RenderNodeRequest;
@@ -927,6 +928,14 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object signSubGraph(@RequestBody SignSubGraphRequest req, HttpSession session) {
         return callProc.run("signSubGraph", true, true, req, session, ms -> {
             return crypto.signSubGraph(req, ms);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/removeSignatures", method = RequestMethod.POST)
+    @ResponseBody
+    public Object removeSignatures(@RequestBody RemoveSignaturesRequest req, HttpSession session) {
+        return callProc.run("removeSignatures", false, false, req, session, ms -> {
+            return crypto.removeSignatures(ms, req);
         });
     }
 

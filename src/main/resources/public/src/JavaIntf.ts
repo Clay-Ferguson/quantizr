@@ -630,6 +630,10 @@ export interface RemovePrivilegeRequest extends RequestBase {
     privilege: string;
 }
 
+export interface RemoveSignaturesRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface RenderCalendarRequest extends RequestBase {
     nodeId: string;
 }
@@ -1082,6 +1086,9 @@ export interface PushPageMessage extends ServerPushInfo {
 }
 
 export interface RemovePrivilegeResponse extends ResponseBase {
+}
+
+export interface RemoveSignaturesResponse extends ResponseBase {
 }
 
 export interface RenderCalendarResponse extends ResponseBase {

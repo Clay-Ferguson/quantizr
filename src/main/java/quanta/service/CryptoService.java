@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.request.RemoveSignaturesRequest;
 import quanta.request.SavePublicKeyRequest;
 import quanta.request.SignNodesRequest;
 import quanta.request.SignSubGraphRequest;
@@ -39,6 +41,7 @@ import quanta.request.SubGraphHashRequest;
 import quanta.response.NodeSigData;
 import quanta.response.NodeSigPushInfo;
 import quanta.response.PushPageMessage;
+import quanta.response.RemoveSignaturesResponse;
 import quanta.response.SavePublicKeyResponse;
 import quanta.response.SignNodesResponse;
 import quanta.response.SignSubGraphResponse;
@@ -351,6 +354,50 @@ public class CryptoService extends ServiceBase {
         });
         return new SignSubGraphResponse();
     }
+
+    public Object removeSignatures(MongoSession ms, RemoveSignaturesRequest req) {
+        SubNode node = read.getNode(ms, req.getNodeId());
+        String sigProp = SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s();
+
+        if (node == null) {
+            throw new RuntimeException("Unknown node: " + req.getNodeId());
+        }
+        auth.ownerAuth(ms, node);
+
+        // query for the subgraph under 'node' for all nodes that have the sigProp and are owned by us
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()))//
+                .and(sigProp).exists(true) //
+                .and(SubNode.OWNER).is(ms.getUserNodeId());
+
+        Query query = new Query();
+        query.addCriteria(crit);
+
+        Val<BulkOperations> bops = new Val<>(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
+        update.bulkOpDelProp(ms, bops.getVal(), node.getId(), sigProp);
+        IntVal batchSize = new IntVal(1);
+
+        opsw.stream(query, SubNode.class).forEach(n -> {
+            // lazy create bops
+            if (!bops.hasVal()) {
+                bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
+            }
+
+            update.bulkOpDelProp(ms, bops.getVal(), n.getId(), sigProp);
+            batchSize.inc();
+
+            if (batchSize.getVal() > Const.MAX_BULK_OPS) {
+                bops.getVal().execute();
+                batchSize.setVal(0);
+                bops.setVal(null);
+            }
+        });
+        if (bops.hasVal()) {
+            bops.getVal().execute();
+        }
+
+        return new RemoveSignaturesResponse();
+    }
+
 
     /**
      * Gets ths sig key json from "sc", and assigns it into "sc" if not assigned yet.

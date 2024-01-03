@@ -138,9 +138,23 @@ public class MongoUpdate extends ServiceBase {
             bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
         }
         Criteria crit = new Criteria("id").is(id);
+
+        // todo-0: should adding writeSecurity be an option because it might be done at a higher level up
+        // already?
         crit = auth.addWriteSecurity(ms, crit);
         Query query = new Query().addCriteria(crit);
         Update update = new Update().set(prop, val);
+        bops.updateOne(query, update);
+        return bops;
+    }
+
+    public BulkOperations bulkOpDelProp(MongoSession ms, BulkOperations bops, ObjectId id, String prop) {
+        if (bops == null) {
+            bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+        }
+        Criteria crit = new Criteria("id").is(id);
+        Query query = new Query().addCriteria(crit);
+        Update update = new Update().unset(prop); // <-- todo-0: I'm guessing that 'unset' is a 'delete' (check this)
         bops.updateOne(query, update);
         return bops;
     }

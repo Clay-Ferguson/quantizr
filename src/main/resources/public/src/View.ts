@@ -339,6 +339,20 @@ export class View {
         new NodeStatsDlg(res, false, false).open();
     }
 
+    removeSignatures = async (): Promise<any> => {
+        const node = S.nodeUtil.getHighlightedNode();
+        const res = await S.rpcUtil.rpc<J.RemoveSignaturesRequest, J.RemoveSignaturesResponse>("removeSignatures", {
+            nodeId: node ? node.id : null
+        });
+
+        if (res) {
+            S.quanta.refresh();
+            setTimeout(() => {
+                S.util.showMessage("Finished Removing Signatures", "Signatures");
+            }, 1000);
+        }
+    }
+
     runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string) => {
         const node = S.nodeUtil.getHighlightedNode();
 

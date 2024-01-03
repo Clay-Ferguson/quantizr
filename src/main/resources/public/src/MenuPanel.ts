@@ -318,22 +318,24 @@ export class MenuPanel extends Div {
             children.push(new Menu("Tools", [
                 new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab, null, true),
                 new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab),
+                new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
 
                 new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
                 new MenuItem("Export", MenuPanel.export, onMainTab && exportFeatureEnabled, null, true),
-                new MenuItemSeparator(), //
-
-                S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine, null, true) : null, //
-                new MenuItem("Verify Signatures", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true) //
 
                 // Removing for now. Our PostIt node icon makes this easy enough.
                 // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
 
                 // DO NOT DELETE
                 // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
+            ], null));
+
+            children.push(new Menu("Signature", [
+                S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine, null, true) : null, //
+                new MenuItem("Verify", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Remove", S.view.removeSignatures, onMainTab && selNodeIsMine, null, true), //
             ], null));
         }
 
