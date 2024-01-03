@@ -68,7 +68,6 @@ export class Quanta {
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, J.OpenGraph> = new Map<string, J.OpenGraph>();
     imageUrls: Set<string> = new Set<string>();
-    brokenImages: Set<string> = new Set<string>();
 
     dragImg: any = null;
     dragElm: any = null;
@@ -243,8 +242,7 @@ export class Quanta {
             }
 
             await this.initialRender();
-
-            Log.log("initApp complete.");
+            console.log("initApp complete.");
             if (S.quanta.config.login) {
                 S.user.userLogin();
             }

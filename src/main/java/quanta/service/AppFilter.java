@@ -76,7 +76,7 @@ public class AppFilter extends GenericFilterBean {
             }
             ThreadLocals.setHttpSession(session);
 
-            mutex = getMutex(httpReq, session, mutex);
+            mutex = getMutex(httpReq, session);
             logUrlAndParams(httpReq);
 
             if (audit) {
@@ -160,8 +160,7 @@ public class AppFilter extends GenericFilterBean {
         return sc;
     }
 
-    private ReentrantLock getMutex(HttpServletRequest httpReq, HttpSession session, ReentrantLock mutex)
-            throws InterruptedException {
+    private ReentrantLock getMutex(HttpServletRequest httpReq, HttpSession session) throws InterruptedException {
         boolean useLock = true;
         // bypass locking for these
         switch (httpReq.getRequestURI()) {
@@ -169,19 +168,24 @@ public class AppFilter extends GenericFilterBean {
             case AppController.API_PATH + "/signNodes":
             case AppController.API_PATH + "/getOpenGraph":
             case AppController.API_PATH + "/health":
+            case AppController.API_PATH + "/bin":
                 useLock = false;
                 break;
             default:
                 break;
         }
 
+        ReentrantLock mutex = null;
         if (useLock) {
             mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
             if (mutex != null) {
-                boolean isLockAcquired = mutex.tryLock(180, TimeUnit.SECONDS);
+                boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
 
-                if (!isLockAcquired)
-                    throw new ServerTooBusyException();
+                if (!isLockAcquired) {
+                    // todo-0: this log message never makes it into the log file
+                    log.debug("MUTEX: Failed to acquire lock for " + httpReq.getRequestURI());
+                    throw new ServerTooBusyException(httpReq.getRequestURI());
+                }
             }
         }
         return mutex;

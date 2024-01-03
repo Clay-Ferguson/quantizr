@@ -196,12 +196,12 @@ export class OpenGraphPanel extends Div {
             else {
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new FlexRowLayout([
-                    !S.quanta.brokenImages.has(state.og.image) ? new Div(null, { className: "openGraphLhs" }, [
+                    new Div(null, { className: "openGraphLhs" }, [
                         new Img({
                             className: this.imageClass,
                             src: state.og.image
                         })
-                    ]) : null,
+                    ]),
                     new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])

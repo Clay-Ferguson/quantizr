@@ -5,8 +5,8 @@ import quanta.exception.base.RuntimeEx;
 
 public class ServerTooBusyException extends RuntimeEx {
 
-    public ServerTooBusyException() {
-        super("Server too busy(1)");
+    public ServerTooBusyException(String url) {
+        super("Server too busy: Failed on " + url);
     }
 
     public int getCode() {
