@@ -22,7 +22,7 @@ public class CalendarType extends TypeBase {
             // if parent is a calendar node, then we need to set the date on this new node
             childNode.getVal().set(NodeProp.DATE, Calendar.getInstance().getTime().getTime());
             childNode.getVal().set(NodeProp.DURATION, "01:00");
-            childNode.getVal().setTags("#due");
+            // childNode.getVal().setTags("#due");
         }
     }
 }
