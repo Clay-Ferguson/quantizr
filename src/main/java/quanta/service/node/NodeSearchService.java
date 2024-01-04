@@ -479,18 +479,6 @@ public class NodeSearchService extends ServiceBase {
         else {
             ms = ThreadLocals.ensure(ms);
             searchRoot = read.getNode(ms, req.getNodeId());
-            if (req.isSignatureVerify()) {
-                String sig = searchRoot.getStr(NodeProp.CRYPTO_SIG);
-                if (sig != null) {
-                    stats.signedNodeCount++;
-                    if (!crypto.nodeSigVerify(searchRoot, sig)) {
-                        stats.failedSigCount++;
-                    }
-                } else {
-                    // log.debug("UNSIGNED: " + XString.prettyPrint(searchRoot));
-                    stats.unsignedNodeCount++;
-                }
-            }
             Sort sort = null;
             int limit = 0;
             if (req.isTrending()) {
@@ -543,6 +531,7 @@ public class NodeSearchService extends ServiceBase {
         sb.append("Admin Owned: " + stats.adminOwnedCount + "\n");
         sb.append("User Shares: " + stats.userShareCount + "\n");
         sb.append("Unique Users Shared To: " + uniqueUsersSharedTo.size() + "\n");
+
         if (req.isSignatureVerify()) {
             sb.append("Signed: " + stats.signedNodeCount + ", Unsigned: " + stats.unsignedNodeCount + ", FAILED SIGS: "
                     + stats.failedSigCount);
