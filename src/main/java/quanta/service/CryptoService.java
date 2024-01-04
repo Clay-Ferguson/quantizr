@@ -173,12 +173,13 @@ public class CryptoService extends ServiceBase {
             for (NodeSigData data : req.getListToSign()) {
                 ObjectId id = new ObjectId(data.getNodeId());
                 SubNode node = read.getNode(ms, id);
+                auth.ownerAuth(ms, node);
 
                 // if we found the node and this setter DID change it's value, then we save.
                 if (node != null && node.set(NodeProp.CRYPTO_SIG, data.getData())) {
                     // clean so we won't let this node get persisted, because we're doing the persist in this bulk op
                     ThreadLocals.clean(node);
-                    bops = update.bulkOpSetPropVal(ms, bops, id, SubNode.PROPS, node.getProps());
+                    bops = update.bulkOpSetPropVal(ms, bops, id, SubNode.PROPS, node.getProps(), false);
                     if (++batchSize > Const.MAX_BULK_OPS) {
                         bops.execute();
                         batchSize = 0;

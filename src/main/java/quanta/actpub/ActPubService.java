@@ -718,9 +718,8 @@ public class ActPubService extends ServiceBase {
         boolean undo = activity instanceof APOUndo;
         arun.<Object>run(as -> {
             log.trace("process " + (undo ? "unannounce" : "announce") + " Payload=" + XString.prettyPrint(activity));
-            // if this is an undo operation we just delete the node and we're done.
             if (undo) {
-                delete.deleteByPropVal(as, NodeProp.OBJECT_ID.s(), activity.getId());
+                delete.deleteByPropVal(as, NodeProp.OBJECT_ID.s(), activity.getId(), false);
                 return null;
             }
             // get the url of the thing being boosted
