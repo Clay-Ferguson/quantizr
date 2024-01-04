@@ -182,7 +182,6 @@ public class AppFilter extends GenericFilterBean {
                 boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
 
                 if (!isLockAcquired) {
-                    // todo-0: this log message never makes it into the log file
                     log.debug("MUTEX: Failed to acquire lock for " + httpReq.getRequestURI());
                     throw new ServerTooBusyException(httpReq.getRequestURI());
                 }
