@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- NOTE: This file is copied over to /log/logback.xml and configured to exist there in
-deployments/runtime, but you 
-should do normal editing in /src/main/resources/logback-spring.xml which is the 'master' copy of
-the file. -->
+deployments/runtime, but you should do normal editing in /src/main/resources/logback-spring.xml 
+which is the 'master' copy of the file. -->
 <configuration scan="true" scanPeriod="120 seconds">
 
     <property name="LOGS" value="/log" />
@@ -17,6 +16,8 @@ the file. -->
     </appender>
 
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="quanta.config.CustomLogFilter" />
+
         <file>${LOGS}/spring-boot-logger.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d %p %C [%t] %m%n</Pattern>
@@ -75,10 +76,7 @@ the file. -->
         <appender-ref ref="Console" />
     </logger>
 
-    <logger name="reactor.util" level="warn" additivity="false">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
-    </logger>
+    <logger name="reactor.util" level="OFF" />
 
     <logger name="com.zaxxer.hikari" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
