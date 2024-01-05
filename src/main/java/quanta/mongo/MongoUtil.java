@@ -581,7 +581,6 @@ public class MongoUtil extends ServiceBase {
         log.debug("Creating FediverseName unique index.");
 
         try {
-            delete.removeDupFediNames();
             log.debug("Indexing FediverseName collection");
             opsw.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
         } catch (Exception e) {

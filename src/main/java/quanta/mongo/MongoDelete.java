@@ -716,19 +716,6 @@ public class MongoDelete extends ServiceBase {
         opsw.remove(ms, q);
     }
 
-    // todo-1: verify if there's now a constraint that disables duplicates
-    public void removeDupFediNames() {
-        Iterable<FediverseName> recs = opsw.findAll(FediverseName.class);
-
-        HashSet<String> names = new HashSet<>();
-        for (FediverseName fName : recs) {
-            if (!names.add(fName.getName())) {
-                opsw.remove(fName);
-                log.debug("Removed Dup FediName: " + fName.getName());
-            }
-        }
-    }
-
     public Object delete(DeleteNodesRequest req, MongoSession ms) {
         if (req.isBulkDelete()) {
             return delete.bulkDeleteNodes(ms);
