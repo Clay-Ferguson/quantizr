@@ -134,7 +134,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.sectionTitle("ActivityPub"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
+                        this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users?token=" + S.quanta.authToken, "_blank")), //
                         this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL)
                     ]),
                     new Div(null, { className: settingsCol }, [

@@ -174,11 +174,10 @@ public class AppController extends ServiceBase implements ErrorController {
                 model);
     }
 
-    @PerfMon
-    @GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
+    @RequestMapping(value = "/fediverse-users", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String fediverseUsers() {
-        return apub.dumpFediverseUsers();
+    public String fediverseUsers(@RequestParam(value = "token", required = true) String token) {
+        return apub.dumpFediverseUsers(token);
     }
 
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)

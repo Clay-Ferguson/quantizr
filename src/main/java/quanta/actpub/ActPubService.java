@@ -1690,8 +1690,11 @@ public class ActPubService extends ServiceBase {
         return sb.toString();
     }
 
-    public String dumpFediverseUsers() {
-        ThreadLocals.requireAdmin();
+    public String dumpFediverseUsers(String token) {
+        if (!user.validToken(token, PrincipalName.ADMIN.s())) {
+            return "Invalid admin token";
+        }
+
         StringBuilder sb = new StringBuilder();
         IntVal count = new IntVal();
 
