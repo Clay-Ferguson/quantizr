@@ -10,6 +10,7 @@ import { NodeCompBinary } from "../node/NodeCompBinary";
 import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
+import { CollapsiblePanel } from "./CollapsiblePanel";
 import { Div } from "./Div";
 import { FlexRowLayout } from "./FlexRowLayout";
 import { Icon } from "./Icon";
@@ -195,7 +196,10 @@ export class EditAttachmentsPanel extends Div {
             }
         }
 
-        const aiPrompt = att.ai ? new Div("AI Prompt: " + att.ai, { className: "smallMarginTop" }) : null;
+        const aiPrompt = new CollapsiblePanel("AI Prompt", "Hide AI Prompt", null,
+            [new Div(att.ai, { className: "smallMarginTop marginLeft" })], true, (exp: boolean) => {
+                dispatch("ExpandAIPrompt", s => s.aiPromptsExpanded = exp);
+            }, getAs().aiPromptsExpanded, null, "smallMarginTop", "smallMarginTop");
 
         return new Div(null, { className: "binaryEditorItem" }, [
             topBinRow, fileNameTagTip, bottomBinRow, aiPrompt

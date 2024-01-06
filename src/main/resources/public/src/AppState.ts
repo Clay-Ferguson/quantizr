@@ -56,6 +56,7 @@ export class AppState {
 
     otherAccountNodesExpanded: boolean = false;
     linksToAttachmentsExpanded: boolean = false;
+    aiPromptsExpanded: boolean = false;
     fullScreenControlsExpanded: boolean = false;
 
     /* name of currently logged in user */
