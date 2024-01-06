@@ -298,9 +298,8 @@ export class TypeBase implements TypeIntf {
 
         const attrs = containerClass ? { className: containerClass } : null;
 
-        // todo-1: tricky hack to detect if this is all HTML. Now that our markdown renderer does supprt HTML this
-        // might not be needed, but I'm leaving it in for now.
-        if (cont && cont.startsWith("<") && cont.indexOf(">") < 20 && cont.endsWith(">")) {
+        // tricky and imperfect hack to detect if this is all HTML.
+        if (cont && cont.startsWith("<") && cont.indexOf(">") < 30 && cont.endsWith(">")) {
             urls = this.parseUrlsFromHtml(node);
 
             // The reason we don't sanitize for admin users is mainly because we need the code containing the

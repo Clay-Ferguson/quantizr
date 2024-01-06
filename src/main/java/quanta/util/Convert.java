@@ -72,9 +72,7 @@ public class Convert extends ServiceBase {
             /*
              * todo-1: This is designed to silently fail here and not show the nodes where a signature is
              * failing and a possible database hack, however on a clean install when an anon user visits the
-             * site and the 'home' node is not yet signed we get this error with no explaination of why. We need
-             * to throw an actual error if this is a 'page root' node that's failing rather than a contained
-             * node.
+             * site and the 'home' node is not yet signed we get this error with no explaination of why.
              */
 
             log.error("Bad Signature on Admin Node: " + node.getIdStr());
