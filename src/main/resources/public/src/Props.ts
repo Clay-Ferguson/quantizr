@@ -1,5 +1,6 @@
 import { dispatch, getAs } from "./AppContext";
 import * as J from "./JavaIntf";
+import { Attachment, NodeInfo, PropertyInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Props {
@@ -11,7 +12,7 @@ export class Props {
 
     hiddenPropertyList: Set<string> = new Set<string>();
 
-    moveNodePosition = (props: J.PropertyInfo[], idx: number, typeName: string): number => {
+    moveNodePosition = (props: PropertyInfo[], idx: number, typeName: string): number => {
         const tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
         if (tagIdx !== -1) {
             S.util.arrayMoveItem(props, tagIdx, idx++);
@@ -19,7 +20,7 @@ export class Props {
         return idx;
     }
 
-    deleteProp = (node: J.NodeInfo, propertyName: string) => {
+    deleteProp = (node: NodeInfo, propertyName: string) => {
         if (node.properties) {
             node.properties = node.properties.filter(p => {
                 return p.name !== propertyName;
@@ -27,7 +28,7 @@ export class Props {
         }
     }
 
-    getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
+    getClientProp = (propName: string, node: NodeInfo): PropertyInfo => {
         if (!node?.clientProps) {
             return null;
         }
@@ -39,7 +40,7 @@ export class Props {
     node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
-    getCryptoKey = (node: J.NodeInfo) => {
+    getCryptoKey = (node: NodeInfo) => {
         if (!node) return null;
         let key = null;
 
@@ -54,15 +55,15 @@ export class Props {
         return key;
     }
 
-    isShared = (node: J.NodeInfo): boolean => {
+    isShared = (node: NodeInfo): boolean => {
         return !!node.ac;
     }
 
-    hasNonPublicShares = (node: J.NodeInfo): boolean => {
+    hasNonPublicShares = (node: NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== J.PrincipalName.PUBLIC);
     }
 
-    hasMentions = (node: J.NodeInfo): boolean => {
+    hasMentions = (node: NodeInfo): boolean => {
         const tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
         let ret = false;
         if (tags?.forEach) {
@@ -75,15 +76,15 @@ export class Props {
         return ret;
     }
 
-    isPublic = (node: J.NodeInfo): boolean => {
+    isPublic = (node: NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC);
     }
 
-    isPublicWritable = (node: J.NodeInfo): boolean => {
+    isPublicWritable = (node: NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }
 
-    isWritableByMe = (node: J.NodeInfo): boolean => {
+    isWritableByMe = (node: NodeInfo): boolean => {
         if (!node) return false;
         const ast = getAs();
 
@@ -106,11 +107,11 @@ export class Props {
             ace.principalNodeId === ast.userProfile?.userNodeId);
     }
 
-    isPublicReadOnly = (node: J.NodeInfo): boolean => {
+    isPublicReadOnly = (node: NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === J.PrincipalName.PUBLIC && !this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }
 
-    getAcCount = (node: J.NodeInfo): number => {
+    getAcCount = (node: NodeInfo): number => {
         return node && node.ac ? node.ac.length : 0;
     }
 
@@ -119,19 +120,19 @@ export class Props {
         return !!ace.privileges.find(p => p.privilegeName.indexOf(priv) !== -1);
     }
 
-    isMine = (node: J.NodeInfo): boolean => {
+    isMine = (node: NodeInfo): boolean => {
         const ast = getAs();
         if (!node || !ast.userName || ast.userName === J.PrincipalName.ANON) return false;
         return ast.userName === node.owner;
     }
 
-    isEncrypted = (node: J.NodeInfo): boolean => {
+    isEncrypted = (node: NodeInfo): boolean => {
         return node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
     }
 
-    getAttachmentByUrl = (node: J.NodeInfo, url: string): J.Attachment => {
+    getAttachmentByUrl = (node: NodeInfo, url: string): Attachment => {
         if (!node || !node.attachments) return null;
-        let ret: J.Attachment = null;
+        let ret: Attachment = null;
         Object.keys(node.attachments).forEach(key => {
             if (node.attachments[key].u === url) {
                 ret = node.attachments[key];
@@ -140,8 +141,8 @@ export class Props {
         return ret;
     }
 
-    getOrderedAtts = (node: J.NodeInfo): J.Attachment[] => {
-        const list: J.Attachment[] = [];
+    getOrderedAtts = (node: NodeInfo): Attachment[] => {
+        const list: Attachment[] = [];
 
         // put all attachments in 'list', random order
         let defaultOrdinal = 0;
@@ -163,52 +164,52 @@ export class Props {
         return list;
     }
 
-    hasBinary = (node: J.NodeInfo): boolean => {
+    hasBinary = (node: NodeInfo): boolean => {
         return !!node.attachments;
     }
 
-    hasImage = (node: J.NodeInfo, attName: string): boolean => {
+    hasImage = (node: NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
         return target?.startsWith("image/");
     }
 
-    hasAudio = (node: J.NodeInfo, attName: string): boolean => {
+    hasAudio = (node: NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
         return target?.startsWith("audio/");
     }
 
-    hasVideo = (node: J.NodeInfo, attName: string): boolean => {
+    hasVideo = (node: NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
         const target = att ? att.m : null;
         return target?.startsWith("video/");
     }
 
-    getProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
+    getProp = (propName: string, node: NodeInfo): PropertyInfo => {
         return node?.properties?.find(p => p.name === propName);
     }
 
-    getPropStr = (propertyName: string, node: J.NodeInfo): string => {
+    getPropStr = (propertyName: string, node: NodeInfo): string => {
         return this.getProp(propertyName, node)?.value;
     }
 
-    getPropObj = (propertyName: string, node: J.NodeInfo): any => {
+    getPropObj = (propertyName: string, node: NodeInfo): any => {
         return this.getProp(propertyName, node)?.value;
     }
 
-    getClientPropStr = (propertyName: string, node: J.NodeInfo): string => {
+    getClientPropStr = (propertyName: string, node: NodeInfo): string => {
         return this.getClientProp(propertyName, node)?.value;
     }
 
-    getAttachment = (name: string, node: J.NodeInfo): J.Attachment => {
+    getAttachment = (name: string, node: NodeInfo): Attachment => {
         if (!name) {
             name = J.Constant.ATTACHMENT_PRIMARY;
         }
         return node?.attachments ? node.attachments[name] : null;
     }
 
-    setPropVal = (propertyName: string, node: J.NodeInfo, val: any) => {
+    setPropVal = (propertyName: string, node: NodeInfo, val: any) => {
         let prop = this.getProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
@@ -226,7 +227,7 @@ export class Props {
         }
     }
 
-    setProp = (node: J.NodeInfo, newProp: J.PropertyInfo) => {
+    setProp = (node: NodeInfo, newProp: PropertyInfo) => {
         if (!newProp) return;
         const prop = this.getProp(newProp.name, node);
 
@@ -277,11 +278,11 @@ export class Props {
         ]);
     }
 
-    isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
+    isGuiControlBasedProp = (prop: PropertyInfo): boolean => {
         return !!S.props.controlBasedPropertyList.has(prop.name);
     }
 
-    isHiddenProp = (prop: J.PropertyInfo): boolean => {
+    isHiddenProp = (prop: PropertyInfo): boolean => {
         // let admin user see all props.
         if (getAs().isAdminUser) return false;
 
@@ -321,7 +322,7 @@ export class Props {
         return null;
     }
 
-    getParentPath = (node: J.NodeInfo): string => {
+    getParentPath = (node: NodeInfo): string => {
         const slashIdx = node.path.lastIndexOf("/");
         if (slashIdx === -1) return null;
         return node.path.substring(0, slashIdx);
@@ -366,7 +367,7 @@ export class Props {
         });
     }
 
-    hasDisplayableProps = (node: J.NodeInfo) => {
+    hasDisplayableProps = (node: NodeInfo) => {
         if (node.properties) {
             for (const prop of node.properties) {
                 if (!S.props.isGuiControlBasedProp(prop) && !S.props.isHiddenProp(prop)) return true;

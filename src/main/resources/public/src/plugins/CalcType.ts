@@ -5,6 +5,7 @@ import { Pre } from "../comp/core/Pre";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
@@ -21,7 +22,7 @@ export class CalcType extends TypeBase {
         return S.quanta.cfg.help?.type?.calculator?.editor;
     }
 
-    override allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
+    override allowAction(_action: NodeActionType, _node: NodeInfo): boolean {
         return true;
     }
 
@@ -29,7 +30,7 @@ export class CalcType extends TypeBase {
         return true;
     }
 
-    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         if (!S.props.isMine(node)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }
@@ -90,7 +91,7 @@ export class CalcType extends TypeBase {
         `;
     }
 
-    override ensureDefaultProperties(_node: J.NodeInfo) {
+    override ensureDefaultProperties(_node: NodeInfo) {
         // this has the unintended behavior of when the user tries to clear out the text it comes back in realtime.
         // if (!node.content) {
         //     node.content = "qc.a=23;\nqc.b=19;\n\nq.log('Answer=' + (qc.a + qc.b));";

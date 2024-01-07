@@ -2,6 +2,7 @@ import { getAs } from "../../AppContext";
 import * as I from "../../Interfaces";
 import { ConfigProp, EditorOptions } from "../../Interfaces";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Comp } from "../../comp/base/Comp";
@@ -33,7 +34,7 @@ export class TypeBase implements TypeIntf {
         return this.allowUserSelect;
     }
 
-    renderEditorSubPanel = (_node: J.NodeInfo): Comp => {
+    renderEditorSubPanel = (_node: NodeInfo): Comp => {
         return null;
     }
 
@@ -162,7 +163,7 @@ export class TypeBase implements TypeIntf {
     /* Types can override this to ensure that during node editing there is a hook to prefill and create any properties that are
     required to exist on that type of node in case they aren't existing yet
     */
-    ensureDefaultProperties(node: J.NodeInfo) {
+    ensureDefaultProperties(node: NodeInfo) {
         // look for this as a configured property
         const typeObj = S.quanta.cfg.props?.[node.type];
 
@@ -186,7 +187,7 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
-    parseUrlsFromHtml = (node: J.NodeInfo): Set<string> => {
+    parseUrlsFromHtml = (node: NodeInfo): Set<string> => {
         const val = node.content;
 
         // this is just a performance optimization to bypass the function if we know we can 
@@ -253,7 +254,7 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    render = (node: J.NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    render = (node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, isLinkedNode: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -375,14 +376,14 @@ export class TypeBase implements TypeIntf {
         return "fa " + this.iconStyle + " fa-lg";
     }
 
-    allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
+    allowAction(_action: NodeActionType, _node: NodeInfo): boolean {
         return true;
     }
 
     domPreUpdateFunction(_parent: Comp): void {
     }
 
-    ensureStringPropExists(node: J.NodeInfo, propName: string) {
+    ensureStringPropExists(node: NodeInfo, propName: string) {
         const prop = S.props.getProp(propName, node);
         if (!prop) {
             node.properties = node.properties || [];

@@ -1,7 +1,7 @@
 import { getAs } from "../AppContext";
 import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
-import * as J from "../JavaIntf";
+import { Attachment } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Main } from "./Main";
 
@@ -23,7 +23,7 @@ export class FullScreenImgViewer extends Main {
 
         const isAnAccountNode = node?.ownerId && node.id === node.ownerId;
         const children = [];
-        const list: J.Attachment[] = S.props.getOrderedAtts(node);
+        const list: Attachment[] = S.props.getOrderedAtts(node);
         let attName = null;
 
         list.forEach(att => {

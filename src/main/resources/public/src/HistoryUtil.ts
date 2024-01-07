@@ -1,6 +1,7 @@
 import { dispatch, getAs } from "./AppContext";
 import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class NodeHistoryItem {
@@ -33,7 +34,7 @@ export class HistoryUtil {
         this.historySaverInterval = setInterval(this.historySaverFunc, 5000);
     }
 
-    updateHistory = (node: J.NodeInfo) => {
+    updateHistory = (node: NodeInfo) => {
         if (!node) {
             node = getAs().node;
         }
@@ -79,7 +80,7 @@ export class HistoryUtil {
     // If 'addLater=true' this means we can't alter state right now, because it could destroy text
     // the user is tempting to 'mouse select' and so we just get ready to add to history
     // the next chance we get.
-    updateNodeHistory = (node: J.NodeInfo, addLater: boolean) => {
+    updateNodeHistory = (node: NodeInfo, addLater: boolean) => {
         if (!node || !node.id || getAs().nodeHistoryLocked ||
             S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) {
             return;

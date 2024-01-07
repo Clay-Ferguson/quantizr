@@ -7,7 +7,7 @@ WARNING: Singletons (just like in Spring) are not allowed to do any logic that r
 inside their constructors because there is no guarantee that all (or any) of the other Singletons have
 been constructed yet.
 */
-import { Attachment } from "./Attachment";
+import { Attach } from "./Attach";
 import { Crypto } from "./Crypto";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
@@ -52,7 +52,7 @@ export class Factory {
             S.histUtil = new HistoryUtil();
             S.push = new ServerPush();
             S.edit = new Edit();
-            S.attachment = new Attachment();
+            S.attachment = new Attach();
             S.crypto = new Crypto();
             S.nav = new Nav();
             S.props = new Props();

@@ -6,7 +6,7 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { FullScreenType } from "../../Interfaces";
 import { TabIntf } from "../../intf/TabIntf";
-import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 
 export class GraphTab implements TabIntf<any> {
     name = "Node Graph";
@@ -36,16 +36,16 @@ export class GraphTab implements TabIntf<any> {
 
     getTabSubOptions = (): Div => { return null; };
 
-    findNode = (_nodeId: string): J.NodeInfo => {
+    findNode = (_nodeId: string): NodeInfo => {
         return null;
     }
 
     nodeDeleted = (_ust: AppState, _nodeId: string): void => {
     }
 
-    replaceNode = (_ust: AppState, _newNode: J.NodeInfo): void => {
+    replaceNode = (_ust: AppState, _newNode: NodeInfo): void => {
     }
 
-    processNode = (_ust: AppState, _func: (node: J.NodeInfo) => void): void => {
+    processNode = (_ust: AppState, _func: (node: NodeInfo) => void): void => {
     }
 }

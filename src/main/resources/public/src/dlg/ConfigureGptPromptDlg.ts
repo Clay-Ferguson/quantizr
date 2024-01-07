@@ -1,5 +1,6 @@
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { Comp, ScrollPos } from "../comp/base/Comp";
@@ -13,7 +14,7 @@ export class ConfigureGptPromptDlg extends DialogBase {
     promptState: Validator = new Validator();
     textScrollPos = new ScrollPos();
 
-    constructor(public node: J.NodeInfo) {
+    constructor(public node: NodeInfo) {
         super("Configure GPT", "appModalContMediumWidth");
     }
 

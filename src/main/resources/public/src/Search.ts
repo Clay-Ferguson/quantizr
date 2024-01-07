@@ -12,6 +12,7 @@ import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
 import { DocumentTab } from "./tabs/data/DocumentTab";
@@ -26,7 +27,7 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
-    findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) => {
+    findSharedNodes = async (node: NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) => {
         const res = await S.rpcUtil.rpc<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
@@ -118,7 +119,7 @@ export class Search {
         }
     }
 
-    showReplies = async (node: J.NodeInfo) => {
+    showReplies = async (node: NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.GetRepliesViewRequest, J.GetRepliesViewResponse>("getNodeRepliesView", {
             nodeId: node.id
         });
@@ -170,7 +171,7 @@ export class Search {
             J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false, false);
     }
 
-    search = async (node: J.NodeInfo, prop: string, searchText: string, searchType: string, description: string,
+    search = async (node: NodeInfo, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
         jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> => {
@@ -253,7 +254,7 @@ export class Search {
         }
     }
 
-    showDocument = async (node: J.NodeInfo) => {
+    showDocument = async (node: NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -297,7 +298,7 @@ export class Search {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = async (node: J.NodeInfo, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
+    timeline = async (node: NodeInfo, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
@@ -579,7 +580,7 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, jumpButton: boolean, allowHeader: boolean,
+    renderSearchResultAsListItem = (node: NodeInfo, tabData: TabIntf<any>, jumpButton: boolean, allowHeader: boolean,
         showThreadButton: boolean, outterClass: string, outterClassHighlight: string,
         extraStyle: any): Comp => {
         const ast = getAs();

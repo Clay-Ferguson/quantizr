@@ -6,7 +6,7 @@ import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
@@ -19,7 +19,7 @@ interface LS { // Local State
 export class SplitNodeDlg extends DialogBase {
     delimiterState: Validator = new Validator();
 
-    constructor(private node: J.NodeInfo) {
+    constructor(private node: NodeInfo) {
         super("Split Node");
         this.node = this.node || S.nodeUtil.getHighlightedNode();
 

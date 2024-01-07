@@ -1,12 +1,12 @@
+import { getAs } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { DocumentRSInfo } from "./DocumentRSInfo";
+import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
-import { Div } from "./comp/core/Div";
-import { TabIntf } from "./intf/TabIntf";
-import * as J from "./JavaIntf";
-import { Html } from "./comp/core/Html";
-import { getAs } from "./AppContext";
 import { Clearfix } from "./comp/core/Clearfix";
+import { Div } from "./comp/core/Div";
+import { Html } from "./comp/core/Html";
+import { TabIntf } from "./intf/TabIntf";
 
 export class DocIndexPanel extends Div {
     static initialized: boolean = false;
@@ -67,7 +67,7 @@ export class DocIndexPanel extends Div {
         return "";
     }
 
-    getShortContent = (node: J.NodeInfo) => {
+    getShortContent = (node: NodeInfo) => {
         let content = node.content;
         const idx = content.indexOf("\n");
         if (idx !== -1) {

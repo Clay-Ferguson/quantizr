@@ -10,7 +10,7 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 
@@ -111,7 +111,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     /* overridable (don't use arrow function) */
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
     // it's essentially to support DOM finding.
-    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
+    renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
         const ast = getAs();
         const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, true, "userFeedItem",

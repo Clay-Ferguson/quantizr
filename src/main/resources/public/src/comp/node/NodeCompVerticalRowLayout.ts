@@ -6,13 +6,14 @@ import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompRow } from "./NodeCompRow";
 
 export class NodeCompVerticalRowLayout extends Div {
     static showSpecialNodes = true;
 
-    constructor(public node: J.NodeInfo, private tabData: TabIntf<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
+    constructor(public node: NodeInfo, private tabData: TabIntf<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
         super();
     }
 
@@ -22,7 +23,7 @@ export class NodeCompVerticalRowLayout extends Div {
         const comps: Comp[] = [];
         const allowInsert = S.props.isWritableByMe(this.node);
         let rowCount: number = 0;
-        let lastNode: J.NodeInfo = null;
+        let lastNode: NodeInfo = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.

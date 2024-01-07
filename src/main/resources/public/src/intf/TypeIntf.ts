@@ -1,6 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { ConfigProp, EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { TabIntf } from "./TabIntf";
 
 /* This interface is how Type Plugins are handled */
@@ -9,9 +10,9 @@ export interface TypeIntf {
     schemaOrg: J.SchemaOrgClass;
     getTypeName(): string;
     getName(): string;
-    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp;
+    render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp;
     getIconClass(): string;
-    allowAction(action: NodeActionType, node: J.NodeInfo): boolean;
+    allowAction(action: NodeActionType, node: NodeInfo): boolean;
     allowDeleteProperty(prop: string): boolean;
     getAllowRowHeader(): boolean;
     getAutoExpandProps(): boolean;
@@ -21,7 +22,7 @@ export interface TypeIntf {
     // if this returns a list of props, then these props are all the EditNodeDlg is allowed to show AND
     // they will all be put outside the collapsible panel if they'd normally be inside he collapse panel
     getCustomProperties(): string[];
-    ensureDefaultProperties(node: J.NodeInfo): void;
+    ensureDefaultProperties(node: NodeInfo): void;
     getAllowPropertyAdd(): boolean;
     getAllowContentEdit(): boolean;
     getEditLabelForProp(propName: string): string;
@@ -34,7 +35,7 @@ export interface TypeIntf {
 
     // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
     subOrdinal(): number;
-    renderEditorSubPanel(node: J.NodeInfo): Comp;
+    renderEditorSubPanel(node: NodeInfo): Comp;
     getEditorOptions(): EditorOptions;
     getType(prop: string): string;
 

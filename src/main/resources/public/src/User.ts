@@ -6,6 +6,7 @@ import { LoginDlg } from "./dlg/LoginDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class User {
@@ -211,7 +212,7 @@ export class User {
         new SignupDlg().open();
     }
 
-    showUsersList = (node: J.NodeInfo) => {
+    showUsersList = (node: NodeInfo) => {
         const friendsDlg = new FriendsDlg("Mentions & Shares", node.id, true);
         friendsDlg.open();
     }

@@ -6,7 +6,7 @@ import { Icon } from "../comp/core/Icon";
 import { Constants as C } from "../Constants";
 import { DocumentRSInfo } from "../DocumentRSInfo";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
@@ -21,7 +21,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
         this.pagingContainerClass = "float-end";
     }
 
-    override renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
+    override renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
 
         const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either

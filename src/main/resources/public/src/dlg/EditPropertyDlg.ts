@@ -8,6 +8,7 @@ import { TextField } from "../comp/core/TextField";
 import { SchemaOrgPropsTable } from "../comp/SchemaOrgPropsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
@@ -21,7 +22,7 @@ export class EditPropertyDlg extends DialogBase {
 
     nameState: Validator = new Validator("");
 
-    constructor(private editNode: J.NodeInfo) {
+    constructor(private editNode: NodeInfo) {
         super("Add Property", "appModalContMediumWidth");
         this.validatedStates = [this.nameState];
         const type = S.plugin.getType(this.editNode.type);

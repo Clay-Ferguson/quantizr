@@ -3,6 +3,7 @@ import { Comp } from "../../comp/base/Comp";
 import { Div } from "../../comp/core/Div";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Anchor } from "../core/Anchor";
 import { Clearfix } from "../core/Clearfix";
@@ -16,7 +17,7 @@ export class NodeCompContent extends Div {
     domPreUpdateFunc: (parent: Comp) => void;
     static PRE_PREFIX = "nc_";
 
-    constructor(public node: J.NodeInfo,
+    constructor(public node: NodeInfo,
         public tabData: TabIntf<any>,
         public rowStyling: boolean,
         public showHeader: boolean,
@@ -123,7 +124,7 @@ export class NodeCompContent extends Div {
         return true;
     }
 
-    renderActPubUrls = (children: Comp[], node: J.NodeInfo) => {
+    renderActPubUrls = (children: Comp[], node: NodeInfo) => {
         const urls: J.APObjUrl[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
         let div: Div = null;
         if (urls?.forEach) {
@@ -144,7 +145,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    renderActPubIcons = (children: Comp[], node: J.NodeInfo) => {
+    renderActPubIcons = (children: Comp[], node: NodeInfo) => {
         const icons: J.APObjIcon[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
         let div: Div = null;
         if (icons?.forEach) {
@@ -162,7 +163,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    maybeRenderDateTime = (children: Comp[], propName: string, node: J.NodeInfo) => {
+    maybeRenderDateTime = (children: Comp[], propName: string, node: NodeInfo) => {
         const timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
             const dateVal: Date = new Date(parseInt(timestampVal));

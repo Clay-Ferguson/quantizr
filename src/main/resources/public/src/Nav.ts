@@ -14,6 +14,7 @@ import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
+import { Attachment } from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
@@ -463,9 +464,9 @@ export class Nav {
         const ast = getAs();
         const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAtts(node);
-            let selAtt: J.Attachment = list[0];
-            let lastAtt: J.Attachment = null;
+            const list: Attachment[] = S.props.getOrderedAtts(node);
+            let selAtt: Attachment = list[0];
+            let lastAtt: Attachment = null;
             list.forEach(att => {
                 if (att.o === ast.fullScreenConfig.ordinal) {
                     selAtt = lastAtt;
@@ -483,8 +484,8 @@ export class Nav {
         const ast = getAs();
         const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAtts(node);
-            let selAtt: J.Attachment = list[list.length - 1];
+            const list: Attachment[] = S.props.getOrderedAtts(node);
+            let selAtt: Attachment = list[list.length - 1];
             let takeNext = false;
             list.forEach(att => {
                 if (takeNext) {

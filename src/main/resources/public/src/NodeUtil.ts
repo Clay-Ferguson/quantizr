@@ -7,6 +7,7 @@ import { Constants as C } from "./Constants";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./dlg/EditNodeDlg";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import * as J from "./JavaIntf";
+import { Attachment, NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
@@ -18,7 +19,7 @@ export class NodeUtil {
         return sels;
     }
 
-    getDisplayName = (node: J.NodeInfo): string => {
+    getDisplayName = (node: NodeInfo): string => {
         return node.owner;
     }
 
@@ -36,7 +37,7 @@ export class NodeUtil {
     //     // });
     // }
 
-    getHighlightedNode = (): J.NodeInfo => {
+    getHighlightedNode = (): NodeInfo => {
         const ast = getAs();
         if (!ast.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
@@ -78,7 +79,7 @@ export class NodeUtil {
         }
     }
 
-    highlightNode = (node: J.NodeInfo, scroll: boolean, ust: AppState) => {
+    highlightNode = (node: NodeInfo, scroll: boolean, ust: AppState) => {
         ust = ust || getAs();
         if (!node || !ust.node) {
             return;
@@ -99,7 +100,7 @@ export class NodeUtil {
     }
 
     /* Find node by looking everywhere we possibly can on local storage for it */
-    findNode = (nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): NodeInfo => {
         const ast = getAs();
         for (const data of ast.tabData) {
             const node = data.findNode(nodeId);
@@ -109,7 +110,7 @@ export class NodeUtil {
     }
 
     /* Returns the node if it's currently displaying on the page. */
-    displayingOnTree = (nodeId: string): J.NodeInfo => {
+    displayingOnTree = (nodeId: string): NodeInfo => {
         const ast = getAs();
         if (!ast.node) return null;
         if (ast.node.id === nodeId) return ast.node;
@@ -120,7 +121,7 @@ export class NodeUtil {
     /**
      * Recursively search for a node by id in the given node and it's children.
      */
-    nodeOrChilderenMatch = (node: J.NodeInfo, nodeId: string): J.NodeInfo => {
+    nodeOrChilderenMatch = (node: NodeInfo, nodeId: string): NodeInfo => {
         if (!node) return null;
         if (node.id === nodeId) return node;
         if (!node.children) return null;
@@ -131,7 +132,7 @@ export class NodeUtil {
         return null;
     }
 
-    getNodeByName = (node: J.NodeInfo, name: string, ust: AppState): J.NodeInfo => {
+    getNodeByName = (node: NodeInfo, name: string, ust: AppState): NodeInfo => {
         if (!node) return null;
         if (node.name === name) return node;
 
@@ -141,7 +142,7 @@ export class NodeUtil {
         return null;
     }
 
-    getPathPartForNamedNode = (node: J.NodeInfo): string => {
+    getPathPartForNamedNode = (node: NodeInfo): string => {
         if (!node || !node.name) return null;
 
         if (node.owner === J.PrincipalName.ADMIN) {
@@ -152,7 +153,7 @@ export class NodeUtil {
         }
     }
 
-    getPathPartForNamedNodeAttachment = (node: J.NodeInfo): string => {
+    getPathPartForNamedNodeAttachment = (node: NodeInfo): string => {
         if (!node || !node.name) return null;
 
         if (node.owner === J.PrincipalName.ADMIN) {
@@ -163,7 +164,7 @@ export class NodeUtil {
         }
     }
 
-    getShortContent = (node: J.NodeInfo): string => {
+    getShortContent = (node: NodeInfo): string => {
         let content = node.content;
         if (!content) {
             if (node.name) {
@@ -210,7 +211,7 @@ export class NodeUtil {
     }
 
     // returns true if all children are same owner as parent
-    allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
+    allChildrenAreSameOwner = (node: NodeInfo): boolean => {
         if (!node || !node.children) return true;
 
         for (const child of node.children) {
@@ -221,18 +222,18 @@ export class NodeUtil {
         return true;
     }
 
-    publishNodeToIpfs = async (node: J.NodeInfo) => {
+    publishNodeToIpfs = async (node: NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
             nodeId: node.id
         });
         S.util.showMessage(res.message, "Server Reply", true);
     }
 
-    loadNodeFromIpfs = (_node: J.NodeInfo): any => {
+    loadNodeFromIpfs = (_node: NodeInfo): any => {
         new LoadNodeFromIpfsDlg().open();
     }
 
-    removePublicShare = async (node: J.NodeInfo, editorDlg: Comp) => {
+    removePublicShare = async (node: NodeInfo, editorDlg: Comp) => {
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: J.PrincipalName.PUBLIC,
@@ -241,7 +242,7 @@ export class NodeUtil {
         this.removePrivilegeResponse(node, editorDlg);
     }
 
-    removePrivilegeResponse = async (node: J.NodeInfo, editorDlg: Comp) => {
+    removePrivilegeResponse = async (node: NodeInfo, editorDlg: Comp) => {
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id
         });
@@ -253,7 +254,7 @@ export class NodeUtil {
         }
     }
 
-    getSharingNames = (node: J.NodeInfo, editorDlg: Comp): Comp[] => {
+    getSharingNames = (node: NodeInfo, editorDlg: Comp): Comp[] => {
         if (!node?.ac) return null;
 
         const ret: Comp[] = [];
@@ -345,7 +346,7 @@ export class NodeUtil {
         return ret;
     }
 
-    getPublicPrivilegsSuffix = (principalName: string, node: J.NodeInfo): string => {
+    getPublicPrivilegsSuffix = (principalName: string, node: NodeInfo): string => {
         if (!node || !node.ac) return "";
         let val = "";
         for (const ac of node.ac) {
@@ -368,14 +369,14 @@ export class NodeUtil {
         return val;
     }
 
-    processInboundNodes = (nodes: J.NodeInfo[]) => {
+    processInboundNodes = (nodes: NodeInfo[]) => {
         if (!nodes) return;
         for (const node of nodes) {
             this.processInboundNode(node);
         }
     }
 
-    processInboundNode = (node: J.NodeInfo) => {
+    processInboundNode = (node: NodeInfo) => {
         if (!node) return;
         const tags: string[] = S.props.getPropObj(J.NodeProp.OPEN_GRAPH, node);
         if (tags) {
@@ -395,7 +396,7 @@ export class NodeUtil {
         }
     }
 
-    isCutAttachment = (att: J.Attachment, nodeId: string): boolean => {
+    isCutAttachment = (att: Attachment, nodeId: string): boolean => {
         const ast = getAs();
         return ast.cutAttachmentsFromId === nodeId && ast.cutAttachments && ast.cutAttachments.has((att as any).key);
     }

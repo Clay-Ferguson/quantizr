@@ -1,6 +1,7 @@
 import { dispatch, getAs } from "../AppContext";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
@@ -46,7 +47,7 @@ export class SearchContentDlg extends DialogBase {
     searchTextField: TextField;
     searchTextState: Validator = new Validator();
 
-    constructor(private searchRoot: J.NodeInfo = null) {
+    constructor(private searchRoot: NodeInfo = null) {
         super("Search");
         this.onMount(() => {
             // console.log("************** searchTextField focus");

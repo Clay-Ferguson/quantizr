@@ -5,12 +5,13 @@ import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompRow } from "./NodeCompRow";
 
 export class NodeCompTableRowLayout extends Div {
 
-    constructor(public node: J.NodeInfo, private tabData: TabIntf<any>, public level: number, public layout: string, public allowNodeMove: boolean, private allowHeaders: boolean) {
+    constructor(public node: NodeInfo, private tabData: TabIntf<any>, public level: number, public layout: string, public allowNodeMove: boolean, private allowHeaders: boolean) {
         super(null, { className: "nodeGridTable" });
     }
 
@@ -42,7 +43,7 @@ export class NodeCompTableRowLayout extends Div {
         const cellWidth = 100 / maxCols;
         const allowInsert = S.props.isWritableByMe(this.node);
         let curCols = 0;
-        let lastNode: J.NodeInfo = null;
+        let lastNode: NodeInfo = null;
         let rowIdx = 0;
 
         // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.

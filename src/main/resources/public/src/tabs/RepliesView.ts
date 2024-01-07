@@ -6,7 +6,7 @@ import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { RepliesRSInfo } from "../RepliesRSInfo";
 import { S } from "../Singletons";
 
@@ -83,7 +83,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): Comp {
+    renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): Comp {
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, true, false, clazz, highlightClazz, null);
     }
 }

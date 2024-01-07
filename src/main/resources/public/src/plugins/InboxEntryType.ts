@@ -1,5 +1,6 @@
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
 export class InboxEntryType extends TypeBase {
@@ -7,7 +8,7 @@ export class InboxEntryType extends TypeBase {
         super(J.NodeType.INBOX_ENTRY, "Notification", "fa-envelope", false);
     }
 
-    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
                 return true;

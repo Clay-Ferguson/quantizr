@@ -1,11 +1,11 @@
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./core/Div";
 
 export class PropDisplayLayout extends Div {
 
-    constructor(private node: J.NodeInfo) {
+    constructor(private node: NodeInfo) {
         super(null, {
             className: "fieldDisplayPanel"
         });

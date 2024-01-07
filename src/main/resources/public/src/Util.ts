@@ -11,6 +11,7 @@ import * as I from "./Interfaces";
 import { ConfigProp } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
+import { NodeInfo, PropertyInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -134,7 +135,7 @@ export class Util {
         }
     }
 
-    searchNodeArray(nodes: J.NodeInfo[], nodeId: string) {
+    searchNodeArray(nodes: NodeInfo[], nodeId: string) {
         if (!nodes) return null;
         for (const n of nodes) {
             if (n.id === nodeId) return n;
@@ -285,7 +286,7 @@ export class Util {
         return a.slice(0);
     }
 
-    arrayIndexOfItemByProp = (props: J.PropertyInfo[], propName: string, propVal: string): number => {
+    arrayIndexOfItemByProp = (props: PropertyInfo[], propName: string, propVal: string): number => {
         for (let i = 0; i < props.length; i++) {
             if (props[i][propName] === propVal) {
                 return i;
@@ -600,7 +601,7 @@ export class Util {
     }
 
     // External Emojis!
-    insertActPubTags = (val: string, node: J.NodeInfo) => {
+    insertActPubTags = (val: string, node: NodeInfo) => {
         let tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
         if (tags?.forEach) {
             tags.forEach((t: any) => {
@@ -883,7 +884,7 @@ export class Util {
 
     /* show metadata if the user has the setting ON or if on POSTS node or a COMMENT node as the
         top page-root node */
-    showMetaData = (ast: AppState, node: J.NodeInfo) => {
+    showMetaData = (ast: AppState, node: NodeInfo) => {
         return ast.userPrefs.showMetaData ||
             J.NodeType.POSTS === node?.type ||
             J.NodeType.COMMENT === node?.type;
@@ -960,7 +961,7 @@ export class Util {
         return false;
     }
 
-    getNodeFromEvent = (evt: Event): J.NodeInfo => {
+    getNodeFromEvent = (evt: Event): NodeInfo => {
         const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
         if (!nodeId) return;
         return S.nodeUtil.findNode(nodeId);

@@ -10,6 +10,7 @@ import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { DropdownMenu } from "../core/DropdownMenu";
 import { Li } from "../core/Li";
@@ -17,7 +18,7 @@ import { Span } from "../core/Span";
 
 export class NodeCompButtonBar extends Div {
 
-    constructor(public node: J.NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean,
+    constructor(public node: NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean,
         private extraButtons: Comp[], extraClass: string, public tabData: TabIntf<any>) {
         super(null, {
             id: "ncbb_" + node.id,

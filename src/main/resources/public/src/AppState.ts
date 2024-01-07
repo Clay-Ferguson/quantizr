@@ -5,6 +5,7 @@ import { NodeHistoryItem } from "./HistoryUtil";
 import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { Tour } from "./Tour";
 
 export interface ExportSettings {
@@ -63,7 +64,7 @@ export class AppState {
     userName: string = J.PrincipalName.ANON;
     displayName: string = "";
 
-    node: J.NodeInfo;
+    node: NodeInfo;
     highlightNodeId: string = null;
     indexHighlightNode: string = null;
     endReached: boolean;
@@ -157,12 +158,12 @@ export class AppState {
     rssFeedPage = {};
 
     // non-null if user is viewing an RSS feed and this will be the actual feed node
-    rssNode: J.NodeInfo = null;
+    rssNode: NodeInfo = null;
 
     bookmarks: J.Bookmark[];
     tour: Tour;
 
-    editNode: J.NodeInfo;
+    editNode: NodeInfo;
     afterEditJumpToId: string;
 
     editNodeReplyToId: string;
@@ -179,7 +180,7 @@ export class AppState {
     // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
     threadViewFromTab: string = null;
 
-    searchViewFromNode: J.NodeInfo = null; // rename to searchViewFromNode
+    searchViewFromNode: NodeInfo = null; // rename to searchViewFromNode
 
     // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
     searchViewFromTab: string = null;

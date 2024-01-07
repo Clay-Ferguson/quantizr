@@ -3,7 +3,7 @@ import { Selection } from "../../comp/core/Selection";
 import { ConfirmDlg } from "../../dlg/ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "../../dlg/EditNodeDlg";
 import { ValueIntf } from "../../Interfaces";
-import * as J from "../../JavaIntf";
+import { Attachment, NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Validator, ValidatorRuleName } from "../../Validator";
 import { NodeCompBinary } from "../node/NodeCompBinary";
@@ -20,7 +20,7 @@ import { TextField } from "./TextField";
 
 export class EditAttachmentsPanel extends Div {
 
-    constructor(private node: J.NodeInfo, private dlg: EditNodeDlg) {
+    constructor(private node: NodeInfo, private dlg: EditNodeDlg) {
         super(null, { className: "binaryEditorSection" });
     }
 
@@ -58,7 +58,7 @@ export class EditAttachmentsPanel extends Div {
         return true;
     }
 
-    makeAttPanel = (att: J.Attachment, isFirst: boolean): Div => {
+    makeAttPanel = (att: Attachment, isFirst: boolean): Div => {
         const ast = getAs();
         if (!att) return null;
         const key = (att as any).key;
@@ -91,7 +91,7 @@ export class EditAttachmentsPanel extends Div {
             ? this.createImgSizeSelection("Width", "widthDropDown", //
                 {
                     setValue: (val: string): void => {
-                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
+                        const att: Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
                             att.c = val;
                             if (isFirst) {
@@ -101,7 +101,7 @@ export class EditAttachmentsPanel extends Div {
                         }
                     },
                     getValue: (): string => {
-                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
+                        const att: Attachment = S.props.getAttachment(key, ast.editNode);
                         return att && att.c;
                     }
                 }) : null;
@@ -110,7 +110,7 @@ export class EditAttachmentsPanel extends Div {
             ? this.createImgPositionSelection("Position", "positionDropDown", //
                 {
                     setValue: (val: string): void => {
-                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
+                        const att: Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
                             att.p = val === "auto" ? null : val;
                             this.dlg.binaryDirty = true;
@@ -118,7 +118,7 @@ export class EditAttachmentsPanel extends Div {
                         this.dlg.mergeState({});
                     },
                     getValue: (): string => {
-                        const att: J.Attachment = S.props.getAttachment(key, ast.editNode);
+                        const att: Attachment = S.props.getAttachment(key, ast.editNode);
                         let ret = att && att.p;
                         if (!ret) ret = "auto";
                         return ret;
@@ -138,7 +138,7 @@ export class EditAttachmentsPanel extends Div {
             val: fileNameFieldState
         });
 
-        const list: J.Attachment[] = S.props.getOrderedAtts(ast.editNode);
+        const list: Attachment[] = S.props.getOrderedAtts(ast.editNode);
         const firstAttachment = list[0].o === att.o;
         const lastAttachment = list[list.length - 1].o === att.o;
 
@@ -206,7 +206,7 @@ export class EditAttachmentsPanel extends Div {
         ]);
     }
 
-    askMakeAllSameSize = async (node: J.NodeInfo, val: string): Promise<void> => {
+    askMakeAllSameSize = async (node: NodeInfo, val: string): Promise<void> => {
         setTimeout(() => {
             const attachments = S.props.getOrderedAtts(node);
             if (attachments?.length > 1) {
@@ -225,12 +225,12 @@ export class EditAttachmentsPanel extends Div {
         }, 250);
     }
 
-    moveAttDown = (att: J.Attachment, node: J.NodeInfo) => {
-        const list: J.Attachment[] = S.props.getOrderedAtts(node);
+    moveAttDown = (att: Attachment, node: NodeInfo) => {
+        const list: Attachment[] = S.props.getOrderedAtts(node);
         let idx: number = 0;
         let setNext: number = -1;
         for (const a of list) {
-            const aObj: J.Attachment = node.attachments[(a as any).key];
+            const aObj: Attachment = node.attachments[(a as any).key];
             if (setNext !== -1) {
                 aObj.o = setNext;
                 setNext = -1;
@@ -249,12 +249,12 @@ export class EditAttachmentsPanel extends Div {
         dispatch("attachmentMoveUp", _s => { });
     }
 
-    moveAttUp = (att: J.Attachment, node: J.NodeInfo) => {
-        const list: J.Attachment[] = S.props.getOrderedAtts(node);
+    moveAttUp = (att: Attachment, node: NodeInfo) => {
+        const list: Attachment[] = S.props.getOrderedAtts(node);
         let idx: number = 0;
         let lastA = null;
         for (const a of list) {
-            const aObj: J.Attachment = node.attachments[(a as any).key];
+            const aObj: Attachment = node.attachments[(a as any).key];
             if (a.o === att.o) {
                 aObj.o = idx - 1;
                 if (lastA) {

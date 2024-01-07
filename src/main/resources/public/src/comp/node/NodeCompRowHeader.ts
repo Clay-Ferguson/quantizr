@@ -8,7 +8,7 @@ import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
-import { NodeType } from "../../JavaIntf";
+import { NodeInfo, NodeType } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
 import { Anchor } from "../core/Anchor";
@@ -23,7 +23,7 @@ export class NodeCompRowHeader extends Div {
     // NOTE: If boostingNode is non-null it's the node that is boosting 'node'. In other words the rendered page will show
     // node boostingNode as the top/outter level and the 'node' will be the actual node that got boosted by 'boostingNode'
     // idx==1 for first row. (not zero offset)
-    constructor(private boostingNode: J.NodeInfo, private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
+    constructor(private boostingNode: NodeInfo, private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
         private isBoost: boolean, private allowDelete: boolean, private prefix: string, private idx: number) {
         super(null);

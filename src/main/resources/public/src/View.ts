@@ -5,6 +5,7 @@ import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
@@ -188,10 +189,10 @@ export class View {
 
     // NOTE: Method not still being used. Let's keep it for future reference
     // scrollRelativeToNode = (dir: string, ast : AppState) => {
-    //     const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode();
+    //     const currentSelNode: NodeInfo = S.nodeUtil.getHighlightedNode();
     //     if (!currentSelNode) return;
 
-    //     let newNode: J.NodeInfo = null;
+    //     let newNode: NodeInfo = null;
 
     //     // First detect if page root node is selected, before doing a child search
     //     if (currentSelNode.id === state.node.id) {
@@ -207,7 +208,7 @@ export class View {
     //         let prevChild = null;
     //         let nodeFound = false;
 
-    //         state.node.children.some((child: J.NodeInfo) => {
+    //         state.node.children.some((child: NodeInfo) => {
     //             let ret = false;
 
     //             if (nodeFound && dir === "down") {
@@ -249,7 +250,7 @@ export class View {
         }
     }
 
-    scrollToNode = (node: J.NodeInfo = null, delay: number = 100) => {
+    scrollToNode = (node: NodeInfo = null, delay: number = 100) => {
         if (!Comp.allowScrollSets || !node) return;
 
         const func = () => {

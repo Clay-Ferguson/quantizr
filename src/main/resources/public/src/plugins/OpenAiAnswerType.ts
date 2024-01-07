@@ -30,7 +30,7 @@ export class OpenAiAnswerType extends TypeBase {
     }
 
     // super_render = this.render;
-    // override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    // override render = (node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
     //     const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
     //     return new Div(null, null, [
     //         baseComp,

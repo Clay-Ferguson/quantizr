@@ -9,6 +9,7 @@ import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
@@ -21,7 +22,7 @@ export class NodeCompRow extends Div {
 
     // isLinkedNode means this node is rendered as a 'sub render' of some other node like it's a boost for example, and we're rendering the
     // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
-    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, //
+    constructor(public node: NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, //
         public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div,

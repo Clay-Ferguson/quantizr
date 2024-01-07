@@ -1,16 +1,16 @@
 import { dispatch, getAs } from "../AppContext";
-import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
 import { FullScreenType } from "../Interfaces";
-import * as J from "../JavaIntf";
+import { Attachment } from "../JavaIntf";
 import { S } from "../Singletons";
-import { Comp } from "./base/Comp";
-import { Checkbox } from "./core/Checkbox";
+import { Div } from "../comp/core/Div";
+import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
-import { CollapsiblePanel } from "./core/CollapsiblePanel";
+import { Comp } from "./base/Comp";
 import { ButtonBar } from "./core/ButtonBar";
+import { Checkbox } from "./core/Checkbox";
+import { CollapsiblePanel } from "./core/CollapsiblePanel";
 
 // todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
@@ -36,7 +36,7 @@ export class FullScreenControlBar extends Div {
             let onFirst = false;
             let onLast = false;
             if (node && node.attachments) {
-                const list: J.Attachment[] = S.props.getOrderedAtts(node);
+                const list: Attachment[] = S.props.getOrderedAtts(node);
 
                 if (list.length > 1) {
                     onFirst = (list[0].o || 0) === ast.fullScreenConfig.ordinal;

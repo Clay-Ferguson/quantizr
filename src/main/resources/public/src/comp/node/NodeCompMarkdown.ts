@@ -5,6 +5,7 @@ import { S } from "../../Singletons";
 import { TabIntf } from "../../intf/TabIntf";
 import { Comp } from "../base/Comp";
 import ReactMarkdownComp from "../core/ReactMarkdownComp";
+import { NodeInfo } from "../../JavaIntf";
 
 interface LS {
     content: string;
@@ -23,7 +24,7 @@ export class NodeCompMarkdown extends Comp {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
-    constructor(public node: J.NodeInfo, extraContainerClass: string, _tabData: TabIntf<any>, urls: Set<string>) {
+    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabIntf<any>, urls: Set<string>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
@@ -56,7 +57,7 @@ export class NodeCompMarkdown extends Comp {
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
-    preprocessMarkdown(node: J.NodeInfo, content: string = null, urls: Set<string>): string {
+    preprocessMarkdown(node: NodeInfo, content: string = null, urls: Set<string>): string {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);

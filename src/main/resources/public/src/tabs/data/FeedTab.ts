@@ -5,7 +5,7 @@ import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
-import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { FeedView } from "../FeedView";
 import { FeedViewProps } from "../FeedViewProps";
@@ -27,7 +27,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
     isVisible = () => true;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
-    findNode = (nodeId: string): J.NodeInfo => {
+    findNode = (nodeId: string): NodeInfo => {
         return S.util.searchNodeArray(this.props.feedResults, nodeId);
     }
 
@@ -35,13 +35,13 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         this.props.feedResults = this.props.feedResults?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (_ust: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (_ust: AppState, newNode: NodeInfo): void => {
         this.props.feedResults = this.props.feedResults?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
-    processNode = (_ust: AppState, func: (node: J.NodeInfo) => void): void => {
+    processNode = (_ust: AppState, func: (node: NodeInfo) => void): void => {
         this.props.feedResults?.forEach(n => func(n));
     }
 

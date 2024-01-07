@@ -1,4 +1,5 @@
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
@@ -15,7 +16,7 @@ export class PostsType extends TypeBase {
         return true;
     }
 
-    override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, "Posts", { className: "noMargin" })
         ]);

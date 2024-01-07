@@ -6,6 +6,7 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { MainTabComp } from "../MainTabComp";
 
@@ -26,13 +27,13 @@ export class MainTab implements TabIntf<any> {
     isVisible = () => true;
     constructView = (data: TabIntf) => new MainTabComp(data);
 
-    findNode = (nodeId: string, ast: AppState = null): J.NodeInfo => {
+    findNode = (nodeId: string, ast: AppState = null): NodeInfo => {
         ast = ast || getAs();
         return this.findNodeRecursive(ast.node, nodeId, 0);
     }
 
     // finds a node matching node with 'id' on this node or any of it's children
-    findNodeRecursive = (node: J.NodeInfo, id: string, level: number): J.NodeInfo => {
+    findNodeRecursive = (node: NodeInfo, id: string, level: number): NodeInfo => {
         if (!node) return null;
         if (node.id === id) return node;
         if (node.boostedNode?.id === id) return node.boostedNode;
@@ -51,11 +52,11 @@ export class MainTab implements TabIntf<any> {
         ust.node.children = ust.node.children?.filter(n => nodeId !== n.id);
     }
 
-    replaceNode = (ust: AppState, newNode: J.NodeInfo): void => {
+    replaceNode = (ust: AppState, newNode: NodeInfo): void => {
         S.edit.replaceNodeRecursive(ust.node, newNode);
     }
 
-    processNode = (ust: AppState, func: (node: J.NodeInfo) => void): void => {
+    processNode = (ust: AppState, func: (node: NodeInfo) => void): void => {
         ust.node.children?.forEach(n => func(n));
     }
 

@@ -2,7 +2,7 @@ import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 
 // todo-2: we should make this a base class instead of interface so that the classes that
 // derive from it won't have to create their own instances of all data members but can
@@ -37,10 +37,10 @@ export interface TabIntf<PT = any, TT = any> {
     isVisible(): boolean;
 
     // tabs are required to be able to search their known nodes and find any that are found, or null if not found
-    findNode(nodeId: string): J.NodeInfo;
+    findNode(nodeId: string): NodeInfo;
     nodeDeleted(ust: AppState, nodeId: string): void;
-    replaceNode(ust: AppState, newNode: J.NodeInfo): void;
-    processNode(ust: AppState, func: (node: J.NodeInfo) => void): void;
+    replaceNode(ust: AppState, newNode: NodeInfo): void;
+    processNode(ust: AppState, func: (node: NodeInfo) => void): void;
 
     props: PT;
 

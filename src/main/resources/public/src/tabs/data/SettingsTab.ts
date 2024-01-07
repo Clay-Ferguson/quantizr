@@ -3,7 +3,7 @@ import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
-import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { SettingsView } from "../SettingsView";
 
 export class SettingsTab implements TabIntf<any> {
@@ -29,16 +29,16 @@ export class SettingsTab implements TabIntf<any> {
     constructView = (data: TabIntf) => new SettingsView(data);
     getTabSubOptions = (): Div => { return null; };
 
-    findNode = (_nodeId: string): J.NodeInfo => {
+    findNode = (_nodeId: string): NodeInfo => {
         return null;
     }
 
     nodeDeleted = (_ust: AppState, _nodeId: string): void => {
     }
 
-    replaceNode = (_ust: AppState, _newNode: J.NodeInfo): void => {
+    replaceNode = (_ust: AppState, _newNode: NodeInfo): void => {
     }
 
-    processNode = (_ust: AppState, _func: (node: J.NodeInfo) => void): void => {
+    processNode = (_ust: AppState, _func: (node: NodeInfo) => void): void => {
     }
 }

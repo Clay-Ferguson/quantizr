@@ -17,6 +17,7 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
@@ -26,7 +27,7 @@ export class Edit {
     showReadOnlyProperties = false;
     helpNewUserEditCalled = false;
 
-    saveNode = async (node: J.NodeInfo, returnInlineChildren: boolean) => {
+    saveNode = async (node: NodeInfo, returnInlineChildren: boolean) => {
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node,
             returnInlineChildren
@@ -46,7 +47,7 @@ export class Edit {
         S.util.notifyNodeUpdated(res.node.id, res.node.type);
     }
 
-    toggleUserExpansion = async (node: J.NodeInfo) => {
+    toggleUserExpansion = async (node: NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.SetExpandedRequest, J.SetExpandedResponse>("toggleNodeExpanded", {
             nodeId: node.id
         });
@@ -190,8 +191,8 @@ export class Edit {
     * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
     * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
     */
-    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo,
-        nodeInsertTarget: J.NodeInfo, ordinalOffset: number) => {
+    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: NodeInfo,
+        nodeInsertTarget: NodeInfo, ordinalOffset: number) => {
 
         const afterEditJumpToId = createAtTop ? parentNode.id : null;
 
@@ -304,7 +305,7 @@ export class Edit {
         }
     }
 
-    saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse,
+    saveNodeResponse = async (node: NodeInfo, res: J.SaveNodeResponse,
         newNodeTargetId: string, newNodeTargetOffset: number) => {
         const ast = getAs();
         if (S.util.checkSuccess("Save node", res)) {
@@ -359,7 +360,7 @@ export class Edit {
         }
     }
 
-    injectUpdatedNode = async (node: J.NodeInfo) => {
+    injectUpdatedNode = async (node: NodeInfo) => {
         await promiseDispatch("nodeUpdated", s => {
             // if the node is our page parent (page root)
             if (node.id === s.node?.id) {
@@ -373,7 +374,7 @@ export class Edit {
         });
     }
 
-    replaceNodeRecursive = (node: J.NodeInfo, newNode: J.NodeInfo): void => {
+    replaceNodeRecursive = (node: NodeInfo, newNode: NodeInfo): void => {
         if (!node || !node.children) return;
 
         node.children = node.children.map(n => {
@@ -383,11 +384,11 @@ export class Edit {
         node.children.forEach(n => this.replaceNodeRecursive(n, newNode));
     }
 
-    injectNewNodeIntoChildren = (newNode: J.NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
+    injectNewNodeIntoChildren = (newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
         // we return the promise from the dispatch and to not wait for it here.
         return promiseDispatch("InjectNewNodeIntoChildren", s => {
             if (s.node.children) {
-                const newChildren: J.NodeInfo[] = [];
+                const newChildren: NodeInfo[] = [];
 
                 // we'll be renumbering ordinals so use this to keep track, by starting at whatever
                 // the first child was at before the insert
@@ -467,7 +468,7 @@ export class Edit {
     //     });
     // }
 
-    distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]) => {
+    distributeKeys = async (node: NodeInfo, aclEntries: J.AccessControlInfo[]) => {
         if (!aclEntries || !S.props.isEncrypted(node)) {
             return;
         }
@@ -682,7 +683,7 @@ export class Edit {
         return ast.node.children[0];
     }
 
-    getLastChildNode = (): J.NodeInfo => {
+    getLastChildNode = (): NodeInfo => {
         const ast = getAs();
         if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
         return ast.node.children[ast.node.children.length - 1];
@@ -770,7 +771,7 @@ export class Edit {
          * We get the node selected for the insert position by using the uid if one was passed in or using the
          * currently highlighted node if no uid was passed.
          */
-        let node: J.NodeInfo = null;
+        let node: NodeInfo = null;
         if (!id) {
             node = S.nodeUtil.getHighlightedNode();
         } else {
@@ -799,7 +800,7 @@ export class Edit {
         }
     }
 
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo): any => {
+    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: NodeInfo): any => {
         const ast = getAs();
         /*
          * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
@@ -1073,7 +1074,7 @@ export class Edit {
         await dlg.open();
     }
 
-    configureGpt = async (node: J.NodeInfo) => {
+    configureGpt = async (node: NodeInfo) => {
         const dlg = new ConfigureGptPromptDlg(node);
         await dlg.open();
     };
@@ -1129,7 +1130,7 @@ export class Edit {
         }
     }
 
-    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string) => {
+    splitNode = async (node: NodeInfo, splitType: string, delimiter: string) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -1162,7 +1163,7 @@ export class Edit {
         }
     }
 
-    addBookmark = (node: J.NodeInfo, content: string = null) => {
+    addBookmark = (node: NodeInfo, content: string = null) => {
         this.createNode(node, J.NodeType.BOOKMARK, true, content);
     }
 
@@ -1189,7 +1190,7 @@ export class Edit {
     }
 
     // like==false means 'unlike'
-    likeNode = async (node: J.NodeInfo, like: boolean) => {
+    likeNode = async (node: NodeInfo, like: boolean) => {
         await S.rpcUtil.rpc<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
@@ -1247,7 +1248,7 @@ export class Edit {
         }
     }
 
-    createNode = async (node: J.NodeInfo, typeName: string,
+    createNode = async (node: NodeInfo, typeName: string,
         pendingEdit: boolean, content: string) => {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
@@ -1383,7 +1384,7 @@ export class Edit {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (_dlg: EditNodeDlg, node: J.NodeInfo) => {
+    editNodeSharing = async (_dlg: EditNodeDlg, node: NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -1409,7 +1410,7 @@ export class Edit {
    the node is shared to. Then publishes that key info into the DB, so that only the other person who this node is shared to
    can use their private key to decrypt the key to the data, to view the node.
    */
-    addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
+    addCipherKeyToNode = async (node: NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
         if (principalNodeId === J.PrincipalName.PUBLIC || !S.crypto.avail) {
             console.warn("public node has encryption turned on. This is a bug.");
             return;
@@ -1443,7 +1444,7 @@ export class Edit {
         });
     }
 
-    updateNode = (node: J.NodeInfo) => {
+    updateNode = (node: NodeInfo) => {
         dispatch("UpdateNode", s => s.editNode = node);
     }
 
@@ -1463,7 +1464,7 @@ export class Edit {
     }
 
     /* WARNING: despite the name this only refreshes attachments and links */
-    refreshFromServer = async (node: J.NodeInfo) => {
+    refreshFromServer = async (node: NodeInfo) => {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
@@ -1535,7 +1536,7 @@ export class Edit {
         }
     }
 
-    recursiveDelete = (nodesToDel: string[], node: J.NodeInfo) => {
+    recursiveDelete = (nodesToDel: string[], node: NodeInfo) => {
         if (node == null || !node.children) return;
         node.children = node.children.filter(child => !nodesToDel.find(id => id === child?.id));
         node.children.forEach(child => this.recursiveDelete(nodesToDel, child));

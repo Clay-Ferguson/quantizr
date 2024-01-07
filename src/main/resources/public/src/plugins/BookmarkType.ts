@@ -5,6 +5,7 @@ import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
@@ -17,7 +18,7 @@ export class BookmarkType extends TypeBase {
         return false;
     }
 
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Div(null, null, [
             new NodeCompMarkdown(node, null, tabData, null),

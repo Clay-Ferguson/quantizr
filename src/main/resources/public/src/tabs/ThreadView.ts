@@ -8,7 +8,7 @@ import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
 
@@ -98,7 +98,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): Comp {
+    renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean, clazz: string, highlightClazz: string): Comp {
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, true, false, clazz, highlightClazz, null);
     }
 }

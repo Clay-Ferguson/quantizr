@@ -1,11 +1,12 @@
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 
 export class ResultSetInfo {
-    public results: J.NodeInfo[];
+    public results: NodeInfo[];
     public description: string;
     public prop: string;
     public timeRangeType: string;
-    public node: J.NodeInfo;
+    public node: NodeInfo;
     public page: number = 0;
     public endReached: boolean = false;
     public fuzzy: boolean;

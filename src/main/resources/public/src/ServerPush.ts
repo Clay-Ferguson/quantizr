@@ -2,6 +2,7 @@ import { dispatch, getAs } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import * as J from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
@@ -72,7 +73,7 @@ export class ServerPush {
 
                     if (data.props.results) {
                         // remove this nodeInfo if it's already in the results.
-                        data.props.results = data.props.results.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
+                        data.props.results = data.props.results.filter((ni: NodeInfo) => ni.id !== nodeInfo.id);
 
                         // now add to the top of the list.
                         data.props.results.unshift(nodeInfo);
@@ -120,7 +121,7 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: J.NodeInfo) => {
+    forceFeedItem = (nodeInfo: NodeInfo) => {
         if (!nodeInfo) return;
         FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
 
@@ -153,7 +154,7 @@ export class ServerPush {
         // });
     }
 
-    feedPushItem = (nodeInfo: J.NodeInfo) => {
+    feedPushItem = (nodeInfo: NodeInfo) => {
         if (!nodeInfo || !FeedTab.inst) return;
         const isMine = S.props.isMine(nodeInfo);
 

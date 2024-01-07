@@ -27,6 +27,7 @@ import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
 import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
+import { Attachment, NodeInfo } from "./JavaIntf";
 
 export class Render {
     private debug: boolean = false;
@@ -38,7 +39,7 @@ export class Render {
     fadeInId: string;
     allowFadeInId: boolean = false;
 
-    injectSubstitutions = (node: J.NodeInfo, val: string): string => {
+    injectSubstitutions = (node: NodeInfo, val: string): string => {
         // note: this is only here to get the markdown renderer to have padding in plain text, but also
         // it means we can leave off the language type and get a plaintext as default
         val = val.replaceAll("```txt\n", "```plaintext\n");
@@ -57,7 +58,7 @@ export class Render {
         val = val.replaceAll("{{url}}", window.location.origin + window.location.pathname);
 
         if (node.attachments) {
-            const list: J.Attachment[] = S.props.getOrderedAtts(node);
+            const list: Attachment[] = S.props.getOrderedAtts(node);
 
             for (const a of list) {
                 if (a.p !== "ft") continue;
@@ -89,7 +90,7 @@ export class Render {
         }) : null;
     }
 
-    setNodeDropHandler = (attribs: any, node: J.NodeInfo) => {
+    setNodeDropHandler = (attribs: any, node: NodeInfo) => {
         if (!node) return;
 
         attribs[C.NODE_ID_ATTR] = node.id;
@@ -173,7 +174,7 @@ export class Render {
         });
     }
 
-    showNodeUrl = (node: J.NodeInfo) => {
+    showNodeUrl = (node: NodeInfo) => {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode();
         }
@@ -250,7 +251,7 @@ export class Render {
 
         const attComps: Comp[] = [];
         if (node.attachments) {
-            const atts: J.Attachment[] = S.props.getOrderedAtts(node);
+            const atts: Attachment[] = S.props.getOrderedAtts(node);
             attComps.push(new Heading(3, "Attachments"));
             for (const att of atts) {
                 attComps.push(new Tag("hr"));
@@ -349,7 +350,7 @@ export class Render {
         dlgHolder.dlg.open();
     }
 
-    allowAction = (type: TypeIntf, action: NodeActionType, node: J.NodeInfo): boolean => {
+    allowAction = (type: TypeIntf, action: NodeActionType, node: NodeInfo): boolean => {
         return !type || type.allowAction(action, node);
     }
 
@@ -410,7 +411,7 @@ export class Render {
                         }
                     }
 
-                    let targetNode: J.NodeInfo = null;
+                    let targetNode: NodeInfo = null;
                     if (targetNodeId) {
                         // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
                         // so we have to call getNodeByName() to get the 'id' that goes with that node name.
@@ -511,7 +512,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean): Comp => {
+    renderChildren = (node: NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
         /*
@@ -541,7 +542,7 @@ export class Render {
         ]);
     }
 
-    renderBoostHeader = (node: J.NodeInfo, treeRender: boolean) => {
+    renderBoostHeader = (node: NodeInfo, treeRender: boolean) => {
         if (!node.boostedNode) return null;
         let displayName = null;
 
@@ -583,7 +584,7 @@ export class Render {
         });
     }
 
-    getAvatarImgUrlByNode = (node: J.NodeInfo): string => {
+    getAvatarImgUrlByNode = (node: NodeInfo): string => {
         const avatarUrl = S.props.getPropStr(J.NodeProp.USER_ICON_URL, node);
         if (avatarUrl) {
             return avatarUrl;
@@ -601,7 +602,7 @@ export class Render {
         return S.rpcUtil.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
-    makeHeaderAvatar = (node: J.NodeInfo) => {
+    makeHeaderAvatar = (node: NodeInfo) => {
         const src: string = node.apAvatar || this.getAvatarImgUrlByNode(node);
         if (!src) {
             return null;
@@ -619,7 +620,7 @@ export class Render {
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
-    allowPropertyEdit = (node: J.NodeInfo, propName: string): boolean => {
+    allowPropertyEdit = (node: NodeInfo, propName: string): boolean => {
         const type: TypeIntf = S.plugin.getType(node.type);
         return type ? type.allowPropertyEdit(propName) : true;
     }
@@ -628,7 +629,7 @@ export class Render {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = async (node: J.NodeInfo, searchText: string) => {
+    showGraph = async (node: NodeInfo, searchText: string) => {
         node = node || S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
@@ -663,7 +664,7 @@ export class Render {
         return newValue;
     };
 
-    renderTagsDiv = (node: J.NodeInfo, moreClasses: string = ""): Div => {
+    renderTagsDiv = (node: NodeInfo, moreClasses: string = ""): Div => {
         if (!node || !node.tags) return null;
         const tags = node.tags.split(" ");
         const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
@@ -675,7 +676,7 @@ export class Render {
         }, spans);
     }
 
-    renderUser(node: J.NodeInfo, user: string, _userBio: string, imgSrc: string, _actorUrl: string,
+    renderUser(node: NodeInfo, user: string, _userBio: string, imgSrc: string, _actorUrl: string,
         displayName: string, className: string, iconClass: string, _showMessageButton: boolean, onClick: (evt: any) => void): Comp {
 
         const img: Img = imgSrc
@@ -733,7 +734,7 @@ export class Render {
         ]);
     }
 
-    renderLinks = (node: J.NodeInfo): Div => {
+    renderLinks = (node: NodeInfo): Div => {
         if (!node.links) return null;
 
         const linkComps: Comp[] = [];

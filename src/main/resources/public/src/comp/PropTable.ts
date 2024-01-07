@@ -1,4 +1,4 @@
-import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { PropTableCell } from "../comp/PropTableCell";
 import { PropTableRow } from "../comp/PropTableRow";
@@ -6,7 +6,7 @@ import { Table } from "./Table";
 import { Comp } from "./base/Comp";
 
 export class PropTable extends Comp {
-    constructor(private node: J.NodeInfo) {
+    constructor(private node: NodeInfo) {
         super({
             className: "propertyTable"
         });

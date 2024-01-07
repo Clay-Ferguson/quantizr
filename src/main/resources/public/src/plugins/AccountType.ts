@@ -1,4 +1,5 @@
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
@@ -17,7 +18,7 @@ export class AccountType extends TypeBase {
         return false;
     }
 
-    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: NodeInfo): boolean {
         switch (action) {
             case NodeActionType.editNode:
                 return false;
@@ -30,7 +31,7 @@ export class AccountType extends TypeBase {
         return true;
     }
 
-    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const name = S.nodeUtil.getDisplayName(node);
         return new Div(null, {
             className: "systemNodeContent"

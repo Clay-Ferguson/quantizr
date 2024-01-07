@@ -22,6 +22,7 @@ import * as I from "../Interfaces";
 import { EditorOptions } from "../Interfaces";
 import { NodeActionType, TypeIntf } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
+import { PropertyInfo } from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
@@ -67,7 +68,7 @@ export class EditNodeDlg extends DialogBase {
 
     /* Since some of our property editing (the Selection components) modify properties 'in-place' in the node we have
     this initialProps clone so we can 'rollback' properties if use clicks cancel */
-    initialProps: J.PropertyInfo[];
+    initialProps: PropertyInfo[];
 
     allowEditAllProps: boolean = false;
     contentScrollPos = new ScrollPos();
@@ -819,7 +820,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* Creates the editing field for a single property 'propEntry' */
-    makePropEditField = (type: TypeIntf, propEntry: J.PropertyInfo, durationPropEntry: J.PropertyInfo,
+    makePropEditField = (type: TypeIntf, propEntry: PropertyInfo, durationPropEntry: PropertyInfo,
         allowCheckbox: boolean, rows: number, flexPropsEditPanel: boolean): Div => {
         const ast = getAs();
 
@@ -904,7 +905,7 @@ export class EditNodeDlg extends DialogBase {
         return tableRow;
     }
 
-    private addPropCheckboxOrLabel(allowCheckbox: boolean, label: string, propEntry: J.PropertyInfo, editItems: any[]) {
+    private addPropCheckboxOrLabel(allowCheckbox: boolean, label: string, propEntry: PropertyInfo, editItems: any[]) {
         if (allowCheckbox) {
             const checkbox = new Checkbox(label, null, {
                 setValue: (checked: boolean) => {

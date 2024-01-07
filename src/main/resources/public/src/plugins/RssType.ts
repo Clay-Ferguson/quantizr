@@ -6,6 +6,7 @@ import { Constants as C } from "../Constants";
 import { EditorOptions } from "../Interfaces";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
@@ -29,7 +30,7 @@ export class RssType extends TypeBase {
         return 1;
     }
 
-    override ensureDefaultProperties(node: J.NodeInfo) {
+    override ensureDefaultProperties(node: NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
@@ -50,7 +51,7 @@ export class RssType extends TypeBase {
 
     // @ts-ignore
     super_render = this.render;
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Div(null, null, [
             new Button("View Feed", () => {

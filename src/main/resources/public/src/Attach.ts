@@ -3,10 +3,10 @@ import { UploadAIGenSpeechDlg } from "./dlg/UploadAIGenSpeechDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
-import * as J from "./JavaIntf";
+import { Attachment, NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
-export class Attachment {
+export class Attach {
     openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File) => {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
@@ -75,14 +75,14 @@ export class Attachment {
         new UploadFromIPFSDlg(nodeId, onUploadFunc).open();
     };
 
-    getAttachmentUrl = (urlPart: string, node: J.NodeInfo, attName: string, downloadLink: boolean): string => {
+    getAttachmentUrl = (urlPart: string, node: NodeInfo, attName: string, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
         const att = S.props.getAttachment(attName, node);
         if (!att) return null;
         return this.getAttUrl(urlPart, att, node.id, downloadLink, attName);
     }
 
-    getAttUrl = (urlPart: string, att: J.Attachment, nodeId: string, downloadLink: boolean, attName: string): string => {
+    getAttUrl = (urlPart: string, att: Attachment, nodeId: string, downloadLink: boolean, attName: string): string => {
         if (att.u) {
             return att.u;
         }
@@ -105,11 +105,11 @@ export class Attachment {
         return null;
     }
 
-    getUrlForNodeAttachment = (node: J.NodeInfo, attName: string, downloadLink: boolean): string => {
+    getUrlForNodeAttachment = (node: NodeInfo, attName: string, downloadLink: boolean): string => {
         return this.getAttachmentUrl("bin", node, attName, downloadLink);
     }
 
-    getStreamUrlForNodeAttachment = (node: J.NodeInfo, attName: string): string => {
+    getStreamUrlForNodeAttachment = (node: NodeInfo, attName: string): string => {
         return this.getAttachmentUrl("stream", node, attName, false);
     }
 }

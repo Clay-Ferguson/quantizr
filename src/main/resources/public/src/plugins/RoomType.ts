@@ -5,6 +5,7 @@ import { Div } from "../comp/core/Div";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
@@ -15,13 +16,13 @@ export class RoomType extends TypeBase {
         super(J.NodeType.ROOM, "Chat Room", "fa-comments", true);
     }
 
-    override allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
+    override allowAction(_action: NodeActionType, _node: NodeInfo): boolean {
         return true;
     }
 
     // @ts-ignore
     super_render = this.render;
-    override render = (node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp => {
         const baseComp = this.super_render(node, tabData, rowStyling, isTreeView, isLinkedNode);
         return new Div(null, null, [
             baseComp,

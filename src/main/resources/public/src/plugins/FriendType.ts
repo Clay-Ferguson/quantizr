@@ -5,6 +5,7 @@ import { EditorOptions } from "../Interfaces";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
@@ -23,7 +24,7 @@ export class FriendType extends TypeBase {
         return false;
     }
 
-    override allowAction(action: NodeActionType, _node: J.NodeInfo): boolean {
+    override allowAction(action: NodeActionType, _node: NodeInfo): boolean {
         switch (action) {
             case NodeActionType.delete:
             case NodeActionType.editNode:
@@ -45,16 +46,16 @@ export class FriendType extends TypeBase {
         return false;
     }
 
-    override ensureDefaultProperties(node: J.NodeInfo) {
+    override ensureDefaultProperties(node: NodeInfo) {
         this.ensureStringPropExists(node, J.NodeProp.USER);
     }
 
-    override renderEditorSubPanel = (node: J.NodeInfo): Comp => {
+    override renderEditorSubPanel = (node: NodeInfo): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         return new Heading(3, user);
     }
 
-    override render = (node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);

@@ -2,6 +2,7 @@ import { dispatch, getAs, promiseDispatch } from "../AppContext";
 import { AppState } from "../AppState";
 import { SymKeyDataPackage } from "../Crypto";
 import * as J from "../JavaIntf";
+import { Attachment, NodeInfo, PropertyInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
@@ -97,7 +98,7 @@ export class EditNodeDlgUtil {
     }
 
     // Takes all the propStates values and converts them into node properties on the node
-    savePropsToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
+    savePropsToNode = (editNode: NodeInfo, dlg: EditNodeDlg) => {
         const type = S.plugin.getType(editNode.type);
         editNode.properties?.forEach(prop => {
             const propState = dlg.propStates.get(prop.name);
@@ -125,8 +126,8 @@ export class EditNodeDlgUtil {
         });
     }
 
-    saveAttFileNamesToNode = (editNode: J.NodeInfo, dlg: EditNodeDlg) => {
-        const list: J.Attachment[] = S.props.getOrderedAtts(editNode);
+    saveAttFileNamesToNode = (editNode: NodeInfo, dlg: EditNodeDlg) => {
+        const list: Attachment[] = S.props.getOrderedAtts(editNode);
         for (const att of list) {
             const propState = dlg.attFileNames.get((att as any).key);
             if (propState) {
@@ -143,7 +144,7 @@ export class EditNodeDlgUtil {
 
         if (propDlg.nameState.getValue()) {
             ast.editNode.properties = ast.editNode.properties || [];
-            const prop: J.PropertyInfo = {
+            const prop: PropertyInfo = {
                 name: propDlg.nameState.getValue(),
                 value: ""
             }
@@ -160,7 +161,7 @@ export class EditNodeDlgUtil {
                 // if this 'sop' is ALREADY a property we have, ignore it. Don't dupliate it.
                 if (ast.editNode.properties.find(prop => prop.name === sop.label)) return;
 
-                const prop: J.PropertyInfo = {
+                const prop: PropertyInfo = {
                     name: sop.label,
                     value: ""
                 }
@@ -362,7 +363,7 @@ export class EditNodeDlgUtil {
         dlg.binaryDirty = true;
     }
 
-    initPropState = (dlg: EditNodeDlg, node: J.NodeInfo, propEntry: J.PropertyInfo) => {
+    initPropState = (dlg: EditNodeDlg, node: NodeInfo, propEntry: PropertyInfo) => {
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const propVal = propEntry.value;
@@ -434,7 +435,7 @@ export class EditNodeDlgUtil {
 the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
 an upload has been added or removed.
 */
-    initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo): any => {
+    initPropStates = (dlg: EditNodeDlg, node: NodeInfo): any => {
         const type = S.plugin.getType(node.type);
         if (type) {
             type.ensureDefaultProperties(node);

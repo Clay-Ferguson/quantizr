@@ -1,4 +1,3 @@
-import type { Attachment } from "./Attachment";
 import type { DomUtil } from "./DomUtil";
 import type { Edit } from "./Edit";
 import type { Crypto } from "./Crypto";
@@ -19,6 +18,7 @@ import type { User } from "./User";
 import type { Util } from "./Util";
 import type { View } from "./View";
 import { HistoryUtil } from "./HistoryUtil";
+import { Attach } from "./Attach";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
 to result in any circular-references during load time, because they instantiate only other interfaces 
@@ -37,7 +37,7 @@ export interface Singletons {
     tabUtil: TabUtil;
     push: ServerPush;
     edit: Edit;
-    attachment: Attachment;
+    attachment: Attach;
     crypto: Crypto;
     nav: Nav;
     props: Props;

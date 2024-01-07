@@ -8,26 +8,26 @@ import { DialogMode } from "../../DialogBase";
 import { AudioPlayerDlg } from "../../dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { FullScreenType } from "../../Interfaces";
-import * as J from "../../JavaIntf";
+import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { FlexRowLayout } from "../core/FlexRowLayout";
 import { Img } from "../core/Img";
 import { Span } from "../core/Span";
 
 interface LS {
-    node: J.NodeInfo;
+    node: NodeInfo;
 }
 
 export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
-    constructor(public node: J.NodeInfo, public attName: string, private isEditorEmbed: boolean,
+    constructor(public node: NodeInfo, public attName: string, private isEditorEmbed: boolean,
         private isFullScreenEmbed: boolean, private allowRightMargin: boolean, private imgClass: string) {
         super();
         this.mergeState<LS>({ node });
     }
 
-    makeImageComp = (node: J.NodeInfo): Img => {
+    makeImageComp = (node: NodeInfo): Img => {
         const ast = getAs();
         if (!node) return null;
         const att = S.props.getAttachment(this.attName, node);

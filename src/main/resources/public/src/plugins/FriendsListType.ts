@@ -7,6 +7,7 @@ import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
 export class FriendsListType extends TypeBase {
@@ -18,11 +19,11 @@ export class FriendsListType extends TypeBase {
         return false;
     }
 
-    override allowAction(_action: NodeActionType, _node: J.NodeInfo): boolean {
+    override allowAction(_action: NodeActionType, _node: NodeInfo): boolean {
         return false;
     }
 
-    override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, "Friends"),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),

@@ -2,6 +2,7 @@ import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Constants as C } from "./Constants";
+import { NodeInfo } from "./JavaIntf";
 
 /*
 SYMMETRIC ENCRYPTION and PUBLIC KEY ENCRYPTION
@@ -826,7 +827,7 @@ export class Crypto {
         return null;
     }
 
-    signNode = async (node: J.NodeInfo): Promise<void> => {
+    signNode = async (node: NodeInfo): Promise<void> => {
         if (!this.sigKeyOk()) {
             return null;
         }
