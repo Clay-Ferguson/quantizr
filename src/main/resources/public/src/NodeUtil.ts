@@ -7,7 +7,7 @@ import { Constants as C } from "./Constants";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./dlg/EditNodeDlg";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import * as J from "./JavaIntf";
-import { Attachment, NodeInfo } from "./JavaIntf";
+import { Attachment, NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 import { MainTab } from "./tabs/data/MainTab";
 
@@ -145,7 +145,7 @@ export class NodeUtil {
     getPathPartForNamedNode = (node: NodeInfo): string => {
         if (!node || !node.name) return null;
 
-        if (node.owner === J.PrincipalName.ADMIN) {
+        if (node.owner === PrincipalName.ADMIN) {
             return "/n/" + node.name;
         }
         else {
@@ -156,7 +156,7 @@ export class NodeUtil {
     getPathPartForNamedNodeAttachment = (node: NodeInfo): string => {
         if (!node || !node.name) return null;
 
-        if (node.owner === J.PrincipalName.ADMIN) {
+        if (node.owner === PrincipalName.ADMIN) {
             return "/f/" + node.name;
         }
         else {
@@ -236,7 +236,7 @@ export class NodeUtil {
     removePublicShare = async (node: NodeInfo, editorDlg: Comp) => {
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
-            principalNodeId: J.PrincipalName.PUBLIC,
+            principalNodeId: PrincipalName.PUBLIC,
             privilege: "*"
         });
         this.removePrivilegeResponse(node, editorDlg);
@@ -269,7 +269,7 @@ export class NodeUtil {
                         className: "fa fa-globe fa-lg sharingIcon microMarginRight",
                         title: "Node is Public"
                     }),
-                    new Span("Public" + this.getPublicPrivilegsSuffix(J.PrincipalName.PUBLIC, node))
+                    new Span("Public" + this.getPublicPrivilegsSuffix(PrincipalName.PUBLIC, node))
                 ])
             );
         }
@@ -286,7 +286,7 @@ export class NodeUtil {
             // }
 
             // Skip public here we processed that above.
-            if (ac.principalName && ac.principalName !== J.PrincipalName.PUBLIC) {
+            if (ac.principalName && ac.principalName !== PrincipalName.PUBLIC) {
                 let props = null;
                 let title = "";
                 if (ac.displayName) {

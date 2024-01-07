@@ -6,6 +6,7 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
+import { PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
@@ -56,7 +57,7 @@ export class NodeCompMainNode extends Div {
 
         let allowHeader: boolean = false;
         // special case, if node is owned by admin and we're not admin, never show header
-        if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === PrincipalName.ADMIN && ast.userName !== PrincipalName.ADMIN) {
             // leave allowHeader false
         }
         else {

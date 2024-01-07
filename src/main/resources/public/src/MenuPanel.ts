@@ -19,6 +19,7 @@ import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { TypeIntf } from "./intf/TypeIntf";
 import * as J from "./JavaIntf";
+import { PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 import { TTSTab } from "./tabs/data/TTSTab";
 
@@ -72,8 +73,8 @@ export class MenuPanel extends Div {
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(false); }
     static joinNodesToParent = () => { S.edit.joinNodes(true); }
-    static showPublicWritableShares = () => { S.srch.findShares(J.PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
-    static showPublicReadonlyShares = () => { S.srch.findShares(J.PrincipalName.PUBLIC, J.PrivilegeType.READ); }
+    static showPublicWritableShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
+    static showPublicReadonlyShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null); }
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
@@ -136,7 +137,7 @@ export class MenuPanel extends Div {
                 hltType = type.getTypeName();
             }
         }
-        const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
+        const selNodeIsMine = !!hltNode && (hltNode.owner === ast.userName || ast.userName === PrincipalName.ADMIN);
         const onMainTab: boolean = ast.activeTab == C.TAB_MAIN;
         const transferFromMe = !!hltNode && hltNode.transferFromId === ast.userProfile?.userNodeId;
         const transferring = !!hltNode && !!hltNode.transferFromId;

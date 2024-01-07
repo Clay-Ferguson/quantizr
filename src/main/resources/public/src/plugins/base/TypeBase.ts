@@ -2,7 +2,7 @@ import { getAs } from "../../AppContext";
 import * as I from "../../Interfaces";
 import { ConfigProp, EditorOptions } from "../../Interfaces";
 import * as J from "../../JavaIntf";
-import { NodeInfo } from "../../JavaIntf";
+import { NodeInfo, PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Comp } from "../../comp/base/Comp";
@@ -305,7 +305,7 @@ export class TypeBase implements TypeIntf {
 
             // The reason we don't sanitize for admin users is mainly because we need the code containing the
             // donations link to work, but there may also be other times we want the admin allowed to embed raw HTML
-            const sanitize = node.owner !== J.PrincipalName.ADMIN;
+            const sanitize = node.owner !== PrincipalName.ADMIN;
             comp = new Html(cont, { className: "marginLeft marginTop" }, null, sanitize);
         }
         // else render as markdown

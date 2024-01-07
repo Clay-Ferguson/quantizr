@@ -17,7 +17,7 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
@@ -183,7 +183,7 @@ export class Edit {
         if (ast.isAdminUser) return true;
 
         // if no owner treat as if admin owns
-        return ast.userName === (node.owner || J.PrincipalName.ADMIN);
+        return ast.userName === (node.owner || PrincipalName.ADMIN);
     }
 
     /*
@@ -1411,7 +1411,7 @@ export class Edit {
    can use their private key to decrypt the key to the data, to view the node.
    */
     addCipherKeyToNode = async (node: NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
-        if (principalNodeId === J.PrincipalName.PUBLIC || !S.crypto.avail) {
+        if (principalNodeId === PrincipalName.PUBLIC || !S.crypto.avail) {
             console.warn("public node has encryption turned on. This is a bug.");
             return;
         }

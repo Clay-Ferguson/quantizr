@@ -1,5 +1,6 @@
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
+import { PrincipalName } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Button } from "../comp/core//Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -49,7 +50,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         const displayName = this.aclEntry.displayName;
         const userNameDisp = S.util.getFriendlyPrincipalName(this.aclEntry);
-        const isPublic = this.aclEntry.principalName === J.PrincipalName.PUBLIC;
+        const isPublic = this.aclEntry.principalName === PrincipalName.PUBLIC;
 
         this.setChildren([
             new Div(null, null, [

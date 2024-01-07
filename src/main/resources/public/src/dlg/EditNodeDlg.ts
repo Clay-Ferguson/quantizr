@@ -22,7 +22,7 @@ import * as I from "../Interfaces";
 import { EditorOptions } from "../Interfaces";
 import { NodeActionType, TypeIntf } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
-import { PropertyInfo } from "../JavaIntf";
+import { PrincipalName, PropertyInfo } from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
@@ -545,7 +545,7 @@ export class EditNodeDlg extends DialogBase {
 
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: ast.editNode.id,
-            principals: [J.PrincipalName.PUBLIC],
+            principals: [PrincipalName.PUBLIC],
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
@@ -1049,7 +1049,7 @@ export class EditNodeDlg extends DialogBase {
             let newLine = false;
             let accum = 0;
             for (const ac of ast.editNode.ac) {
-                if (ac.principalName !== J.PrincipalName.PUBLIC) {
+                if (ac.principalName !== PrincipalName.PUBLIC) {
                     const insertName = S.util.getFriendlyPrincipalName(ac);
 
                     if (content.indexOf(insertName) === -1) {
@@ -1077,7 +1077,7 @@ export class EditNodeDlg extends DialogBase {
         const ast = getAs();
         if (ast.editNode.ac?.length > 0) {
             for (const ac of ast.editNode.ac) {
-                if (ac.principalName !== J.PrincipalName.PUBLIC) {
+                if (ac.principalName !== PrincipalName.PUBLIC) {
                     const insertName = "@" + ac.principalName;
                     if (!content || content.indexOf(insertName) === -1) {
                         return false;

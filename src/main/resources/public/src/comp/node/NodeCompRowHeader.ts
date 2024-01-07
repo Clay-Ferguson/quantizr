@@ -8,7 +8,7 @@ import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
-import { NodeInfo, NodeType } from "../../JavaIntf";
+import { NodeInfo, NodeType, PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
 import { Anchor } from "../core/Anchor";
@@ -67,7 +67,7 @@ export class NodeCompRowHeader extends Div {
         // and they can see whose node it is rather than seeing just content on the page that's confusing who it came from or what it is.
         const showInfo = S.util.showMetaData(ast, this.node) || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
 
-        if (showInfo && this.allowAvatars && this.node.owner !== J.PrincipalName.ADMIN) {
+        if (showInfo && this.allowAvatars && this.node.owner !== PrincipalName.ADMIN) {
             avatarImg = S.render.makeHeaderAvatar(this.node);
             if (avatarImg) {
                 children.push(avatarImg);
@@ -79,7 +79,7 @@ export class NodeCompRowHeader extends Div {
 
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
-        if (showInfo && this.node.owner && this.node.owner !== "?" && this.node.owner !== J.PrincipalName.ADMIN) {
+        if (showInfo && this.node.owner && this.node.owner !== "?" && this.node.owner !== PrincipalName.ADMIN) {
             if (this.node.transferFromId) {
                 displayName = "PENDING XFER -> " + displayName;
             }
@@ -248,7 +248,7 @@ export class NodeCompRowHeader extends Div {
             // Also if we have 'inReplyTo' that will also enable the button.
             const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
-            const adminNode = this.node.owner === J.PrincipalName.ADMIN;
+            const adminNode = this.node.owner === PrincipalName.ADMIN;
 
             if (!adminNode && showInfo && this.showThreadButton && (slashCount > 4 || !!inReplyTo)) {
                 if (ast.mobileMode) {

@@ -2,7 +2,7 @@ import { IndexedDBObj } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Constants as C } from "./Constants";
-import { NodeInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName } from "./JavaIntf";
 
 /*
 SYMMETRIC ENCRYPTION and PUBLIC KEY ENCRYPTION
@@ -282,7 +282,7 @@ export class Crypto {
     // todo-2: need to make this require the password and username to be more secure.
     initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
         console.log("Crypto.initKeys");
-        if (user === J.PrincipalName.ANON) {
+        if (user === PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
             return;
         }

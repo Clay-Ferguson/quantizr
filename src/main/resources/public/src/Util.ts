@@ -11,7 +11,7 @@ import * as I from "./Interfaces";
 import { ConfigProp } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo, PropertyInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName, PropertyInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -859,8 +859,8 @@ export class Util {
         await promiseDispatch("LoginResponse", s => {
             s.userProfile = res.userProfile;
             s.userName = res.userProfile.userName;
-            s.isAdminUser = res.userProfile.userName === J.PrincipalName.ADMIN;
-            s.isAnonUser = res.userProfile.userName === J.PrincipalName.ANON;
+            s.isAdminUser = res.userProfile.userName === PrincipalName.ADMIN;
+            s.isAnonUser = res.userProfile.userName === PrincipalName.ANON;
             s.speechVoice = voice || 0;
             s.speechVoice2 = voice2 || 0;
             s.speechRate = rate || "normal";

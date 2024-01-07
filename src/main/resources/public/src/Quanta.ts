@@ -6,6 +6,7 @@ import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
+import { PrincipalName } from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
 import { TrendingView } from "./tabs/TrendingView";
@@ -52,7 +53,7 @@ export class Quanta {
 
     /* We save userName+password in these vars to pass in every request
     so that we can log back in again silently after any session timeout */
-    userName: string = J.PrincipalName.ANON;
+    userName: string = PrincipalName.ANON;
     authToken: string;
     loggingOut: boolean;
 

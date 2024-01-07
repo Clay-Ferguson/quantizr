@@ -5,7 +5,7 @@ import { NodeHistoryItem } from "./HistoryUtil";
 import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { Tour } from "./Tour";
 
 export interface ExportSettings {
@@ -61,7 +61,7 @@ export class AppState {
     fullScreenControlsExpanded: boolean = false;
 
     /* name of currently logged in user */
-    userName: string = J.PrincipalName.ANON;
+    userName: string = PrincipalName.ANON;
     displayName: string = "";
 
     node: NodeInfo;

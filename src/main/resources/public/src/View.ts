@@ -5,7 +5,7 @@ import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
@@ -301,7 +301,7 @@ export class View {
     getNodeStats = async (): Promise<any> => {
         const ast = getAs();
         const node = S.nodeUtil.getHighlightedNode();
-        const isMine = !!node && (node.owner === ast.userName || ast.userName === J.PrincipalName.ADMIN);
+        const isMine = !!node && (node.owner === ast.userName || ast.userName === PrincipalName.ADMIN);
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,

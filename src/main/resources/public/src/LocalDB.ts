@@ -1,6 +1,6 @@
 import { IndexedDBObj } from "./Interfaces";
+import { PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
-import * as J from "./JavaIntf";
 
 // We need to prefix the store name and not the individual keys.
 
@@ -12,7 +12,7 @@ export class LocalDB {
     STORE_DEFAULT = "store";
 
     /* Name of logged in user or 'null' if anonymous (user not logged in) */
-    userName: string = J.PrincipalName.ANON;
+    userName: string = PrincipalName.ANON;
     allStoreNames: Set<string> = new Set<string>();
     dbVersion: number = 1;
 

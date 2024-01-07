@@ -6,7 +6,7 @@ import { LoginDlg } from "./dlg/LoginDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
-import { NodeInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class User {
@@ -119,7 +119,7 @@ export class User {
         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
         // set anon user to know they're logged out
-        await S.localDB.setUser(J.PrincipalName.ANON);
+        await S.localDB.setUser(PrincipalName.ANON);
         await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
         window.location.href = window.location.origin;
@@ -129,10 +129,10 @@ export class User {
         if (S.util.checkSuccess("Login", res)) {
 
             // if login was successful and we're an authenticated user
-            if (usr !== J.PrincipalName.ANON) {
+            if (usr !== PrincipalName.ANON) {
 
                 // Setting CREDS on 'anon' user means when user comes back to this page it automatically can log them in
-                await S.localDB.setUser(J.PrincipalName.ANON);
+                await S.localDB.setUser(PrincipalName.ANON);
                 await this.setLoginVars(usr, pwd, "1");
 
                 // Setting CREDS after switching DB user
@@ -147,7 +147,7 @@ export class User {
 
                     // NOTE: All these are async methods, but we don't use 'await' because we can let them
                     // execute in parallel and not wait for any of them to complete before any of the others.
-                    if (usr !== J.PrincipalName.ADMIN) {
+                    if (usr !== PrincipalName.ADMIN) {
                         this.checkMessages();
                     }
                     S.util.loadBookmarks();

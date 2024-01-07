@@ -1,5 +1,4 @@
-import * as J from "../JavaIntf";
-import { AccessControlInfo } from "../JavaIntf";
+import { AccessControlInfo, PrincipalName } from "../JavaIntf";
 import { TextContent } from "./core/TextContent";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";
@@ -20,13 +19,13 @@ export class EditPrivsTable extends ListBox {
         if (this.acl) {
             // first add public, so it's at the top
             this.acl.forEach(aclEntry => {
-                if (aclEntry.principalName?.toLowerCase() === J.PrincipalName.PUBLIC) {
+                if (aclEntry.principalName?.toLowerCase() === PrincipalName.PUBLIC) {
                     children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
                 }
             });
 
             this.acl.forEach(aclEntry => {
-                if (aclEntry.principalName?.toLowerCase() !== J.PrincipalName.PUBLIC) {
+                if (aclEntry.principalName?.toLowerCase() !== PrincipalName.PUBLIC) {
                     children.push(new EditPrivsTableRow(this.shareNodeToUserFunc, aclEntry, this.removePrivilege));
                 }
             });

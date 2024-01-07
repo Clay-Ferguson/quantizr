@@ -8,6 +8,7 @@ import { Div } from "../comp/core/Div";
 import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
+import { PrincipalName } from "../JavaIntf";
 import { S } from "../Singletons";
 import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 
@@ -73,7 +74,7 @@ export class SharingDlg extends DialogBase {
                             this.shareImmediate(names);
                         }
                     }, null, "btn-primary"),
-                    isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(J.PrincipalName.PUBLIC, false), null, "btn-secondary ui-share-make-public"),
+                    isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(PrincipalName.PUBLIC, false), null, "btn-secondary ui-share-make-public"),
                     new Button("Done", () => this.close(), null, "btn-secondary float-end ui-sharing-done")
                 ], "marginTop")
             ])
@@ -180,7 +181,7 @@ export class SharingDlg extends DialogBase {
         });
 
         // Since this is a common usage pattern, let's automatically set the unpublished and recursive flags
-        if (userName == J.PrincipalName.PUBLIC) {
+        if (userName == PrincipalName.PUBLIC) {
             this.mergeState<LS>({ recursive: true });
             S.props.setPropVal(J.NodeProp.UNPUBLISHED, ast.editNode, "true");
         }

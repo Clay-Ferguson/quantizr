@@ -12,7 +12,7 @@ import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo } from "./JavaIntf";
+import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
 import { DocumentTab } from "./tabs/data/DocumentTab";
@@ -658,7 +658,7 @@ export class Search {
         }
 
         // special case, if node is owned by admin and we're not admin, never show header, unless the ALLOW flag is true
-        if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === J.PrincipalName.ADMIN && ast.userName !== J.PrincipalName.ADMIN) {
+        if (!C.ALLOW_ADMIN_NODE_HEADERS && node.owner === PrincipalName.ADMIN && ast.userName !== PrincipalName.ADMIN) {
             allowHeader = false;
         }
 
