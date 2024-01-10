@@ -146,6 +146,7 @@ export class Edit {
 
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
+                s.cutCopyOp = null;
             });
 
             // if pasting do a kind of refresh which will maintain us at the same page parent.
@@ -990,6 +991,15 @@ export class Edit {
     undoCutSelNodes = () => {
         dispatch("SetNodesToMove", s => {
             s.nodesToMove = null;
+            s.cutCopyOp = null;
+        });
+    }
+
+    copySelNodes = () => {
+        dispatch("CopySelNodes", s => {
+            s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
+            s.cutCopyOp = "copy";
+            s.selectedNodes.clear();
         });
     }
 
@@ -999,6 +1009,7 @@ export class Edit {
         dispatch("SetNodesToMove", s => {
             S.nav.setNodeSel(true, id, s);
             s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
+            s.cutCopyOp = "cut";
             s.selectedNodes.clear();
         });
     }
@@ -1020,7 +1031,8 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId: nodeId,
             nodeIds: ast.nodesToMove,
-            location
+            location,
+            copyPaste: ast.cutCopyOp === "copy",
         });
         this.moveNodesResponse(res, nodeId, true);
     }
@@ -1339,13 +1351,15 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
-            location
+            location,
+            copyPaste: false
         });
         S.render.fadeInId = sourceNodeId;
 
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
+                s.cutCopyOp = null;
             });
 
             const ast = getAs();

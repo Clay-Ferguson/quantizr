@@ -202,7 +202,7 @@ public class NodeMoveService extends ServiceBase {
     public MoveNodesResponse moveNodes(MongoSession ms, MoveNodesRequest req) {
         MoveNodesResponse res = new MoveNodesResponse();
         ms = ThreadLocals.ensure(ms);
-        moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), res);
+        moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), req.isCopyPaste(), res);
         return res;
     }
 
@@ -213,7 +213,7 @@ public class NodeMoveService extends ServiceBase {
      * siblings posted in below it)
      */
     private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
-            MoveNodesResponse res) {
+            boolean copyPaste, MoveNodesResponse res) {
         // get targetNode which is node we're pasting at or into.
         SubNode targetNode = read.getNode(ms, targetId);
         SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
@@ -242,9 +242,8 @@ public class NodeMoveService extends ServiceBase {
             auth.ownerAuth(ms, node);
             // log.debug("Will be Moving ID (and children of): " + nodeId + " path: " + node.getPath());
             nodesToMove.add(node);
-            /*
-             * Verify all nodes being pasted are siblings
-             */
+
+            // Verify all nodes being pasted are siblings
             if (sourceParentPath != null && !sourceParentPath.equals(node.getParentPath())) {
                 throw new RuntimeException("Nodes to move must be all from the same parent.");
             }
@@ -264,48 +263,62 @@ public class NodeMoveService extends ServiceBase {
             SubNode _nodeParent = nodeParent;
             arun.run(as -> {
                 /*
-                 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
-                 * all children and also update its own path, otherwise it's staying under same parent and only it's
-                 * ordinal will change.
+                 * if a parent node is attempting to be pasted into one of it's children that's an impossible move
+                 * so we reject the attempt.
                  */
-                if (!_nodeParent.getPath().equals(parentToPasteInto.getPath())) {
-                    /*
-                     * if a parent node is attempting to be pasted into one of it's children that's an impossible move
-                     * so we reject the attempt.
-                     */
-                    if (parentToPasteInto.getPath().startsWith(node.getPath() + "/")) {
-                        throw new RuntimeException("Impossible node move requested.");
-                    }
-                    // find any new Path available under the paste target location 'parentPath'
-                    String newPath = mongoUtil.findAvailablePath(parentPath + "/"); // + node.getLastPathPart());
-                    // log.debug("New Available Path Found: " + newPath);
-                    changePathOfSubGraph(as, node, node.getPath(), newPath, res);
-                    node.setPath(newPath);
+                if (parentToPasteInto.getPath().startsWith(node.getPath() + "/")) {
+                    throw new RuntimeException("Impossible node move requested.");
+                }
+                // find any new Path available under the paste target location 'parentPath'
+                String newPath = mongoUtil.findAvailablePath(parentPath + "/");
+                log.debug("New Available Path Found: " + newPath);
+                changePathOfSubGraph(as, node, node.getPath(), newPath, copyPaste, res);
+                node.setPath(newPath);
 
-                    // crypto sig uses path as part of it, so we just invalidated the signature.
-                    if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
-                        node.delete(NodeProp.CRYPTO_SIG);
-                        if (res != null) {
-                            res.setSignaturesRemoved(true);
-                        }
+                // crypto sig uses path as part of it, so we just invalidated the signature.
+                if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
+                    node.delete(NodeProp.CRYPTO_SIG);
+                    if (res != null) {
+                        res.setSignaturesRemoved(true);
                     }
-                    // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
-                    // to verify the parent exists upon saving, because we know the path is fine.
-                    node.verifyParentPath = false;
+                }
+                // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
+                // to verify the parent exists upon saving, because we know the path is fine.
+                node.verifyParentPath = false;
+
+                // If this 'node' will be changing parents (moving to new parent)
+                if (!_nodeParent.getPath().equals(parentToPasteInto.getPath())) {
                     // we know this tareget node has chilren now.
                     parentToPasteInto.setHasChildren(true);
                     // only if we get here do we know the original parent (moved FROM) now has an indeterminate
                     // hasChildren status
                     _nodeParent.setHasChildren(null);
                 }
+
                 // do processing for when ordinal has changed.
                 if (!node.getOrdinal().equals(_targetOrdinal)) {
                     node.setOrdinal(_targetOrdinal);
                     // we know this tareget node has chilren now.
                     parentToPasteInto.setHasChildren(true);
                 }
+
+                // this is only experimental and not correct yet.
+                if (copyPaste) {
+                    ThreadLocals.clean(node);
+                    node.setId(null);
+                    node.setAttachments(null);
+
+                    try {
+                        ThreadLocals.setParentCheckEnabled(false);
+                        update.save(ms, node);
+                    } finally {
+                        ThreadLocals.setParentCheckEnabled(true);
+                    }
+                }
+
                 return null;
             });
+
             curTargetOrdinal++;
         }
         exec.run(() -> {
@@ -318,7 +331,7 @@ public class NodeMoveService extends ServiceBase {
      * all the children under it
      */
     public void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String oldPathPrefix, String newPathPrefix,
-            MoveNodesResponse res) {
+            boolean copyPaste, MoveNodesResponse res) {
         String originalPath = graphRoot.getPath();
         BulkOperations bops = null;
         int batchSize = 0;
@@ -330,6 +343,22 @@ public class NodeMoveService extends ServiceBase {
             }
 
             String newPath = node.getPath().replace(oldPathPrefix, newPathPrefix);
+
+            // this is only experimental and not correct yet.
+            if (copyPaste) {
+                node.setId(null);
+                node.setAttachments(null);
+                node.setPath(newPath);
+                node.verifyParentPath = false;
+                try {
+                    ThreadLocals.setParentCheckEnabled(false);
+                    update.save(ms, node);
+                } finally {
+                    ThreadLocals.setParentCheckEnabled(true);
+                }
+                continue;
+            }
+
             if (bops == null) {
                 bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
             }

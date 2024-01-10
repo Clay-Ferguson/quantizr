@@ -567,6 +567,7 @@ export interface MoveNodesRequest extends RequestBase {
     targetNodeId: string;
     nodeIds: string[];
     location: string;
+    copyPaste: boolean;
 }
 
 export interface NodeFeedRequest extends RequestBase {

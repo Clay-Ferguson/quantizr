@@ -29,7 +29,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             contentDiv = null;
         }
         else {
-            const pageNodeIsCut = ast.nodesToMove && ast.nodesToMove.find(id => id === ast.node.id);
+            const pageNodeIsCut = ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(id => id === ast.node.id);
 
             contentDiv = new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete

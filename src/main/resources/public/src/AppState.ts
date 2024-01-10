@@ -71,6 +71,7 @@ export class AppState {
 
     /* Node Ids to move */
     nodesToMove: string[];
+    cutCopyOp: string = null; // cut | copy
 
     activeTab: string = null;
     savedActiveTab: string = null;

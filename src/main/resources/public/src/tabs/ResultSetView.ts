@@ -85,7 +85,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
         let i = 0;
         results.forEach(node => {
-            if (ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
+            if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
             const c = this.renderItem(node, i, rowCount, true);
             if (c) {
                 if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {

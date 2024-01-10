@@ -32,7 +32,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
         this.node.children?.forEach(n => {
             if (!n) return;
-            if (!(ast.nodesToMove?.find(id => id === n.id))) {
+            if (!(ast.cutCopyOp === "cut" && ast.nodesToMove?.find(id => id === n.id))) {
                 // console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
 
                 let boostComp: NodeCompRow = null;

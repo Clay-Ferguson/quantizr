@@ -27,7 +27,7 @@ export class NodeCompMainNode extends Div {
         const ast = getAs();
         const node = ast.node;
 
-        if (ast.nodesToMove && ast.nodesToMove.find(id => id === node.id)) {
+        if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(id => id === node.id)) {
             this.setChildren([new Div("You've cut this node. Navigate to another folder to paste it.", { className: "pageNodeCutMessage" })]);
             return true;
         }

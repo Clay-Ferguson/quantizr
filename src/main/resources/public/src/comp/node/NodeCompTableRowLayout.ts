@@ -17,7 +17,6 @@ export class NodeCompTableRowLayout extends Div {
 
     override preRender = (): boolean => {
         const ast = getAs();
-        const nodesToMove = ast.nodesToMove;
         let curRow = new Div(null, { className: "nodeGridRow" });
         const children: Comp[] = [];
         const childCount: number = this.node.children.length;
@@ -53,7 +52,7 @@ export class NodeCompTableRowLayout extends Div {
             if (!n) return;
             const comps: Comp[] = [];
 
-            if (!(nodesToMove && nodesToMove.find(id => id === n.id))) {
+            if (!(ast.cutCopyOp == "cut" && ast.nodesToMove && ast.nodesToMove.find(id => id === n.id))) {
 
                 if (this.debug && n) {
                     console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id);
