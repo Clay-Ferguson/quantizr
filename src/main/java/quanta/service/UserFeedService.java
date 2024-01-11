@@ -370,20 +370,12 @@ public class UserFeedService extends ServiceBase {
         int skipped = 0;
 
         for (SubNode node : iter) {
-            /*
-             * todo-2: We could theoretically pre-calculate the 'isEnglish' and 'hasBadWords' state at the time
-             * the node is saved, and ONLY set properties when they are NOT english or are bad. This way we
-             * could avoid the hack of checking the isEnglish and hasBadWords here, and we'd be able to write a
-             * query that can do this filtering based on property existence.
-             *
-             * I'll leave this as is for now, because it's not a big problem, afaik, although the 'skipped'
-             * counting we're doing could eventually lead to pagination problems if we get to where MOST items
-             * are skipped and not accepted.
-             */
-            if (!allowNonEnglish && !english.isEnglish(node.getContent())) {
-                skipped++;
-                continue;
-            }
+            // this is malfunctioning on short texts, so disabling for now
+            // if (!allowNonEnglish && !english.isEnglish(node.getContent())) {
+            // skipped++;
+            // continue;
+            // }
+
             // only do the badWords blocking if it's NOT a node we own. We can never have this filter block
             // our own content.
             if (!allowBadWords && !auth.ownedByThreadUser(node) && english.hasBadWords(node.getContent())) {
@@ -418,11 +410,15 @@ public class UserFeedService extends ServiceBase {
                     skipped++;
                     continue;
                 }
-                if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
-                    // log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " + node.getContent());
-                    skipped++;
-                    continue;
-                }
+
+                // this is malfunctioning on short texts, so disabling for now
+                // if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
+                // // log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " +
+                // node.getContent());
+                // skipped++;
+                // continue;
+                // }
+
                 if (!allowBadWords && !auth.ownedByThreadUser(boostedNode)
                         && english.hasBadWords(boostedNode.getContent())) {
                     skipped++;

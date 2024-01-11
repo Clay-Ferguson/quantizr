@@ -655,7 +655,8 @@ public class NodeSearchService extends ServiceBase {
             content += " " + node.getTags();
         }
         // if strict content filtering ignore non-english or bad words posts completely
-        if (strictFiltering && (!english.isEnglish(content) || english.hasBadWords(content))) {
+        // isEnglish this is malfunctioning on short texts, so disabling for now
+        if (strictFiltering && (/* !english.isEnglish(content) || */ english.hasBadWords(content))) {
             return;
         }
         HashSet<String> knownTokens = null;
