@@ -188,7 +188,7 @@ public class NodeSearchService extends ServiceBase {
                 }
 
                 boolean adminOnly = acl.isAdminOwned(searchRoot);
-                if (Constant.SEARCH_DEF_TIMELINE.s().equals(req.getSearchDefinition())) {
+                if ("timeline".equals(req.getView())) {
                     ThreadLocals.getSC().setTimelinePath(searchRoot.getPath());
                 }
 

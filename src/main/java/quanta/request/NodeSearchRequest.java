@@ -24,7 +24,7 @@ public class NodeSearchRequest extends RequestBase {
 	private boolean caseSensitive;
 
 	// special definition name which gives the server a hint about what kind of search this is
-	private String searchDefinition;
+	private String view;
 
 	private String searchType;
 	private String timeRangeType;
@@ -73,8 +73,8 @@ public class NodeSearchRequest extends RequestBase {
 		return this.caseSensitive;
 	}
 
-	public String getSearchDefinition() {
-		return this.searchDefinition;
+	public String getView() {
+		return this.view;
 	}
 
 	public String getSearchType() {
@@ -137,8 +137,8 @@ public class NodeSearchRequest extends RequestBase {
 		this.caseSensitive = caseSensitive;
 	}
 
-	public void setSearchDefinition(final String searchDefinition) {
-		this.searchDefinition = searchDefinition;
+	public void setView(final String view) {
+		this.view = view;
 	}
 
 	public void setSearchType(final String searchType) {
