@@ -128,7 +128,6 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: true,
             name: J.Constant.FEED_PUB

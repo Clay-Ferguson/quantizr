@@ -71,8 +71,6 @@ export class PluginMgr {
         this.addType(ordinal++, new TextType());
         this.addType(ordinal++, new RssType());
         this.addType(ordinal++, new CalcType());
-        // backing out chat room feature for now.
-        // this.addType(ordinal++, new RoomType());
         this.addType(ordinal++, new CalendarType());
         this.addType(ordinal++, new IPFSNodeType());
         this.addType(ordinal++, new RepoRootType());

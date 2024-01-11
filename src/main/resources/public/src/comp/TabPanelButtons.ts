@@ -5,7 +5,6 @@ import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
-import { FeedTab } from "../tabs/data/FeedTab";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
@@ -44,12 +43,6 @@ export class TabPanelButtons extends Div {
 
     getTabButton(data: TabIntf): Li {
         const ast = getAs();
-        let tabName = data.name;
-
-        // slight hack until we have 'name' as a function and not a string.
-        if (tabName === "Feed" && FeedTab.inst?.props?.feedFilterRootNode) {
-            tabName = "Chat Room";
-        }
 
         return new Li(null, {
             className: "nav-item",
@@ -61,7 +54,7 @@ export class TabPanelButtons extends Div {
                 S.tabUtil.selectTab(data.id);
             }
         }, [
-            new Anchor("#" + data.id, tabName, {
+            new Anchor("#" + data.id, data.name, {
                 "data-bs-toggle": "tab",
                 className: "nav-link appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : ""),
                 title: data.tooltip

@@ -384,66 +384,6 @@ export class Nav {
         }, 10);
     }
 
-    openNodeFeed = async (evt: Event, id: string) => {
-        id = S.util.allowIdFromEvent(evt, id);
-        const node = MainTab.inst?.findNode(id);
-        if (node) {
-            setTimeout(() => {
-                if (FeedTab.inst) {
-                    FeedTab.inst.props.searchTextState.setValue("");
-                }
-
-                this.messages({
-                    feedFilterFriends: false,
-                    feedFilterToMe: false,
-                    feedFilterMyMentions: false,
-                    feedFilterFromMe: false,
-                    feedFilterToUser: null,
-                    feedFilterToPublic: true,
-                    feedFilterLocalServer: true,
-                    feedFilterRootNode: node,
-                    feedResults: null,
-                    applyAdminBlocks: false,
-                    name: J.Constant.FEED_PUB
-                });
-            }, 250);
-        }
-        // if node not in local memory, then we have to get it from the server first...
-        else {
-            const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: id,
-                upLevel: false,
-                siblingOffset: 0,
-                forceRenderParent: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: true,
-                jumpToRss: false
-            });
-            S.nodeUtil.processInboundNode(res.node);
-
-            if (!res.node) return;
-
-            if (FeedTab.inst) {
-                FeedTab.inst.props.searchTextState.setValue("");
-            }
-            this.messages({
-                feedFilterFriends: false,
-                feedFilterToMe: false,
-                feedFilterMyMentions: false,
-                feedFilterFromMe: false,
-                feedFilterToUser: null,
-                feedFilterToPublic: true,
-                feedFilterLocalServer: true,
-                feedFilterRootNode: res.node,
-                feedResults: null,
-                applyAdminBlocks: false,
-                name: J.Constant.FEED_PUB
-            });
-        }
-    }
-
     closeFullScreenViewer = () => {
         dispatch("CloseFullScreenViewer", s => {
             s.activeTab = s.savedActiveTab || C.TAB_MAIN;
@@ -533,7 +473,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_NEW
@@ -549,7 +488,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: true,
             name: J.Constant.FEED_PUB
@@ -594,7 +532,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_TOFROMME
@@ -613,7 +550,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_MY_MENTIONS
@@ -632,7 +568,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_TOME
@@ -653,7 +588,6 @@ export class Nav {
             feedFilterToDisplayName: displayName,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMMETOUSER
@@ -672,7 +606,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMME
@@ -695,7 +628,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_PUB
@@ -715,7 +647,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMFRIENDS
@@ -734,31 +665,9 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_LOCAL
-        });
-    }
-
-    messagesNodeFeed = () => {
-        const hltNode = S.nodeUtil.getHighlightedNode();
-        if (!hltNode) return;
-        if (FeedTab.inst) {
-            FeedTab.inst.props.searchTextState.setValue("");
-        }
-        this.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterMyMentions: false,
-            feedFilterFromMe: false,
-            feedFilterToUser: null,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: true,
-            feedFilterRootNode: hltNode,
-            feedResults: null,
-            applyAdminBlocks: false,
-            name: J.Constant.FEED_NODEFEED
         });
     }
 
@@ -774,7 +683,6 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null,
             feedResults: null,
             applyAdminBlocks: true,
             name: J.Constant.FEED_PUB

@@ -98,32 +98,6 @@ public class UserFeedService extends ServiceBase {
         String pathToSearch = req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH;
         List<Criteria> ands = new LinkedList<>();
 
-        /*
-         * if we're doing a 'feed' under a specific root node this is like the 'chat feature' and is
-         * normally only called for a chat-room type node.
-         */
-        if (req.getNodeId() != null) {
-            // Get the chat room node (root of the chat room query)
-            SubNode rootNode = read.getNode(ms, req.getNodeId());
-            if (rootNode == null) {
-                throw new RuntimeException("Node not found: " + req.getNodeId());
-            }
-            pathToSearch = rootNode.getPath();
-            /* if the chat root is public disable all auth logic in this method */
-            if (AclService.isPublic(rootNode)) {
-            } else {
-                try {
-                    auth.auth(ms, rootNode, PrivilegeType.READ, PrivilegeType.WRITE);
-                } catch (Exception e) {
-                    sc.setWatchingPath(null);
-                    throw e;
-                }
-            }
-            sc.setWatchingPath(pathToSearch);
-        } else {
-            sc.setWatchingPath(null);
-        }
-
         int counter = 0;
         List<Criteria> orCriteria = new LinkedList<>();
         /*
@@ -381,13 +355,8 @@ public class UserFeedService extends ServiceBase {
 
         crit = auth.addReadSecurity(ms, crit, ands);
         q.addCriteria(crit);
+        q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 
-        // if we have a node id this is like a chat room type, and so we sort by create time.
-        if (req.getNodeId() != null) {
-            q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
-        } else {
-            q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
-        }
         // we get up to 2x the max item so that if large numbers of them are being filtered,
         // we can still return a page of results hopefully
         q.limit(MAX_FEED_ITEMS * 2);

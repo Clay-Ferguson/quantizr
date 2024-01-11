@@ -20,7 +20,6 @@ public class TypePluginMgr extends ServiceBase {
         bookmarkType.postConstruct();
         calendarType.postConstruct();
         friendType.postConstruct();
-        roomType.postConstruct();
         rssType.postConstruct();
         aiAnswerType.postConstruct();
     }

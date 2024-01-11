@@ -39,13 +39,6 @@ public class SessionContext {
     private boolean enableIPSM;
     // this gets set to true, to trigger a refresh when needed again.
     private boolean friendsTagsDirty;
-    /*
-     * When the user is viewing the Node Feed for a specific node, this will be the path of that root
-     * node, and we use this so we can easily do a 'browser push' to any user whenever something new is
-     * created under a that feed. todo-2: we could rename this to "chatNodePath", because it's basically
-     * the chat node when the user is in a chat room.
-     */
-    private String watchingPath;
 
     /*
      * Keeps track of expansion states set by user. We can't just use a set to represent expanded nodes,
@@ -78,7 +71,6 @@ public class SessionContext {
         userName = PrincipalName.ANON.s();
         userNodeId = null;
         timelinePath = null;
-        watchingPath = null;
     }
 
     public String getUserToken() {
@@ -163,14 +155,6 @@ public class SessionContext {
 
     public void setLive(boolean live) {
         this.live = live;
-    }
-
-    public String getWatchingPath() {
-        return watchingPath;
-    }
-
-    public void setWatchingPath(String watchingPath) {
-        this.watchingPath = watchingPath;
     }
 
     public String getUserNodeId() {

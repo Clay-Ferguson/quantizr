@@ -3,7 +3,6 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
@@ -11,7 +10,6 @@ import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { Spinner } from "../comp/core/Spinner";
 import { TabHeading } from "../comp/core/TabHeading";
-import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
@@ -34,15 +32,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
          * client side for various reasons.
          */
         let rowCount = 0;
-        const content = this.data.props.feedFilterRootNode ? S.nodeUtil.getShortContent(this.data.props.feedFilterRootNode) : null;
-        let showBookmarkIcon: boolean = false;
-
-        // set showBookmarkIcon visible if we don't already have it bookmarked
-        if (this.data.props.feedFilterRootNode && ast.bookmarks) {
-            showBookmarkIcon = !ast.bookmarks.find((bookmark: J.Bookmark): boolean => {
-                return bookmark.id === this.data.props.feedFilterRootNode.id;
-            });
-        }
 
         // const newItems: any = null;
         // if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
@@ -105,10 +94,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     }),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
-                    showBookmarkIcon ? new IconButton("fa-bookmark", null, {
-                        title: "Bookmark this Chat Room",
-                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode)
-                    }) : null,
 
                     // DO NOT DELETE (this will likely be brought back, in future design)
                     // new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
@@ -116,9 +101,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     //     getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
                     // })
                 ], "flexRowAlignBottom tinyMarginTop tinyMarginBottom")
-            ]),
-            new Clearfix(),
-            content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
+            ])
         ];
 
         // DO NOT DELETE (we may bring this back for some future purpose)
@@ -237,16 +220,10 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         this.setChildren([
             this.headingBar = new TabHeading([
-                this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", null, {
-                    onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
-                    title: "Back to Folders View"
-                }, "marginRight") : null,
                 this.renderHeading(),
                 new Div(null, { className: "float-end" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
-                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, this.data.props.feedFilterRootNode?.id, J.NodeType.COMMENT, false, null, null, null, true, false), {
-                        title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-                    }, "btn-primary")
+                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, null, J.NodeType.COMMENT, false, null, null, null, true, false), null, "btn-primary")
                 ])
             ], this.data),
             new Div(null, { className: "feedView" }, children)
@@ -256,7 +233,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
     /* overridable (don't use arrow function) */
     renderHeading(): Comp {
-        return new Div(this.data.props.feedFilterRootNode ? "Chat Room" : this.getFeedSubHeading(this.data), { className: "tabTitle" });
+        return new Div(this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
     getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {

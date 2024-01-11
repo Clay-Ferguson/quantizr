@@ -77,7 +77,6 @@ import quanta.types.AIAnswerType;
 import quanta.types.BookmarkType;
 import quanta.types.CalendarType;
 import quanta.types.FriendType;
-import quanta.types.RoomType;
 import quanta.types.RssFeedType;
 import quanta.types.TypePluginMgr;
 import quanta.util.AsyncExec;
@@ -178,7 +177,6 @@ public class ServiceBase {
     public static CalendarType calendarType;
     public static AIAnswerType aiAnswerType;
     public static FriendType friendType;
-    public static RoomType roomType;
     public static RssFeedType rssType;
     public static MongoTemplateWrapper opsw;
     public static MongoRepository mongoRepo;
@@ -285,7 +283,6 @@ public class ServiceBase {
             calendarType = getBean(ctx, CalendarType.class);
             aiAnswerType = getBean(ctx, AIAnswerType.class);
             friendType = getBean(ctx, FriendType.class);
-            roomType = getBean(ctx, RoomType.class);
             rssType = getBean(ctx, RssFeedType.class);
             mongoRepo = getBean(ctx, MongoRepository.class);
             tranRepository = getBean(ctx, TranRepository.class);

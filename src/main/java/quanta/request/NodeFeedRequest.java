@@ -6,8 +6,6 @@ import quanta.request.base.RequestBase;
 public class NodeFeedRequest extends RequestBase {
 	// zero offset page of results (page=0 is first page)
 	private Integer page;
-	/* Note one of the other of these should be non-null, but not both */
-	private String nodeId;
 	private String toUser;
 	private Boolean toMe;
 	private Boolean myMentions;
@@ -27,10 +25,6 @@ public class NodeFeedRequest extends RequestBase {
 
 	public Integer getPage() {
 		return this.page;
-	}
-
-	public String getNodeId() {
-		return this.nodeId;
 	}
 
 	public String getToUser() {
@@ -87,10 +81,6 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setPage(final Integer page) {
 		this.page = page;
-	}
-
-	public void setNodeId(final String nodeId) {
-		this.nodeId = nodeId;
 	}
 
 	public void setToUser(final String toUser) {

@@ -47,24 +47,17 @@ export class FeedTab implements TabIntf<FeedViewProps> {
 
     getTabSubOptions = (): Div => {
         const ast = getAs();
-        if (this.props?.feedFilterRootNode) {
-            return !ast.isAnonUser
-                ? new Div(null, { className: "tabSubOptions" }, [
-                    // we close chat by switching user back to the Fediverse view.
-                    new AppNavLink("Close Chat", S.nav.messagesFediverse)
-                ]) : null;
-        }
-        else {
-            return new Div(null, { className: "tabSubOptions" }, [
-                new AppNavLink("Fediverse", S.nav.messagesFediverse),
-                ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions),
-                ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
-                ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
-                ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
-                ast.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
-                // todo-2: eventually we will make available to all users
-                ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
-            ]);
-        }
+
+        return new Div(null, { className: "tabSubOptions" }, [
+            new AppNavLink("Fediverse", S.nav.messagesFediverse),
+            ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions),
+            ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
+            ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
+            ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
+            ast.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
+            // todo-2: eventually we will make available to all users
+            ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
+        ]);
+
     };
 }

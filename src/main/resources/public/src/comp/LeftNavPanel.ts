@@ -7,7 +7,6 @@ import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
-import { FeedTab } from "../tabs/data/FeedTab";
 import { TabPanelButtons } from "./TabPanelButtons";
 import { Icon } from "./core/Icon";
 import { IconButton } from "./core/IconButton";
@@ -46,17 +45,8 @@ export class LeftNavPanel extends Div {
     override preRender = (): boolean => {
         const ast = getAs();
 
-        let myMessages = ast.myNewMessageCount > 0
+        const myMessages = ast.myNewMessageCount > 0
             ? (ast.myNewMessageCount + " new posts") : "";
-
-        // todo-2: this is a hack to keep the new incomming "chat" messages (Node Feed) from tricking
-        // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
-        // if feedFilterRoodNode is non-null which means user is in a node chat. I should consider having
-        // a "Chat" tab that's separate from the "Feed" tab. Maybe the ChatView should be subclass of FeedView?
-        if (FeedTab.inst?.props?.feedFilterRootNode) {
-            myMessages = null;
-        }
-
         let showDocIndex = S.util.willRenderDocIndex();
 
         const docIndexToggle = showDocIndex ? new RadioButtonGroup([

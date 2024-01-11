@@ -422,7 +422,6 @@ export class Search {
 
         const res = await S.rpcUtil.rpc<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
-            nodeId: FeedTab.inst.props.feedFilterRootNode?.id,
             toMe: FeedTab.inst.props.feedFilterToMe,
             myMentions: FeedTab.inst.props.feedFilterMyMentions,
             fromMe: FeedTab.inst.props.feedFilterFromMe,

@@ -76,15 +76,10 @@ public class PushService extends ServiceBase {
             return;
 
         /*
-         * We send a push to all users who are monitoring this node or any ancestor of it. This will be the
-         * users who have opened some ancestor node as their "Feed Node" (viewing feed of that specific
-         * node. This means 'viewing that node as a chat room')
-         *
          * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
          * node and therefore will be sent to their respecitve browsers
          */
         if (node.getOwner().toHexString().equals(sc.getUserNodeId()) // is my node
-                || (sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath()))
                 || (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath()))
                 || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName()))) {
             pushToBrowser(ms, sc, sessionsPushed, node);
