@@ -27,12 +27,10 @@ public class PushService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(PushService.class);
     static final int MAX_FEED_ITEMS = 25;
 
-    /* Notify all users being shared to on this node, or everyone if the node is public. */
+    /*
+     * Notify all users being shared to on this node, or everyone if the node is public.
+     */
     public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<String> sessionsPushed, SubNode node) {
-        // if unpublished or not a comment don't push to browsers.
-        if (node.getBool(NodeProp.UNPUBLISHED) || !node.getType().equals(NodeType.COMMENT.s()))
-            return;
-
         exec.run(() -> {
             boolean isPublic = AclService.isPublic(node);
             // put user names in a hash set for faster performance
@@ -75,14 +73,22 @@ public class PushService extends ServiceBase {
         if (sc == null || sc.getUserName() == null)
             return;
 
+        // if user has no kind of live updateable view, or we know based on path this won't be shown in
+        // the timeline then return
+        if (!sc.isViewingFeed() && (sc.getTimelinePath() == null || !node.getPath().startsWith(sc.getTimelinePath())))
+            return;
+
         /*
          * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
          * node and therefore will be sent to their respecitve browsers
          */
-        if (node.getOwner().toHexString().equals(sc.getUserNodeId()) // is my node
-                || (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath()))
-                || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName()))) {
-            pushToBrowser(ms, sc, sessionsPushed, node);
+        if (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) {
+            if (node.getOwner().toHexString().equals(sc.getUserNodeId()) // is my node
+                    || AclService.isPublic(node) // is public node
+                    || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // shared to me
+            ) {
+                pushToBrowser(ms, sc, sessionsPushed, node);
+            }
         }
     }
 

@@ -298,14 +298,19 @@ export class Search {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = async (node: NodeInfo, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
+    timeline = async (nodeId: string, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
         it's ok to reset node or not */
-        node = node || S.nodeUtil.getHighlightedNode();
+        if (!nodeId) {
+            const node = S.nodeUtil.getHighlightedNode();
+            if (node) {
+                nodeId = node.id;
+            }
+        }
 
-        if (!node) {
+        if (!nodeId) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Timeline");
             return;
         }
@@ -313,7 +318,7 @@ export class Search {
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot: null,
             page,
-            nodeId: node.id,
+            nodeId,
             searchText: "",
             sortDir: "DESC",
             sortField: prop,
@@ -349,7 +354,7 @@ export class Search {
             info.prop = prop;
             info.timeRangeType = timeRangeType;
             info.recursive = recursive;
-            info.node = node;
+            info.node = res.node;
             info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
             info.page = page;
 

@@ -96,10 +96,17 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     // DO NOT DELETE (this will likely be brought back, in future design)
-                    // new Checkbox("Auto-refresh", { className: "bigMarginLeft" }, {
-                    //     setValue: (checked: boolean) => S.edit.setAutoRefreshFeed(checked),
-                    //     getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
-                    // })
+                    // [new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
+                    //         setValue: (checked: boolean) => {
+                    //             // dispatch now for rapid screen refresh
+                    //             dispatch("AutoRefresh", (s) => {
+                    //                 s.userPrefs.autoRefreshFeed = checked;
+                    //             });
+                    //             // save to server now
+                    //             S.edit.setAutoRefreshFeed(checked);
+                    //         },
+                    //         getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
+                    //     })];
                 ], "flexRowAlignBottom tinyMarginTop tinyMarginBottom")
             ])
         ];

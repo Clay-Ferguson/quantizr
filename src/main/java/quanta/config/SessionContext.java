@@ -27,6 +27,8 @@ public class SessionContext {
      * a realtime view of the timeline
      */
     private String timelinePath;
+
+    private boolean viewingFeed;
     private String userName = PrincipalName.ANON.s();
     private String userNodeId;
     private String timezone;
@@ -147,6 +149,14 @@ public class SessionContext {
 
     public void setTimelinePath(String timelinePath) {
         this.timelinePath = timelinePath;
+    }
+
+    public boolean isViewingFeed() {
+        return viewingFeed;
+    }
+
+    public void setViewingFeed(boolean viewingFeed) {
+        this.viewingFeed = viewingFeed;
     }
 
     public boolean isLive() {

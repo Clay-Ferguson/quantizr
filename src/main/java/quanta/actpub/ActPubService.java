@@ -1059,10 +1059,13 @@ public class ActPubService extends ServiceBase {
         openGraph.parseNode(newNode, true);
         update.save(ms, newNode, false);
 
-        try {
-            push.pushNodeUpdateToBrowsers(ms, null, newNode);
-        } catch (Exception e) {
-            log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
+        // unpublished nodes are not pushed to browsers live. That's the pupose of unpublished flag.
+        if (!newNode.getBool(NodeProp.UNPUBLISHED)) {
+            try {
+                push.pushNodeUpdateToBrowsers(ms, null, newNode);
+            } catch (Exception e) {
+                log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
+            }
         }
 
         log.trace("newAPNode: " + XString.prettyPrint(newNode));

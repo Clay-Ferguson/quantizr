@@ -376,12 +376,9 @@ export class Nav {
     }
 
     runTimelineByNodeId = (id: string) => {
-        const node = S.nodeUtil.findNode(id);
-        if (!node) return;
-
         setTimeout(() => {
-            S.srch.timeline(node, "mtm", null, "Rev-chron by Modify Time", 0, true);
-        }, 10);
+            S.srch.timeline(id, "mtm", null, "Rev-chron by Modify Time", 0, true);
+        }, 100);
     }
 
     closeFullScreenViewer = () => {

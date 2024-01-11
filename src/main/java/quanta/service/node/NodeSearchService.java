@@ -141,6 +141,7 @@ public class NodeSearchService extends ServiceBase {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
                         false, false, false, true, null, false);
                 if (info != null) {
+                    res.setNode(info);
                     searchResults.add(info);
                 }
             }
@@ -159,6 +160,7 @@ public class NodeSearchService extends ServiceBase {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
                         false, false, false, true, null, false);
                 if (info != null) {
+                    res.setNode(info);
                     searchResults.add(info);
                 }
             }
@@ -185,6 +187,12 @@ public class NodeSearchService extends ServiceBase {
                     searchRoot = read.getNode(ms, ThreadLocals.getSC().getUserNodeId());
                 } else {
                     searchRoot = read.getNode(ms, req.getNodeId());
+                }
+
+                NodeInfo rootInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, searchRoot, false, counter + 1,
+                        false, false, false, false, true, null, false);
+                if (rootInfo != null) {
+                    res.setNode(rootInfo);
                 }
 
                 boolean adminOnly = acl.isAdminOwned(searchRoot);

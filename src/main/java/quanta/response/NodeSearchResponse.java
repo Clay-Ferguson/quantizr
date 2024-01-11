@@ -7,15 +7,23 @@ import quanta.response.base.ResponseBase;
 
 public class NodeSearchResponse extends ResponseBase {
 	private List<NodeInfo> searchResults;
+	private NodeInfo node;
 
 	public List<NodeInfo> getSearchResults() {
 		return this.searchResults;
 	}
-	
+
 	public void setSearchResults(final List<NodeInfo> searchResults) {
 		this.searchResults = searchResults;
 	}
-	
-	public NodeSearchResponse() {
+
+	public NodeInfo getNode() {
+		return node;
 	}
+
+	public void setNode(NodeInfo node) {
+		this.node = node;
+	}
+
+	public NodeSearchResponse() {}
 }

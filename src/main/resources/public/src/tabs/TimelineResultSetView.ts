@@ -1,4 +1,6 @@
+import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
+import { Checkbox } from "../comp/core/Checkbox";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
@@ -17,13 +19,23 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
             page = delta === 0 ? 0 : this.data.props.page + delta;
         }
 
-        S.srch.timeline(this.data.props.node, this.data.props.prop, this.data.props.timeRangeType,
+        S.srch.timeline(this.data.props.node?.id, this.data.props.prop, this.data.props.timeRangeType,
             this.data.props.description,
             page, this.data.props.recursive);
     }
 
     override extraPagingComps = (): Comp[] => {
-        return null;
+        return [new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
+            setValue: (checked: boolean) => {
+                // dispatch now for rapid screen refresh
+                dispatch("AutoRefresh", (s) => {
+                    s.userPrefs.autoRefreshFeed = checked;
+                });
+                // save to server now
+                S.edit.setAutoRefreshFeed(checked);
+            },
+            getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
+        })];
     }
 
     override getFloatRightHeaderComp = (): Comp => {

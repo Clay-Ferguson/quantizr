@@ -278,6 +278,9 @@ export class Quanta {
             case "thread":
                 initialTab = C.TAB_THREAD;
                 break;
+            case "timeline":
+                initialTab = C.TAB_TIMELINE;
+                break;
             default:
                 initialTab = C.TAB_MAIN;
                 break;
@@ -305,6 +308,12 @@ export class Quanta {
 
         if (initialTab === C.TAB_DOCUMENT && S.quanta.config.initialNodeId) {
             S.nav.openDocumentView(null, S.quanta.config.initialNodeId);
+            S.quanta.config.initialNodeId = null;
+            return;
+        }
+
+        if (initialTab === C.TAB_TIMELINE && S.quanta.config.initialNodeId) {
+            S.nav.runTimelineByNodeId(S.quanta.config.initialNodeId);
             S.quanta.config.initialNodeId = null;
             return;
         }

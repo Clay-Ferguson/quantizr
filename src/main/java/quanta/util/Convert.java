@@ -87,7 +87,7 @@ public class Convert extends ServiceBase {
             return null;
         }
 
-        // if we know we shold only be including admin node then throw an error if this is not an admin
+        // if we know we should only be including admin node then throw an error if this is not an admin
         // node, but only if we ourselves are not admin.
         if (adminOnly && !acl.isAdminOwned(node) && !sc.isAdmin()) {
             throw new ForbiddenException();

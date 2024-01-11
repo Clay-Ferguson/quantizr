@@ -1,6 +1,7 @@
 import { dispatch, getAs } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
@@ -32,11 +33,11 @@ export class ServerPush {
         // };
 
         this.eventSource.onopen = (e: any) => {
-            console.log("ServerPush.onopen" + e);
+            console.log("ServerPush.onopen: token=" + authToken + " e=" + S.util.prettyPrint(e));
         };
 
         this.eventSource.onerror = (e: any) => {
-            console.log("ServerPush.onerror:" + e);
+            console.log("ServerPush.onerror: token=" + authToken + " e=" + S.util.prettyPrint(e));
             // if server push is failing try to recover in 5 seconds by creating new instance, we wait 5 secs
             // just because my paranoia tells me to fear endless loops
             this.eventSource = null;
@@ -155,60 +156,41 @@ export class ServerPush {
     }
 
     feedPushItem = (nodeInfo: NodeInfo) => {
-        if (!nodeInfo || !FeedTab.inst) return;
-        const isMine = S.props.isMine(nodeInfo);
+        if (!nodeInfo || !TimelineTab.inst) return;
 
         if (S.props.isEncrypted(nodeInfo)) {
             nodeInfo.content = "[Encrypted]";
         }
 
-        const ast = getAs();
-
-        /* Ignore changes comming in during edit if we're editing on feed tab (inline)
-         which will be fine because in this case when we are done editing we always
-         process all the accumulated feedDirtyList items. */
-        if (ast.activeTab === C.TAB_FEED && ast.editNode) {
-            FeedTab.inst.props.feedDirtyList = FeedTab.inst.props.feedDirtyList || [];
-            FeedTab.inst.props.feedDirtyList.push(nodeInfo);
-            return;
+        /* todo-1: Currently we know based on path that we will be getting items we should update for the timeline,
+        but since we can't know whether (based on filtering) wether this node would show up in the FeedTab, we
+        don't update the FeedTab live here. See also: userPrefs.autoRefreshFeed */
+        if (getAs().userPrefs.autoRefreshFeed) {
+            dispatch("RenderLiveUpdate", _s => {
+                S.render.fadeInId = nodeInfo.id;
+                this.pushToLiveTab(nodeInfo, TimelineTab.inst);
+                // this.pushToLiveTab(nodeInfo, FeedTab.inst)
+                if (!S.props.isMine(nodeInfo)) {
+                    setTimeout(() => {
+                        S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
+                    }, 1000);
+                }
+            });
         }
+    }
 
-        dispatch("RenderFeedResults", _s => {
-            FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
-            const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
-            const updatesExistingItem = itemFoundIdx !== -1;
-            const refresh = true; // s.userPrefs.autoRefreshFeed
+    pushToLiveTab = (node: NodeInfo, inst: TabIntf) => {
+        if (!inst) return;
+        inst.props.results = inst.props.results || [];
+        const idx = inst.props.results.findIndex(item => item.id === node.id);
+        const updateExisting = idx !== -1;
 
-            // if updates existing item we refresh it even if autoRefresh is off
-            if (updatesExistingItem) {
-                S.render.fadeInId = nodeInfo.id;
-                FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
-            }
-            else if (refresh) {
-                // NOTE: It would be also possible to call delayedRefreshFeed() here instead, but for now
-                // I think we can just display any messages we get pushed in, and not try to query the server
-                // again just for performance reasons.
-                // S.srch.delayedRefreshFeed(s);
-
-                // this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
-                S.render.fadeInId = nodeInfo.id;
-                FeedTab.inst.props.feedResults.unshift(nodeInfo);
-
-                if (!isMine) {
-                    S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
-                }
-            }
-            // or finally if autoRefresh is off we just set feedDirty, and it's up to the user to click refresh
-            // button themselves.
-            else {
-                if (!isMine) {
-                    S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
-                }
-
-                /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
-                keep it simple and only set a dirty flag */
-                FeedTab.inst.props.feedDirty = true;
-            }
-        });
+        // if updates existing item we refresh it even if autoRefresh is off
+        if (updateExisting) {
+            inst.props.results[idx] = node;
+        }
+        else {
+            inst.props.results.unshift(node);
+        }
     }
 }

@@ -1047,6 +1047,7 @@ export interface NodeFeedResponse extends ResponseBase {
 
 export interface NodeSearchResponse extends ResponseBase {
     searchResults: NodeInfo[];
+    node: NodeInfo;
 }
 
 export interface NodeSigData {

@@ -94,6 +94,8 @@ public class UserFeedService extends ServiceBase {
          */
         boolean bidirectional = StringUtils.isNotEmpty(req.getToUser());
         SessionContext sc = ThreadLocals.getSC();
+        sc.setViewingFeed(true);
+
         NodeFeedResponse res = new NodeFeedResponse();
         String pathToSearch = req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH;
         List<Criteria> ands = new LinkedList<>();
