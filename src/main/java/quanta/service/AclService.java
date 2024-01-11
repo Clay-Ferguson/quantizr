@@ -280,6 +280,12 @@ public class AclService extends ServiceBase {
         return true;
     }
 
+    // isMine
+    public boolean userOwnsNode(MongoSession ms, SubNode node) {
+        boolean isMine = ms.getUserNodeId().equals(node.getOwner());
+        return isMine;
+    }
+
     public void removeAclEntry(MongoSession ms, SubNode node, String principalNodeId, String privToRemove) {
         /* special syntax is we remove all if asterisk specified */
         if (principalNodeId.equals("*")) {

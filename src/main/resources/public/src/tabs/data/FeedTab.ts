@@ -50,7 +50,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         if (this.props?.feedFilterRootNode) {
             return !ast.isAnonUser
                 ? new Div(null, { className: "tabSubOptions" }, [
-                    // we close chat by swithing user back to the Fediverse view.
+                    // we close chat by switching user back to the Fediverse view.
                     new AppNavLink("Close Chat", S.nav.messagesFediverse)
                 ]) : null;
         }

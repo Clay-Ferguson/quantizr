@@ -123,6 +123,7 @@ public class UserFeedService extends ServiceBase {
         } else {
             sc.setWatchingPath(null);
         }
+
         int counter = 0;
         List<Criteria> orCriteria = new LinkedList<>();
         /*

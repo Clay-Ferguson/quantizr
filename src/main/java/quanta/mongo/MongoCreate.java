@@ -370,7 +370,9 @@ public class MongoCreate extends ServiceBase {
                 HashMap<String, AccessControl> ac = new HashMap<>();
                 ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
                 newNode.setAc(ac);
-            } else if (req.isReply() || forceInheritSharing) {
+            }
+            // isReply really also can mean !parentNode.isMine for current user
+            else if (!acl.userOwnsNode(ms, parentNode) || req.isReply() || forceInheritSharing) {
                 acl.inheritSharingFromParent(ms, req.getBoosterUserId(), res, nodeBeingRepliedTo, newNode);
             }
 

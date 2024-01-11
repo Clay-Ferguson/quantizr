@@ -175,7 +175,8 @@ export class NodeCompButtonBar extends Div {
                     insertAllowed = ast.isAdminUser || type.allowAction(NodeActionType.insert, this.node);
                 }
             }
-            const editInsertAllowed = S.props.isWritableByMe(this.node);
+
+            const editInsertAllowed = S.props.isMine(this.node); //S.props.isWritableByMe(this.node);
 
             if (!isPageRootNode && C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed && !actPubId) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
