@@ -78,11 +78,14 @@ public class PushService extends ServiceBase {
         if (!sc.isViewingFeed() && (sc.getTimelinePath() == null || !node.getPath().startsWith(sc.getTimelinePath())))
             return;
 
+        if (auth.ownedBy(sc, node)) {
+            pushToBrowser(ms, sc, sessionsPushed, node);
+        }
         /*
          * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
          * node and therefore will be sent to their respecitve browsers
          */
-        if (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) {
+        else if (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) {
             if (node.getOwner().toHexString().equals(sc.getUserNodeId()) // is my node
                     || AclService.isPublic(node) // is public node
                     || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // shared to me

@@ -361,6 +361,10 @@ public class MongoAuth extends ServiceBase {
                 && node.getOwner().toHexString().equals(ThreadLocals.getSC().getUserNodeId());
     }
 
+    public boolean ownedBy(SessionContext sc, SubNode node) {
+        return node != null && node.getOwner() != null && node.getOwner().toHexString().equals(sc.getUserNodeId());
+    }
+
     /*
      * The way know a node is an account node is that it is its id matches its' owner. Self owned node.
      * This is because the very definition of the 'owner' on any given node is the ID of the user's root

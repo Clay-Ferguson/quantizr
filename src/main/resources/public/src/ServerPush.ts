@@ -64,28 +64,13 @@ export class ServerPush {
         });
 
         this.eventSource.addEventListener("nodeEdited", (e: any) => {
-            const obj: J.FeedPushInfo = JSON.parse(e.data);
-            const nodeInfo = obj.nodeInfo;
-
-            if (nodeInfo) {
-                dispatch("RenderTimelineResults", _s => {
-                    const data = TimelineTab.inst;
-                    if (!data) return;
-
-                    if (data.props.results) {
-                        // remove this nodeInfo if it's already in the results.
-                        data.props.results = data.props.results.filter((ni: NodeInfo) => ni.id !== nodeInfo.id);
-
-                        // now add to the top of the list.
-                        data.props.results.unshift(nodeInfo);
-                    }
-                });
-            }
+            const data: J.FeedPushInfo = JSON.parse(e.data);
+            this.nodePushed(data.nodeInfo);
         });
 
         this.eventSource.addEventListener("feedPush", (e: any) => {
             const data: J.FeedPushInfo = JSON.parse(e.data);
-            this.feedPushItem(data.nodeInfo);
+            this.nodePushed(data.nodeInfo);
         }, false);
 
         this.eventSource.addEventListener("ipsmPush", (e: any) => {
@@ -155,8 +140,8 @@ export class ServerPush {
         // });
     }
 
-    feedPushItem = (nodeInfo: NodeInfo) => {
-        if (!nodeInfo || !TimelineTab.inst) return;
+    nodePushed = (nodeInfo: NodeInfo) => {
+        if (!nodeInfo || (!TimelineTab.inst && !FeedTab.inst)) return;
 
         if (S.props.isEncrypted(nodeInfo)) {
             nodeInfo.content = "[Encrypted]";
@@ -169,7 +154,14 @@ export class ServerPush {
             dispatch("RenderLiveUpdate", _s => {
                 S.render.fadeInId = nodeInfo.id;
                 this.pushToLiveTab(nodeInfo, TimelineTab.inst);
-                // this.pushToLiveTab(nodeInfo, FeedTab.inst)
+
+                // when a user posts a new message we want to push it to the feed tab only if they own it
+                // (Update: actually we shouldn't do this, because the feed tab can be filtered to something like 
+                // "From Friends" and so we can't just assume it makes sense to show it)
+                // if (S.props.isMine(nodeInfo)) {
+                //     this.pushToLiveTab(nodeInfo, FeedTab.inst);
+                // }
+
                 if (!S.props.isMine(nodeInfo)) {
                     setTimeout(() => {
                         S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
