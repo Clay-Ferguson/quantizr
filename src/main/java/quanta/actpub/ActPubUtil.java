@@ -388,13 +388,14 @@ public class ActPubUtil extends ServiceBase {
                     .doOnError(e -> {
                         log.error("postJson failed: " + url, e);
                         throw new RuntimeException(e);
-                    });
+                    }).block();
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
             throw new RuntimeException(e);
         }
     }
 
+    // DO NOT DELETE (for a while!)
     public APObj postJson_old(String url, String body, HttpHeaders headers, MediaType postType) {
         APObj ret = null;
         try {
