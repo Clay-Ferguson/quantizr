@@ -3,6 +3,7 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
@@ -108,7 +109,8 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     //         getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
                     //     })];
                 ], "flexRowAlignBottom tinyMarginTop tinyMarginBottom")
-            ])
+            ]),
+            new Clearfix()
         ];
 
         // DO NOT DELETE (we may bring this back for some future purpose)
