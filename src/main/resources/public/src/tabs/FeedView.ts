@@ -3,6 +3,7 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -97,17 +98,17 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     // DO NOT DELETE (this will likely be brought back, in future design)
-                    // [new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
-                    //         setValue: (checked: boolean) => {
-                    //             // dispatch now for rapid screen refresh
-                    //             dispatch("AutoRefresh", (s) => {
-                    //                 s.userPrefs.autoRefreshFeed = checked;
-                    //             });
-                    //             // save to server now
-                    //             S.edit.setAutoRefreshFeed(checked);
-                    //         },
-                    //         getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
-                    //     })];
+                    // new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
+                    //     setValue: (checked: boolean) => {
+                    //         // dispatch now for rapid screen refresh
+                    //         dispatch("AutoRefresh", (s) => {
+                    //             s.userPrefs.autoRefreshFeed = checked;
+                    //         });
+                    //         // save to server now
+                    //         S.edit.setAutoRefreshFeed(checked);
+                    //     },
+                    //     getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
+                    // })
                 ], "flexRowAlignBottom tinyMarginTop tinyMarginBottom")
             ]),
             new Clearfix()

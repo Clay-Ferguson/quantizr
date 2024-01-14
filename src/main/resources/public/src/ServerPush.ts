@@ -147,13 +147,8 @@ export class ServerPush {
             nodeInfo.content = "[Encrypted]";
         }
 
-        /* todo-1: Currently we know based on path that we will be getting items we should update for the timeline,
-        but since we can't know whether (based on filtering) wether this node would show up in the FeedTab, we
-        don't update the FeedTab live here. See also: userPrefs.autoRefreshFeed */
-
-        // todo-0: the checkbox to enable autoRefreshFeed needs to be on FeedTab as well as TimelineTab, and also
-        // whenever this is OUR node we'reve pushing, we should update ALWAYS, regardless of autoRefreshFeed setting.
-        if (S.props.isMine(nodeInfo) || getAs().userPrefs.autoRefreshFeed) {
+        const isMine = S.props.isMine(nodeInfo);
+        if (isMine || getAs().userPrefs.autoRefreshFeed) {
             dispatch("RenderLiveUpdate", _s => {
                 S.render.fadeInId = nodeInfo.id;
 
@@ -162,7 +157,11 @@ export class ServerPush {
                     this.pushToLiveTab(nodeInfo, TimelineTab.inst);
                 }
 
-                this.pushToLiveTab(nodeInfo, FeedTab.inst);
+                // we only forcably update FeedTab if the node is mine, because the filtering is complex, and the
+                // server sends us all the nodes regardless of filter.
+                if (isMine) {
+                    this.pushToLiveTab(nodeInfo, FeedTab.inst);
+                }
 
                 if (!S.props.isMine(nodeInfo)) {
                     setTimeout(() => {
