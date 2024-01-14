@@ -327,6 +327,7 @@ public class ActPubFactory extends ServiceBase {
                     }
                 }
             }
+
             /*
              * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
              * this in our ActPubController. We tolerate Mastodon breaking spec here.

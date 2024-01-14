@@ -112,6 +112,7 @@ export class AppState {
         nsfw: false,
         showProps: false,
         autoRefreshFeed: false, // #add-prop
+        enableActPub: true,
         showReplies: true,
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,

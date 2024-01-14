@@ -14,6 +14,7 @@ public class UserPreferences {
     private boolean nsfw;
     private boolean showProps;
     private boolean autoRefreshFeed; // #add-prop
+    private boolean enableActPub;
     private boolean showReplies;
     private boolean rssHeadlinesOnly;
     // valid Range = 4 thru 8, inclusive.
@@ -110,6 +111,14 @@ public class UserPreferences {
     @JsonProperty(required = false)
     public void setEnableIPSM(final boolean enableIPSM) {
         this.enableIPSM = enableIPSM;
+    }
+
+    public boolean isEnableActPub() {
+        return enableActPub;
+    }
+
+    public void setEnableActPub(boolean enableActPub) {
+        this.enableActPub = enableActPub;
     }
 
     public UserPreferences() {}

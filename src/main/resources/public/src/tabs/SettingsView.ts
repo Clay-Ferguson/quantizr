@@ -53,7 +53,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         }),
                         this.settingsLink("Manage Hashtags", S.edit.editHashtags),
                         this.settingsLink("Blocked Words", S.edit.editBlockedWords),
-                        S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null
+                        S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null,
+                        new Checkbox("Fediverse Enable", { className: "bigMarginLeft" }, {
+                            setValue: (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.enableActPub = checked),
+                            getValue: (): boolean => getAs().userPrefs.enableActPub
+                        }),
                     ])
                 ], horzClass),
 

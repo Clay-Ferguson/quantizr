@@ -594,6 +594,10 @@ export class Edit {
         return S.util.saveUserPrefs(s => s.userPrefs.autoRefreshFeed = autoRefreshFeed);
     }
 
+    setEnableActPub = async (enableActPub: boolean) => {
+        return S.util.saveUserPrefs(s => s.userPrefs.enableActPub = enableActPub);
+    }
+
     setShowComments = async (showReplies: boolean): Promise<void> => {
         return S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
     }

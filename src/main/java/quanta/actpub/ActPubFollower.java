@@ -96,6 +96,10 @@ public class ActPubFollower extends ServiceBase {
                 // the owner of the friend node is the "Follower".
                 SubNode ownerOfFriendNode = read.getNode(as, n.getOwner());
                 if (ownerOfFriendNode != null) {
+                    if (!apUtil.isActPubEnabled(ownerOfFriendNode)) {
+                        continue;
+                    }
+
                     // fyi: we had ACT_PUB_ACTOR_URL here before, which was a bug.
                     String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
                     // this will be non-null if it's a remote account.
@@ -202,7 +206,7 @@ public class ActPubFollower extends ServiceBase {
         Query q = new Query();
         if (userNode == null) {
             userNode = read.getAccountByUserName(ms, userName, false);
-            if (userNode == null) {
+            if (userNode == null || !apUtil.isActPubEnabled(userNode)) {
                 return null;
             }
         }

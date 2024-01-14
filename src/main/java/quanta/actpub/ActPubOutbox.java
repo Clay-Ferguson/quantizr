@@ -62,6 +62,9 @@ public class ActPubOutbox extends ServiceBase {
             }
             if (userNode == null) {
                 userNode = read.getAccountByUserName(ms, apUserName, false);
+                if (!apUtil.isActPubEnabled(userNode)) {
+                    return false;
+                }
             }
             SubNode outboxNode = user.getPostsNode(ms, apUserName, userNode);
             if (outboxNode == null) {
@@ -152,6 +155,9 @@ public class ActPubOutbox extends ServiceBase {
             long count = 0;
             SubNode userNode = read.getAccountByUserName(null, userName, false);
             if (userNode != null) {
+                if (!apUtil.isActPubEnabled(userNode)) {
+                    return Long.valueOf(0);
+                }
                 List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
                 count = auth.countSubGraphByAclUser(as, null, sharedToList, userNode.getOwner());
@@ -245,7 +251,7 @@ public class ActPubOutbox extends ServiceBase {
         }
         try {
             SubNode userNode = read.getAccountByUserName(null, userName, false);
-            if (userNode == null) {
+            if (userNode == null || !apUtil.isActPubEnabled(userNode)) {
                 return null;
             }
             final String _sharedTo = sharedTo;
@@ -378,11 +384,13 @@ public class ActPubOutbox extends ServiceBase {
                     }
                 }
             }
+
             // if not authorized and not a public node fail now.
             if (!authSuccess && !AclService.isPublic(node)) {
                 log.debug("getResource failed on non-public node: " + node.getIdStr());
                 throw new ForbiddenException();
             }
+
             /*
              * todo-1: We should be able to get an object as whatever actual type it is, and not just a Note
              */

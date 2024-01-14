@@ -244,6 +244,10 @@ public class AppProp {
         return env.getProperty("HUGGINGFACE_API_KEY");
     }
 
+    public String getDevEmail() {
+        return env.getProperty("devEmail");
+    }
+
     public String getAdminPassword() {
         return env.getProperty("adminPassword");
     }

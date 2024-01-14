@@ -73,6 +73,18 @@ public class ActPubUtil extends ServiceBase {
         }
     }
 
+    public boolean isActPubEnabled(SubNode accntNode) {
+        if (accntNode == null)
+            return false;
+
+        // if foreign account then always enabled
+        if (accntNode.getStr(NodeProp.USER).contains("@")) {
+            return true;
+        }
+
+        return accntNode.getBool(NodeProp.USER_PREF_ENABLE_ACT_PUB);
+    }
+
     /*
      * input: clay@server.com
      *
@@ -436,6 +448,9 @@ public class ActPubUtil extends ServiceBase {
                         String username = parts[0];
                         SubNode userNode = read.getAccountByUserName(null, username, false);
                         if (userNode != null) {
+                            if (!isActPubEnabled(userNode)) {
+                                return null;
+                            }
                             return new APOWebFinger(username + "@" + fullHost, makeActorUrlForUserName(username));
                         }
                     }

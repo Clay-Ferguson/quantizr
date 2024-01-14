@@ -53,7 +53,7 @@ public class ActPubCrypto extends ServiceBase {
         }
         /* get the userNode for the current user who edited a node */
         SubNode userNode = read.getAccountByUserName(ms, userName, false);
-        if (userNode == null) {
+        if (userNode == null || !apUtil.isActPubEnabled(userNode)) {
             return null;
         }
         /* get private key of this user so we can sign the outbound message */

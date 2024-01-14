@@ -507,6 +507,9 @@ public class ActPubService extends ServiceBase {
                 log.error("Unable to load user: " + apUserName);
             }
         }
+        if (!apUtil.isActPubEnabled(acctNode)) {
+            return null;
+        }
         return acctNode;
     }
 
@@ -518,6 +521,9 @@ public class ActPubService extends ServiceBase {
         /* return node from cache if already cached */
         SubNode acctNode = apCache.acctNodesByActorUrl.get(actorUrl);
         if (acctNode != null) {
+            if (!apUtil.isActPubEnabled(acctNode)) {
+                return null;
+            }
             return acctNode;
         }
         APOActor actor = apUtil.getActorByUrl(ms, userDoingAction, actorUrl);
@@ -560,6 +566,11 @@ public class ActPubService extends ServiceBase {
                 userNode = mongoUtil.createUser(ms, apUserName, null, null, true, null, false);
             }
         }
+
+        if (!apUtil.isActPubEnabled(userNode)) {
+            return null;
+        }
+
         if (apUtil.updateNodeFromActorObject(userNode, actor)) {
             update.save(ms, userNode, false);
         }
@@ -734,6 +745,9 @@ public class ActPubService extends ServiceBase {
                 // get account node for person doing the boosting
                 SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
                 if (actorAccountNode != null) {
+                    if (!apUtil.isActPubEnabled(actorAccountNode)) {
+                        return null;
+                    }
                     String userName = actorAccountNode.getStr(NodeProp.USER);
                     // get posts node which will be parent we save boost into
                     SubNode postsNode = user.getPostsNode(as, userName, actorAccountNode);
@@ -791,6 +805,11 @@ public class ActPubService extends ServiceBase {
             log.debug("user not found: " + actor.getId());
             return;
         }
+
+        if (!apUtil.isActPubEnabled(actorAccnt)) {
+            return;
+        }
+
         if (!encodedKey.equals(actorAccnt.getStr(NodeProp.ACT_PUB_KEYPEM))) {
             throw new RuntimeException("wrong public key");
         }
@@ -870,6 +889,9 @@ public class ActPubService extends ServiceBase {
         // get actor's account node from their actorUrl
         SubNode actorAccountNode = getAcctNodeByActorUrl(as, null, activity.getActor());
         if (actorAccountNode != null) {
+            if (!apUtil.isActPubEnabled(actorAccountNode)) {
+                return;
+            }
             String userName = actorAccountNode.getStr(NodeProp.USER);
             SubNode postsNode = user.getPostsNode(as, userName, actorAccountNode);
             saveInboundForeignObj(as, null, actorAccountNode, postsNode, obj, activity.getType(), null, encodedKey,
@@ -1302,6 +1324,9 @@ public class ActPubService extends ServiceBase {
             // public info.
             SubNode userNode = read.getAccountByUserName(as, userName, false);
             if (userNode != null) {
+                if (!apUtil.isActPubEnabled(userNode)) {
+                    return null;
+                }
                 return apFactory.generatePersonObj(userNode);
             }
             return null;
