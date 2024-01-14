@@ -30,13 +30,13 @@ public class PushService extends ServiceBase {
     /*
      * Notify all users being shared to on this node, or everyone if the node is public.
      */
-    public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<String> sessionsPushed, SubNode node) {
+    public void pushNodeUpdateToBrowsers(MongoSession as, HashSet<String> sessionsPushed, SubNode node) {
         exec.run(() -> {
             boolean isPublic = AclService.isPublic(node);
             // put user names in a hash set for faster performance
             HashSet<String> usersSharedToSet = new HashSet<>();
 
-            List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
+            List<String> usersSharedTo = auth.getUsersSharedTo(as, node);
             if (usersSharedTo != null) {
                 usersSharedToSet.addAll(usersSharedTo);
             }
@@ -45,7 +45,7 @@ public class PushService extends ServiceBase {
             if (!isPublic && usersSharedToSet.size() == 0)
                 return;
 
-            maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, ThreadLocals.getSC());
+            maybePushToBrowser(as, sessionsPushed, node, usersSharedToSet, isPublic, ThreadLocals.getSC());
 
             List<SessionContext> scList = redis.query("*");
             if (scList.size() > 0) {
@@ -56,13 +56,13 @@ public class PushService extends ServiceBase {
 
                     // log.debug("Maybe Pushing to user: " + sc.getUserName() + " sc.hashCode=" + sc.hashCode()
                     // + " token: " + sc.getUserToken());
-                    maybePushToBrowser(ms, sessionsPushed, node, usersSharedToSet, isPublic, sc);
+                    maybePushToBrowser(as, sessionsPushed, node, usersSharedToSet, isPublic, sc);
                 }
             }
         });
     }
 
-    private void maybePushToBrowser(MongoSession ms, HashSet<String> sessionsPushed, SubNode node,
+    private void maybePushToBrowser(MongoSession as, HashSet<String> sessionsPushed, SubNode node,
             HashSet<String> usersSharedToSet, boolean isPublic, SessionContext sc) {
         // if we know we already just pushed to this session, we can skip it in here.
         if (sessionsPushed != null && sessionsPushed.contains(sc.getUserToken())) {
@@ -73,13 +73,20 @@ public class PushService extends ServiceBase {
         if (sc == null || sc.getUserName() == null)
             return;
 
+        // if 'sc' is my session and 'node' is my node, then push to my browser and return
+        if (node.getOwner().toHexString().equals(sc.getUserNodeId()) && ThreadLocals.getSC() != null
+                && sc.getUserToken().equals(ThreadLocals.getSC().getUserToken())) {
+            pushToBrowser(as, sc, sessionsPushed, node);
+            return;
+        }
+
         // if user has no kind of live updateable view, or we know based on path this won't be shown in
         // the timeline then return
         if (!sc.isViewingFeed() && (sc.getTimelinePath() == null || !node.getPath().startsWith(sc.getTimelinePath())))
             return;
 
         if (auth.ownedBy(sc, node)) {
-            pushToBrowser(ms, sc, sessionsPushed, node);
+            pushToBrowser(as, sc, sessionsPushed, node);
         }
         /*
          * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
@@ -90,7 +97,7 @@ public class PushService extends ServiceBase {
                     || AclService.isPublic(node) // is public node
                     || (usersSharedToSet != null && usersSharedToSet.contains(sc.getUserName())) // shared to me
             ) {
-                pushToBrowser(ms, sc, sessionsPushed, node);
+                pushToBrowser(as, sc, sessionsPushed, node);
             }
         }
     }

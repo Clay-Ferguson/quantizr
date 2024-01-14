@@ -20,7 +20,7 @@ export class FeedViewProps {
     friendsTagSearch: string = null;
     feedDirty = false;
     feedLoading = false;
-    feedResults: NodeInfo[] = null;
+    results: NodeInfo[] = null;
     feedEndReached = false;
 
     feedDirtyList: NodeInfo[] = null;

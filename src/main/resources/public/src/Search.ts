@@ -403,7 +403,7 @@ export class Search {
                     s.myNewMessageCount = 0;
                 }
 
-                FeedTab.inst.props.feedResults = [res.node];
+                FeedTab.inst.props.results = [res.node];
                 FeedTab.inst.props.feedEndReached = true;
                 FeedTab.inst.props.feedDirty = false;
                 FeedTab.inst.props.feedLoading = false;
@@ -456,23 +456,23 @@ export class Search {
 
             // if scrolling in new results grow the existing array
             if (growResults) {
-                if (FeedTab.inst?.props?.feedResults && res?.searchResults && FeedTab.inst.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
+                if (FeedTab.inst?.props?.results && res?.searchResults && FeedTab.inst.props.results.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
                     const idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    FeedTab.inst.props.feedResults.forEach(child => idSet.add(child.id));
+                    FeedTab.inst.props.results.forEach(child => idSet.add(child.id));
 
                     scrollToTop = false;
-                    FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    FeedTab.inst.props.results = FeedTab.inst.props.results.concat(res.searchResults.filter(child => !idSet.has(child.id)));
                 }
                 else {
-                    FeedTab.inst.props.feedResults = res.searchResults;
+                    FeedTab.inst.props.results = res.searchResults;
                 }
             }
             // else we have a fresh array (reset the array)
             else {
-                FeedTab.inst.props.feedResults = res.searchResults;
+                FeedTab.inst.props.results = res.searchResults;
             }
 
             FeedTab.inst.props.feedEndReached = res.endReached;

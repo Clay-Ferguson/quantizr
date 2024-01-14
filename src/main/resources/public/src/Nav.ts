@@ -470,7 +470,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_NEW
         });
@@ -485,7 +485,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: true,
             name: J.Constant.FEED_PUB
         });
@@ -529,7 +529,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_TOFROMME
         });
@@ -547,7 +547,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_MY_MENTIONS
         });
@@ -565,7 +565,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_TOME
         });
@@ -585,7 +585,7 @@ export class Nav {
             feedFilterToDisplayName: displayName,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMMETOUSER
         });
@@ -603,7 +603,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMME
         });
@@ -625,7 +625,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_PUB
         });
@@ -644,7 +644,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMFRIENDS
         });
@@ -662,7 +662,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_LOCAL
         });
@@ -680,7 +680,7 @@ export class Nav {
             feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedResults: null,
+            results: null,
             applyAdminBlocks: true,
             name: J.Constant.FEED_PUB
         });

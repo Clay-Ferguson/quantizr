@@ -99,7 +99,7 @@ export class NodeStatsDlg extends DialogBase {
                 feedFilterToUser: null,
                 feedFilterToPublic: true,
                 feedFilterLocalServer: false,
-                feedResults: null,
+                results: null,
                 applyAdminBlocks: true,
                 name: J.Constant.FEED_PUB
             });

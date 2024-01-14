@@ -28,21 +28,21 @@ export class FeedTab implements TabIntf<FeedViewProps> {
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
     findNode = (nodeId: string): NodeInfo => {
-        return S.util.searchNodeArray(this.props.feedResults, nodeId);
+        return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
     nodeDeleted = (_ust: AppState, nodeId: string): void => {
-        this.props.feedResults = this.props.feedResults?.filter(n => nodeId !== n.id);
+        this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }
 
     replaceNode = (_ust: AppState, newNode: NodeInfo): void => {
-        this.props.feedResults = this.props.feedResults?.map(n => {
+        this.props.results = this.props.results?.map(n => {
             return n?.id === newNode?.id ? newNode : n;
         });
     }
 
     processNode = (_ust: AppState, func: (node: NodeInfo) => void): void => {
-        this.props.feedResults?.forEach(n => func(n));
+        this.props.results?.forEach(n => func(n));
     }
 
     getTabSubOptions = (): Div => {
@@ -58,6 +58,5 @@ export class FeedTab implements TabIntf<FeedViewProps> {
             // todo-2: eventually we will make available to all users
             ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
         ]);
-
     };
 }

@@ -134,7 +134,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
         const children: Comp[] = [];
         children.push(new Div(null, null, topChildren));
-        const childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
+        const childCount = this.data.props.results ? this.data.props.results.length : 0;
 
         if (this.data.props.feedLoading && childCount === 0) {
             children.push(new Div(null, null, [
@@ -154,7 +154,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 children.push(new Heading(4, "Refresh when ready."));
             }
         }
-        else if (!this.data.props.feedResults || this.data.props.feedResults.length === 0) {
+        else if (!this.data.props.results || this.data.props.results.length === 0) {
             children.push(new Div("Nothing to display."));
             if (ast.userProfile?.blockedWords) {
                 children.push(new Div("Note: The 'Blocked Words' defined in your Settings can affect this view."));
@@ -166,15 +166,15 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             // holds ids of all boosts (nodes BEING boosted)
             const boosts: Set<string> = new Set<string>();
 
-            // scan all 'feedResults' to build up boosts set of IDs
-            this.data.props.feedResults.forEach(node => {
+            // scan all 'results' to build up boosts set of IDs
+            this.data.props.results.forEach(node => {
                 if (node.boostedNode) {
                     boosts.add(node.boostedNode.id);
                 }
             });
 
             // finally here's where we render the feed items
-            this.data.props.feedResults.forEach(node => {
+            this.data.props.results.forEach(node => {
                 // if this node will be showing up as a boost don't display it on the page, skip it.
                 if (boosts.has(node.id)) {
                     return;
@@ -198,7 +198,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 const buttonCreateTime: number = new Date().getTime();
 
                 if (C.FEED_INFINITE_SCROLL) {
-                    if (this.data.props.feedResults?.length < C.MAX_DYNAMIC_ROWS) {
+                    if (this.data.props.results?.length < C.MAX_DYNAMIC_ROWS) {
                         // When the 'more' button scrolls into view go ahead and load more records.
                         moreButton.onMount((elm: HTMLElement) => {
                             const observer = new IntersectionObserver(entries => {

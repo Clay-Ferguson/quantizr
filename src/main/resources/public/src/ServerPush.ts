@@ -109,9 +109,9 @@ export class ServerPush {
 
     forceFeedItem = (nodeInfo: NodeInfo) => {
         if (!nodeInfo) return;
-        FeedTab.inst.props.feedResults = FeedTab.inst.props.feedResults || [];
+        FeedTab.inst.props.results = FeedTab.inst.props.results || [];
 
-        const itemFoundIdx = FeedTab.inst.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+        const itemFoundIdx = FeedTab.inst.props.results.findIndex(item => item.id === nodeInfo.id);
         const updatesExistingItem = itemFoundIdx !== -1;
 
         if (S.props.isEncrypted(nodeInfo)) {
@@ -120,10 +120,10 @@ export class ServerPush {
 
         // if updates existing item we refresh it even if autoRefresh is off
         if (updatesExistingItem) {
-            FeedTab.inst.props.feedResults[itemFoundIdx] = nodeInfo;
+            FeedTab.inst.props.results[itemFoundIdx] = nodeInfo;
         }
         else {
-            FeedTab.inst.props.feedResults.unshift(nodeInfo);
+            FeedTab.inst.props.results.unshift(nodeInfo);
         }
     }
 
@@ -150,17 +150,19 @@ export class ServerPush {
         /* todo-1: Currently we know based on path that we will be getting items we should update for the timeline,
         but since we can't know whether (based on filtering) wether this node would show up in the FeedTab, we
         don't update the FeedTab live here. See also: userPrefs.autoRefreshFeed */
-        if (getAs().userPrefs.autoRefreshFeed) {
+
+        // todo-0: the checkbox to enable autoRefreshFeed needs to be on FeedTab as well as TimelineTab, and also
+        // whenever this is OUR node we'reve pushing, we should update ALWAYS, regardless of autoRefreshFeed setting.
+        if (S.props.isMine(nodeInfo) || getAs().userPrefs.autoRefreshFeed) {
             dispatch("RenderLiveUpdate", _s => {
                 S.render.fadeInId = nodeInfo.id;
-                this.pushToLiveTab(nodeInfo, TimelineTab.inst);
 
-                // when a user posts a new message we want to push it to the feed tab only if they own it
-                // (Update: actually we shouldn't do this, because the feed tab can be filtered to something like 
-                // "From Friends" and so we can't just assume it makes sense to show it)
-                // if (S.props.isMine(nodeInfo)) {
-                //     this.pushToLiveTab(nodeInfo, FeedTab.inst);
-                // }
+                // if nodeInfo path is under the timeline searchRoot then we update the timeline tab
+                if (nodeInfo.path.startsWith(TimelineTab.inst?.props?.searchRoot)) {
+                    this.pushToLiveTab(nodeInfo, TimelineTab.inst);
+                }
+
+                this.pushToLiveTab(nodeInfo, FeedTab.inst);
 
                 if (!S.props.isMine(nodeInfo)) {
                     setTimeout(() => {
