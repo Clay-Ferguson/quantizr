@@ -155,7 +155,11 @@ public class MongoAuth extends ServiceBase {
         else {
             // add `parent.owner` to the ACL
             child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
-            processActPubForNewNode(parent, child);
+
+            // if user creating this node has ActPub disabled don't do this.
+            if (ThreadLocals.getSC().getUserPreferences().isEnableActPub()) {
+                processActPubForNewNode(parent, child);
+            }
         }
     }
 

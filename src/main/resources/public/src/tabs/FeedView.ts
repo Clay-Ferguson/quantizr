@@ -3,7 +3,6 @@ import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";

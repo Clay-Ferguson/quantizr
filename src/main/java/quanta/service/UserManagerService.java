@@ -895,6 +895,7 @@ public class UserManagerService extends ServiceBase {
         userPrefs.setShowMetaData(true);
         userPrefs.setNsfw(false);
         userPrefs.setShowProps(false);
+        userPrefs.setEnableActPub(true);
         return userPrefs;
     }
 
@@ -910,7 +911,13 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
             userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
             userPrefs.setAutoRefreshFeed(prefsNode.getBool(NodeProp.USER_PREF_AUTO_REFRESH_FEED)); // #add-prop
+
+            // default ActPub enabled to true if property not yet set
+            if (!prefsNode.hasProp(NodeProp.USER_PREF_ENABLE_ACT_PUB.s())) {
+                prefsNode.set(NodeProp.USER_PREF_ENABLE_ACT_PUB, true);
+            }
             userPrefs.setEnableActPub(prefsNode.getBool(NodeProp.USER_PREF_ENABLE_ACT_PUB));
+
             userPrefs.setShowReplies(prefsNode.getBool(NodeProp.USER_PREF_SHOW_REPLIES));
             userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
             long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA);

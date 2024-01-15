@@ -277,7 +277,7 @@ public class NodeEditService extends ServiceBase {
 
             push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 
-            if (!isAccnt) {
+            if (!isAccnt && ThreadLocals.getSC().getUserPreferences().isEnableActPub()) {
                 HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, true);
 
                 if (tags != null && tags.size() > 0) {
@@ -289,20 +289,23 @@ public class NodeEditService extends ServiceBase {
                 }
             }
 
-            // if this is an account type then don't expect it to have any ACL but we still want to broadcast
-            // out to the world the edit that was made to it, as long as it's not admin owned.
-            boolean forceSendToPublic = isAccnt;
-            if (forceSendToPublic || node.getAc() != null) {
-                // We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-                if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
-                    SubNode _parent = parent;
-                    if (_parent == null) {
-                        _parent = read.getParent(ms, node, false);
+            if (ThreadLocals.getSC().getUserPreferences().isEnableActPub()) {
+                // if this is an account type then don't expect it to have any ACL but we still want to broadcast
+                // out to the world the edit that was made to it, as long as it's not admin owned.
+                boolean forceSendToPublic = isAccnt;
+                if (forceSendToPublic || node.getAc() != null) {
+                    // We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
+                    if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
+                        SubNode _parent = parent;
+                        if (_parent == null) {
+                            _parent = read.getParent(ms, node, false);
+                        }
+                        // This broadcasts out to the shared inboxes of all the followers of the user
+                        apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
                     }
-                    // This broadcasts out to the shared inboxes of all the followers of the user
-                    apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
                 }
             }
+
             if (AclService.isPublic(node) && !StringUtils.isEmpty(node.getName())) {
                 ipfs.saveNodeToMFS(ms, node);
             }
