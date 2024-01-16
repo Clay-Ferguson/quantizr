@@ -26,7 +26,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
 
         if (!res) {
             this.setChildren([
-                new Heading(4, "Generating statistics...", { className: "marginTop" }),
+                new Heading(6, "Generating statistics...", { className: "marginTop" }),
                 new Spinner()
             ]);
             return true;
@@ -36,7 +36,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
 
         // todo-1: add back in when votes are implemented
         // if (this.res.topVotes?.length > 0) {
-        //     tagPanel.addChild(new Heading(4, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
+        //     tagPanel.addChild(new Heading(6, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
         //     this.res.topVotes.forEach(word => {
         //         tagPanel.addChild(new Span(word, {
         //             className: ast.mobileMode ? "statsWordMobile" : "statsWord",
@@ -46,7 +46,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         // }
 
         if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
-            tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
+            tagPanel.addChild(new Heading(6, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
             res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
@@ -56,21 +56,9 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
-        const mentionPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if ((!this.data.props.filter || this.data.props.filter === "mentions") && res.topMentions && res.topMentions.length > 0) {
-            mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle alert alert-primary" }));
-            res.topMentions.forEach(word => {
-                mentionPanel.addChild(new Span(word, {
-                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
-                    [C.WORD_ATTR]: word,
-                    onClick: TrendingView.searchWord
-                }));
-            });
-        }
-
         const wordPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
-            wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle alert alert-primary" }));
+            wordPanel.addChild(new Heading(6, "Words", { className: "trendingSectionTitle alert alert-primary" }));
             res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
@@ -80,7 +68,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
-        const hasTop100s = tagPanel?.hasChildren() || mentionPanel?.hasChildren() || wordPanel?.hasChildren();
+        const hasTop100s = tagPanel?.hasChildren() || wordPanel?.hasChildren();
 
         this.setChildren([
             this.headingBar = new TabHeading([
@@ -89,7 +77,6 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             res.stats ? new TextContent(res.stats, "marginTop", true) : null,
             hasTop100s ? new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }) : null,
             tagPanel.hasChildren() ? tagPanel : null,
-            mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
             wordPanel.hasChildren() ? wordPanel : null
         ]);
         return true;

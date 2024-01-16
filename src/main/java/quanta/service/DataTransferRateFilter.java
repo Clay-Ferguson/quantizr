@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import quanta.util.Util;
 import quanta.util.XString;
 
-/* This filter is helpful only for diagnostics. It's currently disabled by not being mentioned in */
 @Component
 public class DataTransferRateFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(DataTransferRateFilter.class);

@@ -465,7 +465,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
-            feedFilterMyMentions: false,
             feedFilterFromMe: true,
             feedFilterToUser: null,
             feedFilterToPublic: false,
@@ -480,7 +479,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
-            feedFilterMyMentions: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: true,
@@ -493,10 +491,6 @@ export class Nav {
 
     showTrendingHashtags = () => {
         this.showTrendingFiltered("hashtags");
-    }
-
-    showTrendingMentions = () => {
-        this.showTrendingFiltered("mentions");
     }
 
     showTrendingWords = () => {
@@ -524,7 +518,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
-            feedFilterMyMentions: false,
             feedFilterFromMe: true,
             feedFilterToUser: null,
             feedFilterToPublic: false,
@@ -535,24 +528,6 @@ export class Nav {
         });
     }
 
-    messagesMyMentions = async () => {
-        if (FeedTab.inst) {
-            FeedTab.inst.props.searchTextState.setValue("");
-        }
-        this.messages({
-            feedFilterFriends: false,
-            feedFilterMyMentions: true,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToUser: null,
-            feedFilterToPublic: false,
-            feedFilterLocalServer: false,
-            results: null,
-            applyAdminBlocks: false,
-            name: J.Constant.FEED_MY_MENTIONS
-        });
-    }
-
     messagesToMe = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
@@ -560,7 +535,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
-            feedFilterMyMentions: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: false,
@@ -578,7 +552,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
-            feedFilterMyMentions: false,
             feedFilterFromMe: false,
             // WARNING: When setting feedFilterToUser, the other filter options should be false!! They're mutually exclusive in that way.
             feedFilterToUser: user,
@@ -598,7 +571,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
-            feedFilterMyMentions: false,
             feedFilterFromMe: true,
             feedFilterToUser: null,
             feedFilterToPublic: false,
@@ -606,28 +578,6 @@ export class Nav {
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMME
-        });
-    }
-
-    // WARNING: This is not "myMentions!" It's for any arbitary user!
-    messagesFindMentions = (userName: string) => {
-        // expand so users can see what's going on with the search string and know they can clear it.
-        // If feed tab exists, expand the filter part
-        if (FeedTab.inst) {
-            FeedTab.inst.props.searchTextState.setValue("@" + userName);
-        }
-
-        this.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterMyMentions: false,
-            feedFilterFromMe: false,
-            feedFilterToUser: null,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: false,
-            results: null,
-            applyAdminBlocks: false,
-            name: J.Constant.FEED_PUB
         });
     }
 
@@ -639,7 +589,6 @@ export class Nav {
         this.messages({
             feedFilterFriends: true,
             feedFilterToMe: false,
-            feedFilterMyMentions: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: false,
@@ -657,7 +606,7 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
-            feedFilterMyMentions: false,
+            feedFilterMys: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: true,
@@ -675,7 +624,6 @@ export class Nav {
         await this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
-            feedFilterMyMentions: false,
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: true,

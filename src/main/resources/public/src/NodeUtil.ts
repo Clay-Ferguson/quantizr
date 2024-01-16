@@ -191,12 +191,6 @@ export class NodeUtil {
         }
         content = content.trim();
 
-        // if content was empty or we weren't able to stip off all the mentions at the front
-        // of it and end up with some other text than just render this as the node id.
-        if (!content || content.startsWith("@")) {
-            return "ID:" + node.id;
-        }
-
         const idx = content.indexOf("\n");
         if (idx !== -1) {
             content = content.substring(0, idx);

@@ -13,7 +13,6 @@ public enum Constant {
     FEED_PUB("publicFediverse"), //
     FEED_TOFROMME("toFromMe"), //
     FEED_TOME("toMe"), //
-    FEED_MY_MENTIONS("myMentions"), //
     FEED_FROMMETOUSER("fromMeToUser"), //
     FEED_FROMME("fromMe"), //
     FEED_FROMFRIENDS("fromFriends"), //

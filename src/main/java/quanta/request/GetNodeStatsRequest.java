@@ -7,7 +7,6 @@ public class GetNodeStatsRequest extends RequestBase {
     private String nodeId;
     private boolean signatureVerify;
     private boolean getWords;
-    private boolean getMentions;
     private boolean getTags;
 
     public String getNodeId() {
@@ -20,10 +19,6 @@ public class GetNodeStatsRequest extends RequestBase {
 
     public boolean isGetWords() {
         return this.getWords;
-    }
-
-    public boolean isGetMentions() {
-        return this.getMentions;
     }
 
     public boolean isGetTags() {
@@ -40,10 +35,6 @@ public class GetNodeStatsRequest extends RequestBase {
 
     public void setGetWords(final boolean getWords) {
         this.getWords = getWords;
-    }
-
-    public void setGetMentions(final boolean getMentions) {
-        this.getMentions = getMentions;
     }
 
     public void setGetTags(final boolean getTags) {

@@ -353,7 +353,6 @@ public class NodeSearchService extends ServiceBase {
 
         HashMap<String, WordStats> wordMap = req.isGetWords() ? new HashMap<>() : null;
         HashMap<String, WordStats> tagMap = req.isGetTags() ? new HashMap<>() : null;
-        HashMap<String, WordStats> mentionMap = req.isGetMentions() ? new HashMap<>() : null;
         HashMap<String, WordStats> voteMap = countVotes ? new HashMap<>() : null;
 
         Stats stats = new Stats();
@@ -371,25 +370,22 @@ public class NodeSearchService extends ServiceBase {
         // for tree stats we need to process the root node as well because our query only gets children
         if (searchRoot != null) {
             processStatsForNode(searchRoot, req, stats, uniqueVoters, strictFiltering, false, uniqueUsersSharedTo,
-                    countVotes, null, wordMap, tagMap, mentionMap, voteMap);
+                    countVotes, null, wordMap, tagMap, voteMap);
         }
 
         for (SubNode node : iter) {
             processStatsForNode(node, req, stats, uniqueVoters, strictFiltering, false, uniqueUsersSharedTo, countVotes,
-                    null, wordMap, tagMap, mentionMap, voteMap);
+                    null, wordMap, tagMap, voteMap);
         }
 
         List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
         List<WordStats> tagList = req.isGetTags() ? new ArrayList<>(tagMap.values()) : null;
-        List<WordStats> mentionList = req.isGetMentions() ? new ArrayList<>(mentionMap.values()) : null;
         List<WordStats> voteList = countVotes ? new ArrayList<>(voteMap.values()) : null;
 
         if (wordList != null)
             wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
         if (tagList != null)
             tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
-        if (mentionList != null)
-            mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
         if (voteList != null)
             voteList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
@@ -449,25 +445,13 @@ public class NodeSearchService extends ServiceBase {
             }
         }
 
-        if (mentionList != null) {
-            ArrayList<String> topMentions = new ArrayList<>();
-            res.setTopMentions(topMentions);
-
-            for (WordStats ws : mentionList) {
-                topMentions.add(ws.word); // + "," + ws.count);
-                if (topMentions.size() >= 100)
-                    break;
-            }
-        }
-
         return res;
     }
 
     private void processStatsForNode(SubNode node, GetNodeStatsRequest req, Stats stats, //
             HashSet<ObjectId> uniqueVoters, boolean strictFiltering, boolean trending,
             HashSet<String> uniqueUsersSharedTo, boolean countVotes, HashSet<String> blockTerms,
-            HashMap<String, WordStats> wordMap, HashMap<String, WordStats> tagMap,
-            HashMap<String, WordStats> mentionMap, HashMap<String, WordStats> voteMap) {
+            HashMap<String, WordStats> wordMap, HashMap<String, WordStats> tagMap, HashMap<String, WordStats> voteMap) {
         stats.nodeCount++;
         if (req.isSignatureVerify()) {
             String sig = node.getStr(NodeProp.CRYPTO_SIG);
@@ -530,25 +514,7 @@ public class NodeSearchService extends ServiceBase {
             }
             if (!english.isStopWord(token)) {
                 String lcToken = token.toLowerCase();
-                // if word is a mention.
-                if (token.startsWith("@")) {
-                    if (token.length() < 3)
-                        continue;
-                    // lazy create and update knownTokens
-                    if (knownTokens == null) {
-                        knownTokens = new HashSet<>();
-                    }
-                    knownTokens.add(lcToken);
-                    if (mentionMap != null) {
-                        WordStats ws = mentionMap.get(lcToken);
-                        if (ws == null) {
-                            ws = new WordStats(token);
-                            mentionMap.put(lcToken, ws);
-                        }
-                        ws.inc(node, trending);
-                    }
-                } //
-                else if (token.startsWith("#")) { // if word is a hashtag.
+                if (token.startsWith("#")) { // if word is a hashtag.
                     if (token.endsWith("#") || token.length() < 4)
                         continue;
                     String tokSearch = token.replace("#", "").toLowerCase();

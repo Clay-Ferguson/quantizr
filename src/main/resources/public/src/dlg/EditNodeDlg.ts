@@ -1070,21 +1070,4 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditorState.setValue(content.trim());
         }
     }
-
-    // returns true if all the shares on the node ARE mentioned in the text.
-    areAllSharesInContent = () => {
-        const content: string = this.contentEditorState.getValue();
-        const ast = getAs();
-        if (ast.editNode.ac?.length > 0) {
-            for (const ac of ast.editNode.ac) {
-                if (ac.principalName !== PrincipalName.PUBLIC) {
-                    const insertName = "@" + ac.principalName;
-                    if (!content || content.indexOf(insertName) === -1) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
 }

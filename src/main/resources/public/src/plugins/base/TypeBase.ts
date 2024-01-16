@@ -206,12 +206,6 @@ export class TypeBase implements TypeIntf {
             href = S.util.stripIfEndsWith(href, "/");
             href = S.util.stripIfEndsWith(href, "\\");
 
-            /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
-            trying to process those for OpenGraph we detect them using the 'mention' and 'hashtag' classes */
-            if (e.classList.contains("mention") ||
-                e.classList.contains("hashtag") ||
-                e.classList.contains("u-url")) return;
-
             // Only add to 'urls' if we do NOT have an attachment pointing to the same href, because this
             // would make it render it twice because we already know the attachments will rendering.
             if (!S.props.getAttachmentByUrl(node, href)) {

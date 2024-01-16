@@ -303,7 +303,6 @@ export class View {
             nodeId: node.id,
             getWords: true,
             getTags: true,
-            getMentions: true,
             signatureVerify: false
         });
 
@@ -335,7 +334,6 @@ export class View {
             nodeId: node ? node.id : null,
             getWords: false,
             getTags: false,
-            getMentions: false,
             signatureVerify: true
         });
 

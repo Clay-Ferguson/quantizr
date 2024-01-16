@@ -156,9 +156,6 @@ export class UserProfileDlg extends DialogBase {
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
-                    !ast.isAnonUser
-                        ? new Button("Mentions", () => this.searchMentions(this.getUserName()), { title: "Find all Public Mentions of this person" }) : null,
-
                     !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Follow", this.addFriend) : null,
 
@@ -299,12 +296,6 @@ export class UserProfileDlg extends DialogBase {
             const state: any = this.getState<LS>();
             S.nav.messagesFromMeToUser(state.userProfile.userName, state.userProfile.displayName);
         }, 10);
-    }
-
-    searchMentions = (fullUserName: string) => {
-        if (this.currentlyEditingWarning()) return;
-        this.close();
-        setTimeout(() => { S.nav.messagesFindMentions(fullUserName); }, 10);
     }
 
     blockUser = async () => {

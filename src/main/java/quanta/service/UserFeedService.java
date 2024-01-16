@@ -113,11 +113,8 @@ public class UserFeedService extends ServiceBase {
         SubNode myAcntNode = null;
         String searchForUserName = null;
 
-        if (req.getMyMentions()) {
-            searchForUserName = sc.getUserName() + "@" + prop.getMetaHost();
-        }
         // includes shares TO me (but not in the context of a 'bidirectional' query)
-        else if (req.getToMe()) {
+        if (req.getToMe()) {
             myAcntNode = read.getNode(ms, sc.getUserNodeId());
             if (myAcntNode != null) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));

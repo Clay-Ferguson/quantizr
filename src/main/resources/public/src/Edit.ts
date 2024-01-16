@@ -1379,16 +1379,6 @@ export class Edit {
 
         const sharingDlg = new SharingDlg();
         await sharingDlg.open();
-
-        // if not all the shares are mentioned in the text ask the user about putting them the content automatically
-        // todo-2: i don't want this for now. I may never bring it back. Not sure if it even still works.
-        // if (!dlg.areAllSharesInContent()) {
-        //     const confDlg = new ConfirmDlg("Insert Mentions into content text?", "Add Mentions ?");
-        //     await confDlg.open();
-        //     if (confDlg.yes) {
-        //         await dlg.addSharingToContentText();
-        //     }
-        // }
     }
 
     /* Whenever we share an encrypted node to a another user, this is the final operation we run which

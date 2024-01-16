@@ -441,7 +441,6 @@ export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
     signatureVerify: boolean;
     getWords: boolean;
-    getMentions: boolean;
     getTags: boolean;
 }
 
@@ -564,7 +563,6 @@ export interface NodeFeedRequest extends RequestBase {
     page: number;
     toUser: string;
     toMe: boolean;
-    myMentions: boolean;
     fromMe: boolean;
     fromFriends: boolean;
     toPublic: boolean;
@@ -913,7 +911,6 @@ export interface GetNodeStatsResponse extends ResponseBase {
     stats: string;
     topWords: string[];
     topTags: string[];
-    topMentions: string[];
     topVotes: string[];
 }
 
@@ -1286,7 +1283,6 @@ export const enum Constant {
     FEED_PUB = "publicFediverse",
     FEED_TOFROMME = "toFromMe",
     FEED_TOME = "toMe",
-    FEED_MY_MENTIONS = "myMentions",
     FEED_FROMMETOUSER = "fromMeToUser",
     FEED_FROMME = "fromMe",
     FEED_FROMFRIENDS = "fromFriends",

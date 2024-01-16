@@ -118,7 +118,6 @@ export class SelectTagsDlg extends DialogBase {
             nodeId: node ? node.id : null,
             getWords: false,
             getTags: true,
-            getMentions: false,
             signatureVerify: false
         });
 

@@ -213,7 +213,7 @@ export class User {
     }
 
     showUsersList = (node: NodeInfo) => {
-        const friendsDlg = new FriendsDlg("Mentions & Shares", node.id, true);
+        const friendsDlg = new FriendsDlg("User Shares", node.id, true);
         friendsDlg.open();
     }
 }
