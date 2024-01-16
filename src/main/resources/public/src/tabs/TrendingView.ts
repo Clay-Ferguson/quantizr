@@ -1,7 +1,5 @@
-import { dispatch, getAs } from "../AppContext";
+import { getAs } from "../AppContext";
 import { Constants as C } from "../Constants";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
 import { AppTab } from "../comp/AppTab";
@@ -10,17 +8,9 @@ import { Heading } from "../comp/core/Heading";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
 import { TabHeading } from "../comp/core/TabHeading";
+import { TextContent } from "../comp/core/TextContent";
+import { SearchContentDlg } from "../dlg/SearchContentDlg";
 import { TabIntf } from "../intf/TabIntf";
-import { FeedTab } from "./data/FeedTab";
-
-PubSub.sub(C.PUBSUB_tabChanging, (tabId: string) => {
-    if (tabId === C.TAB_TRENDING) {
-        // We have this timer to allow the TrendingView to come into existence.
-        setTimeout(() => {
-            TrendingView.inst.refresh();
-        }, 500);
-    }
-});
 
 export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
     static inst: TrendingView = null;
@@ -28,22 +18,6 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
     constructor(data: TabIntf<TrendingRSInfo, TrendingView>) {
         super(data);
         data.inst = TrendingView.inst = this;
-    }
-
-    refresh = async () => {
-        const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
-            nodeId: null,
-            trending: true,
-            feed: true,
-            getWords: true,
-            getTags: true,
-            getMentions: true,
-            signatureVerify: false
-        });
-
-        dispatch("RenderSearchResults", _s => {
-            this.data.props.res = res;
-        });
     }
 
     override preRender = (): boolean => {
@@ -59,6 +33,18 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         }
 
         const tagPanel = new Div(null, { className: "trendingWordStatsArea" });
+
+        // todo-1: add back in when votes are implemented
+        // if (this.res.topVotes?.length > 0) {
+        //     tagPanel.addChild(new Heading(4, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
+        //     this.res.topVotes.forEach(word => {
+        //         tagPanel.addChild(new Span(word, {
+        //             className: ast.mobileMode ? "statsWordMobile" : "statsWord",
+        //             [C.WORD_ATTR]: "\"" + word + "\""
+        //         }));
+        //     });
+        // }
+
         if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
             res.topTags.forEach(word => {
@@ -94,13 +80,14 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             });
         }
 
+        const hasTop100s = tagPanel?.hasChildren() || mentionPanel?.hasChildren() || wordPanel?.hasChildren();
+
         this.setChildren([
             this.headingBar = new TabHeading([
-                new Div("Trending", { className: "tabTitle" })
+                new Div("Node Stats", { className: "tabTitle" })
             ], null),
-
-            new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),
-
+            res.stats ? new TextContent(res.stats, "marginTop", true) : null,
+            hasTop100s ? new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }) : null,
             tagPanel.hasChildren() ? tagPanel : null,
             mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
             wordPanel.hasChildren() ? wordPanel : null
@@ -114,23 +101,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         }
         if (!word) return;
 
-        // expand so users can see what's going on with the search string and know they can clear it.
-        // If feed tab exists, expand the filter part
-        if (FeedTab.inst) {
-            FeedTab.inst.props.searchTextState.setValue(word);
-        }
-
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterMyMentions: false,
-            feedFilterFromMe: false,
-            feedFilterToUser: null,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: false,
-            results: null,
-            applyAdminBlocks: true,
-            name: J.Constant.FEED_PUB
-        });
+        SearchContentDlg.defaultSearchText = word;
+        new SearchContentDlg().open();
     }
 }

@@ -415,9 +415,6 @@ public class SystemService extends ServiceBase {
             case "refreshRssCache":
                 res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
                 break;
-            case "refreshTrendingCache":
-                res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
-                break;
             case "toggleAuditFilter":
                 AppFilter.audit = !AppFilter.audit;
                 res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));

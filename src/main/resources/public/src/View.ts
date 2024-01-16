@@ -1,11 +1,10 @@
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
-import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import { FullScreenType } from "./Interfaces";
 import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo, PrincipalName } from "./JavaIntf";
+import { NodeInfo } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 
@@ -299,20 +298,24 @@ export class View {
     }
 
     getNodeStats = async (): Promise<any> => {
-        const ast = getAs();
         const node = S.nodeUtil.getHighlightedNode();
-        const isMine = !!node && (node.owner === ast.userName || ast.userName === PrincipalName.ADMIN);
-
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
-            nodeId: node ? node.id : null,
-            trending: false,
-            feed: false,
-            getWords: isMine,
-            getTags: isMine,
-            getMentions: isMine,
+            nodeId: node.id,
+            getWords: true,
+            getTags: true,
+            getMentions: true,
             signatureVerify: false
         });
-        new NodeStatsDlg(res, false, false).open();
+
+        dispatch("showNodeStats", s => {
+            // lookup data for TAB_TRENDING and set the data with res
+            const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_TRENDING);
+            data.props.res = res;
+
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
+            s.activeTab = C.TAB_TRENDING;
+            s.statsNodeId = node.id;
+        });
     }
 
     signSubGraph = async (): Promise<any> => {
@@ -330,14 +333,19 @@ export class View {
         const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
-            trending: false,
-            feed: false,
             getWords: false,
             getTags: false,
             getMentions: false,
             signatureVerify: true
         });
-        new NodeStatsDlg(res, false, false).open();
+
+        dispatch("showNodeStats", s => {
+            const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_TRENDING);
+            data.props.res = res;
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
+            s.activeTab = C.TAB_TRENDING;
+            s.statsNodeId = node.id;
+        });
     }
 
     removeSignatures = async (): Promise<any> => {

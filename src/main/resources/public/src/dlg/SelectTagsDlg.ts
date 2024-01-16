@@ -116,8 +116,6 @@ export class SelectTagsDlg extends DialogBase {
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
-            trending: false,
-            feed: false,
             getWords: false,
             getTags: true,
             getMentions: false,

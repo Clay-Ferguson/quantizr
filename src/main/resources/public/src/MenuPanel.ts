@@ -314,7 +314,13 @@ export class MenuPanel extends Div {
                 new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab),
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
+
+                // I decided with this on the toolbar we don't need it repliated here.
+                // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
+                new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
+                new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab, null, true), //
                 // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
+                new MenuItemSeparator(), //
 
                 new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
                 new MenuItem("Export", MenuPanel.export, onMainTab && exportFeatureEnabled, null, true),
@@ -341,13 +347,6 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu("Info", [
-                // I decided with this on the toolbar we don't need it repliated here.
-                // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
-                new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
-                new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab) //
-            ], null));
-
             children.push(new Menu("RDF Triple", [
                 new MenuItem("Set Subject", S.edit.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
                 new MenuItem("Create Triple", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource, null, true), //

@@ -214,4 +214,6 @@ export class AppState {
     cutAttachmentsFromId: string;
     // this is the set of attachment keys that were cut
     cutAttachments: Set<string>;
+
+    statsNodeId: string = null;
 }

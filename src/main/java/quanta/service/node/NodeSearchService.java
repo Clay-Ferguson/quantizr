@@ -59,8 +59,6 @@ import quanta.util.val.Val;
 @Component
 public class NodeSearchService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-    public static Object trendingFeedInfoLock = new Object();
-    public static GetNodeStatsResponse apTrendingFeedInfo;
     static final String SENTENCE_DELIMS = ".!?";
     /*
      * Warning: Do not add '#' or '@' to this list because we're using it to parse text for hashtags
@@ -70,29 +68,6 @@ public class NodeSearchService extends ServiceBase {
      * want '-' character as a delimiter either
      */
     static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
-    static final int TRENDING_LIMIT = 10000;
-    private static final int REFRESH_FREQUENCY_MINS = 180; // 3 hrs
-
-    /*
-     * Runs immediately at startup, and then every few minutes, to refresh the feedCache.
-     */
-    @Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
-    public void run() {
-        if (!initComplete)
-            return;
-        /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
-        synchronized (NodeSearchService.trendingFeedInfoLock) {
-            NodeSearchService.apTrendingFeedInfo = null;
-        }
-    }
-
-    public String refreshTrendingCache() {
-        /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
-        synchronized (NodeSearchService.trendingFeedInfoLock) {
-            NodeSearchService.apTrendingFeedInfo = null;
-        }
-        return "Trending Data will be refreshed immediately at next request to display it.";
-    }
 
     public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
         RenderDocumentResponse res = new RenderDocumentResponse();
@@ -374,25 +349,8 @@ public class NodeSearchService extends ServiceBase {
 
     public GetNodeStatsResponse getNodeStats(MongoSession ms, GetNodeStatsRequest req) {
         GetNodeStatsResponse res = new GetNodeStatsResponse();
-        boolean countVotes = !req.isFeed();
-        /*
-         * If this is the 'feed' being queried (i.e. the Trending tab on the app), then get the data from
-         * trendingFeedInfo (the cache), or else cache it
-         */
-        if (req.isFeed()) {
-            synchronized (NodeSearchService.trendingFeedInfoLock) {
-                if (NodeSearchService.apTrendingFeedInfo != null) {
-                    res.setStats(NodeSearchService.apTrendingFeedInfo.getStats());
-                    res.setTopMentions(NodeSearchService.apTrendingFeedInfo.getTopMentions());
-                    res.setTopTags(NodeSearchService.apTrendingFeedInfo.getTopTags());
-                    res.setTopWords(NodeSearchService.apTrendingFeedInfo.getTopWords());
-                    return res;
-                }
-            }
-        }
-        // If we're doing the system-wide statistics get blockedTerms from Admin account and
-        // use those to ban unwanted things from trending
-        HashSet<String> blockTerms = getAdminBlockedWords(req);
+        boolean countVotes = true;
+
         HashMap<String, WordStats> wordMap = req.isGetWords() ? new HashMap<>() : null;
         HashMap<String, WordStats> tagMap = req.isGetTags() ? new HashMap<>() : null;
         HashMap<String, WordStats> mentionMap = req.isGetMentions() ? new HashMap<>() : null;
@@ -401,72 +359,24 @@ public class NodeSearchService extends ServiceBase {
         Stats stats = new Stats();
         Iterable<SubNode> iter = null;
         boolean strictFiltering = false;
-        boolean trending = req.isTrending();
         SubNode searchRoot = null;
 
-        /*
-         * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
-         * a bunch of options but just the public feed query
-         */
-        if (req.isFeed()) {
-            strictFiltering = true;
-            List<Criteria> ands = new LinkedList<>();
-            Query q = new Query();
-            Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.USERS_PATH));
-            ands.add(Criteria.where(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s()));
-
-            // For public feed statistics only consider PUBLIC nodes.
-            ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
-            HashSet<ObjectId> blockedUserIds = new HashSet<>();
-            /*
-             * We block the "remote users" and "local users" by blocking any admin owned nodes, but we also just
-             * want to in general for other reasons block any admin-owned nodes from showing up in feeds. Feeds
-             * are always only about user content.
-             */
-            blockedUserIds.add(auth.getAdminSession().getUserNodeId());
-            // filter out any nodes owned by users the admin has blocked.
-            userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-            if (blockedUserIds.size() > 0) {
-                ands.add(Criteria.where(SubNode.OWNER).nin(blockedUserIds));
-            }
-
-            // NO! Don't do security check here. We're querying for ONLY PUBLIC (see above)
-            // crit = auth.addReadSecurity(ms, crit, ands);
-
-            q.addCriteria(crit);
-            q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
-            q.limit(TRENDING_LIMIT);
-
-            // pass null session here to bypass security. We quey for only PUBLIC to this is fine
-            iter = opsw.find(null, q);
-        }
-        /*
-         * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
-         * running a stats request under the 'Node Info' main menu
-         */
-        else {
-            ms = ThreadLocals.ensure(ms);
-            searchRoot = read.getNode(ms, req.getNodeId());
-            Sort sort = null;
-            int limit = 0;
-            if (req.isTrending()) {
-                sort = Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME);
-                limit = TRENDING_LIMIT;
-            }
-            iter = read.getSubGraph(ms, searchRoot, sort, limit, false, true, null);
-        }
+        ms = ThreadLocals.ensure(ms);
+        searchRoot = read.getNode(ms, req.getNodeId());
+        Sort sort = null;
+        iter = read.getSubGraph(ms, searchRoot, sort, 0, false, true, null);
         HashSet<String> uniqueUsersSharedTo = new HashSet<>();
         HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
 
         // for tree stats we need to process the root node as well because our query only gets children
         if (searchRoot != null) {
-            processStatsForNode(searchRoot, req, stats, uniqueVoters, strictFiltering, trending, uniqueUsersSharedTo,
-                    countVotes, blockTerms, wordMap, tagMap, mentionMap, voteMap);
+            processStatsForNode(searchRoot, req, stats, uniqueVoters, strictFiltering, false, uniqueUsersSharedTo,
+                    countVotes, null, wordMap, tagMap, mentionMap, voteMap);
         }
 
         for (SubNode node : iter) {
-            processStatsForNode(node, req, stats, uniqueVoters, strictFiltering, trending, uniqueUsersSharedTo,
-                    countVotes, blockTerms, wordMap, tagMap, mentionMap, voteMap);
+            processStatsForNode(node, req, stats, uniqueVoters, strictFiltering, false, uniqueUsersSharedTo, countVotes,
+                    null, wordMap, tagMap, mentionMap, voteMap);
         }
 
         List<WordStats> wordList = req.isGetWords() ? new ArrayList<>(wordMap.values()) : null;
@@ -547,14 +457,6 @@ public class NodeSearchService extends ServiceBase {
                 topMentions.add(ws.word); // + "," + ws.count);
                 if (topMentions.size() >= 100)
                     break;
-            }
-        }
-        /*
-         * If this is a feed query cache it. Only will refresh every 30mins based on a @Schedule event
-         */
-        if (req.isFeed()) {
-            synchronized (NodeSearchService.trendingFeedInfoLock) {
-                NodeSearchService.apTrendingFeedInfo = res;
             }
         }
 
@@ -702,22 +604,5 @@ public class NodeSearchService extends ServiceBase {
                 }
             }
         }
-    }
-
-    private HashSet<String> getAdminBlockedWords(GetNodeStatsRequest req) {
-        HashSet<String> blockTerms = null;
-        if (req.isFeed()) {
-            blockTerms = new HashSet<>();
-            SubNode root = read.getDbRoot();
-            String blockedWords = root.getStr(NodeProp.USER_BLOCK_WORDS);
-            if (StringUtils.isNotEmpty(blockedWords)) {
-                StringTokenizer t = new StringTokenizer(blockedWords, " \n\r\t,", false);
-
-                while (t.hasMoreTokens()) {
-                    blockTerms.add(t.nextToken().replace("#", "").toLowerCase());
-                }
-            }
-        }
-        return blockTerms;
     }
 }

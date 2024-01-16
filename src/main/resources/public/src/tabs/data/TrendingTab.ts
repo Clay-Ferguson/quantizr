@@ -1,5 +1,5 @@
+import { getAs } from "../../AppContext";
 import { AppState } from "../../AppState";
-import { AppNavLink } from "../../comp/core/AppNavLink";
 import { Div } from "../../comp/core/Div";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
@@ -10,8 +10,8 @@ import { TrendingRSInfo } from "../../TrendingRSInfo";
 import { TrendingView } from "../TrendingView";
 
 export class TrendingTab implements TabIntf<TrendingRSInfo> {
-    name = "Trending";
-    tooltip = "What's popular right now on the Fediverse";
+    name = "Node Stats";
+    tooltip = "Statistics about the node and its children";
     id = C.TAB_TRENDING;
     props = new TrendingRSInfo();
     scrollPos = 0;
@@ -23,15 +23,9 @@ export class TrendingTab implements TabIntf<TrendingRSInfo> {
         TrendingTab.inst = this;
     }
 
-    isVisible = () => true;
+    isVisible = () => getAs().statsNodeId !== null;
     constructView = (data: TabIntf) => new TrendingView(data);
-    getTabSubOptions = (): Div => {
-        return new Div(null, { className: "tabSubOptions" }, [
-            new AppNavLink("Hashtags", S.nav.showTrendingHashtags),
-            new AppNavLink("Mentions", S.nav.showTrendingMentions),
-            new AppNavLink("Words", S.nav.showTrendingWords)
-        ]);
-    };
+    getTabSubOptions = (): Div => null;
 
     findNode = (nodeId: string): NodeInfo => {
         return S.util.searchNodeArray(this.props.results, nodeId);

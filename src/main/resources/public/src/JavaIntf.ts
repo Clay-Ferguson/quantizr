@@ -439,9 +439,7 @@ export interface GetNodePrivilegesRequest extends RequestBase {
 
 export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
-    trending: boolean;
     signatureVerify: boolean;
-    feed: boolean;
     getWords: boolean;
     getMentions: boolean;
     getTags: boolean;

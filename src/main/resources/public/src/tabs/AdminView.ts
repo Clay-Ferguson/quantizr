@@ -103,7 +103,6 @@ export class AdminView extends AppTab<any, AdminView> {
                     ]),
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", null, "Refresh RSS Cache", null)), //
-                        this.settingsLink("Refresh Trending Cache", () => S.view.runServerCommand("refreshTrendingCache", null, "Refresh Trending Cache", null))
                     ])
                 ], horzClass),
 
