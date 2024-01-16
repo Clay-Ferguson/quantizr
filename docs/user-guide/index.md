@@ -14,11 +14,7 @@
 
 ### [Sharing](/docs/user-guide/sharing/index.md)
 
-### [Social Media and Fediverse](/docs/user-guide/activity-pub/index.md)
-
 ### [AI - Artificial Intelligence](/docs/user-guide/ai/index.md)
-
-### [Friends and Followers](/docs/user-guide/following/index.md)
 
 ### [Content Layout](/docs/user-guide/page-layout/index.md)
 

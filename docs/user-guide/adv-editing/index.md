@@ -19,6 +19,8 @@
     * [Set Headings](#set-headings)
     * [Node Signatures](#node-signatures)
         * [Purpose of Signatures](#purpose-of-signatures)
+        * [Verify Signatures ](#verify-signatures-)
+        * [Remove Signatures ](#remove-signatures-)
     * [Node Types](#node-types)
     * [Transfers](#transfers)
         * [About Admin Transfers](#about-admin-transfers)
@@ -157,14 +159,14 @@ For example, if your selected node starts with `## My Heading` that would be a m
 
 How to add digital signatures to nodes.
 
-*Note: This is currently an admin-only function. Only the admin can sign nodes.*
+*Note: Use of signatures is currently an admin-only function. Only the admin can sign nodes.*
 
 To add a digital signature to a node (signed using your browser's signature keys), click the "Sign" checkbox that's available in the 'advanced' section of the editor dialog.
 
 ![file-p](attachments/6362b0a70aeca527dc83c3e4-file-p)
 
 
-To sign all the nodes (that you own) under an entire branch of the tree, first select the node by clicking it, and then click `Menu -> Tools -> Sign`.
+To sign all the nodes (that you own) under an entire branch of the tree, first select the node by clicking it, and then click `Menu -> Signature -> Sign`.
 
 ## Purpose of Signatures
 
@@ -174,7 +176,13 @@ Whenever the server is generating a page of content it checks to see if the node
 
 Also for admin-owned content, if a signature fails, that node won't be displayed to the user at all, as an additional safety against database hacks. In other words, if a hacker gets all the way inside the Quanta database where they can alter data at will, they still will not be able to cause any of their hacked content to appear on the actual web page, because the only person in possession of the signature key is the admin's actual browser itself, and the admin signature key is not even stored on the server.
 
-You can (as the admin) also request a verification of all signatures on an entire branch of the tree, by selecting that branch of the tree, and then `Menu -> Tools -> Verify Signatures`
+## Verify Signatures 
+
+You can (as the admin) request a verification of all signatures on an entire branch of the tree, by selecting that branch of the tree, and then `Menu -> Signature -> Verify`
+
+## Remove Signatures 
+
+You can (as the admin) remove all signatures on an entire branch of the tree, by selecting that branch of the tree, and then `Menu -> Signature -> Remove`
 
 *todo: Add more info and/or link to page discussing uploading public keys*
 

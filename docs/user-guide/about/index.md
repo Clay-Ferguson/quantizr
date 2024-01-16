@@ -20,8 +20,6 @@ Node content can be as small as one sentence (like a tweet), or as large as you 
 
 With these small chunks of content you can create nodes that are Social Media posts (free-standing content without any prior context); but you can also organize content into larger structures to compose a document, blog, or other long-form content, with different sections, chapters, headings, etc. containing the individual sentences and paragraphs of the document.
 
-Having documents that are this highly structured existing in the context of a Social Media app also enables a powerful new kind of collaboration, since you can share on the Fediverse and allow other users to append "comments" (replies) under each individual sentence, paragraph, or even image. This concept is elaborated on much more below, and throughout this User Guide.
-
 Since everyone is familiar with files and folders in the context of a computer operating system, the main thing to remember is that Quanta uses the terms tree, branch, or even subgraph to refer to what you already know as "Folders". 
 
 So if you simply realize a folder structure on computers is a "Tree" then everything else about the Quanta terminology should be intuitive and obvious to you. The term "Node" just means "something on the tree".

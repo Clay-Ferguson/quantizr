@@ -48,7 +48,7 @@ You can update your list of URLs any time, and everything will just continue to 
 
 # Comment on a Podcast
 
-The Audio Player has a "Post" button, so you can share the article title and link to the Fediverse, along with a comment/post.
+The Audio Player has a "Post" button, so you can share the article title and link along with a comment/post.
 
 When posting this way the link that gets included points back to the Quanta app, with a URL that will start playing the audio at the time offset that was automatically embedded into the link (or audio podcasts only) 
 

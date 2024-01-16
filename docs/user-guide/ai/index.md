@@ -153,4 +153,4 @@ However more frequently you'll probably just look at how ChatGPT worded the text
 
 
 ----
-**[Next: Friends and Followers](/docs/user-guide/following/index.md)**
+**[Next: Content Layout](/docs/user-guide/page-layout/index.md)**

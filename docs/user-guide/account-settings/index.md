@@ -6,7 +6,6 @@
     * [Settings](#settings)
         * [Manage Hashtags](#manage-hashtags)
         * [Blocked Words](#blocked-words)
-        * [Sensitive Content](#sensitive-content)
         * [Comments](#comments)
         * [Properties](#properties)
         * [Content Width](#content-width)
@@ -39,10 +38,6 @@ Opens a Dialog where you can input any number of custom hashtags that you use fr
 ## Blocked Words
 
 Lets you specify which words you'd like to never see in your feed. Any posts containing any words in your blocked words list will be excluded from your feed.
-
-## Sensitive Content
-
-Controls the content of your "Fediverse Feed" to show/hide content from your feed that the authors of the content have flagged as "sensitive". The term *sensitive* means not appropriate for children for the workplace, etc (profanity, pornography, etc)
 
 ## Comments
 

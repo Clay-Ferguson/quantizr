@@ -4,8 +4,6 @@
     * [Hierarchial CMS](#hierarchial-cms)
     * [Quantized](#quantized)
     * [ChatGPT](#chatgpt)
-    * [Social Media](#social-media)
-    * [Fediverse](#fediverse)
     * [Secure Messaging](#secure-messaging)
     * [Blogs - Notes - Wikis ](#blogs---notes---wikis-)
     * [Advanced Editing](#advanced-editing)
@@ -18,7 +16,6 @@
     * [PDF Creator](#pdf-creator)
     * [Timelines](#timelines)
     * [Audio and Video Recording](#audio-and-video-recording)
-    * [Trending and Analytics](#trending-and-analytics)
     * [Interactive Node Graphs](#interactive-node-graphs)
     * [Import and Export](#import-and-export)
     * [Mobile Support](#mobile-support)
@@ -53,20 +50,6 @@ Every node automatically has it's own URL, so they're easy to link to across the
 Interact with OpenAI's ChatGPT AI, by asking questions on the Quanta Tree and getting answers automatically saved into the tree. The AI can assist you with almost any kind of task, and it retains a memory of the conversation, by using the tree location as a "context" for discussion. Quanta is perhaps the first AI Assistant with a `hierarchical context` (i.e. memory). We support AI chat, question answering, image understanding (asking questions about images), and image generation. You can choose to keep your conversations private or share by sharing branches of your tree.
 
 <img src='attachments/64ebe3e8c33eef3cdbdac6b8-file-p' style='width:25%'/>
-
-
-# Social Media
-
-Your social media feed displays the most recent (i.e. reverse-chronological timeline) posts that are made to or about you, and everyone you follow, and lets you reply to other users also. All features work both with and without the Fediverse, and so a private cloud (private corporate network, for example) is easily supported.
-
-<img src='attachments/60186e0bdd591d5497467563-file-p' style='width:25%'/>
-
-
-# Fediverse
-
-Explore the original Open Source Social Media network (called the Fediverse) and communicate with users of Mastodon, and other Fediverse apps. You can follow people, be followed by them, send private (DMs) or post public messages.
-
-<img src='attachments/60186a8ddd591d549746753b-' style='width:25%'/>
 
 
 # Secure Messaging
@@ -153,15 +136,6 @@ A Timeline is a reverse-chronological listing of all subnodes (including descend
 When you attach an audio or video file to a node, the platform automatically provides a "player" for watching the video or playing the audio. You can also record Audio or Video directly thru your browser (WebCam/Microphone), and it automatically saves as a node attachment, for later playback or downloading as a file.
 
 <img src='attachments/60188b3ea7da7d062f8a2700-file-p' style='width:25%'/>
-
-
-# Trending and Analytics
-
-The Trending Tab shows the top most frequently appearing `hashtags`, `mentions` (user names) and `words` from the most recent 10,000 posts on the curated Fediverse accounts (configured by the instance admin). 
-
-You can also perform ad-hoc `Trending Analysis` runs on-demand, on any node, so you can do the full text analysis on any node of your choice, analyzing the sub-graph of content.
-
-<img src='attachments/60269c3056cf5f7e6cc40883-file-p' style='width:25%'/>
 
 
 # Interactive Node Graphs

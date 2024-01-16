@@ -2,7 +2,7 @@
 
 # How to Build
 
-# How to Build Quanta
+# How to Build Quanta - Dev Mode
 
 To build and start an instance of Quanta on localhost for deveopment use `/scripts/build-dev.sh` which is configured by the settings in `setenv-dev.sh`
 
@@ -17,6 +17,8 @@ Likewise, if you have the server running and you then edit only Java files, and 
 # Production Builds
 
 If you've already understood `build-dev.sh` and how it works you'll notice `build-distro.sh` (used for doing production builds) is very similar.
+
+This script creates the distro folder in `[project]/distro` and updates the local docker repository with the current file image for the QUANTA_VER that's set. Once the docker image is in the docker repo the app can then be run by using the script in the distro folder.
 
 
 ----
