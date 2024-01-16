@@ -159,8 +159,6 @@ public enum NodeProp {
     DATE("date"), //
     DATE_FULL("p.date"), //
 
-    // nodes that contain this property are not published to ActPub servers and not allowed to show up
-    // in feeds.
     UNPUBLISHED("unpub"), //
     AI("ai"), //
     AI_MODEL("ai-model"), //

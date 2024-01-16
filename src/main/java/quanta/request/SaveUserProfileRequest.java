@@ -12,7 +12,7 @@ public class SaveUserProfileRequest extends RequestBase {
 	private String displayName;
 
 	// only publishes DID/IPNS if this is true
-	private boolean publish; // todo-0: delete this.
+	private boolean publish;
 	private boolean mfsEnable;
 
 	public String getUserName() {

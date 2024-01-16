@@ -201,10 +201,6 @@ public class AppProp {
         return Integer.parseInt(env.getProperty("mongodb.port"));
     }
 
-    public Integer getActPubRetentioMonths() {
-        return Integer.parseInt(env.getProperty("actPubRetentionMonths"));
-    }
-
     public String getAdminDataFolder() {
         return getPathProperty("adminDataFolder");
     }

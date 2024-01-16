@@ -24,7 +24,6 @@ export class RepliesTab implements TabIntf<RepliesRSInfo> {
     }
 
     isVisible = () => { return !!getAs().repliesViewNodeId; };
-
     constructView = (data: TabIntf) => new RepliesView(data);
     getTabSubOptions = (): Div => { return null; };
 

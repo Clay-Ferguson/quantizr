@@ -275,8 +275,6 @@ export class TypeBase implements TypeIntf {
         // }
         const ast = getAs();
 
-        // Format ActivityPub Question/Poll Options here
-        // todo-2: This is a hack for now until we have polymorphic type handling for ActPub types
         let choices: Div = null
         const oneOf: any[] = S.props.getPropObj("oneOf", node);
         if (oneOf) {
@@ -296,7 +294,6 @@ export class TypeBase implements TypeIntf {
         let urls: Set<string> = null;
         const containerClass = this.getExtraMarkdownClass();
         const footerComp: Div = this.getCustomFooter();
-
         const attrs = containerClass ? { className: containerClass } : null;
 
         // tricky and imperfect hack to detect if this is all HTML.

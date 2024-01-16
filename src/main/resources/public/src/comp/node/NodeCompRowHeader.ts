@@ -36,9 +36,6 @@ export class NodeCompRowHeader extends Div {
 
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
-
-        // Warning: after running insertActPubTags above that may put us back at an empty displayName,
-        // so we DO need to check for displayName here rather than putting this in an else block.
         if (!displayName) {
             displayName = this.node.owner;
         }
@@ -228,9 +225,6 @@ export class NodeCompRowHeader extends Div {
                 }
             }
 
-            // Don't try to read Foreign server content (by checking actPubId to detect remote)
-            // because the content is likely to be loaded with HTML
-            // and won't read well by TTS, whereas local posts will be JSON and should read ok.
             if (!ast.isAnonUser && allowWideViewIcons) {
                 if (ast.mobileMode) {
                     // for now let's not have tts on mobile.

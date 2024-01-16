@@ -93,6 +93,7 @@ public class MongoRepository extends ServiceBase {
             // apub.refreshForeignUsers();
             system.cacheAdminNodes();
 
+            // todo-0: remove this
             opsw.dropCollection("fediNames");
         }
     }

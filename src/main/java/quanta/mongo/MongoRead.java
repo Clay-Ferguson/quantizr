@@ -227,7 +227,7 @@ public class MongoRead extends ServiceBase {
         // if this is a path we KNOW exists, return false
         if (path == null || path.length() == 0 || !path.contains("/") || path.equals(NodePath.PENDING_PATH)
                 || path.equals(NodePath.ROOT_PATH) || path.equals(NodePath.USERS_PATH)
-                || path.equals(NodePath.LOCAL_USERS_PATH) || path.equals(NodePath.REMOTE_USERS_PATH)) {
+                || path.equals(NodePath.LOCAL_USERS_PATH)) {
             return true;
         }
         return false;
@@ -279,10 +279,7 @@ public class MongoRead extends ServiceBase {
         if (parPath.equals(NodePath.USERS_PATH) || parPath.equals(NodePath.USERS_PATH + "/")) {
             return;
         }
-        // no need to check REMOTE USERS
-        if (parPath.equals(NodePath.REMOTE_USERS_PATH) || parPath.equals(NodePath.REMOTE_USERS_PATH + "/")) {
-            return;
-        }
+
         // no need to check LOCAL USERS
         if (parPath.equals(NodePath.LOCAL_USERS_PATH) || parPath.equals(NodePath.LOCAL_USERS_PATH + "/")) {
             return;
@@ -1093,16 +1090,6 @@ public class MongoRead extends ServiceBase {
         return "Node: " + type;
     }
 
-    public String convertIfLocalName(String userName) {
-        if (!userName.endsWith("@" + prop.getMetaHost())) {
-            return userName;
-        }
-        int atIdx = userName.indexOf("@");
-        if (atIdx == -1)
-            return userName;
-        return userName.substring(0, atIdx);
-    }
-
     public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean caseSensitive,
             boolean allowAuth) {
         if (StringUtils.isEmpty(propVal))
@@ -1132,10 +1119,7 @@ public class MongoRead extends ServiceBase {
             user = ThreadLocals.getSC().getUserName();
         }
         user = user.trim();
-        // if user name ends with "@quanta.wiki" for example, truncate it after the '@'
-        // character, so that ONLY foreign names will have any '@' in the string.
-        user = convertIfLocalName(user);
-        String pathToQuery = user.contains("@") ? NodePath.REMOTE_USERS_PATH : NodePath.LOCAL_USERS_PATH;
+
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {
@@ -1144,7 +1128,7 @@ public class MongoRead extends ServiceBase {
         // Otherwise for ordinary users root is based off their username
         // case-insensitive lookup of username:
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(pathToQuery))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
                 .and(SubNode.PROPS + "." + NodeProp.USER).is(user).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
         if (allowAuth) {
@@ -1348,25 +1332,9 @@ public class MongoRead extends ServiceBase {
         return opsw.find(ms, q);
     }
 
-    public long getAccountNodeCount(MongoSession ms, CriteriaDefinition textCriteria, boolean remote, boolean local) {
-        if (!remote && !local) {
-            throw new RuntimeException("Accont query needs local and/or remote specified.");
-        }
-        Criteria crit = null;
+    public long getAccountNodeCount(MongoSession ms, CriteriaDefinition textCriteria) {
         Query q = new Query();
-
-        if (remote && local) {
-            crit = new Criteria().orOperator(
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH)),
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH)));
-        } //
-        else if (remote) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH));
-        } //
-        else if (local) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
-        }
-
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
         q.addCriteria(crit);
 
         if (textCriteria != null) {

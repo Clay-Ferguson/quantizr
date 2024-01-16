@@ -826,10 +826,6 @@ public class UserManagerService extends ServiceBase {
                     Long followingCount = friend.countFollowingOfUser(as, sessionUserName, nodeUserName);
                     userProfile.setFollowingCount(followingCount.intValue());
                     if (!ThreadLocals.getSC().isAnonUser()) {
-                        /*
-                         * Only for local users do we attemp to generate followers and following, but theoretically we
-                         * can use the ActPub API to query for this for foreign users also.
-                         */
                         boolean blocked = userIsBlockedByMe(as, userNode, nodeUserName);
                         userProfile.setBlocked(blocked);
                         boolean following = userIsFollowedByMe(as, userNode, nodeUserName);
@@ -1100,8 +1096,6 @@ public class UserManagerService extends ServiceBase {
     /*
      * For all foreign servers we remove posts that are older than a certain number of days just to keep
      * our DB from growing too large.
-     *
-     * todo-2: Is this a dupliate of "ActPub Maintenance" menu option logic?
      */
     public void cleanUserAccounts() {
         // not currently used.
@@ -1128,13 +1122,9 @@ public class UserManagerService extends ServiceBase {
 
     public String getUserAccountsReport(MongoSession ms) {
         ms = ThreadLocals.ensure(ms);
-
         StringBuilder sb = new StringBuilder();
-        long localUserCount = read.getAccountNodeCount(ms, null, false, true);
-        long foreignUserCount = read.getAccountNodeCount(ms, null, true, false);
-
-        sb.append("Local Users: " + localUserCount + "\n");
-        sb.append("Foreign ActPub Users: " + foreignUserCount + "\n");
+        long localUserCount = read.getAccountNodeCount(ms, null);
+        sb.append("User Count: " + localUserCount + "\n");
         return sb.toString();
     }
 
