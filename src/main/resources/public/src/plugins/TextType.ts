@@ -13,7 +13,7 @@ export class TextType extends TypeBase {
         super(J.NodeType.PLAIN_TEXT, "Text", "fa-file-text", true);
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         const wordWrap = S.props.getPropStr(J.NodeProp.NOWRAP, node) !== "1";
         return new Pre(S.domUtil.escapeHtml(node.content), { className: "textTypeContent" + (wordWrap ? " preWordWrap" : "") });
     }

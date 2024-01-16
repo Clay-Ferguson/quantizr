@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.model.NodeInfo;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
@@ -17,8 +16,6 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.request.GetActPubObjectRequest;
-import quanta.response.GetActPubObjectResponse;
 import quanta.service.AppController;
 import quanta.util.val.Val;
 
@@ -95,8 +92,7 @@ public class SubNodeUtil extends ServiceBase {
      * secure to always have the server allow misbehaving javascript for security reasons.
      */
     public static boolean isReadonlyProp(String propName) {
-        if (propName.equals(NodeProp.OBJECT_ID.s()) || //
-                propName.equals(NodeProp.BIN.s()) || //
+        if (propName.equals(NodeProp.BIN.s()) || //
                 propName.equals(NodeProp.BIN_TOTAL.s()) || //
                 propName.equals(NodeProp.BIN_QUOTA.s())) {
             return false;
@@ -313,12 +309,5 @@ public class SubNodeUtil extends ServiceBase {
 
     public String getIdBasedUrl(SubNode node) {
         return prop.getProtocolHostAndPort() + "?id=" + node.getIdStr();
-    }
-
-    public Object loadObjectNodeInfoReq(GetActPubObjectRequest req, MongoSession ms) {
-        NodeInfo node = apUtil.loadObjectNodeInfo(ms, null, req.getUrl());
-        GetActPubObjectResponse res = new GetActPubObjectResponse();
-        res.setNode(node);
-        return res;
     }
 }

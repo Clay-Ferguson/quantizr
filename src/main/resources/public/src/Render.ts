@@ -542,48 +542,6 @@ export class Render {
         ]);
     }
 
-    renderBoostHeader = (node: NodeInfo, treeRender: boolean) => {
-        if (!node.boostedNode) return null;
-        let displayName = null;
-
-        const isMine = S.props.isMine(node);
-        if (isMine) {
-            displayName = "You";
-        }
-        else {
-            // if user has set their displayName
-            if (node.displayName) {
-                displayName = S.util.insertActPubTags(node.displayName, node);
-            }
-
-            // Warning: after running insertActPubTags above that may put us back at an empty displayName,
-            // so we DO need to check for displayName here rather than putting this in an else block.
-            if (!displayName) {
-                displayName = node.owner;
-                const atIdx = displayName.indexOf("@");
-                if (atIdx !== -1) {
-                    displayName = displayName.substring(0, atIdx);
-                }
-            }
-        }
-
-        let clazz = null;
-        if (treeRender) {
-            clazz = isMine ? "boostedByMe" : "boostedByOther";
-        }
-        else {
-            clazz = isMine ? "boostedByMeOnFeed" : "boostedByOtherOnFeed";
-        }
-
-        // if this node is the 'container' (booster of) another node, then show only the "Boosted By" header.
-        return new Div("Boosted by " + displayName, {
-            className: clazz,
-            title: "Show Profile:\n\n" + node.owner,
-            [C.USER_ID_ATTR]: node.ownerId,
-            onClick: S.nav.clickToOpenUserProfile
-        });
-    }
-
     getAvatarImgUrlByNode = (node: NodeInfo): string => {
         const avatarUrl = S.props.getPropStr(J.NodeProp.USER_ICON_URL, node);
         if (avatarUrl) {
@@ -676,7 +634,7 @@ export class Render {
         }, spans);
     }
 
-    renderUser(node: NodeInfo, user: string, _userBio: string, imgSrc: string, _actorUrl: string,
+    renderUser(node: NodeInfo, user: string, _userBio: string, imgSrc: string,
         displayName: string, className: string, iconClass: string, _showMessageButton: boolean, onClick: (evt: any) => void): Comp {
 
         const img: Img = imgSrc
@@ -705,9 +663,6 @@ export class Render {
                     //         title: "Send Private Message",
                     //         [C.NODE_ID_ATTR]: nodeId
                     //     }) : null,
-                    //     actorUrl ? new Button("Go to User Page", () => {
-                    //         window.open(actorUrl, "_blank");
-                    //     }) : null
                     // ], null, "float-end"),
                     // new Clearfix(),
 

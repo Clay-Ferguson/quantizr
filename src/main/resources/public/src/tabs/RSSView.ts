@@ -445,7 +445,7 @@ export class RSSView extends AppTab<any, RSSView> {
             className: "fa fa-comment fa-lg rssPostIcon",
             title: "Post a comment about this Article/Link",
             onClick: () => {
-                S.edit.addNode(null, null, J.NodeType.COMMENT, false, entry.title + "\n\n" + entry.link, null, null, false, false);
+                S.edit.addNode(null, J.NodeType.COMMENT, false, entry.title + "\n\n" + entry.link, null, false, false);
             }
         }) : null;
 

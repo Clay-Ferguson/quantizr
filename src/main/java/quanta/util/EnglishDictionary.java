@@ -8,8 +8,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.StringTokenizer;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -21,17 +19,13 @@ import quanta.config.ServiceBase;
 @Component
 public class EnglishDictionary extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
-    private static final HashSet<String> dictWords = new HashSet<>();
     private static final HashSet<String> stopWords = new HashSet<>();
-    private static final HashSet<String> badWords = new HashSet<>();
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {
         super.handleContextRefresh(event);
         log.debug("ContextRefreshedEvent");
-        loadWords("classpath:public/data/english-dictionary.txt", dictWords);
         loadWords("classpath:public/data/stop-words.txt", stopWords);
-        loadWords("classpath:public/data/bad-words.txt", badWords);
     }
 
     public void loadWords(String fileName, HashSet<String> words) {
@@ -87,75 +81,5 @@ public class EnglishDictionary extends ServiceBase {
         if (word == null)
             return true;
         return stopWords.contains(word.toLowerCase());
-    }
-
-    /*
-     * Tokenizes text (like a paragraph of text) to determine if it appears to be English.
-     *
-     * Unfortunately this will currently kick out computer code as non-english, but it I have some ideas
-     * for how fix that by detecting an unusual high number of free floating '{' or '=' or lines ending
-     * in semicolon for example to detect and allow code.
-     *
-     * example threshold=0.60f -> 60% english)
-     */
-    public boolean isEnglish(String text) {
-        if (text == null)
-            return true;
-        if (dictWords.size() == 0)
-            throw new RuntimeException("called isEnglish before dictionary was loaded.");
-        int englishCount = 0;
-        int unknownCount = 0;
-        /*
-         * Counts all the 'words' in the text that consist purely of alphabet strings (letters) and returns
-         * true only of known English reach a threshold percentage.
-         */
-        StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.?!><", false);
-
-        while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken().trim();
-            if (XString.containsNonEnglish(token)) {
-                unknownCount++;
-                continue;
-            }
-            // only consider words that are all alpha characters
-            if (!StringUtils.isAlpha(token) || token.length() < 4) {
-                continue;
-            }
-            token = token.toLowerCase();
-            switch (token) {
-                case "span":
-                case "div":
-                case "html":
-                case "img":
-                    continue;
-                default:
-                    break;
-            }
-            if (dictWords.contains(token)) {
-                englishCount++;
-            } else {
-                unknownCount++;
-            }
-        }
-        if (englishCount == 0 && unknownCount == 0)
-            return true;
-        float percent = (float) englishCount / (englishCount + unknownCount);
-        return percent > 0.6F;
-    }
-
-    public boolean hasBadWords(String text) {
-        if (badWords.size() == 0)
-            throw new RuntimeException("called isBadWord before dictionary was loaded.");
-        if (text == null)
-            return false;
-        StringTokenizer tokens = new StringTokenizer(text, " \n\r\t.,-;:\"'`!?()*#<>", false);
-
-        while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken().trim().toLowerCase();
-            if (badWords.contains(token)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -122,42 +122,6 @@ export class UserProfileDlg extends DialogBase {
                                 onClick: this.deleteFriend,
                                 title: "Click to Unfollow user"
                             }) : null,
-
-                            // todo-2: removing follower counts until we have a user option making users have to opt in
-                            // state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
-                            //     onClick: () => {
-                            //         if (state.userProfile.followerCount) {
-                            //             this.close();
-                            //             if (localUser) {
-                            //                 S.srch.showFollowers(0, state.userProfile.userName);
-                            //             }
-                            //             else {
-                            //                 window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
-                            //             }
-                            //         }
-                            //     },
-                            //     className: "followCount"
-                            // }) : null,
-
-                            // todo-2: removing follower counts until we have a user option making users have to opt in
-                            // state.userProfile.followingCount > 0 ? new Span("following " + state.userProfile.followingCount, {
-                            //     onClick: () => {
-                            //         if (state.userProfile.followingCount) {
-                            //             this.close();
-                            //             if (localUser) {
-                            //                 S.srch.showFollowing(0, state.userProfile.userName);
-                            //             }
-                            //             else {
-                            //                 window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
-                            //             }
-
-                            //             // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
-                            //             // at their own user profile dialog? There's also even the Friend Picker dialog too!
-                            //             // S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-                            //         }
-                            //     },
-                            //     className: "followCount"
-                            // }) : null
                         ])
                     ])
                 ], "avatarAndNamePanel"),
@@ -201,11 +165,6 @@ export class UserProfileDlg extends DialogBase {
                     !ast.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAs().userName
                         ? new Button("Block", this.blockUser) : null,
 
-                    ast.isAdminUser ? new Button("Read Outbox", () => S.view.runServerCommand("readOutbox", state.userProfile.userName, "Read User Outbox: " + state.userProfile.userName, "")) : null,
-
-                    state.userProfile.actorUrl || state.userProfile.actorId ? new Button("User Page", () => {
-                        window.open(state.userProfile.actorUrl || state.userProfile.actorId, "_blank");
-                    }) : null,
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Settings", () => {
                         this.close();
                         S.nav.showUserSettings();
@@ -328,7 +287,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, null, NodeType.COMMENT, false, null, this.userNodeId, null, false, true);
+            S.edit.addNode(null, NodeType.COMMENT, false, null, this.userNodeId, false, true);
         }, 10);
     }
 

@@ -387,9 +387,6 @@ export class NodeUtil {
                 }
             }
         }
-        if (node.boostedNode) {
-            this.processInboundNode(node.boostedNode);
-        }
 
         if (node.children) {
             this.processInboundNodes(node.children);

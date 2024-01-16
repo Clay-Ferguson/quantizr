@@ -20,13 +20,10 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
-    // isLinkedNode means this node is rendered as a 'sub render' of some other node like it's a boost for example, and we're rendering the
-    // content of the boost inside the node that boosted it. And the node that is rendering the boost will have it passed in as 'internalComp'
     constructor(public node: NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, //
         public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, private isLinkedNode: boolean, private internalComp: Div,
-        private renderingBoost: boolean) {
+        public allowInlineInsertButton: boolean, private internalComp: Div) {
         super(null, {
             id: C.TAB_MAIN + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -116,7 +113,7 @@ export class NodeCompRow extends Div {
             // special class if BOTH edit and info is on
             if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && //
                 S.util.showMetaData(ast, this.node)) {
-                layoutClass += this.node.boostedNode ? " rowBorderEditInfoBoost" : " rowBorderEditInfo";
+                layoutClass += " rowBorderEditInfo";
             }
             // else if either is on
             else if (ast.userPrefs.editMode || S.util.showMetaData(ast, this.node)) {
@@ -134,21 +131,16 @@ export class NodeCompRow extends Div {
         const focusNode = S.nodeUtil.getHighlightedNode();
         const selected: boolean = (focusNode && focusNode.id === this.node.id);
 
-        if (this.isLinkedNode) {
-            this.attribs.className = "boostRow";
+        let selectionClass;
+        if (selected) {
+            selectionClass = " activeRow";
         }
         else {
-            let selectionClass;
-            if (selected) {
-                selectionClass = " activeRow";
-            }
-            else {
-                selectionClass = " inactiveRow";
-            }
-            this.attribs.className = (layoutClass || "") + selectionClass;
-            const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-            this.attribs.style = style;
+            selectionClass = " inactiveRow";
         }
+        this.attribs.className = (layoutClass || "") + selectionClass;
+        const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
+        this.attribs.style = style;
 
         if (S.render.enableRowFading && S.render.fadeInId === this.node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
@@ -160,12 +152,12 @@ export class NodeCompRow extends Div {
         let header: NodeCompRowHeader = null;
         let jumpButton: Comp = null;
 
-        if (allowHeader && !this.node.boostedNode) {
+        if (allowHeader) {
             // slight special case for now until Document View knows how to delete all the subchilren and not
             // show orphans on the page when something is deleted. Other panels don't have this problem
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(null, this.node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id, this.rowCount);
+            header = new NodeCompRowHeader(this.node, true, true, this.tabData, showJumpButton, true, allowDelete, this.tabData.id, this.rowCount);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
@@ -185,13 +177,12 @@ export class NodeCompRow extends Div {
 
         this.setChildren([
             this.isTableCell ? null : insertInlineButton,
-            this.renderingBoost ? null : S.render.renderBoostHeader(this.node, true),
             S.render.renderLinkLabel(this.node.id),
             header,
             buttonBar,
             buttonBar ? new Clearfix() : null,
             jumpButton,
-            new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, this.isLinkedNode, null),
+            new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, null),
             this.internalComp,
             S.render.renderLinks(this.node)
         ]);

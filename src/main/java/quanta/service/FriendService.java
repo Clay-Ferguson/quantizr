@@ -1,17 +1,23 @@
 package quanta.service;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
+import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -19,11 +25,17 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
+import quanta.request.GetFollowersRequest;
+import quanta.request.GetFollowingRequest;
 import quanta.request.UpdateFriendNodeRequest;
 import quanta.response.AddFriendResponse;
 import quanta.response.DeleteFriendResponse;
 import quanta.response.FriendInfo;
+import quanta.response.GetFollowersResponse;
+import quanta.response.GetFollowingResponse;
+import quanta.response.GetThreadViewResponse;
 import quanta.response.UpdateFriendNodeResponse;
+import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
@@ -51,14 +63,6 @@ public class FriendService extends ServiceBase {
                 friendNode.setTags(tags);
             }
 
-            String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-            if (userToFollowActorId != null) {
-                friendNode.set(NodeProp.ACT_PUB_ACTOR_ID, userToFollowActorId);
-            }
-            String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
-            if (userToFollowActorUrl != null) {
-                friendNode.set(NodeProp.ACT_PUB_ACTOR_URL, userToFollowActorUrl);
-            }
             update.save(ms, friendNode);
             return friendNode;
         } else {
@@ -85,34 +89,10 @@ public class FriendService extends ServiceBase {
         String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
         String friendUserName = node.getStr(NodeProp.USER);
         if (friendUserName != null) {
-            // if a foreign user, update thru ActivityPub.
-            if (friendUserName.contains("@")) {
-                log.trace("calling setFollowing=true, to post follow to foreign server.");
-                apFollowing.setFollowing(userDoingAction, friendUserName, true);
-            }
             /*
              * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
              */
             if (userNodeId == null) {
-                /*
-                 * A userName containing "@" is considered a foreign Fediverse user and will trigger a WebFinger
-                 * search of them, and a load/update of their outbox
-                 */
-                if (friendUserName.contains("@")) {
-                    exec.run(() -> {
-                        arun.run(s -> {
-                            if (!ThreadLocals.getSC().isAdmin()) {
-                                apub.getAcctNodeByForeignUserName(s, userDoingAction, friendUserName, false, true);
-                            }
-                            /*
-                             * The only time we pass true to load the user into the system is when they're being added
-                             * as a friend.
-                             */
-                            apub.userEncountered(friendUserName, true);
-                            return null;
-                        });
-                    });
-                }
                 Val<SubNode> userNode = new Val<SubNode>();
 
                 userNode.setVal(read.getAccountByUserName(null, friendUserName, false));
@@ -186,9 +166,7 @@ public class FriendService extends ServiceBase {
         // if friendNode is non-null here it means we were already following the user.
         if (friendNode != null)
             return;
-        if (userToFollow.contains("@")) {
-            apub.loadForeignUser(userDoingFollow, userToFollow, false);
-        }
+
         // the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
         // must use arun.
         SubNode userNode = arun.run(s -> read.getAccountByUserName(s, userToFollow, false));
@@ -263,4 +241,276 @@ public class FriendService extends ServiceBase {
         });
         return res;
     }
+
+    private static final int MAX_THREAD_NODES = 200;
+
+    public GetThreadViewResponse getNodeReplies(MongoSession ms, String nodeId) {
+        GetThreadViewResponse res = new GetThreadViewResponse();
+        LinkedList<NodeInfo> nodes = new LinkedList<>();
+        // get node that's going to have it's ancestors gathered
+        SubNode node = read.getNode(ms, nodeId);
+        if (node == null)
+            return res;
+        NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE,
+                false, false, false, true, false);
+        nodes.add(info);
+        if (nodes.size() > 1) {
+            res.setNodes(nodes);
+        }
+        return res;
+    }
+
+    /*
+     * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
+     * towards the root of the tree.
+     */
+    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
+        boolean debug = true;
+        GetThreadViewResponse res = new GetThreadViewResponse();
+        LinkedList<NodeInfo> nodes = new LinkedList<>();
+        if (debug) {
+            log.debug("getNodeThreadView() " + nodeId);
+        }
+        // get node that's going to have it's ancestors gathered
+        SubNode node = read.getNode(ms, nodeId);
+        boolean topReached = false;
+        ObjectId lastNodeId = null;
+        // todo-2: This is an unfinished work in progress. I was unable to find any foreign posts
+        // that put any messages in their 'replies' collection, or at least when I query collections
+        // I get back an empty array of items for whatever reason.
+        // if (ok(node)) {
+        // readForeignReplies(ms, node);
+        // }
+        // iterate up the parent chain or chain of inReplyTo for ActivityPub
+        while (node != null && (nodes.size() < MAX_THREAD_NODES)) {
+            try {
+                NodeInfo info = null;
+                /*
+                 * note topNode doesn't necessarily mean we're done iterating because it's 'inReplyTo' still may
+                 * point to further places 'logically above' (in this conversation thread)
+                 */
+                boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
+                if (!topNode) {
+                    info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
+                            Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true);
+                    // we only collect children at this level if it's not an account top level post
+                    if (loadOthers) {
+                        Iterable<SubNode> iter = read.getChildren(ms, node,
+                                Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0, true);
+                        HashSet<String> childIds = new HashSet<>();
+                        List<NodeInfo> children = new LinkedList<>();
+                        for (SubNode child : iter) {
+                            if (!child.getId().equals(lastNodeId)) {
+                                childIds.add(child.getIdStr());
+                                children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
+                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, false));
+                            }
+                        }
+
+                        String replyTargetId = node.getIdStr();
+
+                        // REGEX path expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
+                        // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
+                        iter = read.findNodesByProp(ms,
+                                NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
+                                NodeProp.INREPLYTO.s(), replyTargetId);
+                        for (SubNode child : iter) {
+                            // if we didn't already add above, add now
+                            if (!childIds.contains(child.getIdStr())) {
+                                children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
+                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, false));
+                            }
+                        }
+                        if (children.size() > 0) {
+                            info.setChildren(children);
+                        }
+                    }
+                }
+                if (info != null) {
+                    nodes.addFirst(info);
+                    lastNodeId = node.getId();
+                }
+                // if topNode, set parent to null, to trigger the only path up to have to
+                // go thru an inReplyTo, rather than be based on tree structure.
+                // SubNode parent = topNode ? null : read.getParent(ms, node);
+                SubNode parent = null;
+                if (topNode) {
+                } else { // leave parent == null;
+                    parent = read.getParent(ms, node);
+                }
+                boolean top = parent != null && parent.isType(NodeType.POSTS);
+                node = parent;
+                if (node == null) {
+                    topReached = true;
+                }
+            } catch (Exception e) {
+                node = null;
+                topReached = true;
+            }
+            /*
+             * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
+             * the one above their account, this represents how far up the user is able to read towards the root
+             * of the tree based on sharing setting of nodes encountered along the way to the root.
+             */
+        }
+        if (node == null) {
+            topReached = true;
+        }
+        res.setTopReached(topReached);
+        res.setNodes(nodes);
+        if (nodes.size() > 1) {
+            // sort the array
+            nodes.sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
+            // sort all children also
+            for (NodeInfo n : nodes) {
+                if (n.getChildren() != null) {
+                    n.getChildren().sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
+                }
+            }
+        }
+        if (debug) {
+            log.debug("getNodeThreadView() RESP: " + XString.prettyPrint(res));
+        }
+        return res;
+    }
+
+    public Long getFollowersCount(String userMakingRequest, String userName) {
+        return (Long) arun.run(as -> {
+            Long count = countFollowersOfUser(as, userMakingRequest, null, userName);
+            return count;
+        });
+    }
+
+    public Iterable<SubNode> getPeopleByUserName(MongoSession ms, String userName) {
+        Query q = getPeopleByUserName_query(ms, null, userName);
+        if (q == null)
+            return null;
+        return opsw.find(ms, q);
+    }
+
+    public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
+        GetFollowersResponse res = new GetFollowersResponse();
+        return arun.run(as -> {
+            Query q = getPeopleByUserName_query(as, null, req.getTargetUserName());
+            if (q == null)
+                return null;
+            q.limit(ConstantInt.ROWS_PER_PAGE.val());
+            q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
+            Iterable<SubNode> iterable = opsw.find(as, q);
+            List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+            int counter = 0;
+
+            for (SubNode node : iterable) {
+                NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false,
+                        false, true, false, false);
+                if (info != null) {
+                    searchResults.add(info);
+                }
+            }
+            res.setSearchResults(searchResults);
+            return res;
+        });
+    }
+
+    public long countFollowersOfUser(MongoSession ms, String userMakingRequest, SubNode userNode, String userName) {
+        return countFollowersOfLocalUser(ms, userNode, userName);
+    }
+
+    public long countFollowersOfLocalUser(MongoSession ms, SubNode userNode, String userName) {
+        Query q = getPeopleByUserName_query(ms, userNode, userName);
+        if (q == null)
+            return 0L;
+        return opsw.count(null, q);
+    }
+
+    /* caller can pass userName only or else pass userNode if it's already available */
+    public Query getPeopleByUserName_query(MongoSession ms, SubNode userNode, String userName) {
+        Query q = new Query();
+        if (userNode == null) {
+            userNode = read.getAccountByUserName(ms, userName, false);
+            if (userNode == null) {
+                return null;
+            }
+        }
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.USERS_PATH))
+                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE)
+                .is(NodeType.FRIEND.s());
+        crit = auth.addReadSecurity(ms, crit);
+        q.addCriteria(crit);
+        return q;
+    }
+
+    public Long getFollowingCount(String userDoingAction, String userName) {
+        return (Long) arun.run(as -> {
+            Long count = countFollowingOfUser(as, userDoingAction, userName);
+            return count;
+        });
+    }
+
+    /*
+     * This function is similar to getPeople, but since getPeople is for a picker dialog we can consider
+     * it to be the odd man out which will eventually need to support paging (currently doesn't) and go
+     * ahead and duplicate that functionality here in a way analogous to getFollowers
+     */
+    public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
+        GetFollowingResponse res = new GetFollowingResponse();
+        return arun.run(as -> {
+            Query q = findFollowingOfUser_query(as, req.getTargetUserName());
+            if (q == null)
+                return null;
+            q.limit(ConstantInt.ROWS_PER_PAGE.val());
+            q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
+            Iterable<SubNode> iterable = opsw.find(ms, q);
+            List<NodeInfo> searchResults = new LinkedList<>();
+            int counter = 0;
+
+            for (SubNode node : iterable) {
+                NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false,
+                        false, false, false, false);
+                if (info != null) {
+                    searchResults.add(info);
+                }
+            }
+            res.setSearchResults(searchResults);
+            return res;
+        });
+    }
+
+    /* Returns FRIEND nodes for every user 'userName' is following */
+    public Iterable<SubNode> findFollowingOfUser(MongoSession ms, String userName) {
+        Query q = findFollowingOfUser_query(ms, userName);
+        if (q == null)
+            return null;
+        return opsw.find(ms, q);
+    }
+
+    public long countFollowingOfUser(MongoSession ms, String userDoingAction, String userName) {
+        return countFollowingOfLocalUser(ms, userName);
+    }
+
+    public long countFollowingOfLocalUser(MongoSession ms, String userName) {
+        Query q = findFollowingOfUser_query(ms, userName);
+        if (q == null)
+            return 0;
+        return opsw.count(null, q);
+    }
+
+    private Query findFollowingOfUser_query(MongoSession ms, String userName) {
+        Query q = new Query();
+        // get friends list node
+        SubNode friendsListNode = user.getFriendsList(ms, userName, false);
+        if (friendsListNode == null)
+            return null;
+        /*
+         * query all the direct children under the friendsListNode, that are FRIEND type although they
+         * should all be FRIEND types.
+         */
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(friendsListNode.getPath()))
+                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
+
+        crit = auth.addReadSecurity(ms, crit);
+        q.addCriteria(crit);
+        return q;
+    }
+
 }

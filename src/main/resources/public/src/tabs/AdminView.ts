@@ -15,14 +15,6 @@ export class AdminView extends AppTab<any, AdminView> {
         data.inst = this;
     }
 
-    static readJSONfromURL = () => {
-        // This is an analytical tool, and doesn't need to be pretty so we just use the browser to ask for an input string.
-        const url = window.prompt("ActivityPub Object URL: ");
-        if (url) {
-            S.view.runServerCommand("getActPubJson", url, "ActivityPub Object JSON", "");
-        }
-    }
-
     // DO NOT DELETE
     // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
     static setIpsmActive = async () => {
@@ -130,19 +122,6 @@ export class AdminView extends AppTab<any, AdminView> {
                         this.settingsLink("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null)), //
                     ])
                 ], horzClass),
-
-                this.sectionTitle("ActivityPub"),
-                new FlexRowLayout([
-                    new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users?token=" + S.quanta.authToken, "_blank")), //
-                        this.settingsLink("Get JSON from URL", AdminView.readJSONfromURL)
-                    ]),
-                    new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", null, "Refresh AP Accounts", null)), //
-                        this.settingsLink("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", null, "ActPub Maintenance Response", null)), //
-                        this.settingsLink("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", null, "ActPub Crawl Response", null)),
-                    ])
-                ], horzClass)
             ])
         ]);
         return true;

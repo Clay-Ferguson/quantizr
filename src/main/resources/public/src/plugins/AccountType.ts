@@ -31,7 +31,7 @@ export class AccountType extends TypeBase {
         return true;
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         const name = S.nodeUtil.getDisplayName(node);
         return new Div(null, {
             className: "systemNodeContent"

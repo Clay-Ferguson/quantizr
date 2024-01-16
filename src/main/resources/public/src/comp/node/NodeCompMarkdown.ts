@@ -61,7 +61,6 @@ export class NodeCompMarkdown extends Comp {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);
-        val = S.util.insertActPubTags(val, node);
         val = this.translateLaTex(val);
         val = this.insertMarkdownLinks(urls, val);
         return val;

@@ -13,7 +13,6 @@ export class Constants {
     static NODE_ID_ATTR = "data-nid";
     static NODE_ID_ATTR_CamelCase = "dataNid";
     static DOM_ID_ATTR = "data-domid";
-    static BOOSTOWNER_ID_ATTR = "data-boostowner";
     static USER_ID_ATTR = "data-usrid";
     static TAB_ID_ATTR = "data-tab";
     static WORD_ATTR = "data-word";

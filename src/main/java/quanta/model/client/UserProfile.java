@@ -24,9 +24,7 @@ public class UserProfile {
     private String apIconUrl;
     /* for foreign users this will point to their user image (i.e. header image) */
     private String apImageUrl;
-    /* for foreign users this will be their actor url */
-    private String actorUrl;
-    private String actorId;
+
     private int followerCount;
     private int followingCount;
     /*
@@ -92,14 +90,6 @@ public class UserProfile {
 
     public String getApImageUrl() {
         return this.apImageUrl;
-    }
-
-    public String getActorUrl() {
-        return this.actorUrl;
-    }
-
-    public String getActorId() {
-        return this.actorId;
     }
 
     public int getFollowerCount() {
@@ -176,14 +166,6 @@ public class UserProfile {
 
     public void setApImageUrl(final String apImageUrl) {
         this.apImageUrl = apImageUrl;
-    }
-
-    public void setActorUrl(final String actorUrl) {
-        this.actorUrl = actorUrl;
-    }
-
-    public void setActorId(final String actorId) {
-        this.actorId = actorId;
     }
 
     public void setFollowerCount(final int followerCount) {

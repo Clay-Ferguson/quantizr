@@ -10,7 +10,6 @@ import { PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
-import { NodeCompRow } from "./NodeCompRow";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
@@ -64,10 +63,10 @@ export class NodeCompMainNode extends Div {
             allowHeader = S.util.showMetaData(ast, node) && (type == null || type?.getAllowRowHeader())
         }
 
-        if (allowHeader && !node.boostedNode) {
+        if (allowHeader) {
             const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(null, node, true, true, this.tabData, showJumpButton, true, false, allowDelete, this.tabData.id, 1);
+            header = new NodeCompRowHeader(node, true, true, this.tabData, showJumpButton, true, allowDelete, this.tabData.id, 1);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
@@ -79,13 +78,6 @@ export class NodeCompMainNode extends Div {
             }
         }
 
-        let boostComp: NodeCompRow = null;
-        if (node.boostedNode) {
-            // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-            const type = S.plugin.getType(node.boostedNode.type);
-            boostComp = new NodeCompRow(node.boostedNode, this.tabData, type, 0, 0, 0, 0, false, false, true, false, true, null, true);
-        }
-
         // if editMode is on, an this isn't the page root node
         if (ast.userPrefs.editMode) {
             S.render.setNodeDropHandler(this.attribs, node);
@@ -94,14 +86,12 @@ export class NodeCompMainNode extends Div {
         const buttonBar = new NodeCompButtonBar(node, false, 0, false, null, null, this.tabData);
 
         this.setChildren([
-            S.render.renderBoostHeader(node, true),
             S.render.renderLinkLabel(node.id),
             header,
             buttonBar,
             new Clearfix(),
             jumpButton,
-            new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, false, null),
-            boostComp,
+            new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, null),
             S.render.renderLinks(node)
         ]);
 

@@ -156,8 +156,6 @@ export interface UserProfile {
     userNodeId: string;
     apIconUrl: string;
     apImageUrl: string;
-    actorUrl: string;
-    actorId: string;
     followerCount: number;
     followingCount: number;
     following: boolean;
@@ -337,7 +335,6 @@ export interface CopySharingRequest extends RequestBase {
 
 export interface CreateSubNodeRequest extends RequestBase {
     nodeId: string;
-    boostTarget: string;
     pendingEdit: boolean;
     content: string;
     newNodeName: string;
@@ -348,7 +345,6 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
-    boosterUserId: string;
     fediSend: boolean;
     payloadType: string;
     reply: boolean;
@@ -405,10 +401,6 @@ export interface FileSearchRequest extends RequestBase {
 
 export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
-}
-
-export interface GetActPubObjectRequest extends RequestBase {
-    url: string;
 }
 
 export interface GetBookmarksRequest extends RequestBase {
@@ -579,7 +571,6 @@ export interface NodeFeedRequest extends RequestBase {
     fromFriends: boolean;
     toPublic: boolean;
     localOnly: boolean;
-    nsfw: boolean;
     searchText: string;
     friendsTagSearch: string;
     loadFriendsTags: boolean;
@@ -884,10 +875,6 @@ export interface FriendInfo {
     foreignAvatarUrl: string;
     tags: string;
     liked: boolean;
-}
-
-export interface GetActPubObjectResponse extends ResponseBase {
-    node: NodeInfo;
 }
 
 export interface GetBookmarksResponse extends ResponseBase {
@@ -1240,16 +1227,13 @@ export interface NodeInfo {
     avatarVer: string;
     apAvatar: string;
     apImage: string;
-    boostedNode: NodeInfo;
 }
 
 export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
-    nsfw: boolean;
     showProps: boolean;
     autoRefreshFeed: boolean;
-    enableActPub: boolean;
     showReplies: boolean;
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
@@ -1296,9 +1280,7 @@ export interface PrivilegeInfo {
 export const enum Constant {
     SEARCH_ALL_NODES = "allNodes",
     SEARCH_CUR_NODE = "curNode",
-    SEARCH_TYPE_USER_LOCAL = "userLocal",
-    SEARCH_TYPE_USER_ALL = "userAll",
-    SEARCH_TYPE_USER_FOREIGN = "userForeign",
+    SEARCH_TYPE_USERS = "userAll",
     SEARCH_TYPE_LINKED_NODES = "linkedNodes",
     SEARCH_TYPE_RDF_SUBJECTS = "rdfSubjects",
     ENC_TAG = "<[ENC]>",
@@ -1322,25 +1304,9 @@ export const enum ConstantInt {
 }
 
 export const enum NodeProp {
-    OBJECT_ID = "apid",
-    ACT_PUB_OBJ_TYPE = "ap:objType",
-    ACT_PUB_OBJ_CONTENT = "ap:objContent",
     INREPLYTO = "ap:objInReplyTo",
-    ACT_PUB_OBJ_URL = "ap:objUrl",
-    ACT_PUB_OBJ_URLS = "ap:objUrls",
-    ACT_PUB_OBJ_ICONS = "ap:objIcons",
-    ACT_PUB_OBJ_NAME = "ap:objName",
-    ACT_PUB_OBJ_ATTRIBUTED_TO = "ap:objAttributedTo",
     USER_ICON_URL = "ap:userIcon",
-    ACT_PUB_SHARED_INBOX = "ap:sharedInbox",
     USER_BANNER_URL = "ap:userImage",
-    ACT_PUB_ACTOR_ID = "ap:actorId",
-    ACT_PUB_ACTOR_URL = "ap:actorUrl",
-    ACT_PUB_KEYPEM = "ap:keyPem",
-    ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
-    ACT_PUB_SENSITIVE = "ap:nsfw",
-    ACT_PUB_TAG = "ap:tag",
-    ACT_PUB_REPLIES = "ap:replies",
     ENC_KEY = "sn:encKey",
     CRYPTO_SIG = "sn:sig",
     SUBGRAPH_HASH = "sn:rSHA256",
@@ -1350,10 +1316,8 @@ export const enum NodeProp {
     USER_PREF_PUBLIC_SIG_KEY = "sn:publicSigKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
-    USER_PREF_NSFW = "sn:nsfw",
     USER_PREF_SHOW_PROPS = "sn:showProps",
     USER_PREF_AUTO_REFRESH_FEED = "sn:autoRefreshFeed",
-    USER_PREF_ENABLE_ACT_PUB = "sn:enableActPub",
     USER_PREF_SHOW_REPLIES = "sn:showReplies",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
@@ -1412,7 +1376,6 @@ export const enum NodeProp {
     UNPUBLISHED = "unpub",
     AI = "ai",
     AI_MODEL = "ai-model",
-    BOOST = "boost",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
     OPEN_GRAPH = "sn:og",

@@ -1087,7 +1087,7 @@ public class AttachmentService extends ServiceBase {
                 }
             }
 
-            Iterable<SubNode> accntNodes = read.getAccountNodes(as, null, null, null, -1, true, true);
+            Iterable<SubNode> accntNodes = read.getAccountNodes(as, null, null, null, -1);
             /*
              * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
              * amount).
@@ -1283,7 +1283,7 @@ public class AttachmentService extends ServiceBase {
         update.save(ms, sourceNode);
 
         NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, targetNode, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, true, null, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, false);
         if (newNodeInfo != null) {
             res.setTargetNode(newNodeInfo);
         }

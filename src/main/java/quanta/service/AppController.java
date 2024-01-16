@@ -45,7 +45,6 @@ import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.DeleteUserTransactionsRequest;
 import quanta.request.ExportRequest;
-import quanta.request.GetActPubObjectRequest;
 import quanta.request.GetBookmarksRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
@@ -56,7 +55,6 @@ import quanta.request.GetNodeJsonRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetOpenGraphRequest;
-import quanta.request.GetPeopleRequest;
 import quanta.request.GetSchemaOrgTypesRequest;
 import quanta.request.GetServerInfoRequest;
 import quanta.request.GetSharedNodesRequest;
@@ -67,7 +65,6 @@ import quanta.request.GraphRequest;
 import quanta.request.InitNodeEditRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.JoinNodesRequest;
-import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
 import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.LoginRequest;
@@ -174,12 +171,6 @@ public class AppController extends ServiceBase implements ErrorController {
                 model);
     }
 
-    @RequestMapping(value = "/fediverse-users", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-    @ResponseBody
-    public String fediverseUsers(@RequestParam(value = "token", required = true) String token) {
-        return apub.dumpFediverseUsers(token);
-    }
-
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
@@ -233,29 +224,11 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    @RequestMapping(value = API_PATH + "/likeNode", method = RequestMethod.POST)
-    @ResponseBody
-    public Object likeNode(@RequestBody LikeNodeRequest req, //
-            HttpServletRequest httpReq, HttpSession session) {
-        return callProc.run("likeNode", false, false, req, session, ms -> {
-            return edit.likeNode(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/loadActPubObject", method = RequestMethod.POST)
-    @ResponseBody
-    public Object loadActPubObject(@RequestBody GetActPubObjectRequest req, HttpServletRequest httpReq,
-            HttpSession session) {
-        return callProc.run("loadActPubObject", true, true, req, session, ms -> {
-            return snUtil.loadObjectNodeInfoReq(req, ms);
-        });
-    }
-
     @RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
         return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
-            return apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
+            return friend.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
         });
     }
 
@@ -263,7 +236,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeRepliesView(@RequestBody GetThreadViewRequest req, HttpSession session) {
         return callProc.run("getNodeRepliesView", false, false, req, session, ms -> {
-            return apUtil.getNodeReplies(ms, req.getNodeId());
+            return friend.getNodeReplies(ms, req.getNodeId());
         });
     }
 
@@ -333,14 +306,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
         return callProc.run("getNodePrivileges", true, true, req, session, ms -> {
             return acl.getNodePrivileges(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/getPeople", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
-        return callProc.run("getPeople", false, false, req, session, ms -> {
-            return user.getPeople(req, ms);
         });
     }
 
@@ -790,7 +755,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
         return callProc.run("getFollowers", false, false, req, session, ms -> {
-            return apFollower.getFollowers(ms, req);
+            return friend.getFollowers(ms, req);
         });
     }
 
@@ -798,7 +763,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
         return callProc.run("getFollowing", false, false, req, session, ms -> {
-            return apFollowing.getFollowing(ms, req);
+            return friend.getFollowing(ms, req);
         });
     }
 

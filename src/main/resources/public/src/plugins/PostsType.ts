@@ -16,7 +16,7 @@ export class PostsType extends TypeBase {
         return true;
     }
 
-    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, "Posts", { className: "noMargin" })
         ]);

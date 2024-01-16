@@ -21,7 +21,6 @@ import { SettingsTab } from "./tabs/data/SettingsTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
-import { TrendingTab } from "./tabs/data/TrendingTab";
 import { TTSTab } from "./tabs/data/TTSTab";
 
 export class TabUtil {
@@ -98,7 +97,7 @@ export class TabUtil {
 
                 new RepliesTab(),
                 new ThreadTab(),
-                new TrendingTab(),
+                // new TrendingTab(), // todo-0: This will come back but in a way that only analyzes public nodes.
                 new ServerInfoTab(),
                 new TTSTab(),
                 new RSSTab(),

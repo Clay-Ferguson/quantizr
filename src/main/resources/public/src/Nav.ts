@@ -445,7 +445,7 @@ export class Nav {
             return;
         }
 
-        // we need to go ahead and boost the refresh counter to avoid it doing a double query.
+        // we need to go ahead and bump the refresh counter to avoid it doing a double query.
         FeedTab.inst.props.refreshCounter++;
 
         await promiseDispatch("SelectTab", s => {

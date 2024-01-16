@@ -139,7 +139,6 @@ export class Util {
         if (!nodes) return null;
         for (const n of nodes) {
             if (n.id === nodeId) return n;
-            if (n.boostedNode?.id === nodeId) return n.boostedNode;
         }
         return null;
     }
@@ -600,39 +599,6 @@ export class Util {
         return ret;
     }
 
-    // External Emojis!
-    insertActPubTags = (val: string, node: NodeInfo) => {
-        let tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
-        if (tags?.forEach) {
-            tags.forEach((t: any) => {
-                if (t.name && t.icon?.url && t.type === "Emoji") {
-                    const img = `<img src='${t.icon.url}'">`;
-                    val = val.replaceAll(t.name, img);
-                }
-            })
-        }
-
-        // the above algo isn't working fully yet so we rip out any ":tag:" items still in the text
-        if (val.indexOf(":") !== -1) {
-
-            // split val into words (space delimited)
-            tags = val.split(" ");
-            val = "";
-            tags.forEach((t: any) => {
-                // skip any `:tag:` words.
-                if (t.startsWith(":") && t.endsWith(":")) return;
-
-                // put words back together
-                if (val) {
-                    val += " ";
-                }
-                val += t;
-            });
-        }
-
-        return val;
-    }
-
     formatCurrency = (n: number): string => {
         return currencyFormatter.format(n);
     }
@@ -731,10 +697,6 @@ export class Util {
                 });
             }, 5000);
         }, 500);
-    }
-
-    isActPubUserName = (userName: string) => {
-        return userName?.indexOf("@") !== -1;
     }
 
     loadBookmarks = async () => {

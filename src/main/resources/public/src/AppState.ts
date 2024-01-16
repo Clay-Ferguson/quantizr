@@ -109,10 +109,8 @@ export class AppState {
     userPrefs: J.UserPreferences = {
         editMode: false,
         showMetaData: false,
-        nsfw: false,
         showProps: false,
         autoRefreshFeed: false, // #add-prop
-        enableActPub: true,
         showReplies: true,
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,

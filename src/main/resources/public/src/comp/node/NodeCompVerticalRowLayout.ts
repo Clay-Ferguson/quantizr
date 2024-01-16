@@ -34,15 +34,6 @@ export class NodeCompVerticalRowLayout extends Div {
             if (!n) return;
             if (!(ast.cutCopyOp === "cut" && ast.nodesToMove?.find(id => id === n.id))) {
                 // console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
-
-                let boostComp: NodeCompRow = null;
-                if (n.boostedNode) {
-                    // console.log("BOOST TARGET: " + S.util.prettyPrint(n.boostedNode));
-                    const type = S.plugin.getType(n.boostedNode.type);
-                    boostComp = new NodeCompRow(n.boostedNode, this.tabData, type, 0, 0, 0, this.level, false, false, this.allowHeaders, false, true, null, true);
-                }
-
-
                 const type = S.plugin.getType(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
@@ -59,7 +50,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     // }
 
                     if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
-                        row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, false, boostComp, false);
+                        row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, null);
                         rowCount++;
                         comps.push(row);
                     }

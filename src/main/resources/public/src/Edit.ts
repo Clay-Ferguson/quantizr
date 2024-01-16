@@ -236,9 +236,7 @@ export class Edit {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null,
-                    boostTarget: null,
                     fediSend: false,
-                    boosterUserId: null,
                     reply: false,
                     directMessage: false,
                     payloadType: null,
@@ -275,9 +273,7 @@ export class Edit {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null,
-                    boostTarget: null,
                     fediSend: false,
-                    boosterUserId: null,
                     reply: false,
                     directMessage: false,
                     payloadType: null,
@@ -585,17 +581,9 @@ export class Edit {
         this.setUserPreferenceVal(s => s.userPrefs.showMetaData = !s.userPrefs.showMetaData);
     }
 
-    toggleNsfw = async () => {
-        return S.util.saveUserPrefs(s => s.userPrefs.nsfw = !s.userPrefs.nsfw);
-    }
-
     // #add-prop
     setAutoRefreshFeed = async (autoRefreshFeed: boolean) => {
         return S.util.saveUserPrefs(s => s.userPrefs.autoRefreshFeed = autoRefreshFeed);
-    }
-
-    setEnableActPub = async (enableActPub: boolean) => {
-        return S.util.saveUserPrefs(s => s.userPrefs.enableActPub = enableActPub);
     }
 
     setShowComments = async (showReplies: boolean): Promise<void> => {
@@ -1069,9 +1057,7 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            boostTarget: null,
             fediSend: false,
-            boosterUserId: null,
             reply: false,
             directMessage: false,
             payloadType: null
@@ -1125,9 +1111,7 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            boostTarget: null,
             fediSend: false,
-            boosterUserId: null,
             reply: false,
             directMessage: false,
             payloadType: null
@@ -1196,9 +1180,7 @@ export class Edit {
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
-            boostTarget: null,
             fediSend: false,
-            boosterUserId: null,
             reply: false,
             directMessage: false
         });
@@ -1226,19 +1208,16 @@ export class Edit {
         });
     }
 
-    /* If this is the user creating a 'boost' then boostTarget is the NodeId of the node being boosted */
-    addNode = async (boosterUserId: string, nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string,
-        boostTarget: string, fediSend: boolean, directMessage: boolean) => {
+    addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string,
+        fediSend: boolean, directMessage: boolean) => {
 
         // auto-enable edit mode
-        if (!boostTarget && !getAs().userPrefs.editMode) {
+        if (!getAs().userPrefs.editMode) {
             await this.setEditMode(true);
         }
 
-        // pending edit will only be true if not a boost, because ActPub doesn't support posting content into a boost
-        // so we save the node without any content in this case.
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            pendingEdit: !boostTarget,
+            pendingEdit: true,
             nodeId,
             aiQuestion: null,
             newNodeName: "",
@@ -1248,20 +1227,13 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId,
-            boostTarget,
             fediSend,
-            boosterUserId,
             reply,
             directMessage,
             payloadType: null
         });
 
-        if (!boostTarget) {
-            this.createSubNodeResponse(res, null);
-        }
-        else {
-            S.util.flashMessageQuick("Post was boosted!", "Boost");
-        }
+        this.createSubNodeResponse(res, null);
     }
 
     createNode = async (node: NodeInfo, typeName: string,
@@ -1278,9 +1250,7 @@ export class Edit {
             properties: null,
             payloadType: null,
             shareToUserId: null,
-            boostTarget: null,
             fediSend: false,
-            boosterUserId: null,
             reply: false,
             directMessage: false
         });
@@ -1309,9 +1279,7 @@ export class Edit {
             typeLock: true,
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
-            boostTarget: null,
             fediSend: false,
-            boosterUserId: null,
             reply: false,
             directMessage: false,
             payloadType: null
@@ -1568,28 +1536,8 @@ export class Edit {
         else {
             const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
             if (!nodeId) return;
-
-            // Note: boostOwnerId can be null, this is not an error.
-            const boostOwnerId = S.domUtil.getPropFromDom(evt, C.BOOSTOWNER_ID_ATTR);
-
-            // when replying to a boost, we want to be able to additionally add to the sharing the person
-            // that DID the boost, so the reply is shared with both the 'booster' and the 'boostee'
-            S.edit.addNode(boostOwnerId, nodeId, J.NodeType.COMMENT,
-                true, null, null, null, true, false);
+            S.edit.addNode(nodeId, J.NodeType.COMMENT, true, null, null, true, false);
         }
-    }
-
-    boostNode = (evt: Event) => {
-        if (getAs().isAnonUser) {
-            S.util.showMessage("Login to boost nodes.", "Login!");
-            return;
-        }
-
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
-        if (!nodeId) return;
-
-        S.edit.addNode(null, null, J.NodeType.COMMENT, false, null, null,
-            nodeId, false, false)
     }
 
     likeNodeClick = (evt: Event) => {

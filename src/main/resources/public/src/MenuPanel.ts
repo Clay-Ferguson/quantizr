@@ -9,7 +9,6 @@ import { BlockedUsersDlg } from "./dlg/BlockedUsersDlg";
 import { FriendsDlg } from "./dlg/FriendsDlg";
 import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
-import { SearchByFediUrlDlg } from "./dlg/SearchByFediUrlDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -79,7 +78,6 @@ export class MenuPanel extends Div {
     static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
-    static searchByFediUrl = () => { new SearchByFediUrlDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time", 0, true);
@@ -120,8 +118,6 @@ export class MenuPanel extends Div {
     };
 
     static showUrls = () => S.render.showNodeUrl(null);
-    static showRawData = () => S.view.runServerCommand("getJson", null, "Node Data", "");
-    static showActPubJson = () => S.view.runServerCommand("getActPubJson", null, "ActivityPub JSON", "");
     static nodeStats = () => S.view.getNodeStats();
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
     static signSubGraph = () => S.view.signSubGraph();
@@ -272,7 +268,6 @@ export class MenuPanel extends Div {
                 new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
-                new MenuItem("By Fediverse URL", MenuPanel.searchByFediUrl), //
 
                 // moved into editor dialog
                 // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
@@ -349,11 +344,7 @@ export class MenuPanel extends Div {
             children.push(new Menu("Info", [
                 // I decided with this on the toolbar we don't need it repliated here.
                 // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
-
                 new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
-                new MenuItem("Show Raw Data", MenuPanel.showRawData, onMainTab && selNodeIsMine, null, true), //
-                ast.isAdminUser ? new MenuItem("Show ActivityPub JSON", MenuPanel.showActPubJson, onMainTab, null, true) : null, //
-                new MenuItemSeparator(), //
                 new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab) //
             ], null));
 

@@ -10,7 +10,7 @@ export interface TypeIntf {
     schemaOrg: J.SchemaOrgClass;
     getTypeName(): string;
     getName(): string;
-    render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, isLinkedNode: boolean): Comp;
+    render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp;
     getIconClass(): string;
     allowAction(action: NodeActionType, node: NodeInfo): boolean;
     allowDeleteProperty(prop: string): boolean;

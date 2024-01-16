@@ -150,19 +150,15 @@ public class UserFeedService extends ServiceBase {
         // IMPORTANT: see long comment above where we have similar type filtering.
         ands.add(Criteria.where(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s()));
 
-        List<Criteria> orCrit = new LinkedList<>();
-        // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
-        orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
-        // this regex simly is "Starts with a period"
-        orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
-        ands.add(new Criteria().orOperator(orCrit));
+        // DO NOT DELETE.
+        // This code itself is completely obsolete, but it is an example of how to do an OR query.
+        // List<Criteria> orCrit = new LinkedList<>();
+        // // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
+        // orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
+        // // this regex simly is "Starts with a period"
+        // orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
+        // ands.add(new Criteria().orOperator(orCrit));
 
-        boolean allowBadWords = true;
-        // add the criteria for sensitive flag
-        if (!req.getNsfw()) {
-            ands.add(Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_SENSITIVE).is(null));
-            allowBadWords = false;
-        }
         // Don't show UNPUBLISHED nodes. The whole point of having the UNPUBLISHED feature for nodes is so
         // we can do this criteria right here and not show those in feeds.
         ands.add(new Criteria(SubNode.PROPS + "." + NodeProp.UNPUBLISHED).is(null));
@@ -178,7 +174,7 @@ public class UserFeedService extends ServiceBase {
          * are always only about user content.
          */
         blockedUserIds.add(auth.getAdminSession().getUserNodeId());
-        boolean allowNonEnglish = false;
+
         if (!bidirectional) {
             /*
              * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
@@ -370,65 +366,9 @@ public class UserFeedService extends ServiceBase {
         int skipped = 0;
 
         for (SubNode node : iter) {
-            // this is malfunctioning on short texts, so disabling for now
-            // if (!allowNonEnglish && !english.isEnglish(node.getContent())) {
-            // skipped++;
-            // continue;
-            // }
-
-            // only do the badWords blocking if it's NOT a node we own. We can never have this filter block
-            // our own content.
-            if (!allowBadWords && !auth.ownedByThreadUser(node) && english.hasBadWords(node.getContent())) {
-                skipped++;
-                continue;
-            }
-            // for the curated feed ignore valueless super short messages that also have no attachment, unless
-            // it's a boost! Be careful boosts also have no content, but we DO want to show boosts.
-            if (Constant.FEED_PUB.s().equals(req.getName())) {
-                if ( //
-                (StringUtils.isEmpty(node.getContent()) || node.getContent().length() < 10)
-                        && node.getAttachments() == null && node.getStr(NodeProp.BOOST) == null) {
-                    skipped++;
-                    continue;
-                }
-            }
-            Val<SubNode> boostedNodeVal = null;
-            String boostTargetId = node.getStr(NodeProp.BOOST);
-            if (boostTargetId != null) {
-                SubNode boostedNode = read.getNode(ms, boostTargetId, false, null);
-                // if we can't find teh boostedNode, don't display this node (the boosting node) at all
-                if (boostedNode == null) {
-                    skipped++;
-                    continue;
-                }
-                // once we searched for the node, we want to have boostedNodeVal non-null, to propagate the result,
-                // even if boostedNode is null here, indicating it's not found.
-                boostedNodeVal = new Val<>(boostedNode);
-                // if the owner of the boosted node is a blocked user and we're querying public nodes and with
-                // applyAdminBlocks in effect then skip this post.
-                if (blockedUserIds.contains(boostedNode.getOwner())) {
-                    skipped++;
-                    continue;
-                }
-
-                // this is malfunctioning on short texts, so disabling for now
-                // if (!allowNonEnglish && !english.isEnglish(boostedNode.getContent())) {
-                // // log.debug("Ignored nonEnglish: node.id=" + node.getIdStr() + " Content: " +
-                // node.getContent());
-                // skipped++;
-                // continue;
-                // }
-
-                if (!allowBadWords && !auth.ownedByThreadUser(boostedNode)
-                        && english.hasBadWords(boostedNode.getContent())) {
-                    skipped++;
-                    continue;
-                }
-            }
-
             try {
-                NodeInfo info = convert.toNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, true,
-                        true, boostedNodeVal, false);
+                NodeInfo info =
+                        convert.toNodeInfo(false, sc, ms, node, false, counter + 1, false, false, false, true, false);
                 if (info != null) {
                     searchResults.add(info);
                     if (searchResults.size() >= MAX_FEED_ITEMS) {

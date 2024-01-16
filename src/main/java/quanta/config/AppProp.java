@@ -12,7 +12,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
-import quanta.actpub.APConst;
 import quanta.mongo.MongoRepository;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
@@ -176,10 +175,6 @@ public class AppProp {
         return env.getProperty("instanceId");
     }
 
-    public boolean isActPubEnabled() {
-        return APConst.TRUE.equals(env.getProperty("actPubEnabled"));
-    }
-
     public boolean ipfsEnabled() {
         // hardcoding disablement for now
         return false;
@@ -228,7 +223,7 @@ public class AppProp {
 
     /* Should be set to true if mongo security is turned on requiring credentials */
     public boolean getMongoSecurity() {
-        return APConst.TRUE.equals(env.getProperty("mongoSecurity"));
+        return "true".equals(env.getProperty("mongoSecurity"));
     }
 
     public String getMongoPassword() {
@@ -253,7 +248,7 @@ public class AppProp {
     }
 
     public boolean isRequireCrypto() {
-        return APConst.TRUE.equals(env.getProperty("requireCrypto"));
+        return "true".equals(env.getProperty("requireCrypto"));
     }
 
     public String getTestPassword() {

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Constant {
     SEARCH_ALL_NODES("allNodes"), //
     SEARCH_CUR_NODE("curNode"), //
-    SEARCH_TYPE_USER_LOCAL("userLocal"), //
-    SEARCH_TYPE_USER_ALL("userAll"), //
-    SEARCH_TYPE_USER_FOREIGN("userForeign"), //
+    SEARCH_TYPE_USERS("userAll"), //
     SEARCH_TYPE_LINKED_NODES("linkedNodes"), //
     SEARCH_TYPE_RDF_SUBJECTS("rdfSubjects"), //
     ENC_TAG("<[ENC]>"), //

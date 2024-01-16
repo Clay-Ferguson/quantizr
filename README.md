@@ -6,7 +6,7 @@
 
 ## A new Kind of CMS with ChatGPT and Social Media features
 
-Quanta is a new kind of [Social Media](https://quanta.wiki/?view=feed) and Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
+Quanta is a new kind of Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
 
 * wikis & micro-blogging
 * [ChatGPT Question Answering](https://quanta.wiki/n/gpt-ai)
@@ -20,7 +20,7 @@ Quanta is a new kind of [Social Media](https://quanta.wiki/?view=feed) and Conte
 
 ## Hierarchical Content
 
-Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture.
+Create hierarchically organized content that's always editable like a wiki and shared online. Quanta is a new kind of platform with a new kind of architecture.
 
 Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content into tree nodes. 
 
@@ -50,6 +50,3 @@ Quanta is a browser-based app that works on both mobile and desktop browsers, al
 
 [Send Money via PayPal](https://PayPal.me/WILLIAMCFERGUSON) directly to the developer.
 
-## Keywords
-
-Decentralized, Social Media, Fediverse, ActivityPub, Mastodon/Pleroma, Web3.0, IPFS, File Sharing, MongoDB, Redis, docker swarm, Java, Javascript, TypesScript, React, HTML+SCSS, SpringBoot, Podcasting, RSS, E2E Encryption, Secure Messaging, Blogging, Wikis, CMS, Collaboration, Full-Text search, Lucene, ChatGPT, GPT-4, AI, Machine Learning, LLM, Large Language Model, OpenAI, Meta

@@ -13,7 +13,6 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean fromFriends;
 	private Boolean toPublic;
 	private Boolean localOnly;
-	private Boolean nsfw;
 	private String searchText;
 	// users can add hashtags to each Friend Node, and those are passed in to filter to show
 	// only friends tagged with this tag
@@ -53,10 +52,6 @@ public class NodeFeedRequest extends RequestBase {
 
 	public Boolean getLocalOnly() {
 		return this.localOnly;
-	}
-
-	public Boolean getNsfw() {
-		return this.nsfw;
 	}
 
 	public String getSearchText() {
@@ -109,10 +104,6 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setLocalOnly(final Boolean localOnly) {
 		this.localOnly = localOnly;
-	}
-
-	public void setNsfw(final Boolean nsfw) {
-		this.nsfw = nsfw;
 	}
 
 	public void setSearchText(final String searchText) {

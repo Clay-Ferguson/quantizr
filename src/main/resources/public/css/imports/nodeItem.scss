@@ -126,44 +126,6 @@
     margin-left: 0;
 }
 
-.boostedBy {
-    display: inline-block;
-    padding: 3px 6px 3px 6px;
-    border: 1px solid gray;
-    margin: 0 $tinyGap $tinyGap $smallGap;
-}
-
-.boostedByMe {
-    @extend .boostedBy;
-    background: $createdByMeBackgroundColor;
-    color: $createdByMeTextColor;
-}
-
-.boostedByOther {
-    @extend .boostedBy;
-    background: $createdByAnotherBackgroundColor;
-    color: $createdByAnotherTextColor;
-}
-
-.boostedByOnFeed {
-    display: inline-block;
-    padding: 3px 10px 3px 10px;
-    border: 1px solid gray;
-    border-radius: 6px 6px 0 0;
-    margin: 0 $tinyGap 0 $smallGap;
-}
-
-.boostedByMeOnFeed {
-    @extend .boostedByOnFeed;
-    background: $createdByMeBackgroundColor;
-    color: $createdByMeTextColor;
-}
-
-.boostedByOtherOnFeed {
-    @extend .boostedByOnFeed;
-    background: $createdByAnotherBackgroundColor;
-    color: $createdByAnotherTextColor;
-}
 
 .transferPending {
     @extend .created-by;
@@ -247,11 +209,6 @@
     padding-top: 4px;
 }
 
-.rowBorderEditInfoBoost {
-    border-top: 1px solid $nodeBorderBottomColor;
-    margin-bottom: $smallGap;
-}
-
 .rowBorderEditInfo {}
 
 /*
@@ -295,24 +252,6 @@ i'm backing out for now
 
 .activeRow {
     border-left: $highlightBorderSize solid $primary;
-}
-
-.boostRow {
-    border: 1px solid gray;
-    margin: 4px 12px 4px 12px;
-    padding: $smallGap $smallGap $tinyGap 0;
-    background-color: #17202A;
-    cursor: pointer;
-}
-
-.boostRowOnFeed {
-    border: 1px solid gray;
-    border-radius: 0px 6px 6px 6px;
-    margin: -1px 12px 4px 12px;
-    padding-bottom: $tinyGap;
-    padding-top: $smallGap;
-    background-color: #17202A;
-    cursor: pointer;
 }
 
 .activeRow:hover {

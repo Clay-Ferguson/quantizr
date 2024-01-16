@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.actpub.APConst;
-import quanta.actpub.model.APOMention;
-import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -31,6 +27,7 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
+import quanta.util.Const;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
@@ -145,7 +142,7 @@ public class MongoAuth extends ServiceBase {
             if (userName != null) {
                 SubNode accountNode = read.getAccountByUserName(null, userName, false);
                 if (accountNode != null) {
-                    child.putAc(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
+                    child.putAc(accountNode.getIdStr(), new AccessControl(null, Const.RDWR));
                 }
             }
         }
@@ -154,48 +151,7 @@ public class MongoAuth extends ServiceBase {
          */
         else {
             // add `parent.owner` to the ACL
-            child.putAc(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
-
-            // if user creating this node has ActPub disabled don't do this.
-            if (ThreadLocals.getSC().getUserPreferences().isEnableActPub()) {
-                processActPubForNewNode(parent, child);
-            }
-        }
-    }
-
-    private void processActPubForNewNode(SubNode parent, SubNode child) {
-        /*
-         * We also extract the 'mentions' out of any 'tag' array that might be on this node, so we can
-         * default the content of the post as `@mention1 @mention2 #mention3...` for all the people being
-         * mentioned in the tags array
-         */
-        HashMap<String, APObj> tags = apub.parseTags(parent);
-        // if no content, and the parent isn't our own node
-        if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
-            SubNode parentUserNode = arun.run(as -> read.getNode(as, parent.getOwner()));
-            if (parentUserNode != null) {
-                String user = parentUserNode.getStr(NodeProp.USER);
-                String url = parentUserNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
-                if (url == null) {
-                    url = prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + user;
-                }
-                tags.put("@" + user, new APOMention(url, "@" + user));
-            }
-        }
-
-        if (tags.size() > 0) {
-            String content = "";
-
-            for (String key : tags.keySet()) {
-                if (key.startsWith("@")) {
-                    content += key + " ";
-                }
-            }
-            /*
-             * This will put a string of all mentioned users right in the text of the message so they can see
-             * who will be replied to or remove users they don't want replied to.
-             */
-            child.setContent(content);
+            child.putAc(parent.getOwner().toHexString(), new AccessControl(null, Const.RDWR));
         }
     }
 
@@ -623,63 +579,6 @@ public class MongoAuth extends ServiceBase {
         crit = auth.addReadSecurity(ms, crit, ands);
         q.addCriteria(crit);
         return q;
-    }
-
-    /*
-     * Parses all mentions (like '@bob@server.com', or '@bob' for local user) in the node content text
-     * and adds them (if not existing) to the node sharing on the node, which ensures the person
-     * mentioned has visibility of this node and that it will also appear in their FEED.
-     */
-    public void saveMentionsToACL(HashMap<String, APObj> tags, MongoSession ms, SubNode node) {
-        if (tags == null) {
-            return;
-        }
-        boolean acChanged = false;
-        HashMap<String, AccessControl> ac = node.getAc();
-        // make sure all parsed toUserNamesSet user names are saved into the node acl */
-        for (String userName : tags.keySet()) {
-            APObj val = tags.get(userName);
-            // ignore of this is something else like a Hashtag
-            if (!(val instanceof APOMention))
-                continue;
-            userName = XString.stripIfStartsWith(userName, "@");
-            SubNode acctNode = read.getAccountByUserName(ms, userName, false);
-            /*
-             * If this is a foreign 'mention' user name that is not imported into our system, we auto-import
-             * that user now
-             */
-            if (StringUtils.countMatches(userName, "@") == 1) {
-                /*
-                 * todo-2: WARNING: this sets off a chain reaction of fediverse crawling!! Unless/until you invent
-                 * some way to stop that (or decide you WANT a FediCrawler) then keep this commented out. Don't
-                 * delete this code until you think this thru more.
-                 */
-                // if (no(acctNode)) {
-                // acctNode = actPub.loadForeignUserByUserName(session, userName);
-                // }
-                apub.userEncountered(userName, false);
-            }
-
-            if (acctNode != null) {
-                String acctNodeId = acctNode.getIdStr();
-                if (ac == null || !ac.containsKey(acctNodeId)) {
-                    /*
-                     * Lazy create 'ac' so that the net result of this method is never to assign non null when it could
-                     * be left null
-                     */
-                    if (ac == null) {
-                        ac = new HashMap<String, AccessControl>();
-                    }
-                    acChanged = true;
-                    ac.put(acctNodeId, new AccessControl(null, APConst.RDWR));
-                }
-            } else {
-                log.debug("Mentioned user not found: " + userName);
-            }
-        }
-        if (acChanged) {
-            node.setAc(ac);
-        }
     }
 
     public MongoSession asUser(String userName) {

@@ -52,7 +52,6 @@ export class NodeCompButtonBar extends Div {
         const specialAccountNode = type?.isSpecialAccountNode();
         if (specialAccountNode) this.allowNodeMove = false;
         let editingAllowed = S.edit.isEditAllowed(this.node);
-        const actPubId = S.props.getPropStr(J.NodeProp.OBJECT_ID, this.node);
         let deleteAllowed = false;
         let editableNode = true;
 
@@ -178,7 +177,7 @@ export class NodeCompButtonBar extends Div {
 
             const editInsertAllowed = S.props.isMine(this.node); //S.props.isWritableByMe(this.node);
 
-            if (!isPageRootNode && C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed && !actPubId) {
+            if (!isPageRootNode && C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"

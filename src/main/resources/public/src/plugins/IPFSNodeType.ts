@@ -18,7 +18,7 @@ export class IPFSNodeType extends TypeBase {
         return true;
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         const cid = S.props.getPropStr(J.NodeProp.IPFS_CID, node) || "";
         return new Div(null, null, [new Heading(6, "CID: " + cid, { className: "ipfsText" })]);
     }

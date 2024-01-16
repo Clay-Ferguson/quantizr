@@ -45,7 +45,6 @@ import quanta.response.RenderDocumentResponse;
 import quanta.service.WordStats;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.XString;
 import quanta.util.val.Val;
 
 /**
@@ -107,7 +106,7 @@ public class NodeSearchService extends ServiceBase {
 
         for (SubNode n : nodes) {
             NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
-                    false, false, true, null, false);
+                    false, false, false);
             if (info != null) {
                 if (truncates.contains(n.getIdStr())) {
                     info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
@@ -139,7 +138,7 @@ public class NodeSearchService extends ServiceBase {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false, true, null, false);
+                        false, false, false, false);
                 if (info != null) {
                     res.setNode(info);
                     searchResults.add(info);
@@ -158,7 +157,7 @@ public class NodeSearchService extends ServiceBase {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false, true, null, false);
+                        false, false, false, false);
                 if (info != null) {
                     res.setNode(info);
                     searchResults.add(info);
@@ -174,9 +173,7 @@ public class NodeSearchService extends ServiceBase {
                 searchRdfSubjects(ms, req, res);
             }
             /* USER Search */
-            else if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())
-                    || Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
-                    Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
+            else if (Constant.SEARCH_TYPE_USERS.s().equals(req.getSearchType())) {
                 userSearch(ms, null, req, searchResults);
             }
             // else we're doing a normal subgraph search for the text
@@ -190,7 +187,7 @@ public class NodeSearchService extends ServiceBase {
                 }
 
                 NodeInfo rootInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, searchRoot, false, counter + 1,
-                        false, false, false, false, true, null, false);
+                        false, false, false, false, false);
                 if (rootInfo != null) {
                     res.setNode(rootInfo);
                 }
@@ -211,7 +208,7 @@ public class NodeSearchService extends ServiceBase {
                             req.isRequireAttachment(), req.isRequireDate())) {
                         try {
                             NodeInfo info = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-                                    counter + 1, false, false, false, false, true, null, false);
+                                    counter + 1, false, false, false, false, false);
                             if (info != null) {
                                 searchResults.add(info);
                             }
@@ -230,7 +227,7 @@ public class NodeSearchService extends ServiceBase {
         for (SubNode node : read.getLinkedNodes(ms, req.getNodeId(), req.getSearchText())) {
             try {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false, true, null, false);
+                        false, false, false, false);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -245,7 +242,7 @@ public class NodeSearchService extends ServiceBase {
         for (SubNode node : read.getRdfSubjects(ms, req.getNodeId())) {
             try {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false, true, null, false);
+                        false, false, false, false);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -264,9 +261,7 @@ public class NodeSearchService extends ServiceBase {
             accountNodes.setVal(read.getAccountNodes(as,
                     Criteria.where("p." + NodeProp.USER.s()).regex(req.getSearchText(), "i"), null, //
                     ConstantInt.ROWS_PER_PAGE.val(), //
-                    ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), //
-                    Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()), //
-                    Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())));
+                    ConstantInt.ROWS_PER_PAGE.val() * req.getPage()));
             return null;
         });
         if (accountNodes.getVal() != null) {
@@ -277,7 +272,7 @@ public class NodeSearchService extends ServiceBase {
             for (SubNode node : accountNodes.getVal()) {
                 try {
                     NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                            false, false, false, false, null, false);
+                            false, false, false, false);
                     if (info != null) {
                         searchResults.add(info);
                     }
@@ -285,32 +280,6 @@ public class NodeSearchService extends ServiceBase {
                     ExUtil.error(log, "failed converting user node", e);
                 }
             }
-        }
-
-        /*
-         * If we didn't find any results and we aren't searching locally only then try to look this up as a
-         * username, over the web (internet, fediverse)
-         */
-        if (searchResults.size() == 0 && !Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
-            String findUserName = req.getSearchText();
-            findUserName = findUserName.replace("\"", "");
-            findUserName = XString.stripIfStartsWith(findUserName, "@");
-            final String _findUserName = findUserName;
-            arun.run(as -> {
-                SubNode userNode = apub.getAcctNodeByForeignUserName(as, userDoingAction, _findUserName, false, true);
-                if (userNode != null) {
-                    try {
-                        NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), as, userNode, false,
-                                counter + 1, false, false, false, false, false, null, false);
-                        if (info != null) {
-                            searchResults.add(info);
-                        }
-                    } catch (Exception e) {
-                        ExUtil.error(log, "failed converting user node", e);
-                    }
-                }
-                return null;
-            });
         }
     }
 
@@ -362,7 +331,7 @@ public class NodeSearchService extends ServiceBase {
                 }
             }
             NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
-                    false, false, true, null, false);
+                    false, false, false);
             if (info != null) {
                 searchResults.add(info);
             }
@@ -444,15 +413,6 @@ public class NodeSearchService extends ServiceBase {
             List<Criteria> ands = new LinkedList<>();
             Query q = new Query();
             Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.USERS_PATH));
-
-            List<Criteria> orCrit = new LinkedList<>();
-
-            // This detects 'local nodes' (nodes from local users, by them NOT having an OBJECT_ID)
-            orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
-            // this regex simly is "Starts with a period"
-            orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
-
-            ands.add(new Criteria().orOperator(orCrit));
             ands.add(Criteria.where(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s()));
 
             // For public feed statistics only consider PUBLIC nodes.
@@ -654,11 +614,7 @@ public class NodeSearchService extends ServiceBase {
         if (node.getTags() != null) {
             content += " " + node.getTags();
         }
-        // if strict content filtering ignore non-english or bad words posts completely
-        // isEnglish this is malfunctioning on short texts, so disabling for now
-        if (strictFiltering && (/* !english.isEnglish(content) || */ english.hasBadWords(content))) {
-            return;
-        }
+
         HashSet<String> knownTokens = null;
         StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
 
@@ -731,7 +687,6 @@ public class NodeSearchService extends ServiceBase {
             }
             stats.wordCount++;
         }
-        extractTagsAndMentions(node, knownTokens, tagMap, mentionMap, blockTerms, trending);
 
         if (countVotes) {
             String vote = node.getStr(NodeProp.VOTE.s());
@@ -764,53 +719,5 @@ public class NodeSearchService extends ServiceBase {
             }
         }
         return blockTerms;
-    }
-
-    // #tag-array
-    private void extractTagsAndMentions(SubNode node, HashSet<String> knownTokens, HashMap<String, WordStats> tagMap,
-            HashMap<String, WordStats> mentionMap, HashSet<String> blockTerms, boolean trending) {
-        List<APTag> tags = node.getTypedObj(NodeProp.ACT_PUB_TAG.s(), new TypeReference<List<APTag>>() {});
-        if (tags == null)
-            return;
-
-        for (APTag tag : tags) {
-            try {
-                // ActPub spec originally didn't have Hashtag here, so default to that if no type
-                if (tag.getType() == null) {
-                    tag.setType("Hashtag");
-                }
-                String _name = tag.getName().toLowerCase();
-                // we use the knownTags to avoid double counting stuff we already counted from the content text
-                if (knownTokens != null && knownTokens.contains(_name))
-                    continue;
-                if (blockTerms != null && blockTerms.contains(_name.replace("#", "")))
-                    continue;
-                // Mentions
-                if (tag.getType().equals("Mention")) {
-                    /*
-                     * Technically the fully qualified name would be the perfect identification for user, but to avoid
-                     * double-counting names that are parset out of the content as the short (no instance) version of
-                     * the name we ignore the href, in here, but href *could* be used if we needed the full name, like
-                     * what we do in parseMentionsFromNode()
-                     */
-                    WordStats ws = mentionMap.get(_name);
-                    if (ws == null) {
-                        ws = new WordStats(_name);
-                        mentionMap.put(_name, ws);
-                    }
-                    ws.inc(node, trending);
-                } //
-                else if (tag.getType().equals("Hashtag")) { // Hashtags
-                    WordStats ws = tagMap.get(_name);
-                    if (ws == null) {
-                        ws = new WordStats(_name);
-                        tagMap.put(_name, ws);
-                    }
-                    ws.inc(node, trending);
-                }
-            } catch (Exception e) {
-                // ignore this
-            }
-        }
     }
 }

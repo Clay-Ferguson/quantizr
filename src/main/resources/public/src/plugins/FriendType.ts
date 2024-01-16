@@ -55,11 +55,10 @@ export class FriendType extends TypeBase {
         return new Heading(3, user);
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, isTreeView: boolean): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);
-        const actorUrl = S.props.getClientPropStr(J.NodeProp.ACT_PUB_ACTOR_URL, node);
         const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
         let imgSrc = S.props.getClientPropStr(J.NodeProp.USER_ICON_URL, node);
 
@@ -72,7 +71,7 @@ export class FriendType extends TypeBase {
         }
 
         // Note: we pass showMessageButton as true when isTreeView is true only.
-        return S.render.renderUser(node, user, userBio, imgSrc, actorUrl,
+        return S.render.renderUser(node, user, userBio, imgSrc,
             displayName, null, isTreeView ? "treeFriendImage" : "listFriendImage", isTreeView, () => {
                 new UserProfileDlg(userNodeId).open();
             });

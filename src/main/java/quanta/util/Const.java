@@ -1,5 +1,7 @@
 package quanta.util;
 
+import quanta.model.client.PrivilegeType;
+
 public class Const {
 
     public static final String REL_FOREIGN_LINK = "nofollow noopener noreferrer";
@@ -17,4 +19,5 @@ public class Const {
 
     public static String BEARER_TOKEN = "token";
     public static String HOME_NODE_NAME = "home";
+    public static final String RDWR = PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s();
 }

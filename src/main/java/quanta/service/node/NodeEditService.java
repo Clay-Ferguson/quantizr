@@ -1,6 +1,5 @@
 package quanta.service.node;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
-import quanta.actpub.model.APList;
-import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
@@ -27,7 +24,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeJsonRequest;
 import quanta.request.InitNodeEditRequest;
-import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
 import quanta.request.SaveNodeJsonRequest;
 import quanta.request.SaveNodeRequest;
@@ -36,7 +32,6 @@ import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.response.GetNodeJsonResponse;
 import quanta.response.InitNodeEditResponse;
-import quanta.response.LikeNodeResponse;
 import quanta.response.LinkNodesResponse;
 import quanta.response.SaveNodeJsonResponse;
 import quanta.response.SaveNodeResponse;
@@ -60,44 +55,6 @@ import quanta.util.XString;
 @Component
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-    public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {
-        LikeNodeResponse res = new LikeNodeResponse();
-        exec.run(() -> {
-            arun.run(as -> {
-                SubNode node = read.getNode(ms, req.getId());
-                if (node == null) {
-                    throw new RuntimeException("Unable to find node: " + req.getId());
-                }
-                if (node.getLikes() == null) {
-                    node.setLikes(new HashSet<>());
-                }
-                String userName = ThreadLocals.getSC().getUserName();
-                // String actorUrl = apUtil.makeActorUrlForUserName(userName); // long name not used.
-                // local users will always just have their userName put in the 'likes'
-                if (req.isLike()) {
-                    if (node.getLikes().add(userName)) {
-                        // set node to dirty only if it just changed.
-                        ThreadLocals.dirty(node);
-                        // if this is a foreign post send message out to fediverse
-                        if (node.getStr(NodeProp.OBJECT_ID) != null) {
-                            apub.sendLikeMessage(as, ms.getUserName(), node);
-                        }
-                    }
-                } else {
-                    if (node.getLikes().remove(userName)) {
-                        // set node to dirty only if it just changed.
-                        ThreadLocals.dirty(node);
-                        if (node.getLikes().size() == 0) {
-                            node.setLikes(null);
-                        }
-                    }
-                }
-                return null;
-            });
-        });
-        return res;
-    }
 
     public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
         SaveNodeResponse res = new SaveNodeResponse();
@@ -226,7 +183,7 @@ public class NodeEditService extends ServiceBase {
         }
 
         NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, req.isReturnInlineChildren(), false, false, true, true, null, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, req.isReturnInlineChildren(), false, false, true, false);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }
@@ -254,7 +211,7 @@ public class NodeEditService extends ServiceBase {
         read.forceCheckHasChildren(ms, node);
 
         NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, expanded, false, false, true, true, null, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, expanded, false, false, true, false);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }
@@ -276,35 +233,6 @@ public class NodeEditService extends ServiceBase {
             }
 
             push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
-
-            if (!isAccnt && ThreadLocals.getSC().getUserPreferences().isEnableActPub()) {
-                HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, true);
-
-                if (tags != null && tags.size() > 0) {
-                    String userDoingAction = ThreadLocals.getSC().getUserName();
-                    apub.importUsers(ms, tags, userDoingAction);
-                    auth.saveMentionsToACL(tags, s, node);
-                    node.set(NodeProp.ACT_PUB_TAG, new APList(new LinkedList<>(tags.values())));
-                    update.save(ms, node);
-                }
-            }
-
-            if (ThreadLocals.getSC().getUserPreferences().isEnableActPub()) {
-                // if this is an account type then don't expect it to have any ACL but we still want to broadcast
-                // out to the world the edit that was made to it, as long as it's not admin owned.
-                boolean forceSendToPublic = isAccnt;
-                if (forceSendToPublic || node.getAc() != null) {
-                    // We only send COMMENTS out to ActivityPub servers, and also only if "not unpublished"
-                    if (!node.getBool(NodeProp.UNPUBLISHED) && node.getType().equals(NodeType.COMMENT.s())) {
-                        SubNode _parent = parent;
-                        if (_parent == null) {
-                            _parent = read.getParent(ms, node, false);
-                        }
-                        // This broadcasts out to the shared inboxes of all the followers of the user
-                        apub.sendObjOutbound(s, _parent, node, forceSendToPublic);
-                    }
-                }
-            }
 
             if (AclService.isPublic(node) && !StringUtils.isEmpty(node.getName())) {
                 ipfs.saveNodeToMFS(ms, node);
@@ -612,7 +540,7 @@ public class NodeEditService extends ServiceBase {
             return res;
         }
         NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false, null, false);
+                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false);
         res.setNodeInfo(nodeInfo);
         return res;
     }

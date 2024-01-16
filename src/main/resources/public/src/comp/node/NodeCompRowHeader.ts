@@ -20,12 +20,9 @@ import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompRowHeader extends Div {
 
-    // NOTE: If boostingNode is non-null it's the node that is boosting 'node'. In other words the rendered page will show
-    // node boostingNode as the top/outter level and the 'node' will be the actual node that got boosted by 'boostingNode'
-    // idx==1 for first row. (not zero offset)
-    constructor(private boostingNode: NodeInfo, private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
+    constructor(private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
-        private isBoost: boolean, private allowDelete: boolean, private prefix: string, private idx: number) {
+        private allowDelete: boolean, private prefix: string, private idx: number) {
         super(null);
 
         const ast = getAs();
@@ -39,11 +36,6 @@ export class NodeCompRowHeader extends Div {
 
         let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
-
-        // if user has set their displayName
-        if (this.node.displayName) {
-            displayName = S.util.insertActPubTags(this.node.displayName, this.node);
-        }
 
         // Warning: after running insertActPubTags above that may put us back at an empty displayName,
         // so we DO need to check for displayName here rather than putting this in an else block.
@@ -108,13 +100,8 @@ export class NodeCompRowHeader extends Div {
         }
 
         const editInsertAllowed = S.props.isWritableByMe(this.node);
-        const actPubId = S.props.getPropStr(J.NodeProp.OBJECT_ID, this.node);
 
-        // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
-        // Also we don't allow admin user to do any replies
-        // WARNING: Mastodon can't cope with the concept of replying to the actual booster node but only the booseted node,
-        // do don't allow replying to boosts.
-        if (!this.node.boostedNode && !ast.isAdminUser && showInfo && (editInsertAllowed || actPubId)) {
+        if (!ast.isAdminUser && showInfo && editInsertAllowed) {
             if (ast.mobileMode) {
                 const iconProps = {
                     title: "Reply to this Post",
@@ -123,9 +110,6 @@ export class NodeCompRowHeader extends Div {
                     onClick: S.edit.replyToNode
                 }
 
-                if (this.boostingNode?.ownerId) {
-                    iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
-                }
                 ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("Reply", iconProps)
                 ]));
@@ -138,40 +122,12 @@ export class NodeCompRowHeader extends Div {
                     onClick: S.edit.replyToNode
                 }
 
-                if (this.boostingNode?.ownerId) {
-                    iconProps[C.BOOSTOWNER_ID_ATTR] = this.boostingNode?.ownerId;
-                }
                 children.push(new Icon(iconProps));
             }
         }
 
         if (showInfo) {
-            // Don't allow boosting a node that is itself a boost. This would confuse Mastodon.
-            if (!ast.isAdminUser && !ast.isAnonUser && !this.node.boostedNode) {
-                if (ast.mobileMode) {
-                    const iconProps = {
-                        title: "Boost this Node",
-                        className: "dropdown-item",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.boostNode
-                    }
-
-                    ddItems.push(new Li(null, { className: "clickable" }, [
-                        new Span("Boost", iconProps)
-                    ]));
-                }
-                else {
-                    children.push(new Icon({
-                        title: "Boost this Node",
-                        className: "fa fa-retweet fa-lg rowHeaderIcon",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.edit.boostNode
-                    }));
-                }
-            }
-
             const hasNonPublicShares = S.props.hasNonPublicShares(this.node);
-            const hasMentions = S.props.hasMentions(this.node);
 
             let youLiked: boolean = false;
             let likeDisplay: string = null;
@@ -183,8 +139,7 @@ export class NodeCompRowHeader extends Div {
                 }
             }
 
-            // NOTE: Don't allow liking of boosting nodes. Mastodon doesn't know how to handle that.
-            if (!this.node.boostedNode && !ast.isAdminUser && !ast.isAnonUser) {
+            if (!ast.isAdminUser && !ast.isAnonUser) {
                 if (ast.mobileMode) {
                     const iconProps = {
                         title: likeDisplay ? likeDisplay : "Like this Node",
@@ -209,7 +164,7 @@ export class NodeCompRowHeader extends Div {
 
             /* only allow this for logged in users, because it might try to access over ActivityPub potentially
             and we need to have a user identity for all the HTTP sigs for that. */
-            if (!ast.isAnonUser && (hasNonPublicShares || hasMentions || this.node.likes?.length > 0)) {
+            if (!ast.isAnonUser && (hasNonPublicShares || this.node.likes?.length > 0)) {
                 ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("People", {
                         className: "dropdown-item",
@@ -271,17 +226,6 @@ export class NodeCompRowHeader extends Div {
                         onClick: S.nav.showThread
                     }));
                 }
-            }
-
-            const repliesProp: string = S.props.getPropStr(J.NodeProp.ACT_PUB_REPLIES, this.node);
-            if (showInfo && ast.allowedFeatures?.indexOf("ap:replies") !== -1 && repliesProp) {
-                ddItems.push(new Li(null, { className: "clickable" }, [
-                    new Span("Show Replies", {
-                        className: "dropdown-item",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.nav.showReplies
-                    })
-                ]));
             }
 
             // Don't try to read Foreign server content (by checking actPubId to detect remote)
@@ -485,7 +429,7 @@ export class NodeCompRowHeader extends Div {
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
-        if (!this.isBoost && !this.isMainTree && ast.userPrefs.editMode) {
+        if (!this.isMainTree && ast.userPrefs.editMode) {
             if (editingAllowed && editableNode) {
                 editButton = new Icon({
                     className: "fa fa-edit fa-lg buttonBarIcon ui-edit-node",
@@ -561,21 +505,6 @@ export class NodeCompRowHeader extends Div {
                     ]));
                 }
             }
-
-            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
-            if (objUrl) {
-                // check to see if it's a link to our server, and don't show 'foreign link' link if so.
-                // todo-3: we should make a util.ts method for this.
-                if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
-                    ddItems.push(new Li(null, { className: "clickable" }, [
-                        new Anchor(objUrl, "Original Post", {
-                            className: "dropdown-item",
-                            target: "_blank",
-                            title: "Go to Original Post/Instance"
-                        })
-                    ]));
-                }
-            }
         }
     }
 
@@ -586,6 +515,6 @@ export class NodeCompRowHeader extends Div {
     }
 
     getContentDomId = () => {
-        return NodeCompContent.PRE_PREFIX + this.prefix + (this.isBoost ? "-boost" : "") + this.node.id;
+        return NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
     }
 }

@@ -24,8 +24,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import quanta.actpub.model.APOMention;
-import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
@@ -623,17 +621,14 @@ public class UserManagerService extends ServiceBase {
              */
             prefsNode.set(NodeProp.USER_PREF_EDIT_MODE, reqUserPrefs.isEditMode());
             prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA, reqUserPrefs.isShowMetaData());
-            prefsNode.set(NodeProp.USER_PREF_NSFW, reqUserPrefs.isNsfw());
             prefsNode.set(NodeProp.USER_PREF_SHOW_PROPS, reqUserPrefs.isShowProps());
             prefsNode.set(NodeProp.USER_PREF_AUTO_REFRESH_FEED, reqUserPrefs.isAutoRefreshFeed()); // #add-prop
-            prefsNode.set(NodeProp.USER_PREF_ENABLE_ACT_PUB, reqUserPrefs.isEnableActPub());
             prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
             prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
             prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
-            userPrefs.setNsfw(reqUserPrefs.isNsfw());
             userPrefs.setShowProps(reqUserPrefs.isShowProps());
             userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
             userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
@@ -669,9 +664,6 @@ public class UserManagerService extends ServiceBase {
                 userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
                 // sessionContext.setUserName(req.getUserName());
                 update.save(as, userNode);
-                if (req.isPublish()) {
-                    ipfs.writeProfileToIPNS(ThreadLocals.getSC(), userName, req.getUserBio(), req.getDisplayName());
-                }
                 edit.processAfterSave(as, userNode, null);
             }
             return null;
@@ -802,8 +794,6 @@ public class UserManagerService extends ServiceBase {
                 String displayName = getFriendlyNameFromNode(userNode);
                 userProfile.setUserName(nodeUserName);
                 userProfile.setDisplayName(displayName);
-                String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
-                String actorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
                 userProfile.setMfsEnable(userNode.getBool(NodeProp.MFS_ENABLE));
                 userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO));
                 userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
@@ -825,17 +815,15 @@ public class UserManagerService extends ServiceBase {
                 userProfile.setUserNodeId(userNode.getIdStr());
                 userProfile.setApIconUrl(userNode.getStr(NodeProp.USER_ICON_URL));
                 userProfile.setApImageUrl(userNode.getStr(NodeProp.USER_BANNER_URL));
-                userProfile.setActorUrl(actorUrl);
-                userProfile.setActorId(actorId);
+
                 if (!abbreviated) {
                     SubNode userHomeNode = read.getNodeByName(as, nodeUserName + ":" + Const.HOME_NODE_NAME);
                     if (userHomeNode != null) {
                         userProfile.setHomeNodeId(userHomeNode.getIdStr());
                     }
-                    Long followerCount =
-                            apFollower.countFollowersOfUser(as, sessionUserName, userNode, nodeUserName, actorUrl);
+                    Long followerCount = friend.countFollowersOfUser(as, sessionUserName, userNode, nodeUserName);
                     userProfile.setFollowerCount(followerCount.intValue());
-                    Long followingCount = apFollowing.countFollowingOfUser(as, sessionUserName, nodeUserName, actorUrl);
+                    Long followingCount = friend.countFollowingOfUser(as, sessionUserName, nodeUserName);
                     userProfile.setFollowingCount(followingCount.intValue());
                     if (!ThreadLocals.getSC().isAnonUser()) {
                         /*
@@ -893,9 +881,7 @@ public class UserManagerService extends ServiceBase {
     public UserPreferences getDefaultUserPreferences() {
         UserPreferences userPrefs = new UserPreferences();
         userPrefs.setShowMetaData(true);
-        userPrefs.setNsfw(false);
         userPrefs.setShowProps(false);
-        userPrefs.setEnableActPub(true);
         return userPrefs;
     }
 
@@ -908,16 +894,8 @@ public class UserManagerService extends ServiceBase {
             }
             userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
             userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
-            userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
             userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
             userPrefs.setAutoRefreshFeed(prefsNode.getBool(NodeProp.USER_PREF_AUTO_REFRESH_FEED)); // #add-prop
-
-            // default ActPub enabled to true if property not yet set
-            if (!prefsNode.hasProp(NodeProp.USER_PREF_ENABLE_ACT_PUB.s())) {
-                prefsNode.set(NodeProp.USER_PREF_ENABLE_ACT_PUB, true);
-            }
-            userPrefs.setEnableActPub(prefsNode.getBool(NodeProp.USER_PREF_ENABLE_ACT_PUB));
-
             userPrefs.setShowReplies(prefsNode.getBool(NodeProp.USER_PREF_SHOW_REPLIES));
             userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
             long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA);
@@ -1047,101 +1025,6 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
-        GetPeopleResponse res = new GetPeopleResponse();
-        SubNode node = read.getNode(ms, nodeId);
-        if (node == null) {
-            res.setMessage("Unable to find node.");
-            res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
-        }
-        String ownerIdStr = node.getOwner().toHexString();
-        HashSet<String> idSet = new HashSet<>();
-        HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, false);
-        HashMap<String, APObj> nodePropTags = apub.parseTags(node);
-        if (nodePropTags != null) {
-            tags.putAll(nodePropTags);
-        }
-        // if we have likes add them into 'tags', because that's what we feed thru the rest of the code.
-        if (node.getLikes() != null) {
-            node.getLikes().forEach(userName -> {
-                String mention = "@" + userName;
-                tags.put(mention, new APOMention(null, mention));
-            });
-        }
-        if (tags != null && tags.size() > 0) {
-            String userDoingAction = ThreadLocals.getSC().getUserName();
-            apub.importUsers(ms, tags, userDoingAction);
-        }
-        List<FriendInfo> friends = new LinkedList<>();
-        arun.run(as -> {
-            SubNode ownerAccntNode = read.getNode(as, node.getOwner());
-            String ownerName = null;
-            if (ownerAccntNode != null) {
-                ownerName = ownerAccntNode.getStr(NodeProp.USER);
-                FriendInfo ownerInfo = buildPersonInfoFromAccntNode(as, ownerAccntNode);
-                if (node.getLikes() != null && node.getLikes().contains(ownerInfo.getUserName())) {
-                    ownerInfo.setLiked(true);
-                }
-                res.setNodeOwner(ownerInfo);
-            }
-            String _ownerName = ownerName;
-            tags.forEach((user, tag) -> {
-                // ignore if this is something else (like a Hashtag)
-                if (!(tag instanceof APOMention))
-                    return;
-                // remove '@' prefix
-                user = XString.stripIfStartsWith(user, "@");
-                if (user.equals(_ownerName))
-                    return;
-                try {
-                    SubNode accntNode = read.getAccountByUserName(as, user, false);
-                    if (accntNode != null) {
-                        String id = accntNode.getIdStr();
-                        if (!idSet.contains(id)) {
-                            FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
-                            if (fi != null) {
-                                friends.add(fi);
-                                idSet.add(id);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    ExUtil.warn(log, "Unable to load user: " + user, e);
-                }
-            });
-            if (node.getAc() != null) {
-                /*
-                 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
-                 */
-                for (String accntId : node.getAc().keySet()) {
-                    // ignore public, it's not a user.
-                    if (accntId.equals(ownerIdStr) || idSet.contains(accntId)
-                            || PrincipalName.PUBLIC.s().equals(accntId))
-                        continue;
-                    SubNode accntNode = apub.cachedGetAccntNodeById(as, accntId, false, null);
-                    if (accntNode != null) {
-                        FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
-                        if (fi != null) {
-                            friends.add(fi);
-                            idSet.add(accntId);
-                        }
-                    }
-                }
-                res.setPeople(friends);
-            }
-            return null;
-        });
-        if (node.getLikes() != null && friends != null) {
-            friends.forEach(fi -> {
-                if (node.getLikes().contains(fi.getUserName())) {
-                    fi.setLiked(true);
-                }
-            });
-        }
-        friends.sort((f1, f2) -> f1.getUserName().compareTo(f2.getUserName()));
-        return res;
-    }
-
     public FriendInfo buildPersonInfoFromAccntNode(MongoSession ms, SubNode userNode) {
         FriendInfo fi = new FriendInfo();
         String displayName = user.getFriendlyNameFromNode(userNode);
@@ -1188,17 +1071,6 @@ public class UserManagerService extends ServiceBase {
             res.setPeople(friends);
         }
         return res;
-    }
-
-    public Object getPeople(GetPeopleRequest req, MongoSession ms) {
-        GetPeopleResponse ret = null;
-        if (req.getNodeId() != null) {
-            ret = user.getPeopleOnNode(ms, req.getNodeId());
-        } else {
-            ret = user.getPeople(ms, ThreadLocals.getSC().getUserName(), req.getType());
-        }
-        ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
-        return ret;
     }
 
     /**

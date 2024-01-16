@@ -27,7 +27,6 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
@@ -98,25 +97,6 @@ public class MongoDelete extends ServiceBase {
             }
         }
         update.saveSession(ms);
-    }
-
-    /*
-     * note: Running this will technically invalidate the 'node.hasChildren' on all parent nodes of the
-     * deleted nodes, but this is ok, because what we deleted was just cached nodes from foreign servers
-     * and if there are still any posts left in the foreign user account then actually the
-     * 'node.hasChildren' will remain correct. So there's no reason to worry about damaging the
-     * 'correctness' of 'hasChildren' for this scenario
-     */
-    public long deleteOldActPubPosts(int monthsOld, MongoSession ms) {
-        Query q = new Query();
-        LocalDate ldt = LocalDate.now().minusDays(30 * monthsOld);
-        Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Criteria crit = Criteria //
-                .where(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_TYPE).ne(null)//
-                .and(SubNode.MODIFY_TIME).lt(date);
-        q.addCriteria(crit);
-        DeleteResult res = opsw.remove(ms, q, SubNode.class);
-        return res.getDeletedCount();
     }
 
     /*
@@ -560,13 +540,6 @@ public class MongoDelete extends ServiceBase {
         // in async thread send out all the deletes to the foreign servers, and then delete the subgraphs
         // under the deleted nodes so there should be no orphans left
         exec.run(() -> {
-            nodes.forEach(n -> {
-                // if node not shared no need to try to send outbound delete
-                if (n.getAc() == null)
-                    return;
-                apub.sendNodeDelete(ms, snUtil.getIdBasedUrl(n), snUtil.cloneAcl(n));
-            });
-
             nodes.forEach(n -> {
                 deleteSubGraphChildren(ms, n, false);
             });

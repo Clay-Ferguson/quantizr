@@ -49,8 +49,8 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         const ast = getAs();
 
         return new Div(null, { className: "tabSubOptions" }, [
-            new AppNavLink("Fediverse", S.nav.messagesFediverse),
-            ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions),
+            // new AppNavLink("Fediverse", S.nav.messagesFediverse), // todo-0: this may come back as "Server" or "Local" or something
+            // ast.isAnonUser ? null : new AppNavLink("My Mentions", S.nav.messagesMyMentions), // todo-0: this probably will not come back
             ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
             ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
             ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),

@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubCache;
 import quanta.config.NodePath;
 import quanta.exception.ForbiddenException;
 import quanta.model.client.NodeProp;
@@ -76,9 +75,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
     @Autowired
     private EventPublisher publisher;
-
-    @Autowired
-    private ActPubCache apCache;
 
     @Autowired
     private AclService acl;
@@ -245,10 +241,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     @Override
     public void onAfterSave(AfterSaveEvent<SubNode> event) {
         SubNode node = event.getSource();
-        // update cache during save
-        if (node != null) {
-            apCache.saveNotify(node);
-        }
         String dbRoot = NodePath.ROOT_PATH;
         if (dbRoot.equals(node.getPath())) {
             read.setDbRoot(node);

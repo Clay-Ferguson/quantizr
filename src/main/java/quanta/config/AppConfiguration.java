@@ -23,7 +23,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import quanta.actpub.APConst;
 import quanta.service.AppController;
 import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
@@ -89,8 +88,6 @@ public class AppConfiguration implements WebMvcConfigurer {
         reg.addUrlPatterns("/fonts/*");
         reg.addUrlPatterns("/dist/*");
         reg.addUrlPatterns(AppController.API_PATH + "/getOpenGraph");
-        reg.addUrlPatterns(APConst.PATH_WEBFINGER + "/*");
-        reg.addUrlPatterns(APConst.PATH_AP + "/*");
         return reg;
     }
 

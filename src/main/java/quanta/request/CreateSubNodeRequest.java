@@ -8,7 +8,6 @@ import quanta.request.base.RequestBase;
 public class CreateSubNodeRequest extends RequestBase {
 
     private String nodeId;
-    private String boostTarget;
     private boolean pendingEdit;
     private String content; // optional, default content
     private String newNodeName;
@@ -38,10 +37,6 @@ public class CreateSubNodeRequest extends RequestBase {
     // for a DM this can be optionally provided to share the node with this person immediately
     private String shareToUserId;
 
-    // If this node is a reply to a boosted node, then we will recieve the booster id here so the node
-    // can also be shared with that person as well.
-    private String boosterUserId;
-
     // send out over Fediverse only if this is true. Will generally be either something created by a
     // "Post" button or a "Reply" button only
     private boolean fediSend;
@@ -54,10 +49,6 @@ public class CreateSubNodeRequest extends RequestBase {
 
     public String getNodeId() {
         return this.nodeId;
-    }
-
-    public String getBoostTarget() {
-        return this.boostTarget;
     }
 
     public boolean isPendingEdit() {
@@ -100,10 +91,6 @@ public class CreateSubNodeRequest extends RequestBase {
         return this.shareToUserId;
     }
 
-    public String getBoosterUserId() {
-        return this.boosterUserId;
-    }
-
     public boolean isFediSend() {
         return this.fediSend;
     }
@@ -119,10 +106,6 @@ public class CreateSubNodeRequest extends RequestBase {
 
     public void setNodeId(final String nodeId) {
         this.nodeId = nodeId;
-    }
-
-    public void setBoostTarget(final String boostTarget) {
-        this.boostTarget = boostTarget;
     }
 
     public void setPendingEdit(final boolean pendingEdit) {
@@ -155,10 +138,6 @@ public class CreateSubNodeRequest extends RequestBase {
 
     public void setShareToUserId(final String shareToUserId) {
         this.shareToUserId = shareToUserId;
-    }
-
-    public void setBoosterUserId(final String boosterUserId) {
-        this.boosterUserId = boosterUserId;
     }
 
     public void setFediSend(final boolean fediSend) {

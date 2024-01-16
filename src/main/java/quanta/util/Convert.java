@@ -7,16 +7,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import quanta.actpub.APConst;
-import quanta.actpub.model.APOHashtag;
-import quanta.actpub.model.APOMention;
-import quanta.actpub.model.APObj;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -34,7 +28,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.types.TypeBase;
-import quanta.util.val.Val;
 
 /**
  * Converting objects from one type to another, and formatting.
@@ -55,8 +48,7 @@ public class Convert extends ServiceBase {
      */
     public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
             boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild,
-            boolean getFollowers, boolean loadLikes, boolean attachBoosted, Val<SubNode> boostedNodeVal,
-            boolean attachLinkedNodes) {
+            boolean getFollowers, boolean loadLikes, boolean attachLinkedNodes) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
         // if we have a signature, check it.
@@ -165,19 +157,6 @@ public class Convert extends ServiceBase {
         String content = node.getContent();
         String renderContent = null;
 
-        if (prop.isActPubEnabled()) {
-            // we have a catch block becasue stuff can go wrong here, when the JSON query against ActPub servers
-            // fails
-            try {
-                renderContent = replaceTagsWithHtml(node, true);
-            } catch (Exception e) {
-                log.error("Error replacing tags with HTML: " + e.getMessage());
-            }
-            if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
-                logicalOrdinal = read.generateLogicalOrdinal(ms, node);
-            }
-        }
-
         NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
                 node.getTags(), displayName, //
                 owner, ownerId, node.getTransferFrom() != null ? node.getTransferFrom().toHexString() : null, //
@@ -220,33 +199,7 @@ public class Convert extends ServiceBase {
         // });
         // }
         // }
-        // -----------------------
 
-        if (attachBoosted) {
-            SubNode boostedNode = null;
-            if (boostedNodeVal != null) {
-                // if boosted node was passed in use it
-                boostedNode = boostedNodeVal.getVal();
-            } else {
-                // otherwise check to see if we have a boosted node from scratch.
-                String boostTargetId = node.getStr(NodeProp.BOOST);
-                if (boostTargetId != null) {
-                    try {
-                        boostedNode = read.getNode(ms, boostTargetId);
-                    } catch (Exception e) {
-                        log.debug("Unable to access boosted node: " + boostTargetId);
-                        return null;
-                    }
-                }
-            }
-            if (boostedNode != null) {
-                NodeInfo info = toNodeInfo(false, sc, ms, boostedNode, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
-                        false, false, false, false, null, false);
-                if (info != null) {
-                    nodeInfo.setBoostedNode(info);
-                }
-            }
-        }
         return nodeInfo;
     }
 
@@ -278,85 +231,12 @@ public class Convert extends ServiceBase {
                 SubNode n = iterator.next();
 
                 NodeInfo info = toNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, allowInlineChildren,
-                        lastChild, false, loadLikes, false, null, false);
+                        lastChild, false, loadLikes, false);
                 if (info != null) {
                     nodeInfo.safeGetChildren().add(info);
                 }
             }
         }
-    }
-
-    /*
-     * reads thru 'content' of node and if there are any "@mentions" that we can render as HTML links
-     * then we insert all those links into the text and return the resultant markdown with the HTML
-     * anchors in it.
-     *
-     * NOTE: The client knows not to render any openGraph panels for anchor tags that have classes
-     * 'mention' or 'hashtag' on them
-     */
-    public static String replaceTagsWithHtml(SubNode node, boolean includeHashtags) {
-        // don't process foreign-created nodes!
-        if (node.getStr(NodeProp.OBJECT_ID) != null) {
-            return null;
-        }
-
-        HashMap<String, APObj> tags = apub.parseTags(node.getContent(), true, false);
-        HashMap<String, APObj> nodePropTags = apub.parseTags(node);
-        if (nodePropTags != null) {
-            tags.putAll(nodePropTags);
-        }
-        // sending back null for renderContent if no tags were inserted (no special HTML to send back, but
-        // just markdown)
-        if (tags == null || tags.size() == 0)
-            return null;
-        StringBuilder sb = new StringBuilder();
-        StringTokenizer t = new StringTokenizer(node.getContent(), APConst.TAGS_TOKENIZER, true);
-
-        while (t.hasMoreTokens()) {
-            String tok = t.nextToken();
-            int tokLen = tok.length();
-            int atCount = 0;
-            boolean formatted = false;
-            // Hashtag
-            if (includeHashtags && tokLen > 1 && tok.startsWith("#") && StringUtils.countMatches(tok, "#") == 1
-                    && Character.isLetter(tok.charAt(1))) {
-                APObj tag = tags.get(tok);
-                if (tag instanceof APOHashtag) {
-                    String href = (String) tag.get(APObj.href);
-                    if (href != null) {
-                        String shortTok = XString.stripIfStartsWith(tok, "#");
-                        // having class = 'mention hashtag' is NOT a typo. Mastodon used both, so we will.
-                        formatted = true;
-                        sb.append( //
-                                "<a class=\"mention hashtag\" href=\"" + href + "\" target=\"_blank\">#<span>"
-                                        + shortTok + "</span></a>");
-                    }
-                }
-            } //
-            else if (tokLen > 1 && tok.startsWith("@") && (atCount = StringUtils.countMatches(tok, "@")) <= 2
-                    && Character.isLetterOrDigit(tok.charAt(1))) {
-                APObj tag = tags.get(tok);
-                if (tag instanceof APOMention) {
-                    String href = (String) tag.get(APObj.href);
-                    if (href != null) {
-                        // if tok is a 'long fedi name' make it the shortened version (no domain)
-                        if (atCount == 2) {
-                            tok = XString.truncAfterLast(tok, "@");
-                        }
-                        String shortTok = XString.stripIfStartsWith(tok, "@");
-                        // NOTE: h-card and u-url are part of 'microformats'
-                        formatted = true;
-                        sb.append( //
-                                "<span class=\"h-card\"><a class=\"u-url mention\" href=\"" + href
-                                        + "\" target=\"_blank\">@<span>" + shortTok + "</span></a></span>");
-                    }
-                }
-            }
-            if (!formatted) {
-                sb.append(tok);
-            }
-        }
-        return sb.toString();
     }
 
     public static ImageSize getImageSize(Attachment att) {

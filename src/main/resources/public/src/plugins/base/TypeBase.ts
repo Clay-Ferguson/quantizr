@@ -254,7 +254,7 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    render = (node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, isLinkedNode: boolean): Comp => {
+    render = (node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -327,7 +327,7 @@ export class TypeBase implements TypeIntf {
                 if (count++ < 50) {
                     // console.log("OG: id=" + node.id + " url=" + url);
                     const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), url,
-                        isLinkedNode ? "openGraphPanelBoost" : "openGraphPanel", "openGraphImage", true, true, true);
+                        "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {

@@ -35,7 +35,6 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
-import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignupRequest;
 import quanta.util.Const;
@@ -578,21 +577,17 @@ public class MongoUtil extends ServiceBase {
         log.debug("checking all indexes.");
         // DO NOT DELETE. This is able to check contstraint volations.
         // read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
-        log.debug("Creating FediverseName unique index.");
-
-        try {
-            log.debug("Indexing FediverseName collection");
-            opsw.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.NAME, Direction.ASC).unique());
-        } catch (Exception e) {
-            ExUtil.error(log, "FediverseName index failed", e);
-        }
 
         createUniqueIndex(ms, SubNode.class, SubNode.PATH);
+
         // Other indexes that *could* be added but we don't, just as a performance enhancer is
         // Unique node names: Key = node.owner+node.name (or just node.name for admin)
         // Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
         // account)
-        createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.OBJECT_ID.s());
+        // This index is obsolete but we keep as an example of this kind of index.
+        // createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." +
+        // NodeProp.OBJECT_ID.s());
+
         createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
         createPartialIndex(ms, "rdf-i", SubNode.class, SubNode.LINKS + "." + NodeLink.ID);
         createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),

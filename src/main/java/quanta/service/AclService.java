@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletResponse;
-import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
@@ -34,7 +33,6 @@ import quanta.mongo.model.MongoPrincipal;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddPrivilegeRequest;
 import quanta.request.CopySharingRequest;
-import quanta.request.CreateSubNodeRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.RemovePrivilegeRequest;
 import quanta.request.SetCipherKeyRequest;
@@ -427,7 +425,7 @@ public class AclService extends ServiceBase {
     }
 
     public void makePublicAppendable(MongoSession ms, SubNode node) {
-        setKeylessPriv(ms, node, PrincipalName.PUBLIC.s(), APConst.RDWR);
+        setKeylessPriv(ms, node, PrincipalName.PUBLIC.s(), Const.RDWR);
     }
 
     // The effeciency of using this function is it won't set the node to dirty of nothing changed.
@@ -464,8 +462,7 @@ public class AclService extends ServiceBase {
      * Sets the default reply ACL on the child node to be the same as the parent node. This is used when
      * creating a new node, and we want to inherit the parent's ACL.
      */
-    public void inheritSharingFromParent(MongoSession ms, String boosterUserId, ResponseBase res, SubNode parentNode,
-            SubNode childNode) {
+    public void inheritSharingFromParent(MongoSession ms, ResponseBase res, SubNode parentNode, SubNode childNode) {
         // we always determine the access controls from the parent for any new nodes
         auth.setDefaultReplyAcl(parentNode, childNode);
 
@@ -476,9 +473,6 @@ public class AclService extends ServiceBase {
             acl.addPrivilege(ms, null, childNode, PrincipalName.PUBLIC.s(), null, prvList, null);
         }
 
-        if (boosterUserId != null) {
-            childNode.safeGetAc().put(boosterUserId, new AccessControl(null, APConst.RDWR));
-        }
         // inherit UNPUBLISHED prop from parent, if we own the parent
         if (parentNode.getBool(NodeProp.UNPUBLISHED) && parentNode.getOwner().equals(ms.getUserNodeId())) {
             childNode.set(NodeProp.UNPUBLISHED, true);

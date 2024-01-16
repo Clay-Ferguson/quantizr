@@ -3,7 +3,6 @@ package quanta.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
 import quanta.model.PropertyInfo;
@@ -368,12 +366,12 @@ public class MongoCreate extends ServiceBase {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
-                ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
+                ac.put(req.getShareToUserId(), new AccessControl(null, Const.RDWR));
                 newNode.setAc(ac);
             }
             // isReply really also can mean !parentNode.isMine for current user
             else if (!acl.userOwnsNode(ms, parentNode) || req.isReply() || forceInheritSharing) {
-                acl.inheritSharingFromParent(ms, req.getBoosterUserId(), res, nodeBeingRepliedTo, newNode);
+                acl.inheritSharingFromParent(ms, res, nodeBeingRepliedTo, newNode);
             }
 
             /* Always make public if we're replying to public node or posting under our POSTs node */
@@ -382,15 +380,6 @@ public class MongoCreate extends ServiceBase {
                             || parentNode.isType(NodeType.POSTS))) {
                 acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
                         Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-            }
-        }
-
-        if (!StringUtils.isEmpty(req.getBoostTarget())) {
-            /* If the node being boosted is itself a boost then boost the original boost instead */
-            SubNode nodeToBoost = read.getNode(ms, req.getBoostTarget());
-            if (nodeToBoost != null) {
-                String innerBoost = nodeToBoost.getStr(NodeProp.BOOST);
-                newNode.set(NodeProp.BOOST, innerBoost != null ? innerBoost : req.getBoostTarget());
             }
         }
         openGraph.parseNode(newNode, true);
@@ -405,18 +394,8 @@ public class MongoCreate extends ServiceBase {
             oai.insertAnswerToQuestion(ms, newNode, req, res);
         }
 
-        /*
-         * if this is a boost node being saved, then immediately run processAfterSave, because we won't be
-         * expecting any final 'saveNode' to ever get called (like when user clicks "Save" in node editor),
-         * because this node will already be final and the user won't be editing it. It's done and ready to
-         * publish out to foreign servers
-         */
-        if (!req.isPendingEdit() && req.getBoostTarget() != null) {
-            edit.processAfterSave(ms, newNode, parentNode);
-        }
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null,
-                false));
+                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false));
         return res;
     }
 
@@ -463,7 +442,7 @@ public class MongoCreate extends ServiceBase {
                 acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
                         Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
             } else {
-                acl.inheritSharingFromParent(ms, null, res, parentNode, newNode);
+                acl.inheritSharingFromParent(ms, res, parentNode, newNode);
             }
         }
 
@@ -488,7 +467,7 @@ public class MongoCreate extends ServiceBase {
 
         update.save(ms, newNode);
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false, null, false));
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false));
 
         return res;
     }

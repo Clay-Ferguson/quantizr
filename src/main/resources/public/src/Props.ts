@@ -63,19 +63,6 @@ export class Props {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== PrincipalName.PUBLIC);
     }
 
-    hasMentions = (node: NodeInfo): boolean => {
-        const tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
-        let ret = false;
-        if (tags?.forEach) {
-            tags.forEach((t: any) => {
-                if (t.type === "Mention") {
-                    ret = true;
-                }
-            })
-        }
-        return ret;
-    }
-
     isPublic = (node: NodeInfo): boolean => {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === PrincipalName.PUBLIC);
     }
@@ -261,16 +248,12 @@ export class Props {
             J.NodeProp.PRIORITY, //
             J.NodeProp.UNPUBLISHED, //
             J.NodeProp.CRYPTO_SIG, //
-            J.NodeProp.ACT_PUB_OBJ_URLS, //
-            J.NodeProp.ACT_PUB_OBJ_ICONS, //
-            J.NodeProp.ACT_PUB_TAG,
             J.NodeProp.AI, //
             J.NodeProp.AI_MODEL
         ]);
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
             J.NodeProp.TYPE_LOCK, //
-            J.NodeProp.BOOST, //
             J.NodeProp.NO_EXPORT, //
             J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI, //
@@ -297,14 +280,12 @@ export class Props {
             case J.NodeProp.RSS_FEED_SRC:
                 return false;
 
-            case J.NodeProp.OBJECT_ID:
             case J.NodeProp.INLINE_CHILDREN:
             case J.NodeProp.PRIORITY:
             case J.NodeProp.LAYOUT:
             case J.NodeProp.ORDER_BY:
             case J.NodeProp.NO_EXPORT:
             case J.NodeProp.UNPUBLISHED:
-            case J.NodeProp.BOOST:
             case J.NodeProp.IN_PENDING_PATH:
             case J.NodeProp.TRUNCATED:
                 return true;

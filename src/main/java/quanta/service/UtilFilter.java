@@ -2,17 +2,16 @@ package quanta.service;
 
 import java.io.IOException;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
-import quanta.actpub.APConst;
 import quanta.util.Const;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -58,11 +57,12 @@ public class UtilFilter extends GenericFilterBean {
             httpRes.setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
         }
 
+        // DO NOT DELETE (leave as an example of how to do CORS)
         // Special check for CORS
-        if (httpReq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
-                httpReq.getRequestURI().contains(APConst.PATH_AP + "/")) {
-            httpRes.setHeader("Access-Control-Allow-Origin", "*");
-        }
+        // if (httpReq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
+        // httpReq.getRequestURI().contains(APConst.PATH_AP + "/")) {
+        // httpRes.setHeader("Access-Control-Allow-Origin", "*");
+        // }
 
         chain.doFilter(httpReq, httpRes);
     }

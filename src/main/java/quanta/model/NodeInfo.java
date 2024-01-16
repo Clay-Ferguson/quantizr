@@ -72,8 +72,6 @@ public class NodeInfo {
     private String avatarVer;
     private String apAvatar;
     private String apImage;
-    // if this node is a boost we put in the target node (node being boosted here)
-    private NodeInfo boostedNode;
 
     public NodeInfo(String id, String path, String name, String content, String renderContent, String tags,
             String displayName, String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified,
@@ -280,10 +278,6 @@ public class NodeInfo {
         return this.apImage;
     }
 
-    public NodeInfo getBoostedNode() {
-        return this.boostedNode;
-    }
-
     public void setId(final String id) {
         this.id = id;
     }
@@ -402,10 +396,6 @@ public class NodeInfo {
 
     public void setApImage(final String apImage) {
         this.apImage = apImage;
-    }
-
-    public void setBoostedNode(final NodeInfo boostedNode) {
-        this.boostedNode = boostedNode;
     }
 
     public NodeInfo() {}

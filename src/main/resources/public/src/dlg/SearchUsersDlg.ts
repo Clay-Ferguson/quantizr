@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -7,12 +6,9 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { RadioButton } from "../comp/core/RadioButton";
-import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { TextField } from "../comp/core/TextField";
 
 interface LS { // Local State
-    searchType?: string;
 }
 
 export class SearchUsersDlg extends DialogBase {
@@ -26,43 +22,15 @@ export class SearchUsersDlg extends DialogBase {
         this.onMount(() => this.searchTextField?.focus());
 
         this.mergeState<LS>({
-            searchType: J.Constant.SEARCH_TYPE_USER_LOCAL
         });
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
     }
 
     renderDlg(): Comp[] {
-        const adminOptions = new RadioButtonGroup([
-            getAs().isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
-                setValue: (checked: boolean) => {
-                    if (checked) {
-                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
-                    }
-                },
-                getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_ALL
-            }) : null,
-            new RadioButton("Local User", true, "optionsGroup", null, {
-                setValue: (checked: boolean) => {
-                    if (checked) {
-                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
-                    }
-                },
-                getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL
-            }),
-            new RadioButton("Foreign User", false, "optionsGroup", null, {
-                setValue: (checked: boolean) => {
-                    if (checked) {
-                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
-                    }
-                },
-                getValue: (): boolean => this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN
-            })
-        ], "marginBottom marginTop");
 
         return [
             new Div(null, null, [
                 this.searchTextField = new TextField({ label: "User", enter: this.search, val: this.searchTextState }),
-                adminOptions,
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
@@ -82,11 +50,10 @@ export class SearchUsersDlg extends DialogBase {
         }
 
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
-        const searchType = this.getState<LS>().searchType;
 
         const desc = "User " + SearchUsersDlg.defaultSearchText;
         const success = await S.srch.search(null, "", SearchUsersDlg.defaultSearchText,
-            searchType,
+            J.Constant.SEARCH_TYPE_USERS,
             desc,
             null,
             false,

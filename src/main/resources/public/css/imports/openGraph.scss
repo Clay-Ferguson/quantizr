@@ -9,16 +9,6 @@
     background-color: #17202A;
 }
 
-.feedView .openGraphPanelBoost {
-    margin-right: 0 !important;
-}
-
-.openGraphPanelBoost {
-    @extend .openGraphPanel;
-    background-color: black;
-    margin-right: $smallGap;
-}
-
 .openGraphPanelRss {
     overflow-x: hidden;
     margin-top: $smallGap;

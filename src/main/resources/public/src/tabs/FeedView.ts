@@ -113,25 +113,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             new Clearfix()
         ];
 
-        // DO NOT DELETE (we may bring this back for some future purpose)
-        // topChildren.push(new CollapsiblePanel("Options", "Options", null, [
-        //     this.makeFilterButtonsBar(state)
-        // ], false,
-        //     (state: boolean) => {
-        //         this.data.props.filterExpanded = state;
-        //     }, this.data.props.filterExpanded, "", "", "", "span"));
-        // DO NOT DELETE, Leave for future use, but for now this isn't worth the space it takes up and is even to small to easily click.
-        // if (!state.userPrefs.nsfw) {
-        //     topChildren.push(new Div("[Show Sensitive Content]", {
-        //         className: "clickable",
-        //         onClick: async () => {
-        //             await S.edit.toggleNsfw(state);
-        //             S.srch.refreshFeed();
-        //         }
-        //     }));
-        //     topChildren.push(new Clearfix());
-        // }
-
         const children: Comp[] = [];
         children.push(new Div(null, null, topChildren));
         const childCount = this.data.props.results ? this.data.props.results.length : 0;
@@ -163,23 +144,8 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         else {
             let i = 0;
 
-            // holds ids of all boosts (nodes BEING boosted)
-            const boosts: Set<string> = new Set<string>();
-
-            // scan all 'results' to build up boosts set of IDs
-            this.data.props.results.forEach(node => {
-                if (node.boostedNode) {
-                    boosts.add(node.boostedNode.id);
-                }
-            });
-
             // finally here's where we render the feed items
             this.data.props.results.forEach(node => {
-                // if this node will be showing up as a boost don't display it on the page, skip it.
-                if (boosts.has(node.id)) {
-                    return;
-                }
-
                 // console.log("FEED: node id=" + node.id + " content: " + node.content);
                 children.push(S.srch.renderSearchResultAsListItem(node, this.data, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
                 i++;
@@ -232,7 +198,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 this.renderHeading(),
                 new Div(null, { className: "float-end" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
-                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, null, J.NodeType.COMMENT, false, null, null, null, true, false), null, "btn-primary")
+                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "btn-primary")
                 ])
             ], this.data),
             new Div(null, { className: "feedView" }, children)

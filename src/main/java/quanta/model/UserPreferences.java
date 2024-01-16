@@ -11,10 +11,8 @@ public class UserPreferences {
 
     private boolean editMode;
     private boolean showMetaData;
-    private boolean nsfw;
     private boolean showProps;
     private boolean autoRefreshFeed; // #add-prop
-    private boolean enableActPub;
     private boolean showReplies;
     private boolean rssHeadlinesOnly;
     // valid Range = 4 thru 8, inclusive.
@@ -56,10 +54,6 @@ public class UserPreferences {
         return this.showMetaData;
     }
 
-    public boolean isNsfw() {
-        return this.nsfw;
-    }
-
     public boolean isShowProps() {
         return this.showProps;
     }
@@ -88,10 +82,6 @@ public class UserPreferences {
         this.showMetaData = showMetaData;
     }
 
-    public void setNsfw(final boolean nsfw) {
-        this.nsfw = nsfw;
-    }
-
     public void setShowProps(final boolean showProps) {
         this.showProps = showProps;
     }
@@ -111,14 +101,6 @@ public class UserPreferences {
     @JsonProperty(required = false)
     public void setEnableIPSM(final boolean enableIPSM) {
         this.enableIPSM = enableIPSM;
-    }
-
-    public boolean isEnableActPub() {
-        return enableActPub;
-    }
-
-    public void setEnableActPub(boolean enableActPub) {
-        this.enableActPub = enableActPub;
     }
 
     public UserPreferences() {}

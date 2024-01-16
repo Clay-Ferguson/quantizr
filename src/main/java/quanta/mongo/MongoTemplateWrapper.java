@@ -249,4 +249,8 @@ public class MongoTemplateWrapper extends ServiceBase {
     public <T> void dropCollection(Class<T> entityClass) {
         mt.dropCollection(entityClass);
     }
+
+    public <T> void dropCollection(String collectionName) {
+        mt.dropCollection(collectionName);
+    }
 }

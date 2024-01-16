@@ -22,12 +22,6 @@ public class FriendType extends TypeBase {
     @Override
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, SubNode ownerAccntNode,
             boolean getFollowers) {
-        // yes this is redundant and loads userUrl again below, but I need to test this before removing it.
-        String userUrl = node.getStr(NodeProp.ACT_PUB_ACTOR_URL);
-        if (userUrl != null) {
-            nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
-        }
-
         /*
          * Get info from accountId based on the node.owner if this is presenting Followers list, or else
          * from USER_NODE_ID, if we're just displaying a Friend node 'as is' (i.e. based on who it points to
@@ -52,11 +46,6 @@ public class FriendType extends TypeBase {
                 String userBio = accountNode.getStr(NodeProp.USER_BIO);
                 if (userBio != null) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
-                }
-
-                userUrl = accountNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
-                if (userUrl != null) {
-                    nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
                 }
 
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntId", accountId));

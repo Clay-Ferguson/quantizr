@@ -45,7 +45,6 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
         // let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
-        // let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
         const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
         const accntUser = S.props.getClientPropStr("accntUser", node);
 
@@ -66,7 +65,7 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
             }
         }
 
-        return S.render.renderUser(null, accntUser, null, imgSrc, null,
+        return S.render.renderUser(null, accntUser, null, imgSrc,
             displayName, "userFeedItem", "listFriendImage", false, (_evt: any) => {
                 new UserProfileDlg(node.ownerId).open();
             });

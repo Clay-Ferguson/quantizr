@@ -5,10 +5,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { Anchor } from "../core/Anchor";
 import { Clearfix } from "../core/Clearfix";
-import { Heading } from "../core/Heading";
-import { Img } from "../core/Img";
 import { PropDisplayLayout } from "../PropDisplayLayout";
 import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
@@ -24,7 +21,6 @@ export class NodeCompContent extends Div {
         public idPrefix: string,
         public isFeed: boolean,
         public isTreeView: boolean,
-        public isLinkedNode: boolean,
         public wrapperClass: string) {
 
         if (node.id == getAs().indexHighlightNode) {
@@ -51,11 +47,6 @@ export class NodeCompContent extends Div {
         let type = S.plugin.getType(this.node.type);
         type = type || S.plugin.getType(J.NodeType.NONE);
         this.domPreUpdateFunc = type.domPreUpdateFunction;
-
-        const name: string = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_NAME, this.node);
-        if (name) {
-            children.push(new Heading(4, name, { className: "marginLeft marginTop" }));
-        }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
         showing the normal attachment for this node, because that will the same as the avatar */
@@ -85,7 +76,7 @@ export class NodeCompContent extends Div {
             });
         }
 
-        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView, this.isLinkedNode));
+        children.push(type.render(this.node, this.tabData, this.rowStyling, this.isTreeView));
 
         if (this.node.type !== J.NodeType.ACCOUNT && //
             (ast.userPrefs.showProps || type.schemaOrg) && S.props.hasDisplayableProps(this.node)) {
@@ -116,51 +107,9 @@ export class NodeCompContent extends Div {
             children.push(new Div(null, { className: "rowImageContainer" }, attComps));
         }
 
-        this.renderActPubUrls(children, this.node);
-        this.renderActPubIcons(children, this.node);
-
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
         this.setChildren(children);
         return true;
-    }
-
-    renderActPubUrls = (children: Comp[], node: NodeInfo) => {
-        const urls: J.APObjUrl[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_URLS, node);
-        let div: Div = null;
-        if (urls?.forEach) {
-            urls.forEach(url => {
-                if (url.type === "Link") {
-                    // lazy create div
-                    div = div || new Div(null, { className: "apObjLinksContainer float-end" });
-                    div.addChild(new Div(null, { className: "apUrlLink" }, [
-                        new Anchor(url.href, url.mediaType, { target: "_blank" })
-                    ]));
-                }
-            });
-        }
-
-        if (div) {
-            children.push(new Clearfix());
-            children.push(div);
-        }
-    }
-
-    renderActPubIcons = (children: Comp[], node: NodeInfo) => {
-        const icons: J.APObjIcon[] = S.props.getPropObj(J.NodeProp.ACT_PUB_OBJ_ICONS, node);
-        let div: Div = null;
-        if (icons?.forEach) {
-            icons.forEach(icon => {
-                if (icon.type === "Icon") {
-                    // lazy create div
-                    div = div || new Div(null, { className: "apObjIconContainer" });
-                    div.addChild(new Img({ src: icon.url, className: "apObjIcon" }));
-                }
-            });
-        }
-
-        if (div) {
-            children.push(div);
-        }
     }
 
     maybeRenderDateTime = (children: Comp[], propName: string, node: NodeInfo) => {

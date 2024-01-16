@@ -218,11 +218,7 @@ public class SystemService extends ServiceBase {
                     }
                 }
             }
-            if (ms.isAdmin()) {
-                ret += "\n\n";
-                ret += "English: " + (english.isEnglish(node.getContent()) ? "Yes" : "No") + "\n";
-                ret += "Profanity: " + (english.hasBadWords(node.getContent()) ? "Yes" : "No") + "\n";
-            }
+
             return ret;
         } else {
             return "node not found!";
@@ -247,7 +243,7 @@ public class SystemService extends ServiceBase {
         sb.append("Node Count: " + read.getNodeCount() + "\n");
         sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
         sb.append(user.getUserAccountsReport(null));
-        sb.append(apub.getStatsReport());
+
         if (!StringUtils.isEmpty(prop.getIPFSApiHostAndPort())) {
             sb.append(ipfsConfig.getStat());
         }
@@ -394,12 +390,6 @@ public class SystemService extends ServiceBase {
             case "clearPerformanceData":
                 res.getMessages().add(new InfoMessage(PerformanceReport.clearData(), null));
                 break;
-            case "crawlUsers":
-                res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
-                break;
-            case "actPubMaintenance":
-                res.getMessages().add(new InfoMessage(apub.maintainActPubUsers(), null));
-                break;
             case "compactDb":
                 res.getMessages().add(new InfoMessage(system.compactDb(), null));
                 break;
@@ -428,10 +418,6 @@ public class SystemService extends ServiceBase {
             case "refreshTrendingCache":
                 res.getMessages().add(new InfoMessage(search.refreshTrendingCache(), null));
                 break;
-            case "refreshAPAccounts":
-                apub.refreshActorPropsForAllUsers();
-                res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
-                break;
             case "toggleAuditFilter":
                 AppFilter.audit = !AppFilter.audit;
                 res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
@@ -450,12 +436,6 @@ public class SystemService extends ServiceBase {
                 break;
             case "getJson":
                 res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
-                break;
-            case "getActPubJson":
-                res.getMessages().add(new InfoMessage(apub.getRemoteJson(ms, null, req.getParameter()), null));
-                break;
-            case "readOutbox":
-                res.getMessages().add(new InfoMessage(apub.readOutbox(req.getParameter()), null));
                 break;
             default:
                 throw new RuntimeEx("Invalid command: " + req.getCommand());

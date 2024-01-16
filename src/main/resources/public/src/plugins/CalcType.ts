@@ -30,7 +30,7 @@ export class CalcType extends TypeBase {
         return true;
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean, _isLinkedNode: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         if (!S.props.isMine(node)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }

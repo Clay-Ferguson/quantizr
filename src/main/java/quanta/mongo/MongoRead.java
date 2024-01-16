@@ -1326,23 +1326,9 @@ public class MongoRead extends ServiceBase {
     }
 
     public Iterable<SubNode> getAccountNodes(MongoSession ms, CriteriaDefinition textCriteria, Sort sort, Integer limit,
-            int skip, boolean remote, boolean local) {
-        if (!remote && !local) {
-            throw new RuntimeException("Accont query needs local and/or remote specified.");
-        }
-        Criteria crit = null;
+            int skip) {
         Query q = new Query();
-
-        if (remote && local) {
-            crit = new Criteria().orOperator(
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH)),
-                    Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH)));
-        } else if (remote) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.REMOTE_USERS_PATH));
-        } else if (local) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
-        }
-
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
 

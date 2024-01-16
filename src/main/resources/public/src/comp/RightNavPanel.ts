@@ -59,8 +59,6 @@ export class RightNavPanel extends Div {
         let displayName = ast.displayName ? ast.displayName : (!ast.isAnonUser ? ast.userName : null);
 
         if (displayName && ast.node) {
-            displayName = S.util.insertActPubTags(displayName, ast.node);
-
             // If user had nothing left after insertion after ":tags:" replacement in their display name, then display their userName
             displayName = displayName || ast.node.owner;
         }
@@ -89,7 +87,7 @@ export class RightNavPanel extends Div {
                         }
                     }
                 }
-                S.edit.addNode(null, "~" + J.NodeType.NOTES, null, false, content, null, null, false, false);
+                S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, false, false);
             },
             title: "Create new Private Note\n(Hold down CTRL key to attach from clipboard)"
         }) : null;
@@ -101,7 +99,7 @@ export class RightNavPanel extends Div {
 
                     if (item.kind === "file") {
                         EditNodeDlg.pendingUploadFile = item.getAsFile();
-                        S.edit.addNode(null, "~" + J.NodeType.NOTES, null, false, null, null, null, false, false);
+                        S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, false, false);
                         return;
                     }
                 }

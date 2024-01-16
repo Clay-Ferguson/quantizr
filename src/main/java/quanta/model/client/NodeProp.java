@@ -3,50 +3,11 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
-    // If this property is non-null on a node it means the node originated (was posted by) some other
-    // forgien server.
-    OBJECT_ID("apid"),
-
-    ACT_PUB_OBJ_TYPE("ap:objType"), //
-
-    ACT_PUB_OBJ_CONTENT("ap:objContent"), //
-
-    // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
-    // Note: we have no ACT_PUB prefix on this to reflect that not just ActPub URLs we can have for
-    // inReplyTo but we also can have just a NodeId to a local node well.
     INREPLYTO("ap:objInReplyTo"), //
-
-    // For "AP Note" Objects (per spec) this is the "url" property on the node.
-    ACT_PUB_OBJ_URL("ap:objUrl"), //
-
-    // when an object has an array as urls we put them here.
-    ACT_PUB_OBJ_URLS("ap:objUrls"), //
-
-    // when an object has an array of icons (like a "Video" type object we hold them here)
-    ACT_PUB_OBJ_ICONS("ap:objIcons"), //
-
-    ACT_PUB_OBJ_NAME("ap:objName"), //
-
-    ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo"), //
 
     USER_ICON_URL("ap:userIcon"), //
 
-    ACT_PUB_SHARED_INBOX("ap:sharedInbox"), //
-
     USER_BANNER_URL("ap:userImage"), //
-
-    ACT_PUB_ACTOR_ID("ap:actorId"), //
-
-    // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)
-    ACT_PUB_ACTOR_URL("ap:actorUrl"), //
-
-    ACT_PUB_KEYPEM("ap:keyPem"), //
-
-    ACT_PUB_ACTOR_INBOX("ap:actorInbox"), //
-    ACT_PUB_SENSITIVE("ap:nsfw"), //
-
-    ACT_PUB_TAG("ap:tag"), //
-    ACT_PUB_REPLIES("ap:replies"), //
 
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using the private key of
@@ -71,10 +32,8 @@ public enum NodeProp {
 
     USER_PREF_EDIT_MODE("sn:editMode"), //
     USER_PREF_SHOW_METADATA("sn:showMetaData"), //
-    USER_PREF_NSFW("sn:nsfw"), //
     USER_PREF_SHOW_PROPS("sn:showProps"), //
     USER_PREF_AUTO_REFRESH_FEED("sn:autoRefreshFeed"), // #add-prop
-    USER_PREF_ENABLE_ACT_PUB("sn:enableActPub"), //
     USER_PREF_SHOW_REPLIES("sn:showReplies"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
     USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly"), //
@@ -205,10 +164,6 @@ public enum NodeProp {
     UNPUBLISHED("unpub"), //
     AI("ai"), //
     AI_MODEL("ai-model"), //
-
-    // holds the NodeId of the node this node is boosting, and also serves as the indicator THAT the
-    // node is s boost.
-    BOOST("boost"), //
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
 

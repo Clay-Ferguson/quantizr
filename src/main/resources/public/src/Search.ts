@@ -102,21 +102,6 @@ export class Search {
                 S.tabUtil.selectTabStateOnly(data.id);
             });
         }
-        else {
-            // The most common known reason we can get here due to lack of feature support is when something like
-            // a "object.type=Video", or "Question" type, (a type not yet supported) is encountered as we attempted to read the thread.
-            let msg = "Thread not available, or contains unsupported post types.";
-
-            // make 'msg' a little more specific if we know there's a 'remote link' showing.
-            const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
-            if (objUrl) {
-                if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
-                    msg = "Top-level post. No conversation to display.";
-                }
-            }
-
-            S.util.showMessage(msg, "Thread");
-        }
     }
 
     showReplies = async (node: NodeInfo) => {
@@ -143,21 +128,6 @@ export class Search {
                 data.props.endReached = true;
                 S.tabUtil.selectTabStateOnly(data.id);
             });
-        }
-        else {
-            // The most common known reason we can get here due to lack of feature support is when something like
-            // a "object.type=Video", or "Question" type, (a type not yet supported) is encountered as we attempted to read the thread.
-            const msg = "Replies not available, or contains unsupported post types.";
-
-            // make 'msg' a little more specific if we know there's a 'remote link' showing.
-            // const objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
-            // if (objUrl) {
-            //     if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
-            //         msg = "Top-level post. No conversation to display.";
-            //     }
-            // }
-
-            S.util.showMessage(msg, "Replies");
         }
     }
 
@@ -374,11 +344,6 @@ export class Search {
 
         // If user enters the url for a fediverse page we try to load it and display it.
         const searchText = FeedTab.inst.props.searchTextState.getValue();
-        if (searchText?.indexOf("https://") === 0) {
-            this.loadSingleFeedItemByUrl(searchText);
-            return;
-        }
-
         await promiseDispatch("RefreshFeed", s => {
             FeedTab.inst.props.feedLoading = true;
             if (!searchText) {
@@ -387,33 +352,6 @@ export class Search {
         });
 
         this.feed(FeedTab.inst.props.page, searchText, false);
-    }
-
-    loadSingleFeedItemByUrl = async (url: string) => {
-        const res = await S.rpcUtil.rpc<J.GetActPubObjectRequest, J.GetActPubObjectResponse>("loadActPubObject", {
-            url
-        });
-
-        if (res.code == C.RESPONSE_CODE_OK) {
-            dispatch("RenderFeedResults", s => {
-                FeedTab.inst.openGraphComps = [];
-
-                // once user requests their stuff, turn off the new messages count indicator.
-                if (FeedTab.inst.props.feedFilterToMe) {
-                    s.myNewMessageCount = 0;
-                }
-
-                FeedTab.inst.props.results = [res.node];
-                FeedTab.inst.props.feedEndReached = true;
-                FeedTab.inst.props.feedDirty = false;
-                FeedTab.inst.props.feedLoading = false;
-
-                S.tabUtil.tabScroll(C.TAB_FEED, 0);
-                S.tabUtil.selectTabStateOnly(C.TAB_FEED);
-
-                S.domUtil.focusId(C.TAB_FEED);
-            });
-        }
     }
 
     /* growResults==true is the "infinite scrolling" support */
@@ -435,7 +373,6 @@ export class Search {
             localOnly: FeedTab.inst.props.feedFilterLocalServer,
             name: FeedTab.inst.props.name,
             fromFriends: FeedTab.inst.props.feedFilterFriends,
-            nsfw: ast.isAnonUser ? false : ast.userPrefs.nsfw, // never show anonymous users NSFW content.
             searchText,
             friendsTagSearch: FeedTab.inst.props.friendsTagSearch,
             loadFriendsTags,
@@ -598,7 +535,7 @@ export class Search {
 
         // render with info bar, etc always, if this is a threaview or freed tab.
         const isFeed = tabData.id === C.TAB_THREAD || tabData.id === C.TAB_FEED || tabData.id === C.TAB_REPLIES;
-        const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, false, null);
+        const content = new NodeCompContent(node, tabData, true, true, prefix, true, false, null);
         let clazz = isFeed ? "feedNode" : "resultsNode";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
@@ -608,41 +545,6 @@ export class Search {
         }
 
         const allowDelete = tabData.id !== C.TAB_DOCUMENT;
-
-        let boostComp: Div = null;
-        if (node.boostedNode) {
-            const boostContent = new NodeCompContent(node.boostedNode, tabData, true, true, prefix + "-boost", true, false, true, "feedBoost");
-            boostComp = new Div(null, {
-                onClick: async () => {
-                    S.histUtil.updateNodeHistory(node.boostedNode, true);
-
-                    // after updating state we need this to ensure this click also focused this window.
-                    S.domUtil.focusId(tabData.id);
-                },
-                className: "boostRowOnFeed"
-            }, [
-                // we use 2 as 'idx' here becasue we just want anything but 1 (which indicates 'first')
-                allowHeader ? new NodeCompRowHeader(node, node.boostedNode, true, false, tabData, jumpButton, showThreadButton, true, allowDelete, tabData.id, 2) : null,
-                allowHeader ? new Clearfix() : null,
-                boostContent
-            ])
-        }
-
-        // ------------------------------------
-        // DO NOT DELETE (This can display actual linkedNodes inline, but I decided for now we should just
-        // render the link text (clickable links) and not embed any content like this)
-        // let linkedNodesComp: Div = null;
-        // if (node.linkedNodes) {
-        //     // all the styles etc in here need to be changed from boost to nodeLinks
-        //     node.linkedNodes.forEach(n => {
-        //         const linkContent = new NodeCompContent(n, tabData, true, true, prefix + "-boost", true, false, true, "feedBoost");
-        //         linkedNodesComp = new Div(null, { className: "boostRow" }, [
-        //             allowHeader ? new NodeCompRowHeader(n, true, false, tabData, jumpButton, showThreadButton, true, allowDelete) : null,
-        //             linkContent
-        //         ])
-        //     });
-        // }
-        // ------------------------------------
 
         // this divClass goes on the parent if we have a parentItem, or else on the 'itemDiv' itself if we don't
         let divClass: string = ast.highlightSearchNodeId === node.id ? outterClassHighlight : outterClass;
@@ -667,12 +569,11 @@ export class Search {
         }
 
         const itemDiv = new Div(null, attrs, [
-            S.render.renderBoostHeader(node, false),
             // we use 2 as 'idx' here becasue we just want anything but 1 (which indicates 'first')
-            allowHeader && !node.boostedNode ? new NodeCompRowHeader(null, node, true, false, tabData, jumpButton, showThreadButton, false, allowDelete, tabData.id, 2) : null,
-            allowHeader && !node.boostedNode ? new Clearfix() : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, allowDelete, tabData.id, 2) : null,
+            allowHeader ? new Clearfix() : null,
             content,
-            boostComp,
+            null,
             S.render.renderLinks(node)
         ]);
 
