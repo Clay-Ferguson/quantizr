@@ -10,8 +10,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEvent
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
-import quanta.model.client.NodeProp;
-import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.redis.RedisBrowserPushInfo;

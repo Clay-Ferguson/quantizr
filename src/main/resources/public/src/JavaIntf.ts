@@ -1,24 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export interface APObjIcon {
-    type: string;
-    mediaType: string;
-    url: string;
-}
-
-export interface APObjUrl {
-    type: string;
-    mediaType: string;
-    href: string;
-}
-
-export interface APTag {
-    name: string;
-    href: string;
-    type: string;
-}
-
 export interface Attachment {
     o: number;
     w: number;

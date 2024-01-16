@@ -18,22 +18,18 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
-import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.CheckMessagesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
-import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import quanta.util.val.Val;
 
 @Component
 public class UserFeedService extends ServiceBase {

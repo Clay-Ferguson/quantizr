@@ -47,7 +47,6 @@ import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
 import quanta.request.DeleteUserTransactionsRequest;
-import quanta.request.GetPeopleRequest;
 import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.LoginRequest;
