@@ -22,9 +22,7 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-import com.mongodb.bulk.BulkWriteResult;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -40,7 +38,6 @@ import quanta.request.SignupRequest;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
-import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
@@ -690,18 +687,16 @@ public class MongoUtil extends ServiceBase {
         log.debug("creatingText Indexes.");
         auth.requireAdmin(ms);
         try {
-            TextIndexDefinition textIndex = //
-                    // note: Switching BACK to "all fields" because of how Mastodon mangles hashtags like this:
-                    // "#<span>tag</span> making the only place we can find "#tag" as an actual string be inside
-                    // the properties array attached to each node.
-                    // Using 'none' as default language allows `stop words` to be indexed, which are words usually
-                    // not searched for like "and, of, the, about, over" etc, however if you index without stop words
-                    // that also means searching for these basic words in the content fails. But if you do index them
-                    // (by using "none" here) then the index will be larger.
-                    // .withDefaultLanguage("none")
-                    // .onField(SubNode.CONTENT) //
-                    // .onField(SubNode.TAGS) //
-                    new TextIndexDefinitionBuilder().onAllFields().build();
+            // Using 'none' as default language allows `stop words` to be indexed, which are words usually
+            // not searched for like "and, of, the, about, over" etc, however if you index without stop words
+            // that also means searching for these basic words in the content fails. But if you do index them
+            // (by using "none" here) then the index will be larger.
+            TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().withDefaultLanguage("none")//
+                    .onField(SubNode.CONTENT) //
+                    .onField(SubNode.TAGS) //
+                    .build();
+            // TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().onAllFields().build();
+
             opsw.indexOps(clazz).ensureIndex(textIndex);
             log.debug("createTextIndex successful.");
         } catch (Exception e) {
