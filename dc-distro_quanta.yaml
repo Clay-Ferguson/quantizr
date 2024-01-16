@@ -260,7 +260,6 @@ services:
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "${MONGO_HOST}"
             mongodb.port: "${MONGO_PORT}" 
-            actPubRetentionMonths: 3
 
             instanceId: "prod"
             profileName: "prod"
@@ -270,7 +269,6 @@ services:
             metaHost: "${quanta_domain}" 
             
             allowFileSystemSearch: "false"
-            actPubEnabled: "true"
 
             ipfsEnabled: "${ipfsEnabled}"
             spring.http.multipart.max-file-size: "200MB" 

@@ -53,14 +53,6 @@ which is the 'master' copy of the file. -->
     </logger>
     -->
 
-    <!-- This is the single point to turn on 'trace' level debugging (level=trace) for pretty much
-    all
-        of the ActivityPub processing. Leaving as 'debug' level here turns it all of, but setting trace
-        turns it all on. -->
-    <logger name="quanta.actpub.ActPubLog" level="debug" additivity="false">
-        <appender-ref ref="RollingFile" />
-    </logger>
-
     <logger name="org.springframework" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
