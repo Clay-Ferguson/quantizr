@@ -60,4 +60,3 @@ echo "Waiting 12s for server to initialize..."
 sleep 12s
 
 printUrlsMessage
-
