@@ -198,7 +198,8 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 this.renderHeading(),
                 new Div(null, { className: "float-end" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
-                    ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "btn-primary")
+                    // todo-0: we'll eventually have this as an admin option
+                    // ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "btn-primary")
                 ])
             ], this.data),
             new Div(null, { className: "feedView" }, children)
@@ -238,12 +239,12 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     subHeading = "From Friends";
                     break;
 
-                case J.Constant.FEED_LOCAL:
+                case J.Constant.FEED_LOCAL: // todo-1: we can get rid of this feed option
                     subHeading = "Local Users";
                     break;
 
                 case J.Constant.FEED_PUB:
-                    subHeading = "Fediverse";
+                    subHeading = "Public Posts";
                     break;
 
                 default: break;

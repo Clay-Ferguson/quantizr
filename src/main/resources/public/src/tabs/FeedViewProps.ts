@@ -7,21 +7,19 @@ export class FeedViewProps {
     refreshCounter = 0;
     searchTextState = new Validator();
     feedFilterFriends = false;
-    feedFilterToMe = false;
-    feedFilterFromMe = false;
+    feedFilterToMe = true;
+    feedFilterFromMe = true;
     feedFilterToUser: string = null;
     feedFilterToDisplayName: string = null;
-    feedFilterToPublic = true;
+    feedFilterToPublic = false;
     feedFilterLocalServer = false;
     applyAdminBlocks: true;
-    name: string = J.Constant.FEED_PUB;
-
+    name: string = J.Constant.FEED_TOFROMME;
     friendsTagSearch: string = null;
     feedDirty = false;
     feedLoading = false;
     results: NodeInfo[] = null;
     feedEndReached = false;
-
     feedDirtyList: NodeInfo[] = null;
     filterExpanded = false;
 }

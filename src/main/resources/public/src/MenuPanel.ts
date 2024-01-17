@@ -440,8 +440,8 @@ export class MenuPanel extends Div {
                     const tab = link.substring(4);
 
                     /* special case for feed tab */
-                    if (tab === C.TAB_FEED) {
-                        func = S.nav.messagesFediverse;
+                    if (tab === C.TAB_FEED && !getAs().isAnonUser) {
+                        func = S.nav.messagesToFromMe;
                     }
                     else {
                         func = () => S.tabUtil.selectTab(tab);

@@ -107,7 +107,6 @@ public class UserFeedService extends ServiceBase {
         }
 
         SubNode myAcntNode = null;
-        String searchForUserName = null;
 
         // includes shares TO me (but not in the context of a 'bidirectional' query)
         if (req.getToMe()) {
@@ -333,12 +332,6 @@ public class UserFeedService extends ServiceBase {
             textCriteria.matching(text);
         }
 
-        if (searchForUserName != null) {
-            if (textCriteria == null) {
-                textCriteria = TextCriteria.forDefaultLanguage();
-            }
-            textCriteria.matching("\"@" + searchForUserName + "\"");
-        }
         if (textCriteria != null) {
             textCriteria.caseSensitive(false);
             q.addCriteria(textCriteria);

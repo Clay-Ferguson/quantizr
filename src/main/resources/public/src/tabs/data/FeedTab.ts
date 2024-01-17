@@ -24,7 +24,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         FeedTab.inst = this;
     }
 
-    isVisible = () => true;
+    isVisible = () => !getAs().isAnonUser || getAs().isAdminUser;
     constructView = (data: TabIntf<FeedViewProps>) => new FeedView(data);
 
     findNode = (nodeId: string): NodeInfo => {
@@ -49,13 +49,14 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         const ast = getAs();
 
         return new Div(null, { className: "tabSubOptions" }, [
-            // new AppNavLink("Fediverse", S.nav.messagesFediverse), // todo-1: this may come back as "Server" or "Local" or something
+            // todo-1: we'll eventually have this as an admin option,
+            // but for now allow it only for admin user
+            ast.isAdminUser ? new AppNavLink("Public Posts", S.nav.messagesFediverse) : null,
+
             ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
             ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
             ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
             ast.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
-            // todo-2: eventually we will make available to all users
-            ast.isAdminUser ? new AppNavLink("Local Users", S.nav.messagesLocal) : null,
         ]);
     };
 }

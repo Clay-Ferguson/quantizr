@@ -475,20 +475,6 @@ export class Nav {
         });
     }
 
-    showPublicFediverse = () => {
-        this.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToUser: null,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: false,
-            results: null,
-            applyAdminBlocks: true,
-            name: J.Constant.FEED_PUB
-        });
-    }
-
     showTrendingHashtags = () => {
         this.showTrendingFiltered("hashtags");
     }
@@ -596,24 +582,6 @@ export class Nav {
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMFRIENDS
-        });
-    }
-
-    messagesLocal = () => {
-        if (FeedTab.inst) {
-            FeedTab.inst.props.searchTextState.setValue("");
-        }
-        this.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterMys: false,
-            feedFilterFromMe: false,
-            feedFilterToUser: null,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: true,
-            results: null,
-            applyAdminBlocks: false,
-            name: J.Constant.FEED_LOCAL
         });
     }
 
