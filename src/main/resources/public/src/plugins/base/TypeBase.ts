@@ -226,26 +226,31 @@ export class TypeBase implements TypeIntf {
     // gi: Flags for global and case-insensitive matching.
     static findUrlsRegex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
 
-    parseUrlsFromText = (content: string): Set<string> => {
-        if (!content || content.toLowerCase().indexOf("http") === -1) return null;
+    // todo-0: I think this method is obsolete, but I'll do more testing before removing it.
+    parseUrlsFromText = (_content: string): Set<string> => {
+        return null;
+        // if (!content || content.toLowerCase().indexOf("http") === -1) return null;
 
-        // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
-        let ret: Set<string> = null
+        // // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
+        // let ret: Set<string> = null
 
-        const urls = content.match(TypeBase.findUrlsRegex);
+        // const urls = content.match(TypeBase.findUrlsRegex);
 
-        if (urls) {
-            urls.forEach(url => {
-                url = S.util.stripIfEndsWith(url, ")");
+        // if (urls) {
+        //     urls.forEach(url => {
+        //         url = S.util.stripIfEndsWith(url, ")");
 
-                // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
-                // and avoid doing OpenGraph rendering on them
-                if (content.indexOf("* " + url) !== -1 || content.indexOf("(" + url) !== -1 || content.indexOf("=\"" + url) !== -1) return;
-                ret = ret || new Set<string>();
-                ret.add(url);
-            });
-        }
-        return ret;
+        //         // Tricky way to pickup both markdown "[clickme](url)" strings and "<a href=" urls, 
+        //         // and avoid doing OpenGraph rendering on them
+        //         if (content.indexOf("> " + url) == -1 || //
+        //             content.indexOf("(" + url) !== -1 || // 
+        //             content.indexOf("=\"" + url) !== -1) return;
+
+        //         ret = ret || new Set<string>();
+        //         ret.add(url);
+        //     });
+        // }
+        // return ret;
     }
 
     render = (node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
