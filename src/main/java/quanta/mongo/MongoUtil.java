@@ -754,7 +754,7 @@ public class MongoUtil extends ServiceBase {
         // todo-2: is user validated here (no invalid characters, etc. and invalid
         // flowpaths tested?)
         SubNode parentNode = newUserName.contains("@") || forceRemoteUser ? remoteUsersNode : localUsersNode;
-        userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true);
+        userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
         parentNode.setHasChildren(true);
         ObjectId id = new ObjectId();
         userNode.setId(id);

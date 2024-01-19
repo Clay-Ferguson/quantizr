@@ -243,7 +243,7 @@ public class IPFSService extends ServiceBase {
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, false);
         if (exportParent != null) {
             SubNode node = create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
-                    null, null, true, true);
+                    null, null, true, true, null);
             // todo-2: make this handle multiple attachments, and all calls to it
             Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
             node.setOwner(exportParent.getOwner());
@@ -257,7 +257,7 @@ public class IPFSService extends ServiceBase {
             if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
                     SubNode child = create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST,
-                            null, null, true, true);
+                            null, null, true, true, null);
                     // todo-2: make this handle multiple attachments, and all calls to it
                     Attachment childAtt = child.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, false);
                     child.setOwner(exportParent.getOwner());

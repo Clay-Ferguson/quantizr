@@ -13,6 +13,33 @@ import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
 
+    applyNodeChanges = (changes: J.NodeChanges): void => {
+        if (changes == null) return;
+
+        // recursively apply to entire tree
+        this.applyNodeChangesInner(getAs().node, changes);
+    }
+
+    // returns true if we found the target parent node, and processed it
+    applyNodeChangesInner = (node: NodeInfo, changes: J.NodeChanges): boolean => {
+        if (!changes || !node) return;
+        if (node?.children) {
+            for (const n of node.children) {
+                if (node.id === changes.parentNodeId) {
+                    if (n.ordinal >= changes.ordinalShifMin) {
+                        n.ordinal += changes.ordinalShiftRange;
+                    }
+                }
+                // if this node IS the parent, we don't need to recurse into it, because we pre
+                // processing it now in this current loop.
+                else if (this.applyNodeChangesInner(n, changes)) {
+                    return true;
+                }
+            }
+        }
+        return node.id === changes.parentNodeId;
+    }
+
     getSelNodeIdsArray = (): string[] => {
         const sels: string[] = [];
         getAs().selectedNodes.forEach(id => sels.push(id));

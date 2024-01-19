@@ -306,9 +306,9 @@ export class NodeCompRowHeader extends Div {
             className: "float-end floatRightHeaderDiv"
         });
 
-        // if (showInfo && ast.isAdminUser) {
-        //     floatUpperRightDiv.addChild(new Span(`[${this.node.ordinal}]`, { className: "marginRight" }));
-        // }
+        if (showInfo && ast.isAdminUser) {
+            floatUpperRightDiv.addChild(new Span(`[${this.node.ordinal}]`, { className: "marginRight" }));
+        }
 
         if (showInfo && this.node.timeAgo) {
             floatUpperRightDiv.addChild(new Span(this.node.timeAgo, {

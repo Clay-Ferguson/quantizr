@@ -1052,7 +1052,8 @@ public class MongoRead extends ServiceBase {
 
         SubNode node = findSubNodeByType(ms, userNode, type);
         if (node == null && autoCreate) {
-            node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true, true);
+            node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true, true,
+                    null);
             node.setOwner(userNode.getId());
             if (content == null) {
                 content = getDefaultContentForNamedNode(type);

@@ -586,11 +586,12 @@ public class OpenAiService extends ServiceBase {
     // Assumes node is a question, and inserts the answer under it as a subnode
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
+
         ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
         res.setGptCredit(aiAnswer.userCredit);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
-                null, null, true, true);
+                null, null, true, true, res.getNodeChanges());
 
         newNode.setContent(oai.formatAnswer(aiAnswer, true));
         newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);

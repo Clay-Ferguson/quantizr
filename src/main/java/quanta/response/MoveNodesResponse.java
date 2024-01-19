@@ -1,19 +1,28 @@
 
 package quanta.response;
 
+import quanta.response.base.NodeChanges;
 import quanta.response.base.ResponseBase;
 
 public class MoveNodesResponse extends ResponseBase {
     private boolean signaturesRemoved;
+    private NodeChanges nodeChanges;
 
     public boolean isSignaturesRemoved() {
         return this.signaturesRemoved;
     }
-    
+
     public void setSignaturesRemoved(final boolean signaturesRemoved) {
         this.signaturesRemoved = signaturesRemoved;
     }
 
-    public MoveNodesResponse() {
+    public NodeChanges getNodeChanges() {
+        return nodeChanges;
     }
+
+    public void setNodeChanges(NodeChanges nodeChanges) {
+        this.nodeChanges = nodeChanges;
+    }
+
+    public MoveNodesResponse() {}
 }

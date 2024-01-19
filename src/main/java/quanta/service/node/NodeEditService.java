@@ -39,6 +39,7 @@ import quanta.response.SearchAndReplaceResponse;
 import quanta.response.SetExpandedResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
+import quanta.response.base.NodeChanges;
 import quanta.service.AclService;
 import quanta.types.TypeBase;
 import quanta.util.Convert;
@@ -250,6 +251,8 @@ public class NodeEditService extends ServiceBase {
      */
     public SplitNodeResponse splitNode(MongoSession ms, SplitNodeRequest req) {
         SplitNodeResponse res = new SplitNodeResponse();
+        NodeChanges nodeChanges = new NodeChanges();
+        res.setNodeChanges(nodeChanges);
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
         SubNode parentNode = read.getParent(ms, node);
@@ -281,7 +284,7 @@ public class NodeEditService extends ServiceBase {
         }
         int numNewSlots = contentParts.length - 1;
         if (numNewSlots > 0) {
-            firstOrdinal = create.insertOrdinal(ms, parentForNewNodes, firstOrdinal, numNewSlots);
+            firstOrdinal = create.insertOrdinal(ms, parentForNewNodes, firstOrdinal, numNewSlots, res.getNodeChanges());
             update.save(ms, parentForNewNodes);
         }
         int idx = 0;
@@ -298,8 +301,10 @@ public class NodeEditService extends ServiceBase {
                 update.save(ms, node);
                 sigDirtyNodes.add(node.getIdStr());
             } else {
+                // This is not a mistake that we pass null for nodeChagnes here (we already captured the shift above
+                // for the node we need to worry about)
                 SubNode newNode = create.createNode(ms, parentForNewNodes, null, firstOrdinal + idx,
-                        CreateNodeLocation.ORDINAL, false);
+                        CreateNodeLocation.ORDINAL, false, null);
                 newNode.setContent(part);
                 newNode.setAc(node.getAc());
                 newNode.touch();

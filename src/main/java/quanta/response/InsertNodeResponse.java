@@ -2,19 +2,28 @@
 package quanta.response;
 
 import quanta.model.NodeInfo;
+import quanta.response.base.NodeChanges;
 import quanta.response.base.ResponseBase;
 
 public class InsertNodeResponse extends ResponseBase {
 	private NodeInfo newNode;
-	
+	private NodeChanges nodeChanges;
+
 	public NodeInfo getNewNode() {
 		return this.newNode;
 	}
-	
+
 	public void setNewNode(final NodeInfo newNode) {
 		this.newNode = newNode;
 	}
 
-	public InsertNodeResponse() {
+	public NodeChanges getNodeChanges() {
+		return nodeChanges;
 	}
+
+	public void setNodeChanges(NodeChanges nodeChanges) {
+		this.nodeChanges = nodeChanges;
+	}
+
+	public InsertNodeResponse() {}
 }

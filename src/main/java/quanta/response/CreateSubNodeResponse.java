@@ -3,6 +3,7 @@ package quanta.response;
 
 import java.math.BigDecimal;
 import quanta.model.NodeInfo;
+import quanta.response.base.NodeChanges;
 import quanta.response.base.ResponseBase;
 
 public class CreateSubNodeResponse extends ResponseBase {
@@ -15,6 +16,8 @@ public class CreateSubNodeResponse extends ResponseBase {
 	 */
 	private boolean encrypt;
 	private BigDecimal gptCredit; // user credit remaining
+
+	private NodeChanges nodeChanges;
 
 	public NodeInfo getNewNode() {
 		return this.newNode;
@@ -38,6 +41,14 @@ public class CreateSubNodeResponse extends ResponseBase {
 
 	public void setGptCredit(BigDecimal gptCredit) {
 		this.gptCredit = gptCredit;
+	}
+
+	public NodeChanges getNodeChanges() {
+		return nodeChanges;
+	}
+
+	public void setNodeChanges(NodeChanges nodeChanges) {
+		this.nodeChanges = nodeChanges;
 	}
 
 	public CreateSubNodeResponse() {}

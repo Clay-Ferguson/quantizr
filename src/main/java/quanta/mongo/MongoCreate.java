@@ -28,6 +28,7 @@ import quanta.request.CreateSubNodeRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.response.CreateSubNodeResponse;
 import quanta.response.InsertNodeResponse;
+import quanta.response.base.NodeChanges;
 import quanta.service.AclService;
 import quanta.types.TypeBase;
 import quanta.util.Const;
@@ -48,8 +49,9 @@ public class MongoCreate extends ServiceBase {
     private static long RESERVE_BLOCK_SIZE = 1000;
 
     public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
-            boolean updateParentOrdinals) {
-        return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals, true);
+            boolean updateParentOrdinals, NodeChanges nodeChanges) {
+        return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals, true,
+                nodeChanges);
     }
 
     public SubNode createNode(MongoSession ms, String path) {
@@ -76,7 +78,7 @@ public class MongoCreate extends ServiceBase {
      */
     public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
             CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals,
-            boolean updateParent) {
+            boolean updateParent, NodeChanges nodeChanges) {
         if (relPath == null) {
             /*
              * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
@@ -100,7 +102,7 @@ public class MongoCreate extends ServiceBase {
                 }
                 Long _ordinal = ordinal;
                 ordinal = (Long) arun.run(as -> {
-                    return create.prepOrdinalForLocation(as, location, parent, _ordinal);
+                    return create.prepOrdinalForLocation(as, location, parent, _ordinal, nodeChanges);
                 });
             }
         }
@@ -122,16 +124,17 @@ public class MongoCreate extends ServiceBase {
         return node;
     }
 
-    private Long prepOrdinalForLocation(MongoSession ms, CreateNodeLocation location, SubNode parent, Long ordinal) {
+    private Long prepOrdinalForLocation(MongoSession ms, CreateNodeLocation location, SubNode parent, Long ordinal,
+            NodeChanges nodeChanges) {
         switch (location) {
             case FIRST:
-                ordinal = create.insertOrdinal(ms, parent, 0L, 1L);
+                ordinal = create.insertOrdinal(ms, parent, 0L, 1L, nodeChanges);
                 break;
             case LAST:
                 ordinal = read.getMaxChildOrdinal(ms, parent) + 1;
                 break;
             case ORDINAL:
-                ordinal = create.insertOrdinal(ms, parent, ordinal, 1L);
+                ordinal = create.insertOrdinal(ms, parent, ordinal, 1L, nodeChanges);
                 break;
             default:
                 throw new RuntimeException("Unknown ordinal");
@@ -150,7 +153,7 @@ public class MongoCreate extends ServiceBase {
      *
      * Returns the first ordinal in the range we actually ended up freeing up for use.
      */
-    public long insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
+    public long insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize, NodeChanges nodeChanges) {
         long minOrdinal = read.getMinChildOrdinal(ms, node);
         // default new ordinal to ordinal
         long newOrdinal = ordinal;
@@ -188,6 +191,7 @@ public class MongoCreate extends ServiceBase {
         BulkOperations bops = null;
         int batchSize = 0;
 
+        boolean madeNodeChanges = false;
         for (SubNode child : read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit,
                 false)) {
             // lazy create bulkOps
@@ -197,6 +201,7 @@ public class MongoCreate extends ServiceBase {
 
             Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
             Update update = new Update().set(SubNode.ORDINAL, child.getOrdinal() + rangeSize);
+            madeNodeChanges = true;
             bops.updateOne(query, update);
             if (++batchSize > Const.MAX_BULK_OPS) {
                 bops.execute();
@@ -204,6 +209,13 @@ public class MongoCreate extends ServiceBase {
                 bops = null;
             }
         }
+
+        if (madeNodeChanges && nodeChanges != null) {
+            nodeChanges.setParentNodeId(node.getIdStr());
+            nodeChanges.setOrdinalShifMin((int) ordinal);
+            nodeChanges.setOrdinalShiftRange((int) rangeSize);
+        }
+
         if (bops != null) {
             bops.execute();
         }
@@ -216,6 +228,8 @@ public class MongoCreate extends ServiceBase {
      */
     public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
         CreateSubNodeResponse res = new CreateSubNodeResponse();
+        NodeChanges nodeChanges = new NodeChanges();
+        res.setNodeChanges(nodeChanges);
         boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
         String nodeId = req.getNodeId();
         boolean makePublicWritable = false;
@@ -318,7 +332,7 @@ public class MongoCreate extends ServiceBase {
         }
         CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
         SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
-                null, true, true);
+                null, true, true, nodeChanges);
         if (req.isPendingEdit()) {
             mongoUtil.setPendingPath(newNode, true);
         }
@@ -406,6 +420,9 @@ public class MongoCreate extends ServiceBase {
      */
     public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
         InsertNodeResponse res = new InsertNodeResponse();
+        NodeChanges nodeChanges = new NodeChanges();
+        res.setNodeChanges(nodeChanges);
+
         String parentNodeId = req.getParentId();
         log.debug("Inserting under parent: " + parentNodeId);
         SubNode parentNode = read.getNode(ms, parentNodeId);
@@ -419,7 +436,7 @@ public class MongoCreate extends ServiceBase {
             throw new ForbiddenException();
         }
         SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-                CreateNodeLocation.ORDINAL, null, null, true, true);
+                CreateNodeLocation.ORDINAL, null, null, true, true, nodeChanges);
         if (req.getInitialValue() != null) {
             newNode.setContent(req.getInitialValue());
         } else {

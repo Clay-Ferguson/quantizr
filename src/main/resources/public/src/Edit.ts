@@ -221,6 +221,7 @@ export class Edit {
                     typeName: typeName || J.NodeType.NONE,
                     initialValue: clipboardText
                 });
+                S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 if (blob) {
                     this.insertNodeResponse(res);
                 }
@@ -241,6 +242,7 @@ export class Edit {
                     directMessage: false,
                     payloadType: null,
                 });
+                S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 if (blob) {
                     this.createSubNodeResponse(res, afterEditJumpToId);
                 }
@@ -260,6 +262,7 @@ export class Edit {
                     typeName: typeName || J.NodeType.NONE,
                     initialValue: ""
                 });
+                S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 this.insertNodeResponse(res);
             } else {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -278,6 +281,7 @@ export class Edit {
                     directMessage: false,
                     payloadType: null,
                 });
+                S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 this.createSubNodeResponse(res, afterEditJumpToId);
             }
         }
@@ -653,6 +657,7 @@ export class Edit {
                 nodeId: id,
                 targetName: "top"
             });
+            S.nodeUtil.applyNodeChanges(res?.nodeChanges);
             this.setNodePositionResponse(res, id);
         }
     }
@@ -1026,6 +1031,7 @@ export class Edit {
             location,
             copyPaste: ast.cutCopyOp === "copy",
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.moveNodesResponse(res, nodeId, true);
     }
 
@@ -1062,6 +1068,7 @@ export class Edit {
             directMessage: false,
             payloadType: null
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
         if (res.code == C.RESPONSE_CODE_OK) {
             dispatch("setShowGptCredit", s => {
@@ -1116,6 +1123,7 @@ export class Edit {
             directMessage: false,
             payloadType: null
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
         if (blob) {
             this.createSubNodeResponse(res, null);
@@ -1143,6 +1151,7 @@ export class Edit {
             nodeId: node.id,
             delimiter
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.splitNodeResponse(res);
     }
 
@@ -1184,6 +1193,7 @@ export class Edit {
             reply: false,
             directMessage: false
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
     }
 
@@ -1232,7 +1242,7 @@ export class Edit {
             directMessage,
             payloadType: null
         });
-
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
     }
 
@@ -1254,6 +1264,7 @@ export class Edit {
             reply: false,
             directMessage: false
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
         // auto-enable edit mode
         if (!getAs().userPrefs.editMode) {
@@ -1284,6 +1295,7 @@ export class Edit {
             directMessage: false,
             payloadType: null
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
     }
 
@@ -1326,6 +1338,7 @@ export class Edit {
             location,
             copyPaste: false
         });
+        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         S.render.fadeInId = sourceNodeId;
 
         if (S.util.checkSuccess("Move nodes", res)) {

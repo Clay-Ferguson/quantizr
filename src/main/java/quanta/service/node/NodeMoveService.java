@@ -26,6 +26,7 @@ import quanta.response.JoinNodesResponse;
 import quanta.response.MoveNodesResponse;
 import quanta.response.SelectAllNodesResponse;
 import quanta.response.SetNodePositionResponse;
+import quanta.response.base.NodeChanges;
 import quanta.util.Const;
 import quanta.util.ThreadLocals;
 
@@ -49,6 +50,9 @@ public class NodeMoveService extends ServiceBase {
      */
     public SetNodePositionResponse setNodePosition(MongoSession ms, SetNodePositionRequest req) {
         SetNodePositionResponse res = new SetNodePositionResponse();
+        NodeChanges nodeChanges = new NodeChanges();
+        res.setNodeChanges(nodeChanges);
+
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
@@ -62,7 +66,7 @@ public class NodeMoveService extends ServiceBase {
             moveNodeDown(ms, node);
         } //
         else if ("top".equals(req.getTargetName())) {
-            moveNodeToTop(ms, node);
+            moveNodeToTop(ms, node, nodeChanges);
         } //
         else if ("bottom".equals(req.getTargetName())) {
             moveNodeToBottom(ms, node);
@@ -92,12 +96,12 @@ public class NodeMoveService extends ServiceBase {
         update.saveSession(ms);
     }
 
-    public void moveNodeToTop(MongoSession ms, SubNode node) {
+    public void moveNodeToTop(MongoSession ms, SubNode node, NodeChanges nodeChanges) {
         SubNode parentNode = read.getParent(ms, node);
         if (parentNode == null) {
             return;
         }
-        create.insertOrdinal(ms, parentNode, 0L, 1L);
+        create.insertOrdinal(ms, parentNode, 0L, 1L, nodeChanges);
         /*
          * todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as part
          * of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
@@ -214,6 +218,8 @@ public class NodeMoveService extends ServiceBase {
      */
     private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
             boolean copyPaste, MoveNodesResponse res) {
+        NodeChanges nodeChanges = new NodeChanges();
+        res.setNodeChanges(nodeChanges);
         // get targetNode which is node we're pasting at or into.
         SubNode targetNode = read.getNode(ms, targetId);
         SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
@@ -226,11 +232,11 @@ public class NodeMoveService extends ServiceBase {
         } //
         else if (location.equalsIgnoreCase("inline")) {
             curTargetOrdinal = targetNode.getOrdinal() + 1;
-            create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+            create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
         } //
         else if (location.equalsIgnoreCase("inline-above")) {
             curTargetOrdinal = targetNode.getOrdinal();
-            create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+            create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
         }
 
         String sourceParentPath = null;

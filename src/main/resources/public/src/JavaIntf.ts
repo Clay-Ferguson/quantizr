@@ -805,6 +805,7 @@ export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
     encrypt: boolean;
     gptCredit: number;
+    nodeChanges: NodeChanges;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {
@@ -962,6 +963,7 @@ export interface InitNodeEditResponse extends ResponseBase {
 
 export interface InsertNodeResponse extends ResponseBase {
     newNode: NodeInfo;
+    nodeChanges: NodeChanges;
 }
 
 export interface JoinNodesResponse extends ResponseBase {
@@ -997,6 +999,7 @@ export interface LuceneSearchResponse extends ResponseBase {
 
 export interface MoveNodesResponse extends ResponseBase {
     signaturesRemoved: boolean;
+    nodeChanges: NodeChanges;
 }
 
 export interface NodeEditedPushInfo extends ServerPushInfo {
@@ -1118,6 +1121,7 @@ export interface SetExpandedResponse extends ResponseBase {
 }
 
 export interface SetNodePositionResponse extends ResponseBase {
+    nodeChanges: NodeChanges;
 }
 
 export interface SetUnpublishedResponse extends ResponseBase {
@@ -1137,6 +1141,7 @@ export interface SignupResponse extends ResponseBase {
 }
 
 export interface SplitNodeResponse extends ResponseBase {
+    nodeChanges: NodeChanges;
 }
 
 export interface SubGraphHashResponse extends ResponseBase {
@@ -1159,6 +1164,12 @@ export interface UploadFromUrlResponse extends ResponseBase {
 
 export interface UploadResponse extends ResponseBase {
     payloads: string[];
+}
+
+export interface NodeChanges {
+    parentNodeId: string;
+    ordinalShifMin: number;
+    ordinalShiftRange: number;
 }
 
 export interface ResponseBase {

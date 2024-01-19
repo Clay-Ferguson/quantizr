@@ -147,22 +147,8 @@ public class AttachmentService extends ServiceBase {
              * UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
              * which will be even more strict.
              */
-            SubNode node = null;
             boolean allowEmailParse = false;
-            // if auto then get the node and make nodeId be that id.
-            if (nodeId.equals("[auto]")) {
-                allowEmailParse = true;
-                SubNode parent = read.getNode(ms, "~" + NodeType.NOTES, false, null);
-                if (parent == null) {
-                    throw ExUtil.wrapEx("Node not found.");
-                }
-                node = create.createNode(ms, parent, null, NodeType.NONE.s(), //
-                        0L, CreateNodeLocation.FIRST, null, null, true, true);
-                nodeId = node.getIdStr();
-            } else {
-                node = read.getNode(ms, nodeId, false, null);
-            }
-
+            SubNode node = read.getNode(ms, nodeId, false, null);
             if (node == null) {
                 throw ExUtil.wrapEx("Node not found.");
             }

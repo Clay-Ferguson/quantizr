@@ -167,7 +167,7 @@ public class SubNodeUtil extends ServiceBase {
             } else {
                 /* Note if parent PARAMETER here is null we are adding a root node */
                 parent = create.createNode(ms, parent, tok, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
-                        true, true);
+                        true, true, null);
                 if (parent == null) {
                     throw ExUtil.wrapEx("unable to create " + tok);
                 }

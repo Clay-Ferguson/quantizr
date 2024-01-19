@@ -56,7 +56,7 @@ public class FriendService extends ServiceBase {
                 properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
             }
             SubNode friendNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
-                    CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true);
+                    CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true, null);
             friendNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 
             if (tags != null) {
