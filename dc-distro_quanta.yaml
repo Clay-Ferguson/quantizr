@@ -207,7 +207,7 @@ services:
             - '${DATA_FOLDER}/tmp:/tmp'
             - '${DATA_FOLDER}/log:/log'
             - '${DEPLOY_TARGET}/config:/config'
-            - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
+            - '/etc/letsencrypt/live/${quanta_domain}-0001:/letsencrypt'
 
         ports:
             - '${HOST_PORT_SEC}:${PORT_SEC}'
