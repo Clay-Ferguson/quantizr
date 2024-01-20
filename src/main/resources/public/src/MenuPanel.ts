@@ -420,6 +420,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //
+            new MenuItem("Main Portal Node", S.util.loadAnonPageHome), //
         ], null));
 
         this.setChildren(children);
