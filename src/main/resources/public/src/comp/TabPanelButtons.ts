@@ -10,7 +10,6 @@ import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
 
 export class TabPanelButtons extends Div {
-
     constructor(private verticalButtons: boolean, public moreClasses: string = "") {
         super(null);
     }
@@ -43,6 +42,12 @@ export class TabPanelButtons extends Div {
 
     getTabButton(data: TabIntf): Li {
         const ast = getAs();
+        let clazz = "nav-link appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : "");
+
+        // experimental hack. Will write 'good code' for this if I like it.
+        if (data.id == C.TAB_TTS && ast.speechSpeaking && !ast.speechPaused) {
+            clazz += " appNavTabAttention";
+        }
 
         return new Li(null, {
             className: "nav-item",
