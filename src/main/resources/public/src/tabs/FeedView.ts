@@ -198,7 +198,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 this.renderHeading(),
                 new Div(null, { className: "float-end" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
-                    // todo-0: we'll eventually have this as an admin option
+                    // todo-1: we'll eventually have this as an admin option
                     // ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "btn-primary")
                 ])
             ], this.data),

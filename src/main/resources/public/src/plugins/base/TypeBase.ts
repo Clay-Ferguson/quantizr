@@ -226,7 +226,7 @@ export class TypeBase implements TypeIntf {
     // gi: Flags for global and case-insensitive matching.
     static findUrlsRegex = /(?:https?):\/\/[^\s/$.?#].[^\s]*|www\.[^\s\/$?#].[^\s]*/gi;
 
-    // todo-0: I think this method is obsolete, but I'll do more testing before removing it.
+    // todo-1: I think this method is obsolete, but I'll do more testing before removing it.
     parseUrlsFromText = (_content: string): Set<string> => {
         return null;
         // if (!content || content.toLowerCase().indexOf("http") === -1) return null;
