@@ -94,6 +94,7 @@ public class NodeSearchService extends ServiceBase {
     public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
         NodeSearchResponse res = new NodeSearchResponse();
         String searchText = req.getSearchText();
+
         // if no search text OR sort order specified that's a bad request.
         if (StringUtils.isEmpty(searchText) && StringUtils.isEmpty(req.getSearchType()) && //
         // note: for timelines this is called but with a sort

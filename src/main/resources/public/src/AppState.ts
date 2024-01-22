@@ -106,6 +106,8 @@ export class AppState {
     showSchemaOrgProps: boolean = false;
     showRecentProps: boolean = false;
 
+    timelineReversedOrder: boolean = false;
+
     userPrefs: J.UserPreferences = {
         editMode: false,
         showMetaData: false,

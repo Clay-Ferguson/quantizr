@@ -285,6 +285,8 @@ export class Search {
             return;
         }
 
+        // Note: we don't need to pass 'searchRoot' to the browser, but we do set it in this view's data property
+        // because we need it on the client side
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot: null,
             page,
@@ -327,6 +329,7 @@ export class Search {
             info.node = res.node;
             info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
             info.page = page;
+            info.searchRoot = res.node.path;
 
             S.tabUtil.selectTabStateOnly(TimelineTab.inst.id);
         });

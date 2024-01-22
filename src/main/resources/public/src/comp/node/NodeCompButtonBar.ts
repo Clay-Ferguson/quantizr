@@ -120,7 +120,7 @@ export class NodeCompButtonBar extends Div {
                 title: "Explore content of this node"
             }, "btn-primary");
 
-            expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-angle-double-up" : "fa-angle-double-down", null, {
+            expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
                 [C.NODE_ID_ATTR]: this.node.id,
                 onClick: S.nav.toggleNodeInlineChildren,
                 title: expandChildren ? "Collapse Children" : "Expand Children"
@@ -266,7 +266,6 @@ export class NodeCompButtonBar extends Div {
         let spanArray = [];
 
         if (ast.mobileMode && (addMoveUp || addMoveDown || addCut || addDelete)) {
-
             spanArray.push(new DropdownMenu([
                 addMoveUp ? new Li(null, {
                     className: "clickable",

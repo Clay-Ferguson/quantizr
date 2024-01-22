@@ -663,7 +663,6 @@ public class UserManagerService extends ServiceBase {
                 userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
                 // sessionContext.setUserName(req.getUserName());
                 update.save(as, userNode);
-                edit.processAfterSave(as, userNode, null);
             }
             return null;
         });

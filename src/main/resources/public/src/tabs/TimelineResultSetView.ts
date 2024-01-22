@@ -1,9 +1,11 @@
 import { dispatch, getAs } from "../AppContext";
-import { Comp } from "../comp/base/Comp";
-import { Checkbox } from "../comp/core/Checkbox";
-import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { TimelineRSInfo } from "../TimelineRSInfo";
+import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
+import { Checkbox } from "../comp/core/Checkbox";
+import { Selection } from "../comp/core/Selection";
+import { TabIntf } from "../intf/TabIntf";
 import { ResultSetView } from "./ResultSetView";
 
 export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetView<PT, TimelineResultSetView<PT>> {
@@ -25,20 +27,34 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
     }
 
     override extraPagingComps = (): Comp[] => {
-        return [new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
-            setValue: (checked: boolean) => {
-                // dispatch now for rapid screen refresh
-                dispatch("AutoRefresh", (s) => {
-                    s.userPrefs.autoRefreshFeed = checked;
-                });
-                // save to server now
-                S.edit.setAutoRefreshFeed(checked);
-            },
-            getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
-        })];
+        return [
+            new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
+                setValue: (checked: boolean) => {
+                    // dispatch now for rapid screen refresh
+                    dispatch("AutoRefresh", (s) => {
+                        s.userPrefs.autoRefreshFeed = checked;
+                    });
+                    // save to server now
+                    S.edit.setAutoRefreshFeed(checked);
+                },
+                getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
+            }),
+            new Selection(null, null, [
+                { key: "true", val: "Chronological" },
+                { key: "false", val: "Rev. Chron" },
+            ],
+                null, "timelineChronoOrder", {
+                setValue: (val: string) => {
+                    dispatch("TimelineReversedOrder", (s) => {
+                        s.timelineReversedOrder = val === "true";
+                    });
+                },
+                getValue: (): string => getAs().timelineReversedOrder ? "true" : "false"
+            }),
+        ];
     }
 
     override getFloatRightHeaderComp = (): Comp => {
-        return null;
+        return new Button("Post", S.edit.postFromTimeline, { className: "float-end" }, "btn-primary")
     }
 }

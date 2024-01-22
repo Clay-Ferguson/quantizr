@@ -80,10 +80,10 @@ export class MenuPanel extends Div {
     static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
-    static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time", 0, true);
-    static timelineByModified = () => S.srch.timeline(null, "mtm", null, "Rev-chron by Modify Time", 0, true);
-    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", null, "Rev-chron by Create Time (top level)", 0, false);
-    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", null, "Rev-chron by Modify Time (top level)", 0, false);
+    static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "by Create Time", 0, true);
+    static timelineByModified = () => S.srch.timeline(null, "mtm", null, "by Modify Time", 0, true);
+    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", null, "by Create Time (top level)", 0, false);
+    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", null, "by Modify Time (top level)", 0, false);
     static showCalendar = () => S.render.showCalendar(null);
     static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);

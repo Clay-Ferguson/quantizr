@@ -12,7 +12,10 @@ export class ResultSetInfo {
     public fuzzy: boolean;
     public caseSensitive: boolean;
     public searchText: string;
+
+    // This will bet the root of the search regardless of whether it's a timeline or an actual search.
     public searchRoot: string;
+
     public searchType: string;
     public recursive: boolean;
     public sortField: string;

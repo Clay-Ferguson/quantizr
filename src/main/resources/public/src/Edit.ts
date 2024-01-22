@@ -21,11 +21,24 @@ import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
+import { TimelineTab } from "./tabs/data/TimelineTab";
 import { DocumentResultSetView } from "./tabs/DocumentResultSetView";
+import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Edit {
     showReadOnlyProperties = false;
     helpNewUserEditCalled = false;
+
+    postFromTimeline = () => {
+        const ast = getAs();
+        if (ast.isAnonUser) {
+            S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+        }
+        else {
+            const info = TimelineTab.inst.props as TimelineRSInfo;
+            S.edit.addNode(info.node.id, J.NodeType.COMMENT, true, null, null, true, false);
+        }
+    }
 
     saveNode = async (node: NodeInfo, returnInlineChildren: boolean) => {
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {

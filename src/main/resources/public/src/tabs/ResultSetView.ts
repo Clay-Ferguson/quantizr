@@ -1,4 +1,5 @@
 import { getAs } from "../AppContext";
+import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -83,24 +84,42 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
         this.addPaginationBar(children, false, this.allowTopMoreButton, true);
 
-        let i = 0;
-        results.forEach(node => {
-            if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
-            const c = this.renderItem(node, i, rowCount, true);
-            if (c) {
-                if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
-                    S.domUtil.setNodeDragHandler(c.attribs, node.id);
-                    S.domUtil.makeDropTarget(c.attribs, node.id);
+        if (ast.timelineReversedOrder) {
+            for (let i = results.length - 1; i >= 0; i--) {
+                const node = results[i];
+                if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
+                const c = this.renderItem(node, i, rowCount, true);
+                if (c) {
+                    this.configDragAndDrop(c, ast, node.id);
+                    children.push(c);
                 }
-                children.push(c);
+                rowCount++;
             }
-            i++;
-            rowCount++;
-        });
+        }
+        else {
+            let i = 0;
+            results.forEach(node => {
+                if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;
+                const c = this.renderItem(node, i, rowCount, true);
+                if (c) {
+                    this.configDragAndDrop(c, ast, node.id);
+                    children.push(c);
+                }
+                i++;
+                rowCount++;
+            });
+        }
 
         this.addPaginationBar(children, true, true, false);
         this.setChildren(children);
         return true;
+    }
+
+    configDragAndDrop = (c: Comp, ast: AppState, id: string) => {
+        if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
+            S.domUtil.setNodeDragHandler(c.attribs, id);
+            S.domUtil.makeDropTarget(c.attribs, id);
+        }
     }
 
     /* overridable (don't use arrow function) */
@@ -120,10 +139,17 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
     addPaginationBar = (children: Comp[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
         let moreButton: IconButton = null;
+        if (this.data.id === C.TAB_TIMELINE) {
+            this.showPageNumber = false;
+        }
+
+        const reverse = this.data.id === C.TAB_TIMELINE && getAs().timelineReversedOrder;
+        const rightArrow = reverse ? "up" : "down";
+        const leftArrow = reverse ? "down" : "up";
+
         if (!this.data.props.endReached && allowMoreButton) {
-            moreButton = new IconButton("fa-angle-right", "More", {
-                onClick: () => this.pageChange(1),
-                title: "Next Page"
+            moreButton = new IconButton("fa-angle-" + rightArrow + " fa-lg", null, {
+                onClick: () => this.pageChange(1)
             })
 
             if (allowInfiniteScroll && this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
@@ -154,25 +180,37 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
         const extraPagingComps = isTopBar ? this.extraPagingComps() : null;
 
+        let buttonBarComps: Comp[] = [];
+        if (isTopBar) {
+            buttonBarComps.push(new IconButton("fa-refresh", null, {
+                onClick: () => this.pageChange(null)
+            }));
+        }
+
+        if (this.data.props.page >= 1) {
+            buttonBarComps.push(new IconButton("fa-angle-double-" + leftArrow + " fa-lg", null, {
+                onClick: () => this.pageChange(0)
+            }));
+        }
+
+        if (this.data.props.page > 0) {
+            buttonBarComps.push(new IconButton("fa-angle-" + leftArrow + " fa-lg", null, {
+                onClick: () => this.pageChange(-1)
+            }));
+        }
+        buttonBarComps.push(moreButton);
+
+        if (extraPagingComps) {
+            buttonBarComps = buttonBarComps.concat(extraPagingComps);
+        }
+
+        if (this.data.props.endReached && !isTopBar && this.showPageNumber) {
+            buttonBarComps.push(new Span("*** Last Page ***", { className: "bigMarginLeft" }));
+        }
+
         children.push(
             this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,
-            new ButtonBar([
-                isTopBar ? new IconButton("fa-refresh", null, {
-                    onClick: () => this.pageChange(null),
-                    title: "Refresh View"
-                }) : null,
-                this.data.props.page > 1 ? new IconButton("fa-angle-double-left", null, {
-                    onClick: () => this.pageChange(0),
-                    title: "First Page"
-                }) : null,
-                this.data.props.page > 0 ? new IconButton("fa-angle-left", null, {
-                    onClick: () => this.pageChange(-1),
-                    title: "Previous Page"
-                }) : null,
-                moreButton,
-                ...(extraPagingComps || []),
-                this.data.props.endReached && !isTopBar && this.showPageNumber ? new Span("*** Last Page ***", { className: "bigMarginLeft" }) : null
-            ], this.pagingContainerClass));
+            new ButtonBar(buttonBarComps, this.pagingContainerClass));
 
         children.push(new Clearfix());
     }

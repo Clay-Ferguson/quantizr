@@ -228,7 +228,6 @@ public class NodeEditService extends ServiceBase {
         }
         arun.run(s -> {
             HashSet<String> sessionsPushed = new HashSet<>();
-            boolean isAccnt = node.isType(NodeType.ACCOUNT);
             if (node.isType(NodeType.FRIEND)) {
                 ThreadLocals.getSC().setFriendsTagsDirty(true);
             }

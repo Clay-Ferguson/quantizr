@@ -377,7 +377,7 @@ export class Nav {
 
     runTimelineByNodeId = (id: string) => {
         setTimeout(() => {
-            S.srch.timeline(id, "mtm", null, "Rev-chron by Modify Time", 0, true);
+            S.srch.timeline(id, "mtm", null, "by Modify Time", 0, true);
         }, 100);
     }
 
