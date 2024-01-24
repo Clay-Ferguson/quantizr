@@ -167,6 +167,7 @@ export class UserProfileDlg extends DialogBase {
                         S.nav.showUserSettings();
                     }),
                     !this.readOnly ? new Button("Logout", S.user.logout) : null,
+
                     new Button(this.readOnly ? "Close" : "Cancel", this.close)
                 ], "marginTop")
             ])

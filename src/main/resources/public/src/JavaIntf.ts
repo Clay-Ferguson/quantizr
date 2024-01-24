@@ -35,6 +35,7 @@ export interface ClientConfig {
     urlView: string;
     search: string;
     login: string;
+    paymentLink: string;
 }
 
 export interface IPSMData {

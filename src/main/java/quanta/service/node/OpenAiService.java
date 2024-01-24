@@ -306,11 +306,11 @@ public class OpenAiService extends ServiceBase {
         } else {
             balance = tranRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
             if (balance == null) {
-                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+                throw new RuntimeException("Sorry, you have no more credit.");
             }
             int comparisonResult = balance.compareTo(BigDecimal.ZERO);
             if (comparisonResult <= 0) {
-                throw new RuntimeException("Sorry, you have no more OpenAI credit.");
+                throw new RuntimeException("Sorry, you have no more credit.");
             }
         }
         return balance;

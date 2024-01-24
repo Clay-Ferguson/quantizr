@@ -59,10 +59,9 @@ public class UtilFilter extends GenericFilterBean {
 
         // DO NOT DELETE (leave as an example of how to do CORS)
         // Special check for CORS
-        // if (httpReq.getRequestURI().contains(APConst.PATH_WEBFINGER) || //
-        // httpReq.getRequestURI().contains(APConst.PATH_AP + "/")) {
-        // httpRes.setHeader("Access-Control-Allow-Origin", "*");
-        // }
+        if (httpReq.getRequestURI().contains("/stripe/")) {
+            httpRes.setHeader("Access-Control-Allow-Origin", "*");
+        }
 
         chain.doFilter(httpReq, httpRes);
     }

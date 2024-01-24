@@ -811,7 +811,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object addCredit(@RequestBody AddCreditRequest req, HttpSession session) {
         return callProc.run("addCredit", true, true, req, session, ms -> {
-            return user.addCredit(ms, req);
+            return user.addCredit(ms, req.getUserId(), req.getAmount());
         });
     }
 

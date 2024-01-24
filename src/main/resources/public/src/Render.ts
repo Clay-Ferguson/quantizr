@@ -786,10 +786,16 @@ export class Render {
         ]);
     }
 
-    buildGptCreditDiv = (): Div => {
+    buildCreditDiv = (): Div => {
         const ast = getAs();
         if (ast.userProfile?.balance) {
-            return new Div("GPT Credit: $" + getAs().userProfile.balance.toFixed(6), { className: "gptCredit float-end" });
+            const credit = getAs().userProfile.balance;
+            const clazz = credit < 1 ? "accountCreditLow" : "accountCredit";
+            const msg = credit < 1 ? " (Running low! Click to add funds)" : "";
+            return new Div("Credit: $" + credit.toFixed(6) + msg, {
+                className: clazz + " float-end",
+                onClick: S.user.addAccountCredit
+            });
         }
         return null;
     }

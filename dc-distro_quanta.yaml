@@ -296,5 +296,9 @@ services:
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
 
+            stripe.apiKey: "${stripeApiKey}"
+            stripe.endpointKey: "${stripeEndpointKey}"
+            stripe.paymentLink: "${stripePaymentLink}"
+
 networks:
     bridge:

@@ -37,7 +37,8 @@ public class FinancialReport extends ServiceBase {
         if (results == null || results.size() == 0) {
             return "No data available yet.";
         }
-        return htmlTable(htmlHeader("Time", "User ID", "User Name", "Code", "Amount") + formatTableRows(results));
+        return htmlTable(htmlHeader("Trans ID", "Time", "User ID", "User Name", "Code", "Amount") + //
+                formatTableRows(results));
     }
 
     private String getStatsTable(String transType) {
@@ -46,7 +47,7 @@ public class FinancialReport extends ServiceBase {
             return "No data available yet.";
         }
 
-        return htmlTable(
-                htmlHeader("User ID", "User Name", "Code", "Count", "Total", "Avg") + formatTableRows(results));
+        return htmlTable(htmlHeader("User ID", "User Name", "Code", "Count", "Total", "Avg") + //
+                formatTableRows(results));
     }
 }

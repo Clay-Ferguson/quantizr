@@ -31,7 +31,7 @@ public interface TranRepository extends JpaRepository<Tran, Long> {
                         "ORDER BY u.userName")
         List<Object[]> findTranSummaryByUser(@Param("transType") String transType);
 
-        @Query("SELECT t.ts, u.mongoId, u.userName, t.descCode, t.amt " + //
+        @Query("SELECT t.id, t.ts, u.mongoId, u.userName, t.descCode, t.amt " + //
                         "FROM Tran t " + //
                         "JOIN t.userAccount u " + //
                         "ORDER BY t.ts DESC")

@@ -279,6 +279,18 @@ public class AppProp {
         return env.getProperty("mail.password");
     }
 
+    public String getStripeApiKey() {
+        return env.getProperty("stripe.apiKey");
+    }
+
+    public String getStripePaymentLink() {
+        return env.getProperty("stripe.paymentLink");
+    }
+
+    public String getStripeEndpointKey() {
+        return env.getProperty("stripe.endpointKey");
+    }
+
     public boolean isAllowFileSystemSearch() {
         return getBooleanProp("allowFileSystemSearch");
     }

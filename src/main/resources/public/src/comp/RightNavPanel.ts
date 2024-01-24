@@ -149,7 +149,7 @@ export class RightNavPanel extends Div {
         ]) : null;
 
         let scrollDiv = null;
-        const gptCreditDiv = ast.showGptCredit ? S.render.buildGptCreditDiv() : null;
+        const creditDiv = ast.showGptCredit ? S.render.buildCreditDiv() : null;
 
         const rightNavDiv = new Div(null, { className: "float-left" }, [
             new FlexRowLayout([
@@ -172,7 +172,6 @@ export class RightNavPanel extends Div {
                     addNoteButton
                 ]),
             ], "fullWidth"),
-            gptCreditDiv,
             // new Div(null, { className: "marginBottom" }, [
             //     new ButtonBar([
             //         clipboardPasteButton,
@@ -190,12 +189,14 @@ export class RightNavPanel extends Div {
 
         if (ast.mobileMode) {
             this.setChildren([
+                creditDiv,
                 rightNavDiv
             ]);
         }
         else {
             this.setChildren([
                 scrollDiv = new Div(null, { className: ast.showRhs ? "rightNavPanel customScrollbar" : "rightNavPanelPopup" }, [
+                    creditDiv,
                     rightNavDiv
                 ])
             ]);

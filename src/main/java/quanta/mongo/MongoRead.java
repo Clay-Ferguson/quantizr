@@ -257,7 +257,7 @@ public class MongoRead extends ServiceBase {
     /*
      * Throws an exception if the parent Node of 'path' does not exist.
      */
-    public void checkParentExists(MongoSession ms, String path) { // &&&
+    public void checkParentExists(MongoSession ms, String path) {
         boolean isRootPath = mongoUtil.isRootPath(path);
         if (isRootPath)
             return;

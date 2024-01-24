@@ -15,5 +15,6 @@ CREATE TABLE tran (
     ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     tran_type CHAR(1) CHECK(tran_type IN ('C', 'D')), -- 'C' for credit, 'D' for debit
     desc_code VARCHAR(3) NOT NULL,
-    detail JSONB
+    detail JSONB,
+    UNIQUE (user_id, ts) -- This line adds the unique constraint
 );

@@ -123,6 +123,7 @@ public class NodeRenderService extends ServiceBase {
 
         config.setConfig(prop.getConfig());
         config.setBrandingAppName(prop.getConfigText("brandingAppName"));
+        config.setPaymentLink(prop.getStripePaymentLink());
         config.setRequireCrypto(prop.isRequireCrypto());
         config.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
         config.setSearch(search);

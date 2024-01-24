@@ -14,6 +14,7 @@ public class ClientConfig {
     private String urlView;
     private String search;
     private String login;
+    private String paymentLink;
 
     public String getLogin() {
         return login;
@@ -93,6 +94,14 @@ public class ClientConfig {
 
     public void setInitialNodeId(final String initialNodeId) {
         this.initialNodeId = initialNodeId;
+    }
+
+    public String getPaymentLink() {
+        return paymentLink;
+    }
+
+    public void setPaymentLink(String paymentLink) {
+        this.paymentLink = paymentLink;
     }
 
     public ClientConfig() {}

@@ -4,14 +4,26 @@
     margin: $smallGap;
 }
 
-.gptCredit {
+.accountCredit {
     border: 1px solid gray;
     border-radius: 4px;
     padding: 0 6px 0 6px;
-    margin-left: 4px;
-    margin-top: 8px;
+    margin-top: 4px;
+    margin-bottom: 8px;
     background-color: darkcyan;
     color: white;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.accountCreditLow {
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    background-color:orange;
+    color: black;
     cursor: pointer;
     display: inline-block;
 }

@@ -570,29 +570,57 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public AddCreditResponse addCredit(MongoSession as, AddCreditRequest req) {
+    public AddCreditResponse addCredit(MongoSession as, String userId, BigDecimal amount) {
         ThreadLocals.requireAdmin();
         AddCreditResponse res = new AddCreditResponse();
+        addCreditInternal(as, userId, amount, null);
 
-        UserAccount user = userRepository.findByMongoId(req.getUserId());
+        // calculate new balance and return it.
+        res.setBalance(tranRepository.getBalByMongoId(userId));
+        return res;
+    }
+
+    public void addCreditByEmail(MongoSession as, String email, BigDecimal amount, Long timestamp) {
+        SubNode ownerNode = read.getLocalUserNodeByProp(as, NodeProp.EMAIL.s(), email, false, false);
+        if (ownerNode != null) {
+            String userName = ownerNode.getStr(NodeProp.USER);
+            addCreditInternal(as, ownerNode.getIdStr(), amount, timestamp);
+
+            if (!StringUtils.isEmpty(prop.getMailHost())) {
+                String brandingAppName = prop.getConfigText("brandingAppName");
+                String content = "Thanks for using " + brandingAppName + ", " + userName + "!" + "<p>\nA payment of $"
+                        + amount + " has been applied to your account.";
+
+                outbox.queueEmail(email, brandingAppName + " - Account Credit", content);
+            }
+
+            // todo-0: send push message to user's browser if they are logged in, to update their credit
+        } else {
+            log.debug("addCreditByEmail: user not found for email: " + email);
+        }
+    }
+
+    private void addCreditInternal(MongoSession as, String userId, BigDecimal amount, Long timestamp) {
+        UserAccount user = userRepository.findByMongoId(userId);
         if (user == null) {
             log.debug("User not found, creating...");
-            SubNode userNode = read.getNode(as, req.getUserId(), true, null);
+            SubNode userNode = read.getNode(as, userId, true, null);
             String userName = userNode.getStr(NodeProp.USER);
-            user = userRepository.save(new UserAccount(req.getUserId(), userName));
+            user = userRepository.save(new UserAccount(userId, userName));
         }
 
         Tran credit = new Tran();
-        credit.setAmt(req.getAmount());
+        credit.setAmt(amount);
         credit.setTransType("C");
         credit.setDescCode("PAY");
-        credit.setTs(Timestamp.from(Instant.now()));
+        if (timestamp == null) {
+            credit.setTs(Timestamp.from(Instant.now()));
+        } else {
+            credit.setTs(new Timestamp(timestamp));
+        }
         credit.setUserAccount(user);
         tranRepository.save(credit);
-
-        // calculate new balance and return it.
-        res.setBalance(tranRepository.getBalByMongoId(req.getUserId()));
-        return res;
+        log.debug("TRAN: " + XString.prettyPrint(credit));
     }
 
     public SaveUserPreferencesResponse saveUserPreferences(SaveUserPreferencesRequest req) {

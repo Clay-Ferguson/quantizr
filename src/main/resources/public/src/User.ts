@@ -98,6 +98,14 @@ export class User {
         }
     }
 
+    addAccountCredit = async () => {
+        if (!S.quanta.config.paymentLink) {
+            S.util.showMessage("No payment link configured.");
+            return;
+        }
+        window.open(S.quanta.config.paymentLink, "_blank");
+    }
+
     logout = async () => {
         new ProgressDlg();
 

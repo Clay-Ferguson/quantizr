@@ -1,5 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
+import { Button } from "../comp/core/Button";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -44,7 +45,9 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
                         this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
-                        ast.userProfile?.balance ? this.settingsLink("ChatGPT Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
+                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
+                        S.quanta.config.paymentLink ?
+                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
                     ]),
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Clear Browser Storage", async () => {
