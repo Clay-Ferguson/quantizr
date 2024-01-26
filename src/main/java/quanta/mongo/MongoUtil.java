@@ -228,15 +228,14 @@ public class MongoUtil extends ServiceBase {
      * if they cancel the node gets orphaned and eventually cleaned up by the system automatically.
      */
     public void setPendingPath(SubNode node, boolean pending) {
-        String pendingPath = NodePath.PENDING_PATH + "/";
-        String rootPath = NodePath.ROOT_PATH + "/";
         // ensure node starts with /r/p
-        if (pending && !node.getPath().startsWith(pendingPath)) {
-            node.setPath(node.getPath().replace(rootPath, pendingPath));
-        } //
-        else if (!pending && node.getPath().startsWith(pendingPath)) { // ensure node starts with /r and not /r/p
-            // get pendingPath out of the path, first
-            String path = node.getPath().replace(pendingPath, rootPath);
+        if (pending && !node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
+            node.setPath(node.getPath().replace(NodePath.ROOT_PATH_S, NodePath.PENDING_PATH_S));
+        }
+        // ensure node starts with /r and not /r/p
+        else if (!pending && node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
+            // get pending path out of the path, first
+            String path = node.getPath().replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
             path = findAvailablePath(path);
             node.setPath(path);
         }

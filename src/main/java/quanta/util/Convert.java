@@ -85,14 +85,6 @@ public class Convert extends ServiceBase {
             throw new ForbiddenException();
         }
 
-        /* If session user shouldn't be able to see secrets on this node remove them */
-        if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
-            if (!ms.isAdmin()) {
-                node.clearSecretProperties();
-            }
-        }
-        attach.fixAllAttachmentMimes(node);
-
         boolean hasChildren = read.hasChildren(ms, node);
         List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
         List<AccessControlInfo> acList = acl.buildAccessControlList(sc, node);
@@ -106,14 +98,7 @@ public class Convert extends ServiceBase {
         String apAvatar = null;
         String apImage = null;
         String owner = PrincipalName.ADMIN.s();
-        SubNode ownerAccnt = ThreadLocals.getCachedNode(node.getOwner());
-
-        if (ownerAccnt == null) {
-            ownerAccnt = read.getOwner(ms, node, false);
-            if (ownerAccnt != null) {
-                ThreadLocals.cacheNode(ownerAccnt);
-            }
-        }
+        SubNode ownerAccnt = read.getOwner(ms, node, false);
 
         if (ownerAccnt != null) {
             nameProp = ownerAccnt.getStr(NodeProp.USER);
@@ -164,13 +149,21 @@ public class Convert extends ServiceBase {
                 node.getModifyTime(), //
                 propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, node.getType(), //
                 logicalOrdinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
+
+        if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
+            if (!ms.isAdmin()) {
+                clearSecretProperties(nodeInfo);
+            }
+        }
+
         // if this node type has a plugin run it's converter to let it contribute
         TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
         if (plugin != null) {
             plugin.convert(ms, nodeInfo, node, ownerAccnt, getFollowers);
         }
+
         // allow client to know if this node is not yet saved by user
-        if (node.getPath().startsWith(NodePath.PENDING_PATH + "/")) {
+        if (node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.IN_PENDING_PATH.s(), "1"));
         }
 
@@ -201,6 +194,19 @@ public class Convert extends ServiceBase {
         // }
 
         return nodeInfo;
+    }
+
+    private void clearSecretProperties(NodeInfo info) {
+        List<PropertyInfo> props = info.getProperties();
+        if (props == null)
+            return;
+
+        snUtil.removeProp(props, NodeProp.CRYPTO_KEY_PRIVATE.s());
+        snUtil.removeProp(props, NodeProp.EMAIL.s());
+        snUtil.removeProp(props, NodeProp.CODE.s());
+        snUtil.removeProp(props, NodeProp.ENC_KEY.s());
+        snUtil.removeProp(props, NodeProp.PWD_HASH.s());
+        snUtil.removeProp(props, NodeProp.VOTE.s());
     }
 
     private void processInlineChildren(SessionContext sc, MongoSession ms, SubNode node, boolean initNodeEdit,

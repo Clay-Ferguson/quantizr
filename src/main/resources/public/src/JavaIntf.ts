@@ -1151,6 +1151,11 @@ export interface SubGraphHashResponse extends ResponseBase {
 export interface TransferNodeResponse extends ResponseBase {
 }
 
+export interface UpdateAccountInfo extends ServerPushInfo {
+    nodeId: string;
+    credit: number;
+}
+
 export interface UpdateFriendNodeResponse extends ResponseBase {
 }
 

@@ -838,6 +838,7 @@ export class Crypto {
 
         let path: string = node.path;
         // convert any 'pending (p)' path to a final verion of the path (no '/p/')
+        // todo-1: We need a method for this: see setPendingPath()
         if (path.startsWith("/r/p/")) {
             path = "/r/" + path.substring(5);
         }

@@ -17,6 +17,10 @@ public class NodePath {
     public static final String ROOT_PATH = "/" + ROOT;
     public static final String PUBLIC_PATH = "/" + ROOT + "/" + PUBLIC;
 
+    public static final String PENDING_PATH_S = PENDING_PATH + "/";
+    public static final String ROOT_PATH_S = ROOT_PATH + "/";
+    public static final String USERS_PATH_S = USERS_PATH + "/";
+
     // WARNING: There are places in TypeScript where we have `/r/public/home` hardcoded
     public static final String PUBLIC_HOME = PUBLIC_PATH + "/" + HOME;
 }

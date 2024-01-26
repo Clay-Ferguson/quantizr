@@ -105,6 +105,16 @@ export class ServerPush {
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
             // new InboxNotifyDlg("Your Inbox has updates!").open();
         }, false);
+
+        this.eventSource.addEventListener("accountInfo", async (e: any) => {
+            dispatch("AccountInfoPushUpdate", s => {
+                debugger;
+                const data: J.UpdateAccountInfo = JSON.parse(e.data);
+                if (s.userProfile) {
+                    s.userProfile.balance = data.credit;
+                }
+            });
+        }, false);
     }
 
     forceFeedItem = (nodeInfo: NodeInfo) => {

@@ -265,18 +265,18 @@ public class MongoRead extends ServiceBase {
 
         // ignore any paths we don't need to check
         if (parPath == null || parPath.equals("") || parPath.equals("/") || parPath.equals(NodePath.ROOT_PATH)
-                || parPath.equals(NodePath.PENDING_PATH) || parPath.equals(NodePath.PENDING_PATH + "/"))
+                || parPath.equals(NodePath.PENDING_PATH) || parPath.equals(NodePath.PENDING_PATH_S))
             return;
 
-        if (parPath.startsWith(NodePath.PENDING_PATH + "/")) {
-            parPath = parPath.replace(NodePath.PENDING_PATH + "/", NodePath.ROOT_PATH + "/");
+        if (parPath.startsWith(NodePath.PENDING_PATH_S)) {
+            parPath = parPath.replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
         }
         // no need to check root.
-        if (parPath.equals(NodePath.ROOT_PATH) || parPath.equals(NodePath.ROOT_PATH + "/")) {
+        if (parPath.equals(NodePath.ROOT_PATH) || parPath.equals(NodePath.ROOT_PATH_S)) {
             return;
         }
         // no need to check USERS
-        if (parPath.equals(NodePath.USERS_PATH) || parPath.equals(NodePath.USERS_PATH + "/")) {
+        if (parPath.equals(NodePath.USERS_PATH) || parPath.equals(NodePath.USERS_PATH_S)) {
             return;
         }
 
@@ -493,12 +493,10 @@ public class MongoRead extends ServiceBase {
         if (StringUtils.isEmpty(parentPath))
             return null;
 
-        String pendingPath = NodePath.PENDING_PATH + "/";
-        String rootPath = NodePath.ROOT_PATH + "/";
         /*
          * If node is in pending area take the pending part out of the path to get the real parent
          */
-        parentPath = parentPath.replace(pendingPath, rootPath);
+        parentPath = parentPath.replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
         return getNode(ms, parentPath, allowAuth, null);
     }
 

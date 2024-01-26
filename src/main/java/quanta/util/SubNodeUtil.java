@@ -1,6 +1,7 @@
 package quanta.util;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
+import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
@@ -29,6 +31,20 @@ import quanta.util.val.Val;
 public class SubNodeUtil extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+
+    public void removeProp(List<PropertyInfo> list, String name) {
+        if (list == null || name == null) {
+            return;
+        }
+
+        Iterator<PropertyInfo> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            PropertyInfo property = iterator.next();
+            if (name.equals(property.getName())) {
+                iterator.remove();
+            }
+        }
+    }
 
     public void removeUnwantedPropsForIPFS(SubNode node) {
         node.delete(NodeProp.IPFS_CID);

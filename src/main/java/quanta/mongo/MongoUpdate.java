@@ -54,6 +54,10 @@ public class MongoUpdate extends ServiceBase {
         if (allowAuth) {
             auth.ownerAuth(ms, node);
         }
+        // calling this may result in an update of this node's children property, and we want to call
+        // it here rather than later so if this modified the node it doesn't trigger an additional write.
+        read.hasChildren(ms, node);
+
         // if not doing allowAuth, we need to be sure the thread has admin session
         // because the MongoEventListener looks in threadlocals for auth
         if (!allowAuth) {
@@ -75,53 +79,56 @@ public class MongoUpdate extends ServiceBase {
     }
 
     public void saveSession(MongoSession ms, boolean asAdmin) {
-        if (ms == null || ThreadLocals.getSaving().booleanValue() || !ThreadLocals.hasDirtyNodes())
+        if (ms == null) {
+            log.warn("saveSession called with null session");
             return;
-        try {
-            // we check the saving flag to ensure we don't go into circular recursion here.
-            ThreadLocals.setSaving(true);
-            synchronized (ms) {
-                ThreadLocals.getDirtyNodes().forEach((key, value) -> {
-                    if (!key.toHexString().equals(value.getIdStr())) {
-                        throw new RuntimeException("Node originally cached as ID " + key.toHexString() + " now has key"
-                                + value.getIdStr());
+        }
+
+        if (!ThreadLocals.hasDirtyNodes()) {
+            log.warn("saveSession called with no dirty nodes");
+            return;
+        }
+
+        synchronized (ThreadLocals.getDirtyNodes()) {
+            try {
+                synchronized (ms) {
+                    ThreadLocals.getDirtyNodes().forEach((key, value) -> {
+                        if (!key.toHexString().equals(value.getIdStr())) {
+                            throw new RuntimeException("Node originally cached as ID " + key.toHexString()
+                                    + " now has key" + value.getIdStr());
+                        }
+                    });
+
+                    /*
+                     * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
+                     * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
+                     * loop below because we're iterating over dirtyNodes.
+                     */
+                    List<SubNode> nodes = new LinkedList<>();
+
+                    /*
+                     * check that we are allowed to write all, before we start writing any
+                     */
+                    for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
+                        try {
+                            auth.ownerAuth(ms, node);
+                        } catch (Exception e) {
+                            log.warn("Dirty node save attempt failed: " + XString.prettyPrint(node)
+                                    + "\nmongoSession has user: " + ms.getUserName() + " and ThreadLocal session is: "
+                                    + ThreadLocals.getSC().getUserName());
+                        }
+                        nodes.add(node);
                     }
-                });
-                /*
-                 * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
-                 * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
-                 * loop below because we're iterating over dirtyNodes.
-                 */
-                List<SubNode> nodes = new LinkedList<>();
-                /*
-                 * check that we are allowed to write all, before we start writing any
-                 */
-                for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
-                    try {
-                        auth.ownerAuth(ms, node);
-                    } catch (Exception e) {
-                        log.debug( //
-                                "Dirty node save attempt failed: " + XString.prettyPrint(node)
-                                        + "\bYour mongoSession has user: " + ms.getUserName()
-                                        + " and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
+
+                    for (SubNode node : nodes) {
+                        update.save(ms, node, false);
                     }
-                    nodes.add(node);
                 }
-                for (SubNode node : nodes) {
-                    update.save(ms, node, false);
-                }
-                /*
-                 * This theoretically should never find any dirty nodes, because we just saved them all but we
-                 * definitely still want this line of code here
-                 */
-                ThreadLocals.clearDirtyNodes();
+                log.debug("sync block for ms - exiting");
+            } catch (Exception e) {
+                // don't rethrow any exceptions from in here.
+                ExUtil.error(log, "exception in call processor", e);
             }
-        } catch (Exception e) {
-            // don't rethrow any exceptions from in here.
-            ExUtil.error(log, "exception in call processor", e);
-        } finally {
-            //
-            ThreadLocals.setSaving(false);
         }
     }
 

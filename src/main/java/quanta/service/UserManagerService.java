@@ -69,6 +69,7 @@ import quanta.response.ResetPasswordResponse;
 import quanta.response.SaveUserPreferencesResponse;
 import quanta.response.SaveUserProfileResponse;
 import quanta.response.SignupResponse;
+import quanta.response.UpdateAccountInfo;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -594,7 +595,9 @@ public class UserManagerService extends ServiceBase {
                 outbox.queueEmail(email, brandingAppName + " - Account Credit", content);
             }
 
-            // todo-0: send push message to user's browser if they are logged in, to update their credit
+            BigDecimal credit = tranRepository.getBalByMongoId(ownerNode.getIdStr());
+            UpdateAccountInfo pushInfo = new UpdateAccountInfo(ownerNode.getIdStr(), credit);
+            push.pushInfo(ThreadLocals.getSC(), pushInfo);
         } else {
             log.debug("addCreditByEmail: user not found for email: " + email);
         }

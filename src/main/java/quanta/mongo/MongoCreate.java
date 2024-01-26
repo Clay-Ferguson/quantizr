@@ -410,6 +410,7 @@ public class MongoCreate extends ServiceBase {
 
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false));
+
         return res;
     }
 
@@ -443,7 +444,7 @@ public class MongoCreate extends ServiceBase {
             newNode.setContent("");
         }
         newNode.touch();
-        // '/r/p/' = pending (nodes not yet published, being edited created by users)
+        // pending path (nodes not yet saved by user, being edited/created by users)
         if (req.isPendingEdit()) {
             mongoUtil.setPendingPath(newNode, true);
         }
@@ -482,10 +483,11 @@ public class MongoCreate extends ServiceBase {
             parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
 
+        // we save right away here so we get the node ID
         update.save(ms, newNode);
+
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
                 Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false));
-
         return res;
     }
 }

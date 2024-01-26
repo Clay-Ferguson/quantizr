@@ -53,6 +53,7 @@ public class AsyncExec extends ServiceBase {
                 } finally {
                     ThreadLocals.removeAll();
                     execCounter--;
+                    // log.error("AsyncExec exiting. Started by: " + stackTrace);
                 }
             }
         });

@@ -189,6 +189,8 @@ public class NodeEditService extends ServiceBase {
             res.setNode(newNodeInfo);
         }
 
+        // this should be unnessary, but we do it anyway just to be safe
+        update.saveSession(ms);
         return res;
     }
 
@@ -518,6 +520,7 @@ public class NodeEditService extends ServiceBase {
     public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
         InitNodeEditResponse res = new InitNodeEditResponse();
         String nodeId = req.getNodeId();
+
         /*
          * IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
          * wanting to edit his Friend node representing this user.
@@ -538,11 +541,12 @@ public class NodeEditService extends ServiceBase {
             });
         }
         SubNode node = read.getNode(ms, nodeId);
-        auth.ownerAuth(ms, node);
         if (node == null) {
             res.error("Node not found.");
             return res;
         }
+        auth.ownerAuth(ms, node);
+
         NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
                 Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false);
         res.setNodeInfo(nodeInfo);

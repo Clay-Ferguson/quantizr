@@ -33,7 +33,6 @@ public class ThreadLocals {
     private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
     private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
     private static final ThreadLocal<String> reqSig = new ThreadLocal<>();
-    private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 
     /*
      * Each thread will set this when a root event is created and any other events that get created,
@@ -48,10 +47,6 @@ public class ThreadLocals {
      * every object that is touched during the processing of a thread/request.
      */
     private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
-
-    // We judiciously add only *some* nodes to this cache that we know are safe to cache because
-    // they're able to be treated as readonly during the context of the thread.
-    private static final ThreadLocal<HashMap<ObjectId, SubNode>> cachedNodes = new ThreadLocal<>();
 
     /*
      * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
@@ -76,9 +71,7 @@ public class ThreadLocals {
         reqBearerToken.remove();
         reqSig.remove();
         rootEvent.remove();
-        saving.remove();
-        getDirtyNodes().clear();
-        getCachedNodes().clear();
+        clearDirtyNodes();
         setParentCheckEnabled(true);
         session.remove();
     }
@@ -177,16 +170,6 @@ public class ThreadLocals {
         return reqSig.get();
     }
 
-    public static void setSaving(Boolean val) {
-        saving.set(val);
-    }
-
-    public static Boolean getSaving() {
-        if (saving.get() == null)
-            return false;
-        return saving.get();
-    }
-
     public static void setParentCheckEnabled(Boolean val) {
         parentCheckEnabled.set(val);
     }
@@ -210,28 +193,6 @@ public class ThreadLocals {
 
     public static void setDirtyNodes(HashMap<ObjectId, SubNode> dn) {
         dirtyNodes.set(dn);
-    }
-
-    public static void cacheNode(SubNode node) {
-        if (node == null || node.getId() == null) {
-            return;
-        }
-        getCachedNodes().put(node.getId(), node);
-    }
-
-    public static SubNode getCachedNode(ObjectId id) {
-        return getCachedNodes().get(id);
-    }
-
-    public static HashMap<ObjectId, SubNode> getCachedNodes() {
-        if (cachedNodes.get() == null) {
-            cachedNodes.set(new HashMap<ObjectId, SubNode>());
-        }
-        return cachedNodes.get();
-    }
-
-    public static void setCachedNodes(HashMap<ObjectId, SubNode> cn) {
-        cachedNodes.set(cn);
     }
 
     public static boolean hasDirtyNodes() {
@@ -274,16 +235,11 @@ public class ThreadLocals {
          * If we are setting this node to dirty, but we already see another copy of the same nodeId in
          * memory, this is a problem and will mean whichever node happens to be saved 'last' will overwrite,
          * so this *may* result in data loss.
-         *
-         * Normally NodeIterator.java, and all places we ready from the DB should be wrapped in a way as to
-         * let the dirty nodes be correctly referenced, so this message should never get printed.
          */
         if (nodeFound != null) {
-            // Not checking this, because it can happen in normal code flow
-            // if (nodeFound.hashCode() != node.hashCode()) {
-            // ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
-            // }
-            return;
+            if (nodeFound.hashCode() != node.hashCode()) {
+                ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+            }
         }
         getDirtyNodes().put(node.getId(), node);
     }

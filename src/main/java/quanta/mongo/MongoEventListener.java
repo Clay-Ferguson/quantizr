@@ -22,6 +22,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
+import quanta.service.AttachmentService;
 import quanta.service.SystemService;
 import quanta.util.Const;
 import quanta.util.EventPublisher;
@@ -77,6 +78,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     private EventPublisher publisher;
 
     @Autowired
+    private AttachmentService attach;
+
+    @Autowired
     private AclService acl;
 
     /**
@@ -89,7 +93,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     @Override
     public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
         SubNode node = event.getSource();
-        log.trace("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
         Document dbObj = event.getDocument();
         ObjectId id = node.getId();
         boolean isNew = false;
@@ -103,6 +106,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             isNew = true;
         }
         dbObj.put(SubNode.ID, id);
+
         // Extra protection to be sure accounts and repo root can't have any sharing
         if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
             node.setAc(null);
@@ -223,6 +227,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
             SystemService.lastAdminOwnedSaveTime = System.currentTimeMillis();
         }
+        attach.fixAllAttachmentMimes(node);
 
         // Since we're saving this node already make sure none of our setters above left it flagged
         // as dirty or it might unnecessarily get saved twice.
@@ -230,7 +235,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     }
 
     private void verifyParentExists(SubNode node, Document dbObj, boolean isNew) {
-        if (!node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ThreadLocals.getParentCheckEnabled()
+        if (!node.getPath().startsWith(NodePath.PENDING_PATH_S) && ThreadLocals.getParentCheckEnabled()
                 && (isNew || node.verifyParentPath)) {
             try {
                 read.checkParentExists(null, node.getPath());
@@ -253,8 +258,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
     @Override
     public void onAfterLoad(AfterLoadEvent<SubNode> event) {
-        // Document dbObj = event.getDocument();
-        // String id = dbObj.getObjectId(SubNode.ID).toHexString();
+        Document dbObj = event.getDocument();
+        ObjectId id = dbObj.getObjectId(SubNode.ID);
+        if (ThreadLocals.hasDirtyNode(dbObj.getObjectId(SubNode.ID))) {
+            log.warn("DIRTY READ (onAfterLoad): " + id.toHexString());
+        }
     }
 
     @Override
@@ -266,6 +274,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                 log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
             }
         }
+
         // Extra protection to be sure accounts and repo root can't have any sharing
         if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
             node.setAc(null);
@@ -274,11 +283,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         if (Const.HOME_NODE_NAME.equalsIgnoreCase(node.getName())) {
             node.set(NodeProp.UNPUBLISHED, true);
         }
+
         node.fixAttachments();
         node.verifyParentPath = StringUtils.isEmpty(node.getPath());
-        if (ThreadLocals.hasDirtyNode(node.getId())) {
-            log.warn("DIRTY READ: " + node.getIdStr());
-        }
     }
 
     @Override
@@ -318,7 +325,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             // Must have write privileges to this node.
             auth.ownerAuth(node);
             // only if this is creating a new node do we need to check that the parent will allow it
-            if (isNew && !node.getPath().startsWith(NodePath.PENDING_PATH + "/")) {
+            if (isNew && !node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
                 SubNode parent = read.getParent(ms, node);
                 if (parent == null) {
                     log.debug("This SAVE should get rejected (its parent is missing): " + XString.prettyPrint(node));
