@@ -61,7 +61,7 @@ export class NodeCompMarkdown extends Comp {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);
-        // val = this.translateLaTex(val); // do not delete
+        val = this.translateLaTex(val);
         val = this.insertMarkdownLinks(urls, val);
         return val;
     }
@@ -76,14 +76,13 @@ export class NodeCompMarkdown extends Comp {
         return val;
     }
 
-    // do not delete
-    // translateLaTex = (val: string): string => {
-    //     val = val.replaceAll("\\(", "$");
-    //     val = val.replaceAll("\\)", "$");
-    //     val = val.replaceAll("\\[", "$$");
-    //     val = val.replaceAll("\\]", "$$");
-    //     return val;
-    // }
+    translateLaTex = (val: string): string => {
+        val = val.replaceAll("\\(", "$");
+        val = val.replaceAll("\\)", "$");
+        val = val.replaceAll("\\[", "$$");
+        val = val.replaceAll("\\]", "$$");
+        return val;
+    }
 
     override preRender = (): boolean => {
         const state: LS = this.getState<LS>();
