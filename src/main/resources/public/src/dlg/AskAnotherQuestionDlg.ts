@@ -43,7 +43,8 @@ export class AskAboutSubgraphDlg extends DialogBase {
         // asks a question about the subgraph of this tree
         const res = await S.rpcUtil.rpc<J.AskSubGraphRequest, J.AskSubGraphResponse>("askSubGraph", {
             nodeId: this.nodeId,
-            question: this.questionState.getValue()
+            question: this.questionState.getValue(),
+            nodeIds: S.nodeUtil.getSelNodeIdsArray()
         });
 
         this.close();

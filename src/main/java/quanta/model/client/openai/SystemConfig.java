@@ -24,7 +24,7 @@ public class SystemConfig {
     }
 
     public boolean isConfigured() {
-        return prompt != null && model != null;
+        return prompt != null;
     }
 
     public Double getTemperature() {

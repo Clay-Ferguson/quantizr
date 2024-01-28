@@ -301,7 +301,7 @@ public class MongoCreate extends ServiceBase {
             // if this is a regular node and not an openai reply node, then we are asking the text on this
             // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
-                openAiAnswer = oai.getOpenAiAnswer(ms, parentNode, null);
+                openAiAnswer = oai.getOpenAiAnswer(ms, parentNode, null, null);
                 res.setGptCredit(openAiAnswer.userCredit);
                 typeToCreate = NodeType.OPENAI_ANSWER.s();
             }

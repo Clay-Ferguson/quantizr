@@ -195,7 +195,7 @@ public class OpenAiService extends ServiceBase {
      * 
      * You can pass a node, or else 'text' to query about.
      */
-    public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question) {
+    public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
 
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
@@ -207,13 +207,15 @@ public class OpenAiService extends ServiceBase {
         // this will hold all the prior chat history
         List<ChatMessage> messages = new ArrayList<>();
 
-        SystemConfig system = new SystemConfig();
+        if (system == null) {
+            system = new SystemConfig();
+        }
 
         if (node != null) {
             buildChatHistory(ms, node, messages, system);
         }
 
-        if (StringUtils.isEmpty(system.getPrompt())) {
+        if (!system.isConfigured()) {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
 
@@ -343,6 +345,8 @@ public class OpenAiService extends ServiceBase {
     }
 
     private void addAttachments(List<Map> content, SubNode node) {
+        if (node == null)
+            return;
         if (node.getAttachments() != null) {
             node.getAttachments().forEach((String key, Attachment att) -> {
                 if (att.getMime().startsWith("image")) {
@@ -491,23 +495,6 @@ public class OpenAiService extends ServiceBase {
         if (StringUtils.isEmpty(system.getModel()) && node.hasProp(NodeProp.AI_MODEL.s())) {
             system.setModel(node.getStr(NodeProp.AI_MODEL.s()));
         }
-
-        // are we now configured from props?
-        if (system.isConfigured())
-            return;
-
-        StringTokenizer t = new StringTokenizer(node.getContent(), "\n\r", false);
-
-        while (t.hasMoreTokens()) {
-            String tok = t.nextToken();
-            if (StringUtils.isEmpty(system.getPrompt()) && tok.toLowerCase().startsWith(NodeProp.AI.s() + ":")) {
-                system.setPrompt(tok.substring(3).trim());
-            }
-
-            if (StringUtils.isEmpty(system.getModel()) && tok.toLowerCase().startsWith(NodeProp.AI_MODEL.s() + ":")) {
-                system.setModel(tok.substring(9).trim());
-            }
-        }
     }
 
     public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
@@ -553,15 +540,22 @@ public class OpenAiService extends ServiceBase {
     public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
         AskSubGraphResponse res = new AskSubGraphResponse();
 
-        // todo-2: in future use cases we'd want to allow includeComments
-        List<SubNode> nodes = read.getFlatSubGraph(ms, req.getNodeId(), false);
+        // todo-2: in future use cases we'd want to allow includeComments setting
+        List<SubNode> nodes = read.getFlatSubGraph(ms, req.getNodeId(), true);
         int counter = 0;
-
         StringBuilder sb = new StringBuilder();
         SubNode node = read.getNode(ms, req.getNodeId());
         sb.append(node.getContent() + "\n\n");
+        SystemConfig system = new SystemConfig();
 
         for (SubNode n : nodes) {
+            // if we have filter IDs and this node isn't in the filter, skip it
+            if (req.getNodeIds() != null && !req.getNodeIds().contains(n.getIdStr())) {
+                continue;
+            }
+            if (!system.isConfigured()) {
+                parseAISystemFromContent(node, system);
+            }
             sb.append(n.getContent() + "\n\n");
             counter++;
 
@@ -570,14 +564,14 @@ public class OpenAiService extends ServiceBase {
                 if (counter > 100) {
                     throw new RuntimeException("Too many nodes in subgraph.");
                 }
-                if (sb.length() > 10000) {
+                if (sb.length() > 32000) {
                     throw new RuntimeException("Too many characters in subgraph.");
                 }
             }
         }
         sb.append(req.getQuestion());
 
-        ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString());
+        ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString(), system);
         res.setGptCredit(answer.userCredit);
         res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
         return res;
@@ -587,7 +581,7 @@ public class OpenAiService extends ServiceBase {
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
 
-        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null);
+        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null, null);
         res.setGptCredit(aiAnswer.userCredit);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,

@@ -291,6 +291,7 @@ export interface AddPrivilegeRequest extends RequestBase {
 export interface AskSubGraphRequest extends RequestBase {
     nodeId: string;
     question: string;
+    nodeIds: string[];
 }
 
 export interface BlockUserRequest extends RequestBase {

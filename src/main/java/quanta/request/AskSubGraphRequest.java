@@ -1,10 +1,23 @@
 package quanta.request;
 
+import java.util.List;
 import quanta.request.base.RequestBase;
 
 public class AskSubGraphRequest extends RequestBase {
     private String nodeId;
     private String question;
+
+    // if there are nodes passed in this then it's a filter and we only include them in the input to the
+    // AI
+    private List<String> nodeIds;
+
+    public List<String> getNodeIds() {
+        return nodeIds;
+    }
+
+    public void setNodeIds(List<String> nodeIds) {
+        this.nodeIds = nodeIds;
+    }
 
     public String getQuestion() {
         return question;
