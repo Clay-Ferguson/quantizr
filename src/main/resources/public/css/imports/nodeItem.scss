@@ -221,8 +221,6 @@
     padding-top: 4px;
 }
 
-.rowBorderEditInfo {}
-
 /*
 With "Display: table", the only way to get the internal 'nodeGridItem' cell content to render with the SAME
 height as the actual cell (i.e. fill up the entire cell) is to use "height: 100%" on the table, and the table-row, 

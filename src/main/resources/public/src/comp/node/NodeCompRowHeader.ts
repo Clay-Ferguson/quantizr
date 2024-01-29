@@ -22,12 +22,12 @@ export class NodeCompRowHeader extends Div {
 
     constructor(private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
-        private allowDelete: boolean, private prefix: string, private idx: number) {
+        private allowDelete: boolean, private prefix: string, private idx: number, indentLevel: number) {
         super(null);
 
         const ast = getAs();
         this.attribs.className = (tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? //
-            (this.idx == 1 ? "rowHeaderEditFirst" : "rowHeaderEdit") : "row-header";
+            (indentLevel <= 1 && this.idx == 1 ? "rowHeaderEditFirst" : "rowHeaderEdit") : "row-header";
     }
 
     override preRender = (): boolean => {

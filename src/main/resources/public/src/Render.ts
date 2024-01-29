@@ -71,7 +71,7 @@ export class Render {
 
                 const key = (a as any).key;
                 const imgUrl = S.attachment.getUrlForNodeAttachment(node, key, false);
-                // todo-0: This approach with <img> tag doesn't work based on our current markdown sanitizer
+                // todo-1: This approach with <img> tag doesn't work based on our current markdown sanitizer
                 // val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" style="margin-bottom: 12px" width="${imgSize}" src="${imgUrl}" ${C.NODE_ID_ATTR}="${node.id}" data-attkey="${key}">\n\n`);
                 val = val.replaceAll(`{{${a.f}}}`, `![](${imgUrl})`);
             }
