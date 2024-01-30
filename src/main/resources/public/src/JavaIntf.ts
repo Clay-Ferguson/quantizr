@@ -291,6 +291,7 @@ export interface AddPrivilegeRequest extends RequestBase {
 export interface AskSubGraphRequest extends RequestBase {
     nodeId: string;
     question: string;
+    aiService: string;
     nodeIds: string[];
 }
 
@@ -1232,6 +1233,7 @@ export interface UserPreferences {
     showReplies: boolean;
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
+    aiService: string;
     enableIPSM: boolean;
     maxUploadFileSize: number;
 }
@@ -1316,6 +1318,7 @@ export const enum NodeProp {
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
     USER_PREF_MAIN_PANEL_COLS = "sn:mainPanelCols",
+    USER_PREF_AI_SERVICE = "sn:aiService",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",
@@ -1375,6 +1378,7 @@ export const enum NodeProp {
     OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
     OPENAI_RESPONSE = "sn:oaiRes",
+    PPLXAI_RESPONSE = "sn:pplxaiRes",
     HUGGINGFACE_RESPONSE = "sn:hfaceRes",
     OOBAI_RESPONSE = "sn:oobRes",
     FILE_NAME = "file",
@@ -1395,6 +1399,7 @@ export const enum NodeType {
     CALENDAR = "sn:calendar",
     COMMENT = "sn:comment",
     OPENAI_ANSWER = "sn:oaiAns",
+    PPLXAI_ANSWER = "sn:pplxaiAns",
     HUGGINGFACE_ANSWER = "sn:hfAns",
     OOBAI_ANSWER = "sn:oobAns",
     RSS_FEED = "sn:rssfeed",

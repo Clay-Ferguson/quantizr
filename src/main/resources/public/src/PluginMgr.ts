@@ -17,6 +17,7 @@ import { IPFSNodeType } from "./plugins/IPFSNodeType";
 import { MarkdownType } from "./plugins/MarkdownType";
 import { NotesNodeType } from "./plugins/NotesNodeType";
 import { OpenAiAnswerType } from "./plugins/OpenAiAnswerType";
+import { PplxAiAnswerType } from "./plugins/PplxAiAnswerType";
 import { HuggingFaceAnswerType } from "./plugins/HuggingFaceAnswerType";
 import { PostsType } from "./plugins/PostsType";
 import { RepoRootType } from "./plugins/RepoRootType";
@@ -83,6 +84,7 @@ export class PluginMgr {
         this.addType(ordinal++, new BookmarkType());
         this.addType(ordinal++, new CommentType());
         this.addType(ordinal++, new OpenAiAnswerType());
+        this.addType(ordinal++, new PplxAiAnswerType());
         this.addType(ordinal++, new HuggingFaceAnswerType());
         this.addType(ordinal++, new BookmarkListType());
         this.addType(ordinal++, new FriendsListType());

@@ -6,6 +6,7 @@ import quanta.request.base.RequestBase;
 public class AskSubGraphRequest extends RequestBase {
     private String nodeId;
     private String question;
+    private String aiService;
 
     // if there are nodes passed in this then it's a filter and we only include them in the input to the
     // AI
@@ -33,5 +34,13 @@ public class AskSubGraphRequest extends RequestBase {
 
     public void setNodeId(String nodeId) {
         this.nodeId = nodeId;
+    }
+
+    public String getAiService() {
+        return aiService;
+    }
+
+    public void setAiService(String aiService) {
+        this.aiService = aiService;
     }
 }

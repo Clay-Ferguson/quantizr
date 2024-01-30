@@ -17,6 +17,7 @@ public class UserPreferences {
     private boolean rssHeadlinesOnly;
     // valid Range = 4 thru 8, inclusive.
     private long mainPanelCols = 6;
+    private String aiService;
 
     // not persisted to DB yet. ipsm was just an experiment using IPFSSubPub for messaging
 
@@ -44,6 +45,14 @@ public class UserPreferences {
     @JsonProperty(required = false)
     public void setMainPanelCols(long mainPanelCols) {
         this.mainPanelCols = mainPanelCols;
+    }
+
+    public String getAiService() {
+        return aiService;
+    }
+
+    public void setAiService(String aiService) {
+        this.aiService = aiService;
     }
 
     public boolean isEditMode() {

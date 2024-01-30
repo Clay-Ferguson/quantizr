@@ -549,7 +549,7 @@ public class UserManagerService extends ServiceBase {
     public boolean initialGrant(String userId, String userName) {
         UserAccount user = userRepository.findByMongoId(userId);
         if (user == null) {
-            log.debug("User not found, creating...");
+            log.debug("UserAccount not found, creating...");
             user = userRepository.save(new UserAccount(userId, userName));
 
             Tran credit = new Tran();
@@ -656,6 +656,7 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_SHOW_REPLIES, reqUserPrefs.isShowReplies());
             prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
             prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
+            prefsNode.set(NodeProp.USER_PREF_AI_SERVICE, reqUserPrefs.getAiService());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
@@ -663,6 +664,7 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
             userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
             userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
+            userPrefs.setAiService(reqUserPrefs.getAiService());
             return null;
         });
         return res;
@@ -933,6 +935,7 @@ public class UserManagerService extends ServiceBase {
                 mainPanelCols = 6;
             }
             userPrefs.setMainPanelCols(mainPanelCols);
+            userPrefs.setAiService(prefsNode.getStr(NodeProp.USER_PREF_AI_SERVICE));
             return null;
         });
         return userPrefs;

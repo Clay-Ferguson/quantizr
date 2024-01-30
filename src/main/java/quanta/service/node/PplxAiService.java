@@ -1,0 +1,165 @@
+package quanta.service.node;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import quanta.config.ServiceBase;
+import quanta.model.client.NodeType;
+import quanta.model.client.openai.ChatCompletionResponse;
+import quanta.model.client.openai.ChatGPTRequest;
+import quanta.model.client.openai.ChatMessage;
+import quanta.model.client.openai.SystemConfig;
+import quanta.model.client.openai.Usage;
+import quanta.mongo.MongoSession;
+import quanta.mongo.model.SubNode;
+import quanta.util.Util;
+import quanta.util.XString;
+import reactor.core.publisher.Mono;
+
+@Component
+public class PplxAiService extends ServiceBase {
+    String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
+    String PPLX_MODEL_COMPLETION = "pplx-70b-chat"; // "mistral-7b-instruct";
+    String COST_CODE = "PPX"; // 3 chars allowed
+
+    DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
+    private static Logger log = LoggerFactory.getLogger(PplxAiService.class);
+
+    /**
+     * Queries PerplexityAI using the 'node.content' as the question to ask.
+     * 
+     * You can pass a node, or else 'text' to query about.
+     */
+    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
+
+        SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
+        if (userNode == null) {
+            throw new RuntimeException("Unknown user.");
+        }
+
+        BigDecimal balance = aiUtil.getBalance(ms, userNode);
+
+        // this will hold all the prior chat history
+        List<ChatMessage> messages = new ArrayList<>();
+
+        if (system == null) {
+            system = new SystemConfig();
+        }
+
+        if (node != null) {
+            buildChatHistory(ms, node, messages, system);
+        }
+
+        if (!system.isConfigured()) {
+            system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
+        }
+
+        String input = node != null ? node.getContent() : question;
+        messages.add(0, new ChatMessage("system", system.getPrompt()));
+        messages.add(new ChatMessage("user", input));
+        system.setModel(PPLX_MODEL_COMPLETION);
+
+        WebClient webClient = Util.webClientBuilder().baseUrl(PPLX_COMP_URL)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("Authorization", "Bearer " + prop.getPplxAiKey()).build();
+
+        ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
+                ms.getUserNodeId().toHexString(), 2000);
+
+        log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
+                + XString.prettyPrint(request));
+
+        /*
+         * Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request' here
+         * instead of the stringified version of it. I haven't tried to figure out why the non-stringified
+         * fails, but it does fail.
+         */
+        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+                .retrieve().bodyToMono(ChatCompletionResponse.class);
+
+        ChatCompletionResponse res = mono.block();
+
+        BigDecimal cost = new BigDecimal(calculateCost(res));
+        res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
+        log.debug("PPLX Res: " + XString.prettyPrint(res));
+        return res;
+
+        // ================================
+        // DO NOT DELETE:
+        // We can use this for debugging to see the raw request and response
+        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
+        // log.debug("RESPONSE: " + response);
+    }
+
+    private double calculateCost(ChatCompletionResponse res) {
+        Usage usage = res.getUsage();
+
+        // price per mega-token
+        double inputPpm = 0;
+        double outputPpm = 0;
+        String model = res.getModel().toLowerCase();
+
+        // We detect using startsWith, because the actual model used will be slightly different than the one
+        // specified
+        if (model.equals(PPLX_MODEL_COMPLETION)) {
+            // https://docs.perplexity.ai/docs/pricing
+            // These proces are for 70b model non "-online" version
+            inputPpm = 0.7;
+            outputPpm = 2.8;
+        } else {
+            throw new RuntimeException("Only " + PPLX_MODEL_COMPLETION + " is currently supported. " + res.getModel()
+                    + " is not supported.");
+        }
+
+        return (usage.getPromptTokens() * inputPpm / 1000000) + (usage.getCompletionTokens() * outputPpm / 1000000);
+    }
+
+    /**
+     * we walk up the tree, to build as much chat history as we have so we can create the full
+     * 
+     * conversation context, If any of the nodes contain a "system: ..." line of text that will be used
+     * as the system we return, so users will always be able to embed the system instructions into a
+     * question.
+     */
+    private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
+        aiUtil.parseAISystemFromContent(node, system);
+        SubNode parent = read.getParent(ms, node);
+        int nonAnswerCounter = NodeType.OPENAI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
+
+        // this while loop should encounter alternating questions and answer nodes as we go back up
+        // the tree building history.
+        while (parent != null) {
+            if (aiUtil.isAnyAnswerType(parent)) {
+                nonAnswerCounter = 0;
+                messages.add(0, new ChatMessage("assistant", parent.getContent()));
+            } else {
+                nonAnswerCounter++;
+                aiUtil.parseAISystemFromContent(parent, system);
+
+                // if we hit two non-answer nodes in a row that means we're at the top level of
+                // where teh first question was asked, and therefore the beginning of the chat.
+                if (nonAnswerCounter > 1) {
+                    break;
+                }
+
+                // addAttachments(content, parent);
+                messages.add(0, new ChatMessage("user", parent.getContent()));
+            }
+
+            // walk up the tree. get parent of parent.
+            parent = read.getParent(ms, parent);
+        }
+
+        // if we still don't have a system prompt check all ancestor nodes
+        aiUtil.getSystemPromptFromAncestorNodes(ms, parent, system);
+    }
+}

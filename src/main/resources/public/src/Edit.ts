@@ -504,6 +504,12 @@ export class Edit {
         }, 100);
     };
 
+    setAiService = (val: string) => {
+        setTimeout(() => {
+            S.util.saveUserPrefs(s => s.userPrefs.aiService = val);
+        }, 100);
+    };
+
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
     saveTabsTopmostVisible = async (): Promise<boolean> => {
         let doScrolling = false;
@@ -1063,12 +1069,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId,
-
-            // todo-2: Eventually we'll have a configurable way to choose which AI to use.
-            aiQuestion: "openAi",
-            // aiQuestion: "huggingFace",
-            // aiQuestion: "oobAi",
-
+            aiQuestion: getAs().userPrefs.aiService, // openAi, pplxAi, huggingFace, oobAi,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,

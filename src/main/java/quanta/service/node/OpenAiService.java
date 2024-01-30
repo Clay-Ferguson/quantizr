@@ -4,15 +4,11 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -40,14 +36,11 @@ import quanta.model.client.openai.Usage;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.postgres.table.Tran;
-import quanta.postgres.table.UserAccount;
 import quanta.request.AskSubGraphRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.response.AskSubGraphResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.service.AppController;
-import quanta.service.UserManagerService;
 import quanta.util.Const;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
@@ -66,6 +59,7 @@ public class OpenAiService extends ServiceBase {
     String OPENAI_MODEL_TTS = "tts-1";
     String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
     String OPENAI_MODEL_COMPLETION = "gpt-4-1106-preview";
+    String COST_CODE = "OAI"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(OpenAiService.class);
@@ -76,7 +70,7 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Unknown user.");
         }
 
-        BigDecimal balance = getBalance(ms, userNode);
+        BigDecimal balance = aiUtil.getBalance(ms, userNode);
         LimitedInputStreamEx lis = null;
         String model = OPENAI_MODEL_TTS;
 
@@ -122,11 +116,10 @@ public class OpenAiService extends ServiceBase {
 
         if (lis != null) {
             BigDecimal cost = getSpeechCost(model, prompt.length());
-            updateUserCredit(userNode, balance, cost);
+            aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         }
         return null;
     }
-
 
     public String generateImage(MongoSession ms, String prompt, boolean highDef, String size) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
@@ -134,7 +127,7 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Unknown user.");
         }
 
-        BigDecimal balance = getBalance(ms, userNode);
+        BigDecimal balance = aiUtil.getBalance(ms, userNode);
         ImageResponse res = null;
 
         try {
@@ -164,7 +157,7 @@ public class OpenAiService extends ServiceBase {
         }
 
         BigDecimal cost = getImageCost(size);
-        updateUserCredit(userNode, balance, cost);
+        aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         return null;
     }
 
@@ -195,14 +188,14 @@ public class OpenAiService extends ServiceBase {
      * 
      * You can pass a node, or else 'text' to query about.
      */
-    public ChatCompletionResponse getOpenAiAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
+    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
 
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
 
-        BigDecimal balance = getBalance(ms, userNode);
+        BigDecimal balance = aiUtil.getBalance(ms, userNode);
 
         // this will hold all the prior chat history
         List<ChatMessage> messages = new ArrayList<>();
@@ -288,7 +281,7 @@ public class OpenAiService extends ServiceBase {
 
         ChatCompletionResponse res = mono.block();
         BigDecimal cost = new BigDecimal(calculateCost(res));
-        res.userCredit = updateUserCredit(userNode, balance, cost);
+        res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("GPT Res: " + XString.prettyPrint(res));
         return res;
 
@@ -298,24 +291,6 @@ public class OpenAiService extends ServiceBase {
         // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
         // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
         // log.debug("RESPONSE: " + response);
-    }
-
-    private BigDecimal getBalance(MongoSession ms, SubNode userNode) {
-        BigDecimal balance = null;
-        String userName = userNode.getStr(NodeProp.USER);
-        if (user.initialGrant(userNode.getIdStr(), userName)) {
-            balance = new BigDecimal(UserManagerService.INITIAL_GRANT_AMOUNT);
-        } else {
-            balance = tranRepository.getBalByMongoId(ms.getUserNodeId().toHexString());
-            if (balance == null) {
-                throw new RuntimeException("Sorry, you have no more credit.");
-            }
-            int comparisonResult = balance.compareTo(BigDecimal.ZERO);
-            if (comparisonResult <= 0) {
-                throw new RuntimeException("Sorry, you have no more credit.");
-            }
-        }
-        return balance;
     }
 
     private boolean messageListHasImages(List<ChatMessage> messages) {
@@ -373,31 +348,6 @@ public class OpenAiService extends ServiceBase {
         }
     }
 
-    // updates the user's credit, and returns new balance
-    private BigDecimal updateUserCredit(SubNode userNode, BigDecimal curBal, BigDecimal cost) {
-        UserAccount user = userRepository.findByMongoId(userNode.getIdStr());
-
-        if (user == null) {
-            // creating here should never be necessary but we do it anyway
-            log.debug("User not found, creating...");
-            String userName = userNode.getStr(NodeProp.USER);
-            user = userRepository.save(new UserAccount(userNode.getIdStr(), userName));
-        }
-
-        Tran debit = new Tran();
-        debit.setAmt(cost);
-        debit.setTransType("D");
-        debit.setTs(Timestamp.from(Instant.now()));
-        debit.setDescCode("OAI"); // OpenAI
-        debit.setUserAccount(user);
-
-        // Eventually we will add to this information about the gpt request too. Entire Q & A
-        // debit.setDetail(mapper.valueToTree(res));
-
-        tranRepository.save(debit);
-        return curBal.subtract(cost);
-    }
-
     private boolean moderationFailed(ChatGPTModerationResponse modResponse) {
         if (modResponse == null || modResponse.getResults() == null || modResponse.getResults().length == 0) {
             return false;
@@ -432,14 +382,14 @@ public class OpenAiService extends ServiceBase {
      * question.
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
-        parseAISystemFromContent(node, system);
+        aiUtil.parseAISystemFromContent(node, system);
         SubNode parent = read.getParent(ms, node);
         int nonAnswerCounter = NodeType.OPENAI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
-            if (NodeType.OPENAI_ANSWER.s().equals(parent.getType())) {
+            if (aiUtil.isAnyAnswerType(parent)) {
                 nonAnswerCounter = 0;
                 List<Map> content = new ArrayList<>();
                 HashMap<String, Object> map = new HashMap<>();
@@ -449,7 +399,7 @@ public class OpenAiService extends ServiceBase {
                 messages.add(0, new ChatMessage("assistant", content));
             } else {
                 nonAnswerCounter++;
-                parseAISystemFromContent(parent, system);
+                aiUtil.parseAISystemFromContent(parent, system);
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
@@ -471,49 +421,7 @@ public class OpenAiService extends ServiceBase {
         }
 
         // if we still don't have a system prompt check all ancestor nodes
-        getSystemPromptFromAncestorNodes(ms, parent, system);
-    }
-
-    public void getSystemPromptFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
-        while (node != null) {
-            parseAISystemFromContent(node, system);
-            if (system.isConfigured()) {
-                return;
-            }
-            node = read.getParent(ms, node);
-        }
-    }
-
-    public void parseAISystemFromContent(SubNode node, SystemConfig system) {
-        if (system.isConfigured())
-            return;
-
-        if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI.s())) {
-            system.setPrompt(node.getStr(NodeProp.AI.s()));
-        }
-
-        if (StringUtils.isEmpty(system.getModel()) && node.hasProp(NodeProp.AI_MODEL.s())) {
-            system.setModel(node.getStr(NodeProp.AI_MODEL.s()));
-        }
-    }
-
-    public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
-        StringBuilder sb = new StringBuilder();
-        int counter = 0;
-        for (Choice choice : ccr.getChoices()) {
-            if (counter > 0) {
-                sb.append("\n\n");
-            }
-            sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getTextContent());
-
-            // Since we store the answer text in the content of the node and also store the answer object
-            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
-            if (nullify) {
-                choice.getMessage().setContent(null);
-            }
-            counter++;
-        }
-        return sb.toString();
+        aiUtil.getSystemPromptFromAncestorNodes(ms, parent, system);
     }
 
     private double calculateCost(ChatCompletionResponse res) {
@@ -537,57 +445,17 @@ public class OpenAiService extends ServiceBase {
         return (usage.getPromptTokens() * inputPpk / 1000) + (usage.getCompletionTokens() * outputPpk / 1000);
     }
 
-    public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
-        AskSubGraphResponse res = new AskSubGraphResponse();
-
-        // todo-2: in future use cases we'd want to allow includeComments setting
-        List<SubNode> nodes = read.getFlatSubGraph(ms, req.getNodeId(), true);
-        int counter = 0;
-        StringBuilder sb = new StringBuilder();
-        SubNode node = read.getNode(ms, req.getNodeId());
-        sb.append(node.getContent() + "\n\n");
-        SystemConfig system = new SystemConfig();
-
-        for (SubNode n : nodes) {
-            // if we have filter IDs and this node isn't in the filter, skip it
-            if (req.getNodeIds() != null && !req.getNodeIds().contains(n.getIdStr())) {
-                continue;
-            }
-            if (!system.isConfigured()) {
-                parseAISystemFromContent(node, system);
-            }
-            sb.append(n.getContent() + "\n\n");
-            counter++;
-
-            if (!ms.isAdmin()) {
-                // we can remove these limitations once we have user quotas in place.
-                if (counter > 100) {
-                    throw new RuntimeException("Too many nodes in subgraph.");
-                }
-                if (sb.length() > 32000) {
-                    throw new RuntimeException("Too many characters in subgraph.");
-                }
-            }
-        }
-        sb.append(req.getQuestion());
-
-        ChatCompletionResponse answer = getOpenAiAnswer(ms, null, sb.toString(), system);
-        res.setGptCredit(answer.userCredit);
-        res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
-        return res;
-    }
-
     // Assumes node is a question, and inserts the answer under it as a subnode
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
 
-        ChatCompletionResponse aiAnswer = oai.getOpenAiAnswer(ms, node, null, null);
+        ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null);
         res.setGptCredit(aiAnswer.userCredit);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
                 null, null, true, true, res.getNodeChanges());
 
-        newNode.setContent(oai.formatAnswer(aiAnswer, true));
+        newNode.setContent(aiUtil.formatAnswer(aiAnswer, true));
         newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
 
         newNode.touch();

@@ -747,7 +747,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object askSubGraph(@RequestBody AskSubGraphRequest req, HttpSession session) {
         return callProc.run("askSubGraph", false, false, req, session, ms -> {
-            return oai.askSubGraph(ms, req);
+            return aiUtil.askSubGraph(ms, req);
         });
     }
 

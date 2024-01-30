@@ -38,6 +38,7 @@ public enum NodeProp {
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth"), //
     USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly"), //
     USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols"), //
+    USER_PREF_AI_SERVICE("sn:aiService"), //
     SIGNUP_PENDING("sn:signupPending"), //
 
     EMAIL_CONTENT("sn:content"), //
@@ -168,6 +169,7 @@ public enum NodeProp {
     OPEN_GRAPH("sn:og"), //
     TRUNCATED("trunc"), //
     OPENAI_RESPONSE("sn:oaiRes"), //
+    PPLXAI_RESPONSE("sn:pplxaiRes"), //
     HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
     OOBAI_RESPONSE("sn:oobRes"), //
 

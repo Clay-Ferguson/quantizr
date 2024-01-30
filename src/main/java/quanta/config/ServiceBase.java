@@ -63,13 +63,15 @@ import quanta.service.node.NodeRenderService;
 import quanta.service.node.NodeSearchService;
 import quanta.service.node.OobaAiService;
 import quanta.service.node.OpenAiService;
+import quanta.service.node.PplxAiService;
 import quanta.test.TestUtil;
-import quanta.types.AIAnswerType;
+import quanta.types.OpenAIAnswerType;
 import quanta.types.BookmarkType;
 import quanta.types.CalendarType;
 import quanta.types.FriendType;
 import quanta.types.RssFeedType;
 import quanta.types.TypePluginMgr;
+import quanta.util.AIUtil;
 import quanta.util.AsyncExec;
 import quanta.util.CallProcessor;
 import quanta.util.Convert;
@@ -124,6 +126,7 @@ public class ServiceBase {
     public static MongoAuth auth;
     public static MongoUtil mongoUtil;
     public static SubNodeUtil snUtil;
+    public static AIUtil aiUtil;
     public static AclService acl;
     public static UserManagerService user;
     public static RedisService redis;
@@ -157,7 +160,7 @@ public class ServiceBase {
     public static MongoAppConfig mac;
     public static BookmarkType bookmarkType;
     public static CalendarType calendarType;
-    public static AIAnswerType aiAnswerType;
+    public static OpenAIAnswerType aiAnswerType;
     public static FriendType friendType;
     public static RssFeedType rssType;
     public static MongoTemplateWrapper opsw;
@@ -166,6 +169,7 @@ public class ServiceBase {
     public static CryptoService crypto;
     public static SchemaOrgService schema;
     public static OpenAiService oai;
+    public static PplxAiService pplxai;
     public static HuggingFaceService huggingFace;
     public static OobaAiService oobaAi;
     public static TransferService transfer;
@@ -222,6 +226,7 @@ public class ServiceBase {
             auth = getBean(ctx, MongoAuth.class);
             mongoUtil = getBean(ctx, MongoUtil.class);
             snUtil = getBean(ctx, SubNodeUtil.class);
+            aiUtil = getBean(ctx, AIUtil.class);
             acl = getBean(ctx, AclService.class);
             user = getBean(ctx, UserManagerService.class);
             redis = getBean(ctx, RedisService.class);
@@ -254,7 +259,7 @@ public class ServiceBase {
             mimeUtil = getBean(ctx, MimeUtil.class);
             bookmarkType = getBean(ctx, BookmarkType.class);
             calendarType = getBean(ctx, CalendarType.class);
-            aiAnswerType = getBean(ctx, AIAnswerType.class);
+            aiAnswerType = getBean(ctx, OpenAIAnswerType.class);
             friendType = getBean(ctx, FriendType.class);
             rssType = getBean(ctx, RssFeedType.class);
             mongoRepo = getBean(ctx, MongoRepository.class);
@@ -265,6 +270,7 @@ public class ServiceBase {
             crypto = getBean(ctx, CryptoService.class);
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);
+            pplxai = getBean(ctx, PplxAiService.class);
             huggingFace = getBean(ctx, HuggingFaceService.class);
             oobaAi = getBean(ctx, OobaAiService.class);
             transfer = getBean(ctx, TransferService.class);

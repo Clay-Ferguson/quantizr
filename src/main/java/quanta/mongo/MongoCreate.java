@@ -293,17 +293,28 @@ public class MongoCreate extends ServiceBase {
 
         String typeToCreate = req.getTypeName();
         ChatCompletionResponse openAiAnswer = null;
+        ChatCompletionResponse pplxAiAnswer = null;
         ChatCompletionResponse oobAiAnswer = null;
         HuggingFaceResponse huggingFaceAnswer = null;
         // OobaAiResponse oobaAiAnswer = null;
+
 
         if ("openAi".equals(req.getAiQuestion())) {
             // if this is a regular node and not an openai reply node, then we are asking the text on this
             // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
-                openAiAnswer = oai.getOpenAiAnswer(ms, parentNode, null, null);
+                openAiAnswer = oai.getAnswer(ms, parentNode, null, null);
                 res.setGptCredit(openAiAnswer.userCredit);
                 typeToCreate = NodeType.OPENAI_ANSWER.s();
+            }
+        } //
+        else if ("pplxAi".equals(req.getAiQuestion())) {
+            // if this is a regular node and not an openai reply node, then we are asking the text on this
+            // existing node as a new question.
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null);
+                res.setGptCredit(pplxAiAnswer.userCredit);
+                typeToCreate = NodeType.PPLXAI_ANSWER.s();
             }
         } //
         else if ("huggingFace".equals(req.getAiQuestion())) {
@@ -339,12 +350,17 @@ public class MongoCreate extends ServiceBase {
 
         // OpenAI
         if (openAiAnswer != null) {
-            newNode.setContent(oai.formatAnswer(openAiAnswer, true));
+            newNode.setContent(aiUtil.formatAnswer(openAiAnswer, true));
             newNode.set(NodeProp.OPENAI_RESPONSE, openAiAnswer);
+        }
+        // Perplexity AI
+        else if (pplxAiAnswer != null) {
+            newNode.setContent(aiUtil.formatAnswer(pplxAiAnswer, true));
+            newNode.set(NodeProp.PPLXAI_RESPONSE, pplxAiAnswer);
         }
         // OobaBooga
         else if (oobAiAnswer != null) {
-            newNode.setContent(oai.formatAnswer(oobAiAnswer, true));
+            newNode.setContent(aiUtil.formatAnswer(oobAiAnswer, true));
             newNode.set(NodeProp.OOBAI_RESPONSE, oobAiAnswer);
         }
         // HuggingFace

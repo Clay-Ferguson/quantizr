@@ -117,7 +117,8 @@ export class AppState {
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
         enableIPSM: false,
-        mainPanelCols: 6
+        mainPanelCols: 6,
+        aiService: "openAi"
     };
 
     exportSettings: ExportSettings = {

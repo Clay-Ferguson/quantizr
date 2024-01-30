@@ -44,10 +44,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Logout", S.user.logout), //
                         this.settingsLink("Edit Profile", () => new UserProfileDlg(null).open()),
                         this.settingsLink("Change Password", () => new ChangePasswordDlg(null).open()),
-                        this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open()),
-                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
-                        S.quanta.config.paymentLink ?
-                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
+                        this.settingsLink("Server Storage Space", () => new ManageStorageDlg().open())
                     ]),
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Clear Browser Storage", async () => {
@@ -61,7 +58,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 ], horzClass),
 
                 // -----------------------
-                this.sectionTitle("View Options"),
+                this.sectionTitle("View"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
                         new Checkbox("Comments", { className: "bigMarginLeft" }, {
@@ -93,6 +90,27 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
+
+                // -----------------------
+                this.sectionTitle("AI - Artificial Intelligence"),
+                new FlexRowLayout([
+                    new Div(null, { className: settingsCol }, [
+                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
+                        S.quanta.config.paymentLink ?
+                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
+                    ]),
+
+                    // todo-1: need a way to warn user when something unsupported by their admin configuration is selected
+                    new Div(null, { className: settingsCol }, [
+                        new Selection(null, "AI Service", [
+                            { key: "openAi", val: "Open AI" },
+                            { key: "pplxAi", val: "Perplexity AI" }
+                        ], "contentWidthSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
+                            setValue: (val: string) => S.edit.setAiService(val),
+                            getValue: (): string => "" + getAs().userPrefs.aiService
+                        }),
+                    ])
+                ], horzClass),
 
                 // -----------------------
                 this.sectionTitle("Tools"),
