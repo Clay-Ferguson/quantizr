@@ -935,7 +935,12 @@ public class UserManagerService extends ServiceBase {
                 mainPanelCols = 6;
             }
             userPrefs.setMainPanelCols(mainPanelCols);
-            userPrefs.setAiService(prefsNode.getStr(NodeProp.USER_PREF_AI_SERVICE));
+
+            String aiService = prefsNode.getStr(NodeProp.USER_PREF_AI_SERVICE);
+            if (StringUtils.isEmpty(aiService)) {
+                aiService = "openAi";
+            }
+            userPrefs.setAiService(aiService);
             return null;
         });
         return userPrefs;
