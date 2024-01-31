@@ -1382,7 +1382,7 @@ public class MongoRead extends ServiceBase {
             HashMap<String, TreeNode> idMap) {
         SubNode rootNode = getNode(ms, new ObjectId(rootId));
         if (rootNode == null)
-            throw new RuntimeException("unable to access node(3): " + rootId);
+            throw new RuntimeException("unable to access node: " + rootId);
 
         TreeNode rootTreeNode = new TreeNode(rootNode);
         if (idMap != null) {

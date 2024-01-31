@@ -334,39 +334,7 @@ export class Nav {
 
     openDocumentView = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        this.openDocumentViewById(id);
-    }
-
-    openDocumentViewById = (id: string) => {
-        setTimeout(() => {
-            const node = MainTab.inst?.findNode(id);
-
-            // if we don't have this node locally on our tree, get it from the server.
-            if (!node) {
-                const resProm = S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                    nodeId: id,
-                    upLevel: false,
-                    siblingOffset: 0,
-                    forceRenderParent: false,
-                    offset: 0,
-                    goToLastPage: false,
-                    forceIPFSRefresh: false,
-                    singleNode: true,
-                    jumpToRss: false
-                });
-                resProm.then(res => {
-                    S.nodeUtil.processInboundNode(res.node);
-                    if (!res.node) {
-                        S.util.showMessage("Failed to render node: " + id, "Warning");
-                        return;
-                    }
-                    S.srch.showDocument(res.node);
-                });
-            }
-            else {
-                S.srch.showDocument(node);
-            }
-        }, 10);
+        S.srch.showDocument(id);
     }
 
     runTimeline = (evt: Event) => {
@@ -705,7 +673,7 @@ export class Nav {
     openDocViewByClick = (evt: Event) => {
         const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
         if (!nodeId) return;
-        this.openDocumentViewById(nodeId);
+        S.srch.showDocument(nodeId);
     }
 
     copyNodeNameToClipboard = (evt: Event) => {

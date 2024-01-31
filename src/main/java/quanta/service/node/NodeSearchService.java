@@ -68,19 +68,14 @@ public class NodeSearchService extends ServiceBase {
         RenderDocumentResponse res = new RenderDocumentResponse();
         List<NodeInfo> results = new LinkedList<>();
         res.setSearchResults(results);
-        HashSet<String> truncates = new HashSet<>();
         List<SubNode> nodes = read.getFlatSubGraph(ms, req.getRootId(), req.isIncludeComments());
         int counter = 0;
-
         SubNode node = read.getNode(ms, req.getRootId());
 
         for (SubNode n : nodes) {
             NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
                     false, false, false);
             if (info != null) {
-                if (truncates.contains(n.getIdStr())) {
-                    info.safeGetClientProps().add(new PropertyInfo(NodeProp.TRUNCATED.s(), "t"));
-                }
                 results.add(info);
             }
         }

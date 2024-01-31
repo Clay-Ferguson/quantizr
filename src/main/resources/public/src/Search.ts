@@ -224,16 +224,9 @@ export class Search {
         }
     }
 
-    showDocument = async (node: NodeInfo) => {
-        node = node || S.nodeUtil.getHighlightedNode();
-
-        if (!node) {
-            S.util.showMessage("Select a node to render a document", "Document View");
-            return;
-        }
-
+    showDocument = async (rootId: string) => {
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
-            rootId: node.id,
+            rootId,
             includeComments: getAs().userPrefs.showReplies
         });
         S.nodeUtil.processInboundNodes(res.searchResults);
@@ -261,7 +254,7 @@ export class Search {
             // set 'results' if this is the top of page being rendered, or else append results if we
             // were pulling down more items at the end of the doc.
             info.results = res.searchResults;
-            info.node = node;
+            info.node = res.searchResults[0];
             s.menuIndexToggle = S.util.willRenderDocIndex(s) ? "index" : "menu";
             S.tabUtil.selectTabStateOnly(DocumentTab.inst.id);
         });
