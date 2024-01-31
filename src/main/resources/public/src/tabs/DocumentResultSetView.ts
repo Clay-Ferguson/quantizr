@@ -53,8 +53,21 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
     override getFloatRightHeaderComp = (): Comp => {
         const ast = getAs();
         return new Div(null, { className: "float-end" }, [
+            ast.mobileMode ? null : new Checkbox("Images", {
+                className: "marginLeft",
+                title: "Display inline images"
+            }, {
+                setValue: (checked: boolean) => {
+                    dispatch("docImages", s => {
+                        s.docImages = checked;
+                    });
+                },
+                getValue: (): boolean => {
+                    return getAs().docImages;
+                }
+            }),
             ast.mobileMode ? null : new Checkbox("Indent", {
-                className: "bigMarginLeft",
+                className: "marginLeft",
                 title: "Indent the Document based on content hierarchy"
             }, {
                 setValue: (checked: boolean) => {

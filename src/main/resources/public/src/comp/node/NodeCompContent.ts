@@ -9,6 +9,7 @@ import { Clearfix } from "../core/Clearfix";
 import { PropDisplayLayout } from "../PropDisplayLayout";
 import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
+import { Constants as C } from "../../Constants";
 
 export class NodeCompContent extends Div {
     domPreUpdateFunc: (parent: Comp) => void;
@@ -51,7 +52,8 @@ export class NodeCompContent extends Div {
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not
         showing the normal attachment for this node, because that will the same as the avatar */
         const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
-        if (S.props.hasBinary(this.node) && !isAccountNode) {
+        const showImages = (ast.docImages || this.tabData.id !== C.TAB_DOCUMENT) && S.props.hasBinary(this.node) && !isAccountNode;
+        if (showImages) {
             const attachments = S.props.getOrderedAtts(this.node);
             attachments.forEach(att => {
                 if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
@@ -89,7 +91,7 @@ export class NodeCompContent extends Div {
             children.push(new Clearfix());
         }
 
-        if (S.props.hasBinary(this.node) && !isAccountNode) {
+        if (showImages) {
             const attComps: Comp[] = [];
             const attachments = S.props.getOrderedAtts(this.node);
             attachments.forEach(att => {

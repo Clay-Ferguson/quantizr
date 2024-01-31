@@ -36,6 +36,7 @@ export class AppState {
     stateId: number = 0;
     displayFeedSearch: boolean = false;
     docIndent: boolean = false;
+    docImages: boolean = true;
 
     mobileMode: boolean = clientInfo.isMobileOrTablet;
     // mobileMode: boolean = true;
