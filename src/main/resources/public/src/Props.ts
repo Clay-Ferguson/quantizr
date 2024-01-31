@@ -174,7 +174,7 @@ export class Props {
     }
 
     getProp = (propName: string, node: NodeInfo): PropertyInfo => {
-        return node?.properties?.find(p => p.name === propName);
+        return node?.properties?.find(p => p?.name === propName);
     }
 
     getPropStr = (propertyName: string, node: NodeInfo): string => {

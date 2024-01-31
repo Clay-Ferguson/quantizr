@@ -827,14 +827,14 @@ export class EditNodeDlg extends DialogBase {
         // Warning: Don't put any left/right margins on this row because the widths to allow widths that sum to
         // precisely 100% to work correctly. Adding a margin would make it wrap prematurely.
         const rowAttribs: any = { className: "marginBottom" };
-        const propConfig = type.getPropConfig(propEntry.name);
+        const propConfig = type?.getPropConfig(propEntry.name);
         const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
         const tableRow = new Div(null, rowAttribs);
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const editItems: any[] = [];
         const label = propConfig?.label || (type ? type.getEditLabelForProp(propEntry.name) : propEntry.name);
-        const propType = type.getType(propEntry.name);
+        const propType = type?.getType(propEntry.name);
 
         if (flexPropsEditPanel) {
             const w: number = propConfig?.width || 100;
@@ -891,7 +891,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            console.error("Unsupported type: " + type.getType(propEntry.name));
+            console.error("Unsupported type: " + type?.getType(propEntry.name));
         }
 
         if (valEditor && !allowEditAllProps && isReadOnly) {
