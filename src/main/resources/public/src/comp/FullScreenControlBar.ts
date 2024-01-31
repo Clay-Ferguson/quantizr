@@ -103,14 +103,14 @@ export class FullScreenControlBar extends Div {
 
             buttons.push(
                 new IconButton("fa-window-minimize fa-lg", null, {
-                    onClick: () => S.nav.minimizeFullScreenViewer(),
+                    onClick: S.nav.minimizeFullScreenViewer,
                     title: "Minimize Graph"
                 }, "btn-primary", "off"));
         }
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", null, {
-                onClick: () => S.nav.closeFullScreenViewer(),
+                onClick: S.nav.closeFullScreenViewer,
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 

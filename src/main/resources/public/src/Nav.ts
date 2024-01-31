@@ -383,6 +383,9 @@ export class Nav {
 
     closeFullScreenViewer = () => {
         dispatch("CloseFullScreenViewer", s => {
+            if (s.savedActiveTab == C.TAB_GRAPH) {
+                s.savedActiveTab = null;
+            }
             s.activeTab = s.savedActiveTab || C.TAB_MAIN;
             s.fullScreenConfig = { type: FullScreenType.NONE };
             s.graphData = null;
@@ -392,6 +395,9 @@ export class Nav {
 
     minimizeFullScreenViewer = () => {
         dispatch("MinimizeFullScreenViewer", s => {
+            if (s.savedActiveTab == C.TAB_GRAPH) {
+                s.savedActiveTab = null;
+            }
             s.activeTab = s.savedActiveTab || C.TAB_MAIN;
             s.fullScreenConfig = { type: FullScreenType.NONE };
         });
