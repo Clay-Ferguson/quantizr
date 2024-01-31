@@ -22,6 +22,7 @@ export interface Bookmark {
     name: string;
     id: string;
     selfId: string;
+    search: string;
 }
 
 export interface ClientConfig {
@@ -1324,6 +1325,7 @@ export const enum NodeProp {
     EMAIL_RECIP = "sn:recip",
     EMAIL_SUBJECT = "sn:subject",
     TARGET_ID = "sn:target_id",
+    BOOKMARK_SEARCH_TEXT = "search",
     USER = "sn:user",
     DISPLAY_NAME = "sn:displayName",
     MFS_ENABLE = "sn:mfsEnable",

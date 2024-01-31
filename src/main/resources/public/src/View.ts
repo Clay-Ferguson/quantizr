@@ -26,6 +26,32 @@ export class View {
         this.jumpToId(id, false);
     }
 
+    searchUnderId = async (id: string, text: string) => {
+        await S.srch.search(id, null, text, null, "Content: " + text,
+            null,
+            false,
+            false, // case sens 
+            0,
+            true, // recursive
+            "mtm", // sort field
+            "desc", // sort dir
+            false,
+            false,
+            false,
+            false,
+            false);
+    }
+
+    bookmarkClick = async (bookmark: J.Bookmark) => {
+        const id = bookmark.id || bookmark.selfId;
+        if (bookmark.search) {
+            await this.searchUnderId(id, bookmark.search);
+        }
+        else {
+            await this.jumpToId(id);
+        }
+    }
+
     jumpToId = async (id: string, forceRenderParent: boolean = false) => {
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");

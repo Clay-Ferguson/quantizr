@@ -278,7 +278,7 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        const success = await S.srch.search(node, null, SearchContentDlg.defaultSearchText, null, desc,
+        const success = await S.srch.search(node.id, null, SearchContentDlg.defaultSearchText, null, desc,
             state.searchRoot,
             state.fuzzy,
             state.caseSensitive, 0,
@@ -287,7 +287,9 @@ export class SearchContentDlg extends DialogBase {
             state.sortDir,
             requirePriority,
             state.requireAttachment,
-            deleteMatches, false, state.requireDate);
+            deleteMatches,
+            false,
+            state.requireDate);
         if (success) {
             this.close();
         }

@@ -5,6 +5,7 @@ public class Bookmark {
     private String name;
     private String id;
     private String selfId;
+    private String search;
 
     public String getName() {
         return this.name;
@@ -28,6 +29,14 @@ public class Bookmark {
 
     public void setSelfId(final String selfId) {
         this.selfId = selfId;
+    }
+
+    public String getSearch() {
+        return search;
+    }
+
+    public void setSearch(String search) {
+        this.search = search;
     }
 
     public Bookmark() {}

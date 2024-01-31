@@ -312,11 +312,13 @@ public class NodeSearchService extends ServiceBase {
         if (bookmarksNode != null) {
             for (SubNode bmNode : bookmarksNode) {
                 String targetId = bmNode.getStr(NodeProp.TARGET_ID);
+                String search = bmNode.getStr(NodeProp.BOOKMARK_SEARCH_TEXT);
                 Bookmark bm = new Bookmark();
                 String shortContent = render.getFirstLineAbbreviation(bmNode.getContent(), 100);
                 bm.setName(shortContent);
                 bm.setId(targetId);
                 bm.setSelfId(bmNode.getIdStr());
+                bm.setSearch(search);
                 bookmarks.add(bm);
             }
         }

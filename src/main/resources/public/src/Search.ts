@@ -137,11 +137,11 @@ export class Search {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
         }
-        this.search(node, null, null, null, "Priority Listing", null, false, false, 0, true,
+        this.search(node.id, null, null, null, "Priority Listing", null, false, false, 0, true,
             J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false, false);
     }
 
-    search = async (node: NodeInfo, prop: string, searchText: string, searchType: string, description: string,
+    search = async (nodeId: string, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
         jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> => {
@@ -149,7 +149,7 @@ export class Search {
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
             page,
-            nodeId: node ? node.id : null, // for user searchTypes this node can be null
+            nodeId, // for user searchTypes this node can be null
             searchText,
             sortDir,
             sortField,
@@ -194,7 +194,7 @@ export class Search {
                 data.props.page = page;
                 data.props.searchType = searchType;
                 data.props.description = description;
-                data.props.node = node;
+                data.props.node = res.node;
                 data.props.searchText = searchText;
                 data.props.fuzzy = fuzzy;
                 data.props.caseSensitive = caseSensitive;
@@ -627,7 +627,7 @@ export class Search {
         dispatch("findRdfSubjects", _s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
-                S.srch.search(node, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RFF Subjects", null, false,
+                S.srch.search(node.id, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RFF Subjects", null, false,
                     false, 0, true, null, null, false, false, false, false, false);
             }
         });

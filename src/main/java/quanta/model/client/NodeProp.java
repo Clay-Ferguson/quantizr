@@ -50,6 +50,7 @@ public enum NodeProp {
      * now used only for inbox to point to nodes
      */
     TARGET_ID("sn:target_id"), //
+    BOOKMARK_SEARCH_TEXT("search"), //
 
     /*
      * WARNING: Only the User Account Root nodes have this property of the actual user name. All other
