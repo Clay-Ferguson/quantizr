@@ -9,19 +9,22 @@ import { Validator, ValidatorRuleName } from "../Validator";
 export class AskNodeLinkNameDlg extends DialogBase {
     public nameEntered: string;
 
-    nameState: Validator = new Validator("", [
+    static nameState: Validator = new Validator("", [
         { name: ValidatorRuleName.REQUIRED }
     ]);
 
     constructor() {
         super("RDF Predicate", "appModalContNarrowWidth");
-        this.validatedStates = [this.nameState];
+        if (AskNodeLinkNameDlg.nameState.getValue() === "") {
+            AskNodeLinkNameDlg.nameState.setValue("link");
+        }
+        this.validatedStates = [AskNodeLinkNameDlg.nameState];
     }
 
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new TextField({ label: "Predicate", val: this.nameState })
+                new TextField({ label: "Predicate", val: AskNodeLinkNameDlg.nameState })
             ]),
             new ButtonBar([
                 new Button("Ok", this.save, null, "btn-primary"),
@@ -34,7 +37,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        this.nameEntered = this.nameState.getValue();
+        this.nameEntered = AskNodeLinkNameDlg.nameState.getValue();
         this.close();
     }
 }

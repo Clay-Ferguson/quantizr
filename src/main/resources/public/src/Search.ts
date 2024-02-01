@@ -627,7 +627,7 @@ export class Search {
         dispatch("findRdfSubjects", _s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
-                S.srch.search(node.id, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RFF Subjects", null, false,
+                S.srch.search(node.id, null, null, J.Constant.SEARCH_TYPE_RDF_SUBJECTS, "RDF Subjects", null, false,
                     false, 0, true, null, null, false, false, false, false, false);
             }
         });
