@@ -2,21 +2,21 @@
 
 # Quanta Web Platform
 
-[Demo Instance: https://quanta.wiki](https://quanta.wiki)
+[Live Instance: https://quanta.wiki](https://quanta.wiki)
 
 ## A new Kind of CMS with ChatGPT and Social Media features
 
 Quanta is a new kind of Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
 
-* wikis & micro-blogging
+* Wikis & micro-blogging
 * [ChatGPT Question Answering](https://quanta.wiki/n/gpt-ai)
-* document collaboration and publishing
+* Document collaboration and publishing
 * PDF Generation
-* secure messaging with (E2E Encryption)
-* video/audio recording & sharing
-* file sharing
-* podcatcher (RSS Reader)
-* plus about 100 more features!
+* Secure messaging with (E2E Encryption)
+* Video/audio recording & sharing
+* File sharing
+* Podcatcher (RSS Reader)
+* Many other features related to managing hierarchical content
 
 ## Hierarchical Content
 
@@ -27,12 +27,6 @@ Designed to allow a more fine-grained hierarchical approach to content managemen
 These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, ChatGPT conversations, etc.
 
 Learn more here: [User Guide and Technical Info](/docs/index.md) 
-
-## Take it for a Test Drive
-
-The [Quanta Dev Instance](https://quanta.wiki) is open to the public, so anyone can try it out. If you're interested in [Social Media](https://quanta.wiki/?view=feed) you might like the [Trending Tab](https://quanta.wiki/?view=trending) as well.
-
-Quanta is a browser-based app that works on both mobile and desktop browsers, although it's optimized for desktop.
 
 ## Technology Stack
 
@@ -45,8 +39,4 @@ Quanta is a browser-based app that works on both mobile and desktop browsers, al
 * IPFS Gateway
 * ChatGPT (via OpenAI API)
 * Deployment: Docker Compose (Swarm Mode)
-
-## Help Fund the Project
-
-[Send Money via PayPal](https://PayPal.me/WILLIAMCFERGUSON) directly to the developer.
 
