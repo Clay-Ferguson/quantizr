@@ -51,7 +51,6 @@ export class FullScreenGraphViewer extends Main {
     }
 
     forceDirectedTree = () => {
-
         /* We use 'thiz' to capture 'this' because the methods below to expect to have their own 'this'
          that will be set based on code outside our control that is expected by the Graph Implementation itself. */
         const thiz = this;
@@ -96,15 +95,19 @@ export class FullScreenGraphViewer extends Main {
             const nodeLinks: any = [];
 
             if (ast.showNodeLinksInGraph) {
+                // map from any id to the node
                 const nodesMap = new Map<string, string>();
                 nodes.forEach((n: any) => {
                     nodesMap.set(n.data.id, n);
                 });
 
+                // for each node add links
                 nodes.forEach((n: any) => {
+                    // does node have elinks
                     if (n.data.links) {
-                        Object.keys(n.data.links).forEach(key => {
-                            const nt = nodesMap.get(n.data.links[key].i);
+                        // scan each link (link will be object with {id, name} of a target)
+                        n.data.links.forEach(link => {
+                            const nt: any = nodesMap.get(link.id);
                             if (nt) {
                                 nodeLinks.push({ source: n, target: nt });
                             }
