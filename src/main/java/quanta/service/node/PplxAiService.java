@@ -27,7 +27,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class PplxAiService extends ServiceBase {
     String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
-    String PPLX_MODEL_COMPLETION = "pplx-70b-chat"; // "mistral-7b-instruct";
+    public final String PPLX_MODEL_COMPLETION_ONLINE = "pplx-70b-online";
+    public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
+    public final String PPLX_MODEL_COMPLETION_LLAMA2 = "llama-2-70b-chat";
+    public final String PPLX_MODEL_COMPLETION_CHAT = "pplx-70b-chat"; // "mistral-7b-instruct";
     String COST_CODE = "PPX"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -38,7 +41,8 @@ public class PplxAiService extends ServiceBase {
      * 
      * You can pass a node, or else 'text' to query about.
      */
-    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
+    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system,
+            String model) {
 
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
@@ -65,7 +69,7 @@ public class PplxAiService extends ServiceBase {
         String input = node != null ? node.getContent() : question;
         messages.add(0, new ChatMessage("system", system.getPrompt()));
         messages.add(new ChatMessage("user", input));
-        system.setModel(PPLX_MODEL_COMPLETION);
+        system.setModel(model);
 
         WebClient webClient = Util.webClientBuilder().baseUrl(PPLX_COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -100,27 +104,34 @@ public class PplxAiService extends ServiceBase {
         // log.debug("RESPONSE: " + response);
     }
 
+    // https://docs.perplexity.ai/docs/pricing
     private double calculateCost(ChatCompletionResponse res) {
         Usage usage = res.getUsage();
-
-        // price per mega-token
-        double inputPpm = 0;
-        double outputPpm = 0;
         String model = res.getModel().toLowerCase();
+        double outputPpm;
+        double inputPpm;
+        double inputPricePerReq;
 
         // We detect using startsWith, because the actual model used will be slightly different than the one
         // specified
-        if (model.equals(PPLX_MODEL_COMPLETION)) {
-            // https://docs.perplexity.ai/docs/pricing
-            // These proces are for 70b model non "-online" version
-            inputPpm = 0.7;
-            outputPpm = 2.8;
-        } else {
-            throw new RuntimeException("Only " + PPLX_MODEL_COMPLETION + " is currently supported. " + res.getModel()
-                    + " is not supported.");
-        }
+        switch (model) {
+            case PPLX_MODEL_COMPLETION_CHAT:
+            case PPLX_MODEL_COMPLETION_CODELLAMA:
+            case PPLX_MODEL_COMPLETION_LLAMA2:
+                // prices per magatoken
+                inputPpm = 0.7;
+                outputPpm = 2.8;
+                return (usage.getPromptTokens() * inputPpm / 1000000) + //
+                        (usage.getCompletionTokens() * outputPpm / 1000000);
 
-        return (usage.getPromptTokens() * inputPpm / 1000000) + (usage.getCompletionTokens() * outputPpm / 1000000);
+            case PPLX_MODEL_COMPLETION_ONLINE:
+                outputPpm = 2.8;
+                inputPricePerReq = 0.005;
+                return inputPricePerReq + (usage.getCompletionTokens() * outputPpm / 1000000);
+
+            default:
+                throw new RuntimeException("Model not supported: " + res.getModel() + " is not supported.");
+        }
     }
 
     /**

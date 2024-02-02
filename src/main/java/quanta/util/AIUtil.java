@@ -140,7 +140,16 @@ public class AIUtil extends ServiceBase {
                 answer = oai.getAnswer(ms, null, sb.toString(), system);
                 break;
             case "pplxAi":
-                answer = pplxai.getAnswer(ms, null, sb.toString(), system);
+                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                break;
+            case "pplxAi_online":
+                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                break;
+            case "pplxAi_codeLlama":
+                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
+                break;
+            case "pplxAi_llama2":
+                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
                 break;
             default:
                 throw new RuntimeException("Unknown AI service: " + req.getAiService());

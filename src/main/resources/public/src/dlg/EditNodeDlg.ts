@@ -697,7 +697,7 @@ export class EditNodeDlg extends DialogBase {
             this.close();
         }
 
-        S.edit.askOpenAiQuestion(getAs().editNode.id);
+        S.edit.askAiQuestion(getAs().editNode.id);
     }
 
     renderButtons(): Comp {

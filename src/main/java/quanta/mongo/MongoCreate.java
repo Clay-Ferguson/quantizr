@@ -300,8 +300,6 @@ public class MongoCreate extends ServiceBase {
 
 
         if ("openAi".equals(req.getAiQuestion())) {
-            // if this is a regular node and not an openai reply node, then we are asking the text on this
-            // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
                 openAiAnswer = oai.getAnswer(ms, parentNode, null, null);
                 res.setGptCredit(openAiAnswer.userCredit);
@@ -309,17 +307,34 @@ public class MongoCreate extends ServiceBase {
             }
         } //
         else if ("pplxAi".equals(req.getAiQuestion())) {
-            // if this is a regular node and not an openai reply node, then we are asking the text on this
-            // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
-                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null);
+                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                res.setGptCredit(pplxAiAnswer.userCredit);
+                typeToCreate = NodeType.PPLXAI_ANSWER.s();
+            }
+        } //
+        else if ("pplxAi_online".equals(req.getAiQuestion())) {
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                res.setGptCredit(pplxAiAnswer.userCredit);
+                typeToCreate = NodeType.PPLXAI_ANSWER.s();
+            }
+        } //
+        else if ("pplxAi_codeLlama".equals(req.getAiQuestion())) {
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
+                res.setGptCredit(pplxAiAnswer.userCredit);
+                typeToCreate = NodeType.PPLXAI_ANSWER.s();
+            }
+        } //
+        else if ("pplxAi_llama2".equals(req.getAiQuestion())) {
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
                 res.setGptCredit(pplxAiAnswer.userCredit);
                 typeToCreate = NodeType.PPLXAI_ANSWER.s();
             }
         } //
         else if ("huggingFace".equals(req.getAiQuestion())) {
-            // if this is a regular node and not an openai reply node, then we are asking the text on this
-            // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
                 huggingFaceAnswer = huggingFace.getAnswer(ms, parentNode, null);
                 typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
@@ -327,8 +342,6 @@ public class MongoCreate extends ServiceBase {
         }
         // Oobabooga
         else if ("oobAi".equals(req.getAiQuestion())) {
-            // if this is a regular node and not an openai reply node, then we are asking the text on this
-            // existing node as a new question.
             if (NodeType.NONE.s().equals(parentNode.getType())) {
                 oobAiAnswer = oobaAi.getAnswer(ms, parentNode, null);
                 typeToCreate = NodeType.OOBAI_ANSWER.s();

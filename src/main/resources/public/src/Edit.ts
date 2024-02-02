@@ -1064,7 +1064,7 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
-    askOpenAiQuestion = async (nodeId: string) => {
+    askAiQuestion = async (nodeId: string) => {
 
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,

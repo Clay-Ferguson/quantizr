@@ -31,6 +31,25 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const horzClass = "marginTop marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
+        let modelSpecs = "";
+        switch (getAs().userPrefs.aiService) {
+            case "openAi":
+                modelSpecs = "OpenAI ChatGPT-4 (Chat): This is the default chatbot and is widely considered the most intelligent general-purpose AI on the market.";
+                break;
+            case "pplxAi":
+                modelSpecs = "Perplexity AI: This is Perplexity's best high-end powerful general-purpose AI.";
+                break;
+            case "pplxAi_online":
+                modelSpecs = "Perplexity AI: This is Perplexity's AI which has access to the latest news and content from from the web.";
+                break;
+            case "pplxAi_codeLlama":
+                modelSpecs = "Code Llama: This is the well-known open source Code Llama, which is great for coding and programming tasks.";
+                break;
+            case "pplxAi_llama2":
+                modelSpecs = "Llama 2: This is the well-known open source Llama 2, which is great for general-purpose tasks.";
+                break;
+        }
+
         this.setChildren([
             this.headingBar = new TabHeading([
                 new Div("Settings", { className: "tabTitle" })
@@ -94,22 +113,27 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // -----------------------
                 this.sectionTitle("AI - Artificial Intelligence"),
                 new FlexRowLayout([
-                    new Div(null, { className: settingsCol }, [
-                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
-                        S.quanta.config.paymentLink ?
-                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
-                    ]),
 
                     // todo-1: need a way to warn user when something unsupported by their admin configuration is selected
                     new Div(null, { className: settingsCol }, [
                         new Selection(null, "AI Service", [
-                            { key: "openAi", val: "Open AI" },
-                            { key: "pplxAi", val: "Perplexity AI" }
-                        ], "contentWidthSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
+                            { key: "openAi", val: "OpenAI (Chat)" },
+                            { key: "pplxAi", val: "Perplexity (Chat)" },
+                            { key: "pplxAi_online", val: "Perplexity (Recent News)" },
+                            { key: "pplxAi_codeLlama", val: "Code Llama" },
+                            { key: "pplxAi_llama2", val: "Llama 2" }
+                        ], "aiServiceSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
                             setValue: (val: string) => S.edit.setAiService(val),
                             getValue: (): string => "" + getAs().userPrefs.aiService
                         }),
+                        modelSpecs ? new Div(modelSpecs, { className: "bigMarginLeft" }) : null
+                    ]),
+                    new Div(null, { className: settingsCol }, [
+                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
+                        S.quanta.config.paymentLink ?
+                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
                     ])
+
                 ], horzClass),
 
                 // -----------------------
