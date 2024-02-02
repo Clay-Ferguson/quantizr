@@ -99,7 +99,7 @@ export class FullScreenControlBar extends Div {
                 dispatch("ExpandFullScreenControls", s => {
                     s.fullScreenControlsExpanded = exp;
                 });
-            }, ast.fullScreenControlsExpanded, "marginAll", "marginBottom", null, "span"));
+            }, ast.fullScreenControlsExpanded, "inlineBlock", "inlineBlock", null, "div"));
 
             buttons.push(
                 new IconButton("fa-window-minimize fa-lg", null, {
