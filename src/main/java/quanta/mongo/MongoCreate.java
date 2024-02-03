@@ -516,7 +516,7 @@ public class MongoCreate extends ServiceBase {
         update.save(ms, newNode);
 
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, false));
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false));
         return res;
     }
 }
