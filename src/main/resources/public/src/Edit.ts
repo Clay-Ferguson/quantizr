@@ -1601,7 +1601,6 @@ export class Edit {
         });
     };
 
-
     linkNodesClick = () => {
         dispatch("setLinkSourceNodeId", s => {
             const node = S.nodeUtil.getHighlightedNode();
@@ -1618,6 +1617,7 @@ export class Edit {
                     return;
                 }
 
+                // create a run method because we're inside a dispatch and we can't await here
                 const run = async () => {
                     const dlg = new AskNodeLinkNameDlg(null);
                     await dlg.open();
