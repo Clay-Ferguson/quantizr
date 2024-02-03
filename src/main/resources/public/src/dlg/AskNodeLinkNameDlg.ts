@@ -17,7 +17,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
     ]);
 
     constructor(public link: NodeLink) {
-        super("Create RDF Link", "appModalContNarrowWidth");
+        super("RDF Link", "appModalContNarrowWidth");
         this.editExisting = !!link;
         this.link = link || {} as NodeLink;
         AskNodeLinkNameDlg.nameState.setValue(this.link.name || "");

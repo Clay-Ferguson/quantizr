@@ -140,6 +140,7 @@ export class AppState {
 
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
+    expandedCollapsibles: Set<string> = new Set<string>();
     highlightSearchNodeId: string;
 
     nodeClickedToDel: string;

@@ -1,5 +1,5 @@
 import { ReactNode, createElement } from "react";
-import { getAs } from "../../AppContext";
+import { dispatch, getAs } from "../../AppContext";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { TabIntf } from "../../intf/TabIntf";
@@ -124,7 +124,106 @@ export class NodeCompMarkdown extends Comp {
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 
+        if (state.content.indexOf("-**") != -1 && state.content.indexOf("**-") != -1) {
+            const sections = this.buildWithCollapsibles(state);
+            if (sections) {
+                return sections;
+            }
+        }
+
         return createElement(ReactMarkdownComp as any, this.attribs, state.content);
+    }
+
+    /* When any markdown content contains something like "-**My Section Title**-" that will be rendered as a 
+        collapsible section where everhthing below the section title, up to a double blank line, will be hidden
+        until the user clicks the section title to expand it. 
+    */
+    buildWithCollapsibles = (state: LS) => {
+        state.content = state.content || "";
+        state.content = state.content.replaceAll("\r", "");
+        const lines = state.content.split("\n");
+        let inCollapse: boolean = false;
+        let blankLines = 0;
+        const children: ReactNode[] = [];
+        let curBuf = "";
+        let collapseTitle: string = null;
+
+        lines?.forEach((line, i) => {
+            if (line.startsWith("-**") && line.endsWith("**-")) {
+                // if we ran into another collapsible before the last one ended, end it now. It should've ended with
+                // two blank lines but that's ok, we can end it anyway.
+                if (inCollapse && curBuf) {
+                    this.addCollapsible(children, curBuf, collapseTitle, "_" + i);
+                    curBuf = "";
+                }
+
+                collapseTitle = line.substring(3, line.length - 3);
+                if (curBuf) {
+                    this.attribs.key = "ncmkd_" + this.node.id + "_" + i;
+                    children.push(createElement(ReactMarkdownComp as any, this.attribs, curBuf));
+                    curBuf = "";
+                }
+                inCollapse = true;
+                blankLines = 0;
+                return;
+            }
+            else {
+                curBuf += line + "\n";
+            }
+
+            if (line.trim().length == 0) {
+                blankLines++;
+                if (inCollapse && blankLines == 2 && curBuf) {
+                    inCollapse = false;
+                    this.addCollapsible(children, curBuf, collapseTitle, "_" + i);
+                    curBuf = "";
+                    collapseTitle = null;
+                    blankLines = 0;
+                }
+            }
+            else {
+                blankLines = 0;
+            }
+        });
+
+        if (children.length > 0 || inCollapse) {
+            if (curBuf) {
+                if (inCollapse) {
+                    this.addCollapsible(children, curBuf, collapseTitle, "f");
+                }
+                else {
+                    this.attribs.key = "ncmkd_" + this.node.id + "_f";
+                    children.push(createElement(ReactMarkdownComp as any, this.attribs, curBuf));
+                }
+            }
+            return children;
+        }
+        return null;
+    }
+
+    addCollapsible = (children: ReactNode[], curBuf: string, collapseTitle: string, suffix: string) => {
+        const key = this.node.id + "_" + collapseTitle;
+        const expanded = (getAs().expandedCollapsibles.has(key));
+
+        children.push(createElement("div", {
+            onClick: () => {
+                dispatch("toggleCollapsibleMarkdown", s => {
+                    if (s.expandedCollapsibles.has(key)) {
+                        s.expandedCollapsibles.delete(key);
+                    }
+                    else {
+                        s.expandedCollapsibles.add(key);
+                    }
+                });
+            },
+            className: "collapsibleMarkdown " + (expanded ? " iconUp" : " iconDown marginBottom"),
+            title: expanded ? "Click to Collapse" : "Click to Expand"
+        }, collapseTitle));
+        this.attribs.key = "ncmkd_" + this.node.id + "_" + suffix;
+
+        if (expanded) {
+            children.push(createElement(ReactMarkdownComp as any, this.attribs, curBuf));
+        }
     }
 
     decrypt = async () => {

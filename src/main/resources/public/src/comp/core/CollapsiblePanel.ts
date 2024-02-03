@@ -33,7 +33,7 @@ export class CollapsiblePanel extends Comp {
 
     override preRender = (): boolean => {
         const state = this.getState<LS>();
-        const style = this.textLink ? "collapsePanelLink" : "btn btn-primary ";
+        const style = this.textLink ? "collapsePanelLink" : "btn btn-primary";
         const collapseClass = state.expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,
