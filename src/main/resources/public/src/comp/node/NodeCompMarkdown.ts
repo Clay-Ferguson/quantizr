@@ -15,6 +15,8 @@ interface LS {
 export class NodeCompMarkdown extends Comp {
     // detects URLs in a string (from Stack Overflow, not fully vetted yet)
     static urlRegex = /(https?:\/\/[^\s]+)/g;
+    static COLLAPSE_TITLE_START = "-**";
+    static COLLAPSE_TITLE_END = "**-";
 
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
     // but is ok named as 'cont'
@@ -124,7 +126,8 @@ export class NodeCompMarkdown extends Comp {
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 
-        if (state.content.indexOf("-**") != -1 && state.content.indexOf("**-") != -1) {
+        if (state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
+            state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
             const sections = this.buildWithCollapsibles(state);
             if (sections) {
                 return sections;
@@ -149,7 +152,8 @@ export class NodeCompMarkdown extends Comp {
         let collapseTitle: string = null;
 
         lines?.forEach((line, i) => {
-            if (line.startsWith("-**") && line.endsWith("**-")) {
+            if (line.startsWith(NodeCompMarkdown.COLLAPSE_TITLE_START) && //
+                line.endsWith(NodeCompMarkdown.COLLAPSE_TITLE_END)) {
                 // if we ran into another collapsible before the last one ended, end it now. It should've ended with
                 // two blank lines but that's ok, we can end it anyway.
                 if (inCollapse && curBuf) {
