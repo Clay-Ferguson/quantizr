@@ -185,7 +185,7 @@ export class NodeCompRow extends Div {
             jumpButton,
             new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, null),
             this.internalComp,
-            S.render.renderLinks(this.node)
+            S.render.renderLinks(this.node, this.tabData)
         ]);
         return true;
     }

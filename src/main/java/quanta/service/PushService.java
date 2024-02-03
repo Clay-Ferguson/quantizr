@@ -107,7 +107,7 @@ public class PushService extends ServiceBase {
 
         /* build our push message payload */
         NodeInfo info = convert.toNodeInfo(false, sc, ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false,
-                false, true, false);
+                false, true);
 
         if (info != null) {
             FeedPushInfo pushInfo = new FeedPushInfo(info);

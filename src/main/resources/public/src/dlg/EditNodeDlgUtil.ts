@@ -8,6 +8,7 @@ import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
+import { AskNodeLinkNameDlg } from "./AskNodeLinkNameDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./EditNodeDlg";
 import { EditPropertyDlg, LS as EditPropertyDlgState } from "./EditPropertyDlg";
@@ -551,17 +552,17 @@ an upload has been added or removed.
                 hasLinks = true;
                 linkComps.push(new Span(link.name, {
                     className: "nodeLink",
-                    title: "Click to Remove Link",
-                    onClick: () => this.removeNodeLink(link.name)
+                    title: "Click to Edit Link",
+                    onClick: () => this.editLink(link.name)
                 }));
             });
         }
         return hasLinks ? new Div(null, { className: "linksPanelInEditor" }, linkComps) : null;
     }
 
-    removeNodeLink = (name: string): void => {
-        const ast = getAs();
-        ast.editNode.links = ast.editNode.links.filter(link => link.name !== name);
-        S.edit.updateNode(ast.editNode);
+    editLink = async (name: string) => {
+        const link = getAs().editNode.links.find(link => link.name == name);
+        const dlg = new AskNodeLinkNameDlg(link);
+        await dlg.open();
     }
 }

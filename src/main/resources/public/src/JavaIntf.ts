@@ -63,6 +63,7 @@ export interface MFSDirEntry {
 export interface NodeLink {
     id: string;
     name: string;
+    embed: boolean;
 }
 
 export interface OpenGraph {
@@ -510,6 +511,7 @@ export interface LinkNodesRequest extends RequestBase {
     targetNodeId: string;
     name: string;
     type: string;
+    embed: boolean;
 }
 
 export interface LoadNodeFromIpfsRequest extends RequestBase {

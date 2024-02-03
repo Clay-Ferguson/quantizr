@@ -1313,7 +1313,7 @@ export class Edit {
         this.createSubNodeResponse(res, null);
     }
 
-    linkNodes = async (sourceNodeId: string, targetNodeId: string, name: string, type: string) => {
+    linkNodes = async (sourceNodeId: string, targetNodeId: string, link: J.NodeLink, type: string) => {
         if (targetNodeId === sourceNodeId) {
             return;
         }
@@ -1321,7 +1321,8 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.LinkNodesRequest, J.LinkNodesResponse>("linkNodes", {
             sourceNodeId,
             targetNodeId,
-            name,
+            name: link.name,
+            embed: link.embed,
             type
         });
 
@@ -1618,10 +1619,10 @@ export class Edit {
                 }
 
                 const run = async () => {
-                    const dlg = new AskNodeLinkNameDlg();
+                    const dlg = new AskNodeLinkNameDlg(null);
                     await dlg.open();
-                    if (dlg.nameEntered) {
-                        this.linkNodes(sourceId, node.id, dlg.nameEntered, "forward-link");
+                    if (dlg.link) {
+                        this.linkNodes(sourceId, node.id, dlg.link, "forward-link");
                     }
                 };
                 run();

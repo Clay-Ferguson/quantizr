@@ -22,6 +22,7 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
+import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoSession;
@@ -48,7 +49,7 @@ public class Convert extends ServiceBase {
      */
     public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
             boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild,
-            boolean getFollowers, boolean loadLikes, boolean attachLinkedNodes) {
+            boolean getFollowers, boolean loadLikes) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
         // if we have a signature, check it.
@@ -171,28 +172,20 @@ public class Convert extends ServiceBase {
             processInlineChildren(sc, ms, node, initNodeEdit, allowInlineChildren, lastChild, loadLikes, nodeInfo);
         }
 
-        // -----------------------
-        // DO NOT DELETE: This code works, but for now we don't use it. However this is important and VERY
-        // likely we'll be needing this, once we have some use case where we want the linked node
-        // to be embedded/displayed in the node that links to it.
-        // if (attachLinkedNodes) {
-        // if (ok(node.getLinks())) {
-        // LinkedList<NodeInfo> linkedNodes = new LinkedList<>();
-        // nodeInfo.setLinkedNodes(linkedNodes);
-        // node.getLinks().forEach((k, v) -> {
-        // SubNode linkNode = read.getNode(ms, v.getNodeId());
-        // if (ok(linkNode)) {
-        // NodeInfo info = convertToNodeInfo(false, sc, ms, linkNode, false, 0, false, false, false, false,
-        // false,
-        // false, null, false);
-        // if (ok(info)) {
-        // linkedNodes.add(info);
-        // }
-        // }
-        // });
-        // }
-        // }
-
+        if (node.getLinks() != null) {
+            LinkedList<NodeInfo> linkedNodes = new LinkedList<>();
+            nodeInfo.setLinkedNodes(linkedNodes);
+            for (NodeLink link : node.getLinks()) {
+                SubNode linkNode = read.getNode(ms, link.getNodeId());
+                if (linkNode != null) {
+                    NodeInfo info = convert.toNodeInfo(false, sc, ms, linkNode, false, Convert.LOGICAL_ORDINAL_IGNORE,
+                            false, false, false, true);
+                    if (info != null) {
+                        linkedNodes.add(info);
+                    }
+                }
+            }
+        }
         return nodeInfo;
     }
 
@@ -237,7 +230,7 @@ public class Convert extends ServiceBase {
                 SubNode n = iterator.next();
 
                 NodeInfo info = toNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, allowInlineChildren,
-                        lastChild, false, loadLikes, false);
+                        lastChild, false, loadLikes);
                 if (info != null) {
                     nodeInfo.safeGetChildren().add(info);
                 }

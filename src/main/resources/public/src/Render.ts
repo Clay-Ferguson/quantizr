@@ -28,6 +28,7 @@ import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
 import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
 import { Attachment, NodeInfo } from "./JavaIntf";
+import { NodeCompContent } from "./comp/node/NodeCompContent";
 
 export class Render {
     private debug: boolean = false;
@@ -691,15 +692,19 @@ export class Render {
         ]);
     }
 
-    renderLinks = (node: NodeInfo): Div => {
+    renderLinks = (node: NodeInfo, tabData: TabIntf): Div => {
         if (!node.links) return null;
 
         const linkComps: Comp[] = [];
+        const idSet: Set<string> = new Set();
         if (node.links) {
             const nameSet: Set<string> = new Set();
             node.links.forEach((link: J.NodeLink) => {
                 if (!nameSet.has(link.name)) {
                     nameSet.add(link.name);
+                    if (link.embed) {
+                        idSet.add(link.id);
+                    }
                     linkComps.push(new Span(link.name, {
                         title: "RDF: Click to Find Objects",
                         className: "nodeLink",
@@ -711,6 +716,13 @@ export class Render {
                 }
             });
         }
+
+        node.linkedNodes?.forEach((node: J.NodeInfo) => {
+            if (idSet.has(node.id)) {
+                linkComps.push(new NodeCompContent(node, tabData, true, true, tabData.id, null, true, null));
+            }
+        });
+
         return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 

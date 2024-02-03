@@ -92,7 +92,7 @@ export class NodeCompMainNode extends Div {
             new Clearfix(),
             jumpButton,
             new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, null),
-            S.render.renderLinks(node)
+            S.render.renderLinks(node, this.tabData)
         ]);
 
         return true;

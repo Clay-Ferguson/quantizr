@@ -569,7 +569,7 @@ export class Search {
             allowHeader ? new Clearfix() : null,
             content,
             null,
-            S.render.renderLinks(node)
+            S.render.renderLinks(node, tabData)
         ]);
 
         return itemDiv;

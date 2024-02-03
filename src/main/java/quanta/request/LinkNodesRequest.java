@@ -8,31 +8,32 @@ public class LinkNodesRequest extends RequestBase {
 	private String targetNodeId;
 	private String name;
 	private String type; // forward, bidirectional
+	private Boolean embed;
 
 	public String getSourceNodeId() {
 		return this.sourceNodeId;
 	}
-	
+
 	public String getTargetNodeId() {
 		return this.targetNodeId;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
-	
+
 	public String getType() {
 		return this.type;
 	}
-	
+
 	public void setSourceNodeId(final String sourceNodeId) {
 		this.sourceNodeId = sourceNodeId;
 	}
-	
+
 	public void setTargetNodeId(final String targetNodeId) {
 		this.targetNodeId = targetNodeId;
 	}
-	
+
 	public void setName(final String name) {
 		this.name = name;
 	}
@@ -41,6 +42,13 @@ public class LinkNodesRequest extends RequestBase {
 		this.type = type;
 	}
 
-	public LinkNodesRequest() {
+	public Boolean getEmbed() {
+		return embed;
 	}
+
+	public void setEmbed(Boolean embed) {
+		this.embed = embed;
+	}
+
+	public LinkNodesRequest() {}
 }

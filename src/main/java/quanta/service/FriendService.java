@@ -252,7 +252,7 @@ public class FriendService extends ServiceBase {
         if (node == null)
             return res;
         NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE,
-                false, false, false, true, false);
+                false, false, false, true);
         nodes.add(info);
         if (nodes.size() > 1) {
             res.setNodes(nodes);
@@ -292,7 +292,7 @@ public class FriendService extends ServiceBase {
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
                 if (!topNode) {
                     info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                            Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, true);
+                            Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true);
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
                         Iterable<SubNode> iter = read.getChildren(ms, node,
@@ -303,7 +303,7 @@ public class FriendService extends ServiceBase {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
                                 children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
-                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, false));
+                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true));
                             }
                         }
 
@@ -318,7 +318,7 @@ public class FriendService extends ServiceBase {
                             // if we didn't already add above, add now
                             if (!childIds.contains(child.getIdStr())) {
                                 children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
-                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, false));
+                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true));
                             }
                         }
                         if (children.size() > 0) {
@@ -402,7 +402,7 @@ public class FriendService extends ServiceBase {
 
             for (SubNode node : iterable) {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false,
-                        false, true, false, false);
+                        false, true, false);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -466,7 +466,7 @@ public class FriendService extends ServiceBase {
 
             for (SubNode node : iterable) {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), as, node, false, counter + 1, false,
-                        false, false, false, false);
+                        false, false, false);
                 if (info != null) {
                     searchResults.add(info);
                 }

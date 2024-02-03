@@ -184,7 +184,7 @@ public class NodeEditService extends ServiceBase {
         }
 
         NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, req.isReturnInlineChildren(), false, false, true, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, req.isReturnInlineChildren(), false, false, true);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }
@@ -214,7 +214,7 @@ public class NodeEditService extends ServiceBase {
         read.forceCheckHasChildren(ms, node);
 
         NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, expanded, false, false, true, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, expanded, false, false, true);
         if (newNodeInfo != null) {
             res.setNode(newNodeInfo);
         }
@@ -330,6 +330,7 @@ public class NodeEditService extends ServiceBase {
             NodeLink link = new NodeLink();
             link.setNodeId(req.getTargetNodeId());
             link.setName(req.getName());
+            link.setEmbed(req.getEmbed());
             sourceNode.addLink(link);
         }
         return res;
@@ -548,7 +549,7 @@ public class NodeEditService extends ServiceBase {
         auth.ownerAuth(ms, node);
 
         NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, true,
-                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false, false);
+                Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, false);
         res.setNodeInfo(nodeInfo);
         return res;
     }

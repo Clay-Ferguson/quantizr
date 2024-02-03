@@ -171,7 +171,7 @@ public class NodeRenderService extends ServiceBase {
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
             res.setRssNode(true);
             NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, false);
+                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true);
             res.setNode(nodeInfo);
             return res;
         }
@@ -197,7 +197,7 @@ public class NodeRenderService extends ServiceBase {
         if (req.isSingleNode()) {
             // that loads these all asynchronously.
             NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, false);
+                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true);
             res.setNode(nodeInfo);
             return res;
         }
@@ -274,7 +274,7 @@ public class NodeRenderService extends ServiceBase {
     public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
             SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
         NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
-                level > 0, false, false, true, false);
+                level > 0, false, false, true);
         if (nodeInfo == null) {
             return null;
         }

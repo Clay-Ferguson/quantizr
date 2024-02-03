@@ -1269,7 +1269,7 @@ public class AttachmentService extends ServiceBase {
         update.save(ms, sourceNode);
 
         NodeInfo newNodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, targetNode, false,
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, false);
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true);
         if (newNodeInfo != null) {
             res.setTargetNode(newNodeInfo);
         }

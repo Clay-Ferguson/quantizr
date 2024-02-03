@@ -11,12 +11,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class NodeLink {
     public static final String ID = "id";
     public static final String NAME = "name";
+    public static final String EMBED = "embed";
 
     @Field(ID)
     private String nodeId;
 
     @Field(NAME)
     private String name;
+
+    @Field(EMBED)
+    private Boolean embed;
 
     public NodeLink() {}
 
@@ -38,5 +42,15 @@ public class NodeLink {
     @JsonProperty(NAME)
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonProperty(EMBED)
+    public Boolean getEmbed() {
+        return embed;
+    }
+
+    @JsonProperty(EMBED)
+    public void setEmbed(Boolean embed) {
+        this.embed = embed;
     }
 }
