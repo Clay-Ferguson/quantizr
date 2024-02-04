@@ -79,6 +79,7 @@ export class NodeCompMarkdown extends Comp {
     }
 
     translateLaTex = (val: string): string => {
+        val = val.replaceAll("$", "\\$");
         val = val.replaceAll("\\(", "$");
         val = val.replaceAll("\\)", "$");
         val = val.replaceAll("\\[", "$$");

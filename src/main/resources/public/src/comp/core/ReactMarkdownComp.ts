@@ -1,7 +1,7 @@
 import { createElement, forwardRef } from "react";
 import Markdown from "react-markdown";
 import { Prism } from "react-syntax-highlighter";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { S } from "../../Singletons";
 import rehypeKatex from "rehype-katex";
@@ -9,14 +9,12 @@ import remarkMath from "remark-math";
 
 // Good styles are: a11yDark, nightOwl, oneLight
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
-
-// NOTE: This schema alteration appears to have no effect, probably because we need to be using "unify()" like the
-// example code on the rehype-sanitize page shows. So this means for now we can't use img, span, or div in markdown 
-// The only thing broken because of this is the sizing option on embedded images using {{tag}} markdown embedding.
-const schema = JSON.parse(JSON.stringify(defaultSchema));
-schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
-schema.attributes.span = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
-schema.attributes.div = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
+// import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+// const schema = JSON.parse(JSON.stringify(defaultSchema));
+// schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
+// schema.attributes.span = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
+// schema.attributes.div = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
+// rehypePlugins: [rehypeKatex, [rehypeSanitize, schema]],
 
 const ReactMarkdownComp = forwardRef((props: any, ref) => {
     props = props || {};
@@ -32,9 +30,9 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
     return createElement(Markdown as any, {
         ...props,
         ref,
-        // WARNING: The order of these plugins is significant!!! DO NOT ALTER
-        remarkPlugins: [remarkGfm, remarkMath],
-        rehypePlugins: [rehypeKatex, [rehypeSanitize, schema]],
+        // WARNING: The order of these plugins is VERY significant!!! DO NOT ALTER
+        remarkPlugins: [remarkMath, remarkGfm],
+        rehypePlugins: [rehypeSanitize, rehypeKatex],
     });
 });
 
