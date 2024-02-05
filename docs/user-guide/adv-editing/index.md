@@ -2,9 +2,10 @@
 
 * [Tree Editing](#tree-editing)
     * [Search and Replace](#search-and-replace)
-    * [Cut - Paste - Delete](#cut---paste---delete)
+    * [Copy - Cut - Paste - Delete](#copy---cut---paste---delete)
         * [Delete](#delete)
         * [Cut and Paste](#cut-and-paste)
+        * [Copy and Paste](#copy-and-paste)
     * [Moving Nodes](#moving-nodes)
         * [Move To Top](#move-to-top)
         * [Move To Bottom](#move-to-bottom)
@@ -39,7 +40,7 @@ Under `Menu -> Edit -> Search and Replace` you'll find the same kind of "Search 
 ![file-p](attachments/63eda70f32831373361c49fe-file-p)
 
 
-# Cut - Paste - Delete
+# Copy - Cut - Paste - Delete
 
 You can Cut, Paste, and Delete nodes in a hierarchical way similar to how you do it in your computer's file system.
 
@@ -56,6 +57,10 @@ To delete nodes use the `Trash Can Icon` on the node, and that will delete all t
 To move nodes to some other location (on the Tree), select the nodes to move, and click the `Scissors Icon` on one of the nodes. Then use the "Paste Here" buttons that start appearing on the page to paste the nodes elsewhere.
 
 If you decide you don't want to paste the nodes, click `Menu -> Edit -> Undo Cut` before you paste anywhere. Nothing actually changes in the database until you actually Paste the nodes.
+
+## Copy and Paste
+
+Copy and Paste works just like Cut and Paste described above except since the "Copy/Paste" is a function used much less frequently, the Copy option is only available on the menu at `Menu -> Edit -> Copy`.
 
 # Moving Nodes
 

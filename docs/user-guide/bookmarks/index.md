@@ -13,4 +13,4 @@ todo: This screenshot is obsolete now because the "Boomark" option has been move
 
 
 ----
-**[Next: Semantic Web](/docs/user-guide/semantic-web/index.md)**
+**[Next: Account Profile and Settings](/docs/user-guide/account-settings/index.md)**

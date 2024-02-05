@@ -17,7 +17,7 @@
 
 # Semantic Web
 
-*This section discusses how Quanta supports the Semantic Web.*
+*This section discusses how to use industry standard data types.*
 
 Quanta doesn't require you to know about `Data Types`, because every node is just automatically the "Markdown Type" (i.e. assumed to contain markdown text). However we do fully support the Semantic Web types.
 
@@ -166,4 +166,4 @@ Recommended reading: Search for "Project Gutenberg" in WordPress online informat
 
 
 ----
-**[Next: Account Profile and Settings](/docs/user-guide/account-settings/index.md)**
+**[Next: RDF Triples](/docs/user-guide/rdf-triples/index.md)**

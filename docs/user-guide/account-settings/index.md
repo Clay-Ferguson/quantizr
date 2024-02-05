@@ -85,4 +85,4 @@ The `Import Key` lets you update the Selected Key type, from text content that y
 
 
 ----
-**[Next: Addendum](/docs/user-guide/addendum/index.md)**
+**[Next: Semantic Web](/docs/user-guide/semantic-web/index.md)**

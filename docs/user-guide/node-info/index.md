@@ -8,7 +8,7 @@ The `Menu -> Info` menu lets you access various information and statistics about
 
 Each node is automatically accessible via its own unique URL. Only the owner of a node and people its owner has shared the node with can access the URL.
 
-To find the URL of a node, click the node, and then choose `Menu -> Node Info -> Show URLs`. By default each node will have a URL based on its database record ID. If the node has a custom 'name' there will be an additional URL for this same node based on the name.
+To find the URL of a node, click the node, and then choose `Menu -> Tools -> Show URLs`. By default each node will have a URL based on its database record ID. If the node has a custom 'name' there will be an additional URL for this same node based on the name.
 
 There will potentially be various other URLs associated with a node, such as a URL to get its attachments, to view its RSS feed, etc.
 
@@ -25,7 +25,7 @@ This is a technical feature that displays the content of the node in a human-rea
 
 # Node Stats
 
-Select `Menu -> Node Info -> Node Stats` to generate a statistics report for the selected node. Any node subgraph can be analyzed this way to find the top most frequently used words, hashtags, and mentions, under that node.
+Select `Menu -> Tools -> Node Stats` to generate a statistics report for the selected node. Any node subgraph can be analyzed this way to find the top most frequently used words, hashtags, and mentions, under that node.
 
 This opens a dialog showing the top words (and hashtags, and mentions) by frequency of use, under that specific subgraph. Words are listed in descending order based on the number of times the word appears in the node subgraph.
 

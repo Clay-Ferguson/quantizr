@@ -1,30 +1,43 @@
 **[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
-* [AI - Artificial Intelligence](#ai---artificial-intelligence)
-    * [ChatGPT - Powered by OpenAI](#chatgpt---powered-by-openai)
+* [Artificial Intelligence](#artificial-intelligence)
+    * [AI via ChatGPT](#ai-via-chatgpt)
+    * [Perplexity AI](#perplexity-ai)
     * [AI Conversations](#ai-conversations)
     * [A Node that Asks a Question to AI](#a-node-that-asks-a-question-to-ai)
     * [Asking Questions to the AI](#asking-questions-to-the-ai)
-    * [Question about Content](#question-about-content)
+    * [Questions about a Subgraph](#questions-about-a-subgraph)
     * [Configure GPT](#configure-gpt)
         * [System Prompt Examples](#system-prompt-examples)
     * [Image Understanding](#image-understanding)
     * [Image Generation](#image-generation)
-    * [Image Generation Examples](#image-generation-examples)
     * [Speech Generation](#speech-generation)
+    * [AI Service Selection](#ai-service-selection)
+        * [AI Services and Pricing](#ai-services-and-pricing)
     * [Practical Use Case - Writing a Scientific Paper](#practical-use-case---writing-a-scientific-paper)
 
-# AI - Artificial Intelligence
+# Artificial Intelligence
 
-Converse with AI, generate images, ask questions about images.
+Converse with AI, generate images, ask questions about images, generate speech MP3s from text.
 
-# ChatGPT - Powered by OpenAI
+# AI via ChatGPT
 ----
 
 Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context". *Note: Quanta uses OpenAI to power all it's AI capabilities.*
 
 <img src='attachments/64ebe6bfc33eef3cdbdac756-file-p' style='width:20%'/>
 
+
+# Perplexity AI
+
+By a selection in your account in `Menu -> Account -> Settings -> AI -> AI Service` you can choose which AI Service to use in your account. You can switch to either Perplexity or OpenAI, because currently only those two are supported.
+
+If you're doing image recognition, image generation, or speech generation, you can only use the "OpenAI" Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use either Perplexity or OpenAI. In other words Quanta can only do conversational AI when Perplexity is set as your AI Service.
+
+<img src='attachments/65b983a605442a5ea3c2b19a-file-p' style='width:20%'/>
+
+
+Everything in Quanta is offered for free except for AI Capabilities. Since AI is provided by [OpenAI](https://openai.com) and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to `Menu -> Account -> Settings -> Add Credit` to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want.
 
 **Use Quanta AI to...**
 
@@ -63,17 +76,31 @@ You can keep asking more follow-up questions as long as you want, and that will 
 
 This memory of the conversation state is called Hierarchical Contextual Memory (HCM). Stated another way, we could say that the "context" (the AI's memory and understanding of the conversation) for any question always includes all "parent nodes" at higher levels up in the tree, going back to when you asked your original question.
 
-# Question about Content
+# Questions about a Subgraph
 
-This option will open a text entry box where you can enter a question about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.
+Use `Menu -> ChatGPT -> Ask about Subgraph` to open a text entry box where you can enter a question (to be answered by AI) about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.
 
-*Currently (Until Quanta is available as a commercial service) you are severely limited on the size of the data that you can do this query on. Soon there will be a paid-version of Quanta where you can submit questions about larger amounts of data.*
+The term *subgraph*, of course means just "everything under that branch". All of the text under that subgraph will be used as the context information fed to the AI for it to be able to answer the question with, in addition to all it's built-in knowledge.
+
+If you only want to ask an AI question about a limited subset of nodes you can use the checkboxes on each node (when `Edit Mode` is enabled) to select one or more nodes and this will cause the subgraph to be filtered to only included your selected nodes as input context to the AI.
 
 # Configure GPT
 
-You can use the `Configure GPT` function on a node, so that all questions anywhere on the tree under that node will have the GPT prompt settings you specify. These two prompt settings let you define what the role of the AI will be in answering questions.
+Use `Menu -> ChatGPT -> Configure GPT` to configure a node (any node), so that all questions anywhere on the tree under that node will have the GPT prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers. 
 
-![file-p](attachments/64f79adb06a5b22fcf329542-file-p)
+In other words you can say things like the following examples and the AI will assume this role during all question answering you do anywhere in the subgraph under this node. Once you set this `System Prompt` on the node it gets saved but it doesn't appear on the screen until you come back to the Configure GPT dialog to edit/view it again. 
+
+**Example System Prompts:**
+
+* You are a pirate, and will answer all questions like a pirate.
+
+* You are an expert physicist and research assistant helping me write a paper on a discovery in Quantum Mechanics
+
+* We are playing an adding game, and you will simply just sum up all the numbers you've ever seen and respond with the result.
+
+NOTE: Experimenting with that adding game is the simplest way to make sure you understand how this, because you can just enter a few numbers into some nodes and not matter what question you ask you should always see it obeys it's system prompt and just replies with the total of all numbers it encountered, since that was it's explicit instructions
+
+![file-p](attachments/65b6b364e6d38a174f58684d-file-p)
 
 
 So we would first click a node on the tree, and then choose `Menu -> ChatGPT -> Configure GPT` to open the dialog above. After clicking "Save" in the dialog it will store these settings onto the selected node, so that all future questions asked below that section of the tree (anywhere under that branch of the tree) will `cause GPT to answer as a pirate`. Pirates are a fun role to let the GPT play, because they start sentences with `"Hey matey, how arrrr ye."` etc.
@@ -114,10 +141,6 @@ To generate images with DALL-E 3, click the upload button, then specify that you
 <img src='attachments/654ab18182df4f629959741c-bird-house-hunting.gif' style='width:100%'/>
 
 
-# Image Generation Examples
-
-* https://quanta.wiki/u/wclayf/ai-images?view=doc
-
 # Speech Generation
 
 To convert a body of text to an MP3 file of a person narrating the text, you can do that using the "Attach" button, to attach the MP3.
@@ -126,6 +149,41 @@ In the screen recording below we generate an MP3 file and attaching it to the no
 
 <img src='attachments/6591e76fc9873822b24fa51c-ai-text-to-speech.gif' style='width:100%'/>
 
+
+# AI Service Selection
+
+Quanta can connect to several different AI APIs on the back end, which is what performs the actual AI services. Any time you ask the AI a question it goes to your currently active Service. You can change what service you want to use any time using the selection in your Account Settings at `Menu -> Account -> Settings -> AI Service`, as shown in the following image:
+
+<img src='attachments/65bc2b7bcf425c5fe6f2dde2-file-p' style='width:100%'/>
+
+
+## AI Services and Pricing
+
+No matter what AI service you use, you will be charged only exactly what you consume based on OpenAI and/or Perplexity's pricing models. Quanta doesn't charge extra for use of AI, but merely passes your costs thru without any markup.
+
+----
+
+Here's a full list of the available AI Services:
+
+## OpenAI (Chat)
+
+This is, ChatGPT-4 the default chatbot and is widely considered the most intelligent general-purpose AI on the market.
+
+## Perplexity (Chat)
+
+This is Perplexity's best high-end powerful general-purpose AI.
+
+## Perplexity (Recent News)
+
+This is Perplexity's AI which has access to the latest news and content from from the web.
+
+## Code Llama
+
+This is the well-known open source Code Llama, which is great for coding and programming tasks.
+
+## Llama 2
+
+This is the well-known open source Llama 2, which is great for general-purpose tasks.
 
 # Practical Use Case - Writing a Scientific Paper
 ----

@@ -14,7 +14,7 @@
 
 ### [Sharing](/docs/user-guide/sharing/index.md)
 
-### [AI - Artificial Intelligence](/docs/user-guide/ai/index.md)
+### [Artificial Intelligence](/docs/user-guide/ai/index.md)
 
 ### [Content Layout](/docs/user-guide/page-layout/index.md)
 
@@ -23,6 +23,8 @@
 ### [Searching](/docs/user-guide/searching/index.md)
 
 ### [Timelines](/docs/user-guide/timelines/index.md)
+
+### [Chat Rooms](/docs/user-guide/chat-rooms/index.md)
 
 ### [Playing Audio or Video](/docs/user-guide/audio-video/index.md)
 
@@ -42,9 +44,11 @@
 
 ### [Bookmarks](/docs/user-guide/bookmarks/index.md)
 
+### [Account Profile and Settings](/docs/user-guide/account-settings/index.md)
+
 ### [Semantic Web](/docs/user-guide/semantic-web/index.md)
 
-### [Account Profile and Settings](/docs/user-guide/account-settings/index.md)
+### [RDF Triples](/docs/user-guide/rdf-triples/index.md)
 
 ### [Addendum](/docs/user-guide/addendum/index.md)
 

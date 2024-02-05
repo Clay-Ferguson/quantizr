@@ -7,6 +7,7 @@
         * [Positioning Images](#positioning-images)
     * [Node Layout](#node-layout)
     * [Tips](#tips)
+    * [Collapsible Sections](#collapsible-sections)
 
 # Content Layout
 
@@ -88,6 +89,22 @@ which will expand the subnodes on the page with their parent so that the user ca
 
 
 2) CTRL-Click any image to zoom in/out on the location of the image where you clicked
+
+# Collapsible Sections
+
+Quanta supports a special syntax to make content expandable/collapsible, which looks like the following (in the editor image below), which is how the node you're now reading was created.
+
+-**Click to Expand**-
+
+This content will be hidden until expanded.
+
+
+The content up until the double spaced area (two blank lines) is assumed to be the content you want in the collapsible section.
+
+<img src='attachments/65becefadfa1d7445c56e949-file-p' style='width:100%'/>
+
+
+As you saw in the example above, the expand/collapse link text will be whatever text is between the `-**` and `**-`, which is a syntax that will render just as a normal bold font, on systems that don't support this non-standard Markdown syntax feature.
 
 
 ----
