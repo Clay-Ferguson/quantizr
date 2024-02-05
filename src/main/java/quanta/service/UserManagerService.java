@@ -42,11 +42,11 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
-import quanta.request.AddCreditRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
 import quanta.request.DeleteUserTransactionsRequest;
+import quanta.request.GetPeopleRequest;
 import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.LoginRequest;
@@ -1058,6 +1058,54 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    public GetPeopleResponse getPeopleOnNode(MongoSession ms, String nodeId) {
+        GetPeopleResponse res = new GetPeopleResponse();
+        SubNode node = read.getNode(ms, nodeId);
+        if (node == null) {
+            res.setMessage("Unable to find node.");
+            res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
+        }
+        String ownerIdStr = node.getOwner().toHexString();
+        HashSet<String> idSet = new HashSet<>();
+
+        List<FriendInfo> friends = new LinkedList<>();
+        arun.run(as -> {
+            SubNode ownerAccntNode = read.getNode(as, node.getOwner());
+            if (ownerAccntNode != null) {
+                FriendInfo ownerInfo = buildPersonInfoFromAccntNode(as, ownerAccntNode);
+                if (node.getLikes() != null && node.getLikes().contains(ownerInfo.getUserName())) {
+                    ownerInfo.setLiked(true);
+                }
+                res.setNodeOwner(ownerInfo);
+            }
+
+            if (node.getAc() != null) {
+                /*
+                 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
+                 */
+                for (String accntId : node.getAc().keySet()) {
+                    // ignore public, it's not a user.
+                    if (accntId.equals(ownerIdStr) || idSet.contains(accntId)
+                            || PrincipalName.PUBLIC.s().equals(accntId))
+                        continue;
+                    SubNode accntNode = read.getNode(as, accntId, false, null);
+                    if (accntNode != null) {
+                        FriendInfo fi = buildPersonInfoFromAccntNode(as, accntNode);
+                        if (fi != null) {
+                            friends.add(fi);
+                            idSet.add(accntId);
+                        }
+                    }
+                }
+                res.setPeople(friends);
+            }
+            return null;
+        });
+
+        friends.sort((f1, f2) -> f1.getUserName().compareTo(f2.getUserName()));
+        return res;
+    }
+
     public FriendInfo buildPersonInfoFromAccntNode(MongoSession ms, SubNode userNode) {
         FriendInfo fi = new FriendInfo();
         String displayName = user.getFriendlyNameFromNode(userNode);
@@ -1104,6 +1152,18 @@ public class UserManagerService extends ServiceBase {
             res.setPeople(friends);
         }
         return res;
+    }
+
+
+    public Object getPeople(GetPeopleRequest req, MongoSession ms) {
+        GetPeopleResponse ret = null;
+        if (req.getNodeId() != null) {
+            ret = user.getPeopleOnNode(ms, req.getNodeId());
+        } else {
+            ret = user.getPeople(ms, ThreadLocals.getSC().getUserName(), req.getType());
+        }
+        ret.setFriendHashTags(userFeed.getFriendsHashTags(ms));
+        return ret;
     }
 
     /**

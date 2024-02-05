@@ -82,10 +82,10 @@ export class FriendsTableRow extends ListBoxRow {
 
                 this.friend.liked ? new Icon({
                     title: "This person Liked the Node",
-                    className: "fa fa-star fa-lg marginTop marginRight float-end " +
+                    className: "fa fa-star fa-lg marginTop bigMarginLeft " +
                         (this.friend.userName === ast.userName ? "likedByMeIcon" : "")
                 }) : null
-            ])
+            ], "flexAlignChildrenTop")
         ]);
         return true;
     }

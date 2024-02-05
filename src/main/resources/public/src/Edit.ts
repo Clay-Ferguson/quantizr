@@ -1573,7 +1573,7 @@ export class Edit {
         const node = S.util.getNodeFromEvent(evt);
         if (!node) return;
 
-        const youLiked = !!node.likes.find(u => u === ast.userName);
+        const youLiked = !!node.likes?.find(u => u === ast.userName);
         S.edit.likeNode(node, !youLiked);
     }
 

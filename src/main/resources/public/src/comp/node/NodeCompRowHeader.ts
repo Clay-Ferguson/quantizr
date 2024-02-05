@@ -159,8 +159,6 @@ export class NodeCompRowHeader extends Div {
                 }
             }
 
-            /* only allow this for logged in users, because it might try to access over ActivityPub potentially
-            and we need to have a user identity for all the HTTP sigs for that. */
             if (!ast.isAnonUser && (hasNonPublicShares || this.node.likes?.length > 0)) {
                 ddItems.push(new Li(null, { className: "clickable" }, [
                     new Span("People", {

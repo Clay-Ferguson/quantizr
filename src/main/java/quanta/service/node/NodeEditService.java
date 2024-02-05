@@ -24,6 +24,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeJsonRequest;
 import quanta.request.InitNodeEditRequest;
+import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
 import quanta.request.SaveNodeJsonRequest;
 import quanta.request.SaveNodeRequest;
@@ -32,6 +33,7 @@ import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.response.GetNodeJsonResponse;
 import quanta.response.InitNodeEditResponse;
+import quanta.response.LikeNodeResponse;
 import quanta.response.LinkNodesResponse;
 import quanta.response.SaveNodeJsonResponse;
 import quanta.response.SaveNodeResponse;
@@ -56,6 +58,39 @@ import quanta.util.XString;
 @Component
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
+
+    public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {
+        LikeNodeResponse res = new LikeNodeResponse();
+        exec.run(() -> {
+            arun.run(as -> {
+                SubNode node = read.getNode(ms, req.getId());
+                if (node == null) {
+                    throw new RuntimeException("Unable to find node: " + req.getId());
+                }
+                if (node.getLikes() == null) {
+                    node.setLikes(new HashSet<>());
+                }
+                String userName = ThreadLocals.getSC().getUserName();
+                // local users will always just have their userName put in the 'likes'
+                if (req.isLike()) {
+                    if (node.getLikes().add(userName)) {
+                        // set node to dirty only if it just changed.
+                        ThreadLocals.dirty(node);
+                    }
+                } else {
+                    if (node.getLikes().remove(userName)) {
+                        // set node to dirty only if it just changed.
+                        ThreadLocals.dirty(node);
+                        if (node.getLikes().size() == 0) {
+                            node.setLikes(null);
+                        }
+                    }
+                }
+                return null;
+            });
+        });
+        return res;
+    }
 
     public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
         SaveNodeResponse res = new SaveNodeResponse();

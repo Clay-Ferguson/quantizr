@@ -181,7 +181,7 @@ export class FriendsDlg extends DialogBase {
                 !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
                     !this.displayOnly && !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
-                    new Button("Import", this.import),
+                    !this.displayOnly ? new Button("Import", this.import) : null,
                     state.friends?.length > 0 ? new Button("Export", this.export) : null,
                     new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),

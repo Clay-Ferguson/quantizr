@@ -108,7 +108,6 @@ export class ServerPush {
 
         this.eventSource.addEventListener("accountInfo", async (e: any) => {
             dispatch("AccountInfoPushUpdate", s => {
-                debugger;
                 const data: J.UpdateAccountInfo = JSON.parse(e.data);
                 if (s.userProfile) {
                     s.userProfile.balance = data.credit;

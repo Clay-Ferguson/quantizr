@@ -201,6 +201,10 @@
     margin-bottom: $tinyGap;
 }
 
+.flexAlignChildrenTop {
+    align-items: flex-start;
+}
+
 .alignBottom {
     vertical-align: bottom;
 }
