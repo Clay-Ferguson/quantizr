@@ -28,7 +28,7 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
 
     override extraPagingComps = (): Comp[] => {
         return [
-            new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
+            new Checkbox("Live", { className: "bigMarginLeft" }, {
                 setValue: (checked: boolean) => {
                     // dispatch now for rapid screen refresh
                     dispatch("AutoRefresh", (s) => {

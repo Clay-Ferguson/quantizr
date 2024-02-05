@@ -193,6 +193,7 @@ export class Render {
 
         const byIdUrl = window.location.origin + "?id=" + node.id;
         const byIdUrlThreadView = byIdUrl + "&view=thread";
+        const pathPart = S.nodeUtil.getPathPartForNamedNode(node);
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
 
         children.push(new Heading(6, "By ID"), //
@@ -211,7 +212,7 @@ export class Render {
             }));
 
         if (node.name) {
-            const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
+            const byNameUrl = window.location.origin + pathPart;
             children.push(new Heading(6, "By Name"), //
                 new Div(byNameUrl, {
                     className: "linkDisplay",
@@ -219,15 +220,23 @@ export class Render {
                     onClick: () => S.util.copyToClipboard(byNameUrl)
                 }));
 
-            const docViewByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node) + "?view=doc";
-            children.push(new Heading(6, "Doc View By Name"), //
+            const docViewByNameUrl = window.location.origin + pathPart + "?view=doc";
+            children.push(new Heading(6, "Doc View (By Name)"), //
                 new Div(docViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
                     onClick: () => S.util.copyToClipboard(docViewByNameUrl)
                 }));
 
-            const markdownByNameUrl = "[Link](" + S.nodeUtil.getPathPartForNamedNode(node) + ")";
+            const timelineViewByNameUrl = window.location.origin + pathPart + "?view=timeline";
+            children.push(new Heading(6, "Timeline View (By Name)"), //
+                new Div(timelineViewByNameUrl, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(timelineViewByNameUrl)
+                }));
+
+            const markdownByNameUrl = "[Link](" + pathPart + ")";
             children.push(new Heading(6, "By Name (Markdown)"), //
                 new Div(markdownByNameUrl, {
                     className: "linkDisplay",
@@ -285,7 +294,7 @@ export class Render {
                     ]);
 
                     if (node.name) {
-                        const attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
+                        const attByNameUrl = window.location.origin + pathPart;
                         linkGroup.addChildren([
                             new Heading(6, "View By Name"), //
                             new Div(attByNameUrl, {

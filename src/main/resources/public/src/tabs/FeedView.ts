@@ -97,7 +97,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     // DO NOT DELETE (this will likely be brought back, in future design)
-                    // new Checkbox("Live Updates", { className: "bigMarginLeft" }, {
+                    // new Checkbox("Live", { className: "bigMarginLeft" }, {
                     //     setValue: (checked: boolean) => {
                     //         // dispatch now for rapid screen refresh
                     //         dispatch("AutoRefresh", (s) => {
