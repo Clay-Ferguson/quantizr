@@ -56,7 +56,6 @@ export abstract class Comp {
     // static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
     public ordinal: number;
 
-
     constructor(attribs?: any, private stateMgr?: State) {
         if (typeof attribs === "string") {
             throw new Error("string was passed for 'attribs' in " + this.constructor.name);
@@ -272,28 +271,32 @@ export abstract class Comp {
     Note: Tag can also be a type here, not just a string.
     */
     reactNode = (type: any): ReactNode => {
+        let ret: ReactNode = null;
 
         // If this is a raw HTML component just render using 'attribs', which is what react expects.
         if (this.attribs.dangerouslySetInnerHTML) {
-            return createElement(type, this.attribs);
+            ret = createElement(type, this.attribs);
+        }
+        else {
+            try {
+                const children = this.createChildren(this.children);
+
+                if (children?.length == 1) {
+                    ret = createElement(type, this.attribs, children[0]);
+                }
+                else if (children?.length > 0) {
+                    ret = createElement(type, this.attribs, children);
+                }
+                else {
+                    ret = createElement(type, this.attribs);
+                }
+            }
+            catch (e) {
+                S.util.logErr(e, "Failed in Comp.tagRender" + this.getCompClass() + " attribs=" + S.util.prettyPrint(this.attribs));
+            }
         }
 
-        try {
-            const children = this.createChildren(this.children);
-
-            if (children?.length == 1) {
-                return createElement(type, this.attribs, children[0]);
-            }
-            else if (children?.length > 0) {
-                return createElement(type, this.attribs, children);
-            }
-            else {
-                return createElement(type, this.attribs);
-            }
-        }
-        catch (e) {
-            S.util.logErr(e, "Failed in Comp.tagRender" + this.getCompClass() + " attribs=" + S.util.prettyPrint(this.attribs));
-        }
+        return ret;
     }
 
     checkState = (): boolean => {

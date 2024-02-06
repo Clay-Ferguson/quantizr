@@ -157,9 +157,28 @@ export class Util {
         return hash.toString();
     }
 
-    hashOfObject = (obj: any): string => {
+    stringifyObject = (obj: any): string => {
         if (!obj) return "null";
-        return this.hashOfString(JSON.stringify(obj));
+        // A helper function to sort the object keys (including nested objects)
+        function sortObject(object) {
+            if (object === null) return null;
+            if (typeof object !== 'object') return object;
+            if (Array.isArray(object)) return object.map(sortObject);
+            const sortedObj = {};
+            Object.keys(object).sort().forEach(key => {
+                sortedObj[key] = sortObject(object[key]);
+            });
+            return sortedObj;
+        }
+
+        // Sort the object to ensure consistent serialization
+        const sortedObj = sortObject(obj);
+        // Serialize the object to a JSON string
+        return JSON.stringify(sortedObj);
+    }
+
+    hashOfObject = (obj: any): string => {
+        return this.hashOfString(this.stringifyObject(obj));
     }
 
     /** Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can either be an actual
