@@ -84,7 +84,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
         this.addPaginationBar(children, false, this.allowTopMoreButton, true);
 
-        if (ast.timelineReversedOrder) {
+        if (this.data.id === C.TAB_TIMELINE && ast.timelineReversedOrder) {
             for (let i = results.length - 1; i >= 0; i--) {
                 const node = results[i];
                 if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(n => n === node.id)) return;

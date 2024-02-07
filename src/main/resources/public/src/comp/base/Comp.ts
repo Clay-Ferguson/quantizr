@@ -68,6 +68,8 @@ export abstract class Comp {
             console.log("construct: " + this.constructor.name);
         }
         this.attribs = attribs || {};
+
+        // todo-0: is this a performance issue? Do we always need 'createRef'?
         this.attribs.ref = createRef();
 
         if (this.attribs.title) {

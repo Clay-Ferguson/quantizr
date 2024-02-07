@@ -47,6 +47,7 @@ public class MongoRead extends ServiceBase {
     private static final Object dbRootsLock = new Object();
     private SubNode dbRoot;
     public static Sort ordinalSort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
+    public static int MAX_TREE_GRAPH_SIZE = 5000;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
@@ -1396,8 +1397,9 @@ public class MongoRead extends ServiceBase {
         // first scan to build up the nodes list and nodeMap
         for (SubNode n : getSubGraph(ms, rootNode, null, 0, false, true, criteria)) {
             nodeMap.put(n.getPath(), new TreeNode(n));
-            if (nodeMap.size() > 2000) {
-                throw new RuntimeException("Too much data to return. Max is 2000 nodes.");
+            if (nodeMap.size() > MAX_TREE_GRAPH_SIZE) {
+                throw new RuntimeException(
+                        "Too much data to return. Max is " + String.valueOf(MAX_TREE_GRAPH_SIZE) + " nodes.");
             }
         }
 

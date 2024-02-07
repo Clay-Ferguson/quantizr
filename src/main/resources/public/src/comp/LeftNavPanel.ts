@@ -44,7 +44,6 @@ export class LeftNavPanel extends Div {
 
     override preRender = (): boolean => {
         const ast = getAs();
-
         const myMessages = ast.myNewMessageCount > 0
             ? (ast.myNewMessageCount + " new posts") : "";
         let showDocIndex = S.util.willRenderDocIndex();

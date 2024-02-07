@@ -1,4 +1,4 @@
-import { dispatch, getAs, promiseDispatch } from "./AppContext";
+import { dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { FullScreenType } from "./Interfaces";
@@ -12,19 +12,6 @@ declare const BUILDTIME: string;
 
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
-
-    clkIdx = async (id: string) => {
-        await promiseDispatch("highlightNode", s => s.indexHighlightNode = id);
-        const activeTab = S.tabUtil.getActiveTabComp();
-        if (activeTab) {
-            if (activeTab.scrollToNode(id)) {
-                return;
-            }
-        }
-
-        // if we fall thru to here then jump to tree, and do a query to get the data.
-        this.jumpToId(id, false);
-    }
 
     searchUnderId = async (id: string, text: string) => {
         await S.srch.search(id, null, text, null, "Content: " + text,

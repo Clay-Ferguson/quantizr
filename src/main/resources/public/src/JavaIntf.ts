@@ -1299,6 +1299,7 @@ export const enum Constant {
 
 export const enum ConstantInt {
     ROWS_PER_PAGE = 50,
+    DOC_ITEMS_PER_PAGE = 100,
     MAX_EXPANDED_CHILDREN = 100,
 }
 

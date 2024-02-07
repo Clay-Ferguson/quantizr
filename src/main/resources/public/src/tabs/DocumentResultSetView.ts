@@ -8,12 +8,12 @@ import { DocumentRSInfo } from "../DocumentRSInfo";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
-import { ResultSetView } from "./ResultSetView";
+import { DocumentView } from "./DocumentView";
 
-export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetView<TT, DocumentResultSetView<TT>> {
+export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentView<TT, DocumentResultSetView<TT>> {
 
     constructor(data: TabIntf<TT, DocumentResultSetView<TT>>) {
-        super(data, false, false, true);
+        super(data);
         data.inst = this;
 
         // turn the top more button off for infinite scrolling
@@ -44,10 +44,6 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends ResultSetV
             style = indentLevel > 0 ? { marginLeft: "" + (indentLevel * 25) + "px" } : null;
         }
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, true, itemClass, itemClassHighlight, style);
-    }
-
-    override pageChange(_delta: number): void {
-        S.nav.openDocumentView(null, getAs().node?.id);
     }
 
     override getFloatRightHeaderComp = (): Comp => {

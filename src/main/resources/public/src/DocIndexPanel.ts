@@ -1,6 +1,7 @@
-import { getAs } from "./AppContext";
+import { getAs, promiseDispatch } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { DocumentRSInfo } from "./DocumentRSInfo";
+import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 import { Clearfix } from "./comp/core/Clearfix";
@@ -26,6 +27,9 @@ export class DocIndexPanel extends Div {
         let index = "";
         let count = 0;
         const baseSlashCount = S.util.countChars(info.results[0].path, "/");
+
+        // Since we can have a large number of items we use a single HTML string for performance. This is a very special case
+        // and is not a pattern to be followed in general.
         for (const node of info.results) {
             if (node.hasChildren) {
                 const level = S.util.countChars(node.path, "/") - baseSlashCount;
@@ -41,7 +45,7 @@ export class DocIndexPanel extends Div {
             (evt: Event) => {
                 const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
                 if (nodeId) {
-                    S.view.clkIdx(nodeId);
+                    this.clickItem(nodeId);
                 }
             });
 
@@ -51,6 +55,31 @@ export class DocIndexPanel extends Div {
         }
         this.setChildren([backToDocLink, backToDocLink ? new Clearfix() : null, html]);
         return true;
+    }
+
+    // This click function opens up the document tab and scrolls to the node that was clicked on
+    clickItem = async (id: string) => {
+        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+        if (!data || !data.props) return false;
+        const info = data.props as DocumentRSInfo;
+        if (!info.results) return false;
+        let curPage = 0;
+        let idx = 0;
+        for (const node of info.results) {
+            if (node.id === id) {
+                curPage = Math.floor(idx / J.ConstantInt.DOC_ITEMS_PER_PAGE);
+                await promiseDispatch("docPage", s => {
+                    info.page = curPage;
+                    s.activeTab = C.TAB_DOCUMENT;
+                    s.indexHighlightNode = id;
+                });
+                setTimeout(() => {
+                    data.inst.scrollToNode(id);
+                }, 10);
+                break;
+            }
+            idx++;
+        }
     }
 
     goToDocTab = () => {

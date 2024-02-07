@@ -236,7 +236,6 @@ export class Search {
                 DocumentTab.inst.openGraphComps = [];
                 const info = DocumentTab.inst.props as DocumentRSInfo;
                 info.breadcrumbs = res.breadcrumbs;
-                info.endReached = true;
                 s.menuIndexToggle = S.util.willRenderDocIndex(s) ? "index" : "menu";
             });
             return;
@@ -248,7 +247,6 @@ export class Search {
             DocumentTab.inst.openGraphComps = [];
             const info = DocumentTab.inst.props as DocumentRSInfo;
             info.breadcrumbs = res.breadcrumbs;
-            info.endReached = true;
             S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
 
             // set 'results' if this is the top of page being rendered, or else append results if we
