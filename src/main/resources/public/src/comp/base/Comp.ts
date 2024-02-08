@@ -20,7 +20,7 @@ export abstract class Comp {
     public rendered: boolean = false;
 
     // tag can be a string *or* a react functional component
-    public tag: any = "div";
+    private tag: any;
     public firstContent: string = null;
 
     private static guid: number = 0;
@@ -262,9 +262,6 @@ export abstract class Comp {
 
     public static getDangerousHtml = (content: string) => {
         return { __html: S.domUtil.sanitizeHtml(content) };
-
-        // DO NOT DELETE UNTIL WE'RE SURE WE DON'T NEED DOMPurify ANYMORE
-        // return { __html: DOMPurify.sanitize(content, Comp.DOM_PURIFY_CONFIG) };
     }
 
     /* Renders this node to a specific tag, including support for non-React children 
@@ -384,10 +381,9 @@ export abstract class Comp {
             }
             const ret = this.compRender();
 
-            if (this.debug) {
-                // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
-            }
-
+            // if (this.debug) {
+            //     // console.log("render done: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
+            // }
             return ret;
         }
         catch (e) {
@@ -421,7 +417,6 @@ export abstract class Comp {
         if (!elm) {
             return;
         }
-
         this.maybeFocus();
         this.runQueuedFuncs(elm);
     }
@@ -447,7 +442,7 @@ export abstract class Comp {
     // This is the function you override/define to implement the actual render method, which is simple and decoupled from state
     // management aspects that are wrapped in 'render' which is what calls this, and the ONLY function that calls this.
     compRender = (): ReactNode => {
-        return this.reactNode(this.tag);
+        return this.reactNode(this.tag || "div");
     }
 
     scrollDomAddEvent = () => {
@@ -515,8 +510,7 @@ export abstract class Comp {
     // There are a few very special places where we need to sort components
     // that may have been added in an order we don't want this this is how we do it.
     ordinalSortChildren = () => {
-        if (!this.children) return;
-        this.children.sort((a, b) => a.ordinal - b.ordinal);
+        this.children?.sort((a, b) => a.ordinal - b.ordinal);
     }
 }
 
