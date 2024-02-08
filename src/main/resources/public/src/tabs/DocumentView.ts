@@ -120,6 +120,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
             buttonBarComps.push(new IconButton("fa-angle-double-up fa-lg", null, {
                 onClick: () => {
                     this.data.props.page = 0;
+                    this.data.scrollPos = 0;
                     dispatch("pageChange", _s => { });
                 }
             }));
@@ -129,6 +130,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
             buttonBarComps.push(new IconButton("fa-angle-up fa-lg", null, {
                 onClick: () => {
                     this.data.props.page--;
+                    this.data.scrollPos = 0;
                     dispatch("pageChange", _s => { });
                 }
             }));
@@ -138,6 +140,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
             buttonBarComps.push(new IconButton("fa-angle-double-down fa-lg", null, {
                 onClick: () => {
                     this.data.props.page = maxPage - 1;
+                    this.data.scrollPos = 0;
                     dispatch("pageChange", _s => { });
                 }
             }));
@@ -147,6 +150,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
             buttonBarComps.push(new IconButton("fa-angle-down fa-lg", null, {
                 onClick: () => {
                     this.data.props.page++;
+                    this.data.scrollPos = 0;
                     dispatch("pageChange", _s => { });
                 }
             }));
