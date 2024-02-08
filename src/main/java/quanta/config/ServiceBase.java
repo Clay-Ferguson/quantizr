@@ -64,6 +64,7 @@ import quanta.service.node.NodeSearchService;
 import quanta.service.node.OobaAiService;
 import quanta.service.node.OpenAiService;
 import quanta.service.node.PplxAiService;
+import quanta.service.node.GeminiAiService;
 import quanta.test.TestUtil;
 import quanta.types.OpenAIAnswerType;
 import quanta.types.BookmarkType;
@@ -170,6 +171,7 @@ public class ServiceBase {
     public static SchemaOrgService schema;
     public static OpenAiService oai;
     public static PplxAiService pplxai;
+    public static GeminiAiService geminiai;
     public static HuggingFaceService huggingFace;
     public static OobaAiService oobaAi;
     public static TransferService transfer;
@@ -271,6 +273,7 @@ public class ServiceBase {
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);
             pplxai = getBean(ctx, PplxAiService.class);
+            geminiai = getBean(ctx, GeminiAiService.class);
             huggingFace = getBean(ctx, HuggingFaceService.class);
             oobaAi = getBean(ctx, OobaAiService.class);
             transfer = getBean(ctx, TransferService.class);

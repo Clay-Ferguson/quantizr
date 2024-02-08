@@ -211,6 +211,7 @@ services:
             mongoPassword: "${mongoPassword}"
             OPENAI_API_KEY: "${OPENAI_API_KEY}"
             PPLX_API_KEY: "${PPLX_API_KEY}"
+            GEMINI_API_KEY: "${GEMINI_API_KEY}"
             mongoSecurity: "true"
 
             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS

@@ -12,7 +12,7 @@ public class ChatCompletionResponse {
     private List<Choice> choices;
     private Usage usage;
 
-    // transient, part of pojo
+    // transient, not part of pojo
     public BigDecimal userCredit;
 
     public ChatCompletionResponse() {}

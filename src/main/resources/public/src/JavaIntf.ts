@@ -149,6 +149,30 @@ export interface UserProfile {
     balance: number;
 }
 
+export interface GeminiChatCandidate {
+    content: GeminiChatContent;
+    finishReason: string;
+    index: number;
+}
+
+export interface GeminiChatContent {
+    role: string;
+    parts: GeminiChatPart[];
+}
+
+export interface GeminiChatPart {
+    text: string;
+}
+
+export interface GeminiChatRequest {
+    contents: GeminiChatContent[];
+}
+
+export interface GeminiChatResponse {
+    candidates: GeminiChatCandidate[];
+    credit: number;
+}
+
 export interface HuggingFaceConversation {
     generated_responses: string[];
     past_user_inputs: string[];
@@ -1384,6 +1408,7 @@ export const enum NodeProp {
     TRUNCATED = "trunc",
     OPENAI_RESPONSE = "sn:oaiRes",
     PPLXAI_RESPONSE = "sn:pplxaiRes",
+    GEMINIAI_RESPONSE = "sn:geminiaiRes",
     HUGGINGFACE_RESPONSE = "sn:hfaceRes",
     OOBAI_RESPONSE = "sn:oobRes",
     FILE_NAME = "file",
@@ -1405,6 +1430,7 @@ export const enum NodeType {
     COMMENT = "sn:comment",
     OPENAI_ANSWER = "sn:oaiAns",
     PPLXAI_ANSWER = "sn:pplxaiAns",
+    GEMINIAI_ANSWER = "sn:geminiaiAns",
     HUGGINGFACE_ANSWER = "sn:hfAns",
     OOBAI_ANSWER = "sn:oobAns",
     RSS_FEED = "sn:rssfeed",

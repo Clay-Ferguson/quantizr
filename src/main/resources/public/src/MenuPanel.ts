@@ -340,9 +340,9 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser && S.quanta.config.useOpenAi) {
-            children.push(new Menu("ChatGPT", [
+            children.push(new Menu("AI", [
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Configure GPT", MenuPanel.configureGpt, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Configure AI", MenuPanel.configureGpt, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

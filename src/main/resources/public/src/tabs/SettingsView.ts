@@ -36,6 +36,9 @@ export class SettingsView extends AppTab<any, SettingsView> {
             case "openAi":
                 modelSpecs = "OpenAI ChatGPT-4 (Chat): This is the default chatbot and is widely considered the most intelligent general-purpose AI on the market.";
                 break;
+            case "geminiAi":
+                modelSpecs = "Gemini AI: This is Google's best general-purpose AI.";
+                break;
             case "pplxAi":
                 modelSpecs = "Perplexity AI: This is Perplexity's best high-end powerful general-purpose AI.";
                 break;
@@ -118,6 +121,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     new Div(null, { className: settingsCol }, [
                         new Selection(null, "AI Service", [
                             { key: "openAi", val: "OpenAI (Chat)" },
+                            { key: "geminiAi", val: "Google Gemini (Chat)" },
                             { key: "pplxAi", val: "Perplexity (Chat)" },
                             { key: "pplxAi_online", val: "Perplexity (Recent News)" },
                             { key: "pplxAi_codeLlama", val: "Code Llama" },

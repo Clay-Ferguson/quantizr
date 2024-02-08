@@ -18,6 +18,7 @@ public enum NodeType {
     COMMENT("sn:comment"), //
     OPENAI_ANSWER("sn:oaiAns"), //
     PPLXAI_ANSWER("sn:pplxaiAns"), //
+    GEMINIAI_ANSWER("sn:geminiaiAns"), //
     HUGGINGFACE_ANSWER("sn:hfAns"), //
     OOBAI_ANSWER("sn:oobAns"), //
 

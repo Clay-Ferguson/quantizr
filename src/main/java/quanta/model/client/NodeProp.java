@@ -171,6 +171,7 @@ public enum NodeProp {
     TRUNCATED("trunc"), //
     OPENAI_RESPONSE("sn:oaiRes"), //
     PPLXAI_RESPONSE("sn:pplxaiRes"), //
+    GEMINIAI_RESPONSE("sn:geminiaiRes"), //
     HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
     OOBAI_RESPONSE("sn:oobRes"), //
 

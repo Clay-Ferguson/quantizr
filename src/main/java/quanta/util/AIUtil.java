@@ -11,6 +11,10 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.geminiai.GeminiChatCandidate;
+import quanta.model.client.geminiai.GeminiChatContent;
+import quanta.model.client.geminiai.GeminiChatPart;
+import quanta.model.client.geminiai.GeminiChatResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
@@ -39,9 +43,10 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public boolean isAnyAnswerType(SubNode node) {
-        return NodeType.OPENAI_ANSWER.s().equals(node.getType()) || //
-                NodeType.PPLXAI_ANSWER.s().equals(node.getType());
+    public boolean isAnyAnswerType(String type) {
+        return NodeType.OPENAI_ANSWER.s().equals(type) || //
+                NodeType.PPLXAI_ANSWER.s().equals(type) || //
+                NodeType.GEMINIAI_ANSWER.s().equals(type);
     }
 
     public void getSystemPromptFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
@@ -134,7 +139,8 @@ public class AIUtil extends ServiceBase {
         sb.append("Here is my question:\n");
         sb.append(req.getQuestion());
 
-        ChatCompletionResponse answer;
+        ChatCompletionResponse answer = null;
+        GeminiChatResponse geminiAnswer = null;
         switch (req.getAiService()) {
             case "openAi":
                 answer = oai.getAnswer(ms, null, sb.toString(), system);
@@ -151,11 +157,22 @@ public class AIUtil extends ServiceBase {
             case "pplxAi_llama2":
                 answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
                 break;
+            case "geminiAi":
+                geminiAnswer = geminiai.getAnswer(ms, null, sb.toString());
+                break;
             default:
                 throw new RuntimeException("Unknown AI service: " + req.getAiService());
         }
-        res.setGptCredit(answer.userCredit);
-        res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
+
+        if (answer != null) {
+            res.setGptCredit(answer.userCredit);
+            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
+        } else if (geminiAnswer != null) {
+            res.setGptCredit(geminiAnswer.credit);
+            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(geminiAnswer, false));
+        } else {
+            throw new RuntimeException("No answer from AI service: " + req.getAiService());
+        }
         return res;
     }
 
@@ -172,6 +189,30 @@ public class AIUtil extends ServiceBase {
             // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
             if (nullify) {
                 choice.getMessage().setContent(null);
+            }
+            counter++;
+        }
+        return sb.toString();
+    }
+
+    public String formatAnswer(GeminiChatResponse ccr, boolean nullify) {
+        StringBuilder sb = new StringBuilder();
+        int counter = 0;
+        for (GeminiChatCandidate choice : ccr.getCandidates()) {
+            if (counter > 0) {
+                sb.append("\n\n----\n\n");
+            }
+            GeminiChatContent content = choice.getContent();
+            if (content != null && content.getParts() != null && content.getParts().size() > 0) {
+                for (GeminiChatPart part : content.getParts()) {
+                    sb.append(part.getText() + "\n");
+                }
+            }
+
+            // Since we store the answer text in the content of the node and also store the answer object
+            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
+            if (nullify) {
+                choice.setContent(null);
             }
             counter++;
         }

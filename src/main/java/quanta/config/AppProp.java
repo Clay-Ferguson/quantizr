@@ -234,6 +234,10 @@ public class AppProp {
         return env.getProperty("PPLX_API_KEY");
     }
 
+    public String getGeminiAiKey() {
+        return env.getProperty("GEMINI_API_KEY");
+    }
+
     // note: this isn't used yet
     public String getHuggingFaceKey() {
         return env.getProperty("HUGGINGFACE_API_KEY");

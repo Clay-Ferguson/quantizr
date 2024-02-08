@@ -20,6 +20,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.geminiai.GeminiChatResponse;
 import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.mongo.model.AccessControl;
@@ -297,7 +298,7 @@ public class MongoCreate extends ServiceBase {
         ChatCompletionResponse oobAiAnswer = null;
         HuggingFaceResponse huggingFaceAnswer = null;
         // OobaAiResponse oobaAiAnswer = null;
-
+        GeminiChatResponse geminiAiAnswer = null;
 
         if ("openAi".equals(req.getAiQuestion())) {
             if (NodeType.NONE.s().equals(parentNode.getType())) {
@@ -347,6 +348,14 @@ public class MongoCreate extends ServiceBase {
                 typeToCreate = NodeType.OOBAI_ANSWER.s();
             }
         }
+        // Gemini
+        else if ("geminiAi".equals(req.getAiQuestion())) {
+            if (NodeType.NONE.s().equals(parentNode.getType())) {
+                geminiAiAnswer = geminiai.getAnswer(ms, parentNode, null);
+                res.setGptCredit(geminiAiAnswer.credit);
+                typeToCreate = NodeType.GEMINIAI_ANSWER.s();
+            }
+        }
 
         auth.writeAuth(ms, parentNode);
         parentNode.adminUpdate = true;
@@ -380,6 +389,11 @@ public class MongoCreate extends ServiceBase {
         else if (huggingFaceAnswer != null) {
             newNode.setContent(huggingFaceAnswer.getGeneratedText());
             newNode.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAnswer);
+        }
+        // Gemini AI
+        else if (geminiAiAnswer != null) {
+            newNode.setContent(aiUtil.formatAnswer(geminiAiAnswer, true));
+            newNode.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAnswer);
         } else {
             newNode.setContent(req.getContent() != null ? req.getContent() : "");
         }
@@ -432,8 +446,7 @@ public class MongoCreate extends ServiceBase {
         }
 
         update.save(ms, newNode);
-
-        if (req.getAiQuestion() != null && NodeType.OPENAI_ANSWER.s().equals(parentNode.getType())) {
+        if (req.getAiQuestion() != null && aiUtil.isAnyAnswerType(parentNode.getType())) {
             oai.insertAnswerToQuestion(ms, newNode, req, res);
         }
 

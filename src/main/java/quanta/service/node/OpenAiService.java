@@ -384,12 +384,12 @@ public class OpenAiService extends ServiceBase {
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
         aiUtil.parseAISystemFromContent(node, system);
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = NodeType.OPENAI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
-            if (aiUtil.isAnyAnswerType(parent)) {
+            if (aiUtil.isAnyAnswerType(parent.getType())) {
                 nonAnswerCounter = 0;
                 List<Map> content = new ArrayList<>();
                 HashMap<String, Object> map = new HashMap<>();

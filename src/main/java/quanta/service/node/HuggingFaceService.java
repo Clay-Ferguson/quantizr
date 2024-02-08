@@ -90,15 +90,14 @@ public class HuggingFaceService extends ServiceBase {
     private void buildChatHistory(MongoSession ms, SubNode node, List<String> pastUserInputs,
             List<String> generatedResponses) {
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = NodeType.OPENAI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
 
             // we allow either type here (todo-1: add that to the openai stuff too)
-            if (NodeType.OPENAI_ANSWER.s().equals(parent.getType())
-                    || NodeType.HUGGINGFACE_ANSWER.s().equals(parent.getType())) {
+            if (aiUtil.isAnyAnswerType(parent.getType())) {
                 nonAnswerCounter = 0;
                 generatedResponses.add(0, parent.getContent());
             } else {
