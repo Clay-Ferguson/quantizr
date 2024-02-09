@@ -65,7 +65,7 @@ export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
 
 # Sets a base location for MongoDB
 export MONGO_DATA=${PRJPARENT}/dev-vols/mongodb
-export MONGO_BACKUP=/home/clay/mongodb-dev-backup
+export MONGO_BACKUP=${PRJPARENT}/dev-vols/mongodb-dev-backup
 
 export PGADMIN_DATA=${PRJPARENT}/dev-vols/pgadmin
 export POSTGRES_DATA=${PRJPARENT}/dev-vols/postgres
