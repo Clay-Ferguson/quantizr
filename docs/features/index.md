@@ -3,8 +3,9 @@
 * [Quanta Features](#quanta-features)
     * [Hierarchial CMS](#hierarchial-cms)
     * [Quantized](#quantized)
-    * [AI via ChatGPT](#ai-via-chatgpt)
-    * [AI via Perplexity](#ai-via-perplexity)
+    * [ChatGPT AI](#chatgpt-ai)
+    * [Perplexity AI](#perplexity-ai)
+    * [Gemini AI](#gemini-ai)
     * [Secure Messaging](#secure-messaging)
     * [Blogs - Notes - Wikis ](#blogs---notes---wikis-)
     * [Advanced Editing](#advanced-editing)
@@ -46,18 +47,25 @@ Every node automatically has it's own URL, so they're easy to link to across the
 <img src='attachments/60187b83f5fad05e348a3835-file-p' style='width:25%'/>
 
 
-# AI via ChatGPT
+# ChatGPT AI
 
-Interact with OpenAI's ChatGPT AI, by asking questions on the Quanta Tree and getting answers automatically saved into the tree. The AI can assist you with almost any kind of task, and it retains a memory of the conversation, by using the tree location as a "context" for discussion. Quanta is perhaps the first AI Assistant with a `hierarchical context` (i.e. memory). We support AI chat, question answering, image understanding (asking questions about images), and image generation. You can choose to keep your conversations private or share by sharing branches of your tree.
+Interact with `OpenAI's ChatGPT AI`, by asking questions on the Quanta Tree and getting answers automatically saved into the tree. The AI can assist you with almost any kind of task, and it retains a memory of the conversation, by using the tree location as a "context" for discussion. Quanta is perhaps the first AI Assistant with a `hierarchical context` (i.e. memory). We support AI chat, question answering, image understanding (asking questions about images), and image generation. You can choose to keep your conversations private or share by sharing branches of your tree.
 
 <img src='attachments/64ebe3e8c33eef3cdbdac6b8-file-p' style='width:25%'/>
 
 
-# AI via Perplexity
+# Perplexity AI
 
-In addition to supporting OpenAI, you also have the option of selecting `Perplexity` as your AI provider, via a simple selection in your account settings panel.
+Optionally use `Perplexity` as your AI provider, via a simple selection in your account settings panel.
 
 <img src='attachments/65b9823505442a5ea3c2b197-file-p' style='width:25%'/>
+
+
+# Gemini AI
+
+Optionally use `Google's Gemini AI` as your AI provider, via a simple selection in your account settings panel.
+
+<img src='attachments/65c5a60b3e8c3b6aec828355-file-p' style='width:25%'/>
 
 
 # Secure Messaging

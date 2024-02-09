@@ -1,13 +1,15 @@
 **[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
 * [Artificial Intelligence](#artificial-intelligence)
-    * [AI via ChatGPT](#ai-via-chatgpt)
-    * [Perplexity AI](#perplexity-ai)
+    * [AI Services Supported](#ai-services-supported)
+        * [OpenAI](#openai)
+        * [Perplexity](#perplexity)
+        * [Google Gemini](#google-gemini)
     * [AI Conversations](#ai-conversations)
     * [A Node that Asks a Question to AI](#a-node-that-asks-a-question-to-ai)
     * [Asking Questions to the AI](#asking-questions-to-the-ai)
     * [Questions about a Subgraph](#questions-about-a-subgraph)
-    * [Configure GPT](#configure-gpt)
+    * [Configure AI](#configure-ai)
         * [System Prompt Examples](#system-prompt-examples)
     * [Image Understanding](#image-understanding)
     * [Image Generation](#image-generation)
@@ -20,21 +22,33 @@
 
 Converse with AI, generate images, ask questions about images, generate speech MP3s from text.
 
-# AI via ChatGPT
-----
+Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context".
 
-Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context". *Note: Quanta uses OpenAI to power all it's AI capabilities.*
+# AI Services Supported
 
-<img src='attachments/64ebe6bfc33eef3cdbdac756-file-p' style='width:20%'/>
+By a selection in your account in `Menu -> Account -> Settings -> AI -> AI Service` you can choose which AI Service to use in your account. You can choose OpenAI, Gemini, or Perplexity.
+
+If you're doing image recognition, image generation, or speech generation, you can only use the "OpenAI" Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use any of the three services.
+
+## OpenAI
+
+Including Chat Model, Text to Image (Image Generation), Image Understand, Text to Speech (Speech to MP3 Generation)
+
+<img src='attachments/65c5a9043e8c3b6aec82835c-file-p' style='width:25%'/>
 
 
-# Perplexity AI
+## Perplexity
 
-By a selection in your account in `Menu -> Account -> Settings -> AI -> AI Service` you can choose which AI Service to use in your account. You can switch to either Perplexity or OpenAI, because currently only those two are supported.
+Including Chat Model, Online Model (news aware), Code Llama, Llama 2
 
-If you're doing image recognition, image generation, or speech generation, you can only use the "OpenAI" Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use either Perplexity or OpenAI. In other words Quanta can only do conversational AI when Perplexity is set as your AI Service.
+<img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:25%'/>
 
-<img src='attachments/65b983a605442a5ea3c2b19a-file-p' style='width:20%'/>
+
+## Google Gemini
+
+Includes google's new chat model, for interactive chats.
+
+<img src='attachments/65c5a9543e8c3b6aec82835e-file-p' style='width:25%'/>
 
 
 Everything in Quanta is offered for free except for AI Capabilities. Since AI is provided by [OpenAI](https://openai.com) and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to `Menu -> Account -> Settings -> Add Credit` to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want.
@@ -78,15 +92,15 @@ This memory of the conversation state is called Hierarchical Contextual Memory (
 
 # Questions about a Subgraph
 
-Use `Menu -> ChatGPT -> Ask about Subgraph` to open a text entry box where you can enter a question (to be answered by AI) about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.
+Use `Menu -> AI -> Ask about Subgraph` to open a text entry box where you can enter a question (to be answered by AI) about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.
 
 The term *subgraph*, of course means just "everything under that branch". All of the text under that subgraph will be used as the context information fed to the AI for it to be able to answer the question with, in addition to all it's built-in knowledge.
 
 If you only want to ask an AI question about a limited subset of nodes you can use the checkboxes on each node (when `Edit Mode` is enabled) to select one or more nodes and this will cause the subgraph to be filtered to only included your selected nodes as input context to the AI.
 
-# Configure GPT
+# Configure AI
 
-Use `Menu -> ChatGPT -> Configure GPT` to configure a node (any node), so that all questions anywhere on the tree under that node will have the GPT prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers. 
+Use `Menu -> AI -> Configure AI` to configure a node (any node), so that all questions anywhere on the tree under that node will have the prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers. 
 
 In other words you can say things like the following examples and the AI will assume this role during all question answering you do anywhere in the subgraph under this node. Once you set this `System Prompt` on the node it gets saved but it doesn't appear on the screen until you come back to the Configure GPT dialog to edit/view it again. 
 
@@ -103,7 +117,7 @@ NOTE: Experimenting with that adding game is the simplest way to make sure you u
 ![file-p](attachments/65b6b364e6d38a174f58684d-file-p)
 
 
-So we would first click a node on the tree, and then choose `Menu -> ChatGPT -> Configure GPT` to open the dialog above. After clicking "Save" in the dialog it will store these settings onto the selected node, so that all future questions asked below that section of the tree (anywhere under that branch of the tree) will `cause GPT to answer as a pirate`. Pirates are a fun role to let the GPT play, because they start sentences with `"Hey matey, how arrrr ye."` etc.
+So we would first click a node on the tree, and then choose `Menu -> AI -> Configure AI` to open the dialog above. After clicking "Save" in the dialog it will store these settings onto the selected node, so that all future questions asked below that section of the tree (anywhere under that branch of the tree) will `cause GPT to answer as a pirate`. Pirates are a fun role to let the GPT play, because they start sentences with `"Hey matey, how arrrr ye."` etc.
 
 *Tip: When you use a prompt that start with "You will...", or "You are..." or some sentence starting with "you", or when you use the word "you" in any sentence at all in this prompt the AI knows you're talking to it. You speak to it (the AI) basically the same way you would speak to a person.
 
@@ -163,27 +177,16 @@ No matter what AI service you use, you will be charged only exactly what you con
 
 ----
 
-Here's a full list of the available AI Services:
+Here's the list of the available AI Services:
 
-## OpenAI (Chat)
-
-This is, ChatGPT-4 the default chatbot and is widely considered the most intelligent general-purpose AI on the market.
-
-## Perplexity (Chat)
-
-This is Perplexity's best high-end powerful general-purpose AI.
-
-## Perplexity (Recent News)
-
-This is Perplexity's AI which has access to the latest news and content from from the web.
-
-## Code Llama
-
-This is the well-known open source Code Llama, which is great for coding and programming tasks.
-
-## Llama 2
-
-This is the well-known open source Llama 2, which is great for general-purpose tasks.
+| AI Service Name     | Description                                                                       |
+|---------------------|-----------------------------------------------------------------------------------|
+| **OpenAI (Chat)**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
+| **Google Gemini (Chat)** | Google's best high-end powerful general-purpose AI.                        |
+| **Perplexity (Chat)** | Perplexity's best high-end powerful general-purpose AI.                    |
+| **Perplexity (Recent News)** | Perplexity's AI which has access to the latest news and content from the web. |
+| **Code Llama**      | The well-known open source Code Llama, which is great for coding and programming tasks. |
+| **Llama 2**         | The well-known open source Llama 2, which is great for general-purpose tasks. |
 
 # Practical Use Case - Writing a Scientific Paper
 ----
