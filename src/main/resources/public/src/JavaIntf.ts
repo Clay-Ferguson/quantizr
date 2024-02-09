@@ -30,6 +30,8 @@ export interface ClientConfig {
     brandingAppName: string;
     requireCrypto: boolean;
     useOpenAi: boolean;
+    usePplxAi: boolean;
+    useGeminiAi: boolean;
     userMsg: string;
     displayUserProfileId: string;
     initialNodeId: string;

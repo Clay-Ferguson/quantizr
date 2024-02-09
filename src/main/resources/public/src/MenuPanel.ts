@@ -339,7 +339,7 @@ export class MenuPanel extends Div {
             ], null));
         }
 
-        if (!ast.isAnonUser && S.quanta.config.useOpenAi) {
+        if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi)) {
             children.push(new Menu("AI", [
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Configure AI", MenuPanel.configureGpt, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),

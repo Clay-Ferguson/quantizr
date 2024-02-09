@@ -126,6 +126,8 @@ public class NodeRenderService extends ServiceBase {
         config.setPaymentLink(prop.getStripePaymentLink());
         config.setRequireCrypto(prop.isRequireCrypto());
         config.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
+        config.setUsePplxAi(!StringUtils.isEmpty(prop.getPplxAiKey()));
+        config.setUseGeminiAi(!StringUtils.isEmpty(prop.getGeminiAiKey()));
         config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);

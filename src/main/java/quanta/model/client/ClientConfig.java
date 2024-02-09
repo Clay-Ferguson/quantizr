@@ -8,6 +8,8 @@ public class ClientConfig {
     private String brandingAppName;
     private boolean requireCrypto;
     private boolean useOpenAi;
+    private boolean usePplxAi;
+    private boolean useGeminiAi;
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
@@ -58,6 +60,22 @@ public class ClientConfig {
 
     public void setUseOpenAi(boolean useOpenAi) {
         this.useOpenAi = useOpenAi;
+    }
+
+    public boolean isUsePplxAi() {
+        return usePplxAi;
+    }
+
+    public void setUsePplxAi(boolean usePplxAi) {
+        this.usePplxAi = usePplxAi;
+    }
+
+    public boolean isUseGeminiAi() {
+        return useGeminiAi;
+    }
+
+    public void setUseGeminiAi(boolean useGeminiAi) {
+        this.useGeminiAi = useGeminiAi;
     }
 
     public String getUserMsg() {

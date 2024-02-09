@@ -52,6 +52,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 modelSpecs = "Llama 2: This is the well-known open source Llama 2, which is great for general-purpose tasks.";
                 break;
         }
+        const aiOptions = this.getAiOptions();
 
         this.setChildren([
             this.headingBar = new TabHeading([
@@ -114,19 +115,11 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // S.edit.fullRepositoryExport();") + //
 
                 // -----------------------
-                this.sectionTitle("AI - Artificial Intelligence"),
-                new FlexRowLayout([
-
+                aiOptions?.length ? this.sectionTitle("AI - Artificial Intelligence") : null,
+                aiOptions?.length ? new FlexRowLayout([
                     // todo-1: need a way to warn user when something unsupported by their admin configuration is selected
                     new Div(null, { className: settingsCol }, [
-                        new Selection(null, "AI Service", [
-                            { key: "openAi", val: "OpenAI (Chat)" },
-                            { key: "geminiAi", val: "Google Gemini (Chat)" },
-                            { key: "pplxAi", val: "Perplexity (Chat)" },
-                            { key: "pplxAi_online", val: "Perplexity (Recent News)" },
-                            { key: "pplxAi_codeLlama", val: "Code Llama" },
-                            { key: "pplxAi_llama2", val: "Llama 2" }
-                        ], "aiServiceSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
+                        new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
                             setValue: (val: string) => S.edit.setAiService(val),
                             getValue: (): string => "" + getAs().userPrefs.aiService
                         }),
@@ -138,7 +131,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                             new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
                     ])
 
-                ], horzClass),
+                ], horzClass) : null,
 
                 // -----------------------
                 this.sectionTitle("Tools"),
@@ -166,6 +159,25 @@ export class SettingsView extends AppTab<any, SettingsView> {
             ])
         ]);
         return true;
+    }
+
+    private getAiOptions = (): any[] => {
+        const aiOptions = [];
+        if (S.quanta.config.useOpenAi) {
+            aiOptions.push({ key: "openAi", val: "OpenAI (Chat)" });
+        }
+
+        if (S.quanta.config.useGeminiAi) {
+            aiOptions.push({ key: "geminiAi", val: "Google Gemini (Chat)" });
+        }
+
+        if (S.quanta.config.usePplxAi) {
+            aiOptions.push({ key: "pplxAi", val: "Perplexity (Chat)" },
+                { key: "pplxAi_online", val: "Perplexity (Recent News)" },
+                { key: "pplxAi_codeLlama", val: "Code Llama" },
+                { key: "pplxAi_llama2", val: "Llama 2" });
+        }
+        return aiOptions;
     }
 
     settingsLink = (name: string, onClick: () => void, moreClasses: string = ""): Div => {
