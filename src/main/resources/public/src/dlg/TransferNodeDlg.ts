@@ -55,13 +55,13 @@ export class TransferNodeDlg extends DialogBase {
 
     static operationName(op: string) {
         switch (op) {
-            case "transfer":
+            case J.TransferOp.TRANSFER:
                 return "Transfer";
-            case "reject":
-                return "Reject";
-            case "accept":
+            case J.TransferOp.ACCEPT:
                 return "Accept";
-            case "reclaim":
+            case J.TransferOp.REJECT:
+                return "Reject";
+            case J.TransferOp.RECLAIM:
                 return "Reclaim";
             default:
                 return "???";

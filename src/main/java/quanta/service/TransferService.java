@@ -10,6 +10,7 @@ import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Constant;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.TransferOp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.TransferNodeRequest;
@@ -38,7 +39,7 @@ public class TransferService extends ServiceBase {
         }
         // get user node of person being transfered to
         SubNode toUserNode = null;
-        if (req.getOperation().equals("transfer")) {
+        if (req.getOperation().equals(TransferOp.TRANSFER.s()) {
             toUserNode = read.getAccountByUserName(null, req.getToUser(), false);
             if (toUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getToUser());
@@ -86,8 +87,7 @@ public class TransferService extends ServiceBase {
             return;
         }
 
-        // todo-0: put switch statement here
-        if (op.equals("transfer")) {
+        if (op.equals(TransferOp.TRANSFER.s())) {
             // if we don't happen do own this node, do nothing.
             if (!ms.getUserNodeId().equals(node.getOwner())) {
                 return;
@@ -105,7 +105,7 @@ public class TransferService extends ServiceBase {
             node.adminUpdate = true;
             ops.inc();
         } //
-        else if (op.equals("accept")) { //
+        else if (op.equals(TransferOp.ACCEPT.s())) { //
             // if we don't happen do own this node, do nothing.
             if (!ms.getUserNodeId().equals(node.getOwner())) {
                 return;
@@ -122,7 +122,7 @@ public class TransferService extends ServiceBase {
                 ops.inc();
             }
         } //
-        else if (op.equals("reject")) { //
+        else if (op.equals(TransferOp.REJECT.s())) { //
             // if we don't happen do own this node, do nothing.
             if (!ms.getUserNodeId().equals(node.getOwner())) {
                 return;
@@ -140,7 +140,7 @@ public class TransferService extends ServiceBase {
                 ops.inc();
             }
         } //
-        else if (op.equals("reclaim")) { //
+        else if (op.equals(TransferOp.RECLAIM.s())) { //
             if (node.getTransferFrom() != null) {
                 // if we're reclaiming just make sure the transferFrom was us
                 if (!ms.getUserNodeId().equals(node.getTransferFrom())) {

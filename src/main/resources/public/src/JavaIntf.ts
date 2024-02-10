@@ -1470,3 +1470,10 @@ export const enum PrivilegeType {
     READ = "rd",
     WRITE = "wr",
 }
+
+export const enum TransferOp {
+    TRANSFER = "transfer",
+    ACCEPT = "accept",
+    REJECT = "reject",
+    RECLAIM = "reclaim",
+}

@@ -63,10 +63,10 @@ export class MenuPanel extends Div {
     static toggleInfoMode = () => { S.edit.setShowMetaData(!getAs().userPrefs.showMetaData); }
     static userProfile = () => { new UserProfileDlg(null).open(); }
     static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
-    static transferNode = () => { new TransferNodeDlg("transfer").open(); };
-    static acceptTransfer = () => { new TransferNodeDlg("accept").open(); };
-    static rejectTransfer = () => { new TransferNodeDlg("reject").open(); };
-    static reclaimTransfer = () => { new TransferNodeDlg("reclaim").open(); };
+    static transferNode = () => { new TransferNodeDlg(J.TransferOp.TRANSFER).open(); };
+    static acceptTransfer = () => { new TransferNodeDlg(J.TransferOp.ACCEPT).open(); };
+    static rejectTransfer = () => { new TransferNodeDlg(J.TransferOp.REJECT).open(); };
+    static reclaimTransfer = () => { new TransferNodeDlg(J.TransferOp.RECLAIM).open(); };
     static subgraphHash = () => { S.edit.subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
