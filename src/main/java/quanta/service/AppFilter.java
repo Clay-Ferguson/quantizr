@@ -56,7 +56,6 @@ public class AppFilter extends GenericFilterBean {
         SessionContext sc = null;
         HttpServletRequest httpReq = (HttpServletRequest) req;
         HttpServletResponse httpRes = (HttpServletResponse) res;
-
         HttpSession session = null;
         boolean newSession = false;
         ReentrantLock mutex = null;
@@ -95,14 +94,12 @@ public class AppFilter extends GenericFilterBean {
             }
             Date now = new Date();
             sc.setLastActiveTime(now.getTime());
-
             ThreadLocals.setSC(sc);
             chain.doFilter(req, res);
 
             // detect if we did a login just now and set token on session.
             if (token == null && sc.getUserToken() != null) {
                 session.setAttribute(Const.BEARER_TOKEN, sc.getUserToken());
-
                 if (newSession) {
                     log.debug("New Session: User: " + sc.getUserName() + " SessId=" + session.getId() + " token="
                             + sc.getUserToken());
@@ -131,9 +128,7 @@ public class AppFilter extends GenericFilterBean {
             if (mutex != null) {
                 mutex.unlock();
             }
-
             ThreadLocals.removeAll();
-
             if (audit) {
                 if (res instanceof HttpServletResponse sres) {
                     postProcess(httpReq, sres);
@@ -180,7 +175,6 @@ public class AppFilter extends GenericFilterBean {
             mutex = (ReentrantLock) session.getAttribute(AppFilter.SESSION_LOCK_NAME);
             if (mutex != null) {
                 boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
-
                 if (!isLockAcquired) {
                     log.debug("MUTEX: Failed to acquire lock for " + httpReq.getRequestURI());
                     throw new ServerTooBusyException(httpReq.getRequestURI());

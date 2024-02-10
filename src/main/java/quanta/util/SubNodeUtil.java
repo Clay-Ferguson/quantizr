@@ -29,8 +29,7 @@ import quanta.util.val.Val;
  */
 @Component
 public class SubNodeUtil extends ServiceBase {
-    @SuppressWarnings("unused")
-    private static Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+    private Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
     public void removeProp(List<PropertyInfo> list, String name) {
         if (list == null || name == null) {

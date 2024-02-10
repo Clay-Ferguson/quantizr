@@ -146,7 +146,6 @@ public class MongoUpdate extends ServiceBase {
             bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
         }
         Criteria crit = new Criteria("id").is(id);
-
         if (addSecurity) {
             crit = auth.addWriteSecurity(ms, crit);
         }

@@ -27,7 +27,6 @@ import quanta.model.client.openai.ChatGPTModerationResponse;
 import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatGPTTextModerationItem;
 import quanta.model.client.openai.ChatMessage;
-import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.ImageGenRequest;
 import quanta.model.client.openai.ImageResponse;
 import quanta.model.client.openai.SpeechGenRequest;
@@ -36,9 +35,7 @@ import quanta.model.client.openai.Usage;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.AskSubGraphRequest;
 import quanta.request.CreateSubNodeRequest;
-import quanta.response.AskSubGraphResponse;
 import quanta.response.CreateSubNodeResponse;
 import quanta.service.AppController;
 import quanta.util.Const;
@@ -80,8 +77,6 @@ public class OpenAiService extends ServiceBase {
                     .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
             SpeechGenRequest request = new SpeechGenRequest(model, prompt, voice);
-            // log.debug("GPT generateSpeech: " + XString.prettyPrint(request));
-
             Mono<DataBuffer> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
                     .retrieve().bodyToMono(DataBuffer.class);
             DataBuffer dataBuffer = mono.block();
@@ -137,7 +132,6 @@ public class OpenAiService extends ServiceBase {
 
             // WARNING: If you alter the size of the image, you will need to update the pricing calculations
             ImageGenRequest request = new ImageGenRequest("dall-e-3", prompt, 1, size, highDef ? "hd" : null);
-            // log.debug("GPT generateImage: " + XString.prettyPrint(request));
 
             Mono<ImageResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
                     .retrieve().bodyToMono(ImageResponse.class);
@@ -189,7 +183,6 @@ public class OpenAiService extends ServiceBase {
      * You can pass a node, or else 'text' to query about.
      */
     public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
-
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
@@ -352,7 +345,6 @@ public class OpenAiService extends ServiceBase {
         if (modResponse == null || modResponse.getResults() == null || modResponse.getResults().length == 0) {
             return false;
         }
-
         for (ChatGPTTextModerationItem result : modResponse.getResults()) {
             if (result.isFlagged()) {
                 return true;
@@ -441,7 +433,6 @@ public class OpenAiService extends ServiceBase {
         } else {
             throw new RuntimeException("Only gpt-4-* is currently supported. " + res.getModel() + " is not supported.");
         }
-
         return (usage.getPromptTokens() * inputPpk / 1000) + (usage.getCompletionTokens() * outputPpk / 1000);
     }
 

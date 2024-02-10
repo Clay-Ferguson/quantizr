@@ -74,7 +74,6 @@ public class CallProcessor extends ServiceBase {
 
             if (ret instanceof ResponseBase _ret) {
                 orb = _ret;
-
                 if (orb.getCode() == null) {
                     orb.setCode(HttpServletResponse.SC_OK);
                 }

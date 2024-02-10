@@ -92,7 +92,6 @@ public class ExportServiceFlexmark extends ServiceBase {
 
         TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null, null);
         SubNode exportNode = rootNode.node;
-
         String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
         shortFileName = fileName + "." + format;
         fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
@@ -267,7 +266,6 @@ public class ExportServiceFlexmark extends ServiceBase {
         }
 
         content = insertPropertySubstitutions(content, node);
-
         markdown.append(content);
         markdown.append("\n");
         writeImages(node);

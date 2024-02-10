@@ -22,6 +22,7 @@ import quanta.util.Util;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
+// todo-0: move all these AI services class into a new package called 'ai'
 @Component
 public class GeminiAiService extends ServiceBase {
     String GEMINI_COMP_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=";

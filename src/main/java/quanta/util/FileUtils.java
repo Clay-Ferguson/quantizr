@@ -36,9 +36,7 @@ public class FileUtils extends ServiceBase {
         editableExtensions.add("txt");
         editableExtensions.add("sh");
     }
-
     private static HashSet<String> imageExtensions = new HashSet<>();
-
     static {
         imageExtensions.add("jpg");
         imageExtensions.add("png");
@@ -71,9 +69,7 @@ public class FileUtils extends ServiceBase {
         try {
             BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
             return attr.creationTime().toMillis();
-        } catch (
-        // System.out.println("lastAccessTime: " + attr.lastAccessTime());
-        Exception e) {
+        } catch (Exception e) {
             return -1;
         }
     }

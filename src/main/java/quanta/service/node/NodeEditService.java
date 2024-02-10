@@ -311,10 +311,12 @@ public class NodeEditService extends ServiceBase {
         if (req.getSplitType().equalsIgnoreCase("inline")) {
             parentForNewNodes = parentNode;
             firstOrdinal = node.getOrdinal();
-        } else /*
-                * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
-                * the top (ordinal), regardless of whether this node already has any children or not.
-                */ {
+        }
+        /*
+         * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
+         * the top (ordinal), regardless of whether this node already has any children or not.
+         */
+        else {
             parentForNewNodes = node;
             firstOrdinal = 0L;
         }
@@ -328,7 +330,6 @@ public class NodeEditService extends ServiceBase {
         List<String> sigDirtyNodes = new LinkedList<>();
 
         for (String part : contentParts) {
-            // log.debug("ContentPart[" + idx + "] " + part);
             part = part.trim();
             if (idx == 0) {
                 node.setContent(part);
@@ -492,7 +493,6 @@ public class NodeEditService extends ServiceBase {
         int replacements = 0;
         int cachedChanges = 0;
         String nodeId = req.getNodeId();
-        // log.debug("searchingAndReplace node: " + nodeId);
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
         if (replaceText(ms, node, req.getSearch(), req.getReplace())) {

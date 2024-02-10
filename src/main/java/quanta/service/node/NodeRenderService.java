@@ -158,7 +158,6 @@ public class NodeRenderService extends ServiceBase {
         if (sc != null && !sc.isAnonUser()) {
             showReplies = sc.getUserPreferences().isShowReplies();
         }
-        // XString.prettyPrint(sc.getUserPreferences()));
         String targetId = req.getNodeId();
         boolean isActualUplevelRequest = req.isUpLevel();
         SubNode node = read.getNode(ms, targetId);
@@ -299,7 +298,7 @@ public class NodeRenderService extends ServiceBase {
          * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
          * that is enough to trigger 'endReached' logic to be set correctly
          */
-        int queryLimit = scanToNode != null ? -1 : limit + 1;
+        limit = scanToNode != null ? -1 : limit + 1;
         String orderBy = node.getStr(NodeProp.ORDER_BY);
         Sort sort = null;
         if (!StringUtils.isEmpty(orderBy)) {
@@ -320,7 +319,7 @@ public class NodeRenderService extends ServiceBase {
         // if (!showReplies) {
         // moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
         // }
-        Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria, true);
+        Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, limit, offset, moreCriteria, true);
         Iterator<SubNode> iterator = nodeIter.iterator();
         int idx = offset;
         // this should only get set to true if we run out of records, because we reached
@@ -330,14 +329,7 @@ public class NodeRenderService extends ServiceBase {
             // todo-2: fix
             throw new RuntimeEx("No ability to go to last page yet in new mongo api.");
         }
-        // offset = (int) nodeIter.getSize() - ROWS_PER_PAGE;
-        // if (offset < 0) {
-        // offset = 0;
-        // }
-        // if (offset > 0) {
-        // // log.debug("Skipping the first " + offset + " records in the resultset.");
-        // idx = read.skip(iterator, offset);
-        // }
+
         List<SubNode> slidingWindow = null;
         NodeInfo ninfo = null;
         // -1 means "no last ordinal known" (i.e. first iteration)
@@ -349,7 +341,6 @@ public class NodeRenderService extends ServiceBase {
          */
         while (true) {
             if (!iterator.hasNext()) {
-                // log.debug("End reached.");
                 endReached = true;
                 break;
             }
@@ -385,7 +376,6 @@ public class NodeRenderService extends ServiceBase {
             idx++;
             // log.debug("Iterate [" + idx + "]: nodeId" + n.getIdStr() + "scanToNode=" +
             // scanToNode);
-            // log.debug(" DATA: " + XString.prettyPrint(n));
             /* are we still just scanning for our target node */
             if (scanToNode != null) {
                 /*
@@ -657,8 +647,9 @@ public class NodeRenderService extends ServiceBase {
         }
         content = XString.truncAfterFirst(content, "\n");
         content = XString.truncAfterFirst(content, "\r");
-        content = XString.removeCharsFromBeginning(content, "\"'`.!?=-_~@#$%^&*()[]{}|\\;:<>");
-        content = XString.removeCharsFromEnd(content, "\"'`.!?=-_~@#$%^&*()[]{}|\\;:<>");
+        String removes = "\"'`.!?=-_~@#$%^&*()[]{}|\\;:<>";
+        content = XString.removeCharsFromBeginning(content, removes);
+        content = XString.removeCharsFromEnd(content, removes);
         if (content.length() > maxLen) {
             content = content.substring(0, maxLen) + "...";
         }

@@ -65,7 +65,6 @@ public class OpenGraphService extends ServiceBase {
         synchronized (ogCache) {
             ogCache.put(url, openGraph);
         }
-
         return openGraph;
     }
 
@@ -164,7 +163,6 @@ public class OpenGraphService extends ServiceBase {
                 break;
             }
         }
-
         node.set(NodeProp.OPEN_GRAPH.s(), ogList);
     }
 }

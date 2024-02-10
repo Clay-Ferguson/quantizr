@@ -694,7 +694,6 @@ public class UserManagerService extends ServiceBase {
                 userNode.set(NodeProp.USER_RECENT_TYPES, req.getRecentTypes());
                 userNode.set(NodeProp.DISPLAY_NAME, req.getDisplayName());
                 userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
-                // sessionContext.setUserName(req.getUserName());
                 update.save(as, userNode);
             }
             return null;
@@ -1154,7 +1153,6 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-
     public Object getPeople(GetPeopleRequest req, MongoSession ms) {
         GetPeopleResponse ret = null;
         if (req.getNodeId() != null) {
@@ -1266,7 +1264,6 @@ public class UserManagerService extends ServiceBase {
         if (quota == 0) {
             return Const.DEFAULT_USER_QUOTA;
         }
-
         int binTotal = userNode.getInt(NodeProp.BIN_TOTAL).intValue();
         return quota - binTotal;
     }

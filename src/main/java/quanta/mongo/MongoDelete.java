@@ -109,9 +109,8 @@ public class MongoDelete extends ServiceBase {
         Query q = new Query();
         LocalDate ldt = LocalDate.now().minusDays(5);
         Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Criteria crit = Criteria //
-                .where(SubNode.PATH).regex(mongoUtil.regexSubGraph(userNode.getPath())).and(SubNode.MODIFY_TIME)
-                .lt(date); //
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(userNode.getPath()))
+                .and(SubNode.MODIFY_TIME).lt(date); //
         q.addCriteria(crit);
         // set all the parents of all nodes in 'q' to null child status
         bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null, false);
@@ -182,7 +181,6 @@ public class MongoDelete extends ServiceBase {
          */
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
-
         crit = auth.addWriteSecurity(ms, crit);
         q.addCriteria(crit);
         DeleteResult res = opsw.remove(ms, q, SubNode.class);
@@ -318,7 +316,6 @@ public class MongoDelete extends ServiceBase {
             // starting a new pass, so zero deletes so far in this pass
             deletesInPass.setVal(0L);
             // scan the entire DB
-
             opsw.stream(new Query(), SubNode.class).forEach(node -> {
                 // if this node is root node, ignore
                 if (NodePath.ROOT_PATH.equals(node.getPath()))
@@ -685,7 +682,6 @@ public class MongoDelete extends ServiceBase {
         for (CriteriaDefinition c : criterias) {
             q.addCriteria(c);
         }
-
         opsw.remove(ms, q);
     }
 

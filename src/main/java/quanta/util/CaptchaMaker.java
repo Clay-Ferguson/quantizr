@@ -17,7 +17,6 @@ import javax.imageio.stream.ImageOutputStream;
  * kept it. It's just too simple for me to have found fault with.
  */
 public class CaptchaMaker {
-
     private static final Random rand = new Random();
 
     /* returns a random string of at least 5 numeric characters */

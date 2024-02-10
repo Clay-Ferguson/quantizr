@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.model.BreadcrumbInfo;
 import quanta.model.NodeInfo;
-import quanta.model.PropertyInfo;
 import quanta.model.client.Bookmark;
 import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
@@ -79,7 +78,6 @@ public class NodeSearchService extends ServiceBase {
                 results.add(info);
             }
         }
-
         LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
         res.setBreadcrumbs(breadcrumbs);
         render.getBreadcrumbs(ms, node, breadcrumbs);
@@ -507,7 +505,8 @@ public class NodeSearchService extends ServiceBase {
             }
             if (!english.isStopWord(token)) {
                 String lcToken = token.toLowerCase();
-                if (token.startsWith("#")) { // if word is a hashtag.
+                // if word is a hashtag.
+                if (token.startsWith("#")) {
                     if (token.endsWith("#") || token.length() < 4)
                         continue;
                     String tokSearch = token.replace("#", "").toLowerCase();
@@ -530,7 +529,9 @@ public class NodeSearchService extends ServiceBase {
                         }
                         ws.inc(node, trending);
                     }
-                } else { // ordinary word
+                }
+                // ordinary word
+                else {
                     if (!StringUtils.isAlpha(token) || token.length() < 3) {
                         continue;
                     }

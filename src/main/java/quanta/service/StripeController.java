@@ -91,7 +91,7 @@ public class StripeController extends ServiceBase implements ErrorController {
                         }
                         break;
                     default:
-                        // other event type
+                        break;
                 }
             });
         } catch (Exception e) {

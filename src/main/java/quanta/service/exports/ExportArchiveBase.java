@@ -134,7 +134,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw ExUtil.wrapEx("adminDataFolder does not exist: " + prop.getAdminDataFolder());
         }
         String nodeId = req.getNodeId();
-
         TreeNode rootNode = read.getSubGraphTree(ms, nodeId, null, null);
         node = rootNode.node;
 
@@ -746,7 +745,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 String mdLink = null;
                 if (att.getCssSize() != null && (att.getCssSize().endsWith("%") || att.getCssSize().endsWith("px"))) {
                     mdLink = "\n<img src='" + fullUrl + "' style='width:" + att.getCssSize() + "'/>\n\n";
-
                 } else {
                     mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
                 }

@@ -781,9 +781,8 @@ public class MongoUtil extends ServiceBase {
             postsNodeVal.setVal(postsNode);
         }
 
-        // ensure this node exists.
-        SubNode notesNode = user.getNotesNode(ms, null, userNode);
-
+        // ensure this node exists, by calling the getter (but we don't need the return value)
+        user.getNotesNode(ms, null, userNode);
         update.save(ms, userNode);
         return userNode;
     }
@@ -834,11 +833,9 @@ public class MongoUtil extends ServiceBase {
             acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), null,
                     Arrays.asList(PrivilegeType.READ.s()), null);
         }
-        /////////////////////////////////////////////////////////
         created = new Val<>(Boolean.FALSE);
         // create home node (admin owned node named 'home').
         snUtil.ensureNodeExists(ms, NodePath.PENDING_PATH, null, "Pending Edits", null, true, null, created);
-        /////////////////////////////////////////////////////////
         created = new Val<>(Boolean.FALSE);
         // create admin home node
         SubNode publicHome = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, "home",

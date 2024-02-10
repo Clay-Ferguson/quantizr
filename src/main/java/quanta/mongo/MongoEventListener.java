@@ -121,14 +121,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             node.setOrdinal(0L);
             dbObj.put(SubNode.ORDINAL, 0L);
         }
-        // DO NOT DELETE
-        /*
-         * If we ever add a unique-index for "Name" (not currently the case), then we'd need something like
-         * this to be sure each node WOULD have a unique name.
-         */
-        // if (StringUtils.isEmpty(node.getName())) {
-        // node.setName(id.toHexString())
-        // }
         /* if no owner is assigned... */
         if (node.getOwner() == null) {
             /*

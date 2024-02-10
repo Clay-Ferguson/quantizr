@@ -308,47 +308,4 @@ public class Convert extends ServiceBase {
         val = val.replace("\r", "<p>");
         return val;
     }
-    /**
-     * Searches in 'val' anywhere there is a line that begins with http:// (or https), and replaces that
-     * with the normal way of doing a link in markdown. So we are injecting a snippet of markdown (not
-     * html)
-     *
-     * Not currently used, but I'm leaving it just in case.
-     */
-    // public static String convertLinksToMarkdown(String val) {
-    // while (true) {
-    // /* find http after newline character */
-    // int startOfLink = val.indexOf("\nhttp://");
-    // /* or else find one after return char */
-    // if (startOfLink == -1) {
-    // startOfLink = val.indexOf("\rhttp://");
-    // }
-    // /* or else find one after return char */
-    // if (startOfLink == -1) {
-    // startOfLink = val.indexOf("\nhttps://");
-    // }
-    // /* or else find one after return char */
-    // if (startOfLink == -1) {
-    // startOfLink = val.indexOf("\rhttps://");
-    // }
-    // /* nothing found we're all done here */
-    // if (startOfLink == -1)
-    // break;
-    // /*
-    // * locate end of link via \n or \r
-    // */
-    // int endOfLink = val.indexOf("\n", startOfLink + 1);
-    // if (endOfLink == -1) {
-    // endOfLink = val.indexOf("\r", startOfLink + 1);
-    // }
-    // if (endOfLink == -1) {
-    // endOfLink = val.length();
-    // }
-    // String link = val.substring(startOfLink + 1, endOfLink);
-    // String left = val.substring(0, startOfLink + 1);
-    // String right = val.substring(endOfLink);
-    // val = left + "[" + link + "](" + link + ")" + right;
-    // }
-    // return val;
-    // }
 }

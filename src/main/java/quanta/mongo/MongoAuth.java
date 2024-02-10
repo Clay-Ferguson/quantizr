@@ -71,21 +71,22 @@ public class MongoAuth extends ServiceBase {
     }
 
     public String getAccountPropById(MongoSession ms, String accountId, String prop) {
-        String propVal = null;
-        SubNode accntNode = null;
+        String val = null;
         // try to get the node from the cache of nodes
-        accntNode = userNodesById.get(accountId);
+        SubNode accntNode = userNodesById.get(accountId);
         // if we found the node get property from it to return.
         if (accntNode != null) {
-            propVal = accntNode.getStr(prop);
-        } else { // else we have to lookup the node from the DB, and then cache it if found
+            val = accntNode.getStr(prop);
+        }
+        // else we have to lookup the node from the DB, and then cache it if found
+        else {
             accntNode = read.getNode(ms, accountId);
             if (accntNode != null) {
-                propVal = accntNode.getStr(prop);
+                val = accntNode.getStr(prop);
                 userNodesById.put(accountId, accntNode);
             }
         }
-        return propVal;
+        return val;
     }
 
     /*

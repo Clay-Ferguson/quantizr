@@ -21,7 +21,6 @@ public class MimeTypeUtils {
 
     static {
         mimeMap = new HashMap<>();
-        // todo-2: why this tiny list here? If doing this why not many many more?
         mimeMap.put("mp4", "video/mp4");
         mimeMap.put("mp3", "audio/mp3");
         mimeMap.put("flv", "video/flv");
@@ -45,7 +44,6 @@ public class MimeTypeUtils {
         }
     }
 
-    // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public static String probeContentType(Path file) throws IOException {
         String mimeType = Files.probeContentType(file);
         if (mimeType == null) {

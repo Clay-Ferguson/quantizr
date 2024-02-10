@@ -56,10 +56,8 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
-import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AIGenImageRequest;
@@ -749,7 +747,6 @@ public class AttachmentService extends ServiceBase {
      */
     public void readFromUrl(MongoSession ms, String sourceUrl, SubNode node, String nodeId, String mimeHint,
             String mimeType, int maxFileSize, boolean storeLocally, String aiPrompt) {
-
         if (mimeType == null) {
             mimeType = Util.getMimeTypeFromUrl(sourceUrl);
             if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
@@ -783,7 +780,6 @@ public class AttachmentService extends ServiceBase {
         try {
             URL url = new URL(sourceUrl);
             int timeout = 20;
-
             /*
              * if this is an image extension, handle it in a special way, mainly to extract the width, height
              * from it
@@ -937,7 +933,6 @@ public class AttachmentService extends ServiceBase {
             long totalBytes = attach.getTotalAttachmentBytes(ms, node);
             user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
         }
-
         Criteria crit = Criteria.where("_id").is(att.getBin());
         crit = auth.addWriteSecurity(ms, crit);
         grid.delete(new Query(crit));
@@ -972,7 +967,6 @@ public class AttachmentService extends ServiceBase {
     public InputStream getStreamByNode(SubNode node, String attName) {
         if (node == null)
             return null;
-        // long startTime = System.currentTimeMillis();
         Attachment att = node.getAttachment(attName, false, false);
         if (att == null || att.getBin() == null)
             return null;
@@ -991,7 +985,6 @@ public class AttachmentService extends ServiceBase {
             if (is == null) {
                 throw new RuntimeEx("Unable to get inputStream");
             }
-            // duration = System.currentTimeMillis() - startTime;
             return is;
         } catch (Exception e) {
             throw new RuntimeEx("unable to readStream", e);
@@ -1189,7 +1182,9 @@ public class AttachmentService extends ServiceBase {
                             response);
                     return null;
                 });
-            } else /* Else if not an avatar request then do a secure acccess */ {
+            }
+            /* Else if not an avatar request then do a secure acccess */
+            else {
                 callProc.run("bin", false, false, null, session, ms -> {
                     if (ipfsCid != null) {
                         ipfs.streamResponse(response, ms, ipfsCid, null);
@@ -1281,7 +1276,6 @@ public class AttachmentService extends ServiceBase {
         exec.run(() -> {
             crypto.signNodesById(ms, sigDirtyNodes);
         });
-
         return res;
     }
 }

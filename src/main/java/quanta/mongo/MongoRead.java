@@ -44,14 +44,14 @@ import quanta.util.val.Val;
 @Component
 public class MongoRead extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRead.class);
-    private static final Object dbRootsLock = new Object();
+    private static final Object rootLock = new Object();
     private SubNode dbRoot;
     public static Sort ordinalSort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
     public static int MAX_TREE_GRAPH_SIZE = 5000;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
-        synchronized (dbRootsLock) {
+        synchronized (rootLock) {
             if (dbRoot == null) {
                 dbRoot = findNodeByPath(null, NodePath.ROOT_PATH, false);
             }
@@ -60,7 +60,7 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode setDbRoot(SubNode node) {
-        synchronized (dbRootsLock) {
+        synchronized (rootLock) {
             dbRoot = node;
             return dbRoot;
         }
@@ -338,11 +338,9 @@ public class MongoRead extends ServiceBase {
         }
 
         Criteria crit = Criteria.where(SubNode.NAME).is(name).and(SubNode.OWNER).is(nodeOwnerId);
-
         if (allowAuth) {
             crit = auth.addReadSecurity(ms, crit);
         }
-
         q.addCriteria(crit);
         return opsw.findOne(allowAuth ? ms : null, q);
     }
@@ -622,7 +620,6 @@ public class MongoRead extends ServiceBase {
                 }
             }
         }
-
         if (allowAuth) {
             auth.auth(ms, node, PrivilegeType.READ);
         }
@@ -886,6 +883,7 @@ public class MongoRead extends ServiceBase {
          * For a calculated field we do an Aggregate Query operation. The purpose of this entire Aggregation
          * is to calculate contentLength on the fly so we can sort on it.
          */
+        // todo-0: break these three if blocks into methods
         if ("contentLength".equals(sortField)) {
             List<AggregationOperation> aggOps = new LinkedList<>();
             /*

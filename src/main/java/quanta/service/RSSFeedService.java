@@ -177,9 +177,7 @@ public class RSSFeedService extends ServiceBase {
                 }
             }
 
-            log.debug("Unpaged Aggregated Entry Count: " + entries.size());
             entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
-            log.debug("done sorting.");
             /*
              * Now from the complete 'entries' list we extract out just the page we need into 'pageEntires' and
              * then stuff pageEntries back into 'entries' to send out of this method
@@ -199,8 +197,6 @@ public class RSSFeedService extends ServiceBase {
                 idx++;
             }
             entries.clear();
-
-            log.debug("Sending back: " + pageEntries.size());
             entries.addAll(pageEntries);
         } catch (Exception e) {
             ExUtil.error(log, "Error: ", e);
@@ -244,10 +240,8 @@ public class RSSFeedService extends ServiceBase {
 
             long start = System.currentTimeMillis();
             WebClient webClient = Util.webClientBuilder().build();
-
             String response = webClient.get().uri(url).retrieve() //
                     .bodyToMono(String.class).timeout(Duration.ofSeconds(60)).block();
-            // log.debug("RSS XML: " + response);
 
             InputStream inputStream = new LimitedInputStreamEx(
                     new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), 100 * Const.ONE_MB);

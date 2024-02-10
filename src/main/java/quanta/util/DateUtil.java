@@ -18,7 +18,6 @@ import quanta.exception.base.RuntimeEx;
  * Date-related functions
  */
 public class DateUtil {
-
     public static final long SECOND_MILLIS = 1000;
     public static final long MINUTE_MILLIS = 60 * SECOND_MILLIS;
     public static final long HOUR_MILLIS = 60 * MINUTE_MILLIS;
@@ -263,17 +262,8 @@ public class DateUtil {
         return date.toInstant().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_INSTANT);
     }
 
-    // Smitherene ActivityPub code uses this:
-    // SimpleDateFormat dateFormat=new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-    // dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-    // String date=dateFormat.format(new Date());
-
     public static String getFormattedDateTime() {
         return ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-        // supposedly this also works:
-        // thisMoment = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
-        // .withZone(ZoneOffset.UTC)
-        // .format(Instant.now());
     }
 
     // This is from a trustworthy-looking StackOverflow article, but untested by me.
@@ -309,7 +299,9 @@ public class DateUtil {
                 dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
             }
             return dateFormat.format(date) + " " + timeZoneAbbrev;
-        } /* else display timezone in standard GMT format */ else {
+        }
+        /* else display timezone in standard GMT format */
+        else {
             SimpleDateFormat dateFormat =
                     new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
             if (timezone != null) {

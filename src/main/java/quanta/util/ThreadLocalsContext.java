@@ -14,7 +14,6 @@ import quanta.response.base.ResponseBase;
  * Holder for transferring ThreadLocals values from one thread to another.
  */
 public class ThreadLocalsContext {
-
     private HttpServletResponse servletResponse;
     private HttpSession httpSession;
     private SessionContext sessionContext;

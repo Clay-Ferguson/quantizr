@@ -39,7 +39,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     private static Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
     public static final String databaseName = "database";
     private MongoTemplate ops;
-    private MongoClient mongoClient;
+    private MongoClient client;
     private GridFsTemplate grid;
     private SimpleMongoClientDatabaseFactory factory;
     /**
@@ -85,7 +85,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     public MongoClient mongoClient() {
         if (connectionFailed)
             return null;
-        if (mongoClient == null) {
+        if (client == null) {
             log.debug("create mongoClient");
             MongoCredential credential = null;
             if (appProp.getMongoSecurity()) {
@@ -97,15 +97,15 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
             }
 
             try {
-                String mongoHost = appProp.getMongoDbHost();
-                Integer mongoPort = appProp.getMongoDbPort();
-                if (mongoHost == null) {
+                String host = appProp.getMongoDbHost();
+                Integer port = appProp.getMongoDbPort();
+                if (host == null) {
                     throw new RuntimeEx("mongodb.host property is missing");
                 }
-                if (mongoPort == null) {
+                if (port == null) {
                     throw new RuntimeEx("mongodb.port property is missing");
                 }
-                String uri = "mongodb://" + mongoHost + ":" + String.valueOf(mongoPort);
+                String uri = "mongodb://" + host + ":" + String.valueOf(port);
                 log.info("Connecting to MongoDb: " + uri);
 
                 // This is just to slightly help give the MongoDB replica some time to start
@@ -116,20 +116,20 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                  * This codec registroy is what allows us to store objects that contain other POJOS, like for
                  * example the way we're storing AccessControl objects in a map inside SubNode
                  */
-                CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistry codecReg = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                         fromProviders(PojoCodecProvider.builder().automatic(true).build()));
                 MongoClientSettings.Builder builder = MongoClientSettings.builder();
                 if (credential != null) {
                     builder = builder.credential(credential);
                 }
                 builder = builder.applyConnectionString(new ConnectionString(uri)); //
-                builder = builder.codecRegistry(pojoCodecRegistry); //
+                builder = builder.codecRegistry(codecReg); //
                 MongoClientSettings settings = builder.build();
-                mongoClient = MongoClients.create(settings);
+                client = MongoClients.create(settings);
 
-                if (mongoClient != null) {
+                if (client != null) {
                     if (credential != null) {
-                        for (String db : mongoClient.listDatabaseNames()) {
+                        for (String db : client.listDatabaseNames()) {
                             log.debug("MONGO DB NAME: " + db);
                         }
                     }
@@ -144,7 +144,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 throw e;
             }
         }
-        return mongoClient;
+        return client;
     }
 
     /**

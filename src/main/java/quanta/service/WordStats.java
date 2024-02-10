@@ -5,7 +5,6 @@ import org.bson.types.ObjectId;
 import quanta.mongo.model.SubNode;
 
 public class WordStats {
-
     public String word;
     public long count;
 

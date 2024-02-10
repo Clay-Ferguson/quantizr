@@ -52,26 +52,28 @@ public class NodeMoveService extends ServiceBase {
         SetNodePositionResponse res = new SetNodePositionResponse();
         NodeChanges nodeChanges = new NodeChanges();
         res.setNodeChanges(nodeChanges);
-
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
         if (node == null) {
             throw new RuntimeEx("Node not found: " + nodeId);
         }
-        if ("up".equals(req.getTargetName())) {
-            moveNodeUp(ms, node);
-        } //
-        else if ("down".equals(req.getTargetName())) {
-            moveNodeDown(ms, node);
-        } //
-        else if ("top".equals(req.getTargetName())) {
-            moveNodeToTop(ms, node, nodeChanges);
-        } //
-        else if ("bottom".equals(req.getTargetName())) {
-            moveNodeToBottom(ms, node);
-        } else {
-            throw new RuntimeEx("Invalid target type: " + req.getTargetName());
+
+        switch (req.getTargetName()) {
+            case "up":
+                moveNodeUp(ms, node);
+                break;
+            case "down":
+                moveNodeDown(ms, node);
+                break;
+            case "top":
+                moveNodeToTop(ms, node, nodeChanges);
+                break;
+            case "bottom":
+                moveNodeToBottom(ms, node);
+                break;
+            default:
+                throw new RuntimeEx("Invalid target type: " + req.getTargetName());
         }
         return res;
     }
@@ -227,16 +229,22 @@ public class NodeMoveService extends ServiceBase {
         String parentPath = parentToPasteInto.getPath();
         Long curTargetOrdinal = null;
 
-        if (location.equalsIgnoreCase("inside")) {
-            curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
-        } //
-        else if (location.equalsIgnoreCase("inline")) {
-            curTargetOrdinal = targetNode.getOrdinal() + 1;
-            create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
-        } //
-        else if (location.equalsIgnoreCase("inline-above")) {
-            curTargetOrdinal = targetNode.getOrdinal();
-            create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
+        if (location != null) {
+            switch (location.toLowerCase()) {
+                case "inside":
+                    curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
+                    break;
+                case "inline":
+                    curTargetOrdinal = targetNode.getOrdinal() + 1;
+                    create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
+                    break;
+                case "inline-above":
+                    curTargetOrdinal = targetNode.getOrdinal();
+                    create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
+                    break;
+                default:
+                    break;
+            }
         }
 
         String sourceParentPath = null;
@@ -277,7 +285,6 @@ public class NodeMoveService extends ServiceBase {
                 }
                 // find any new Path available under the paste target location 'parentPath'
                 String newPath = mongoUtil.findAvailablePath(parentPath + "/");
-                log.debug("New Available Path Found: " + newPath);
                 changePathOfSubGraph(as, node, node.getPath(), newPath, copyPaste, res);
                 node.setPath(newPath);
 
@@ -321,10 +328,8 @@ public class NodeMoveService extends ServiceBase {
                         ThreadLocals.setParentCheckEnabled(true);
                     }
                 }
-
                 return null;
             });
-
             curTargetOrdinal++;
         }
         exec.run(() -> {

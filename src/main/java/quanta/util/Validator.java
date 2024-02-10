@@ -5,7 +5,6 @@ import quanta.config.ServiceBase;
 
 @Component
 public class Validator extends ServiceBase {
-
     /*
      * UserName requirements, between 5 and 100 characters (inclusive) long, and only allowing digits,
      * letters, underscore, dash, and space.

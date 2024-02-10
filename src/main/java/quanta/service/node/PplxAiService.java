@@ -90,7 +90,6 @@ public class PplxAiService extends ServiceBase {
                 .retrieve().bodyToMono(ChatCompletionResponse.class);
 
         ChatCompletionResponse res = mono.block();
-
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("PPLX Res: " + XString.prettyPrint(res));

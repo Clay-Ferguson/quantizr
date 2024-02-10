@@ -96,7 +96,6 @@ public class CryptoService extends ServiceBase {
                         "\n strToSign=" + strToSign + //
                         "\n pubKeyJson=" + pubKeyJson);
             }
-
             return verified;
         } catch (Exception e) {
             ExUtil.error(log, "crypto sig failed on " + node.getIdStr(), e);
@@ -395,10 +394,8 @@ public class CryptoService extends ServiceBase {
         if (bops.hasVal()) {
             bops.getVal().execute();
         }
-
         return new RemoveSignaturesResponse();
     }
-
 
     /**
      * Gets ths sig key json from "sc", and assigns it into "sc" if not assigned yet.

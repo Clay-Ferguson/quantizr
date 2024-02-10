@@ -270,7 +270,6 @@ public class XString {
                 result.append(currentChar);
             }
         }
-
         return result.toString();
     }
 
@@ -292,7 +291,6 @@ public class XString {
         while (!result.toString().isEmpty() && removesSet.contains(result.charAt(0))) {
             result.deleteCharAt(0);
         }
-
         return result.toString();
     }
 
@@ -316,7 +314,6 @@ public class XString {
             result.deleteCharAt(length - 1);
             length = result.length();
         }
-
         return result.toString();
     }
 

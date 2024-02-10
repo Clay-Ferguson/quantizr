@@ -8,7 +8,6 @@ import quanta.config.ServiceBase;
  */
 @Component
 public class MimeUtil extends ServiceBase {
-
     public boolean isTextTypeFileName(String fileName) {
         if (!fileName.contains("."))
             return false;

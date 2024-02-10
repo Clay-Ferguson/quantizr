@@ -293,67 +293,56 @@ public class MongoCreate extends ServiceBase {
         }
 
         String typeToCreate = req.getTypeName();
-        ChatCompletionResponse openAiAnswer = null;
-        ChatCompletionResponse pplxAiAnswer = null;
-        ChatCompletionResponse oobAiAnswer = null;
-        HuggingFaceResponse huggingFaceAnswer = null;
+        ChatCompletionResponse openAiAns = null;
+        ChatCompletionResponse pplxAiAns = null;
+        ChatCompletionResponse oobAiAns = null;
+        HuggingFaceResponse huggingFaceAns = null;
         // OobaAiResponse oobaAiAnswer = null;
-        GeminiChatResponse geminiAiAnswer = null;
+        GeminiChatResponse geminiAiAns = null;
 
-        if ("openAi".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                openAiAnswer = oai.getAnswer(ms, parentNode, null, null);
-                res.setGptCredit(openAiAnswer.userCredit);
-                typeToCreate = NodeType.OPENAI_ANSWER.s();
-            }
-        } //
-        else if ("pplxAi".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
-                res.setGptCredit(pplxAiAnswer.userCredit);
-                typeToCreate = NodeType.PPLXAI_ANSWER.s();
-            }
-        } //
-        else if ("pplxAi_online".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
-                res.setGptCredit(pplxAiAnswer.userCredit);
-                typeToCreate = NodeType.PPLXAI_ANSWER.s();
-            }
-        } //
-        else if ("pplxAi_codeLlama".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
-                res.setGptCredit(pplxAiAnswer.userCredit);
-                typeToCreate = NodeType.PPLXAI_ANSWER.s();
-            }
-        } //
-        else if ("pplxAi_llama2".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                pplxAiAnswer = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
-                res.setGptCredit(pplxAiAnswer.userCredit);
-                typeToCreate = NodeType.PPLXAI_ANSWER.s();
-            }
-        } //
-        else if ("huggingFace".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                huggingFaceAnswer = huggingFace.getAnswer(ms, parentNode, null);
-                typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
-            }
-        }
-        // Oobabooga
-        else if ("oobAi".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                oobAiAnswer = oobaAi.getAnswer(ms, parentNode, null);
-                typeToCreate = NodeType.OOBAI_ANSWER.s();
-            }
-        }
-        // Gemini
-        else if ("geminiAi".equals(req.getAiQuestion())) {
-            if (NodeType.NONE.s().equals(parentNode.getType())) {
-                geminiAiAnswer = geminiai.getAnswer(ms, parentNode, null);
-                res.setGptCredit(geminiAiAnswer.credit);
-                typeToCreate = NodeType.GEMINIAI_ANSWER.s();
+        // todo-0: these case strings need to be in a constant somewhere
+        if (NodeType.NONE.s().equals(parentNode.getType())) {
+            switch (req.getAiQuestion()) {
+                case "openAi":
+                    openAiAns = oai.getAnswer(ms, parentNode, null, null);
+                    res.setGptCredit(openAiAns.userCredit);
+                    typeToCreate = NodeType.OPENAI_ANSWER.s();
+                    break;
+                case "pplxAi":
+                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                    break;
+                case "pplxAi_online":
+                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                    break;
+                case "pplxAi_codeLlama":
+                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                    break;
+                case "pplxAi_llama2":
+                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                    break;
+                case "huggingFace":
+                    huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
+                    typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
+                    break;
+                case "oobAi":
+                    oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
+                    typeToCreate = NodeType.OOBAI_ANSWER.s();
+                    break;
+                case "geminiAi":
+                    geminiAiAns = geminiai.getAnswer(ms, parentNode, null);
+                    res.setGptCredit(geminiAiAns.credit);
+                    typeToCreate = NodeType.GEMINIAI_ANSWER.s();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -371,29 +360,29 @@ public class MongoCreate extends ServiceBase {
         }
 
         // OpenAI
-        if (openAiAnswer != null) {
-            newNode.setContent(aiUtil.formatAnswer(openAiAnswer, true));
-            newNode.set(NodeProp.OPENAI_RESPONSE, openAiAnswer);
+        if (openAiAns != null) {
+            newNode.setContent(aiUtil.formatAnswer(openAiAns, true));
+            newNode.set(NodeProp.OPENAI_RESPONSE, openAiAns);
         }
         // Perplexity AI
-        else if (pplxAiAnswer != null) {
-            newNode.setContent(aiUtil.formatAnswer(pplxAiAnswer, true));
-            newNode.set(NodeProp.PPLXAI_RESPONSE, pplxAiAnswer);
+        else if (pplxAiAns != null) {
+            newNode.setContent(aiUtil.formatAnswer(pplxAiAns, true));
+            newNode.set(NodeProp.PPLXAI_RESPONSE, pplxAiAns);
         }
         // OobaBooga
-        else if (oobAiAnswer != null) {
-            newNode.setContent(aiUtil.formatAnswer(oobAiAnswer, true));
-            newNode.set(NodeProp.OOBAI_RESPONSE, oobAiAnswer);
+        else if (oobAiAns != null) {
+            newNode.setContent(aiUtil.formatAnswer(oobAiAns, true));
+            newNode.set(NodeProp.OOBAI_RESPONSE, oobAiAns);
         }
         // HuggingFace
-        else if (huggingFaceAnswer != null) {
-            newNode.setContent(huggingFaceAnswer.getGeneratedText());
-            newNode.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAnswer);
+        else if (huggingFaceAns != null) {
+            newNode.setContent(huggingFaceAns.getGeneratedText());
+            newNode.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAns);
         }
         // Gemini AI
-        else if (geminiAiAnswer != null) {
-            newNode.setContent(aiUtil.formatAnswer(geminiAiAnswer, true));
-            newNode.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAnswer);
+        else if (geminiAiAns != null) {
+            newNode.setContent(aiUtil.formatAnswer(geminiAiAns, true));
+            newNode.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAns);
         } else {
             newNode.setContent(req.getContent() != null ? req.getContent() : "");
         }
@@ -419,7 +408,7 @@ public class MongoCreate extends ServiceBase {
             nodeBeingRepliedTo = parentNode;
         }
 
-        if (allowSharing && openAiAnswer == null) {
+        if (allowSharing && openAiAns == null) {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
@@ -463,8 +452,8 @@ public class MongoCreate extends ServiceBase {
      */
     public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
         InsertNodeResponse res = new InsertNodeResponse();
-        NodeChanges nodeChanges = new NodeChanges();
-        res.setNodeChanges(nodeChanges);
+        NodeChanges changes = new NodeChanges();
+        res.setNodeChanges(changes);
 
         String parentNodeId = req.getParentId();
         log.debug("Inserting under parent: " + parentNodeId);
@@ -479,7 +468,7 @@ public class MongoCreate extends ServiceBase {
             throw new ForbiddenException();
         }
         SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-                CreateNodeLocation.ORDINAL, null, null, true, true, nodeChanges);
+                CreateNodeLocation.ORDINAL, null, null, true, true, changes);
         if (req.getInitialValue() != null) {
             newNode.setContent(req.getInitialValue());
         } else {

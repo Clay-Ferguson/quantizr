@@ -7,13 +7,10 @@ import java.awt.image.BufferedImage;
  * Image manipulation utilities
  */
 public class ImageUtil {
-
     public static BufferedImage scaleImage(BufferedImage image, int width) {
         Image outImage = image.getScaledInstance(width, -1, Image.SCALE_SMOOTH);
-        BufferedImage outBufferedImage = new BufferedImage(
-                outImage.getWidth(null),
-                outImage.getHeight(null),
-                BufferedImage.TYPE_INT_RGB);
+        BufferedImage outBufferedImage =
+                new BufferedImage(outImage.getWidth(null), outImage.getHeight(null), BufferedImage.TYPE_INT_RGB);
         outBufferedImage.getGraphics().drawImage(outImage, 0, 0, null);
         return outBufferedImage;
     }

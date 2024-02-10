@@ -335,7 +335,8 @@ public class FriendService extends ServiceBase {
                 // SubNode parent = topNode ? null : read.getParent(ms, node);
                 SubNode parent = null;
                 if (topNode) {
-                } else { // leave parent == null;
+                    // leave parent == null;
+                } else {
                     parent = read.getParent(ms, node);
                 }
                 boolean top = parent != null && parent.isType(NodeType.POSTS);

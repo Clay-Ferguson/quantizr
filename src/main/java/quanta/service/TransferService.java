@@ -85,6 +85,8 @@ public class TransferService extends ServiceBase {
         if (fromUserNode != null && !fromUserNode.getOwner().equals(node.getOwner())) {
             return;
         }
+
+        // todo-0: put switch statement here
         if (op.equals("transfer")) {
             // if we don't happen do own this node, do nothing.
             if (!ms.getUserNodeId().equals(node.getOwner())) {
