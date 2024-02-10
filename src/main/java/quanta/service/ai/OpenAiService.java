@@ -1,4 +1,4 @@
-package quanta.service.node;
+package quanta.service.ai;
 
 import java.io.InputStream;
 import java.math.BigDecimal;

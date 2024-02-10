@@ -39,7 +39,7 @@ public class TransferService extends ServiceBase {
         }
         // get user node of person being transfered to
         SubNode toUserNode = null;
-        if (req.getOperation().equals(TransferOp.TRANSFER.s()) {
+        if (req.getOperation().equals(TransferOp.TRANSFER.s())) {
             toUserNode = read.getAccountByUserName(null, req.getToUser(), false);
             if (toUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getToUser());

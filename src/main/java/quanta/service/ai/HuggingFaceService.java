@@ -1,4 +1,4 @@
-package quanta.service.node;
+package quanta.service.ai;
 
 import java.util.List;
 import org.slf4j.Logger;

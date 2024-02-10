@@ -1,4 +1,4 @@
-package quanta.service.node;
+package quanta.service.ai;
 
 import java.util.ArrayList;
 import java.util.List;
