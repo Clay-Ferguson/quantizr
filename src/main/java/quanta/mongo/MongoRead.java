@@ -883,84 +883,96 @@ public class MongoRead extends ServiceBase {
          * For a calculated field we do an Aggregate Query operation. The purpose of this entire Aggregation
          * is to calculate contentLength on the fly so we can sort on it.
          */
-        // todo-0: break these three if blocks into methods
         if ("contentLength".equals(sortField)) {
-            List<AggregationOperation> aggOps = new LinkedList<>();
-            /*
-             * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
-             * process it first here
-             */
-            if (textCriteria != null) {
-                aggOps.add(Aggregation.match(textCriteria));
-            }
-
-            Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
-            aggOps.add(Aggregation.match(c));
-
-            // calculate contentLength
-            aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("strLenCP(cont)")
-                    .as("contentLength"));
-            /*
-             * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
-             * with aggregates we doing a step by step pipeline of processing so we need records in the correct
-             * order before we do limit or skip and so the ordering of these 'ops' does that.
-             */
-            aggOps.add(Aggregation.sort(sort));
-            aggOps.add(Aggregation.skip((long) skip));
-            aggOps.add(Aggregation.limit(limit));
-            Aggregation agg = Aggregation.newAggregation(aggOps);
-            AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
-            return results.getMappedResults();
+            return queryByConentLenOrder(ms, limit, skip, ands, textCriteria, sort);
         } //
         else if ("treeDepth".equals(sortField)) {
-            List<AggregationOperation> aggOps = new LinkedList<>();
-            /*
-             * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
-             * process it first here
-             */
-            if (textCriteria != null) {
-                aggOps.add(Aggregation.match(textCriteria));
-            }
-
-            Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
-            aggOps.add(Aggregation.match(c));
-
-            aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("size(split(pth, '/'))")
-                    .as("treeDepth"));
-
-            /*
-             * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
-             * with aggregates we doing a step by step pipeline of processing so we need records in the correct
-             * order before we do limit or skip and so the ordering of these 'ops' does that.
-             */
-            aggOps.add(Aggregation.sort(sort));
-            aggOps.add(Aggregation.skip((long) skip));
-            aggOps.add(Aggregation.limit(limit));
-            Aggregation agg = Aggregation.newAggregation(aggOps);
-            AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
-            return results.getMappedResults();
-        }
-        // Otherwise a standard Query.
+            return queryByTreeDepthOrder(ms, limit, skip, ands, textCriteria, sort);
+        } //
         else {
-            Query q = new Query();
-            Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
-            q.addCriteria(c);
-
-            if (textCriteria != null) {
-                q.addCriteria(textCriteria);
-            }
-
-            if (sort != null) {
-                q.with(sort);
-            }
-            if (limit > 0) {
-                q.limit(limit);
-            }
-            if (skip > 0) {
-                q.skip(skip);
-            }
-            return opsw.find(ms, q);
+            return basicQuery(ms, limit, skip, ands, textCriteria, sort);
         }
+    }
+
+    private Iterable<SubNode> basicQuery(MongoSession ms, int limit, int skip, List<Criteria> ands,
+            TextCriteria textCriteria, Sort sort) {
+        Query q = new Query();
+        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+        q.addCriteria(c);
+
+        if (textCriteria != null) {
+            q.addCriteria(textCriteria);
+        }
+        if (sort != null) {
+            q.with(sort);
+        }
+        if (limit > 0) {
+            q.limit(limit);
+        }
+        if (skip > 0) {
+            q.skip(skip);
+        }
+        return opsw.find(ms, q);
+    }
+
+    private Iterable<SubNode> queryByTreeDepthOrder(MongoSession ms, int limit, int skip, List<Criteria> ands,
+            TextCriteria textCriteria, Sort sort) {
+        List<AggregationOperation> aggOps = new LinkedList<>();
+        /*
+         * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
+         * process it first here
+         */
+        if (textCriteria != null) {
+            aggOps.add(Aggregation.match(textCriteria));
+        }
+
+        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+        aggOps.add(Aggregation.match(c));
+
+        aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("size(split(pth, '/'))")
+                .as("treeDepth"));
+
+        /*
+         * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
+         * with aggregates we doing a step by step pipeline of processing so we need records in the correct
+         * order before we do limit or skip and so the ordering of these 'ops' does that.
+         */
+        aggOps.add(Aggregation.sort(sort));
+        aggOps.add(Aggregation.skip((long) skip));
+        aggOps.add(Aggregation.limit(limit));
+        Aggregation agg = Aggregation.newAggregation(aggOps);
+        AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
+        return results.getMappedResults();
+    }
+
+    private Iterable<SubNode> queryByConentLenOrder(MongoSession ms, int limit, int skip, List<Criteria> ands,
+            TextCriteria textCriteria, Sort sort) {
+        List<AggregationOperation> aggOps = new LinkedList<>();
+        /*
+         * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
+         * process it first here
+         */
+        if (textCriteria != null) {
+            aggOps.add(Aggregation.match(textCriteria));
+        }
+
+        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+        aggOps.add(Aggregation.match(c));
+
+        // calculate contentLength
+        aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("strLenCP(cont)")
+                .as("contentLength"));
+        /*
+         * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
+         * with aggregates we doing a step by step pipeline of processing so we need records in the correct
+         * order before we do limit or skip and so the ordering of these 'ops' does that.
+         */
+        aggOps.add(Aggregation.sort(sort));
+        aggOps.add(Aggregation.skip((long) skip));
+        aggOps.add(Aggregation.limit(limit));
+        Aggregation agg = Aggregation.newAggregation(aggOps);
+        AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
+        return results.getMappedResults();
     }
 
     public Iterable<SubNode> getLinkedNodes(MongoSession ms, String nodeId, String search) {
