@@ -20,12 +20,15 @@ public enum AIServiceName {
     }
 
     public static AIServiceName fromString(String name) {
-        for (AIServiceName e : AIServiceName.values()) {
+        if (name == null) {
+            return null;
+        }
+        for (AIServiceName e : values()) {
             if (e.value.equalsIgnoreCase(name)) {
                 return e;
             }
         }
-        throw new IllegalArgumentException("No constant with text " + name + " found");
+        return null;
     }
 
     public String toString() {

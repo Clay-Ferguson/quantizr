@@ -302,47 +302,51 @@ public class MongoCreate extends ServiceBase {
         GeminiChatResponse geminiAiAns = null;
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
-            switch (AIServiceName.fromString(req.getAiQuestion())) {
-                case OPENAI:
-                    openAiAns = oai.getAnswer(ms, parentNode, null, null);
-                    res.setGptCredit(openAiAns.userCredit);
-                    typeToCreate = NodeType.OPENAI_ANSWER.s();
-                    break;
-                case PPLX:
-                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
-                    res.setGptCredit(pplxAiAns.userCredit);
-                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
-                    break;
-                case PPLX_ONLINE:
-                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
-                    res.setGptCredit(pplxAiAns.userCredit);
-                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
-                    break;
-                case PPLX_CODE_LLAMA:
-                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
-                    res.setGptCredit(pplxAiAns.userCredit);
-                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
-                    break;
-                case PPLX_LLAMA2:
-                    pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
-                    res.setGptCredit(pplxAiAns.userCredit);
-                    typeToCreate = NodeType.PPLXAI_ANSWER.s();
-                    break;
-                case HUGGING_FACE:
-                    huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
-                    typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
-                    break;
-                case OOBA:
-                    oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
-                    typeToCreate = NodeType.OOBAI_ANSWER.s();
-                    break;
-                case GEMINI:
-                    geminiAiAns = geminiai.getAnswer(ms, parentNode, null);
-                    res.setGptCredit(geminiAiAns.credit);
-                    typeToCreate = NodeType.GEMINIAI_ANSWER.s();
-                    break;
-                default:
-                    break;
+            AIServiceName svc = AIServiceName.fromString(req.getAiQuestion());
+            if (svc != null) {
+                switch (svc) {
+                    case OPENAI:
+                        openAiAns = oai.getAnswer(ms, parentNode, null, null);
+                        res.setGptCredit(openAiAns.userCredit);
+                        typeToCreate = NodeType.OPENAI_ANSWER.s();
+                        break;
+                    case PPLX:
+                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                        res.setGptCredit(pplxAiAns.userCredit);
+                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        break;
+                    case PPLX_ONLINE:
+                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                        res.setGptCredit(pplxAiAns.userCredit);
+                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        break;
+                    case PPLX_CODE_LLAMA:
+                        pplxAiAns =
+                                pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
+                        res.setGptCredit(pplxAiAns.userCredit);
+                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        break;
+                    case PPLX_LLAMA2:
+                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
+                        res.setGptCredit(pplxAiAns.userCredit);
+                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        break;
+                    case HUGGING_FACE:
+                        huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
+                        typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
+                        break;
+                    case OOBA:
+                        oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
+                        typeToCreate = NodeType.OOBAI_ANSWER.s();
+                        break;
+                    case GEMINI:
+                        geminiAiAns = geminiai.getAnswer(ms, parentNode, null);
+                        res.setGptCredit(geminiAiAns.credit);
+                        typeToCreate = NodeType.GEMINIAI_ANSWER.s();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

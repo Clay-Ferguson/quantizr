@@ -142,27 +142,30 @@ public class AIUtil extends ServiceBase {
 
         ChatCompletionResponse answer = null;
         GeminiChatResponse geminiAnswer = null;
-        switch (AIServiceName.fromString(req.getAiService())) {
-            case OPENAI:
-                answer = oai.getAnswer(ms, null, sb.toString(), system);
-                break;
-            case PPLX:
-                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
-                break;
-            case PPLX_ONLINE:
-                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
-                break;
-            case PPLX_CODE_LLAMA:
-                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
-                break;
-            case PPLX_LLAMA2:
-                answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
-                break;
-            case GEMINI:
-                geminiAnswer = geminiai.getAnswer(ms, null, sb.toString());
-                break;
-            default:
-                throw new RuntimeException("Unknown AI service: " + req.getAiService());
+        AIServiceName svc = AIServiceName.fromString(req.getAiService());
+        if (svc != null) {
+            switch (svc) {
+                case OPENAI:
+                    answer = oai.getAnswer(ms, null, sb.toString(), system);
+                    break;
+                case PPLX:
+                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                    break;
+                case PPLX_ONLINE:
+                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                    break;
+                case PPLX_CODE_LLAMA:
+                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
+                    break;
+                case PPLX_LLAMA2:
+                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
+                    break;
+                case GEMINI:
+                    geminiAnswer = geminiai.getAnswer(ms, null, sb.toString());
+                    break;
+                default:
+                    throw new RuntimeException("Unknown AI service: " + req.getAiService());
+            }
         }
 
         if (answer != null) {
