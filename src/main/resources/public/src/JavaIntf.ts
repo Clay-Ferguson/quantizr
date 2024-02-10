@@ -1303,6 +1303,17 @@ export interface PrivilegeInfo {
     privilegeName: string;
 }
 
+export const enum AIServiceName {
+    OPENAI = "openAi",
+    PPLX = "pplxAi",
+    PPLX_ONLINE = "pplxAi_online",
+    PPLX_CODE_LLAMA = "pplxAi_codeLlama",
+    PPLX_LLAMA2 = "pplxAi_llama2",
+    HUGGING_FACE = "huggingFace",
+    OOBA = "oobAi",
+    GEMINI = "geminiAi",
+}
+
 export const enum Constant {
     SEARCH_ALL_NODES = "allNodes",
     SEARCH_CUR_NODE = "curNode",

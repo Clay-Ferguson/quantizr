@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.geminiai.GeminiChatCandidate;
@@ -141,23 +142,23 @@ public class AIUtil extends ServiceBase {
 
         ChatCompletionResponse answer = null;
         GeminiChatResponse geminiAnswer = null;
-        switch (req.getAiService()) {
-            case "openAi":
+        switch (AIServiceName.fromString(req.getAiService())) {
+            case OPENAI:
                 answer = oai.getAnswer(ms, null, sb.toString(), system);
                 break;
-            case "pplxAi":
+            case PPLX:
                 answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                 break;
-            case "pplxAi_online":
+            case PPLX_ONLINE:
                 answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
                 break;
-            case "pplxAi_codeLlama":
+            case PPLX_CODE_LLAMA:
                 answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
                 break;
-            case "pplxAi_llama2":
+            case PPLX_LLAMA2:
                 answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
                 break;
-            case "geminiAi":
+            case GEMINI:
                 geminiAnswer = geminiai.getAnswer(ms, null, sb.toString());
                 break;
             default:

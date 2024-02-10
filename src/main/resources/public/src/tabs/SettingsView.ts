@@ -14,6 +14,7 @@ import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
+import * as J from "../JavaIntf";
 
 export class SettingsView extends AppTab<any, SettingsView> {
 
@@ -33,22 +34,22 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
         let modelSpecs = "";
         switch (getAs().userPrefs.aiService) {
-            case "openAi":
+            case J.AIServiceName.OPENAI:
                 modelSpecs = "OpenAI ChatGPT-4 (Chat): This is the default chatbot and is widely considered the most intelligent general-purpose AI on the market.";
                 break;
-            case "geminiAi":
+            case J.AIServiceName.GEMINI:
                 modelSpecs = "Gemini AI: This is Google's best general-purpose AI.";
                 break;
-            case "pplxAi":
+            case J.AIServiceName.PPLX:
                 modelSpecs = "Perplexity AI: This is Perplexity's best high-end powerful general-purpose AI.";
                 break;
-            case "pplxAi_online":
+            case J.AIServiceName.PPLX_ONLINE:
                 modelSpecs = "Perplexity AI: This is Perplexity's AI which has access to the latest news and content from from the web.";
                 break;
-            case "pplxAi_codeLlama":
+            case J.AIServiceName.PPLX_CODE_LLAMA:
                 modelSpecs = "Code Llama: This is the well-known open source Code Llama, which is great for coding and programming tasks.";
                 break;
-            case "pplxAi_llama2":
+            case J.AIServiceName.PPLX_LLAMA2:
                 modelSpecs = "Llama 2: This is the well-known open source Llama 2, which is great for general-purpose tasks.";
                 break;
         }
@@ -164,18 +165,19 @@ export class SettingsView extends AppTab<any, SettingsView> {
     private getAiOptions = (): any[] => {
         const aiOptions = [];
         if (S.quanta.config.useOpenAi) {
-            aiOptions.push({ key: "openAi", val: "OpenAI (Chat)" });
+            aiOptions.push({ key: J.AIServiceName.OPENAI, val: "OpenAI (Chat)" });
         }
 
         if (S.quanta.config.useGeminiAi) {
-            aiOptions.push({ key: "geminiAi", val: "Google Gemini (Chat)" });
+            aiOptions.push({ key: J.AIServiceName.GEMINI, val: "Google Gemini (Chat)" });
         }
 
         if (S.quanta.config.usePplxAi) {
-            aiOptions.push({ key: "pplxAi", val: "Perplexity (Chat)" },
-                { key: "pplxAi_online", val: "Perplexity (Recent News)" },
-                { key: "pplxAi_codeLlama", val: "Code Llama" },
-                { key: "pplxAi_llama2", val: "Llama 2" });
+            aiOptions.push(//
+                { key: J.AIServiceName.PPLX, val: "Perplexity (Chat)" },
+                { key: J.AIServiceName.PPLX_ONLINE, val: "Perplexity (Recent News)" },
+                { key: J.AIServiceName.PPLX_CODE_LLAMA, val: "Code Llama" },
+                { key: J.AIServiceName.PPLX_LLAMA2, val: "Llama 2" });
         }
         return aiOptions;
     }

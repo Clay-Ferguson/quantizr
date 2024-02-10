@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
 import quanta.model.PropertyInfo;
+import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -300,43 +301,42 @@ public class MongoCreate extends ServiceBase {
         // OobaAiResponse oobaAiAnswer = null;
         GeminiChatResponse geminiAiAns = null;
 
-        // todo-0: these case strings need to be in a constant somewhere
         if (NodeType.NONE.s().equals(parentNode.getType())) {
-            switch (req.getAiQuestion()) {
-                case "openAi":
+            switch (AIServiceName.fromString(req.getAiQuestion())) {
+                case OPENAI:
                     openAiAns = oai.getAnswer(ms, parentNode, null, null);
                     res.setGptCredit(openAiAns.userCredit);
                     typeToCreate = NodeType.OPENAI_ANSWER.s();
                     break;
-                case "pplxAi":
+                case PPLX:
                     pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                     res.setGptCredit(pplxAiAns.userCredit);
                     typeToCreate = NodeType.PPLXAI_ANSWER.s();
                     break;
-                case "pplxAi_online":
+                case PPLX_ONLINE:
                     pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
                     res.setGptCredit(pplxAiAns.userCredit);
                     typeToCreate = NodeType.PPLXAI_ANSWER.s();
                     break;
-                case "pplxAi_codeLlama":
+                case PPLX_CODE_LLAMA:
                     pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
                     res.setGptCredit(pplxAiAns.userCredit);
                     typeToCreate = NodeType.PPLXAI_ANSWER.s();
                     break;
-                case "pplxAi_llama2":
+                case PPLX_LLAMA2:
                     pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
                     res.setGptCredit(pplxAiAns.userCredit);
                     typeToCreate = NodeType.PPLXAI_ANSWER.s();
                     break;
-                case "huggingFace":
+                case HUGGING_FACE:
                     huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
                     typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
                     break;
-                case "oobAi":
+                case OOBA:
                     oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
                     typeToCreate = NodeType.OOBAI_ANSWER.s();
                     break;
-                case "geminiAi":
+                case GEMINI:
                     geminiAiAns = geminiai.getAnswer(ms, parentNode, null);
                     res.setGptCredit(geminiAiAns.credit);
                     typeToCreate = NodeType.GEMINIAI_ANSWER.s();
