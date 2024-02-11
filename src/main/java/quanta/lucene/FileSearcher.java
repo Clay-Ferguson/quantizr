@@ -44,10 +44,8 @@ public class FileSearcher {
         log.debug("searching for: " + line);
         String field = "contents";
         int hitsPerPage = 10;
-        /**
-         * todo-2: Is it more efficient (or even threadsafe?) to hold one or more of these two resources
-         * open for multiple searches, and potentially simultaneous/threads?
-         */
+        // todo-2: Is it more efficient (or even threadsafe?) to hold one or more of these two resources
+        // open for multiple searches, and potentially simultaneous/threads?
         FSDirectory fsDir = null;
         IndexReader reader = null;
         try {

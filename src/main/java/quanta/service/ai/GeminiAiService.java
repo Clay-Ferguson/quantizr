@@ -64,11 +64,10 @@ public class GeminiAiService extends ServiceBase {
         GeminiChatRequest request = new GeminiChatRequest(contents);
         log.debug("Gemini Req: USER: " + ms.getUserName() + ": " + XString.prettyPrint(request));
 
-        /*
-         * Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request' here
-         * instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-         * fails, but it does fail.
-         */
+        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
+        // here
+        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
+        // fails, but it does fail.
         Mono<GeminiChatResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
                 .retrieve().bodyToMono(GeminiChatResponse.class);
         GeminiChatResponse res = mono.block();

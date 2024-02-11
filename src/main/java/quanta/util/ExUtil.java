@@ -69,7 +69,7 @@ public class ExUtil {
 
     public static void debug(Logger logger, String msg, Throwable e) {
         logger.debug(msg, e);
-        /* Not showing all sub-causes in the chain, but just the immediate one */
+        // Not showing all sub-causes in the chain, but just the immediate one
         if (e.getCause() != null) {
             logger.debug("cause:", e);
         }
@@ -77,7 +77,7 @@ public class ExUtil {
 
     public static void error(Logger logger, String msg, Throwable e) {
         logger.error(msg, e);
-        /* Not showing all sub-causes in the chain, but just the immediate one */
+        // Not showing all sub-causes in the chain, but just the immediate one
         if (e.getCause() != null) {
             logger.error("cause:", e);
         }
@@ -85,7 +85,7 @@ public class ExUtil {
 
     public static void warn(Logger logger, String msg, Throwable e) {
         logger.warn(msg, e);
-        /* Not showing all sub-causes in the chain, but just the immediate one */
+        // Not showing all sub-causes in the chain, but just the immediate one
         if (e.getCause() != null) {
             logger.warn("cause:", e);
         }

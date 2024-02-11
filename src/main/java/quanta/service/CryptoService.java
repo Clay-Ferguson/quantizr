@@ -161,10 +161,8 @@ public class CryptoService extends ServiceBase {
     }
 
     public SignNodesResponse signNodes(MongoSession ms, SignNodesRequest req) {
-        /*
-         * if the signPendingQueue contains the workload we assume it's the same workload, which is fine
-         * because we aren't doing that security right here.
-         */
+        // if the signPendingQueue contains the workload we assume it's the same workload, which is fine
+        // because we aren't doing that security right here.
         if (sigPendingQueue.containsKey(req.getWorkloadId())) {
             BulkOperations bops = null;
             int batchSize = 0;

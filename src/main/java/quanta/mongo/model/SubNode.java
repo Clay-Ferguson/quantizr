@@ -48,11 +48,10 @@ public class SubNode {
     // This optimization is optional and we have this flag if we need to turn it off.
     public static final boolean USE_HAS_CHILDREN = true;
 
-    /*
-     * This tells all parts of the code that any changes being made on this node can be accepted without
-     * further auth checks. important for when a user thread is doing something but that causes us to
-     * need to modify some node that user is not expected to also own
-     */
+    // This tells all parts of the code that any changes being made on this node can be accepted
+    // without
+    // further auth checks. important for when a user thread is doing something but that causes us to
+    // need to modify some node that user is not expected to also own
     @Transient
     @JsonIgnore
     public boolean adminUpdate = false;
@@ -157,10 +156,9 @@ public class SubNode {
 
     @PersistenceCreator
     public SubNode() {
-        /*
-         * WARNING: Do NOT initialize times (mod time or create time) in here. This constructor gets called
-         * any time the persistence engine loads a node!!!!
-         */
+        // WARNING: Do NOT initialize times (mod time or create time) in here. This constructor gets
+        // called
+        // any time the persistence engine loads a node!!!!
     }
 
     public SubNode(ObjectId owner, String path, String type, Long ordinal) {
@@ -788,10 +786,8 @@ public class SubNode {
             Object v = props().get(key);
             if (v == null)
                 return false;
-            /*
-             * Our current property editor only knows how to save strings, so we just cope with that here, but
-             * eventually we will have type-safety and types even in the editor.
-             */
+            // Our current property editor only knows how to save strings, so we just cope with that here, but
+            // eventually we will have type-safety and types even in the editor.
             if (v instanceof String o) {
                 String s = o.toLowerCase();
                 // detect true or 1.

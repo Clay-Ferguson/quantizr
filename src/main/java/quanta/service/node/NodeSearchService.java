@@ -110,7 +110,7 @@ public class NodeSearchService extends ServiceBase {
             }
         } //
         else if ("node.name".equals(req.getSearchProp())) {
-            /* Undocumented Feature: You can find named nodes using format ":userName:nodeName" */
+            // Undocumented Feature: You can find named nodes using format ":userName:nodeName"
             if (!searchText.contains(":")) {
                 if (ThreadLocals.getSC().isAdmin()) {
                     searchText = ":" + searchText;
@@ -136,7 +136,7 @@ public class NodeSearchService extends ServiceBase {
             else if (Constant.SEARCH_TYPE_RDF_SUBJECTS.s().equals(req.getSearchType())) {
                 searchRdfSubjects(ms, req, res);
             }
-            /* USER Search */
+            // USER Search
             else if (Constant.SEARCH_TYPE_USERS.s().equals(req.getSearchType())) {
                 userSearch(ms, null, req, searchResults);
             }
@@ -229,10 +229,8 @@ public class NodeSearchService extends ServiceBase {
             return null;
         });
         if (accountNodes.getVal() != null) {
-            /*
-             * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
-             * amount).
-             */
+            // scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+            // amount).
             for (SubNode node : accountNodes.getVal()) {
                 try {
                     NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
@@ -253,29 +251,24 @@ public class NodeSearchService extends ServiceBase {
         List<NodeInfo> searchResults = new LinkedList<>();
         res.setSearchResults(searchResults);
         int counter = 0;
-        /*
-         * DO NOT DELETE (may want searching under selected node as an option some day) we can remove nodeId
-         * from req, because we always search from account root now.
-         */
+        // DO NOT DELETE (may want searching under selected node as an option some day) we can remove
+        // nodeId
+        // from req, because we always search from account root now.
         // SubNode searchRoot = api.getNode(session, req.getNodeId());
         // search under account root only
         SubNode searchRoot = read.getNode(ms, ThreadLocals.getSC().getUserNodeId());
-        /*
-         * todo-2: Eventually we want two ways of searching here.
-         *
-         * 1) All my shared nodes under my account,
-         *
-         * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
-         * here
-         */
+        // todo-2: Eventually we want two ways of searching here.
+        //
+        // 1) All my shared nodes under my account,
+        //
+        // 2) all my shared nodes globally, and the globally is done simply by passing null for the path
+        // here
         for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
                 searchRoot.getPath(), searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME),
                 ConstantInt.ROWS_PER_PAGE.val())) {
             if (node.getAc() == null || node.getAc().size() == 0)
                 continue;
-            /*
-             * If we're only looking for shares to a specific person (or public) then check here
-             */
+            // If we're only looking for shares to a specific person (or public) then check here
             if (req.getShareTarget() != null) {
                 if (!node.getAc().containsKey(req.getShareTarget())) {
                     continue;

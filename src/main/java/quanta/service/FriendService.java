@@ -89,9 +89,7 @@ public class FriendService extends ServiceBase {
         String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
         String friendUserName = node.getStr(NodeProp.USER);
         if (friendUserName != null) {
-            /*
-             * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
-             */
+            // when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
             if (userNodeId == null) {
                 Val<SubNode> userNode = new Val<SubNode>();
 
@@ -154,9 +152,7 @@ public class FriendService extends ServiceBase {
             log.debug("Can't access Friend list for: " + userDoingFollow);
             return;
         }
-        /*
-         * lookup to see if this followerFriendList node already has userToFollow already under it.
-         */
+        // lookup to see if this followerFriendList node already has userToFollow already under it.
         SubNode friendNode = read.findFriendNode(ms, accntIdDoingFollow, null, userToFollow);
         // if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
         if (friendNode != null && !mongoUtil.isChildOf(followerFriendList, friendNode)) {
@@ -208,7 +204,9 @@ public class FriendService extends ServiceBase {
                     if (att != null) {
                         fi.setAvatarVer(att.getBin());
                     }
-                } else { // Otherwise the avatar will be specified as a remote user's Icon.
+                }
+                // Otherwise the avatar will be specified as a remote user's Icon.
+                else {
                     // set avatar here only if we didn't set it above already
                     if (fi.getForeignAvatarUrl() == null) {
                         fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.USER_ICON_URL));
@@ -285,10 +283,8 @@ public class FriendService extends ServiceBase {
         while (node != null && (nodes.size() < MAX_THREAD_NODES)) {
             try {
                 NodeInfo info = null;
-                /*
-                 * note topNode doesn't necessarily mean we're done iterating because it's 'inReplyTo' still may
-                 * point to further places 'logically above' (in this conversation thread)
-                 */
+                // note topNode doesn't necessarily mean we're done iterating because it's 'inReplyTo' still may
+                // point to further places 'logically above' (in this conversation thread)
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
                 if (!topNode) {
                     info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false,
@@ -348,11 +344,6 @@ public class FriendService extends ServiceBase {
                 node = null;
                 topReached = true;
             }
-            /*
-             * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
-             * the one above their account, this represents how far up the user is able to read towards the root
-             * of the tree based on sharing setting of nodes encountered along the way to the root.
-             */
         }
         if (node == null) {
             topReached = true;
@@ -477,7 +468,7 @@ public class FriendService extends ServiceBase {
         });
     }
 
-    /* Returns FRIEND nodes for every user 'userName' is following */
+    // Returns FRIEND nodes for every user 'userName' is following
     public Iterable<SubNode> findFollowingOfUser(MongoSession ms, String userName) {
         Query q = findFollowingOfUser_query(ms, userName);
         if (q == null)
@@ -502,10 +493,8 @@ public class FriendService extends ServiceBase {
         SubNode friendsListNode = user.getFriendsList(ms, userName, false);
         if (friendsListNode == null)
             return null;
-        /*
-         * query all the direct children under the friendsListNode, that are FRIEND type although they
-         * should all be FRIEND types.
-         */
+        // query all the direct children under the friendsListNode, that are FRIEND type although they
+        // should all be FRIEND types.
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(friendsListNode.getPath()))
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
@@ -513,5 +502,4 @@ public class FriendService extends ServiceBase {
         q.addCriteria(crit);
         return q;
     }
-
 }

@@ -29,14 +29,13 @@ public class LuceneService extends ServiceBase {
         String ret = null;
         SubNode node = read.getNode(ms, nodeId, true, null);
         if (node != null) {
-            /*
-             * Remember 'searchFolder' will have to be visible to the VM and therefore this might require adding
-             * a new mapping parameter to the startup shell script for docker. Docker can't see the entire
-             * folder structure on the host machine, but can only see what has specifically been shared to it.
-             *
-             * NOTE: We're using the nodeId as the subdirectory in the lucene data folder to keep the index of
-             * this node garanteed to be separate but determined by this node (i.e. unique to this node)
-             */
+            // Remember 'searchFolder' will have to be visible to the VM and therefore this might require
+            // adding
+            // a new mapping parameter to the startup shell script for docker. Docker can't see the entire
+            // folder structure on the host machine, but can only see what has specifically been shared to it.
+            //
+            // NOTE: We're using the nodeId as the subdirectory in the lucene data folder to keep the index of
+            // this node garanteed to be separate but determined by this node (i.e. unique to this node)
             fileIndexer.index(searchFolder/* "/tmp/search" */, nodeId, "sh,md,txt,pdf,zip,tar,json,gz,tgz,xz", true);
             ret = fileIndexer.getSummaryReport();
             fileIndexer.close();

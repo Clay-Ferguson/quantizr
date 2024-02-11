@@ -42,10 +42,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     private MongoClient client;
     private GridFsTemplate grid;
     private SimpleMongoClientDatabaseFactory factory;
-    /**
-     * we have this so we can set it to true and know that MongoDb failed and gracefully run in case we
-     * need to run for debugging purposes.
-     */
+    // we have this so we can set it to true and know that MongoDb failed and gracefully run in case
+    // we
+    // need to run for debugging purposes.
     public static boolean connectionFailed = false;
 
     @Autowired
@@ -112,10 +111,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 // becasue in a docker swarm everying sort of starts simultaneously and there's
                 // no way to define a depends_on in the yaml.
                 Util.sleep(5000);
-                /*
-                 * This codec registroy is what allows us to store objects that contain other POJOS, like for
-                 * example the way we're storing AccessControl objects in a map inside SubNode
-                 */
+                // This codec registroy is what allows us to store objects that contain other POJOS, like for
+                // example the way we're storing AccessControl objects in a map inside SubNode
                 CodecRegistry codecReg = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                         fromProviders(PojoCodecProvider.builder().automatic(true).build()));
                 MongoClientSettings.Builder builder = MongoClientSettings.builder();

@@ -128,11 +128,10 @@ public class EmailSender extends ServiceBase implements TransportListener {
             message.setContent(content, MIME_HTML);
             // can get alreadyconnected exception here ??
             // transport.connect(mailHost, mailUser, mailPassword);
-            /*
-             * important: while inside this 'sendMessage' method, the 'messageDelivered' callback will get
-             * called if the send is successful, so we can return the value below, even though we do not set it
-             * in this method
-             */
+            // important: while inside this 'sendMessage' method, the 'messageDelivered' callback will get
+            // called if the send is successful, so we can return the value below, even though we do not set
+            // it
+            // in this method
             transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
         } catch (
         // I'm not sure if the callbacks are on this same thread or not. Commenting out

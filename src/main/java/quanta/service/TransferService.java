@@ -78,11 +78,9 @@ public class TransferService extends ServiceBase {
             // (todo-2)
             return;
         }
-        /*
-         * if we're transferring only from a specific user (will only be admin able to do this) then we
-         * simply return without doing anything if this node in't owned by the person we're transferring
-         * from
-         */
+        // if we're transferring only from a specific user (will only be admin able to do this) then we
+        // simply return without doing anything if this node in't owned by the person we're transferring
+        // from
         if (fromUserNode != null && !fromUserNode.getOwner().equals(node.getOwner())) {
             return;
         }

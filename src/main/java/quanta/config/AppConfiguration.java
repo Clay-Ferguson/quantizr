@@ -92,20 +92,16 @@ public class AppConfiguration implements WebMvcConfigurer {
         return reg;
     }
 
-    /*
-     * To avoid error message during startup
-     * "No qualifying bean of type 'org.springframework.scheduling.TaskScheduler' available" we have to
-     * provide spring with a Task Scheduler.
-     */
+    // To avoid error message during startup
+    // "No qualifying bean of type 'org.springframework.scheduling.TaskScheduler' available" we have to
+    // provide spring with a Task Scheduler.
     @Bean
     public TaskScheduler taskScheduler() {
         return new ConcurrentTaskScheduler(); // single threaded by default
     }
 
-    /*
-     * This method is not perfectly thread-safe but Spring initializes this during context
-     * initialization only so it's ok
-     */
+    // This method is not perfectly thread-safe but Spring initializes this during context
+    // initialization only so it's ok
     @Bean(name = "threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         if (executor != null) {
@@ -135,12 +131,11 @@ public class AppConfiguration implements WebMvcConfigurer {
         }
     }
 
-    /*
-     * DO NOT DELETE (keep for future reference)
-     *
-     * This method is removed because we switched to using the spring.resources.static-locations
-     * property in application.properties file to accomplish loading static files
-     */
+    // DO NOT DELETE (keep for future reference)
+    //
+    // This method is removed because we switched to using the spring.resources.static-locations
+    // property in application.properties file to accomplish loading static files
+    //
     // import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
     // import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
     // import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -148,18 +143,18 @@ public class AppConfiguration implements WebMvcConfigurer {
     // @Override
     // public void addResourceHandlers(ResourceHandlerRegistry registry) {
     // /*
-    // * This is how we enable the JS files to be edited and tested without doing a rebuild and restart
+    // This is how we enable the JS files to be edited and tested without doing a rebuild and restart
     // of
-    // * server code. We can just run TSC compile to generate the new JS files (or let vite do that),
-    // * and then refresh the browser to reload them. This jsBaseFolder should of course be empty
+    // server code. We can just run TSC compile to generate the new JS files (or let vite do that),
+    // and then refresh the browser to reload them. This jsBaseFolder should of course be empty
     // (unused)
-    // * in production environment, or any time the JAR (build) should be used exclusively at runtime,
-    // * rather than serving from actual directories at runtime
-    // *
-    // * NOTE: There is another way to do this also:
-    // * https://stackoverflow.com/questions/21123437/how-do-i-use-spring-boot-to-serve-static-content-
-    // * located-in-dropbox-folder
-    // */
+    // in production environment, or any time the JAR (build) should be used exclusively at runtime,
+    // rather than serving from actual directories at runtime
+    //
+    // NOTE: There is another way to do this also:
+    // https://stackoverflow.com/questions/21123437/how-do-i-use-spring-boot-to-serve-static-content-
+    // located-in-dropbox-folder
+    ///
     // if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
     // ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
     // List<String> folders = XString.tokenize(appProp.getResourcesBaseFolder(), ",", true);

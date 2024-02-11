@@ -113,12 +113,11 @@ public class AppFilter extends GenericFilterBean {
                 }
             }
         } catch (RuntimeEx e) {
-            /*
-             * NOTE: Normal flow for this exception case is NOT thru here by by a successful code=200 with the
-             * error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able
-             * to still respond to this error even in the case where no ResponseBase is being returned which is
-             * rare but is still possible
-             */
+            // NOTE: Normal flow for this exception case is NOT thru here by by a successful code=200 with the
+            // error code embedded in a ResponseBase.code. This exception is just a 'catch all' for being able
+            // to still respond to this error even in the case where no ResponseBase is being returned which
+            // is
+            // rare but is still possible
             sendError(httpRes, e.getMessage() != null ? e.getMessage() : httpReq.getRequestURI(), e.getCode(), e);
         } catch (Exception e) {
             // ditto comment above

@@ -32,10 +32,9 @@ public class EnglishDictionary extends ServiceBase {
         if (words.size() > 0)
             return;
         try {
-            /*
-             * Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes it into
-             * unique sorted list in 'words-unique.txt'
-             */
+            // Tip: Here's a shell script which starts with unsorted ununique 'words.txt' and processes it
+            // into
+            // unique sorted list in 'words-unique.txt'
             // sed 's/[[:blank:]]//g' words.txt > cleaned.txt
             // awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt
             Resource resource = context.getResource(fileName);

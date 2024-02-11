@@ -75,14 +75,12 @@ public class AppProp {
         }
     }
 
-    /* Gets config text from external file if found, and it not gets property from internal */
+    // Gets config text from external file if found, and it not gets property from internal
     public String getConfigText(String prop) {
         return (String) getConfig().get(prop);
     }
 
-    /*
-     * Reads a yaml file into a map from internal file at "classname:[fileName]
-     */
+    // Reads a yaml file into a map from internal file at "classname:[fileName]
     private HashMap<String, Object> readYamlInternal(String fileName) {
         synchronized (Util.yamlMapper) {
             InputStream is = null;
@@ -217,7 +215,7 @@ public class AppProp {
         return env.getProperty("mongoAdminUserName");
     }
 
-    /* Should be set to true if mongo security is turned on requiring credentials */
+    // Should be set to true if mongo security is turned on requiring credentials
     public boolean getMongoSecurity() {
         return "true".equals(env.getProperty("mongoSecurity"));
     }
@@ -303,7 +301,7 @@ public class AppProp {
         return getBooleanProp("allowFileSystemSearch");
     }
 
-    /* considers property 'true' if it starts with letter 't', 'y' (yes), or 1 */
+    // considers property 'true' if it starts with letter 't', 'y' (yes), or 1
     public boolean getBooleanProp(String propName) {
         String val = env.getProperty(propName);
         if (val == null)

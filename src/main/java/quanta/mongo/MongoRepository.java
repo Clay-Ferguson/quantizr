@@ -18,15 +18,12 @@ import quanta.util.ThreadLocals;
 public class MongoRepository extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
-    /*
-     * Flag only gets set to true when application is fully initialized, all DB conversiona have been
-     * done and all endpoints are ready to start servicing requests
-     */
+    // Flag only gets set to true when application is fully initialized, all DB conversiona have been
+    // done and all endpoints are ready to start servicing requests
     public static boolean fullInit = false;
-    /*
-     * We only need this lock to protect against startup and/or shutdown concurrency. Remember during
-     * debugging, etc the server process can be shutdown (CTRL-C) even while it's in the startup phase.
-     */
+    // We only need this lock to protect against startup and/or shutdown concurrency. Remember during
+    // debugging, etc the server process can be shutdown (CTRL-C) even while it's in the startup
+    // phase.
     private static final Object lock = new Object();
     private boolean initialized = false;
 
@@ -70,10 +67,8 @@ public class MongoRepository extends ServiceBase {
             if (AppServer.isShuttingDown())
                 return;
             log.debug("initializing MongoRepository");
-            /*
-             * IMPORTANT: Do not move this line below this point. An infinite loop of re-entry can occur into
-             * this method because of calls to getRepository() always doing an init.
-             */
+            // IMPORTANT: Do not move this line below this point. An infinite loop of re-entry can occur into
+            // this method because of calls to getRepository() always doing an init.
             initialized = true;
             try {
                 mongoUtil.createAllIndexes(as);

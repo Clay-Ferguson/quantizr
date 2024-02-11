@@ -168,7 +168,7 @@ public class FileUtils extends ServiceBase {
         if (!directory.isDirectory()) {
             throw new RuntimeEx("Folder doesn't exist: " + folder);
         }
-        /* First read folders and sort them */
+        // First read folders and sort them
         File[] folders = directory.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
@@ -189,7 +189,7 @@ public class FileUtils extends ServiceBase {
         if (!directory.isDirectory()) {
             throw new RuntimeEx("Folder doesn't exist: " + folder);
         }
-        /* Then read files and sort them */
+        // Then read files and sort them
         File[] files = directory.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {

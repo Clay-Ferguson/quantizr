@@ -46,7 +46,7 @@ public class EmailSenderDaemon extends ServiceBase {
                 return;
             }
             runCounter++;
-            /* fail fast if no mail host is configured. */
+            // fail fast if no mail host is configured.
             if (StringUtils.isEmpty(prop.getMailHost())) {
                 if (runCounter < 3) {
                     log.debug("NotificationDaemon is disabled, because no mail server is configured.");
@@ -70,7 +70,7 @@ public class EmailSenderDaemon extends ServiceBase {
         }
     }
 
-    /* Triggers the next cycle to not wait, but process immediately */
+    // Triggers the next cycle to not wait, but process immediately
     public void setOutboxDirty() {
         runCountdown = 0;
     }

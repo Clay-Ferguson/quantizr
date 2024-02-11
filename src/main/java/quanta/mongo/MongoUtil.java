@@ -94,8 +94,10 @@ public class MongoUtil extends ServiceBase {
                     // ${parantPath}/* (that is, we append a slash and then find anything starting with that)
                     delete.deleteUnderPath(ms, parentPath);
                 }
-            } else { // otherwise add to our output results. // NOTE: we can also go ahead and DELETE these orphans as
-                     // found (from the DB)
+            }
+            // otherwise add to our output results. // NOTE: we can also go ahead and DELETE these orphans as
+            // found (from the DB)
+            else {
                 ret.add(node);
             }
         }
@@ -109,11 +111,11 @@ public class MongoUtil extends ServiceBase {
      * scratch.
      */
     public String findAvailablePath(String path) {
-        /*
-         * If the path we want doesn't exist at all we can use it, so check that case first, but only if we
-         * don't have a path ending with slash because that means we KNOW we need to always find a new child
-         * regardless of any existing ones
-         */
+        // If the path we want doesn't exist at all we can use it, so check that case first, but only if
+        // we
+        // don't have a path ending with slash because that means we KNOW we need to always find a new
+        // child
+        // regardless of any existing ones
         if (!path.endsWith("/") && pathIsAvailable(path)) {
             // we must proactively delete any orphaned nodes that might be existing and would be 'ressurected'
             // which would be BAD!
@@ -126,15 +128,12 @@ public class MongoUtil extends ServiceBase {
         int tries = 0;
 
         while (true) {
-            /*
-             * Append one random char to path. Statistically if we keep adding characters it becomes
-             * exponentially more likely we find an unused path.
-             */
+            // Append one random char to path. Statistically if we keep adding characters it becomes
+            // exponentially more likely we find an unused path.
             path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
-            /*
-             * if we encountered two misses, start adding two characters per iteration (at least), because this
-             * node has lots of children
-             */
+            // if we encountered two misses, start adding two characters per iteration (at least), because
+            // this
+            // node has lots of children
             if (tries >= 2) {
                 path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
             }
@@ -161,11 +160,10 @@ public class MongoUtil extends ServiceBase {
 
     public boolean pathIsAvailable(String path) {
         Criteria crit = new Criteria();
-        /*
-         * Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
-         * as an orphan (which can definitely happen) then this path it not available. So even orphaned
-         * nodes can keep us from being able to consider a path 'available for use'
-         */
+        // Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists
+        // even
+        // as an orphan (which can definitely happen) then this path it not available. So even orphaned
+        // nodes can keep us from being able to consider a path 'available for use'
         crit = crit.orOperator( //
                 Criteria.where(SubNode.PATH).is(path), //
                 Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
@@ -178,10 +176,8 @@ public class MongoUtil extends ServiceBase {
      * nodes from user to user, etc) without first having to manually register users.
      */
     public void createTestAccounts() {
-        /*
-         * The testUserAccounts is a comma delimited list of user accounts where each user account is a
-         * colon-delimited list like username:password:email.
-         */
+        // The testUserAccounts is a comma delimited list of user accounts where each user account is a
+        // colon-delimited list like username:password:email.
         final List<String> testUserAccountsList = XString.tokenize(prop.getTestUserAccounts(), ",", true);
         if (testUserAccountsList == null) {
             return;
@@ -206,10 +202,8 @@ public class MongoUtil extends ServiceBase {
                 } else {
                     log.debug("account exists: " + userName);
                 }
-                /*
-                 * keep track of these names, because some API methods need to know if a given account is a test
-                 * account
-                 */
+                // keep track of these names, because some API methods need to know if a given account is a test
+                // account
                 testAccountNames.add(userName);
             }
             update.saveSession(as);
@@ -268,10 +262,10 @@ public class MongoUtil extends ServiceBase {
         // if (nodesProcessed.getVal() % 1000 == 0) {
         // }
         // // /*
-        // // * NOTE: MongoEventListener#onBeforeSave runs in here, which is where some
+        // // NOTE: MongoEventListener#onBeforeSave runs in here, which is where some
         // of
-        // // * the workload is done that pertains ot this reSave process
-        // // */
+        // // the workload is done that pertains ot this reSave process
+        // ///
         // save(session, node, true, false);
         // });
     }
@@ -457,11 +451,10 @@ public class MongoUtil extends ServiceBase {
         createPartialIndex(ms, "rdf-i", SubNode.class, SubNode.LINKS + "." + NodeLink.ID);
         createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),
                 NodeType.ACCOUNT.s());
-        /*
-         * DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations prior
-         * to adding some new constraint. And this one was for making sure the "UniqueFriends" Index could
-         * be built ok. You can't create such an index until violations of it are already removed.
-         */
+        // DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations
+        // prior
+        // to adding some new constraint. And this one was for making sure the "UniqueFriends" Index could
+        // be built ok. You can't create such an index until violations of it are already removed.
         // delete.removeFriendConstraintViolations(ms);
         createUniqueFriendsIndex(ms);
         createUniqueNodeNameIndex(ms);
@@ -469,10 +462,9 @@ public class MongoUtil extends ServiceBase {
         // I had done this temporarily to fix a constraint violation
         // dropIndex(ms, SubNode.class, "unique-friends");
         // dropIndex(ms, SubNode.class, "unique-node-name");
-        /*
-         * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
-         * user. That is, prefixed by their username followed by two dashes.
-         */
+        // NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of
+        // the
+        // user. That is, prefixed by their username followed by two dashes.
         createIndex(ms, SubNode.class, SubNode.NAME);
         createIndex(ms, SubNode.class, SubNode.TYPE);
         createIndex(ms, SubNode.class, SubNode.OWNER);
@@ -616,7 +608,6 @@ public class MongoUtil extends ServiceBase {
             opsw.indexOps(clazz).ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of( //
-                            //
                             Criteria.where(SubNode.TYPE).is(type).and(property).exists(true))));
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + name, e);
@@ -671,8 +662,8 @@ public class MongoUtil extends ServiceBase {
     // /* If mongo will not allow dupliate checks of a text index, i can simply take
     // a HASH of the
     // content text, and enforce that's unique
-    // * and while i'm at it secondarily use it as a corruption check.
-    // */
+    // and while i'm at it secondarily use it as a corruption check.
+    ///
     // /* todo-2: haven't yet run my test case that verifies duplicate tree paths
     // are indeed
     // rejected */
@@ -805,10 +796,8 @@ public class MongoUtil extends ServiceBase {
             adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
             adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
             update.save(ms, adminNode);
-            /*
-             * If we just created this user we know the session object here won't have the adminNode id in it
-             * yet and it needs to for all subsequent operations.
-             */
+            // If we just created this user we know the session object here won't have the adminNode id in it
+            // yet and it needs to for all subsequent operations.
             ms.setUserNodeId(adminNode.getId());
         }
         allUsersRootNode =

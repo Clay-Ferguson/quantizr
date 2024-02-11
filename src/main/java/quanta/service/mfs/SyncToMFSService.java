@@ -60,10 +60,8 @@ public class SyncToMFSService extends ServiceBase {
             auth.ownerAuth(ms, node);
             // Get all public nodes under the subgraph
             Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true, true, null);
-            /*
-             * process the root node then all subgraph nodes, which will write the JSON of each node to an MFS
-             * file, and add the generated filenames of all files to the 'allNodePaths' set.
-             */
+            // process the root node then all subgraph nodes, which will write the JSON of each node to an MFS
+            // file, and add the generated filenames of all files to the 'allNodePaths' set.
             processNode(node);
 
             for (SubNode n : results) {
@@ -73,10 +71,8 @@ public class SyncToMFSService extends ServiceBase {
             ipfsFiles.flushFiles(node.getPath());
             // collects all paths into allFilePaths, and deletes any empty dirs as they're encounterd
             ipfsFiles.traverseDir(node.getPath(), allFilePaths, true);
-            /*
-             * Now with 'allFilePaths' and 'allNodePaths' we can remove any orphaned MFS files, and this will
-             * result in the MFS files now being perfectly in sync with the Quanta Nodes
-             */
+            // Now with 'allFilePaths' and 'allNodePaths' we can remove any orphaned MFS files, and this will
+            // result in the MFS files now being perfectly in sync with the Quanta Nodes
             removeOrphanFiles();
             // Now we can get the IPFS CID of the root and save it on a property on the root of the node we just
             // saved to MFS.
@@ -103,15 +99,16 @@ public class SyncToMFSService extends ServiceBase {
     /* Remove orphans from the MFS file system, to sync up with the Quanta DB tree */
     private void removeOrphanFiles() {
         allFilePaths.forEach(path -> {
-            /*
-             * if any file path is not a node path, it needes to be deleted.
-             *
-             * todo-2: this will run more efficiently if we put path values into a list and then sort that list
-             * ascending by the length of the string, so any parent folders are guaranteed to get deleted before
-             * any of their subfolders (as a convenient consequence of children having to have longer paths than
-             * their parents!) are encountered, and we run therefore the minimal number of deletes required to
-             * accomplish this in every case!
-             */
+            // if any file path is not a node path, it needes to be deleted.
+            //
+            // todo-2: this will run more efficiently if we put path values into a list and then sort that
+            // list
+            // ascending by the length of the string, so any parent folders are guaranteed to get deleted
+            // before
+            // any of their subfolders (as a convenient consequence of children having to have longer paths
+            // than
+            // their parents!) are encountered, and we run therefore the minimal number of deletes required to
+            // accomplish this in every case!
             if (!allNodePaths.contains(path)) {
                 try {
                     // to delete the files we really just delete it's parent folder instead, because
@@ -125,23 +122,20 @@ public class SyncToMFSService extends ServiceBase {
                 }
             }
         });
-        /*
-         * I'm expecting this to fail when it attempts to delete any subfolders under folders that were
-         * already deleted because we may have just deleted their parents already in this same loop so...
-         *
-         * todo-2: when we delete a folder, scan for all other folders that have that matching prefix and
-         * remove them too, because there's no need to call deleteFile on those.
-         */
+        // I'm expecting this to fail when it attempts to delete any subfolders under folders that were
+        // already deleted because we may have just deleted their parents already in this same loop so...
+        //
+        // todo-2: when we delete a folder, scan for all other folders that have that matching prefix and
+        // remove them too, because there's no need to call deleteFile on those.
     }
 
     private void processNode(SubNode node) {
         // todo-2: This should eventually be unnecessary but for now we need it.
         snUtil.removeDefaultProps(node);
         snUtil.removeUnwantedPropsForIPFS(node);
-        /*
-         * todo-2: this and other places needs to generate canonical JSON (basically just sorted properties
-         * ?) using this??
-         */
+        // todo-2: this and other places needs to generate canonical JSON (basically just sorted
+        // properties
+        // ?) using this??
         // objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         // objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         String json = XString.prettyPrint(node);

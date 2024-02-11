@@ -38,11 +38,9 @@ public class ImportService extends ServiceBase {
                     + node.getPath());
         }
 
-        /*
-         * It's important to be sure there are absolutely no orphans at any level under this branch of the
-         * tree, so even though the check above told us there are no direct children we still need to run
-         * this recursive delete.
-         */
+        // It's important to be sure there are absolutely no orphans at any level under this branch of the
+        // tree, so even though the check above told us there are no direct children we still need to run
+        // this recursive delete.
         delete.deleteUnderPath(ms, node.getPath());
         if (uploadFiles.length != 1) {
             throw ExUtil.wrapEx("Multiple file import not allowed");

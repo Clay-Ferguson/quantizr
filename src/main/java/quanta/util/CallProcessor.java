@@ -39,23 +39,22 @@ public class CallProcessor extends ServiceBase {
             user.authBearer();
         }
 
-        /*
-         * #sig: this works fine, but I'm disabling for now (except for admin) until there's a better way to
-         * inform the user that this can happen when their key on their browser is different than expected,
-         * which CAN even happen simply from using a different browser that hasn't had the signature key
-         * imported into it. And also all the flow around how this can be encountered during login/logout
-         * needs to be tested and more well thought out.
-         */
+        // #sig: this works fine, but I'm disabling for now (except for admin) until there's a better way
+        // to
+        // inform the user that this can happen when their key on their browser is different than
+        // expected,
+        // which CAN even happen simply from using a different browser that hasn't had the signature key
+        // imported into it. And also all the flow around how this can be encountered during login/logout
+        // needs to be tested and more well thought out.
         if (authSig && sc.isAdmin()) {
             crypto.authSig();
         }
 
         logRequest(command, req, httpSession);
-        /*
-         * Instantiating this, runs its constructor and ensures our threadlocal at least has response object
-         * on it, but most (not all) implementations of methods end up instantiating their own which
-         * overwrites this
-         */
+        // Instantiating this, runs its constructor and ensures our threadlocal at least has response
+        // object
+        // on it, but most (not all) implementations of methods end up instantiating their own which
+        // overwrites this
         ResponseBase orb = new ResponseBase();
         Object ret = null;
         long startTime = System.currentTimeMillis();
@@ -119,7 +118,7 @@ public class CallProcessor extends ServiceBase {
 
         // If this is an error condition and there's no message set then set one.
         if (code != HttpServletResponse.SC_OK || e != null) {
-            /* only set a message if one is not already set */
+            // only set a message if one is not already set
             if (StringUtils.isEmpty(orb.getMessage())) {
                 // if it's an exception and the exception has ap message, show that message
                 if (e != null && e.getMessage() != null) {

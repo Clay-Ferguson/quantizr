@@ -62,15 +62,11 @@ public class IPFSService extends ServiceBase {
     public final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
     public LinkedHashMap<String, Object> instanceId = null;
     Object instanceIdLock = new Object();
-    /*
-     * originally this was 'data-endcoding' (or at least i got that from somewhere), but now their
-     * example page seems to show 'encoding' is the name here.
-     */
+    // originally this was 'data-endcoding' (or at least i got that from somewhere), but now their
+    // example page seems to show 'encoding' is the name here.
     public String ENCODING_PARAM_NAME = "encoding";
-    /*
-     * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
-     * instance ever
-     */
+    // RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
+    // instance ever
     public final RestTemplate restTemplate = new RestTemplate();
     public final RestTemplate restTemplateNoTimeout = new RestTemplate();
 
@@ -79,7 +75,7 @@ public class IPFSService extends ServiceBase {
         API_ID = prop.getIPFSApiBase() + "/id";
     }
 
-    /* On regular interval forget which CIDs have failed and allow them to be retried */
+    // On regular interval forget which CIDs have failed and allow them to be retried
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
         if (!initComplete && !MongoRepository.fullInit)
@@ -98,7 +94,7 @@ public class IPFSService extends ServiceBase {
         }
     }
 
-    /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
+    // Ensures this node's attachment is saved to IPFS and returns the CID of it
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         checkIpfs();
         // todo-2: this is not yet handling multiple images. It's ok IPFS is on the back burner right now.
@@ -278,11 +274,10 @@ public class IPFSService extends ServiceBase {
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
         try {
-            /*
-             * To set contentType and contentLength here we'd need to read the entire stream into byte array and
-             * get that info, and then use the byte array to stream the result. For now things seem to work
-             * without us holding it all in memory which is ideal
-             */
+            // To set contentType and contentLength here we'd need to read the entire stream into byte array
+            // and
+            // get that info, and then use the byte array to stream the result. For now things seem to work
+            // without us holding it all in memory which is ideal
             // response.setContentType(mimeTypeProp);
             // response.setContentLength((int) size);
             response.setHeader("Cache-Control", "public, max-age=31536000");
@@ -411,7 +406,7 @@ public class IPFSService extends ServiceBase {
                     throw new RuntimeException("Unable to find owner node.");
                 }
                 String pathBase = "/" + userNodeId;
-                // **** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files,
+                // *** DO NOT DELETE *** (this code works and is how we could use the 'path' to store our files,
                 // for a tree on a user's MFS area
                 // but what we do instead is take the NAME of the node, and use that is the filename, and write
                 // directly into '[user]/posts/[name]' loation
@@ -472,10 +467,8 @@ public class IPFSService extends ServiceBase {
             int orphanCount = 0;
             LinkedHashMap<String, Object> pins = toLinkedHashMap(ipfsPin.getPins());
             if (pins != null) {
-                /*
-                 * For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
-                 * if not we remove the pin
-                 */
+                // For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
+                // if not we remove the pin
                 for (String pin : pins.keySet()) {
                     log.debug("Check PIN: " + pin);
                     boolean attachment = false;
@@ -484,12 +477,10 @@ public class IPFSService extends ServiceBase {
 
                     // if there was no IPFS_LINK using this pin, then check to see if any node has the SubNode.CID
                     if (ipfsNode != null) {
-                        /*
-                         * ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear in
-                         * the pinning system. // are // to pin it ever, so for now I'm leaving this code here, but we
-                         * don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no
-                         * matter what, so we don't need
-                         */
+                        // ipfsNode = read.findByCID(as, pin); // 'backing' the MFS file storage don't even appear in
+                        // the pinning system. // are // to pin it ever, so for now I'm leaving this code here, but we
+                        // don't need it, and the CIDs that // turns out MFS stuff will never be Garbage Collected, no
+                        // matter what, so we don't need
                         attachment = true;
                         pinCount++;
                         log.debug("Found CID" + (attachment ? "(att)" : "") + " nodeId=" + ipfsNode.getIdStr());
@@ -500,12 +491,11 @@ public class IPFSService extends ServiceBase {
                                 // an call objectStat to put correct amount in.
                                 binSize = 0L;
                             }
-                            /*
-                             * Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could
-                             * be more aggressive about 'correctness' here and actually call ipfs.objectStat on each
-                             * CID, to get a more bullet proof total bytes amount, but we are safe enough trusting what
-                             * the node info holds, because it should be correct.
-                             */
+                            // Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could
+                            // be more aggressive about 'correctness' here and actually call ipfs.objectStat on each
+                            // CID, to get a more bullet proof total bytes amount, but we are safe enough trusting
+                            // what
+                            // the node info holds, because it should be correct.
                             UserStats stats = statsMap.get(ipfsNode.getOwner());
                             if (stats == null) {
                                 stats = new UserStats();

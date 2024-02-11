@@ -124,7 +124,7 @@ public class PerformanceReport {
         int totalCount;
     }
 
-    /* This is the most 'powerful/useful' feature, because it displays time usage for each category */
+    // This is the most 'powerful/useful' feature, because it displays time usage for each category
     public static String getTimesPerCategory() {
         HashMap<String, MethodStat> stats = new HashMap<>();
 
@@ -149,7 +149,7 @@ public class PerformanceReport {
         return htmlH(3, "Times Per Category") + htmlTable(table);
     }
 
-    /* returns as an HTML Row (user, event, rootEvent, eventId */
+    // returns as an HTML Row (user, event, rootEvent, eventId
     public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean isSubItem) {
         String tr = "";
         // too verbose, keeping this capability turned off for now.)

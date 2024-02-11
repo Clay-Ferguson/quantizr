@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RedisBrowserPushInfo extends RedisObj {
-
     // 'token' is login token for login session that is the recipient of 'info'
     private String token;
     private String type; // payload type

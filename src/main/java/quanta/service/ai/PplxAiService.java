@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
-import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatMessage;
@@ -81,11 +80,10 @@ public class PplxAiService extends ServiceBase {
         log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        /*
-         * Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request' here
-         * instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-         * fails, but it does fail.
-         */
+        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
+        // here
+        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
+        // fails, but it does fail.
         Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
                 .retrieve().bodyToMono(ChatCompletionResponse.class);
 

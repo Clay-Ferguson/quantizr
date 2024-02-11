@@ -105,14 +105,12 @@ public class NodeEditService extends ServiceBase {
         node.setAttachments(req.getNode().getAttachments());
         attach.fixAllAttachmentMimes(node);
         node.setLinks(req.getNode().getLinks());
-        /*
-         * The only purpose of this limit is to stop hackers from using up lots of space, because our only
-         * current quota is on attachment file size uploads
-         */
+        // The only purpose of this limit is to stop hackers from using up lots of space, because our only
+        // current quota is on attachment file size uploads
         if (nodeInfo.getContent() != null && nodeInfo.getContent().length() > 64 * 1024) {
             throw new RuntimeEx("Max text length is 64K");
         }
-        /* If current content exists content is being edited reset likes */
+        // If current content exists content is being edited reset likes
         if (node.getContent() != null && node.getContent().trim().length() > 0
                 && !Util.equalObjs(node.getContent(), nodeInfo.getContent())) {
             node.setLikes(null);
@@ -122,9 +120,7 @@ public class NodeEditService extends ServiceBase {
         node.touch();
         node.setType(nodeInfo.getType());
 
-        /*
-         * if node name is empty or not valid (canot have ":" in the name) set it to null quietly
-         */
+        // if node name is empty or not valid (canot have ":" in the name) set it to null quietly
         if (StringUtils.isEmpty(nodeInfo.getName())) {
             node.setName(null);
         } //
@@ -163,11 +159,9 @@ public class NodeEditService extends ServiceBase {
                 if ("[null]".equals(property.getValue())) {
                     node.delete(property.getName());
                 } else {
-                    /*
-                     * save only if server determines the property is savable. Just protection. Client shouldn't be
-                     * trying to save stuff that is illegal to save, but we have to assume the worst behavior from
-                     * client code, for security and robustness.
-                     */
+                    // save only if server determines the property is savable. Just protection. Client shouldn't be
+                    // trying to save stuff that is illegal to save, but we have to assume the worst behavior from
+                    // client code, for security and robustness.
                     if (ms.isAdmin() || SubNodeUtil.isReadonlyProp(property.getName())) {
                         node.set(property.getName(), property.getValue());
                     } else {
@@ -189,10 +183,9 @@ public class NodeEditService extends ServiceBase {
             res.setAclEntries(auth.getAclEntries(ms, node));
         }
         ipfsPin.pinLocalIpfsAttachments(node);
-        /*
-         * If the node being saved is currently in the pending area /p/ then we publish it now, and move it
-         * out of pending.
-         */
+        // If the node being saved is currently in the pending area /p/ then we publish it now, and move
+        // it
+        // out of pending.
         mongoUtil.setPendingPath(node, false);
         // todo-2: for now only admin user is REQUIRED to have signed nodes.
         if (prop.isRequireCrypto() && ms.isAdmin()) {
@@ -211,9 +204,7 @@ public class NodeEditService extends ServiceBase {
         if (parent != null) {
             parent.setHasChildren(true);
         }
-        /*
-         * Send notification to local server or to remote server when a node is added (and not by admin)
-         */
+        // Send notification to local server or to remote server when a node is added (and not by admin)
         if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
             processAfterSave(ms, node, parent);
         }
@@ -295,27 +286,22 @@ public class NodeEditService extends ServiceBase {
         auth.ownerAuth(ms, node);
         String content = node.getContent();
         boolean containsDelim = content.contains(req.getDelimiter());
-        /*
-         * If split will have no effect, just return as if successful.
-         */
+        // If split will have no effect, just return as if successful.
         if (!containsDelim) {
             return res;
         }
         String[] contentParts = StringUtils.splitByWholeSeparator(content, req.getDelimiter());
         SubNode parentForNewNodes = null;
         long firstOrdinal = 0;
-        /*
-         * When inserting inline all nodes go in right where the original node is, in order below it as
-         * siblings
-         */
+        // When inserting inline all nodes go in right where the original node is, in order below it as
+        // siblings
         if (req.getSplitType().equalsIgnoreCase("inline")) {
             parentForNewNodes = parentNode;
             firstOrdinal = node.getOrdinal();
         }
-        /*
-         * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
-         * the top (ordinal), regardless of whether this node already has any children or not.
-         */
+        // but for a 'child' insert all new nodes are inserted as children of the original node, starting
+        // at
+        // the top (ordinal), regardless of whether this node already has any children or not.
         else {
             parentForNewNodes = node;
             firstOrdinal = 0L;
@@ -424,10 +410,8 @@ public class NodeEditService extends ServiceBase {
                 if (spaceIdx != -1) {
                     // strip the pre-existing hashes off
                     content = content.substring(spaceIdx + 1);
-                    /*
-                     * These strings (pound sign headings) could be generated dynamically, but this switch with them
-                     * hardcoded is more performant
-                     */
+                    // These strings (pound sign headings) could be generated dynamically, but this switch with them
+                    // hardcoded is more performant
                     switch (level) {
                         case 0:
                             // special case for a markdown file root node we want the first line to be bold, instead of
@@ -557,10 +541,8 @@ public class NodeEditService extends ServiceBase {
         InitNodeEditResponse res = new InitNodeEditResponse();
         String nodeId = req.getNodeId();
 
-        /*
-         * IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
-         * wanting to edit his Friend node representing this user.
-         */
+        // IF EDITING A FRIEND NODE: If 'nodeId' is the Admin-Owned user account node, and this user it
+        // wanting to edit his Friend node representing this user.
         if (req.getEditMyFriendNode()) {
             String _nodeId = nodeId;
             nodeId = arun.run(as -> {

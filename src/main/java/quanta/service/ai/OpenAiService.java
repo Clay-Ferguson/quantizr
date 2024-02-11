@@ -228,7 +228,7 @@ public class OpenAiService extends ServiceBase {
             system.setModel(OPENAI_MODEL_COMPLETION);
         }
 
-        /* Moderate Call before submitting */
+        // Moderate Call before submitting
         String contentToModerate = concatenateContent(messages);
 
         ChatGPTModerationRequest modRequest = new ChatGPTModerationRequest(contentToModerate);
@@ -252,23 +252,21 @@ public class OpenAiService extends ServiceBase {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
-        /*
-         * Without maxTokens we get comically short answers (like not even the complete first sentence of
-         * the response, but a sentence frament), so I'm not sure what to do about if or how end users
-         * should be able to tweak this. Before switching to gpt-4 vision we were getting sensible response
-         * lengths without having to provide a maxTokens value
-         */
+        // Without maxTokens we get comically short answers (like not even the complete first sentence of
+        // the response, but a sentence frament), so I'm not sure what to do about if or how end users
+        // should be able to tweak this. Before switching to gpt-4 vision we were getting sensible
+        // response
+        // lengths without having to provide a maxTokens value
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), 2000);
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        /*
-         * Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request' here
-         * instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-         * fails, but it does fail.
-         */
+        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
+        // here
+        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
+        // fails, but it does fail.
         Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
                 .retrieve().bodyToMono(ChatCompletionResponse.class);
 

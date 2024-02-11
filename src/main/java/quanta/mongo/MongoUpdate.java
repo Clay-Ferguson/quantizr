@@ -99,16 +99,12 @@ public class MongoUpdate extends ServiceBase {
                         }
                     });
 
-                    /*
-                     * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
-                     * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
-                     * loop below because we're iterating over dirtyNodes.
-                     */
+                    // We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
+                    // node will have the side effect of removing it from dirtyNodes, and that can't happen during the
+                    // loop below because we're iterating over dirtyNodes.
                     List<SubNode> nodes = new LinkedList<>();
 
-                    /*
-                     * check that we are allowed to write all, before we start writing any
-                     */
+                    // check that we are allowed to write all, before we start writing any
                     for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
                         try {
                             auth.ownerAuth(ms, node);

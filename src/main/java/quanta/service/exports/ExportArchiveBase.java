@@ -52,13 +52,14 @@ public abstract class ExportArchiveBase extends ServiceBase {
     ExportRequest req;
     int baseSlashCount = 0;
 
-    /*
-     * This master toc works great, but it's a bit confusing having toc type info on each page AND in a
-     * single file because then there's more than just one obvious 'page flow' to get to any content.
-     * Also if we bring this back we probably need some way to make nodes that have child nodes that are
-     * all file be excluded from the master index because again it just kind of creates a confusing flow
-     * for the user
-     */
+    // This master toc works great, but it's a bit confusing having toc type info on each page AND in
+    // a
+    // single file because then there's more than just one obvious 'page flow' to get to any content.
+    // Also if we bring this back we probably need some way to make nodes that have child nodes that
+    // are
+    // all file be excluded from the master index because again it just kind of creates a confusing
+    // flow
+    // for the user
     boolean useMasterToc = false;
 
     // warnings and issues will be written to 'problems.txt' if there were any issues with the export
@@ -96,10 +97,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    /*
-     * It's possible that nodes recursively contained under a given node can have same name, so we have
-     * to detect that and number them, so we use this hashset to detect existing filenames.
-     */
+    // It's possible that nodes recursively contained under a given node can have same name, so we
+    // have
+    // to detect that and number them, so we use this hashset to detect existing filenames.
     private final HashSet<String> fileNameSet = new HashSet<>();
     private MongoSession session;
     private StringBuilder fullHtml = new StringBuilder();
@@ -331,11 +331,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
             markdownFilesByNodeName.put(node.getName(), mdFile);
         }
 
-        /* process the current node */
+        // process the current node
         Val<String> fileName = new Val<>();
-        /*
-         * This is the header row at the top of the page. The rest of the page is children of this node
-         */
+        // This is the header row at the top of the page. The rest of the page is children of this node
         processNodeExport(session, parentFolder, "", node, true, fileName, level, true);
         String folder = node.getIdStr();
 
@@ -610,9 +608,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private String getNodeJson(SubNode node) {
         String json;
-        /*
-         * Pretty print the node having the relative path, and then restore the node to the full path
-         */
+        // Pretty print the node having the relative path, and then restore the node to the full path
         String fullPath = node.getPath();
         String relPath = fullPath.substring(rootPathParent.length());
         try {
@@ -652,10 +648,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
             ext = "." + ext;
         }
 
-        /*
-         * If we had a binary property on this node we write the binary file into a separate file, but for
-         * ipfs links we do NOT do this
-         */
+        // If we had a binary property on this node we write the binary file into a separate file, but for
+        // ipfs links we do NOT do this
         if (att.getMime() != null) {
             InputStream is = null;
             try {
@@ -680,14 +674,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
 
                 if (length > 0) {
-                    /* NOTE: the archive WILL fail if no length exists in this codepath */
+                    // NOTE: the archive WILL fail if no length exists in this codepath
                     addFileEntry(binFileName, bis, length);
                 } else {
-                    /*
-                     * This *should* never happen that we fall back to writing as an array from the input stream because
-                     * normally we will always have the length saved on the node. But re are trying to be as resilient
-                     * as possible here falling back to this rather than failing the entire export
-                     */
+                    // This *should* never happen that we fall back to writing as an array from the input stream
+                    // because
+                    // normally we will always have the length saved on the node. But re are trying to be as resilient
+                    // as possible here falling back to this rather than failing the entire export
                     addFileEntry(binFileName, IOUtils.toByteArray(bis));
                 }
             } catch (Exception e) {
@@ -834,9 +827,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void addFileEntry(String fileName, byte[] bytes) {
-        /*
-         * If we have duplicated a filename, number it sequentially to create a unique file
-         */
+        // If we have duplicated a filename, number it sequentially to create a unique file
         if (fileNameSet.contains(fileName)) {
             int idx = 1;
             String numberedFileName = fileName + String.valueOf(idx);
@@ -854,9 +845,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (length <= 0) {
             throw new RuntimeEx("length is required");
         }
-        /*
-         * If we have duplicated a filename, number it sequentially to create a unique file
-         */
+        // If we have duplicated a filename, number it sequentially to create a unique file
         if (fileNameSet.contains(fileName)) {
             int idx = 1;
             String numberedFileName = fileName + String.valueOf(idx);

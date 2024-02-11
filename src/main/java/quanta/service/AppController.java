@@ -147,7 +147,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping({"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
     public String index( //
             // =======================================================================================
-            /* PATH PARAMS */
+            // PATH PARAMS
             // node name on 'admin' account. Non-admin named nodes use url
             // "/u/userName/nodeName"
             @PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode, //
@@ -155,7 +155,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @PathVariable(value = "userName", required = false) String userName, //
             //
             // =======================================================================================
-            /* REQUEST PARAMS */
+            // REQUEST PARAMS
             @RequestParam(value = "id", required = false) String id, //
             @RequestParam(value = "refNodeId", required = false) String refNodeId, //
             @RequestParam(value = "search", required = false) String search, //
@@ -585,18 +585,15 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
     public void getBinary(@PathVariable("binId") String binId,
             @RequestParam(value = "nodeId", required = false) String nodeId,
-            /*
-             * In the file exports where this is appended, we could have appended just nodeId and it would also
-             * work but be a bit slower as that would look up the node rather than streaming straight out of
-             * IPFS.
-             */
+            // In the file exports where this is appended, we could have appended just nodeId and it would
+            // also
+            // work but be a bit slower as that would look up the node rather than streaming straight out of
+            // IPFS.
             @RequestParam(value = "cid", required = false) String ipfsCid, //
-            /*
-             * The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
-             * it's generated from HTML intermediate file what has all the links in it for accessing binary
-             * content, and as the PDF is being generated calls are made to this endpoint for each image, or
-             * other file so we use the token to auth the request
-             */
+            // The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
+            // it's generated from HTML intermediate file what has all the links in it for accessing binary
+            // content, and as the PDF is being generated calls are made to this endpoint for each image, or
+            // other file so we use the token to auth the request
             @RequestParam(value = "token", required = false) String token,
             @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {

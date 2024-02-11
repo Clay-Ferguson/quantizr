@@ -140,11 +140,9 @@ public class AttachmentService extends ServiceBase {
         }
 
         try {
-            /*
-             * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
-             * UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
-             * which will be even more strict.
-             */
+            // NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
+            // UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
+            // which will be even more strict.
             boolean allowEmailParse = false;
             SubNode node = read.getNode(ms, nodeId, false, null);
             if (node == null) {
@@ -154,13 +152,13 @@ public class AttachmentService extends ServiceBase {
             long maxFileSize = user.getUserStorageRemaining(ms);
             int imageCount = 0;
 
-            /*
-             * if uploading multiple files check quota first, to make sure there's space for all files before we
-             * start uploading any of them If there's only one file, the normal flow will catch an out of space
-             * problem, so we don't need to do it in advance in here as we do for multiple file uploads only.
-             *
-             * Also we only do this check if not admin. Admin can upload unlimited amounts.
-             */
+            // if uploading multiple files check quota first, to make sure there's space for all files before
+            // we
+            // start uploading any of them If there's only one file, the normal flow will catch an out of
+            // space
+            // problem, so we don't need to do it in advance in here as we do for multiple file uploads only.
+            //
+            // Also we only do this check if not admin. Admin can upload unlimited amounts.
             if (!ms.isAdmin() && files.length > 1) {
                 SubNode userNode = read.getAccountByUserName(null, null, false);
                 // get how many bytes of storage the user currently holds
@@ -221,14 +219,12 @@ public class AttachmentService extends ServiceBase {
             String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
             boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
             String sourceUrl, boolean allowEmailParse, String aiPrompt) {
-        /*
-         * If caller already has 'node' it can pass node, and avoid looking up node again
-         */
+        // If caller already has 'node' it can pass node, and avoid looking up node again
         if (node == null && nodeId != null) {
             node = read.getNode(ms, nodeId);
         }
         auth.ownerAuth(ms, node);
-        /* mimeType can be passed as null if it's not yet determined */
+        // mimeType can be passed as null if it's not yet determined
         if (mimeType == null) {
             mimeType = Util.getMimeFromFileType(fileName);
         }
@@ -239,9 +235,7 @@ public class AttachmentService extends ServiceBase {
             update.save(ms, node);
         } //
         else if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
-            /*
-             * This is a prototype-scope bean, with state for processing one import at a time
-             */
+            // This is a prototype-scope bean, with state for processing one import at a time
             ImportZipService importSvc = (ImportZipService) context.getBean(ImportZipService.class);
             importSvc.importFromStream(ms, is, node, false);
         } //
@@ -273,10 +267,8 @@ public class AttachmentService extends ServiceBase {
             LimitedInputStreamEx inputStream, String mimeType, String fileName, long size, int width, int height,
             SubNode node, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
             String sourceUrl, String aiPrompt) {
-        /*
-         * NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
-         * everything EXCEPT calculate the image size
-         */
+        // NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
+        // everything EXCEPT calculate the image size
         BufferedImage bufImg = null;
         byte[] imageBytes = null;
         InputStream isTemp = null;
@@ -317,10 +309,8 @@ public class AttachmentService extends ServiceBase {
                         att.setWidth(bufImg.getWidth());
                         att.setHeight(bufImg.getHeight());
                     } catch (Exception e) {
-                        /*
-                         * reading files from IPFS caused this exception, and I didn't investigate why yet, because I
-                         * don't think it's a bug in my code, but something in IPFS.
-                         */
+                        // reading files from IPFS caused this exception, and I didn't investigate why yet, because I
+                        // don't think it's a bug in my code, but something in IPFS.
                         log.error("Failed to get image length.", e);
                     }
                 } catch (Exception e) {
@@ -387,7 +377,7 @@ public class AttachmentService extends ServiceBase {
         return "img" + String.valueOf(imgIdx);
     }
 
-    /* appends all the attachments from sourceNode onto targetNode, leaving targetNode as is */
+    // appends all the attachments from sourceNode onto targetNode, leaving targetNode as is
     public void mergeAttachments(SubNode sourceNode, SubNode targetNode) {
         if (sourceNode == null || targetNode == null)
             return;
@@ -508,28 +498,27 @@ public class AttachmentService extends ServiceBase {
             }
             long size = att.getSize();
             response.setContentType(mimeTypeProp);
-            /*
-             * we gracefully tolerate the case where no size is available but normally it will be there.
-             *
-             * todo-2: when we detect this and then stream back some data should be just go ahead and SET the
-             * correct 'size' on the node at that point?
-             */
+            // we gracefully tolerate the case where no size is available but normally it will be there.
+            //
+            // todo-2: when we detect this and then stream back some data should be just go ahead and SET the
+            // correct 'size' on the node at that point?
             if (size > 0) {
-                /*
-                 * todo-2: I'm getting the "disappearing image" (from the browser) network problem related to size
-                 * (content length), but not calling 'contentLength()' below is a workaround.
-                 *
-                 * You get this error if you just wait about 30s to 1 minute, and maybe scroll out of view and back
-                 * into view the images. What happens is the image loads just fine but then some background thread
-                 * in Chrome looks at content lengths and finds some thing off somehoe and decides to make the image
-                 * just disappear and show a broken link icon instead.
-                 *
-                 * SO... I keep having to come back and remove the setContentLength every time I think this problem
-                 * is resolved and then later find out it isn't. Somehow this is *currently* only happening for
-                 * images that are served up from IPFS storage.
-                 *
-                 * Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
-                 */
+                // todo-2: I'm getting the "disappearing image" (from the browser) network problem related to size
+                // (content length), but not calling 'contentLength()' below is a workaround.
+                //
+                // You get this error if you just wait about 30s to 1 minute, and maybe scroll out of view and
+                // back
+                // into view the images. What happens is the image loads just fine but then some background thread
+                // in Chrome looks at content lengths and finds some thing off somehoe and decides to make the
+                // image
+                // just disappear and show a broken link icon instead.
+                //
+                // SO... I keep having to come back and remove the setContentLength every time I think this
+                // problem
+                // is resolved and then later find out it isn't. Somehow this is *currently* only happening for
+                // images that are served up from IPFS storage.
+                //
+                // Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
                 if (!ipfs) {
                     response.setContentLength((int) size);
                 }
@@ -606,16 +595,12 @@ public class AttachmentService extends ServiceBase {
             if (disposition == null) {
                 disposition = "inline";
             }
-            /*
-             * I think we could be using the MultipartFileSender here, eventually but not until we decople it
-             * from reading directly from filesystem
-             */
+            // I think we could be using the MultipartFileSender here, eventually but not until we decople it
+            // from reading directly from filesystem
             AutoCloseInputStream acis = new AutoCloseInputStream(new FileInputStream(fullFileName));
-            /*
-             * I'm not sure if FileSystemResource is better than StreamingResponseBody, but i do know
-             * StreamingResponseBody does EXACTLY what is needed which is to use a small buffer size and never
-             * hold entire media file all in memory
-             */
+            // I'm not sure if FileSystemResource is better than StreamingResponseBody, but i do know
+            // StreamingResponseBody does EXACTLY what is needed which is to use a small buffer size and never
+            // hold entire media file all in memory
             StreamingResponseBody stream = os -> {
                 IOUtils.copy(acis, os);
                 os.flush();
@@ -667,10 +652,9 @@ public class AttachmentService extends ServiceBase {
     }
 
     private ResourceRegion resourceRegion(Resource resource, HttpHeaders headers) throws IOException {
-        /*
-         * todo-2: Will a smaller chunk size be better to get the video playing sooner after first clicked,
-         * or will it do that at the cost of less overall resource effeciency? Need to research
-         */
+        // todo-2: Will a smaller chunk size be better to get the video playing sooner after first
+        // clicked,
+        // or will it do that at the cost of less overall resource effeciency? Need to research
         long chunkSize = 500000L;
         long contentLength = resource.contentLength();
         HttpRange httpRange = headers.getRange().stream().findFirst().get();
@@ -780,10 +764,8 @@ public class AttachmentService extends ServiceBase {
         try {
             URL url = new URL(sourceUrl);
             int timeout = 20;
-            /*
-             * if this is an image extension, handle it in a special way, mainly to extract the width, height
-             * from it
-             */
+            // if this is an image extension, handle it in a special way, mainly to extract the width, height
+            // from it
             if (ImageUtil.isImageMime(mimeType)) {
                 limitedIs = StreamUtil.getLimitedStream(sourceUrl, timeout, maxFileSize);
 
@@ -791,11 +773,9 @@ public class AttachmentService extends ServiceBase {
                 attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
                         false, false, true, true, storeLocally, sourceUrl, false, aiPrompt);
             }
-            /*
-             * if not an image extension, we can just stream directly into the database, but we want to try to
-             * get the mime type first, from calling detectImage so that if we do detect its an image we can
-             * handle it as one.
-             */
+            // if not an image extension, we can just stream directly into the database, but we want to try to
+            // get the mime type first, from calling detectImage so that if we do detect its an image we can
+            // handle it as one.
             else {
                 if (!detectAndSaveImage(ms, nodeId, attKey, sourceUrl, url, storeLocally)) {
                     limitedIs = StreamUtil.getLimitedStream(sourceUrl, timeout, maxFileSize);
@@ -808,7 +788,7 @@ public class AttachmentService extends ServiceBase {
         } catch (Exception e) {
             throw ExUtil.wrapEx(e);
         } finally {
-            /* finally block just for extra safety */
+            // finally block just for extra safety
             // this stream will have been closed by 'attachBinaryFromStream' but we close
             // here too anyway.
             StreamUtil.close(limitedIs);
@@ -818,7 +798,7 @@ public class AttachmentService extends ServiceBase {
     // FYI: Warning: this way of getting content type doesn't work.
     // String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
     //
-    /* returns true if it was detected AND saved as an image */
+    // returns true if it was detected AND saved as an image
     private boolean detectAndSaveImage(MongoSession ms, String nodeId, String attKey, String sourceUrl, URL url,
             boolean storeLocally) {
         ImageInputStream is = null;
@@ -866,9 +846,7 @@ public class AttachmentService extends ServiceBase {
         }
         // if we're importing we should leave any binary alone
         if (!importMode) {
-            /*
-             * Delete any existing grid data stored under this node, before saving new attachment
-             */
+            // Delete any existing grid data stored under this node, before saving new attachment
             deleteBinary(ms, attName, node, userNode, true);
         }
         String id = grid.store(stream, fileName, mimeType, metaData).toString();
@@ -880,9 +858,7 @@ public class AttachmentService extends ServiceBase {
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }
-        /*
-         * Now save the node also since the property on it needs to point to GridFS id
-         */
+        // Now save the node also since the property on it needs to point to GridFS id
         att.setBin(id);
         att.setSize(streamCount);
         att.setMime(mimeType);
@@ -901,7 +877,7 @@ public class AttachmentService extends ServiceBase {
         if (ret != null) {
             att.setIpfsLink(ret.getHash());
             att.setSize((long) streamSize.getVal());
-            /* consume user quota space */
+            // consume user quota space
             user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode);
         }
     }
@@ -925,11 +901,10 @@ public class AttachmentService extends ServiceBase {
             node.setAttachments(attachments);
         }
         if (!ms.isAdmin()) {
-            /*
-             * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
-             * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
-             * deducted from
-             */
+            // NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
+            // don't do reference counting we let the garbage collecion cleanup be the only way user quotas
+            // are
+            // deducted from
             long totalBytes = attach.getTotalAttachmentBytes(ms, node);
             user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
         }
@@ -952,11 +927,9 @@ public class AttachmentService extends ServiceBase {
         InputStream is = null;
         String ipfsHash = att.getIpfsLink();
         if (ipfsHash != null) {
-            /*
-             * todo-2: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
-             * timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
-             * log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" + ipfsHash);
-             */
+            // todo-2: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
+            // timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
+            // log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" + ipfsHash);
             is = ipfs.getStream(ms, ipfsHash);
         } else {
             is = getStreamByNode(node, attName);
@@ -996,12 +969,11 @@ public class AttachmentService extends ServiceBase {
         return arun.run(as -> {
             int count = 0;
             GridFSFindIterable files = grid.find(new Query());
-            /* Scan all files in the grid */
+            // Scan all files in the grid
             if (files != null) {
-                /*
-                 * I am needing this quick and didn't find another way to do this other than brute force scan. Maybe
-                 * they are using a linked list so that there genuinely is no faster way ?
-                 */
+                // I am needing this quick and didn't find another way to do this other than brute force scan.
+                // Maybe
+                // they are using a linked list so that there genuinely is no faster way ?
                 for (GridFSFile file : files) {
                     count++;
                 }
@@ -1025,18 +997,16 @@ public class AttachmentService extends ServiceBase {
             int delCount = 0;
 
             GridFSFindIterable files = grid.find(new Query());
-            /* Scan all files in the grid */
+            // Scan all files in the grid
             if (files != null) {
                 for (GridFSFile file : files) {
                     Document meta = file.getMetadata();
                     if (meta != null) {
-                        /* Get which nodeId owns this grid file */
+                        // Get which nodeId owns this grid file
                         ObjectId id = (ObjectId) meta.get("nodeId");
                         if (id != null) {
                             SubNode node = read.getNode(as, id);
-                            /*
-                             * If the node doesn't exist then this grid file is an orphan and should go away
-                             */
+                            // If the node doesn't exist then this grid file is an orphan and should go away
                             if (node == null) {
                                 log.debug("Grid Orphan Delete: " + id.toHexString());
                                 // Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
@@ -1048,9 +1018,7 @@ public class AttachmentService extends ServiceBase {
                                 grid.delete(q);
                                 delCount++;
                             }
-                            /*
-                             * else update the UserStats by adding the file length to the total for this user
-                             */
+                            // else update the UserStats by adding the file length to the total for this user
                             else {
                                 UserStats stats = statsMap.get(node.getOwner());
                                 if (stats == null) {
@@ -1067,10 +1035,8 @@ public class AttachmentService extends ServiceBase {
             }
 
             Iterable<SubNode> accntNodes = read.getAccountNodes(as, null, null, null, -1);
-            /*
-             * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
-             * amount).
-             */
+            // scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+            // amount).
             for (SubNode accntNode : accntNodes) {
                 log.debug("Processing Account Node: id=" + accntNode.getIdStr());
                 UserStats stats = statsMap.get(accntNode.getOwner());
@@ -1095,12 +1061,11 @@ public class AttachmentService extends ServiceBase {
             if (StringUtils.isEmpty(attName)) {
                 attName = Constant.ATTACHMENT_PRIMARY.s();
             }
-            /*
-             * NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
-             * but check below only after knowing whether the node has any sharing on it at all or not.
-             *
-             * Node Names are identified using a colon in front of it, to make it detectable
-             */
+            // NOTE: Don't check token here, because we need this to be accessible by foreign fediverse
+            // servers,
+            // but check below only after knowing whether the node has any sharing on it at all or not.
+            //
+            // Node Names are identified using a colon in front of it, to make it detectable
             if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
                 id = ":" + userName + ":" + nameOnUserNode;
             } //
@@ -1117,11 +1082,10 @@ public class AttachmentService extends ServiceBase {
                     if (node == null) {
                         throw new RuntimeException("Node not found.");
                     }
-                    /*
-                     * if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
-                     * This is for good fediverse interoperability but still with a level of privacy for completely
-                     * unshared nodes.
-                     */
+                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow
+                    // access.
+                    // This is for good fediverse interoperability but still with a level of privacy for completely
+                    // unshared nodes.
                     if (node.getAc() == null || node.getAc().size() == 0) {
                         user.authBearer();
                         crypto.authSig();
@@ -1175,15 +1139,14 @@ public class AttachmentService extends ServiceBase {
                 });
             } //
             else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request
-                // and if so
-                // bypass security
+                // and if so bypass security
                 arun.run(as -> {
                     attach.getBinary(as, Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null,
                             response);
                     return null;
                 });
             }
-            /* Else if not an avatar request then do a secure acccess */
+            // Else if not an avatar request then do a secure acccess
             else {
                 callProc.run("bin", false, false, null, session, ms -> {
                     if (ipfsCid != null) {

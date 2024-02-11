@@ -68,11 +68,10 @@ public class OobaAiService extends ServiceBase {
         messages.add(new OobAiMessage("user", input));
         log.debug("GPT Req: USER: " + ms.getUserName() + ": " + XString.prettyPrint(request));
 
-        /*
-         * Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request' here
-         * instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-         * fails, but it does fail.
-         */
+        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
+        // here
+        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
+        // fails, but it does fail.
         // Mono<ChatCompletionResponse> mono =
         // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
         // .retrieve().bodyToMono(ChatCompletionResponse.class);

@@ -75,10 +75,9 @@ public class NodeRenderService extends ServiceBase {
         }
 
         boolean hasUrlId = false;
-        /*
-         * if we have an ID, try to look it up, to put it in the session and load the Social Card properties
-         * for this request. If no id given defalt to ":home" only so we can get the social card props.
-         */
+        // if we have an ID, try to look it up, to put it in the session and load the Social Card
+        // properties
+        // for this request. If no id given defalt to ":home" only so we can get the social card props.
         if (id != null) {
             hasUrlId = true;
         } else {
@@ -202,21 +201,19 @@ public class NodeRenderService extends ServiceBase {
             res.setNode(nodeInfo);
             return res;
         }
-        /*
-         * If scanToNode is non-null it means we are trying to get a subset of the children that contains
-         * scanToNode as one child, because that's the child we want to highlight and scroll to on the front
-         * end when the query returns, and the page root node will of course be the parent of scanToNode
-         */
+        // If scanToNode is non-null it means we are trying to get a subset of the children that contains
+        // scanToNode as one child, because that's the child we want to highlight and scroll to on the
+        // front
+        // end when the query returns, and the page root node will of course be the parent of scanToNode
         SubNode scanToNode = null;
         // we pass allowAuth=true because right here we DO care that the hasChildren is considering only
         // based on what WE can access.
         if (req.isForceRenderParent()) {
             req.setUpLevel(true);
         }
-        /*
-         * the 'siblingOffset' is for jumping forward or backward thru at the same level of the tree without
-         * having to first 'uplevel' and then click on the prev or next node.
-         */
+        // the 'siblingOffset' is for jumping forward or backward thru at the same level of the tree
+        // without
+        // having to first 'uplevel' and then click on the prev or next node.
         if (req.getSiblingOffset() != 0) {
             SubNode parent = read.getParent(ms, node);
             if (req.getSiblingOffset() < 0) {
@@ -246,11 +243,9 @@ public class NodeRenderService extends ServiceBase {
                         node = parent;
                     }
                 } catch (Exception e) {
-                    /*
-                     * failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not
-                     * something we decided to to inside this method based on trying not to render a page with no
-                     * children showing.
-                     */
+                    // failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not
+                    // something we decided to to inside this method based on trying not to render a page with no
+                    // children showing.
                     if (isActualUplevelRequest) {
                         throw new ForbiddenException();
                     }
@@ -283,21 +278,19 @@ public class NodeRenderService extends ServiceBase {
             return nodeInfo;
         }
         nodeInfo.setChildren(new LinkedList<>());
-        /*
-         * If we are scanning to a node we know we need to start from zero offset, or else we use the offset
-         * passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
-         */
+        // If we are scanning to a node we know we need to start from zero offset, or else we use the
+        // offset
+        // passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
         int offset = scanToNode != null ? 0 : req.getOffset();
         if (offset < 0) {
             offset = 0;
         }
-        /*
-         * todo-2: need optimization to work well with large numbers of child nodes: If scanToNode is in
-         * use, we should instead look up the node itself, and then get it's ordinal, and use that as a '>='
-         * in the query to pull up the list when the node ordering is ordinal. Note, if sort order is by a
-         * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
-         * that is enough to trigger 'endReached' logic to be set correctly
-         */
+        // todo-2: need optimization to work well with large numbers of child nodes: If scanToNode is in
+        // use, we should instead look up the node itself, and then get it's ordinal, and use that as a
+        // '>='
+        // in the query to pull up the list when the node ordering is ordinal. Note, if sort order is by a
+        // timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
+        // that is enough to trigger 'endReached' logic to be set correctly
         limit = scanToNode != null ? -1 : limit + 1;
         String orderBy = node.getStr(NodeProp.ORDER_BY);
         Sort sort = null;
@@ -310,12 +303,10 @@ public class NodeRenderService extends ServiceBase {
             isOrdinalOrder = true;
         }
         Criteria moreCriteria = null;
-        /*
-         * #optional-show-replies: disabling this for now. Needs more thought regarding how to keep this
-         * from accidentally hiding nodes from users in a way where they don't realize nodes are being
-         * hidden simply because of being comment types. especially with the 'Show Comments' being hidden
-         * away in the settings menu instead of like at the top of the tree view like document view does.
-         */
+        // #optional-show-replies: disabling this for now. Needs more thought regarding how to keep this
+        // from accidentally hiding nodes from users in a way where they don't realize nodes are being
+        // hidden simply because of being comment types. especially with the 'Show Comments' being hidden
+        // away in the settings menu instead of like at the top of the tree view like document view does.
         // if (!showReplies) {
         // moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
         // }
@@ -336,22 +327,18 @@ public class NodeRenderService extends ServiceBase {
         long lastOrdinal = -1;
         BulkOperations bops = null;
         int batchSize = 0;
-        /*
-         * Main loop to keep reading nodes from the database until we have enough to render the page
-         */
+        // Main loop to keep reading nodes from the database until we have enough to render the page
         while (true) {
             if (!iterator.hasNext()) {
                 endReached = true;
                 break;
             }
             SubNode n = iterator.next();
-            /*
-             * Side Effect: Fixing Duplicate Ordinals
-             *
-             * we do the side effect of repairing ordinals here just because it's really only an issue if it's
-             * rendered and here's where we're rendering. It would be 'possible' but less performant to just
-             * detect when a node's children have dupliate ordinals, and fix the entire list of children
-             */
+            // Side Effect: Fixing Duplicate Ordinals
+            //
+            // we do the side effect of repairing ordinals here just because it's really only an issue if it's
+            // rendered and here's where we're rendering. It would be 'possible' but less performant to just
+            // detect when a node's children have dupliate ordinals, and fix the entire list of children
             if (isOrdinalOrder) {
                 if (lastOrdinal != -1 && lastOrdinal == n.getOrdinal()) {
                     lastOrdinal++;
@@ -376,12 +363,11 @@ public class NodeRenderService extends ServiceBase {
             idx++;
             // log.debug("Iterate [" + idx + "]: nodeId" + n.getIdStr() + "scanToNode=" +
             // scanToNode);
-            /* are we still just scanning for our target node */
+            // are we still just scanning for our target node
             if (scanToNode != null) {
-                /*
-                 * If this is the node we are scanning for turn off scan mode, and add up to ROWS_PER_PAGE-1 of any
-                 * sliding window nodes above it.
-                 */
+                // If this is the node we are scanning for turn off scan mode, and add up to ROWS_PER_PAGE-1 of
+                // any
+                // sliding window nodes above it.
                 if (n.getPath().equals(scanToNode.getPath())) {
                     scanToNode = null;
                     if (slidingWindow != null) {
@@ -394,14 +380,14 @@ public class NodeRenderService extends ServiceBase {
                                 ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, relativeIdx,
                                         level + 1, limit, showReplies);
                                 nodeInfo.getChildren().add(0, ninfo);
-                                /*
-                                 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example
-                                 * would also work and would bring back the target node as close to the center of the
-                                 * results sent back to the brower as possible, but what we do instead is just set to
-                                 * ROWS_PER_PAGE which maximizes performance by iterating the smallese number of results
-                                 * in order to get a page that contains what we need (namely the target node as indiated
-                                 * by scanToNode item)
-                                 */
+                                // If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example
+                                // would also work and would bring back the target node as close to the center of the
+                                // results sent back to the brower as possible, but what we do instead is just set to
+                                // ROWS_PER_PAGE which maximizes performance by iterating the smallese number of
+                                // results
+                                // in order to get a page that contains what we need (namely the target node as
+                                // indiated
+                                // by scanToNode item)
                                 if (nodeInfo.getChildren().size() >= limit - 1) {
                                     break;
                                 }
@@ -412,16 +398,14 @@ public class NodeRenderService extends ServiceBase {
                         slidingWindow = null;
                     }
                 }
-                /*
-                 * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
-                 * iteration/node
-                 */
+                // else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
+                // iteration/node
                 else {
-                    /* lazily create sliding window */
+                    // lazily create sliding window
                     if (slidingWindow == null) {
                         slidingWindow = new LinkedList<>();
                     }
-                    /* update sliding window */
+                    // update sliding window
                     slidingWindow.add(n);
                     if (slidingWindow.size() > limit) {
                         slidingWindow.remove(0);
@@ -429,7 +413,7 @@ public class NodeRenderService extends ServiceBase {
                     continue;
                 }
             }
-            /* if we get here we're accumulating rows */
+            // if we get here we're accumulating rows
             ninfo = render.processRenderNode(adminOnly, ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies);
             nodeInfo.getChildren().add(ninfo);
             if (!iterator.hasNext()) {
@@ -438,14 +422,12 @@ public class NodeRenderService extends ServiceBase {
                 break;
             }
             if (nodeInfo.getChildren().size() >= limit) {
-                /* break out of while loop, we have enough children to send back */
+                // break out of while loop, we have enough children to send back
                 break;
             }
         }
-        /*
-         * if we accumulated less than ROWS_PER_PAGE, then try to scan back up the sliding window to build
-         * up the ROW_PER_PAGE by looking at nodes that we encountered before we reached the end.
-         */
+        // if we accumulated less than ROWS_PER_PAGE, then try to scan back up the sliding window to build
+        // up the ROW_PER_PAGE by looking at nodes that we encountered before we reached the end.
         if (slidingWindow != null && nodeInfo.getChildren().size() < limit) {
             int count = slidingWindow.size();
             if (count > 0) {
@@ -495,11 +477,9 @@ public class NodeRenderService extends ServiceBase {
             dir = orderBy.substring(spaceIdx + 1);
             sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
                     SubNode.PROPS + "." + orderByProp);
-            /*
-             * when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes
-             * appear at top. todo-2: probably would be better to to just make this orderBy parser handle
-             * comma-delimited sort list which is not a difficult change
-             */
+            // when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes
+            // appear at top. todo-2: probably would be better to to just make this orderBy parser handle
+            // comma-delimited sort list which is not a difficult change
             if (orderByProp.equals(NodeProp.PRIORITY.s())) {
                 sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
             }
@@ -605,11 +585,6 @@ public class NodeRenderService extends ServiceBase {
             }
         } catch (Exception e) {
         }
-        /*
-         * this is normal for users to wind up here because looking up the tree always ends at a place they
-         * can't access, and whatever paths we accumulated until this access error is what we do want to
-         * return so we just return everything as is by ignoring this exception
-         */
     }
 
     /**

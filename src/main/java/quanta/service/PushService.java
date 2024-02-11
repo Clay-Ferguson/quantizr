@@ -67,7 +67,7 @@ public class PushService extends ServiceBase {
             return;
         }
 
-        /* Anonymous sessions won't have userName and can be ignored */
+        // Anonymous sessions won't have userName and can be ignored
         if (sc == null || sc.getUserName() == null)
             return;
 
@@ -86,10 +86,8 @@ public class PushService extends ServiceBase {
         if (auth.ownedBy(sc, node)) {
             pushToBrowser(as, sc, sessionsPushed, node);
         }
-        /*
-         * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
-         * node and therefore will be sent to their respecitve browsers
-         */
+        // Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
+        // node and therefore will be sent to their respecitve browsers
         else if (sc.getTimelinePath() != null && node.getPath().startsWith(sc.getTimelinePath())) {
             if (node.getOwner().toHexString().equals(sc.getUserNodeId()) // is my node
                     || AclService.isPublic(node) // is public node
@@ -105,7 +103,7 @@ public class PushService extends ServiceBase {
             return;
         }
 
-        /* build our push message payload */
+        // build our push message payload
         NodeInfo info = convert.toNodeInfo(false, sc, ms, node, false, Convert.LOGICAL_ORDINAL_IGNORE, false, false,
                 false, true);
 
@@ -170,10 +168,8 @@ public class PushService extends ServiceBase {
                 log.debug("No PushEmitter for token: " + token);
                 return;
             }
-            /*
-             * Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable
-             * even probably to be sure each session is only doing one emit at a time.
-             */
+            // Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable
+            // even probably to be sure each session is only doing one emit at a time.
             synchronized (pushEmitter) {
                 try {
                     SseEventBuilder event =

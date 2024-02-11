@@ -20,12 +20,12 @@ public class SessionContext {
     private String pubSigKeyJson;
     private boolean live = true;
 
-    /*
-     * When the user does a "Timeline" search we store the path of the node the timeline was done on so
-     * that with a simple substring search, we can detect any time a new node is added that would've
-     * appeared in the timeline and then do a server push to browsers of any new nodes, thereby creating
-     * a realtime view of the timeline
-     */
+    // When the user does a "Timeline" search we store the path of the node the timeline was done on
+    // so
+    // that with a simple substring search, we can detect any time a new node is added that would've
+    // appeared in the timeline and then do a server push to browsers of any new nodes, thereby
+    // creating
+    // a realtime view of the timeline
     private String timelinePath;
 
     private boolean viewingFeed;
@@ -42,11 +42,10 @@ public class SessionContext {
     // this gets set to true, to trigger a refresh when needed again.
     private boolean friendsTagsDirty;
 
-    /*
-     * Keeps track of expansion states set by user. We can't just use a set to represent expanded nodes,
-     * because we need to know if a node is expanded or not, based on an actual action taken by the
-     * user.
-     */
+    // Keeps track of expansion states set by user. We can't just use a set to represent expanded
+    // nodes,
+    // because we need to know if a node is expanded or not, based on an actual action taken by the
+    // user.
     private HashMap<String, Boolean> nodeExpandStates = new HashMap<>();
 
     public SessionContext() {}
@@ -67,7 +66,7 @@ public class SessionContext {
         this.enableIPSM = enableIPSM;
     }
 
-    /* Extra layer of security to invalidate this session object */
+    // Extra layer of security to invalidate this session object
     public void forceAnonymous() {
         userToken = null;
         userName = PrincipalName.ANON.s();

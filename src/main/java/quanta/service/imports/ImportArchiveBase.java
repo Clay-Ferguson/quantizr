@@ -103,21 +103,18 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 if (node == null) {
                     throw new RuntimeException("import unmarshalling failed.");
                 }
-                /*
-                 * when importing we want to keep all the attachment info EXCEPT the binary IDs because those will
-                 * be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
-                 * the obsolete values cannot be reused.
-                 */
+                // when importing we want to keep all the attachment info EXCEPT the binary IDs because those will
+                // be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
+                // the obsolete values cannot be reused.
                 if (node.getAttachments() != null) {
                     node.getAttachments().forEach((String key, Attachment att) -> {
                         att.setBin(null);
                     });
                 }
-                /*
-                 * NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set into
-                 * the dirty cache either, so we can't call any setters on it UNTIL it's saved here and we get the
-                 * DB to give us the new ID for it.
-                 */
+                // NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set
+                // into
+                // the dirty cache either, so we can't call any setters on it UNTIL it's saved here and we get the
+                // DB to give us the new ID for it.
                 update.save(session, node);
                 pathToIdMap.put(path, node.getIdStr());
             }
@@ -139,11 +136,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
         HashMap<String, Attachment> atts = node.getAttachments();
         if (atts == null)
             return false;
-        /*
-         * note the filename in the imported JAR is the 'attName', but when we import we name the
-         * Attachment.name back to what it originally was before the export which is in the JSON, but also
-         * on the node we have now.
-         */
+        // note the filename in the imported JAR is the 'attName', but when we import we name the
+        // Attachment.name back to what it originally was before the export which is in the JSON, but also
+        // on the node we have now.
         Attachment att = atts.get(attName);
         if (att == null)
             return false;

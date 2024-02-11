@@ -44,10 +44,9 @@ import quanta.util.val.Val;
 @Component
 public class MongoCreate extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoCreate.class);
-    /*
-     * this large top reserve size means the "insert at top" will always be done with out multiple node
-     * updates except for once every thousand times.
-     */
+    // this large top reserve size means the "insert at top" will always be done with out multiple
+    // node
+    // updates except for once every thousand times.
     private static long RESERVE_BLOCK_SIZE = 1000;
 
     public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
@@ -82,9 +81,7 @@ public class MongoCreate extends ServiceBase {
             CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals,
             boolean updateParent, NodeChanges nodeChanges) {
         if (relPath == null) {
-            /*
-             * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
-             */
+            // Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
             relPath = "?";
         }
         if (type == null) {
@@ -159,13 +156,12 @@ public class MongoCreate extends ServiceBase {
         long minOrdinal = read.getMinChildOrdinal(ms, node);
         // default new ordinal to ordinal
         long newOrdinal = ordinal;
-        /*
-         * We detect the special case where we're attempting to insert at 'top' ordinals and if we find room
-         * to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries to
-         * leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
-         * 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we
-         * end up trying to insert above it.
-         */
+        // We detect the special case where we're attempting to insert at 'top' ordinals and if we find
+        // room
+        // to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries to
+        // leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
+        // 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we
+        // end up trying to insert above it.
         // if we're inserting a single node
         if (rangeSize == 1) {
             // if the target ordinal is at or below the current minimum
@@ -179,8 +175,10 @@ public class MongoCreate extends ServiceBase {
                         ret = ret / 2;
                     }
                     return ret;
-                } else { // "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now // else minOrdinal is already at zero so
-                         // we insert a new block, and then let
+                }
+                // "INSERT_BLOCK_SIZE - 1" be the topmost ordinal now // else minOrdinal is already at zero so
+                // we insert a new block, and then let
+                else {
                     rangeSize = RESERVE_BLOCK_SIZE;
                     newOrdinal = RESERVE_BLOCK_SIZE - 1;
                 }
@@ -238,20 +236,17 @@ public class MongoCreate extends ServiceBase {
         boolean allowSharing = true;
         boolean forceInheritSharing = false;
 
-        /*
-         * note: parentNode and nodeBeingReplied to are not necessarily the same. 'parentNode' is the node
-         * that will HOLD the reply, but may not always be WHAT is being replied to.
-         */
+        // note: parentNode and nodeBeingReplied to are not necessarily the same. 'parentNode' is the node
+        // that will HOLD the reply, but may not always be WHAT is being replied to.
         SubNode parentNode = null;
         SubNode nodeBeingRepliedTo = null;
         if (req.isReply()) {
             nodeBeingRepliedTo = read.getNode(ms, nodeId);
         }
-        /*
-         * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
-         * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
-         * user's POSTS node.
-         */
+        // If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
+        // "My Posts" node, and the other case is if we are doing a reply we also will put the reply in
+        // the
+        // user's POSTS node.
         if (nodeId == null && !linkBookmark) {
             parentNode = read.getUserNodeByType(ms, null, null,
                     "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
@@ -263,7 +258,7 @@ public class MongoCreate extends ServiceBase {
             }
         }
 
-        /* Node still null, then try other ways of getting it */
+        // Node still null, then try other ways of getting it
         if (parentNode == null && !linkBookmark) {
             if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
                 parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null,
@@ -424,7 +419,7 @@ public class MongoCreate extends ServiceBase {
                 acl.inheritSharingFromParent(ms, res, nodeBeingRepliedTo, newNode);
             }
 
-            /* Always make public if we're replying to public node or posting under our POSTs node */
+            // Always make public if we're replying to public node or posting under our POSTs node
             if (!req.isDirectMessage()
                     && (makePublicWritable || (req.isReply() && AclService.isPublic(nodeBeingRepliedTo))
                             || parentNode.isType(NodeType.POSTS))) {

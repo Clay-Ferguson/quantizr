@@ -25,7 +25,7 @@ public class DateUtil {
     public static final long MONTH_MILLIS = 30 * DAY_MILLIS;
     public static final long YEAR_MILLIS = 365 * DAY_MILLIS;
 
-    /** Used to format date values */
+    // Used to format date values
     // public static final String ECMA_DATE_FORMAT = "EEE MMM dd yyyy HH:mm:ss
     // 'GMT'Z";
     public static final String DATE_FORMAT_WITH_TIMEZONE = "yyyy/MM/dd hh:mm:ss a z";
@@ -34,16 +34,15 @@ public class DateUtil {
     public static final String DATE_FORMAT_FILENAME_COMPAT = "yyMMddhhmmss";
     public static final String DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
 
-    /** Used to format date values */
+    // Used to format date values
     public static final Locale DATE_FORMAT_LOCALE = Locale.US;
     private static final HashMap<String, String> zoneMap = new HashMap<>();
 
-    /*
-     * Date APIs have deprecated the use of short abbreviations for timezones, but we preferr to still
-     * have them shown for at least United States timezones, so we have to implement our own way of
-     * detecting the proper one and also consider proper Daylight Savings Time value, which is of course
-     * coming from the browser.
-     */
+    // Date APIs have deprecated the use of short abbreviations for timezones, but we preferr to still
+    // have them shown for at least United States timezones, so we have to implement our own way of
+    // detecting the proper one and also consider proper Daylight Savings Time value, which is of
+    // course
+    // coming from the browser.
     static {
         zoneMap.put("-4S", "AST"); // ATLANTIC STANDARD TIME UTC - 4
         zoneMap.put("-5S", "EST"); // EASTERN STANDARD TIME UTC - 5
@@ -56,7 +55,7 @@ public class DateUtil {
         zoneMap.put("-7D", "PDT"); // PACIFIC DAYLIGHT TIME UTC - 7
     }
 
-    /* Note: this object is Session-specific to the timezone will be per user */
+    // Note: this object is Session-specific to the timezone will be per user
     public static SimpleDateFormat getDateFormat() {
         return new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
     }
@@ -108,7 +107,7 @@ public class DateUtil {
         return getDateFormatFileNameCompat().format(new Date());
     }
 
-    /* This is not the most elegant solution but appears to work */
+    // This is not the most elegant solution but appears to work
     public static String getTimezoneFromOffset(int offsetMinutes) {
         int hours = offsetMinutes / 60;
         int mins = offsetMinutes - hours * 60;
@@ -149,7 +148,7 @@ public class DateUtil {
             time = time.replace("-", "/");
             return getDateFormat().parse(time);
         } catch (ParseException e) {
-            /* if date parse fails, try without the time */
+            // if date parse fails, try without the time
             if (time.length() > 10) {
                 time = time.substring(0, 10);
                 try {
@@ -291,7 +290,7 @@ public class DateUtil {
         if (date == null)
             return null;
 
-        /* If we have a short timezone abbreviation display timezone with it */
+        // If we have a short timezone abbreviation display timezone with it
         if (timeZoneAbbrev != null) {
             SimpleDateFormat dateFormat =
                     new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
@@ -300,7 +299,7 @@ public class DateUtil {
             }
             return dateFormat.format(date) + " " + timeZoneAbbrev;
         }
-        /* else display timezone in standard GMT format */
+        // else display timezone in standard GMT format
         else {
             SimpleDateFormat dateFormat =
                     new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);

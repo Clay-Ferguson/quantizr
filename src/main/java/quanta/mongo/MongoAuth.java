@@ -132,10 +132,9 @@ public class MongoAuth extends ServiceBase {
         // if parent or child is null or parent is an ACCOUNT node do nothing here.
         if (parent == null || parent.isType(NodeType.ACCOUNT) || child == null)
             return;
-        /*
-         * Special case of replying to (appending under) a FRIEND-type node is always to make this a private
-         * message to the user that friend node represents
-         */
+        // Special case of replying to (appending under) a FRIEND-type node is always to make this a
+        // private
+        // message to the user that friend node represents
         if (parent.isType(NodeType.FRIEND)) {
             // get user prop from node
             String userName = parent.getStr(NodeProp.USER);
@@ -147,9 +146,7 @@ public class MongoAuth extends ServiceBase {
                 }
             }
         }
-        /*
-         * otherwise if not a FRIEND node we just share to the owner of the parent node
-         */
+        // otherwise if not a FRIEND node we just share to the owner of the parent node
         else {
             // add `parent.owner` to the ACL
             child.putAc(parent.getOwner().toHexString(), new AccessControl(null, Const.RDWR));
@@ -396,10 +393,9 @@ public class MongoAuth extends ServiceBase {
         if (privsForUserId != null) {
             allPrivs += privsForUserId;
         }
-        /*
-         * We always add on any privileges assigned to the PUBLIC when checking privs for this user, because
-         * the auth equivalent is really the union of this set.
-         */
+        // We always add on any privileges assigned to the PUBLIC when checking privs for this user,
+        // because
+        // the auth equivalent is really the union of this set.
         AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());
         String privsForPublic = acPublic != null ? acPublic.getPrvs() : null;
         if (privsForPublic != null) {
@@ -411,11 +407,11 @@ public class MongoAuth extends ServiceBase {
         if (allPrivs.length() > 0) {
             for (PrivilegeType priv : privs) {
                 if (allPrivs.indexOf(priv.name) == -1) {
-                    /* if any priv is missing we fail the auth */
+                    // if any priv is missing we fail the auth
                     return false;
                 }
             }
-            /* if we looped thru all privs ok, auth is successful */
+            // if we looped thru all privs ok, auth is successful
             return true;
         }
         return false;
@@ -426,10 +422,8 @@ public class MongoAuth extends ServiceBase {
         if (aclMap == null) {
             return null;
         }
-        /*
-         * I'd like this to not be created unless needed but that pesky lambda below needs a 'final' thing
-         * to work with.
-         */
+        // I'd like this to not be created unless needed but that pesky lambda below needs a 'final' thing
+        // to work with.
         List<AccessControlInfo> ret = new LinkedList<>();
         aclMap.forEach((k, v) -> {
             AccessControlInfo acei = createAccessControlInfo(ms, k, v.getPrvs());
@@ -447,11 +441,11 @@ public class MongoAuth extends ServiceBase {
         String avatarVer = null;
         String foreignAvatarUrl = null;
 
-        /* If this is a share to public we don't need to lookup a user name */
+        // If this is a share to public we don't need to lookup a user name
         if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
             principalName = PrincipalName.PUBLIC.s();
         }
-        /* else we need the user name */
+        // else we need the user name
         else {
             SubNode principalNode = read.getNode(ms, principalId, false, null);
             if (principalNode == null) {
@@ -565,11 +559,10 @@ public class MongoAuth extends ServiceBase {
         if (pathToSearch == null) {
             pathToSearch = NodePath.USERS_PATH;
         }
-        /*
-         * This regex finds all that START WITH path, have some characters after path, before the end of the
-         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-         * children.
-         */
+        // This regex finds all that START WITH path, have some characters after path, before the end of
+        // the
+        // string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+        // children.
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch));
 
         ands.add(Criteria.where(SubNode.AC).ne(null));

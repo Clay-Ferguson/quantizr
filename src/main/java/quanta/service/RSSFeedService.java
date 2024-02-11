@@ -73,18 +73,12 @@ public class RSSFeedService extends ServiceBase {
     private static boolean refreshingCache = false;
     private static final Object policyLock = new Object();
     PolicyFactory policy = null;
-    /*
-     * Cache of all feeds.
-     */
+    // Cache of all feeds.
     private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> feedNameOfItem = new ConcurrentHashMap<>();
-    /*
-     * keep track of which feeds failed so we don't try them again until another 30-min cycle
-     */
+    // keep track of which feeds failed so we don't try them again until another 30-min cycle
     private static final HashSet<String> failedFeeds = new HashSet<>();
-    /*
-     * Cache of all aggregates
-     */
+    // Cache of all aggregates
     private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
     private static int MAX_CACHE_SIZE = 500;
     private static final boolean debug = true;
@@ -178,10 +172,9 @@ public class RSSFeedService extends ServiceBase {
             }
 
             entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
-            /*
-             * Now from the complete 'entries' list we extract out just the page we need into 'pageEntires' and
-             * then stuff pageEntries back into 'entries' to send out of this method
-             */
+            // Now from the complete 'entries' list we extract out just the page we need into 'pageEntires'
+            // and
+            // then stuff pageEntries back into 'entries' to send out of this method
             List<SyndEntry> pageEntries = new LinkedList<>();
             int pageNo = page - 1;
             int startIdx = pageNo * FEED_ITEMS_PER_PAGE;
@@ -204,11 +197,9 @@ public class RSSFeedService extends ServiceBase {
     }
 
     public SyndFeed getFeed(final String url, boolean fromCache, int index, int maxIndex) {
-        /*
-         * if this feed failed don't try it again. Whenever we DO force the system to try a feed again
-         * that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
-         * feed has failed
-         */
+        // if this feed failed don't try it again. Whenever we DO force the system to try a feed again
+        // that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
+        // feed has failed
         if (fromCache && failedFeeds.contains(url)) {
             if (debug) {
                 log.debug("Feed previously failed (skipping): " + url);
@@ -290,17 +281,18 @@ public class RSSFeedService extends ServiceBase {
             }
             return inFeed;
         } catch (Exception e) {
-            /*
-             * Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale cache
-             * remains in place rather than getting forgotten just because it's currently unavailable
-             *
-             * This error can happen a lot since feeds out on the wild are so chaotic so we won't bother to
-             * clutter our logs with a stack trace here, and just log the message.
-             *
-             * todo-2: Actually it would be better to put this entire string being logged here into a hashset to
-             * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
-             * under the admin menu for checking server status info.
-             */
+            // Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale
+            // cache
+            // remains in place rather than getting forgotten just because it's currently unavailable
+            //
+            // This error can happen a lot since feeds out on the wild are so chaotic so we won't bother to
+            // clutter our logs with a stack trace here, and just log the message.
+            //
+            // todo-2: Actually it would be better to put this entire string being logged here into a hashset
+            // to
+            // just keep a unique list, and not even log it here, but make it part of the 'systemInfo'
+            // available
+            // under the admin menu for checking server status info.
             log.debug("Error reading feed: " + url + " msg: " + e.getMessage());
             failedFeeds.add(url);
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
@@ -331,10 +323,9 @@ public class RSSFeedService extends ServiceBase {
         html = quoteFix(html);
         if (policy == null) {
             synchronized (policyLock) {
-                /*
-                 * I have removed IMAGES only because it looks silly when we display an image that's also displayed
-                 * as part of the feed formatting
-                 */
+                // I have removed IMAGES only because it looks silly when we display an image that's also
+                // displayed
+                // as part of the feed formatting
                 policy = /* .and(Sanitizers.IMAGES) *///
                         Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.LINKS).and(Sanitizers.STYLES)
                                 .and(Sanitizers.TABLES);
@@ -355,7 +346,7 @@ public class RSSFeedService extends ServiceBase {
         urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
         SyndFeed feed = null;
 
-        /* If multiple feeds we build an aggregate */
+        // If multiple feeds we build an aggregate
         if (urlList.size() > 1) {
             feed = new SyndFeedImpl();
             feed.setEncoding("UTF-8");
@@ -368,7 +359,7 @@ public class RSSFeedService extends ServiceBase {
             feed.setEntries(entries);
             aggregateFeeds(urlList, entries, req.getPage());
         }
-        /* If not an aggregate return the one external feed itself */
+        // If not an aggregate return the one external feed itself
         else {
             String url = urlList.get(0);
             SyndFeed cachedFeed = getFeed(url, true, 1, 1);
@@ -677,25 +668,26 @@ public class RSSFeedService extends ServiceBase {
                     entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getIdStr());
                     entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl()
                             : prop.getProtocolHostAndPort());
-                    /*
-                     * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
-                     * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
-                     * optional property which can be set on any node to override this.
-                     *
-                     * UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
-                     * dialog) we can use that as our publish time here, and allow that to be the override for the date
-                     * on the node.
-                     */
+
+                    // todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
+                    // GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
+                    // optional property which can be set on any node to override this.
+                    //
+                    // UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
+                    // dialog) we can use that as our publish time here, and allow that to be the override for the
+                    // date
+                    // on the node.
                     entry.setPublishedDate(n.getCreateTime());
                     SyndContent description = new SyndContentImpl();
-                    /*
-                     * todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
-                     * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
-                     * this is low priority for now so I'm not doing it yet.
-                     *
-                     * todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so I
-                     * need to check what I'm doing here and see if we need "HTML" now here instead.
-                     */
+
+                    // todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
+                    // it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions,
+                    // but
+                    // this is low priority for now so I'm not doing it yet.
+                    //
+                    // todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so
+                    // I
+                    // need to check what I'm doing here and see if we need "HTML" now here instead.
                     description.setType("text/plain");
                     description.setType("text/html");
                     description

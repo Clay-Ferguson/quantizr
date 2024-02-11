@@ -77,7 +77,6 @@ public class DataTransferRateFilter extends GenericFilterBean {
     }
 
     private static class CountingResponseWrapper extends HttpServletResponseWrapper {
-
         private CountingServletOutputStream outputStream;
         private PrintWriter writer;
 
@@ -105,7 +104,6 @@ public class DataTransferRateFilter extends GenericFilterBean {
     }
 
     private static class CountingServletOutputStream extends ServletOutputStream {
-
         private ServletOutputStream original;
         private AtomicLong count = new AtomicLong();
 

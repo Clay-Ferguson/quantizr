@@ -29,12 +29,12 @@ public class AppSessionListener implements HttpSessionListener {
 
         // multiply by 60 to convert minutes to seconds.
         session.setMaxInactiveInterval(appProp.getSessionTimeoutMinutes() * 60);
-        /*
-         * I'm not sure if certain parts of 'Spring API' are gonna see this LockEx and just synchronize on
-         * it using synchronize keyword and treating it just as a plain Object would be used for a lock, but
-         * for our own API use of this lock we call lockEx() and unlockEx() on this object to use its' built
-         * in ability to detect and forcably break deadlocks when they happen!
-         */
+        // I'm not sure if certain parts of 'Spring API' are gonna see this LockEx and just synchronize on
+        // it using synchronize keyword and treating it just as a plain Object would be used for a lock,
+        // but
+        // for our own API use of this lock we call lockEx() and unlockEx() on this object to use its'
+        // built
+        // in ability to detect and forcably break deadlocks when they happen!
         session.setAttribute(AppFilter.SESSION_LOCK_NAME, new ReentrantLock());
         sessionCounter++;
 

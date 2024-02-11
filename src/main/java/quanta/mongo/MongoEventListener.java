@@ -96,10 +96,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         Document dbObj = event.getDocument();
         ObjectId id = node.getId();
         boolean isNew = false;
-        /*
-         * Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
-         * there, along with setting that on the owner property so we can do one save and have both updated
-         */
+        // Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
+        // there, along with setting that on the owner property so we can do one save and have both
+        // updated
         if (id == null) {
             id = new ObjectId();
             node.setId(id);
@@ -121,13 +120,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             node.setOrdinal(0L);
             dbObj.put(SubNode.ORDINAL, 0L);
         }
-        /* if no owner is assigned... */
+        // if no owner is assigned
         if (node.getOwner() == null) {
-            /*
-             * if we are saving the root node, we make it be the owner of itself. This is also the admin owner,
-             * and we only allow this to run during initialiation when the server may be creating the database,
-             * and is not yet processing user requests
-             */
+            // if we are saving the root node, we make it be the owner of itself. This is also the admin
+            // owner,
+            // and we only allow this to run during initialiation when the server may be creating the
+            // database,
+            // and is not yet processing user requests
             if (node.getPath().equals(NodePath.ROOT_PATH) && !MongoRepository.fullInit) {
                 ThreadLocals.requireAdminThread();
                 dbObj.put(SubNode.OWNER, id);
@@ -143,7 +142,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         }
         Date now = null;
 
-        /* If no create/mod time has been set, then set it */
+        // If no create/mod time has been set, then set it
         if (node.getCreateTime() == null) {
             if (now == null) {
                 now = Calendar.getInstance().getTime();
@@ -159,10 +158,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             node.setModifyTime(now);
         }
 
-        /*
-         * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
-         * part of the path
-         */
+        // New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
+        // part of the path
         if (node.getPath().endsWith("/?")) {
             String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
             dbObj.put(SubNode.PATH, path);
@@ -178,7 +175,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         verifyParentExists(node, dbObj, isNew);
         saveAuthByThread(node, dbObj, isNew);
 
-        /* Node name not allowed to contain : or ~ */
+        // Node name not allowed to contain : or ~
         String nodeName = node.getName();
         if (nodeName != null) {
             nodeName = nodeName.replace(":", "-");
@@ -196,13 +193,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         }
 
         if (node.getAc() != null) {
-            /*
-             * we need to ensure that we never save an empty Acl, but null instead, because some parts of the
-             * code assume that if the AC is non-null then there ARE some shares on the node.
-             *
-             * This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends
-             * up causing the AC to contain an empty object sometimes
-             */
+            // we need to ensure that we never save an empty Acl, but null instead, because some parts of the
+            // code assume that if the AC is non-null then there ARE some shares on the node.
+            //
+            // This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends
+            // up causing the AC to contain an empty object sometimes
             if (node.getAc().size() == 0) {
                 node.setAc(null);
                 dbObj.put(SubNode.AC, null);
@@ -322,11 +317,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                 if (parent == null) {
                     log.debug("This SAVE should get rejected (its parent is missing): " + XString.prettyPrint(node));
 
-                    /*
-                     * Make MongoDB fail to save this by sabatoging the ID here. It's the only way to abort the save.
-                     * Supposedly throwing the Exception which we do below, is supposed to abort saves but it's not
-                     * working where as nullifying the ID does indeed abort the save.
-                     */
+                    // Make MongoDB fail to save this by sabatoging the ID here. It's the only way to abort the save.
+                    // Supposedly throwing the Exception which we do below, is supposed to abort saves but it's not
+                    // working where as nullifying the ID does indeed abort the save.
                     dbObj.put(SubNode.ID, null);
                     node.setId(null);
                     throw new RuntimeException("unable to get node parent: " + node.getParentPath());

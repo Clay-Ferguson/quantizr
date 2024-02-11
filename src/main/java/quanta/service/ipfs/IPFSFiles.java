@@ -108,9 +108,7 @@ public class IPFSFiles extends ServiceBase {
                 if (entry.getSize() == 0) {
                     traverseDir(entryPath, allFilePaths, deleteEmptyDirs);
                 } else {
-                    /*
-                     * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
-                     */
+                    // as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
                     if (!entry.getName().endsWith(".json")) {
                         traverseDir(entryPath, allFilePaths, deleteEmptyDirs);
                     } else {

@@ -104,11 +104,10 @@ public class NodeMoveService extends ServiceBase {
             return;
         }
         create.insertOrdinal(ms, parentNode, 0L, 1L, nodeChanges);
-        /*
-         * todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as part
-         * of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
-         * get to it.
-         */
+        // todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as
+        // part
+        // of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
+        // get to it.
         update.saveSession(ms);
         node.setOrdinal(0L);
         update.saveSession(ms);
@@ -276,10 +275,8 @@ public class NodeMoveService extends ServiceBase {
             Long _targetOrdinal = curTargetOrdinal;
             SubNode _nodeParent = nodeParent;
             arun.run(as -> {
-                /*
-                 * if a parent node is attempting to be pasted into one of it's children that's an impossible move
-                 * so we reject the attempt.
-                 */
+                // if a parent node is attempting to be pasted into one of it's children that's an impossible move
+                // so we reject the attempt.
                 if (parentToPasteInto.getPath().startsWith(node.getPath() + "/")) {
                     throw new RuntimeException("Impossible node move requested.");
                 }

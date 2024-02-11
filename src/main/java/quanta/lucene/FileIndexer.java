@@ -55,6 +55,7 @@ import quanta.util.XString;
 // org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 // org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
 // org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
+
 /**
  * Recursively scans all files in a folder (and subfolders) and indexes them into Lucene.
  *
@@ -117,9 +118,7 @@ public class FileIndexer extends ServiceBase {
         return fileName.endsWith(".txz") || fileName.endsWith(".tar.xz");
     }
 
-    /*
-     * Takes a comma delimited list of suffixes, and loads up the suffixSet for faster access
-     */
+    // Takes a comma delimited list of suffixes, and loads up the suffixSet for faster access
     private void buildSuffixSet(String suffixes) {
         suffixSet = XString.tokenizeToSet(suffixes.toLowerCase(), ",", true);
     }
@@ -143,12 +142,10 @@ public class FileIndexer extends ServiceBase {
                 // Add new documents to an existing index:
                 iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
             }
-            /*
-             * Optional: for better indexing performance, if you are indexing many documents, increase the RAM
-             * buffer. But if you do this, increase the max heap size to the JVM (eg add -Xmx512m or -Xmx1g):
-             *
-             * iwc.setRAMBufferSizeMB(256.0);
-             */
+            // Optional: for better indexing performance, if you are indexing many documents, increase the RAM
+            // buffer. But if you do this, increase the max heap size to the JVM (eg add -Xmx512m or -Xmx1g):
+            //
+            // iwc.setRAMBufferSizeMB(256.0);
             writer = new IndexWriter(fsDir, iwc);
         } catch (IOException e) {
             throw ExUtil.wrapEx(e);
@@ -276,15 +273,14 @@ public class FileIndexer extends ServiceBase {
 
         while ((entry = zis.getNextEntry()) != null) {
             if (entry.isDirectory()) {
-            } else/*
-                   * WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
-                   * doesn't require folders to be stored but only FILES, and actually the full path on each file is
-                   * what determines the hierarchy.
-                   */ // processDirectory(entry);
-            {
+            }
+            // WARNING: This method is here for clarity but usually will NOT BE CALLED. The Zip file format
+            // doesn't require folders to be stored but only FILES, and actually the full path on each file is
+            // what determines the hierarchy.
+            // processDirectory(entry);
+            else {
                 String absPath = entry.getName();
-                // if we encountered a zip file inside a zip file this is the recursion for
-                // that.
+                // if we encountered a zip file inside a zip file this is the recursion for that.
                 if (isZipFileFormatFileName(absPath)) {
                     // todo-2: (or tar! handle tars)
                     indexZipInputStream(zis, zipParent + "->" + absPath);
@@ -306,8 +302,10 @@ public class FileIndexer extends ServiceBase {
                     continue;
                 }
                 if (entry.isDirectory()) {
-                } else { // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories,
-                         // but I'm not sure if this
+                }
+                // is the case for TAR files. Check this. // todo-2: I know for ZIPs we can ignore directories,
+                // but I'm not sure if this
+                else {
                     String absPath = entry.getName();
                     log.debug("TAR ENTRY:" + absPath);
                     // todo-2: oops ZIP is missing here. plain zip in a tar
@@ -347,28 +345,26 @@ public class FileIndexer extends ServiceBase {
         log.debug("INDEXING ZipEntry: " + absPath);
         // InputStream stream = Files.newInputStream(file);
         Document doc = new Document();
-        /*
-         * Add the path of the file as a field named "path". Use a field that is indexed (i.e. searchable),
-         * but don't tokenize the field into separate words and don't index term frequency or positional
-         * information:
-         */
+        // Add the path of the file as a field named "path". Use a field that is indexed (i.e.
+        // searchable),
+        // but don't tokenize the field into separate words and don't index term frequency or positional
+        // information:
         Field pathField = new StringField("path", zipParent + "->" + absPath, Field.Store.YES);
         doc.add(pathField);
-        /*
-         * Add the last modified date of the file a field named "modified". Use a LongPoint that is indexed
-         * (i.e. efficiently filterable with PointRangeQuery). This indexes to milli-second resolution,
-         * which is often too fine. You could instead create a number based on
-         * year/month/day/hour/minutes/seconds, down the resolution you require. For example the long value
-         * 2011021714 would mean February 17, 2011, 2-3 PM.
-         */
+        // Add the last modified date of the file a field named "modified". Use a LongPoint that is
+        // indexed
+        // (i.e. efficiently filterable with PointRangeQuery). This indexes to milli-second resolution,
+        // which is often too fine. You could instead create a number based on
+        // year/month/day/hour/minutes/seconds, down the resolution you require. For example the long
+        // value
+        // 2011021714 would mean February 17, 2011, 2-3 PM.
         doc.add(new LongPoint("modified", lastModified));
-        /*
-         * Add the contents of the file to a field named "contents". Specify a Reader, so that the text of
-         * the file is tokenized and indexed, but not stored. Note that FileReader expects the file to be in
-         * UTF-8 encoding. If that's not the case searching for special characters will fail. doc.add(new
-         * TextField("contents", new BufferedReader(new InputStreamReader(stream,
-         * StandardCharsets.UTF_8))));
-         */
+        // Add the contents of the file to a field named "contents". Specify a Reader, so that the text of
+        // the file is tokenized and indexed, but not stored. Note that FileReader expects the file to be
+        // in
+        // UTF-8 encoding. If that's not the case searching for special characters will fail. doc.add(new
+        // TextField("contents", new BufferedReader(new InputStreamReader(stream,
+        // StandardCharsets.UTF_8))));
         try {
             doc.add(new TextField("contents", parseContent(zis), Store.NO));
         } catch (Exception e) {
@@ -410,21 +406,20 @@ public class FileIndexer extends ServiceBase {
         // or positional information:
         Field pathField = new StringField("path", zipParent + "->" + absPath, Field.Store.YES);
         doc.add(pathField);
-        /*
-         * Add the last modified date of the file a field named "modified". Use a LongPoint that is indexed
-         * (i.e. efficiently filterable with PointRangeQuery). This indexes to milli-second resolution,
-         * which is often too fine. You could instead create a number based on
-         * year/month/day/hour/minutes/seconds, down the resolution you require. For example the long value
-         * 2011021714 would mean February 17, 2011, 2-3 PM.
-         */
+        // Add the last modified date of the file a field named "modified". Use a LongPoint that is
+        // indexed
+        // (i.e. efficiently filterable with PointRangeQuery). This indexes to milli-second resolution,
+        // which is often too fine. You could instead create a number based on
+        // year/month/day/hour/minutes/seconds, down the resolution you require. For example the long
+        // value
+        // 2011021714 would mean February 17, 2011, 2-3 PM.
         doc.add(new LongPoint("modified", lastModified));
-        /*
-         * Add the contents of the file to a field named "contents". Specify a Reader, so that the text of
-         * the file is tokenized and indexed, but not stored. Note that FileReader expects the file to be in
-         * UTF-8 encoding. If that's not the case searching for special characters will fail. doc.add(new
-         * TextField("contents", new BufferedReader(new InputStreamReader(stream,
-         * StandardCharsets.UTF_8))));
-         */
+        // Add the contents of the file to a field named "contents". Specify a Reader, so that the text of
+        // the file is tokenized and indexed, but not stored. Note that FileReader expects the file to be
+        // in
+        // UTF-8 encoding. If that's not the case searching for special characters will fail. doc.add(new
+        // TextField("contents", new BufferedReader(new InputStreamReader(stream,
+        // StandardCharsets.UTF_8))));
         try {
             doc.add(new TextField("contents", parseContent(zis), Store.NO));
         } catch (Exception e) {
@@ -437,10 +432,8 @@ public class FileIndexer extends ServiceBase {
             writer.addDocument(doc);
             filesAdded++;
         } else {
-            /*
-             * Existing index (an old copy of this document may have been indexed) so we use updateDocument
-             * instead to replace the old one matching the exact path, if present:
-             */
+            // Existing index (an old copy of this document may have been indexed) so we use updateDocument
+            // instead to replace the old one matching the exact path, if present:
             log.debug("updating");
             writer.updateDocument(new Term("path", zipParent + "->" + absPath), doc);
             filesUpdated++;
@@ -540,8 +533,8 @@ public class FileIndexer extends ServiceBase {
     // haven't convinced myself yet it's time to go ahead and delete it, but it's
     // all completely obsolete.
     // /**
-    // * Index a file by creating a Document and adding fields
-    // */
+    // Index a file by creating a Document and adding fields
+    ///
     // private void indexFile(final File f, final String suffix) {
     // if (f.length() > 2 * 1024 * 1024 || f.isHidden() || f.isDirectory() ||
     // !f.canRead() || !f.exists() || //
@@ -560,25 +553,25 @@ public class FileIndexer extends ServiceBase {
     // final String path = file.getCanonicalPath();
     // final String name = file.getName();
     // /*
-    // * If a searcher is provided it means we need to use it to avoid if we already
-    // * have this file added with an identical timestamp.
-    // */
+    // If a searcher is provided it means we need to use it to avoid if we already
+    // have this file added with an identical timestamp.
+    ///
     // if (ok(searcher )) {
     // Document docFound = searcher.findByFileName(path);
     // if (ok(docFound )) {
     // /*
-    // * If our index has this document with same lastModified time, then return
-    // * because the index is up to date, and there's nothing we need to do
-    // */
+    // If our index has this document with same lastModified time, then return
+    // because the index is up to date, and there's nothing we need to do
+    ///
     // if (lastModified.equals(docFound.get("lastModified"))) {
     // log.info("NO CHANGE. file: {}", file.getCanonicalPath());
     // return;
     // }
     // /*
-    // * If we found this doc, and it's out of date, we delete the old doc and
+    // If we found this doc, and it's out of date, we delete the old doc and
     // re-add
-    // * below
-    // */
+    // below
+    ///
     // else {
     // deletedExisting = true;
     // writer.deleteDocuments(new Term("filepath", path));

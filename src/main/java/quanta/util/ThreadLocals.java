@@ -231,11 +231,10 @@ public class ThreadLocals {
             return;
         }
         SubNode nodeFound = getDirtyNodes().get(node.getId());
-        /*
-         * If we are setting this node to dirty, but we already see another copy of the same nodeId in
-         * memory, this is a problem and will mean whichever node happens to be saved 'last' will overwrite,
-         * so this *may* result in data loss.
-         */
+        // If we are setting this node to dirty, but we already see another copy of the same nodeId in
+        // memory, this is a problem and will mean whichever node happens to be saved 'last' will
+        // overwrite,
+        // so this *may* result in data loss.
         if (nodeFound != null) {
             if (nodeFound.hashCode() != node.hashCode()) {
                 ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
@@ -244,7 +243,7 @@ public class ThreadLocals {
         getDirtyNodes().put(node.getId(), node);
     }
 
-    /* Opposite of dirty */
+    // Opposite of dirty
     public static void clean(SubNode node) {
         getDirtyNodes().remove(node.getId());
     }

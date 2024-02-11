@@ -204,12 +204,12 @@ public class ServiceBase {
     // optionally overridden
     public void postConstruct() {}
 
-    /*
-     * Note: All` @EventListener public void handleContextRefresh(ContextRefreshedEvent event)` should
-     * call this method immediately before doing anything else, and this is fine because nothing happens
-     * on subsequent runs. The reason is because we cannot predict WHICH @EventListener will be called
-     * first, so we must allow any sequence that Spring happens to run with, in a non-deterministic way.
-     */
+    // Note: All` @EventListener public void handleContextRefresh(ContextRefreshedEvent event)` should
+    // call this method immediately before doing anything else, and this is fine because nothing
+    // happens
+    // on subsequent runs. The reason is because we cannot predict WHICH @EventListener will be called
+    // first, so we must allow any sequence that Spring happens to run with, in a non-deterministic
+    // way.
     public static void initBeans(ApplicationContext ctx) {
         synchronized (initLock) {
             if (initComplete) {

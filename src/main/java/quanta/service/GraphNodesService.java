@@ -97,13 +97,14 @@ public class GraphNodesService extends ServiceBase {
         for (String path : mapByPath.keySet()) {
             keys.add(path);
         }
-        /*
-         * First scan to create any parents that don't exist, putting them in mapByPath. Since the query to
-         * get nodes wasn't a pure recursive method we can have nodes in 'mapByPath' which don't have their
-         * parent in mapByPath, so we want to pull all those parents into 'mapByPath' too, to be sure we
-         * have a an actual proper directed graph to send back to client (no orphans in it, not connected to
-         * root)
-         */
+        // First scan to create any parents that don't exist, putting them in mapByPath. Since the query
+        // to
+        // get nodes wasn't a pure recursive method we can have nodes in 'mapByPath' which don't have
+        // their
+        // parent in mapByPath, so we want to pull all those parents into 'mapByPath' too, to be sure we
+        // have a an actual proper directed graph to send back to client (no orphans in it, not connected
+        // to
+        // root)
         for (String path : keys) {
             ensureEnoughParents(rootPath, rootLevel, path, mapByPath);
         }

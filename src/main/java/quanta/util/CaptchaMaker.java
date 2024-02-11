@@ -19,12 +19,12 @@ import javax.imageio.stream.ImageOutputStream;
 public class CaptchaMaker {
     private static final Random rand = new Random();
 
-    /* returns a random string of at least 5 numeric characters */
+    // returns a random string of at least 5 numeric characters
     public static String createCaptchaString() {
         StringBuilder captcha = new StringBuilder();
 
         while (captcha.length() < CAPTCHA_NUM_CHARS) {
-            /* add random character between 0 and 9 */
+            // add random character between 0 and 9
             captcha.append(String.valueOf(rand.nextInt(10)));
         }
         return captcha.toString();
@@ -126,9 +126,9 @@ public class CaptchaMaker {
     // g.setColor(Color.green);
 
     // /*
-    // * due to wierdness on various comptuers the rendering size of any given font is not known and we
-    // * must iterate to find the appropriate font to match our image size
-    // */
+    // due to wierdness on various comptuers the rendering size of any given font is not known and we
+    // must iterate to find the appropriate font to match our image size
+    ///
     // if (fontKnown != null) {
     // g.setFont(fontKnown);
     // } else {

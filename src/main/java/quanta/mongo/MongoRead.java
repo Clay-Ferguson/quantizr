@@ -310,20 +310,17 @@ public class MongoRead extends ServiceBase {
         ObjectId nodeOwnerId;
         int colonIdx = -1;
         SubNode userNode = null;
-        /*
-         * if 'name' doesn't contain a colon it's known to be just an admin-owned global named node without
-         * a user prefix
-         */
+        // if 'name' doesn't contain a colon it's known to be just an admin-owned global named node
+        // without
+        // a user prefix
         if ((colonIdx = name.indexOf(":")) == -1) {
             nodeOwnerId = getDbRoot().getOwner();
-        } else /*
-                * If there is a colon in the name then it's of the format 'userName:nodeName'
-                */ {
+        }
+        // If there is a colon in the name then it's of the format 'userName:nodeName'
+        else {
             String userName = name.substring(0, colonIdx);
-            /*
-             * pass a null session here to cause adminSession to be used which is required to get a user node,
-             * but it always safe to get this node this way here.
-             */
+            // pass a null session here to cause adminSession to be used which is required to get a user node,
+            // but it always safe to get this node this way here.
             userNode = getAccountByUserName(null, userName, false);
             if (userNode == null) {
                 log.debug("Unable to find node by: " + name);
@@ -397,7 +394,6 @@ public class MongoRead extends ServiceBase {
                     }
                 }
             }
-
             if (ret == null) {
                 ret = opsw.findById(allowAuth ? ms : null, new ObjectId(identifier));
             }
@@ -463,11 +459,9 @@ public class MongoRead extends ServiceBase {
         if (readFromAdminCache()) {
             synchronized (SystemService.adminNodesCacheLock) {
                 TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
-                /*
-                 * Note this parent check for null here is consistent with the fact that node we might have just
-                 * found in the cache might be the root of the cache tree which doesn't keep track of what it's
-                 * parent is, so we can only return here in cases where we did find a parent
-                 */
+                // Note this parent check for null here is consistent with the fact that node we might have just
+                // found in the cache might be the root of the cache tree which doesn't keep track of what it's
+                // parent is, so we can only return here in cases where we did find a parent
                 if (tn != null && tn.parent != null) {
                     return tn.parent.node;
                 }
@@ -492,9 +486,7 @@ public class MongoRead extends ServiceBase {
         if (StringUtils.isEmpty(parentPath))
             return null;
 
-        /*
-         * If node is in pending area take the pending part out of the path to get the real parent
-         */
+        // If node is in pending area take the pending part out of the path to get the real parent
         parentPath = parentPath.replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
         return getNode(ms, parentPath, allowAuth, null);
     }
@@ -508,17 +500,15 @@ public class MongoRead extends ServiceBase {
         if (limit != null) {
             q.limit(limit.intValue());
         }
-        /*
-         * This regex finds all that START WITH "path/" and then end with some other string that does NOT
-         * contain "/", so that we know it's not at a deeper level of the tree, but is immediate children of
-         * 'node'
-         *
-         * ^:aa:bb:([^:])*$
-         *
-         * example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
-         * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
-         *
-         */
+        // This regex finds all that START WITH "path/" and then end with some other string that does NOT
+        // contain "/", so that we know it's not at a deeper level of the tree, but is immediate children
+        // of
+        // 'node'
+        //
+        // ^:aa:bb:([^:])*$
+        //
+        // example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
+        // ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node == null ? "" : node.getPath()));
         if (ordered) {
             q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
@@ -551,17 +541,15 @@ public class MongoRead extends ServiceBase {
         if (skip > 0) {
             q.skip(skip);
         }
-        /*
-         * This regex finds all that START WITH "path/" and then end with some other string that does NOT
-         * contain "/", so that we know it's not at a deeper level of the tree, but is immediate children of
-         * 'node'
-         *
-         * ^:aa:bb:([^:])*$
-         *
-         * example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
-         * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
-         *
-         */
+        // This regex finds all that START WITH "path/" and then end with some other string that does NOT
+        // contain "/", so that we know it's not at a deeper level of the tree, but is immediate children
+        // of
+        // 'node'
+        //
+        // ^:aa:bb:([^:])*$
+        //
+        // example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
+        // ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path));
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
@@ -734,11 +722,10 @@ public class MongoRead extends ServiceBase {
             auth.auth(ms, node, PrivilegeType.READ);
         }
         Query q = new Query();
-        /*
-         * This regex finds all that START WITH path, have some characters after path, before the end of the
-         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-         * children.
-         */
+        // This regex finds all that START WITH path, have some characters after path, before the end of
+        // the
+        // string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+        // children.
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         if (publicOnly) {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
@@ -778,11 +765,10 @@ public class MongoRead extends ServiceBase {
         List<Criteria> ands = new LinkedList<>();
         TextCriteria textCriteria = null;
         Sort sort = null;
-        /*
-         * This regex finds all that START WITH path, have some characters after path, before the end of the
-         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-         * children.
-         */
+        // This regex finds all that START WITH path, have some characters after path, before the end of
+        // the
+        // string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+        // children.
         Criteria crit = null;
         if (recursive) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
@@ -809,22 +795,20 @@ public class MongoRead extends ServiceBase {
                 // .matching("search term") // matches any that contain "search" OR "term"
                 // .matchingPhrase("search term")
                 textCriteria = TextCriteria.forDefaultLanguage();
-                /*
-                 * If searching for a pure tag name or a username (no spaces in search string), be smart enough to
-                 * enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up finding
-                 * also just instances of mytag (not a tag) which is incorrect.
-                 */
+                // If searching for a pure tag name or a username (no spaces in search string), be smart enough to
+                // enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up
+                // finding
+                // also just instances of mytag (not a tag) which is incorrect.
                 if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
                     text = "\"" + text + "\"";
                 }
-                /*
-                 * his reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
-                 * bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an
-                 * OR search on strings containing special characters, without the special characters basically
-                 * being ignored.
-                 *
-                 * textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
-                 */
+                // his reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
+                // bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do
+                // an
+                // OR search on strings containing special characters, without the special characters basically
+                // being ignored.
+                //
+                // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
             }
@@ -918,10 +902,8 @@ public class MongoRead extends ServiceBase {
     private Iterable<SubNode> queryByTreeDepthOrder(MongoSession ms, int limit, int skip, List<Criteria> ands,
             TextCriteria textCriteria, Sort sort) {
         List<AggregationOperation> aggOps = new LinkedList<>();
-        /*
-         * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
-         * process it first here
-         */
+        // MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
+        // process it first here
         if (textCriteria != null) {
             aggOps.add(Aggregation.match(textCriteria));
         }
@@ -932,11 +914,10 @@ public class MongoRead extends ServiceBase {
         aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("size(split(pth, '/'))")
                 .as("treeDepth"));
 
-        /*
-         * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
-         * with aggregates we doing a step by step pipeline of processing so we need records in the correct
-         * order before we do limit or skip and so the ordering of these 'ops' does that.
-         */
+        // IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
+        // with aggregates we doing a step by step pipeline of processing so we need records in the
+        // correct
+        // order before we do limit or skip and so the ordering of these 'ops' does that.
         aggOps.add(Aggregation.sort(sort));
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
@@ -948,10 +929,8 @@ public class MongoRead extends ServiceBase {
     private Iterable<SubNode> queryByConentLenOrder(MongoSession ms, int limit, int skip, List<Criteria> ands,
             TextCriteria textCriteria, Sort sort) {
         List<AggregationOperation> aggOps = new LinkedList<>();
-        /*
-         * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
-         * process it first here
-         */
+        // MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
+        // process it first here
         if (textCriteria != null) {
             aggOps.add(Aggregation.match(textCriteria));
         }
@@ -962,11 +941,10 @@ public class MongoRead extends ServiceBase {
         // calculate contentLength
         aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("strLenCP(cont)")
                 .as("contentLength"));
-        /*
-         * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
-         * with aggregates we doing a step by step pipeline of processing so we need records in the correct
-         * order before we do limit or skip and so the ordering of these 'ops' does that.
-         */
+        // IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
+        // with aggregates we doing a step by step pipeline of processing so we need records in the
+        // correct
+        // order before we do limit or skip and so the ordering of these 'ops' does that.
         aggOps.add(Aggregation.sort(sort));
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
@@ -1013,10 +991,8 @@ public class MongoRead extends ServiceBase {
         auth.auth(ms, node, PrivilegeType.READ);
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
-        /*
-         * this mod time condition is simply to be sure the user has 'saved' the node and not pick up new
-         * node currently being crafted
-         */
+        // this mod time condition is simply to be sure the user has 'saved' the node and not pick up new
+        // node currently being crafted
         crit = crit.and(SubNode.MODIFY_TIME).ne(null);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
@@ -1358,7 +1334,7 @@ public class MongoRead extends ServiceBase {
     // (not currently used)
     public SubNode findByCID(MongoSession ms, String cid) {
         Query q = new Query();
-        /* Match the PIN to cid */
+        // Match the PIN to cid
         // need to add an index for this field if we ever start using it.
         Criteria crit = Criteria.where(SubNode.MCID).is(cid);
         q.addCriteria(crit);

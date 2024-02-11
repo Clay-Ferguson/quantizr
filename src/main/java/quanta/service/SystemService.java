@@ -138,10 +138,8 @@ public class SystemService extends ServiceBase {
             delete.deleteNodeOrphans();
             // do not delete.
             // usrMgr.cleanUserAccounts();
-            /*
-             * Create map to hold all user account storage statistics which gets updated by the various
-             * processing in here and then written out in 'writeUserStats' below
-             */
+            // Create map to hold all user account storage statistics which gets updated by the various
+            // processing in here and then written out in 'writeUserStats' below
             final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
             attach.gridMaintenanceScan(statsMap);
 

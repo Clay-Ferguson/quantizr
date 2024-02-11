@@ -76,13 +76,13 @@ public class SubNodeUtil extends ServiceBase {
      */
     public boolean removeDefaultProps(SubNode node) {
         boolean ret = false;
-        /* If layout=="v" then remove the property */
+        // If layout=="v" then remove the property
         String layout = node.getStr(NodeProp.LAYOUT);
         if ("v".equals(layout)) {
             node.delete(NodeProp.LAYOUT);
             ret = true;
         }
-        /* If priority=="0" then remove the property */
+        // If priority=="0" then remove the property
         String priority = node.getStr(NodeProp.PRIORITY);
         if ("0".equals(priority)) {
             node.delete(NodeProp.PRIORITY);
@@ -174,13 +174,11 @@ public class SubNodeUtil extends ServiceBase {
         for (String tok : toks) {
             String path = fixPath(parentPath + tok);
             node = read.getNode(ms, path);
-            /*
-             * if this node is found continue on, using it as current parent to build on
-             */
+            // if this node is found continue on, using it as current parent to build on
             if (node != null) {
                 parent = node;
             } else {
-                /* Note if parent PARAMETER here is null we are adding a root node */
+                // Note if parent PARAMETER here is null we are adding a root node
                 parent = create.createNode(ms, parent, tok, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
                         true, true, null);
                 if (parent == null) {
@@ -236,7 +234,7 @@ public class SubNodeUtil extends ServiceBase {
         String uid = UUID.randomUUID().toString();
         StringBuilder sb = new StringBuilder();
         int len = uid.length();
-        /* chop length in half by using every other character */
+        // chop length in half by using every other character
         for (int i = 0; i < len; i += 2) {
             char c = uid.charAt(i);
             if (c == '-') {
@@ -246,11 +244,10 @@ public class SubNodeUtil extends ServiceBase {
             }
         }
         return sb.toString();
-        /*
-         * WARNING: I remember there are some cases where SecureRandom can hang on non-user machines (i.e.
-         * production servers), as they rely no some OS level sources of entropy that may be dormant at the
-         * time. Be careful. here's another way to generate a random 64bit number...
-         */
+        // WARNING: I remember there are some cases where SecureRandom can hang on non-user machines (i.e.
+        // production servers), as they rely no some OS level sources of entropy that may be dormant at
+        // the
+        // time. Be careful. here's another way to generate a random 64bit number...
         // if (no(prng )) {
         // prng = SecureRandom.getInstance("SHA1PRNG");
         // }
@@ -314,7 +311,7 @@ public class SubNodeUtil extends ServiceBase {
         if (bin != null) {
             return prop.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
         }
-        /* as last resort try to get any extrnally linked binary image */
+        // as last resort try to get any extrnally linked binary image
         if (bin == null) {
             bin = att.getUrl();
         }

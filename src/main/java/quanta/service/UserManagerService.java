@@ -167,7 +167,7 @@ public class UserManagerService extends ServiceBase {
         SessionContext sc = ThreadLocals.getSC();
         Val<SubNode> userNodeVal = new Val<>();
 
-        /* Anonymous user */
+        // Anonymous user
         if (req.getUserName() == null || PrincipalName.ANON.s().equals(req.getUserName())) {
             log.debug("Anonymous user login.");
             // just as a precaution update the sc userName to anon values
@@ -211,10 +211,8 @@ public class UserManagerService extends ServiceBase {
         }
         // If we reach here we either have ANON user or some authenticated user (password checked ok)
         ThreadLocals.initMongoSession(sc);
-        /*
-         * We have to get timezone information from the user's browser, so that all times on all nodes
-         * always show up in their precise local time!
-         */
+        // We have to get timezone information from the user's browser, so that all times on all nodes
+        // always show up in their precise local time!
         sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
         sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
         res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
@@ -394,8 +392,7 @@ public class UserManagerService extends ServiceBase {
         log.debug("User is trying signupCode: " + signupCode);
         return arun.run(as -> {
             // signupCode is just the new account node id? I guess that's secure, if user
-            // has this value it's the only user
-            // who could possibly know this unguessable value.
+            // has this value it's the only user who could possibly know this unguessable value.
             SubNode node = read.getNode(as, signupCode);
             if (node != null) {
                 if (!node.getBool(NodeProp.SIGNUP_PENDING)) {
@@ -500,16 +497,12 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeEx("User already exists.");
         }
         SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false, null, false);
-        /*
-         * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
-         * it's random and tied to this user by definition
-         */
+        // It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
+        // it's random and tied to this user by definition
         String signupCode = newUserNode.getIdStr();
         String signupLink = prop.getHttpProtocol() + "://" + prop.getMetaHost() + "?signupCode=" + signupCode;
         String content = null;
-        /*
-         * We print this out so we can use it in DEV mode when no email support may be configured
-         */
+        // We print this out so we can use it in DEV mode when no email support may be configured
         log.debug("Signup URL: " + signupLink);
         String brandingAppName = prop.getConfigText("brandingAppName");
         content = "Welcome to " + brandingAppName + ", " + userName + "!"
@@ -646,9 +639,7 @@ public class UserManagerService extends ServiceBase {
             if (!ThreadLocals.getSC().getUserName().equals(prefsNode.getStr(NodeProp.USER))) {
                 throw new RuntimeException("Not your node.");
             }
-            /*
-             * Assign preferences as properties on this node,
-             */
+            // Assign preferences as properties on this node,
             prefsNode.set(NodeProp.USER_PREF_EDIT_MODE, reqUserPrefs.isEditMode());
             prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA, reqUserPrefs.isShowMetaData());
             prefsNode.set(NodeProp.USER_PREF_SHOW_PROPS, reqUserPrefs.isShowProps());
@@ -884,8 +875,7 @@ public class UserManagerService extends ServiceBase {
         if (friendsList == null)
             return false;
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
-        // Block.
-        // Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
+        // Block. Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
         SubNode userNode =
                 read.findNodeByUserAndType(ms, friendsList, inUserNode, maybeFollowedUser, NodeType.FRIEND.s());
         return userNode != null;
@@ -955,9 +945,7 @@ public class UserManagerService extends ServiceBase {
         Val<String> userName = new Val<>();
         String passCode = req.getPassCode();
         if (passCode != null) {
-            /*
-             * We can run this block as admin, because the codePart below is secret and is checked for a match
-             */
+            // We can run this block as admin, because the codePart below is secret and is checked for a match
             arun.run(as -> {
                 String userNodeId = XString.truncAfterFirst(passCode, "-");
                 if (userNodeId == null) {
@@ -1011,7 +999,7 @@ public class UserManagerService extends ServiceBase {
         arun.run(as -> {
             String user = req.getUser();
             String email = req.getEmail();
-            /* make sure username itself is acceptalbe */
+            // make sure username itself is acceptalbe
             if (!isNormalUserName(user)) {
                 res.error("User name is illegal.");
                 return null;
@@ -1021,25 +1009,22 @@ public class UserManagerService extends ServiceBase {
                 res.error("User does not exist.");
                 return null;
             }
-            /*
-             * IMPORTANT!
-             *
-             * verify that the email address provides IS A MATCH to the email address for this user!
-             */
+            // IMPORTANT!
+            //
+            // verify that the email address provides IS A MATCH to the email address for this user!
             String nodeEmail = ownerNode.getStr(NodeProp.EMAIL);
             if (nodeEmail == null || !nodeEmail.equals(email)) {
                 res.error("Wrong user name and/or email.");
                 return null;
             }
-            /*
-             * if we make it to here the user and email are both correct, and we can initiate the password
-             * reset. We pick some random time between 1 and 2 days from now into the future to serve as the
-             * unguessable auth code AND the expire time for it. Later we can create a deamon processor that
-             * cleans up expired authCodes, but for now we just need to HAVE the auth code.
-             *
-             * User will be emailed this code and we will perform reset when we see it, and the user has entered
-             * new password we can use.
-             */
+            // if we make it to here the user and email are both correct, and we can initiate the password
+            // reset. We pick some random time between 1 and 2 days from now into the future to serve as the
+            // unguessable auth code AND the expire time for it. Later we can create a deamon processor that
+            // cleans up expired authCodes, but for now we just need to HAVE the auth code.
+            //
+            // User will be emailed this code and we will perform reset when we see it, and the user has
+            // entered
+            // new password we can use.
             int oneDayMillis = 60 * 60 * 1000;
             long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
             ownerNode.set(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE, String.valueOf(authCode));
@@ -1079,9 +1064,7 @@ public class UserManagerService extends ServiceBase {
             }
 
             if (node.getAc() != null) {
-                /*
-                 * Lookup all userNames from the ACL info, to add them all to 'toUserNames'
-                 */
+                // Lookup all userNames from the ACL info, to add them all to 'toUserNames'
                 for (String accntId : node.getAc().keySet()) {
                     // ignore public, it's not a user.
                     if (accntId.equals(ownerIdStr) || idSet.contains(accntId)

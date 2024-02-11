@@ -12,7 +12,7 @@ import quanta.mongo.model.SubNode;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
- * <p>
+ * 
  * The system always sends emails out in a batch operation every 30seconds or so, by emptying out
  * this queue.
  */
@@ -41,14 +41,14 @@ public class OutboxMgr extends ServiceBase {
         // null, NodeName.INBOX);
         // if (userInbox != null) {
         // /*
-        // * First look to see if there is a target node already existing in this persons inbox that points
+        // First look to see if there is a target node already existing in this persons inbox that points
         // to
-        // * the node in question
-        // */
+        // the node in question
+        ///
         // SubNode notifyNode = read.findNodeByProp(as, userInbox, NodeProp.TARGET_ID.s(), node.getIdStr());
         // /*
-        // * If there's no notification for this node already in the user's inbox then add one
-        // */
+        // If there's no notification for this node already in the user's inbox then add one
+        ///
         // if (notifyNode == null) {
         // notifyNode =
         // create.createNode(
@@ -74,9 +74,9 @@ public class OutboxMgr extends ServiceBase {
         // update.save(as, notifyNode);
         // }
         // /*
-        // * Send push notification so the user sees live there's a new share comming in or being re-added
-        // * even.
-        // */
+        // Send push notification so the user sees live there's a new share comming in or being re-added
+        // even.
+        ///
         // List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
         // if (scList != null) {
         // for (SessionContext sc : scList) {

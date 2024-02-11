@@ -201,7 +201,7 @@ public class Util {
     // String mimeType = Files.probeContentType(path);
     public static String getMimeFromFileType(String fileName) {
         String mimeType = null;
-        /* mimeType can be passed as null if it's not yet determined */
+        // mimeType can be passed as null if it's not yet determined
         if (mimeType == null) {
             mimeType = URLConnection.guessContentTypeFromName(fileName);
         }
@@ -209,7 +209,7 @@ public class Util {
             String ext = FilenameUtils.getExtension(fileName);
             mimeType = MimeTypeUtils.getMimeType(ext);
         }
-        /* fallback to at lest some acceptable mime type */
+        // fallback to at lest some acceptable mime type
         if (mimeType == null) {
             mimeType = "application/octet-stream";
         }

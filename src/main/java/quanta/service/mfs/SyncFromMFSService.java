@@ -62,8 +62,10 @@ public class SyncFromMFSService extends ServiceBase {
                 } else {
                     res.error("Unable to process: " + req.getPath());
                 }
-            } else { // access data from the local MFS // Loading from an actual MFS path was completed, but is not very
-                     // usable because we can only
+            }
+            // access data from the local MFS // Loading from an actual MFS path was completed, but is not very
+            // usable because we can only
+            else {
                 if (processPath(req.getPath())) {
                     res.setMessage(buildReport());
                 } else {
@@ -107,22 +109,22 @@ public class SyncFromMFSService extends ServiceBase {
         // for (MerkleLink entry : dag.getLinks()) {
         // String entryCid = entry.getCid().getPath();
         // /*
-        // * we rely on the logic of "if not a json file, it's a folder"
-        // */
+        // we rely on the logic of "if not a json file, it's a folder"
+        ///
         // if (!entry.getName().endsWith(".json")) {
         // log.debug(indent + "Processing Folder: " + entry.getName());
         // if (recursive > 0) {
         // /*
-        // * WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
-        // * 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
-        // * now we could either just put it's CID also in as the text for it, or else actually read the
-        // * text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
-        // * sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO
+        // WARNING. This code is Incomplete: Left off working here: Need to create newNode as a child of
+        // 'node', and put the entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for
+        // now we could either just put it's CID also in as the text for it, or else actually read the
+        // text-content from the JSON (But we'd need to first query all subnodes under 'node' so we can be
+        // sure not to recreate any duplicate nodes in case this scid already exists). Also once we DO
         // load
-        // * a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting
+        // a level we'd need to set a flag on the node to indicate we DID read it and to avoid attempting
         // to
-        // * traverse any node that's already fully loaded.
-        // */
+        // traverse any node that's already fully loaded.
+        ///
         // SubNode newNode = null;
         // traverseDag(newNode, entry.getCid().getPath(), level + 1, recursive - 1);
         // }
@@ -164,11 +166,12 @@ public class SyncFromMFSService extends ServiceBase {
                 String entryPath = path + "/" + entry.getName();
                 if (entry.getSize() == 0) {
                     processPath(entryPath);
-                } else { // else process a file
+                } else {
                     // process directory
                     if (entry.isDir()) {
                         processPath(entryPath);
-                    } //
+                    }
+                    // else process a file
                     else if (entry.isFile()) { // process file
                         log.debug("processFile: " + entryPath);
                         // read the node json from ipfs file
@@ -181,26 +184,27 @@ public class SyncFromMFSService extends ServiceBase {
                             // we found the ipfs file json, so convert it to SubNode, and save
                             SubNodeIdentity node = null;
                             try {
-                                /*
-                                 * UPDATE: Now that we have SubNodePojo.java for deseralizing we no longer need
-                                 * SubNodeIdentity and we can refactor it out.
-                                 *
-                                 * todo-2: WARNING! Simply deserializing a SubNode object causes it to become a REAL
-                                 * node and behave as if it were inserted into the DB, so that after json parses it
-                                 * 'read.getNode()' Mongo query will immediately find it and 'claim' that it's been
-                                 * inserted into the DB already.
-                                 *
-                                 * Solution: I created SubNodeIdentity to perform a pure (partial) deserialization, but
-                                 * I need to check the rest of the codebase to be sure there's nowhere that this
-                                 * surprise will break things. (import/export logic?)
-                                 */
+                                // UPDATE: Now that we have SubNodePojo.java for deseralizing we no longer need
+                                // SubNodeIdentity and we can refactor it out.
+                                //
+                                // todo-2: WARNING! Simply deserializing a SubNode object causes it to become a REAL
+                                // node and behave as if it were inserted into the DB, so that after json parses it
+                                // 'read.getNode()' Mongo query will immediately find it and 'claim' that it's been
+                                // inserted into the DB already.
+                                //
+                                // Solution: I created SubNodeIdentity to perform a pure (partial) deserialization,
+                                // but
+                                // I need to check the rest of the codebase to be sure there's nowhere that this
+                                // surprise will break things. (import/export logic?)
                                 node = Util.mapper.readValue(json, SubNodeIdentity.class);
                                 // we assume the node.id values can be the same across Federated instances.
                                 SubNode findNode = read.getNode(session, node.getId());
                                 if (findNode != null) {
                                     log.debug("Node existed: " + node.getId());
                                     matchingFiles++;
-                                } else { // todo-2: check if node is same content here.
+                                }
+                                // todo-2: check if node is same content here.
+                                else {
                                     SubNode realNode = Util.mapper.readValue(json, SubNode.class);
                                     update.save(session, realNode);
                                     log.debug("Created Node: " + node.getId());

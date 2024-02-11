@@ -8,7 +8,6 @@ import org.bson.types.ObjectId;
  * accessLevels: w = read/write r = readonly
  */
 public class MongoPrincipal {
-
     private ObjectId userNodeId;
     private String userName;
     private String accessLevel;

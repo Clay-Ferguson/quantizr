@@ -46,7 +46,7 @@ public class ExportJsonService extends ServiceBase {
             }
             String targetFolder = prop.getAdminDataFolder() + File.separator + fileName;
             FileUtils.createDirectory(targetFolder);
-            /* This is not a typo, this path will be like ".../fileName/fileName.json" */
+            // This is not a typo, this path will be like ".../fileName/fileName.json"
             String fullFileName = targetFolder + File.separator + fileName + ".json";
             Val<Integer> numDocs = new Val<>(0);
             Val<Integer> numBins = new Val<>(0);
@@ -137,7 +137,7 @@ public class ExportJsonService extends ServiceBase {
             try {
                 String targetFileName = targetFolder + File.separator + node.getIdStr() + "-" + binFileName;
                 File targetFile = new File(targetFileName);
-                /* warning: we have our own FileUtils (conflict of name) */
+                // warning: we have our own FileUtils (conflict of name)
                 org.apache.commons.io.FileUtils.copyInputStreamToFile(is, targetFile);
             } catch (Exception e) {
                 e.printStackTrace();
