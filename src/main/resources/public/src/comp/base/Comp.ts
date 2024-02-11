@@ -514,6 +514,8 @@ export abstract class Comp {
     }
 }
 
+/* We have a wrapper class around this single value so we can pass by reference and store the actual value in 
+a higher level object, and not have to worry about the value being out of sync. */
 export class ScrollPos {
     scrollPos: number = 0;
 

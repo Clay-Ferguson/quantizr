@@ -106,6 +106,7 @@ export class NodeCompContent extends Div {
                     attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, null));
                 }
             });
+            children.push(new Clearfix());
             children.push(new Div(null, { className: "rowImageContainer" }, attComps));
         }
 
