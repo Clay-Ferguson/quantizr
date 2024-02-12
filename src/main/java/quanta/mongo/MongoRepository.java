@@ -85,7 +85,6 @@ public class MongoRepository extends ServiceBase {
             // broadcast to all other parts of the app that the DB is now live and ready.
             publisher.getPublisher().publishEvent(new AppStartupEvent());
             delete.removeAbandonedNodes(as);
-            // apub.refreshForeignUsers();
             system.cacheAdminNodes();
         }
     }

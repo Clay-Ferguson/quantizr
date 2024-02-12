@@ -502,8 +502,7 @@ public class MongoRead extends ServiceBase {
         }
         // This regex finds all that START WITH "path/" and then end with some other string that does NOT
         // contain "/", so that we know it's not at a deeper level of the tree, but is immediate children
-        // of
-        // 'node'
+        // of 'node'
         //
         // ^:aa:bb:([^:])*$
         //
@@ -543,8 +542,7 @@ public class MongoRead extends ServiceBase {
         }
         // This regex finds all that START WITH "path/" and then end with some other string that does NOT
         // contain "/", so that we know it's not at a deeper level of the tree, but is immediate children
-        // of
-        // 'node'
+        // of 'node'
         //
         // ^:aa:bb:([^:])*$
         //
@@ -723,9 +721,8 @@ public class MongoRead extends ServiceBase {
         }
         Query q = new Query();
         // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the
-        // string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-        // children.
+        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
+        // its children.
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         if (publicOnly) {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
@@ -766,9 +763,8 @@ public class MongoRead extends ServiceBase {
         TextCriteria textCriteria = null;
         Sort sort = null;
         // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the
-        // string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-        // children.
+        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
+        // its children.
         Criteria crit = null;
         if (recursive) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
@@ -804,8 +800,7 @@ public class MongoRead extends ServiceBase {
                 }
                 // his reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
                 // bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do
-                // an
-                // OR search on strings containing special characters, without the special characters basically
+                // an OR search on strings containing special characters, without the special characters basically
                 // being ignored.
                 //
                 // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
@@ -830,8 +825,8 @@ public class MongoRead extends ServiceBase {
                 // example date RANGE condition:
                 // query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
                 // and this 'may' be the same:
-                // Query q = new
-                // Query(Criteria.where("ip").is(ip).andOperator(Criteria.where("createdDate").lt(endDate),
+                // Query q = new Query(Criteria.where("ip").is(ip)
+                // .andOperator(Criteria.where("createdDate").lt(endDate),
                 // Criteria.where("createdDate").gte(startDate)));
                 if ("futureOnly".equals(timeRangeType)) {
                     // because we want to show the soonest items on top, for "future" query, we have
@@ -916,8 +911,7 @@ public class MongoRead extends ServiceBase {
 
         // IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
         // with aggregates we doing a step by step pipeline of processing so we need records in the
-        // correct
-        // order before we do limit or skip and so the ordering of these 'ops' does that.
+        // correct order before we do limit or skip and so the ordering of these 'ops' does that.
         aggOps.add(Aggregation.sort(sort));
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
@@ -943,8 +937,7 @@ public class MongoRead extends ServiceBase {
                 .as("contentLength"));
         // IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
         // with aggregates we doing a step by step pipeline of processing so we need records in the
-        // correct
-        // order before we do limit or skip and so the ordering of these 'ops' does that.
+        // correct order before we do limit or skip and so the ordering of these 'ops' does that.
         aggOps.add(Aggregation.sort(sort));
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
@@ -1040,9 +1033,6 @@ public class MongoRead extends ServiceBase {
             node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true, true,
                     null);
             node.setOwner(userNode.getId());
-            if (content == null) {
-                content = getDefaultContentForNamedNode(type);
-            }
             node.setContent(content);
             node.touch();
             if (publicPrivs != null) {
@@ -1052,28 +1042,6 @@ public class MongoRead extends ServiceBase {
         }
 
         return node;
-    }
-
-    public String getDefaultContentForNamedNode(String type) {
-        if (type.equals(NodeType.EXPORTS.s())) {
-            return "### Exports";
-        }
-        if (type.equals(NodeType.FRIEND_LIST.s())) {
-            return "### Friends List";
-        }
-        if (type.equals(NodeType.BLOCKED_USERS.s())) {
-            return "### Blocked Users";
-        }
-        if (type.equals(NodeType.POSTS.s())) {
-            return "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts";
-        }
-        if (type.equals(NodeType.NOTES.s())) {
-            return "### Notes";
-        }
-        if (type.equals(NodeType.BOOKMARK_LIST.s())) {
-            return "### Bookmarks";
-        }
-        return "Node: " + type;
     }
 
     public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean caseSensitive,

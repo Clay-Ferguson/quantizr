@@ -243,29 +243,6 @@ public class UserManagerService extends ServiceBase {
         sc.setUserNodeId(userNodeId.toHexString());
     }
 
-    // public void ensureUserHomeNodeExists(MongoSession ms, String userName, String content, String
-    // type, String name) {
-    // SubNode userNode = read.getAccountByUserName(ms, userName, false);
-    // if (userNode != null) {
-    // SubNode userHomeNode = read.getNodeByName(ms, userName + ":" + name);
-    // if (userHomeNode == null) {
-    // SubNode node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null,
-    // null,
-    // true, true);
-    // node.setOwner(userNode.getId());
-    // if (name != null) {
-    // node.setName(name);
-    // }
-    // node.setContent(content);
-    // node.touch();
-    // acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), null,
-    // Arrays.asList(PrivilegeType.READ.s()),
-    // null);
-    // update.save(ms, node);
-    // }
-    // }
-    // }
-
     public SubNode getNotesNode(MongoSession ms, String userName, SubNode userNode) {
         return read.getUserNodeByType(ms, userName, userNode, "### Notes", NodeType.NOTES.s(),
                 Arrays.asList(PrivilegeType.READ.s()), true);
@@ -277,11 +254,12 @@ public class UserManagerService extends ServiceBase {
     }
 
     public SubNode getFriendsList(MongoSession ms, String userName, boolean create) {
-        return read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, create);
+        return read.getUserNodeByType(ms, userName, null, "### Friends List", NodeType.FRIEND_LIST.s(), null, create);
     }
 
     public SubNode getBlockedUsers(MongoSession ms, String userName, boolean create) {
-        return read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, create);
+        return read.getUserNodeByType(ms, userName, null, "### Blocked Users", NodeType.BLOCKED_USERS.s(), null,
+                create);
     }
 
     /*
@@ -871,7 +849,8 @@ public class UserManagerService extends ServiceBase {
 
     public boolean userIsFollowedByMe(MongoSession ms, SubNode inUserNode, String maybeFollowedUser) {
         String userName = ThreadLocals.getSC().getUserName();
-        SubNode friendsList = read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, false);
+        SubNode friendsList =
+                read.getUserNodeByType(ms, userName, null, "### Friends", NodeType.FRIEND_LIST.s(), null, false);
         if (friendsList == null)
             return false;
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or

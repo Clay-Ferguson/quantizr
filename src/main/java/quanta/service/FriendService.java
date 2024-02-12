@@ -147,7 +147,7 @@ public class FriendService extends ServiceBase {
     private void addFriendInternal(MongoSession ms, String userDoingFollow, ObjectId accntIdDoingFollow,
             String userToFollow, String tags) {
         SubNode followerFriendList =
-                read.getUserNodeByType(ms, userDoingFollow, null, null, NodeType.FRIEND_LIST.s(), null, true);
+                read.getUserNodeByType(ms, userDoingFollow, null, "### Friends", NodeType.FRIEND_LIST.s(), null, true);
         if (followerFriendList == null) {
             log.debug("Can't access Friend list for: " + userDoingFollow);
             return;

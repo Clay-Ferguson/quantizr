@@ -133,8 +133,7 @@ public class MongoAuth extends ServiceBase {
         if (parent == null || parent.isType(NodeType.ACCOUNT) || child == null)
             return;
         // Special case of replying to (appending under) a FRIEND-type node is always to make this a
-        // private
-        // message to the user that friend node represents
+        // private message to the user that friend node represents
         if (parent.isType(NodeType.FRIEND)) {
             // get user prop from node
             String userName = parent.getStr(NodeProp.USER);
@@ -394,8 +393,7 @@ public class MongoAuth extends ServiceBase {
             allPrivs += privsForUserId;
         }
         // We always add on any privileges assigned to the PUBLIC when checking privs for this user,
-        // because
-        // the auth equivalent is really the union of this set.
+        // because the auth equivalent is really the union of this set.
         AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());
         String privsForPublic = acPublic != null ? acPublic.getPrvs() : null;
         if (privsForPublic != null) {
@@ -560,9 +558,8 @@ public class MongoAuth extends ServiceBase {
             pathToSearch = NodePath.USERS_PATH;
         }
         // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the
-        // string. Without the trailing (.+)$ we would be including the node itself in addition to all its
-        // children.
+        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
+        // its children.
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch));
 
         ands.add(Criteria.where(SubNode.AC).ne(null));

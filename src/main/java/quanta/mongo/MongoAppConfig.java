@@ -43,8 +43,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     private GridFsTemplate grid;
     private SimpleMongoClientDatabaseFactory factory;
     // we have this so we can set it to true and know that MongoDb failed and gracefully run in case
-    // we
-    // need to run for debugging purposes.
+    // we need to run for debugging purposes.
     public static boolean connectionFailed = false;
 
     @Autowired
@@ -144,9 +143,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return client;
     }
 
-    /**
-     * MongoTemplate is thread-safe and can be reused everywhere in all threads.
-     */
+
+    // MongoTemplate is thread-safe and can be reused everywhere in all threads.
     @Override
     @Bean
     public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {

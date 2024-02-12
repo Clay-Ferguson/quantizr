@@ -16,7 +16,7 @@ import quanta.util.ThreadLocals;
 /**
  * Instrumentation for the app (for Performance Monitoring)
  *
- * Any method can be annotated with @PerfMon to gather performance statistics .
+ * Any method can be annotated with @PerfMon to gather performance statistics.
  *
  * Eventually we can perhaps use OpenTelemetry+SigNoz for performance metrics, but for now to be
  * able to gather specific targeted metrics in the simplest way possible, we just use this class

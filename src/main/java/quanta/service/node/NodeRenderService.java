@@ -291,7 +291,7 @@ public class NodeRenderService extends ServiceBase {
         // in the query to pull up the list when the node ordering is ordinal. Note, if sort order is by a
         // timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
         // that is enough to trigger 'endReached' logic to be set correctly
-        limit = scanToNode != null ? -1 : limit + 1;
+        int queryLimit = scanToNode != null ? -1 : limit + 1;
         String orderBy = node.getStr(NodeProp.ORDER_BY);
         Sort sort = null;
         if (!StringUtils.isEmpty(orderBy)) {
@@ -310,7 +310,7 @@ public class NodeRenderService extends ServiceBase {
         // if (!showReplies) {
         // moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
         // }
-        Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, limit, offset, moreCriteria, true);
+        Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset, moreCriteria, true);
         Iterator<SubNode> iterator = nodeIter.iterator();
         int idx = offset;
         // this should only get set to true if we run out of records, because we reached

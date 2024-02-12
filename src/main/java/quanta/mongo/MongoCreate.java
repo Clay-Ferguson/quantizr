@@ -45,8 +45,7 @@ import quanta.util.val.Val;
 public class MongoCreate extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoCreate.class);
     // this large top reserve size means the "insert at top" will always be done with out multiple
-    // node
-    // updates except for once every thousand times.
+    // node updates except for once every thousand times.
     private static long RESERVE_BLOCK_SIZE = 1000;
 
     public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
@@ -157,9 +156,8 @@ public class MongoCreate extends ServiceBase {
         // default new ordinal to ordinal
         long newOrdinal = ordinal;
         // We detect the special case where we're attempting to insert at 'top' ordinals and if we find
-        // room
-        // to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries to
-        // leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
+        // room to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries
+        // to leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
         // 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we
         // end up trying to insert above it.
         // if we're inserting a single node
@@ -245,11 +243,9 @@ public class MongoCreate extends ServiceBase {
         }
         // If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
         // "My Posts" node, and the other case is if we are doing a reply we also will put the reply in
-        // the
-        // user's POSTS node.
+        // the user's POSTS node.
         if (nodeId == null && !linkBookmark) {
-            parentNode = read.getUserNodeByType(ms, null, null,
-                    "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
+            parentNode = read.getUserNodeByType(ms, null, null, "### Posts", NodeType.POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s()), true);
 
             if (parentNode != null) {

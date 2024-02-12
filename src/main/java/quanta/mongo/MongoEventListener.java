@@ -123,10 +123,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         // if no owner is assigned
         if (node.getOwner() == null) {
             // if we are saving the root node, we make it be the owner of itself. This is also the admin
-            // owner,
-            // and we only allow this to run during initialiation when the server may be creating the
-            // database,
-            // and is not yet processing user requests
+            // owner, and we only allow this to run during initialiation when the server may be creating the
+            // database, and is not yet processing user requests
             if (node.getPath().equals(NodePath.ROOT_PATH) && !MongoRepository.fullInit) {
                 ThreadLocals.requireAdminThread();
                 dbObj.put(SubNode.OWNER, id);
