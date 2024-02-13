@@ -10,7 +10,6 @@
         * [Special Markdown Options](#special-markdown-options)
     * [Export Tips](#export-tips)
         * [noexport](#noexport)
-    * [Exporting to IPFS](#exporting-to-ipfs)
     * [Import](#import)
 
 # Export and Import
@@ -65,16 +64,6 @@ The export as Markdown will result in a folder structure that's directly usable 
 ## noexport
 
 If there are one or more nodes you don't want included in your export, you can add a property named `noexport` to the node and give it any value like '1'. This will basically truncate that entire branch of the tree from the export and none of the subnodes under that Branch will be exported .
-
-# Exporting to IPFS
-
-By default, exports will be downloadable to your local machine as a TAR/ZIP (or other file) but you can also export directly to IPFS by clicking the "Save to IPFS" checkbox on the export dialog. 
-
-When you do this, instead of getting a file you can download, you get the IPFS CID to the exported file. That is, the node content is saved to IPFS and you're given its root CID.
-
-The IPFS option works for PDF export only.
-
-*Note: IPFS features on this site are currently disabled*
 
 # Import
 

@@ -96,7 +96,7 @@ After you've done this nothing will have moved in the database but your "Source 
 
 ## Drag to Upload Files
 
-Files or URLs can be dragged over the app to immediately upload directly into Quanta's DB or onto IPFS.
+Files or URLs can be dragged over the app to immediately upload directly into Quanta's DB.
 
 * Upload a file by dragging it over the editor dialog.
 * Upload a file into a new node by dragging it over any of the '+' (Plus Buttons) that you see on the page when you have "Edit Mode" turned on.

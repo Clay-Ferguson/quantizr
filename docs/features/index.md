@@ -22,7 +22,6 @@
     * [Import and Export](#import-and-export)
     * [Mobile Support](#mobile-support)
     * [Semantic Web](#semantic-web)
-    * [IPFS and Web 3](#ipfs-and-web-3)
     * [Docker Installation](#docker-installation)
     * [White-Label](#white-label)
     * [Open Source](#open-source)
@@ -133,9 +132,7 @@ The editor dialog lets you dictate content. There's a microphone icon above the 
 
 # PDF Creator
 
-PDF documents can be exported for any branch of the tree. The PDF generation uses the markdown headings (i.e. '#', '##', '###') to allow an optional 'Table of Contents' in the generated PDF document. 
-
-You can also optionally save your PDF to IPFS and it's CID will automatically get `IPFS Pinned` to your account.
+PDF documents can be exported for any branch of the tree. The PDF generation uses the markdown headings (i.e. '#', '##', '###') to allow an optional 'Table of Contents' in the generated PDF document.
 
 <img src='attachments/60187ef4f5fad05e348a3844-file-p' style='width:25%'/>
 
@@ -184,15 +181,6 @@ Create 'Typed' content using any of the `Schema.org` defined types. Use a system
 <img src='attachments/6418e16da4db9e5e43bb71e2-file-p' style='width:25%'/>
 
 
-# IPFS and Web 3
-
-Files (images, video, audio, etc.) can be uploaded and saved to IPFS. Files are automatically `IPFS Pinned` when uploaded and unpinned when deleted, so the platform functions like a pinning service.
-
-You can also publish content to IPFS using the Export feature which can generate a PDF, HTML, or Markdown file to save to IPFS.
-
-<img src='attachments/60186bc2dd591d549746753c-p' style='width:25%'/>
-
-
 # Docker Installation
 
 A docker image is available thru the Public Docker Repository so the only requirement to run your own instance is a Linux OS with 'docker-compose' installed, and running swarm mode.
@@ -209,7 +197,7 @@ The platform is re-brandable by your organization so its name, logo images, and 
 
 # Open Source
 
-Tech Stack: `Java` SpringBoot (back end), `TypeScript` (front end), SPA WebApp, React JS, SCSS, Vite front end build, NodeJS, with MongoDB and IPFS as primary storage. OpenAI HTTP API is used for all AI features. 
+Tech Stack: `Java` SpringBoot (back end), `TypeScript` (front end), SPA WebApp, React JS, SCSS, Vite front end build, NodeJS, with MongoDB as primary storage. 
 
 [GitHub Project (MIT License)](https://github.com/Clay-Ferguson/quantizr)
 

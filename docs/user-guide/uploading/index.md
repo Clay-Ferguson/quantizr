@@ -49,15 +49,9 @@ As you saw in the screenshot above, are several kinds of sources from which you 
 
 When uploading from a URL you can leave the checkbox labeled "Store a copy on this server" unchecked and this will save only the URL of the external file, rather than uploading it. This is useful if you don't want to load a file directly into your Quanta storage (consuming some of your quota), but would rather leave it as a link external to your personal storage space.
 
-Files can be uploaded either to the Quanta database or to IPFS. There's a checkbox on the Upload Dialog that lets you specify whether you want the file saved to IPFS or not, and if unchecked files are saved into the Quanta server database.
-
-This is only available when the admin has configured the server to use IPFS, and may not be available on all instances.
-
 # Account Quotas
 
-Each user account is allotted a specific amount of storage space (quota) which controls how much data they're allowed to upload. The platform will automatically deduct from your quota any time you upload a file to the DB, or to IPFS, or "IPFS pin" pre-existing content from IPFS. 
-
-This means Quanta can effectively function as an `IPFS Pinning Service`
+Each user account is allotted a specific amount of storage space (quota) which controls how much data they're allowed to upload. The platform will automatically deduct from your quota any time you upload a file to the DB.
 
 # Tips
 

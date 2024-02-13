@@ -220,6 +220,6 @@ services:
 
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
-            
+
 networks:
     bridge:

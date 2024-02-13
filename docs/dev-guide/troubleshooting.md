@@ -116,18 +116,6 @@ Should tell you image is already up to date
     docker system prune -a
     docker image prune -a
 
-# IPFS Not Working
-
-Run this to see the ipfs logs:
-
-    docker logs ipfs
-
-If you see an error like this:
-
-    Error: lock /data/ipfs/repo.lock: permission denied
-
-Then that means something went wrong starting or terminating IPFS, and the emergency fix for that which is hopefully safe seems to work is to just reboot your Linux instance to be sure everything's clean and nothing in IPFS is running, and then simply delete the 'repo.lock' file. This should then allow IPFS to be working fine the next time you startup Quanta. This is a bug in IPFS not a Quanta bug. The IPFS system doesn't always correctly manage this lock file.
-
 
 ----
 **[Next: Demo Content](/docs/demo-content/index.md)**
