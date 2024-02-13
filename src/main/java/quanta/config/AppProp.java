@@ -123,10 +123,6 @@ public class AppProp {
         return getHttpProtocol() + "://" + getMetaHost() + ":" + getServerPort();
     }
 
-    public String getLuceneDir() {
-        return "/subnode-lucene"; // todo-2: get this from prop
-    }
-
     public String getStringProp(String propName) {
         return env.getProperty(propName);
     }

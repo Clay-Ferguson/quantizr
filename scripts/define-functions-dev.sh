@@ -11,7 +11,6 @@ makeDirs () {
     mkdir -p ${QUANTA_BASE}/log
     mkdir -p ${QUANTA_BASE}/tmp
     mkdir -p ${QUANTA_BASE}/config
-    mkdir -p ${QUANTA_BASE}/lucene
 }
 
 set -a

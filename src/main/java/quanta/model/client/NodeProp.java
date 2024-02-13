@@ -77,7 +77,6 @@ public enum NodeProp {
 
     // FS_FILE("fs:file"), //
     // FS_FOLDER("fs:folder"), //
-    // FS_LUCENE("fs:lucene"), //
 
     FS_LINK("fs:link"), //
 

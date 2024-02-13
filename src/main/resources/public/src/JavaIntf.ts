@@ -1357,7 +1357,6 @@ export const enum NodeType {
     PLAIN_TEXT = "sn:txt",
     FS_FILE = "fs:file",
     FS_FOLDER = "fs:folder",
-    FS_LUCENE = "fs:lucene",
 }
 
 export const enum PrincipalName {

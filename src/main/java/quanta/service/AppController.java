@@ -894,22 +894,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    @RequestMapping(value = API_PATH + "/luceneIndex", method = RequestMethod.POST)
-    @ResponseBody
-    public Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
-        return callProc.run("luceneIndex", true, true, req, session, ms -> {
-            return lucene.reindex(ms, req.getNodeId(), req.getPath());
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/luceneSearch", method = RequestMethod.POST)
-    @ResponseBody
-    public Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
-        return callProc.run("luceneSearch", true, true, req, session, ms -> {
-            return lucene.search(ms, req.getNodeId(), req.getText());
-        });
-    }
-
     @RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String health() {

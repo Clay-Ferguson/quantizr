@@ -31,8 +31,7 @@ public enum NodeType {
     NONE("u"), // same as 'markdown' really (untyped, default to markdown)
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //
-    FS_FOLDER("fs:folder"), //
-    FS_LUCENE("fs:lucene");
+    FS_FOLDER("fs:folder");
 
     @JsonValue
     private final String value;
