@@ -173,8 +173,7 @@ public class RSSFeedService extends ServiceBase {
 
             entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
             // Now from the complete 'entries' list we extract out just the page we need into 'pageEntires'
-            // and
-            // then stuff pageEntries back into 'entries' to send out of this method
+            // and then stuff pageEntries back into 'entries' to send out of this method
             List<SyndEntry> pageEntries = new LinkedList<>();
             int pageNo = page - 1;
             int startIdx = pageNo * FEED_ITEMS_PER_PAGE;
@@ -244,31 +243,10 @@ public class RSSFeedService extends ServiceBase {
                 throw new RuntimeException("Could not parse response for feed: " + url, e);
             }
 
-            // =============================
-            // DO NOT DELETE. Let's keep this old code pattern here (which was failing because
-            // it didn't have the `bufferSize` set and the default was too small) for future reference.
-            // I'm going with the above which retrieves the RSS as a string we can get access too because
-            // this code sometimes needs to be debugged in a way where we have access to the actual XML RSS.
-            // Mono<SyndFeed> inFeedMono =
-            // WebClient.create().get().uri(url).retrieve().bodyToMono(DataBuffer.class)
-            // .timeout(Duration.ofSeconds(timeout)).map(dataBuffer -> {
-            // try {
-            // SyndFeedInput input = new SyndFeedInput();
-            // return input.build(new XmlReader(
-            // new LimitedInputStreamEx(dataBuffer.asInputStream(), 10 * Const.ONE_MB), true));
-            // } catch (Exception e) {
-            // throw new RuntimeException("Could not parse response for feed: " + url, e);
-            // }
-            // });
-            // inFeed = inFeedMono.block();
-            // =============================
-
             long time = System.currentTimeMillis() - start;
             if (time > 2000) {
                 log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
             }
-            new PerfMonEvent(System.currentTimeMillis() - start, "readFeed",
-                    ThreadLocals.getSC() != null ? ThreadLocals.getSC().getUserName() : "admin");
 
             // we update the cache regardless of 'fromCache' val. this is correct.
             feedCache.put(url, inFeed);
@@ -281,17 +259,16 @@ public class RSSFeedService extends ServiceBase {
             }
             return inFeed;
         } catch (Exception e) {
-            // Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale
-            // cache
-            // remains in place rather than getting forgotten just because it's currently unavailable
-            //
-            // This error can happen a lot since feeds out on the wild are so chaotic so we won't bother to
-            // clutter our logs with a stack trace here, and just log the message.
-            //
-            // todo-2: Actually it would be better to put this entire string being logged here into a hashset
-            // to
-            // just keep a unique list, and not even log it here, but make it part of the 'systemInfo'
-            // available
+            /*
+             * Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale cache
+             * remains in place rather than getting forgotten just because it's currently unavailable
+             * 
+             * This error can happen a lot since feeds out on the wild are so chaotic so we won't bother to
+             * clutter our logs with a stack trace here, and just log the message.
+             * 
+             * todo-2: Actually it would be better to put this entire string being logged here into a hashset to
+             * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
+             */
             // under the admin menu for checking server status info.
             log.debug("Error reading feed: " + url + " msg: " + e.getMessage());
             failedFeeds.add(url);

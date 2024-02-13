@@ -17,7 +17,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.instrument.PerfMonEvent;
 import quanta.mongo.MongoRepository;
 import quanta.util.DateUtil;
 
@@ -38,36 +37,28 @@ public class RedisService extends ServiceBase {
     public void save(SessionContext sc) {
         if (sc.getUserToken() == null)
             return;
-        long start = System.currentTimeMillis();
         rops.opsForValue().set(sc.getUserToken(), sc);
-        new PerfMonEvent(System.currentTimeMillis() - start, "redisSave", sc.getUserName());
     }
 
     public void delete(SessionContext sc) {
         if (sc.getUserToken() == null)
             return;
-        long start = System.currentTimeMillis();
         if (rops.delete(sc.getUserToken())) {
             log.debug("Redis Token Deleted: " + sc.getUserToken());
         }
-        new PerfMonEvent(System.currentTimeMillis() - start, "redisDel", sc.getUserName());
     }
 
     public SessionContext get(String token) {
         if (StringUtils.isEmpty(token))
             return null;
-        long start = System.currentTimeMillis();
         SessionContext sc = rops.opsForValue().get(token);
-        if (sc != null) {
-            new PerfMonEvent(System.currentTimeMillis() - start, "redisGet", sc.getUserName());
-        } else {
+        if (sc == null) {
             log.debug("unknown redis token: " + token);
         }
         return sc;
     }
 
     public List<SessionContext> query(String pattern) {
-        long start = System.currentTimeMillis();
         LinkedList<SessionContext> list = new LinkedList<>();
         Set<String> keys = rops.keys(pattern);
         if (keys != null) {
@@ -75,7 +66,6 @@ public class RedisService extends ServiceBase {
                 list.add(rops.opsForValue().get(key));
             }
         }
-        new PerfMonEvent(System.currentTimeMillis() - start, "redisQuery", "_sys_");
         return list;
     }
 

@@ -4,6 +4,15 @@ import java.util.LinkedList;
 import java.util.List;
 import quanta.util.ThreadLocals;
 
+/**
+ * Example Use:
+ * 
+ * <pre>
+ *  long start = System.currentTimeMillis(); 
+ * ...do something to be time new
+ * PerfMonEvent(System.currentTimeMillis() - start, "Thing that was timed", sc.getUserName());
+ * </pre>
+ */
 public class PerfMonEvent {
 
     public PerfMonEvent root;

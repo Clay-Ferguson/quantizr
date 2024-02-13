@@ -15,6 +15,14 @@ import quanta.util.ThreadLocals;
 
 /**
  * Instrumentation for the app (for Performance Monitoring)
+ * 
+ * IMPORTANT:
+ * 
+ * To enable this AOP, the following is required:
+ * 
+ * Note that @EnableAspectJAutoProxy in AppConfiguration.java is also required to enable this AOP
+ * PLUS, you also need to uncomment the @Aspect and @Component annotations below, and put the
+ * imports back in
  *
  * Any method can be annotated with @PerfMon to gather performance statistics.
  *
@@ -32,14 +40,20 @@ import quanta.util.ThreadLocals;
  * cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the
  * Instrumentation unless turning on temporarily for performance analysis.
  *
- * For reference: import org.aspectj.lang.annotation.Aspect; import
- * org.springframework.stereotype.Component;
- *
+ * <pre>
  * Example Call
- *
- * @PerfMon(category = "apub") public APOPerson generatePersonObj(SubNode userNode) { String host =
- *                   prop.getProtocolHostAndPort();
+ * @PerfMon(category = "apub") 
+ * public APOPerson generatePersonObj(SubNode userNode) { 
+ *      String host = prop.getProtocolHostAndPort();
+ * </pre>
  */
+
+// DO NOT DELETE
+// import org.aspectj.lang.annotation.Aspect;
+// import org.springframework.stereotype.Component;
+// @Aspect
+// @Component
+
 public class Instrument {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(Instrument.class);
@@ -83,10 +97,8 @@ public class Instrument {
         Method method = signature.getMethod();
         PerfMon annotation = method.getAnnotation(PerfMon.class);
         if (duration > CAPTURE_THRESHOLD) {
-            new PerfMonEvent(duration,
-                    annotation.category().equals("") ? signature.getName()
-                            : (annotation.category() + "." + signature.getName()), //
-                    userName);
+            new PerfMonEvent(duration, annotation.category().equals("") ? signature.getName()
+                    : (annotation.category() + "." + signature.getName()), userName);
         }
 
         return value;

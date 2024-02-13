@@ -12,6 +12,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -27,10 +28,12 @@ import quanta.service.AppController;
 import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
 
-// @EnableAspectJAutoProxy // (proxyTargetClass = true)
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
  */
+// DO NOT DELETE (this is diagnostic code. See Instrument.java for more info)
+// import org.springframework.context.annotation.EnableAspectJAutoProxy;
+// @EnableAspectJAutoProxy // (proxyTargetClass = true)
 @Configuration
 @EnableAsync
 public class AppConfiguration implements WebMvcConfigurer {

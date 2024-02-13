@@ -92,7 +92,7 @@ import quanta.util.Validator;
  * Spring normally when you call a method in the same object you're calling from Spring WILL NOT go
  * thru the proxy. As an example if we called a method in UserFeedService from inside that same
  * service, then unless we call like this: userFeed.myMethod(), then the proxy-based AOP stuff will
- * not execute, becuase it won't ge called thru a proxy.
+ * not execute, because it won't be called thru a proxy.
  */
 public class ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ServiceBase.class);
