@@ -91,7 +91,6 @@ export class TransferNodeDlg extends DialogBase {
             nodeId: null,
             zeroOffset: false,
             highlightId: null,
-            forceIPFSRefresh: false,
             scrollToTop: true,
             allowScroll: true,
             setTab: true,

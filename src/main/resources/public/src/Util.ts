@@ -783,7 +783,6 @@ export class Util {
                     forceRenderParent: false,
                     offset: 0,
                     goToLastPage: false,
-                    forceIPFSRefresh: false,
                     singleNode: false,
                     jumpToRss: false
                 });
@@ -845,10 +844,6 @@ export class Util {
             s.speechVoice = voice || 0;
             s.speechVoice2 = voice2 || 0;
             s.speechRate = rate || "normal";
-
-            // allow for everyone for now
-            s.allowedFeatures = res.allowedFeatures || "";
-            // Log.log("LoginResponse userName = " + res.userName + ". Features: " + s.allowedFeatures);
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
             // sure i'm keeping this feature.

@@ -13,8 +13,6 @@ export interface Attachment {
     b: string;
     d: string;
     u: string;
-    il: string;
-    ir: string;
     ai: string;
 }
 
@@ -39,27 +37,6 @@ export interface ClientConfig {
     search: string;
     login: string;
     paymentLink: string;
-}
-
-export interface IPSMData {
-    mime: string;
-    data: string;
-}
-
-export interface IPSMMessage {
-    from: string;
-    sig: string;
-    content: IPSMData[];
-    ts: number;
-}
-
-export interface MFSDirEntry {
-    dir: boolean;
-    file: boolean;
-    Name: string;
-    Type: number;
-    Size: number;
-    Hash: string;
 }
 
 export interface NodeLink {
@@ -132,8 +109,6 @@ export interface UserProfile {
     displayName: string;
     userName: string;
     homeNodeId: string;
-    didIPNS: string;
-    mfsEnable: boolean;
     userBio: string;
     userTags: string;
     blockedWords: string;
@@ -372,10 +347,6 @@ export interface DeleteFriendRequest extends RequestBase {
     userNodeId: string;
 }
 
-export interface DeleteMFSFileRequest extends RequestBase {
-    item: string;
-}
-
 export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
     childrenOnly: boolean;
@@ -395,7 +366,6 @@ export interface ExportRequest extends RequestBase {
     nodeId: string;
     exportExt: string;
     fileName: string;
-    toIpfs: boolean;
     includeToc: boolean;
     includeMetaComments: boolean;
     attOneFolder: boolean;
@@ -427,14 +397,6 @@ export interface GetFollowersRequest extends RequestBase {
 export interface GetFollowingRequest extends RequestBase {
     page: number;
     targetUserName: string;
-}
-
-export interface GetIPFSContentRequest extends RequestBase {
-    id: string;
-}
-
-export interface GetIPFSFilesRequest extends RequestBase {
-    folder: string;
 }
 
 export interface GetMultiRssRequest extends RequestBase {
@@ -540,10 +502,6 @@ export interface LinkNodesRequest extends RequestBase {
     embed: boolean;
 }
 
-export interface LoadNodeFromIpfsRequest extends RequestBase {
-    path: string;
-}
-
 export interface LoginRequest extends RequestBase {
     userName: string;
     password: string;
@@ -621,10 +579,6 @@ export interface PasteAttachmentsRequest extends RequestBase {
 export interface PingRequest extends RequestBase {
 }
 
-export interface PublishNodeToIpfsRequest extends RequestBase {
-    nodeId: string;
-}
-
 export interface RemovePrivilegeRequest extends RequestBase {
     nodeId: string;
     principalNodeId: string;
@@ -653,7 +607,6 @@ export interface RenderNodeRequest extends RequestBase {
     jumpToRss: boolean;
     goToLastPage: boolean;
     singleNode: boolean;
-    forceIPFSRefresh: boolean;
 }
 
 export interface ResetPasswordRequest extends RequestBase {
@@ -687,8 +640,6 @@ export interface SaveUserProfileRequest extends RequestBase {
     blockedWords: string;
     recentTypes: string;
     displayName: string;
-    publish: boolean;
-    mfsEnable: boolean;
 }
 
 export interface SearchAndReplaceRequest extends RequestBase {
@@ -773,13 +724,6 @@ export interface UpdateHeadingsRequest extends RequestBase {
     nodeId: string;
 }
 
-export interface UploadFromIPFSRequest extends RequestBase {
-    pinLocally: boolean;
-    nodeId: string;
-    cid: string;
-    mime: string;
-}
-
 export interface UploadFromUrlRequest extends RequestBase {
     storeLocally: boolean;
     nodeId: string;
@@ -846,9 +790,6 @@ export interface DeleteAttachmentResponse extends ResponseBase {
 export interface DeleteFriendResponse extends ResponseBase {
 }
 
-export interface DeleteMFSFileResponse extends ResponseBase {
-}
-
 export interface DeleteNodesResponse extends ResponseBase {
 }
 
@@ -859,8 +800,6 @@ export interface DeleteUserTransactionsResponse extends ResponseBase {
 }
 
 export interface ExportResponse extends ResponseBase {
-    ipfsCid: string;
-    ipfsMime: string;
     fileName: string;
 }
 
@@ -898,16 +837,6 @@ export interface GetFollowersResponse extends ResponseBase {
 
 export interface GetFollowingResponse extends ResponseBase {
     searchResults: NodeInfo[];
-}
-
-export interface GetIPFSContentResponse extends ResponseBase {
-    content: string;
-}
-
-export interface GetIPFSFilesResponse extends ResponseBase {
-    files: MFSDirEntry[];
-    folder: string;
-    cid: string;
 }
 
 export interface GetMultiRssResponse extends ResponseBase {
@@ -977,10 +906,6 @@ export interface GraphResponse extends ResponseBase {
     rootNode: GraphNode;
 }
 
-export interface IPSMPushInfo extends ServerPushInfo {
-    payload: string;
-}
-
 export interface ImportResponse extends ResponseBase {
 }
 
@@ -1007,14 +932,10 @@ export interface LikeNodeResponse extends ResponseBase {
 export interface LinkNodesResponse extends ResponseBase {
 }
 
-export interface LoadNodeFromIpfsResponse extends ResponseBase {
-}
-
 export interface LoginResponse extends ResponseBase {
     userProfile: UserProfile;
     authToken: string;
     rootNodePath: string;
-    allowedFeatures: string;
     anonUserLandingPageNode: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
@@ -1074,9 +995,6 @@ export interface PasteAttachmentsResponse extends ResponseBase {
 
 export interface PingResponse extends ResponseBase {
     serverInfo: string;
-}
-
-export interface PublishNodeToIpfsResponse extends ResponseBase {
 }
 
 export interface PushPageMessage extends ServerPushInfo {
@@ -1193,9 +1111,6 @@ export interface UpdateFriendNodeResponse extends ResponseBase {
 export interface UpdateHeadingsResponse extends ResponseBase {
 }
 
-export interface UploadFromIPFSResponse extends ResponseBase {
-}
-
 export interface UploadFromUrlResponse extends ResponseBase {
 }
 
@@ -1263,7 +1178,6 @@ export interface UserPreferences {
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
     aiService: string;
-    enableIPSM: boolean;
     maxUploadFileSize: number;
 }
 
@@ -1368,10 +1282,7 @@ export const enum NodeProp {
     BOOKMARK_SEARCH_TEXT = "search",
     USER = "sn:user",
     DISPLAY_NAME = "sn:displayName",
-    MFS_ENABLE = "sn:mfsEnable",
     USER_BIO = "sn:userBio",
-    USER_DID_IPNS = "sn:didIPNS",
-    USER_IPFS_KEY = "sn:ipfsKey",
     USER_TAGS = "sn:tags",
     USER_BLOCK_WORDS = "sn:blockWords",
     USER_RECENT_TYPES = "sn:recentTypes",
@@ -1380,15 +1291,7 @@ export const enum NodeProp {
     FILE_SYNC_LINK = "fs:link",
     USER_NODE_ID = "sn:userNodeId",
     NAME = "sn:name",
-    IPFS_CID = "ipfs:cid",
-    IPNS_CID = "ipns:cid",
-    IPFS_SCID = "ipfs:scid",
-    JSON_HASH = "ipfs:json",
-    SAVE_TO_IPFS = "sn:saveToIpfs",
-    IPFS_LINK_NAME = "ipfs:linkName",
-    IPFS_SOURCE = "ipfs:source",
     FS_LINK = "fs:link",
-    IPFS_OK = "ipfs:ok",
     MIME_EXT = "sn:ext",
     EMAIL = "sn:email",
     CODE = "sn:code",
@@ -1397,7 +1300,6 @@ export const enum NodeProp {
     BIN = "bin",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
-    ALLOWED_FEATURES = "sn:features",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_ACTIVE_TIME = "sn:lastActive",
     CRYPTO_KEY_PUBLIC = "sn:cryptoKeyPublic",
@@ -1456,7 +1358,6 @@ export const enum NodeType {
     FS_FILE = "fs:file",
     FS_FOLDER = "fs:folder",
     FS_LUCENE = "fs:lucene",
-    IPFS_NODE = "sn:ipfsNode",
 }
 
 export const enum PrincipalName {

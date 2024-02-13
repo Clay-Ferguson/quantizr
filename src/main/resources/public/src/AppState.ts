@@ -10,7 +10,6 @@ import { Tour } from "./Tour";
 
 export interface ExportSettings {
     exportType: string;
-    toIpfs?: boolean;
     includeToc?: boolean;
     includeMetaComments?: boolean;
     includeJypyter?: boolean;
@@ -40,9 +39,6 @@ export class AppState {
 
     mobileMode: boolean = clientInfo.isMobileOrTablet;
     // mobileMode: boolean = true;
-
-    // show the ipfsTab to any users, even users without their MFS Files option turned on in their user profile
-    // showIpfsTab: boolean;
 
     dialogStack: DialogBase[] = [];
 
@@ -117,7 +113,6 @@ export class AppState {
         showReplies: true,
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
-        enableIPSM: false,
         mainPanelCols: 6,
         aiService: "openAi"
     };
@@ -149,7 +144,6 @@ export class AppState {
     isAdminUser: boolean;
     isAnonUser: boolean = true;
     allowBashScripting: boolean;
-    allowedFeatures: string;
 
     allowFileSystemSearch: boolean;
     anonUserLandingPageNode: any;
@@ -195,8 +189,6 @@ export class AppState {
 
     serverInfoCommand: string = null;
     serverInfoTitle: string = null;
-
-    ipsmActive: boolean = false;
 
     graphData: J.GraphNode;
 

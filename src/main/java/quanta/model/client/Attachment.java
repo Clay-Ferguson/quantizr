@@ -24,8 +24,6 @@ public class Attachment {
     private String bin;
     private String binData;
     private String url;
-    private String ipfsLink;
-    private String ipfsRef;
     private String aiPrompt;
     private SubNode ownerNode;
 
@@ -135,28 +133,6 @@ public class Attachment {
     public void setUrl(String url) {
         ThreadLocals.dirty(ownerNode);
         this.url = url;
-    }
-
-    @JsonProperty("il")
-    public String getIpfsLink() {
-        return ipfsLink;
-    }
-
-    @JsonProperty("il")
-    public void setIpfsLink(String ipfsLink) {
-        ThreadLocals.dirty(ownerNode);
-        this.ipfsLink = ipfsLink;
-    }
-
-    @JsonProperty("ir")
-    public String getIpfsRef() {
-        return ipfsRef;
-    }
-
-    @JsonProperty("ir")
-    public void setIpfsRef(String ipfsRef) {
-        ThreadLocals.dirty(ownerNode);
-        this.ipfsRef = ipfsRef;
     }
 
     @JsonProperty("c")

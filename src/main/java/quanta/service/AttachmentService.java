@@ -57,20 +57,17 @@ import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrivilegeType;
-import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.AIGenImageRequest;
 import quanta.request.AIGenSpeechRequest;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.PasteAttachmentsRequest;
-import quanta.request.UploadFromIPFSRequest;
 import quanta.request.UploadFromUrlRequest;
 import quanta.response.AIGenImageResponse;
 import quanta.response.AIGenSpeechResponse;
 import quanta.response.DeleteAttachmentResponse;
 import quanta.response.PasteAttachmentsResponse;
-import quanta.response.UploadFromIPFSResponse;
 import quanta.response.UploadFromUrlResponse;
 import quanta.response.UploadResponse;
 import quanta.response.base.ResponseBase;
@@ -131,10 +128,7 @@ public class AttachmentService extends ServiceBase {
      * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
      */
     public ResponseBase uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] files,
-            boolean explodeZips, boolean toIpfs) {
-        if (toIpfs) {
-            checkIpfs();
-        }
+            boolean explodeZips) {
         if (nodeId == null) {
             throw ExUtil.wrapEx("target nodeId not provided");
         }
@@ -153,10 +147,9 @@ public class AttachmentService extends ServiceBase {
             int imageCount = 0;
 
             // if uploading multiple files check quota first, to make sure there's space for all files before
-            // we
-            // start uploading any of them If there's only one file, the normal flow will catch an out of
-            // space
-            // problem, so we don't need to do it in advance in here as we do for multiple file uploads only.
+            // we start uploading any of them If there's only one file, the normal flow will catch an out of
+            // space problem, so we don't need to do it in advance in here as we do for multiple file uploads
+            // only.
             //
             // Also we only do this check if not admin. Admin can upload unlimited amounts.
             if (!ms.isAdmin() && files.length > 1) {
@@ -190,7 +183,7 @@ public class AttachmentService extends ServiceBase {
                     LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(file.getInputStream(), maxFileSize);
                     // attaches AND closes the stream.
                     attachBinaryFromStream(ms, false, attName, node, nodeId, fileName, size, limitedIs, contentType, -1,
-                            -1, explodeZips, toIpfs, true, true, true, null, allowEmailParse, null);
+                            -1, explodeZips, true, true, true, null, allowEmailParse, null);
                 }
             }
 
@@ -217,8 +210,8 @@ public class AttachmentService extends ServiceBase {
      */
     public void attachBinaryFromStream(MongoSession ms, boolean importMode, String attName, SubNode node, String nodeId,
             String fileName, long size, LimitedInputStreamEx is, String mimeType, int width, int height,
-            boolean explodeZips, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
-            String sourceUrl, boolean allowEmailParse, String aiPrompt) {
+            boolean explodeZips, boolean calcImageSize, boolean closeStream, boolean storeLocally, String sourceUrl,
+            boolean allowEmailParse, String aiPrompt) {
         // If caller already has 'node' it can pass node, and avoid looking up node again
         if (node == null && nodeId != null) {
             node = read.getNode(ms, nodeId);
@@ -240,7 +233,7 @@ public class AttachmentService extends ServiceBase {
             importSvc.importFromStream(ms, is, node, false);
         } //
         else {
-            saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node, toIpfs,
+            saveBinaryStreamToNode(ms, importMode, attName, is, mimeType, fileName, size, width, height, node,
                     calcImageSize, closeStream, storeLocally, sourceUrl, aiPrompt);
         }
     }
@@ -265,8 +258,8 @@ public class AttachmentService extends ServiceBase {
 
     public void saveBinaryStreamToNode(MongoSession ms, boolean importMode, String attName,
             LimitedInputStreamEx inputStream, String mimeType, String fileName, long size, int width, int height,
-            SubNode node, boolean toIpfs, boolean calcImageSize, boolean closeStream, boolean storeLocally,
-            String sourceUrl, String aiPrompt) {
+            SubNode node, boolean calcImageSize, boolean closeStream, boolean storeLocally, String sourceUrl,
+            String aiPrompt) {
         // NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
         // everything EXCEPT calculate the image size
         BufferedImage bufImg = null;
@@ -309,8 +302,6 @@ public class AttachmentService extends ServiceBase {
                         att.setWidth(bufImg.getWidth());
                         att.setHeight(bufImg.getHeight());
                     } catch (Exception e) {
-                        // reading files from IPFS caused this exception, and I didn't investigate why yet, because I
-                        // don't think it's a bug in my code, but something in IPFS.
                         log.error("Failed to get image length.", e);
                     }
                 } catch (Exception e) {
@@ -328,17 +319,13 @@ public class AttachmentService extends ServiceBase {
         if (imageBytes == null) {
             try {
                 att.setSize(size);
-                if (toIpfs) {
-                    writeStreamToIpfs(ms, attName, node, inputStream, mimeType, userNode);
-                } else {
-                    if (storeLocally) {
-                        if (fileName != null) {
-                            att.setFileName(fileName);
-                        }
-                        writeStream(ms, importMode, attName, node, inputStream, fileName, mimeType, userNode);
-                    } else {
-                        att.setUrl(sourceUrl);
+                if (storeLocally) {
+                    if (fileName != null) {
+                        att.setFileName(fileName);
                     }
+                    writeStream(ms, importMode, attName, node, inputStream, fileName, mimeType, userNode);
+                } else {
+                    att.setUrl(sourceUrl);
                 }
             } finally {
                 if (closeStream) {
@@ -354,11 +341,7 @@ public class AttachmentService extends ServiceBase {
                         att.setFileName(fileName);
                     }
                     is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
-                    if (toIpfs) {
-                        writeStreamToIpfs(ms, attName, node, is, mimeType, userNode);
-                    } else {
-                        writeStream(ms, importMode, attName, node, is, fileName, mimeType, userNode);
-                    }
+                    writeStream(ms, importMode, attName, node, is, fileName, mimeType, userNode);
                 } else {
                     att.setUrl(sourceUrl);
                 }
@@ -472,7 +455,6 @@ public class AttachmentService extends ServiceBase {
                     throw ExUtil.wrapEx("attachment info not found.");
                 }
             }
-            boolean ipfs = StringUtils.isNotEmpty(att.getIpfsLink());
             // Everyone's account node can publish it's attachment and is assumed to be an
             // avatar.
             boolean allowAuth = true;
@@ -507,21 +489,12 @@ public class AttachmentService extends ServiceBase {
                 // (content length), but not calling 'contentLength()' below is a workaround.
                 //
                 // You get this error if you just wait about 30s to 1 minute, and maybe scroll out of view and
-                // back
-                // into view the images. What happens is the image loads just fine but then some background thread
-                // in Chrome looks at content lengths and finds some thing off somehoe and decides to make the
-                // image
-                // just disappear and show a broken link icon instead.
-                //
-                // SO... I keep having to come back and remove the setContentLength every time I think this
-                // problem
-                // is resolved and then later find out it isn't. Somehow this is *currently* only happening for
-                // images that are served up from IPFS storage.
+                // back into view the images. What happens is the image loads just fine but then some background
+                // thread in Chrome looks at content lengths and finds some thing off somehoe and decides to make
+                // the image just disappear and show a broken link icon instead.
                 //
                 // Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
-                if (!ipfs) {
-                    response.setContentLength((int) size);
-                }
+                response.setContentLength((int) size);
             }
             if (download) {
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
@@ -694,36 +667,7 @@ public class AttachmentService extends ServiceBase {
         return res;
     }
 
-    public UploadFromIPFSResponse attachFromIPFS(MongoSession ms, UploadFromIPFSRequest req) {
-        UploadFromIPFSResponse res = new UploadFromIPFSResponse();
-        if (req.getNodeId() == null) {
-            throw new RuntimeException("null nodeId");
-        }
-        SubNode node = read.getNode(ms, req.getNodeId());
-        if (node == null) {
-            throw new RuntimeException("node not found: id=" + req.getNodeId());
-        }
-        // todo-2: make this handle multiple attachments, and all calls to it
-        Attachment att = node.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), true, true);
-        auth.ownerAuth(node);
-        att.setIpfsLink(req.getCid().trim());
-        String mime = req.getMime().trim().replace(".", "");
-        // If an extension was given (not a mime), then use it to make a filename, and
-        // generate the mime from it.
-        if (!mime.contains("/")) {
-            att.setFileName("file." + mime);
-            mime = MimeTypeUtils.getMimeType(mime);
-        }
-        att.setMime(mime);
-        update.save(ms, node);
-        return res;
-    }
-
     /**
-     * mimeHint This is an additional string invented because IPFS urls don't contain the file extension
-     * always and in that case we need to get it from the IPFS filename itself and that's what the hint
-     * is in that case. Normally however mimeHint is null
-     *
      * 'inputStream' is a retrofit to this function for when we want to just call this method and get an
      * inputStream handed back that can be read from. Normally the inputStream Val is null and not used.
      *
@@ -771,7 +715,7 @@ public class AttachmentService extends ServiceBase {
 
                 // insert 0L for size now, because we don't know it yet
                 attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, mimeType, -1, -1,
-                        false, false, true, true, storeLocally, sourceUrl, false, aiPrompt);
+                        false, true, true, storeLocally, sourceUrl, false, aiPrompt);
             }
             // if not an image extension, we can just stream directly into the database, but we want to try to
             // get the mime type first, from calling detectImage so that if we do detect its an image we can
@@ -782,7 +726,7 @@ public class AttachmentService extends ServiceBase {
 
                     // insert 0L for size now, because we don't know it yet
                     attachBinaryFromStream(ms, false, attKey, node, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false,
-                            false, true, true, storeLocally, sourceUrl, false, aiPrompt);
+                            true, true, storeLocally, sourceUrl, false, aiPrompt);
                 }
             }
         } catch (Exception e) {
@@ -821,8 +765,8 @@ public class AttachmentService extends ServiceBase {
                     byte[] bytes = os.toByteArray();
                     is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
                     attachBinaryFromStream(ms, false, attKey, null, nodeId, sourceUrl, bytes.length, is2, mimeType,
-                            bufImg.getWidth(null), bufImg.getHeight(null), false, false, true, true, storeLocally,
-                            sourceUrl, false, null);
+                            bufImg.getWidth(null), bufImg.getHeight(null), false, true, true, storeLocally, sourceUrl,
+                            false, null);
                     return true;
                 }
             }
@@ -868,20 +812,6 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    public void writeStreamToIpfs(MongoSession ms, String attName, SubNode node, InputStream stream, String mimeType,
-            SubNode userNode) {
-        auth.ownerAuth(node);
-        Attachment att = node.getAttachment(attName, true, false);
-        Val<Integer> streamSize = new Val<>();
-        MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, false);
-        if (ret != null) {
-            att.setIpfsLink(ret.getHash());
-            att.setSize((long) streamSize.getVal());
-            // consume user quota space
-            user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode);
-        }
-    }
-
     /*
      * Assumes owner 'ms' has already been auth-checked for owning this node. If 'gridOnly' is true that
      * means we should only delete from the GRID DB, and not touch any of the properties on the node
@@ -901,10 +831,6 @@ public class AttachmentService extends ServiceBase {
             node.setAttachments(attachments);
         }
         if (!ms.isAdmin()) {
-            // NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
-            // don't do reference counting we let the garbage collecion cleanup be the only way user quotas
-            // are
-            // deducted from
             long totalBytes = attach.getTotalAttachmentBytes(ms, node);
             user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
         }
@@ -913,10 +839,6 @@ public class AttachmentService extends ServiceBase {
         grid.delete(new Query(crit));
     }
 
-    /*
-     * Gets the binary data attachment stream from the node regardless of wether it's from IPFS_LINK or
-     * BIN.
-     */
     public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean allowAuth) {
         if (allowAuth) {
             auth.auth(ms, node, PrivilegeType.READ);
@@ -924,16 +846,7 @@ public class AttachmentService extends ServiceBase {
         Attachment att = node.getAttachment(attName, false, false);
         if (att == null)
             return null;
-        InputStream is = null;
-        String ipfsHash = att.getIpfsLink();
-        if (ipfsHash != null) {
-            // todo-2: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
-            // timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
-            // log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" + ipfsHash);
-            is = ipfs.getStream(ms, ipfsHash);
-        } else {
-            is = getStreamByNode(node, attName);
-        }
+        InputStream is = getStreamByNode(node, attName);
         return is;
     }
 
@@ -1094,7 +1007,7 @@ public class AttachmentService extends ServiceBase {
                     // if no cachebuster gid was on url then redirect to a url that does have the gid
                     if (_gid == null) {
                         Attachment att = node.getAttachment(_attName, false, false);
-                        _gid = att != null ? att.getIpfsLink() : null;
+                        _gid = null;
                         if (_gid == null) {
                             _gid = att != null ? att.getBin() : null;
                         }
@@ -1122,13 +1035,11 @@ public class AttachmentService extends ServiceBase {
     }
 
     /*
-     * binId param not uses currently but the client will send either the gridId or the ipfsHash of the
-     * node depending on which type of attachment it sees on the node
-     *
-     * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
+     * binId param not uses currently but the client will send either the gridId of the node depending
+     * on which type of attachment it sees on the node
      */
-    public void getBinary(String binId, String nodeId, String ipfsCid, String token, String download,
-            HttpSession session, HttpServletResponse response) {
+    public void getBinary(String binId, String nodeId, String token, String download, HttpSession session,
+            HttpServletResponse response) {
         if (token == null) {
             // Check if this is an 'avatar' request and if so bypass security
             if ("avatar".equals(binId)) {
@@ -1149,11 +1060,7 @@ public class AttachmentService extends ServiceBase {
             // Else if not an avatar request then do a secure acccess
             else {
                 callProc.run("bin", false, false, null, session, ms -> {
-                    if (ipfsCid != null) {
-                        ipfs.streamResponse(response, ms, ipfsCid, null);
-                    } else {
-                        attach.getBinary(null, null, null, nodeId, binId, download != null, response);
-                    }
+                    attach.getBinary(null, null, null, nodeId, binId, download != null, response);
                     return null;
                 });
             }

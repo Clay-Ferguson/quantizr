@@ -13,11 +13,6 @@ EXPOSE ${PORT}
 EXPOSE ${PORT_SEC}
 EXPOSE ${PORT_DEBUG}
 
-# For IPFS...
-# EXPOSE 4001
-# Swarm UDP; should be exposed to the public
-# EXPOSE 4001/udp
-
 COPY ./target/quanta-0.0.1-SNAPSHOT.jar app.jar
 RUN sh -c 'touch app.jar' 
 
@@ -25,7 +20,6 @@ COPY ./entrypoint-distro.sh entrypoint-distro.sh
 RUN ["chmod", "+x", "entrypoint-distro.sh"]
 ENTRYPOINT ["./entrypoint-distro.sh"]
 
-# We had this format for a long time, but then noticed IPFS container was failing finding /bin/bash so I moved to the simpler shell script command above
 # ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint-distro.sh"]
 
 # This works too but it's more flexible to just put the commands in 'entrypoint-distro.sh'

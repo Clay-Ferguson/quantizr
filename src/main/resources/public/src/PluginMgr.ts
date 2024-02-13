@@ -13,7 +13,6 @@ import { FriendsListType } from "./plugins/FriendsListType";
 import { FriendType } from "./plugins/FriendType";
 import { InboxEntryType } from "./plugins/InboxEntryType";
 import { InboxNodeType } from "./plugins/InboxNodeType";
-import { IPFSNodeType } from "./plugins/IPFSNodeType";
 import { MarkdownType } from "./plugins/MarkdownType";
 import { NotesNodeType } from "./plugins/NotesNodeType";
 import { OpenAiAnswerType } from "./plugins/OpenAiAnswerType";
@@ -74,7 +73,6 @@ export class PluginMgr {
         this.addType(ordinal++, new RssType());
         this.addType(ordinal++, new CalcType());
         this.addType(ordinal++, new CalendarType());
-        this.addType(ordinal++, new IPFSNodeType());
         this.addType(ordinal++, new RepoRootType());
         this.addType(ordinal++, new AccountType());
         this.addType(ordinal++, new PostsType());

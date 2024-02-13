@@ -50,12 +50,6 @@ dockerUp
 serviceCheck ${docker_stack}_quanta-dev
 serviceCheck ${docker_stack}_mongo-dev
 
-if [[ -z ${ipfsEnabled} ]]; then  
-    echo "ipfs not in use"
-else
-    serviceCheck ${docker_stack}_ipfs-dev
-fi
-
 echo "Waiting 12s for server to initialize..."
 sleep 12s
 

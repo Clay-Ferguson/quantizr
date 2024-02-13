@@ -21,14 +21,6 @@ export quanta_domain=172.17.0.1
 export dc_yaml=dc-distro.yaml
 export docker_stack=quanta-stack-distro
 
-export ipfs_data=${DEPLOY_TARGET}/ipfs
-export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
-
-# make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
-# dependency in the dockercompose YAML file to start IPFS deamon before the app starts
-export ipfsEnabled=
-export ipfs_container=ipfs-distro
-
 export HOST_PORT=80
 export PORT=80
 export PORT_DEBUG=8000

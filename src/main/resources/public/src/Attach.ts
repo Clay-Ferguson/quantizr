@@ -1,13 +1,12 @@
 import { UploadAIGenImgDlg } from "./dlg/UploadAIGenImgDlg";
 import { UploadAIGenSpeechDlg } from "./dlg/UploadAIGenSpeechDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
-import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
 import { Attachment, NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Attach {
-    openUploadFromFileDlg = (toIpfs: boolean, nodeId: string, autoAddFile: File) => {
+    openUploadFromFileDlg = (nodeId: string, autoAddFile: File) => {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             nodeId = node?.id;
@@ -18,7 +17,7 @@ export class Attach {
             return;
         }
 
-        new UploadFromFileDropzoneDlg(nodeId, "", toIpfs, autoAddFile, false, true, () => {
+        new UploadFromFileDropzoneDlg(nodeId, "", autoAddFile, false, true, () => {
             S.view.jumpToId(nodeId);
         }).open();
     };
@@ -62,19 +61,6 @@ export class Attach {
         new UploadAIGenSpeechDlg(nodeId, onUploadFunc).open();
     };
 
-    openUploadFromIPFSDlg = (nodeId: string, onUploadFunc: () => void) => {
-        if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode();
-            if (!node) {
-                S.util.showMessage("No node is selected.", "Warning");
-                return;
-            }
-            nodeId = node.id;
-        }
-
-        new UploadFromIPFSDlg(nodeId, onUploadFunc).open();
-    };
-
     getAttachmentUrl = (urlPart: string, node: NodeInfo, attName: string, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
         const att = S.props.getAttachment(attName, node);
@@ -87,13 +73,8 @@ export class Attach {
             return att.u;
         }
 
-        const ipfsLink = att.il;
-        let bin = att.b;
-
-        if (bin || ipfsLink) {
-            if (ipfsLink) {
-                bin = "ipfs";
-            }
+        const bin = att.b;
+        if (bin) {
             let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId + "&att=" + attName;
 
             if (downloadLink) {

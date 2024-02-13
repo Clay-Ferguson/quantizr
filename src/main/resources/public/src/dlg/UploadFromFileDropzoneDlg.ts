@@ -7,12 +7,11 @@ import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
+import { FlexLayout } from "../comp/core/FlexLayout";
 import { IconButton } from "../comp/core/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
-import { FlexLayout } from "../comp/core/FlexLayout";
 
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
@@ -31,7 +30,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     numFiles: number = 0;
 
     /* We allow either nodeId or 'node' to be passed in here */
-    constructor(private nodeId: string, private attName: string, private toIpfs: boolean, //
+    constructor(private nodeId: string, private attName: string, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: () => void) {
         super(importMode ? "Import File" : "Attach File");
     }
@@ -39,16 +38,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     renderDlg(): Comp[] {
         const children = [
             new Div(null, null, [
-                this.importMode || !S.quanta.cfg.ipfsEnabled ? null : new Div(null, { className: "marginBottom" }, [
-                    /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
-                    to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
-                    and create a new one any time there's a state change and rerender */
-                    new Checkbox("Save to IPFS", null, {
-                        setValue: (checked: boolean) => this.toIpfs = checked,
-                        getValue: (): boolean => this.toIpfs
-                    })
-                ]),
-
                 this.buildSourcesComponent(),
 
                 new Div("From your Computer (Click or Drag-n-Drop)", { className: "marginTop" }),
@@ -99,8 +88,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         onClick: this.uploadFromAiGenSpeech,
                         title: "Create an AI Generated Speech MP3"
                     }),
-
-                    !S.quanta.cfg.ipfsEnabled ? null : new Button("IPFS", this.uploadFromIPFS),
 
                     // LEAVING THIS FOR FUTURE
                     // (Currently the clipboard upload button on the editor itself is all we need so this button
@@ -191,16 +178,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         });
     }
-
-    uploadFromIPFS = () => {
-        S.attachment.openUploadFromIPFSDlg(this.nodeId, () => {
-            this.close();
-            if (this.afterUploadFunc) {
-                this.afterUploadFunc();
-            }
-        });
-    }
-
 
     upload = async (): Promise<boolean> => {
         if (this.filesAreValid()) {
@@ -298,7 +275,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         formData.append("nodeId", dlg.nodeId);
                         formData.append("attName", dlg.attName);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
-                        formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                     }
 
                     dlg.zipQuestionAnswered = false;

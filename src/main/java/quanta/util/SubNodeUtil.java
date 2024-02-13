@@ -45,10 +45,6 @@ public class SubNodeUtil extends ServiceBase {
         }
     }
 
-    public void removeUnwantedPropsForIPFS(SubNode node) {
-        node.delete(NodeProp.IPFS_CID);
-    }
-
     public boolean validNodeName(String name) {
         if (name == null || name.length() == 0) {
             return false;
@@ -306,8 +302,8 @@ public class SubNodeUtil extends ServiceBase {
         Attachment att = node.getFirstAttachment();
         if (att == null)
             return null;
-        String ipfsLink = att.getIpfsLink();
-        String bin = ipfsLink != null ? ipfsLink : att.getBin();
+
+        String bin = att.getBin();
         if (bin != null) {
             return prop.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
         }

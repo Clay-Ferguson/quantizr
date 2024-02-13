@@ -146,7 +146,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
         String mimeType = att.getMime();
         LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
         attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1,
-                false, false, true, false, true, null, false, null);
+                false, true, false, true, null, false, null);
         return true;
     }
 }

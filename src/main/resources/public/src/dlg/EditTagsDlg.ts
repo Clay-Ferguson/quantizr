@@ -54,8 +54,6 @@ export class EditTagsDlg extends DialogBase {
             blockedWords: ast.userProfile.blockedWords,
             userBio: ast.userProfile.userBio,
             displayName: ast.userProfile.displayName,
-            publish: false,
-            mfsEnable: ast.userProfile.mfsEnable,
             recentTypes: ast.userProfile.recentTypes
         });
         this.close();

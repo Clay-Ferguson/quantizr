@@ -11,7 +11,6 @@ import { FeedTab } from "./tabs/data/FeedTab";
 import { FollowersTab } from "./tabs/data/FollowersTab";
 import { FollowingTab } from "./tabs/data/FollowingTab";
 import { GraphTab } from "./tabs/data/GraphTab";
-import { IPFSTab } from "./tabs/data/IPFSTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { RepliesTab } from "./tabs/data/RepliesTab";
 import { RSSTab } from "./tabs/data/RSSTab";
@@ -77,32 +76,12 @@ export class TabUtil {
                 new FollowersTab(),
                 new FollowingTab(),
                 new FeedTab(),
-
-                // DO NOT DELETE
-                // The IPSMView will be repurposed as a server event log viewer
-                // {
-                //     name: "IPSM Console",
-                //     id: C.TAB_IPSM,
-                //     isVisible: () => {
-                //         let ast = getAst();
-                //         return ast.ipsmActive;
-                //     },
-                //     constructView: (data: TabIntf) => new IPSMView(s, data),
-                //     rsInfo: null,
-                //     scrollPos: 0,
-                //     // need typesafe props (todo-2)
-                //     props: {
-                //         events: null // for now string[]
-                //     }
-                // },
-
                 new RepliesTab(),
                 new ThreadTab(),
                 new TrendingTab(),
                 new ServerInfoTab(),
                 new TTSTab(),
                 new RSSTab(),
-                new IPFSTab(),
                 new SettingsTab(),
                 new AdminTab()
 

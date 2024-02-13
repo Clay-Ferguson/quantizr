@@ -47,10 +47,4 @@ dockerUp
 serviceCheck ${docker_stack}_quanta-distro
 serviceCheck ${docker_stack}_mongo-distro
 
-if [[ -z ${ipfsEnabled} ]]; then  
-    echo "ipfs not in use"
-else
-    serviceCheck ${docker_stack}_ipfs-distro
-fi
-
 printUrlsMessage

@@ -59,7 +59,7 @@ public class AppProp {
                 if (configMap == null) {
                     configMap = new HashMap<>();
                 }
-                configMap.put("ipfsEnabled", ipfsEnabled());
+
                 return configMap;
             }
         }
@@ -171,24 +171,6 @@ public class AppProp {
 
     public String getInstanceId() {
         return env.getProperty("instanceId");
-    }
-
-    public boolean ipfsEnabled() {
-        // hardcoding disablement for now
-        return false;
-        // return APConst.TRUE.equals(env.getProperty("ipfsEnabled"));
-    }
-
-    public String getIPFSApiHostAndPort() {
-        return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.apiPort");
-    }
-
-    public String getIPFSApiBase() {
-        return getIPFSApiHostAndPort() + "/api/v0";
-    }
-
-    public String getIPFSGatewayHostAndPort() {
-        return env.getProperty("ipfs.host") + ":" + env.getProperty("ipfs.gatewayPort");
     }
 
     public String getMongoDbHost() {

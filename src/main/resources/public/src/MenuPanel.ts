@@ -90,7 +90,6 @@ export class MenuPanel extends Div {
     static calendarPastDueDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastDueOnly", "Past Due calendar dates (Newest at the top)", 0, true);
     static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "all", "All calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-    // static toolsShowIpfsTab = () => S.edit.showIpfsTab();
     static import = () => S.edit.openImportDlg();
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority();
     static export = () => S.edit.openExportDlg();
@@ -319,7 +318,6 @@ export class MenuPanel extends Div {
                 // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
                 new MenuItem("Show URLs", MenuPanel.showUrls, onMainTab && !!hltNode, null, true), //
                 new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab, null, true), //
-                // new MenuItem("IPFS Explorer", MenuPanel.toolsShowIpfsTab), //
                 new MenuItemSeparator(), //
 
                 new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
@@ -327,9 +325,6 @@ export class MenuPanel extends Div {
 
                 // Removing for now. Our PostIt node icon makes this easy enough.
                 // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
-
-                // DO NOT DELETE
-                // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
             ], null));
 
             children.push(new Menu("Signature", [
@@ -403,20 +398,6 @@ export class MenuPanel extends Div {
         //     menuItem("Search", "fileSysSearchButton", "systemfolder.search();"); //
         //     //menuItem("Browse", "fileSysBrowseButton", "systemfolder.browse();");
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
-
-        /* This was experimental, and does work perfectly well (based on a small aount of testing done).
-          These menu items can save a node subgraph to IPFS files (MFS) and then restore those nodes back
-          from that tree branch. But the feature is not currently needed or enabled.
-          */
-        if (ast.isAdminUser) {
-            // DO NOT DELETE: Work in Progress....
-            // children.push(new Menu(localState, "IPFS", [
-            //     new MenuItem("Sync: To IPFS", () => S.nodeUtil.publishNodeToIpfs(hltNode), //
-            //         state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //
-            //     new MenuItem("Sync: From IPFS", () => S.nodeUtil.loadNodeFromIpfs(hltNode), //
-            //         state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)) //
-            // ]));
-        }
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //

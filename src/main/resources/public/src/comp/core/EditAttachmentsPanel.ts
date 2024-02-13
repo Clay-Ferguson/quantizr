@@ -62,16 +62,6 @@ export class EditAttachmentsPanel extends Div {
         const ast = getAs();
         if (!att) return null;
         const key = (att as any).key;
-        const ipfsLink = att.il;
-        const mime = att.m;
-
-        let pinCheckbox = null;
-        if (ipfsLink) {
-            pinCheckbox = new Checkbox("Pin", { className: "ipfsPinnedCheckbox" }, {
-                setValue: (checked: boolean) => { att.ir = checked ? null : "1" },
-                getValue: (): boolean => att.ir ? false : true
-            });
-        }
 
         const attCheckbox = new Checkbox(null, null, {
             setValue: (checked: boolean) => {
@@ -148,7 +138,6 @@ export class EditAttachmentsPanel extends Div {
             imgSizeSelection,
             imgPositionSelection,
             fileNameField,
-            pinCheckbox,
             new Div(null, null, [
                 !firstAttachment ? new Icon({
                     className: "fa fa-lg fa-arrow-up clickable marginLeft",
@@ -161,22 +150,7 @@ export class EditAttachmentsPanel extends Div {
                     onClick: () => this.moveAttDown(att, ast.editNode)
                 }) : null
             ])
-
-            // todo-2: this is not doing what I want but is unimportant so removing it for now.
-            // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.ast), { title: "Show the IPFS URL for the attached file." }) : null
         ]);
-
-        let bottomBinRow = null;
-        if (ipfsLink) {
-            bottomBinRow = new Div(null, { className: "smallMarginTop marginBottom" }, [
-                ipfsLink ? new Div(`IPFS CID: ${ipfsLink}`, {
-                    className: "clickable",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => S.util.copyToClipboard(`ipfs://${ipfsLink}`)
-                }) : null,
-                ipfsLink ? new Div(`Type: ${mime}`) : null
-            ]);
-        }
 
         let fileNameTagTip = null;
         if (att.p === "ft") {
@@ -202,7 +176,7 @@ export class EditAttachmentsPanel extends Div {
             }, getAs().aiPromptsExpanded, null, "smallMarginTop", "smallMarginTop") : null;
 
         return new Div(null, { className: "binaryEditorItem" }, [
-            topBinRow, fileNameTagTip, bottomBinRow, aiPrompt
+            topBinRow, fileNameTagTip, aiPrompt
         ]);
     }
 

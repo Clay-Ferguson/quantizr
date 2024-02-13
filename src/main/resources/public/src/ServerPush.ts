@@ -73,11 +73,6 @@ export class ServerPush {
             this.nodePushed(data.nodeInfo);
         }, false);
 
-        this.eventSource.addEventListener("ipsmPush", (e: any) => {
-            const data: J.IPSMPushInfo = JSON.parse(e.data);
-            this.ipsmPushItem(data.payload);
-        }, false);
-
         // This is where we receive signing requests pushed from the server to be signed by the browser and pushed back up.
         this.eventSource.addEventListener("sigPush", async (e: any) => {
             const data: J.NodeSigPushInfo = JSON.parse(e.data);
@@ -134,19 +129,6 @@ export class ServerPush {
         else {
             FeedTab.inst.props.results.unshift(nodeInfo);
         }
-    }
-
-    ipsmPushItem = (_payload: string) => {
-        // IPSM currently disabled
-        // const feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
-        // if (!feedData) return;
-
-        // dispatch("RenderIPSMFeedResults", s => {
-        //     feedData.props.events = feedData.props.events || [];
-
-        //     // add to head of array (rev-chron view)
-        //     feedData.props.events.unshift(payload);
-        // });
     }
 
     nodePushed = (nodeInfo: NodeInfo) => {

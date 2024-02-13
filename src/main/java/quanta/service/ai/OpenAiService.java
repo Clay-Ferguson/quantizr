@@ -93,7 +93,7 @@ public class OpenAiService extends ServiceBase {
                     if (node != null) {
                         int attIdx = node.getAttachments() != null ? node.getAttachments().size() : 0;
                         attach.saveBinaryStreamToNode(ms, false, "p" + attIdx, lis, "audio/mpeg", "file.mp3", //
-                                0L, 0, 0, node, false, false, false, //
+                                0L, 0, 0, node, false, false, //
                                 true, null, null);
                     }
                 } finally {

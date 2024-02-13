@@ -11,7 +11,6 @@ public class LoginResponse extends ResponseBase {
 	private UserProfile userProfile;
 	private String authToken;
 	private String rootNodePath;
-	private String allowedFeatures;
 	private String anonUserLandingPageNode;
 	private UserPreferences userPreferences;
 	private boolean allowFileSystemSearch;
@@ -19,59 +18,50 @@ public class LoginResponse extends ResponseBase {
 	public UserProfile getUserProfile() {
 		return this.userProfile;
 	}
-	
+
 	public String getAuthToken() {
 		return this.authToken;
 	}
-	
+
 	public String getRootNodePath() {
 		return this.rootNodePath;
 	}
-	
-	public String getAllowedFeatures() {
-		return this.allowedFeatures;
-	}
-	
+
 	public String getAnonUserLandingPageNode() {
 		return this.anonUserLandingPageNode;
 	}
-	
+
 	public UserPreferences getUserPreferences() {
 		return this.userPreferences;
 	}
-	
+
 	public boolean isAllowFileSystemSearch() {
 		return this.allowFileSystemSearch;
 	}
-	
+
 	public void setUserProfile(final UserProfile userProfile) {
 		this.userProfile = userProfile;
 	}
-	
+
 	public void setAuthToken(final String authToken) {
 		this.authToken = authToken;
 	}
-	
+
 	public void setRootNodePath(final String rootNodePath) {
 		this.rootNodePath = rootNodePath;
 	}
-	
-	public void setAllowedFeatures(final String allowedFeatures) {
-		this.allowedFeatures = allowedFeatures;
-	}
-	
+
 	public void setAnonUserLandingPageNode(final String anonUserLandingPageNode) {
 		this.anonUserLandingPageNode = anonUserLandingPageNode;
 	}
-	
+
 	public void setUserPreferences(final UserPreferences userPreferences) {
 		this.userPreferences = userPreferences;
 	}
-	
+
 	public void setAllowFileSystemSearch(final boolean allowFileSystemSearch) {
 		this.allowFileSystemSearch = allowFileSystemSearch;
 	}
-	
-	public LoginResponse() {
-	}
+
+	public LoginResponse() {}
 }

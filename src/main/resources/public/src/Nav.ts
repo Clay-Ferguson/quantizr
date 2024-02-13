@@ -63,7 +63,6 @@ export class Nav {
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
-            forceIPFSRefresh: false,
             singleNode: false,
             jumpToRss: false
         });
@@ -96,7 +95,6 @@ export class Nav {
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
-            forceIPFSRefresh: false,
             singleNode: false,
             jumpToRss: false
         });
@@ -150,7 +148,6 @@ export class Nav {
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
-            forceIPFSRefresh: false,
             singleNode: false,
             jumpToRss
         });
@@ -211,7 +208,6 @@ export class Nav {
                 nodeId: node.id,
                 zeroOffset: true,
                 highlightId: null,
-                forceIPFSRefresh: false,
                 scrollToTop: true,
                 allowScroll: true,
                 setTab: true,
@@ -305,7 +301,6 @@ export class Nav {
                 forceRenderParent: false,
                 offset: 0,
                 goToLastPage: false,
-                forceIPFSRefresh: false,
                 singleNode: false,
                 jumpToRss: false
             });

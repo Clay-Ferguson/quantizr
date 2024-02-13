@@ -5,7 +5,6 @@ import { Icon } from "./comp/core/Icon";
 import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { EditNodeDlg, LS as EditNodeDlgState } from "./dlg/EditNodeDlg";
-import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import * as J from "./JavaIntf";
 import { Attachment, NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
@@ -241,17 +240,6 @@ export class NodeUtil {
             }
         }
         return true;
-    }
-
-    publishNodeToIpfs = async (node: NodeInfo) => {
-        const res = await S.rpcUtil.rpc<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
-            nodeId: node.id
-        });
-        S.util.showMessage(res.message, "Server Reply", true);
-    }
-
-    loadNodeFromIpfs = (_node: NodeInfo): any => {
-        new LoadNodeFromIpfsDlg().open();
     }
 
     removePublicShare = async (node: NodeInfo, editorDlg: Comp) => {

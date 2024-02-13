@@ -26,7 +26,6 @@ import quanta.mail.EmailSender;
 import quanta.model.TreeNode;
 import quanta.model.UserStats;
 import quanta.model.client.Attachment;
-import quanta.model.ipfs.file.IPFSObjectStat;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -143,11 +142,6 @@ public class SystemService extends ServiceBase {
             final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
             attach.gridMaintenanceScan(statsMap);
 
-            if (prop.ipfsEnabled()) {
-                // todo-2: ipfs temporarily disabled due to refactoring, and is not being worked on again
-                // unless/until IPFS is needed again.
-                // ret += ipfsGarbageCollect(statsMap);
-            }
             arun.run(as -> {
                 user.writeUserStats(as, statsMap);
                 return null;
@@ -157,14 +151,6 @@ public class SystemService extends ServiceBase {
         } finally {
             prop.setDaemonsEnabled(true);
         }
-        return ret;
-    }
-
-    public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-        if (!prop.ipfsEnabled())
-            return "IPFS Disabled.";
-        String ret = ipfsRepo.gc();
-        ret += ipfs.releaseOrphanIPFSPins(statsMap);
         return ret;
     }
 
@@ -182,10 +168,6 @@ public class SystemService extends ServiceBase {
         ret += "\n\ndbStats: "
                 + runMongoDbCommand(MongoAppConfig.databaseName, new Document("dbStats", 1).append("scale", 1024));
         ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
-        if (prop.ipfsEnabled()) {
-            ret += ipfsRepo.verify();
-            ret += ipfsPin.verify();
-        }
         return ret;
     }
 
@@ -205,18 +187,6 @@ public class SystemService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId, true, null);
         if (node != null) {
             String ret = XString.prettyPrint(node);
-            List<Attachment> atts = node.getOrderedAttachments();
-            if (atts != null) {
-                for (Attachment att : atts) {
-                    if (att.getIpfsLink() != null) {
-                        IPFSObjectStat fullStat = ipfsObj.objectStat(att.getIpfsLink(), false);
-                        if (fullStat != null) {
-                            ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
-                        }
-                    }
-                }
-            }
-
             return ret;
         } else {
             return "node not found!";
@@ -242,9 +212,6 @@ public class SystemService extends ServiceBase {
         sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
         sb.append(user.getUserAccountsReport(null));
 
-        if (!StringUtils.isEmpty(prop.getIPFSApiHostAndPort())) {
-            sb.append(ipfsConfig.getStat());
-        }
         RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();
         sb.append("\nJava VM args:\n");
@@ -294,9 +261,6 @@ public class SystemService extends ServiceBase {
     }
 
     public Object export(ExportRequest req, MongoSession ms) {
-        if (req.isToIpfs()) {
-            checkIpfs();
-        }
         ExportResponse res = new ExportResponse();
 
         arun.run(as -> {
@@ -315,9 +279,7 @@ public class SystemService extends ServiceBase {
         }
         // ================================================
         // // } // // } // res.setSuccess(false);
-        // // res.setMessage("Export of Markdown to
-        // IPFS not yet available."); // if
-        // (req.isToIpfs()) { // else if
+        // else if
         // ("md".equalsIgnoreCase(req.getExportExt()))
         // { // } // // svc.export(ms, "html", req,
         // res); // ExportServiceFlexmark svc =
@@ -333,23 +295,14 @@ public class SystemService extends ServiceBase {
         // ================================================
         // //
         else if ("zip".equalsIgnoreCase(req.getExportExt())) {
-            if (req.isToIpfs()) {
-                res.error("Export of ZIP to IPFS not yet available.");
-            }
             ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
             svc.export(ms, req, res);
         } //
         else if ("tar".equalsIgnoreCase(req.getExportExt())) {
-            if (req.isToIpfs()) {
-                res.error("Export of TAR to IPFS not yet available.");
-            }
             ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
             svc.export(ms, req, res);
         } //
         else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
-            if (req.isToIpfs()) {
-                res.error("Export of TAR.GZ to IPFS not yet available.");
-            }
             ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
             svc.setUseGZip(true);
             svc.export(ms, req, res);
@@ -421,11 +374,6 @@ public class SystemService extends ServiceBase {
                 prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
                 res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
                 break;
-            case "ipfsPubSubTest":
-                // currently unused (leaving hook in place)
-                throw new RuntimeException("ipfsPubSubTest depricated");
-            // res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
-            // break;
             case "getServerInfo":
                 res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
                 break;

@@ -33,7 +33,6 @@ import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 export interface LS {
     selectedProps?: Set<string>;
     selectedAttachments?: Set<string>;
-    toIpfs?: boolean;
     speechActive?: boolean;
     signCheckboxVal?: boolean;
     encryptCheckboxVal?: boolean;

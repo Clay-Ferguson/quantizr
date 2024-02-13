@@ -1,4 +1,4 @@
-import { getAs, promiseDispatch } from "../AppContext";
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -14,20 +14,6 @@ export class AdminView extends AppTab<any, AdminView> {
         super(data);
         data.inst = this;
     }
-
-    // DO NOT DELETE
-    // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
-    static setIpsmActive = async () => {
-
-        await promiseDispatch("enableIpsm", s => {
-            s.ipsmActive = true;
-            setTimeout(() => {
-                // S.tabUtil.selectTab(C.TAB_IPSM);
-            }, 250);
-        });
-
-        S.util.saveUserPrefs(s => s.userPrefs.enableIPSM = true);
-    };
 
     sectionTitle(title: string): Heading {
         return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
@@ -62,7 +48,6 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Run JUnit Tests", () => S.view.runServerCommand("getTestResults", "run", "Test Results", null)),
                         this.settingsLink("Show Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null)),
-                        this.settingsLink("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", null, "PubSub Test", null)), //
                         this.settingsLink("Send Email", S.util.sendTestEmail),
                         this.settingsLink("Server Log Text", S.util.sendLogText),
                     ]),

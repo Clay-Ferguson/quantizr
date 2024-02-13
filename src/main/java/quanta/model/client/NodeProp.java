@@ -58,11 +58,7 @@ public enum NodeProp {
      */
     USER("sn:user"), //
     DISPLAY_NAME("sn:displayName"), //
-    MFS_ENABLE("sn:mfsEnable"), // Mutable File System enabled (user can set this, independend of their admin
-                                // authorization)
     USER_BIO("sn:userBio"), //
-    USER_DID_IPNS("sn:didIPNS"), //
-    USER_IPFS_KEY("sn:ipfsKey"), //
 
     // This holds the user's defined tags they've defined in the Tags Editor Dlg, and is stored on their
     // account node.
@@ -83,33 +79,7 @@ public enum NodeProp {
     // FS_FOLDER("fs:folder"), //
     // FS_LUCENE("fs:lucene"), //
 
-    // To create an "Explorable" (by user) tree of content assign this property to a node, and set the
-    // type of the node to "sn:ipfsNode" (IPFS_NODE)
-    IPFS_CID("ipfs:cid"), //
-    IPNS_CID("ipns:cid"), //
-
-    // Represents an IPFS CID that is aht "Source" for the data in such a way that we assume
-    // the IPFS content will supercede (and take precedence), so that we can always read from IPFS
-    // and make that content be the content in our DB with fear of overwriting anything.
-    IPFS_SCID("ipfs:scid"),
-
-    JSON_HASH("ipfs:json"), //
-    SAVE_TO_IPFS("sn:saveToIpfs"), //
-
-    // todo-2: is this still used?
-    IPFS_LINK_NAME("ipfs:linkName"), //
-
-    // This property indicates that it's data is sourced from IPFS files, and can
-    // come from another server
-    IPFS_SOURCE("ipfs:source"), //
-
     FS_LINK("fs:link"), //
-
-    /*
-     * property used to indicate we should not query the IPFS network again for this conten because we
-     * have already loaded it
-     */
-    IPFS_OK("ipfs:ok"), //
 
     /*
      * mime type expressed as a file extension. Invented so we can set 'txt' v.s. 'md' to turn off
@@ -130,9 +100,6 @@ public enum NodeProp {
 
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota"), //
-
-    // if this contains web3, then web3 active, etc.
-    ALLOWED_FEATURES("sn:features"), //
 
     LAST_LOGIN_TIME("sn:lastLogin"), //
     LAST_ACTIVE_TIME("sn:lastActive"), //

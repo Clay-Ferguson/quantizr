@@ -33,15 +33,6 @@ export quanta_domain=172.17.0.1
 export dc_yaml=dc-dev.yaml
 export docker_stack=quanta-stack-dev
 
-# Configure some locations for IPFS-related runtime files
-export ipfs_data=/home/clay/ipfs
-export ipfs_staging=/home/clay/ipfs/staging
-
-# make this BLANK for disabled, and "true" for enabled. When enabling don't forget to add the
-# dependency in the dockercompose YAML file to start IPFS deamon before the app starts
-export ipfsEnabled=
-export ipfs_container=ipfs-dev
-
 export DOCKER_ENV=dev
 
 # When we run Maven builder, this selects our profile.

@@ -33,12 +33,11 @@ public class SessionContext {
     private String userNodeId;
     private String timezone;
     private String timeZoneAbbrev;
-    private String allowedFeatures = "";
     private long lastLoginTime;
     private long lastActiveTime;
     private UserPreferences userPreferences;
     private String userToken;
-    private boolean enableIPSM;
+    private boolean enable;
     // this gets set to true, to trigger a refresh when needed again.
     private boolean friendsTagsDirty;
 
@@ -56,14 +55,6 @@ public class SessionContext {
 
     public void setPubSigKeyJson(String pubSigKeyJson) {
         this.pubSigKeyJson = pubSigKeyJson;
-    }
-
-    public boolean isEnableIPSM() {
-        return enableIPSM;
-    }
-
-    public void setEnableIPSM(boolean enableIPSM) {
-        this.enableIPSM = enableIPSM;
     }
 
     // Extra layer of security to invalidate this session object
@@ -172,20 +163,6 @@ public class SessionContext {
 
     public void setUserNodeId(String userNodeId) {
         this.userNodeId = userNodeId;
-    }
-
-    public String getAllowedFeatures() {
-        return allowedFeatures;
-    }
-
-    public void setAllowedFeatures(String allowedFeatures) {
-        this.allowedFeatures = allowedFeatures;
-    }
-
-    public boolean allowWeb3() {
-        // turning on for everyone for now
-        return true;
-        // return getAllowedFeatures().contains("web3");
     }
 
     public boolean isFriendsTagsDirty() {

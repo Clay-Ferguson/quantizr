@@ -211,10 +211,9 @@ export class EditNodeDlgUtil {
     }
 
     upload = async (file: File, dlg: EditNodeDlg) => {
-        const state = dlg.getState<EditNodeDlgState>();
         const ast = getAs();
 
-        const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", state.toIpfs, file, false, true, async () => {
+        const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", file, false, true, async () => {
             await S.edit.refreshFromServer(ast.editNode);
             S.edit.updateNode(ast.editNode);
             dlg.binaryDirty = true;

@@ -47,7 +47,6 @@ export class View {
             nodeId: id,
             zeroOffset: true,
             highlightId: id,
-            forceIPFSRefresh: false,
             scrollToTop: false,
             allowScroll: true,
             setTab: true,
@@ -83,7 +82,6 @@ export class View {
             forceRenderParent: a.forceRenderParent,
             offset,
             goToLastPage: false,
-            forceIPFSRefresh: a.forceIPFSRefresh,
             singleNode: false,
             jumpToRss: a.jumpToRss
         });
@@ -164,7 +162,6 @@ export class View {
             forceRenderParent: false,
             offset,
             goToLastPage,
-            forceIPFSRefresh: false,
             singleNode: false,
             jumpToRss: false
         },
@@ -412,7 +409,6 @@ interface RefreshTreeArgs {
     nodeId: string;
     zeroOffset: boolean;
     highlightId: string;
-    forceIPFSRefresh: boolean;
     scrollToTop: boolean;
     allowScroll: boolean;
     setTab: boolean;

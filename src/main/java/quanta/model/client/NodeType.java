@@ -32,8 +32,7 @@ public enum NodeType {
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //
     FS_FOLDER("fs:folder"), //
-    FS_LUCENE("fs:lucene"), //
-    IPFS_NODE("sn:ipfsNode");
+    FS_LUCENE("fs:lucene");
 
     @JsonValue
     private final String value;

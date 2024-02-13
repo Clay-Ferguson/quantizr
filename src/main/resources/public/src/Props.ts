@@ -232,7 +232,6 @@ export class Props {
     // here's the simple mode property hider!
     initConstants = () => {
         S.util.addAllToSet(this.readOnlyPropertyList, [ //
-            J.NodeProp.JSON_HASH, //
             J.NodeProp.ENC_KEY, //
             J.NodeProp.TYPE_LOCK, //
             J.NodeProp.UNPUBLISHED
@@ -243,7 +242,6 @@ export class Props {
         S.util.addAllToSet(this.controlBasedPropertyList, [ //
             J.NodeProp.INLINE_CHILDREN, //
             J.NodeProp.NOWRAP, //
-            J.NodeProp.SAVE_TO_IPFS, //
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
             J.NodeProp.UNPUBLISHED, //
@@ -342,8 +340,6 @@ export class Props {
             blockedWords: ast.userProfile.blockedWords,
             userBio: ast.userProfile.userBio,
             displayName: ast.userProfile.displayName,
-            publish: false,
-            mfsEnable: ast.userProfile.mfsEnable,
             recentTypes: ast.userProfile.recentTypes
         });
     }

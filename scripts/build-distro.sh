@@ -60,10 +60,6 @@ mkdir -p ${POSTGRES_DATA}
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
 
-# ensure the IPFS folders exist
-mkdir -p ${ipfs_data}
-mkdir -p ${ipfs_staging}
-
 genMongoConfig
 
 if [ "${COMPILE}" == "yes" ]; then

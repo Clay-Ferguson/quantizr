@@ -16,13 +16,11 @@ import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { Value } from "../Value";
 import { MessageDlg } from "./MessageDlg";
 
 export class ExportDlg extends DialogBase {
 
     fileNameState: Validator = new Validator();
-    saveToIpfsState: Value<boolean> = new Value<boolean>(this, "toIpfs");
 
     constructor(private node: NodeInfo) {
         super("Export Node");
@@ -43,9 +41,6 @@ export class ExportDlg extends DialogBase {
             ], "radioButtonsBar marginTop"),
 
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
-            S.quanta.cfg.ipfsEnabled ? new Div(null, null, [
-                new Checkbox("Save to IPFS", null, this.saveToIpfsState)
-            ]) : null,
 
             exportType === "pdf" || ast.exportSettings.contentType == "md" ? new Checkbox("Table of Contents", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
@@ -129,7 +124,6 @@ export class ExportDlg extends DialogBase {
             nodeId: this.node.id,
             exportExt: ast.exportSettings.exportType,
             fileName: this.fileNameState.getValue(),
-            toIpfs: ast.exportSettings.toIpfs,
             includeToc: ast.exportSettings.includeToc,
             includeMetaComments: ast.exportSettings.includeMetaComments,
             includeJypyter: ast.exportSettings.includeJypyter,
@@ -151,23 +145,13 @@ export class ExportDlg extends DialogBase {
         // disp=inline (is the other)
         const downloadLink = hostAndPort + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
-        // todo-3: Currently only PDF exports are saveable to IPFS MFS, and there is an inconsistency here, because we DO want ALL types exports to
-        // be able to go to MFS, and it would be pretty easy to do what the PDFs are doing (recarding save to MFS) for all other types of exports.
-        const ipfsMessage = (res.ipfsCid && res.ipfsCid.endsWith(".pdf")) ? " You can also use the `IPFS Explorer` to view the IPFS copy of the file." : "";
-
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(
-                "Export successful.<p>Use the download link below now, to get the file." + ipfsMessage,
+                "Export successful.<p>Use the download link below now, to get the file.",
                 "Export",
                 null,
                 new VerticalLayout([
-                    res.ipfsCid ? new Div("IPFS Location: " + res.ipfsCid, {
-                        className: "ipfsCidText",
-                        title: "Click -> Copy to clipboard",
-                        onClick: () => S.util.copyToClipboard(res.ipfsCid)
-                    }) : null,
                     new Anchor(downloadLink, "Download", { target: "_blank" }),
-                    res.ipfsMime ? new Div("mime type: " + res.ipfsMime) : null
                 ]), false, 0, null
             ).open();
 

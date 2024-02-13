@@ -143,7 +143,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return client;
     }
 
-
     // MongoTemplate is thread-safe and can be reused everywhere in all threads.
     @Override
     @Bean

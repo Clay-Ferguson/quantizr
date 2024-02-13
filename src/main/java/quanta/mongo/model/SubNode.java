@@ -49,9 +49,8 @@ public class SubNode {
     public static final boolean USE_HAS_CHILDREN = true;
 
     // This tells all parts of the code that any changes being made on this node can be accepted
-    // without
-    // further auth checks. important for when a user thread is doing something but that causes us to
-    // need to modify some node that user is not expected to also own
+    // without further auth checks. important for when a user thread is doing something but that causes
+    // us to need to modify some node that user is not expected to also own
     @Transient
     @JsonIgnore
     public boolean adminUpdate = false;
@@ -157,8 +156,7 @@ public class SubNode {
     @PersistenceCreator
     public SubNode() {
         // WARNING: Do NOT initialize times (mod time or create time) in here. This constructor gets
-        // called
-        // any time the persistence engine loads a node!!!!
+        // called any time the persistence engine loads a node!!!!
     }
 
     public SubNode(ObjectId owner, String path, String type, Long ordinal) {

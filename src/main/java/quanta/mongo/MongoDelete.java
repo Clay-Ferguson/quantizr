@@ -494,10 +494,6 @@ public class MongoDelete extends ServiceBase {
 
             // back out the number of bytes it was using
             if (!ms.isAdmin()) {
-                // NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
-                // don't do reference counting we let the garbage collecion cleanup be the only way user quotas
-                // are deducted from.
-                //
                 // todo-2: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
                 // grant them back the space, so this would rob users of some space. Need to fix that.
                 long totalBytes = attach.getTotalAttachmentBytes(ms, node);

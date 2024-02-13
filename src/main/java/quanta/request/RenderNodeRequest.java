@@ -32,18 +32,6 @@ public class RenderNodeRequest extends RequestBase {
 	 * children
 	 */
 	private boolean singleNode;
-	@JsonProperty(required = false)
-	private boolean forceIPFSRefresh;
-
-	@JsonProperty(required = false)
-	public boolean isForceIPFSRefresh() {
-		return forceIPFSRefresh;
-	}
-
-	@JsonProperty(required = false)
-	public void setForceIPFSRefresh(boolean forceIPFSRefresh) {
-		this.forceIPFSRefresh = forceIPFSRefresh;
-	}
 
 	public String getNodeId() {
 		return this.nodeId;

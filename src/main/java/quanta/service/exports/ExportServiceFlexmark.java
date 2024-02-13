@@ -28,8 +28,6 @@ import quanta.config.ServiceBase;
 import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
-import quanta.model.ipfs.dag.MerkleLink;
-import quanta.model.ipfs.dag.MerkleNode;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -58,7 +56,6 @@ public class ExportServiceFlexmark extends ServiceBase {
     private ExportRequest req;
     private ExportResponse res;
     int baseSlashCount = 0;
-    private List<ExportIpfsFile> files = new LinkedList<>();
 
     /*
      * Exports the node specified in the req. If the node specified is "/", or the repository root, then
@@ -141,48 +138,16 @@ public class ExportServiceFlexmark extends ServiceBase {
             String body = renderer.render(document);
             String html = generateHtml(body);
             if ("html".equals(format)) {
-                if (req.isToIpfs()) {
-                    writeIpfsFiles(html);
-                } else {
-                    FileUtils.writeEntireFile(fullFileName, html);
-                    wroteFile = true;
-                }
+                FileUtils.writeEntireFile(fullFileName, html);
+                wroteFile = true;
             } //
             else if ("pdf".equals(format)) {
-                // todo-2: We should have an OPTION to export ONLY and DIRECTLY to IPFS here, and
-                // not even write to a file.
                 out = new FileOutputStream(new File(fullFileName));
-                // todo-2: we're writing to a physical file here EVEN when all we need it for is to put out on
-                // IPFS.
                 // This can be improved to not need the physica file but do it either all as streams or in byte
                 // array.
                 PdfConverterExtension.exportToPdf(out, html, "", options);
                 wroteFile = true;
                 StreamUtil.close(out);
-                if (req.isToIpfs()) {
-                    // now write the file we just generated out to IPFS.
-                    FileInputStream is = null;
-                    try {
-                        is = new FileInputStream(fullFileName);
-                        String mime = "application/pdf";
-                        // -----------------------------------------------------
-                        // DO NOT DELETE
-                        // ---------------
-                        // this does the regular IPFS file add
-                        // MerkleLink ret = ipfs.addFromStream(ms, is, shortFileName, mime, null, false);
-                        // ipfs.writeIpfsExportNode(ms, ret.getHash(), mime, shortFileName, null);
-                        // res.setIpfsCid(ret.getHash());
-                        // ---------------
-                        // But let's write to MFS now instead!
-                        String mfsPath = "/" + ThreadLocals.getSC().getUserNodeId() + "/exports/" + shortFileName;
-                        ipfsFiles.addFileFromStream(ms, mfsPath, is, mime, null);
-                        res.setIpfsCid("/exports/" + shortFileName);
-                        // ----------------------------------------------------
-                        res.setIpfsMime(mime);
-                    } finally {
-                        StreamUtil.close(is);
-                    }
-                }
             } else {
                 throw new RuntimeException("invalid format.");
             }
@@ -193,41 +158,6 @@ public class ExportServiceFlexmark extends ServiceBase {
             if (wroteFile) {
                 (new File(fullFileName)).deleteOnExit();
             }
-        }
-    }
-
-    private void writeIpfsFiles(String html) {
-        String mime = "text/html";
-        // generate root folder to hold all the files
-        MerkleNode rootDir = ipfsObj.newObject();
-        // add the main html file as index.html
-        MerkleLink index = ipfs.addFileFromString(session, html, "index.html", mime, false);
-        rootDir = ipfsObj.addFileToDagRoot(rootDir.getHash(), "index.html", index.getHash());
-        // Next we add all the 'image' attachments that the HTML can point to (currently only supports
-        // other
-        // IPFS-type uploads (images stored on ipfs already))
-        //
-        // This will make images work inside this DAG file using no path so an image file named
-        // 'my-image.jpg' will work in an html IMG tag with just src='my-image.jpg'.
-        //
-        // However the tricky part is that since Quanta doesn't yet have a reverse proxy and a way for
-        // 'end
-        // users' to directly access it's IPFS gateway we embed the actual CID onto the end of the 'src'
-        // as
-        // a param like this: src='my-image.jpg?cid=Qm123456...', so the Quanta server is able to use
-        // queries like that and grab the correct data to return based on the 'cid=' arg, where as the
-        // rest
-        // of the IPFS internet gateways will hopefully ignore that unknown parameter.
-        for (ExportIpfsFile file : files) {
-            // todo-2: is there a way to add multiple files to a DAG all at once? Post this
-            // question on discuss.ipfs.io?
-            rootDir = ipfsObj.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
-        }
-        String fullCid = rootDir.getHash() + "/index.html";
-        ipfs.writeIpfsExportNode(session, fullCid, mime, "index.html", files);
-        if (rootDir != null) {
-            res.setIpfsCid(fullCid);
-            res.setIpfsMime(mime);
         }
     }
 
@@ -305,8 +235,8 @@ public class ExportServiceFlexmark extends ServiceBase {
                 continue;
             String bin = att.getBin();
             String url = att.getUrl();
-            String ipfsLink = att.getIpfsLink();
-            if (bin == null && ipfsLink == null && url == null) {
+
+            if (bin == null && url == null) {
                 continue;
             }
             String style = "";
@@ -324,37 +254,7 @@ public class ExportServiceFlexmark extends ServiceBase {
             }
 
             String src = null;
-            if (req.isToIpfs() && "html".equals(format)) {
-                String fileName = att.getFileName();
-                if (bin != null) {
-                    String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
-                    files.add(new ExportIpfsFile(cid, fileName, mime));
-                    src = fileName + "?cid=" + cid;
-                }
-                // if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
-                // so reference it in src
-                else if (ipfsLink != null && fileName != null) {
-                    files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
-                    // NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway
-                    // open
-                    // to the internet we have to use this trick if sticking on the cid parameter so that our
-                    // AppController.getBinary function (which will be called when the user references the resuorce)
-                    // can
-                    // use that instead of the relative path to locate the file.
-                    //
-                    // When normal other IPFS gateways are opening this content they'll reference the actual
-                    // 'fileName'
-                    // and it will work because we do DAG-link that file into the root CID DAG entry for this export!
-                    src = fileName + "?cid=" + ipfsLink;
-                }
-            }
-            // NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate
-            // this
-            // kind of reference to the image resource, because ultimately the Flexmark code that converts the
-            // HTML to the PDF will be calling this image url to extract out the actual image data to embed
-            // directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
-            // eventually put out on IPFS or simply provided to the user as a downloadable link.
-            else if (bin != null) {
+            if (bin != null) {
                 String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
                         + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
                 src = prop.getProtocolHostAndPort() + path;
@@ -364,11 +264,12 @@ public class ExportServiceFlexmark extends ServiceBase {
             }
             if (src == null)
                 continue;
-            // I'm not wrapping this img in a div, so they don't get forced into a vertical display of images,
-            // but the PDF engine seems to be able to smartly insert images in an attractive way arranging
-            // small
-            // images side-by-side when they'll fit on the page so I'm just letting the PDF determine how to
-            // position images, since it seems ok
+            /*
+             * I'm not wrapping this img in a div, so they don't get forced into a vertical display of images,
+             * but the PDF engine seems to be able to smartly insert images in an attractive way arranging small
+             * images side-by-side when they'll fit on the page so I'm just letting the PDF determine how to
+             * position images, since it seems ok
+             */
             markdown.append("\n<img src='" + src + "' " + style + "/>\n");
         }
     }

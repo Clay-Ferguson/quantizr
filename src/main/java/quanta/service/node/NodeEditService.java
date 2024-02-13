@@ -182,10 +182,8 @@ public class NodeEditService extends ServiceBase {
         } else /* if node is currently encrypted */ {
             res.setAclEntries(auth.getAclEntries(ms, node));
         }
-        ipfsPin.pinLocalIpfsAttachments(node);
         // If the node being saved is currently in the pending area /p/ then we publish it now, and move
-        // it
-        // out of pending.
+        // it out of pending.
         mongoUtil.setPendingPath(node, false);
         // todo-2: for now only admin user is REQUIRED to have signed nodes.
         if (prop.isRequireCrypto() && ms.isAdmin()) {
@@ -261,10 +259,6 @@ public class NodeEditService extends ServiceBase {
             }
 
             push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
-
-            if (AclService.isPublic(node) && !StringUtils.isEmpty(node.getName())) {
-                ipfs.saveNodeToMFS(ms, node);
-            }
             return null;
         });
     }

@@ -49,18 +49,6 @@ import quanta.service.ai.OobaAiService;
 import quanta.service.ai.OpenAiService;
 import quanta.service.ai.PplxAiService;
 import quanta.service.imports.ImportService;
-import quanta.service.ipfs.IPFSCat;
-import quanta.service.ipfs.IPFSConfig;
-import quanta.service.ipfs.IPFSDag;
-import quanta.service.ipfs.IPFSFiles;
-import quanta.service.ipfs.IPFSKey;
-import quanta.service.ipfs.IPFSName;
-import quanta.service.ipfs.IPFSObj;
-import quanta.service.ipfs.IPFSPin;
-import quanta.service.ipfs.IPFSPubSub;
-import quanta.service.ipfs.IPFSRepo;
-import quanta.service.ipfs.IPFSService;
-import quanta.service.ipfs.IPFSSwarm;
 import quanta.service.node.NodeEditService;
 import quanta.service.node.NodeMoveService;
 import quanta.service.node.NodeRenderService;
@@ -175,18 +163,6 @@ public class ServiceBase {
     public static HuggingFaceService huggingFace;
     public static OobaAiService oobaAi;
     public static TransferService transfer;
-    public static IPFSService ipfs;
-    public static IPFSCat ipfsCat;
-    public static IPFSFiles ipfsFiles;
-    public static IPFSPin ipfsPin;
-    public static IPFSObj ipfsObj;
-    public static IPFSDag ipfsDag;
-    public static IPFSName ipfsName;
-    public static IPFSKey ipfsKey;
-    public static IPFSRepo ipfsRepo;
-    public static IPFSSwarm ipfsSwarm;
-    public static IPFSConfig ipfsConfig;
-    public static IPFSPubSub ipfsPubSub;
     public static boolean initComplete = false;
     public static final Object initLock = new Object();
     public static GracefulShutdown gracefulShutdown;
@@ -277,18 +253,6 @@ public class ServiceBase {
             huggingFace = getBean(ctx, HuggingFaceService.class);
             oobaAi = getBean(ctx, OobaAiService.class);
             transfer = getBean(ctx, TransferService.class);
-            ipfs = getBean(ctx, IPFSService.class);
-            ipfsCat = getBean(ctx, IPFSCat.class);
-            ipfsFiles = getBean(ctx, IPFSFiles.class);
-            ipfsPin = getBean(ctx, IPFSPin.class);
-            ipfsObj = getBean(ctx, IPFSObj.class);
-            ipfsDag = getBean(ctx, IPFSDag.class);
-            ipfsName = getBean(ctx, IPFSName.class);
-            ipfsKey = getBean(ctx, IPFSKey.class);
-            ipfsRepo = getBean(ctx, IPFSRepo.class);
-            ipfsSwarm = getBean(ctx, IPFSSwarm.class);
-            ipfsConfig = getBean(ctx, IPFSConfig.class);
-            ipfsPubSub = getBean(ctx, IPFSPubSub.class);
             gracefulShutdown = getBean(ctx, GracefulShutdown.class);
 
             // We improve over Spring by only calling PostConstructs once all
@@ -308,11 +272,5 @@ public class ServiceBase {
             ServiceBase.postConstructs.add(_ret::postConstruct);
         }
         return ret;
-    }
-
-    public void checkIpfs() {
-        if (!prop.ipfsEnabled()) {
-            throw new RuntimeException("IPFS Not Enabled");
-        }
     }
 }

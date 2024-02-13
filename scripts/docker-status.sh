@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE=quanta-stack-dev_ipfs-dev
+SERVICE=quanta-stack-???
 NETWORK=bridge
 
 echo "_________________________________________________________"

@@ -9,7 +9,6 @@ import { Validator } from "../Validator";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
@@ -67,33 +66,6 @@ export class UserProfileDlg extends DialogBase {
         const profileHeaderImg = this.makeProfileHeaderImg();
         const profileImg = this.makeProfileImg(!!profileHeaderImg);
         const localUser = S.util.isLocalUserName(state.userProfile.userName);
-        let web3Div: Div = null;
-        const web3Enabled = ast.allowedFeatures?.indexOf("web3") !== -1;
-
-        if (S.quanta.cfg.ipfsEnabled && web3Enabled) {
-            const web3Comps: Comp[] = [];
-
-            if (state.userProfile.didIPNS) {
-                web3Comps.push(new Div("Identity: " + "/ipns/" + state.userProfile.didIPNS, {
-                    title: "Decentralized Identity (DID) IPNS Name",
-                    className: "marginTop clickable",
-                    onClick: () => S.util.copyToClipboard("https://ipfs.io/ipns/" + state.userProfile.didIPNS)
-                }));
-            }
-
-            if (!this.readOnly) {
-                web3Comps.push(new Checkbox("Web3 File System", null, {
-                    setValue: (checked: boolean) => {
-                        const state = this.getState<LS>();
-                        state.userProfile.mfsEnable = checked;
-                        this.mergeState<LS>({ userProfile: state.userProfile });
-                    },
-                    getValue: (): boolean => this.getState<LS>().userProfile.mfsEnable
-                }));
-            }
-
-            web3Div = new Div(null, null, web3Comps);
-        }
 
         const children = [
             new Div(null, null, [
@@ -132,14 +104,10 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
-                web3Div,
                 getAs().isAdminUser && localUser ? new UserAdminPanel(this) : null,
 
                 new ButtonBar([
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this.save, null, "btn-primary"),
-                    (getAs().isAnonUser || this.readOnly || !S.quanta.cfg.ipfsEnabled || !web3Enabled) ? null : new Button("Publish Identity", this.publish, {
-                        title: "Publish Identity to IPFS/IPNS (Decentralized Identity, DID)"
-                    }),
 
                     // only local users might have set their 'home' node (named a node 'home')
                     localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //
@@ -223,7 +191,6 @@ export class UserProfileDlg extends DialogBase {
     }
 
     save = async () => {
-        const state = this.getState<LS>();
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
@@ -231,15 +198,12 @@ export class UserProfileDlg extends DialogBase {
             blockedWords: ast.userProfile.blockedWords,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
-            publish: false,
-            mfsEnable: state.userProfile.mfsEnable,
             recentTypes: ast.userProfile.recentTypes
         });
         this.saveResponse(res);
     }
 
     publish = async () => {
-        const state = this.getState<LS>();
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
@@ -247,8 +211,6 @@ export class UserProfileDlg extends DialogBase {
             blockedWords: ast.userProfile.blockedWords,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue(),
-            publish: true,
-            mfsEnable: state.userProfile.mfsEnable,
             recentTypes: ast.userProfile.recentTypes
         });
         this.saveResponse(res);
@@ -349,7 +311,7 @@ export class UserProfileDlg extends DialogBase {
         const onClick = async () => {
             if (this.readOnly) return;
 
-            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_PRIMARY, false, null, false, false, async () => {
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_PRIMARY, null, false, false, async () => {
                 const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 });
@@ -406,7 +368,7 @@ export class UserProfileDlg extends DialogBase {
 
         const onClick = () => {
             if (this.readOnly) return;
-            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_HEADER, false, null, false, false,
+            const dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, J.Constant.ATTACHMENT_HEADER, null, false, false,
                 async () => {
                     const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                         userId: state.userProfile.userNodeId

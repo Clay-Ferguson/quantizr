@@ -40,7 +40,6 @@ import quanta.request.CopySharingRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.DeleteFriendRequest;
-import quanta.request.DeleteMFSFileRequest;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.DeleteUserTransactionsRequest;
@@ -48,8 +47,6 @@ import quanta.request.ExportRequest;
 import quanta.request.GetBookmarksRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
-import quanta.request.GetIPFSContentRequest;
-import quanta.request.GetIPFSFilesRequest;
 import quanta.request.GetMultiRssRequest;
 import quanta.request.GetNodeJsonRequest;
 import quanta.request.GetNodePrivilegesRequest;
@@ -68,7 +65,6 @@ import quanta.request.InsertNodeRequest;
 import quanta.request.JoinNodesRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
-import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.LoginRequest;
 import quanta.request.LogoutRequest;
 import quanta.request.LuceneIndexRequest;
@@ -78,7 +74,6 @@ import quanta.request.NodeFeedRequest;
 import quanta.request.NodeSearchRequest;
 import quanta.request.PasteAttachmentsRequest;
 import quanta.request.PingRequest;
-import quanta.request.PublishNodeToIpfsRequest;
 import quanta.request.RemovePrivilegeRequest;
 import quanta.request.RemoveSignaturesRequest;
 import quanta.request.RenderCalendarRequest;
@@ -106,7 +101,6 @@ import quanta.request.SubGraphHashRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateFriendNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
-import quanta.request.UploadFromIPFSRequest;
 import quanta.request.UploadFromUrlRequest;
 import quanta.util.CaptchaMaker;
 
@@ -259,35 +253,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    @RequestMapping(value = API_PATH + "/getIPFSFiles", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getIPFSFiles(@RequestBody GetIPFSFilesRequest req, HttpServletRequest httpReq, HttpSession session) {
-        checkIpfs();
-        return callProc.run("getIPFSFiles", false, false, req, session, ms -> {
-            return ipfsFiles.getIPFSFiles(req, ms);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/deleteMFSFile", method = RequestMethod.POST)
-    @ResponseBody
-    public Object deleteIpfsFile(@RequestBody DeleteMFSFileRequest req, HttpServletRequest httpReq,
-            HttpSession session) {
-        checkIpfs();
-        return callProc.run("deleteMFSFile", false, false, req, session, ms -> {
-            return ipfsFiles.deleteMFSFile(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/getIPFSContent", method = RequestMethod.POST)
-    @ResponseBody
-    public Object getIPFSContent(@RequestBody GetIPFSContentRequest req, HttpServletRequest httpReq,
-            HttpSession session) {
-        checkIpfs();
-        return callProc.run("getIPFSContent", false, false, req, session, ms -> {
-            return ipfsFiles.getIPFSContent(ms, req);
-        });
-    }
-
     @RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
     @ResponseBody
     public Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
@@ -405,22 +370,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
         return callProc.run("searchAndReplace", true, true, req, session, ms -> {
             return edit.searchAndReplace(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
-    @ResponseBody
-    public Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
-        return callProc.run("publishNodeToIpfs", true, true, req, session, ms -> {
-            return ipfs.publishNodeToIpfs(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
-    @ResponseBody
-    public Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
-        return callProc.run("loadNodeFromIpfs", true, true, req, session, ms -> {
-            return ipfs.loadNodeFromIpfs(ms, req);
         });
     }
 
@@ -572,7 +521,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @PathVariable(value = "userName", required = false) String userName,
             @PathVariable(value = "id", required = false) String id,
             @RequestParam(value = "download", required = false) String download,
-            // gid is used ONLY for cache bustring so it can be the IPFS hash -or- the
+            // gid is used ONLY for cache bustring so it can be the
             // gridId, we don't know or care which it is.
             @RequestParam(value = "gid", required = false) String gid,
             // attachment name for retrieving from a multiple attachment node, and if omitted
@@ -585,11 +534,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
     public void getBinary(@PathVariable("binId") String binId,
             @RequestParam(value = "nodeId", required = false) String nodeId,
-            // In the file exports where this is appended, we could have appended just nodeId and it would
-            // also
-            // work but be a bit slower as that would look up the node rather than streaming straight out of
-            // IPFS.
-            @RequestParam(value = "cid", required = false) String ipfsCid, //
             // The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
             // it's generated from HTML intermediate file what has all the links in it for accessing binary
             // content, and as the PDF is being generated calls are made to this endpoint for each image, or
@@ -597,7 +541,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "token", required = false) String token,
             @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {
-        attach.getBinary(binId, nodeId, ipfsCid, token, download, session, response);
+        attach.getBinary(binId, nodeId, token, download, session, response);
     }
 
     /*
@@ -686,12 +630,11 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object upload(@RequestParam(value = "nodeId", required = true) String nodeId,
             @RequestParam(value = "attName", required = false) String attName,
             @RequestParam(value = "explodeZips", required = false) String explodeZips,
-            @RequestParam(value = "ipfs", required = false) String ipfs,
             @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
         final String _attName = attName == null ? "" : attName;
         return callProc.run("upload", true, true, null, session, ms -> {
             return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
-                    "true".equalsIgnoreCase(explodeZips), "true".equalsIgnoreCase(ipfs));
+                    "true".equalsIgnoreCase(explodeZips));
         });
     }
 
@@ -724,14 +667,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
         return callProc.run("uploadFromUrl", true, true, req, session, ms -> {
             return attach.readFromUrl(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/uploadFromIPFS", method = RequestMethod.POST)
-    @ResponseBody
-    public Object uploadFromIPFS(@RequestBody UploadFromIPFSRequest req, HttpSession session) {
-        return callProc.run("uploadFromIPFS", true, true, req, session, ms -> {
-            return attach.attachFromIPFS(ms, req);
         });
     }
 

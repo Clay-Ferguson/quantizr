@@ -8,8 +8,6 @@ public class UserProfile {
     private String userName;
     // if a node exists named '[userName]:home', then the id of that node is stored here.
     private String homeNodeId;
-    private String didIPNS;
-    private boolean mfsEnable;
     private String userBio;
     private String userTags;
     private String blockedWords;
@@ -46,14 +44,6 @@ public class UserProfile {
 
     public String getHomeNodeId() {
         return this.homeNodeId;
-    }
-
-    public String getDidIPNS() {
-        return this.didIPNS;
-    }
-
-    public boolean isMfsEnable() {
-        return this.mfsEnable;
     }
 
     public String getUserBio() {
@@ -122,14 +112,6 @@ public class UserProfile {
 
     public void setHomeNodeId(final String homeNodeId) {
         this.homeNodeId = homeNodeId;
-    }
-
-    public void setDidIPNS(final String didIPNS) {
-        this.didIPNS = didIPNS;
-    }
-
-    public void setMfsEnable(final boolean mfsEnable) {
-        this.mfsEnable = mfsEnable;
     }
 
     public void setUserBio(final String userBio) {

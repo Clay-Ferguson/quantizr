@@ -94,7 +94,7 @@ export class Edit {
             return;
         }
 
-        const dlg = new UploadFromFileDropzoneDlg(node.id, "", false, null, true, true, () => {
+        const dlg = new UploadFromFileDropzoneDlg(node.id, "", null, true, true, () => {
             S.view.jumpToId(node.id);
         });
         dlg.open();
@@ -115,7 +115,6 @@ export class Edit {
                 nodeId: ast.node.id,
                 zeroOffset: false,
                 highlightId: null,
-                forceIPFSRefresh: false,
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
@@ -168,7 +167,6 @@ export class Edit {
                     nodeId: null,
                     zeroOffset: false,
                     highlightId: nodeId,
-                    forceIPFSRefresh: false,
                     scrollToTop: false,
                     allowScroll: true,
                     setTab: true,
@@ -452,7 +450,6 @@ export class Edit {
     //             forceRenderParent: false,
     //             offset: 0,
     //             goToLastPage: false,
-    //             forceIPFSRefresh: false,
     //             singleNode: true,
     //             jumpToRss: false
     //         });
@@ -1175,7 +1172,6 @@ export class Edit {
                 nodeId: null,
                 zeroOffset: false,
                 highlightId: null,
-                forceIPFSRefresh: false,
                 scrollToTop: false,
                 allowScroll: true,
                 setTab: true,
@@ -1331,7 +1327,6 @@ export class Edit {
                 nodeId: null,
                 zeroOffset: false,
                 highlightId: null,
-                forceIPFSRefresh: false,
                 scrollToTop: false,
                 allowScroll: false,
                 setTab: false,
@@ -1368,7 +1363,6 @@ export class Edit {
                     nodeId: null,
                     zeroOffset: false,
                     highlightId: null,
-                    forceIPFSRefresh: false,
                     scrollToTop: false,
                     allowScroll: false,
                     setTab: false,
@@ -1476,7 +1470,6 @@ export class Edit {
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
-            forceIPFSRefresh: false,
             singleNode: true,
             jumpToRss: false
         });

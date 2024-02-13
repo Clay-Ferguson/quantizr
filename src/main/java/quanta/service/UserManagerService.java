@@ -280,8 +280,6 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeException("userNode id is null for user: " + userName);
         }
         sc.setUserNodeId(id);
-        sc.setAllowedFeatures(userNode.getStr(NodeProp.ALLOWED_FEATURES));
-        res.setAllowedFeatures(sc.getAllowedFeatures());
         UserPreferences userPreferences = getUserPreferences(userName, userNode);
         sc.setUserPreferences(userPreferences);
         res.setRootNodePath(userNode.getPath());
@@ -605,10 +603,7 @@ public class UserManagerService extends ServiceBase {
             return res;
         }
         UserPreferences reqUserPrefs = req.getUserPreferences();
-        // once triggered it stays on (for now)
-        if (reqUserPrefs.isEnableIPSM()) {
-            ThreadLocals.getSC().setEnableIPSM(true);
-        }
+
         arun.run(as -> {
             SubNode prefsNode = read.getNode(as, req.getUserNodeId());
             if (prefsNode == null)
@@ -662,7 +657,6 @@ public class UserManagerService extends ServiceBase {
                 userNode.set(NodeProp.USER_BLOCK_WORDS, processBlockedWords(req.getBlockedWords()));
                 userNode.set(NodeProp.USER_RECENT_TYPES, req.getRecentTypes());
                 userNode.set(NodeProp.DISPLAY_NAME, req.getDisplayName());
-                userNode.set(NodeProp.MFS_ENABLE, req.isMfsEnable());
                 update.save(as, userNode);
             }
             return null;
@@ -793,9 +787,7 @@ public class UserManagerService extends ServiceBase {
                 String displayName = getFriendlyNameFromNode(userNode);
                 userProfile.setUserName(nodeUserName);
                 userProfile.setDisplayName(displayName);
-                userProfile.setMfsEnable(userNode.getBool(NodeProp.MFS_ENABLE));
                 userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO));
-                userProfile.setDidIPNS(userNode.getStr(NodeProp.USER_DID_IPNS));
                 userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS));
                 userProfile.setBlockedWords(userNode.getStr(NodeProp.USER_BLOCK_WORDS));
                 userProfile.setRecentTypes(userNode.getStr(NodeProp.USER_RECENT_TYPES));

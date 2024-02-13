@@ -10,7 +10,6 @@
     * [Delete all Images](#delete-all-images)
     * [To Remove Most Running things](#to-remove-most-running-things)
     * [To Cleanup Disk Space](#to-cleanup-disk-space)
-    * [IPFS Not Working](#ipfs-not-working)
 
 # Troubleshooting
 
@@ -40,7 +39,6 @@ https://docs.docker.com/engine/reference/commandline/image_ls/
 
     docker image ls --digests | grep "quanta"
     docker image ls --digests | grep "mongo"
-    docker image ls --digests | grep "ipfs"
 
 # Inspect your Docker Repository
 

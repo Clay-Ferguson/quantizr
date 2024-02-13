@@ -11,10 +11,6 @@ public class SaveUserProfileRequest extends RequestBase {
 	private String recentTypes;
 	private String displayName;
 
-	// only publishes DID/IPNS if this is true
-	private boolean publish;
-	private boolean mfsEnable;
-
 	public String getUserName() {
 		return this.userName;
 	}
@@ -39,14 +35,6 @@ public class SaveUserProfileRequest extends RequestBase {
 		return this.displayName;
 	}
 
-	public boolean isPublish() {
-		return this.publish;
-	}
-
-	public boolean isMfsEnable() {
-		return this.mfsEnable;
-	}
-
 	public void setUserName(final String userName) {
 		this.userName = userName;
 	}
@@ -69,14 +57,6 @@ public class SaveUserProfileRequest extends RequestBase {
 
 	public void setDisplayName(final String displayName) {
 		this.displayName = displayName;
-	}
-
-	public void setPublish(final boolean publish) {
-		this.publish = publish;
-	}
-
-	public void setMfsEnable(final boolean mfsEnable) {
-		this.mfsEnable = mfsEnable;
 	}
 
 	public SaveUserProfileRequest() {}

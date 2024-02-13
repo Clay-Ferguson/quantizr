@@ -311,8 +311,7 @@ public class MongoRead extends ServiceBase {
         int colonIdx = -1;
         SubNode userNode = null;
         // if 'name' doesn't contain a colon it's known to be just an admin-owned global named node
-        // without
-        // a user prefix
+        // without a user prefix
         if ((colonIdx = name.indexOf(":")) == -1) {
             nodeOwnerId = getDbRoot().getOwner();
         }
@@ -793,8 +792,7 @@ public class MongoRead extends ServiceBase {
                 textCriteria = TextCriteria.forDefaultLanguage();
                 // If searching for a pure tag name or a username (no spaces in search string), be smart enough to
                 // enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up
-                // finding
-                // also just instances of mytag (not a tag) which is incorrect.
+                // finding also just instances of mytag (not a tag) which is incorrect.
                 if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
                     text = "\"" + text + "\"";
                 }
@@ -1249,20 +1247,6 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    public SubNode findByIPFSPinned(MongoSession ms, String cid) {
-        // #ipfs-pending-work: pending rewrite based on new Attachments array on SubNode
-        throw new RuntimeException("findByIPFSPinned not available");
-        // Query q = new Query();
-        // /* Match the PIN to cid */
-        // Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).is(cid);
-        // /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
-        // crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
-        // q.addCriteria(crit);
-        // SubNode ret = mongoUtil.findOne(q);
-        // auth.auth(ms, ret, PrivilegeType.READ);
-        // return ret;
-    }
-
     public Iterable<SubNode> getAccountNodes(MongoSession ms, CriteriaDefinition textCriteria, Sort sort, Integer limit,
             int skip) {
         Query q = new Query();
@@ -1309,19 +1293,6 @@ public class MongoRead extends ServiceBase {
         SubNode ret = opsw.findOne(ms, q);
         auth.auth(ms, ret, PrivilegeType.READ);
         return ret;
-    }
-
-    // This gets all nodes with a pinned attachment on IPFS.
-    // (not currently used)
-    public Iterable<SubNode> findAllWithIpfsLinks() {
-        // #ipfs-pending-work: pending refactor with new Attachments array
-        throw new RuntimeException("findAllWithIpfsLinks not available");
-        // Query q = new Query();
-        // Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).ne(null);
-        // /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
-        // crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
-        // q.addCriteria(crit);
-        // return mongoUtil.find(q);
     }
 
     // (not currently used)

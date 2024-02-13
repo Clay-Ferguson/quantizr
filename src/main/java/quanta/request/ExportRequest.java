@@ -8,7 +8,6 @@ public class ExportRequest extends RequestBase {
 	// must be file extension, and selects which type of file to export
 	private String exportExt;
 	private String fileName;
-	private boolean toIpfs;
 	private boolean includeToc;
 	private boolean includeMetaComments;
 	private boolean attOneFolder;
@@ -30,10 +29,6 @@ public class ExportRequest extends RequestBase {
 
 	public String getFileName() {
 		return this.fileName;
-	}
-
-	public boolean isToIpfs() {
-		return this.toIpfs;
 	}
 
 	public boolean isIncludeToc() {
@@ -78,10 +73,6 @@ public class ExportRequest extends RequestBase {
 
 	public void setFileName(final String fileName) {
 		this.fileName = fileName;
-	}
-
-	public void setToIpfs(final boolean toIpfs) {
-		this.toIpfs = toIpfs;
 	}
 
 	public void setIncludeToc(final boolean includeToc) {

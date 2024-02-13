@@ -36,7 +36,6 @@ Learn more here: [User Guide and Technical Info](/docs/index.md)
 * Bootstrap Styling
 * MongoDB as primary data store
 * Redis for Session Data
-* IPFS Gateway
 * ChatGPT (via OpenAI API)
 * Deployment: Docker Compose (Swarm Mode)
 

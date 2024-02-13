@@ -648,8 +648,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             ext = "." + ext;
         }
 
-        // If we had a binary property on this node we write the binary file into a separate file, but for
-        // ipfs links we do NOT do this
         if (att.getMime() != null) {
             InputStream is = null;
             try {

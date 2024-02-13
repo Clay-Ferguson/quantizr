@@ -593,7 +593,6 @@ export class Search {
             nodeId: null,
             zeroOffset: false,
             highlightId: null,
-            forceIPFSRefresh: false,
             scrollToTop: false,
             allowScroll: true,
             setTab: true,

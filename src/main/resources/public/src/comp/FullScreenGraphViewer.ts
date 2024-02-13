@@ -338,7 +338,6 @@ export class FullScreenGraphViewer extends Main {
             forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
-            forceIPFSRefresh: false,
             singleNode: true,
             jumpToRss: false
         });

@@ -107,7 +107,7 @@ export class Render {
                     //     return;
                     // }
 
-                    S.attachment.openUploadFromFileDlg(false, node.id, file);
+                    S.attachment.openUploadFromFileDlg(node.id, file);
                     return;
                 }
             }
@@ -315,18 +315,6 @@ export class Render {
                         ]);
                     }
 
-                    // il = IpfsLink
-                    if (att.il) {
-                        linkGroup.addChildren([
-                            new Heading(6, "IPFS LINK"), //
-                            new Div("ipfs://" + att.il, {
-                                className: "linkDisplay",
-                                title: "Copy to clipboard",
-                                onClick: () => S.util.copyToClipboard("ipfs://" + att.il)
-                            })
-                        ]);
-                    }
-
                     attComps.push(linkGroup);
                 }
             }
@@ -336,26 +324,6 @@ export class Render {
                     dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
                 }, getAs().linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
             }
-        }
-
-        const ipfsCid = S.props.getPropStr(J.NodeProp.IPFS_CID, node);
-        if (ipfsCid) {
-            children.push(new Heading(6, "IPFS CID"), //
-                new Div("ipfs://" + ipfsCid, {
-                    className: "linkDisplay",
-                    title: "Copy to clipboard",
-                    onClick: () => S.util.copyToClipboard(ipfsCid)
-                }));
-        }
-
-        const ipnsCid = S.props.getPropStr(J.NodeProp.IPNS_CID, node);
-        if (ipnsCid) {
-            children.push(new Heading(6, "IPNS Name"), //
-                new Div("ipns://" + ipnsCid, {
-                    className: "linkDisplay",
-                    title: "Copy to clipboard",
-                    onClick: () => S.util.copyToClipboard("ipns://" + ipnsCid)
-                }));
         }
 
         dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);

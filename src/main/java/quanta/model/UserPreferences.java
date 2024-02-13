@@ -19,11 +19,6 @@ public class UserPreferences {
     private long mainPanelCols = 6;
     private String aiService;
 
-    // not persisted to DB yet. ipsm was just an experiment using IPFSSubPub for messaging
-
-    @JsonProperty(required = false)
-    private boolean enableIPSM;
-
     @JsonProperty(required = false)
     private long maxUploadFileSize;
 
@@ -79,10 +74,6 @@ public class UserPreferences {
         return this.rssHeadlinesOnly;
     }
 
-    public boolean isEnableIPSM() {
-        return this.enableIPSM;
-    }
-
     public void setEditMode(final boolean editMode) {
         this.editMode = editMode;
     }
@@ -105,11 +96,6 @@ public class UserPreferences {
 
     public void setRssHeadlinesOnly(final boolean rssHeadlinesOnly) {
         this.rssHeadlinesOnly = rssHeadlinesOnly;
-    }
-
-    @JsonProperty(required = false)
-    public void setEnableIPSM(final boolean enableIPSM) {
-        this.enableIPSM = enableIPSM;
     }
 
     public UserPreferences() {}
