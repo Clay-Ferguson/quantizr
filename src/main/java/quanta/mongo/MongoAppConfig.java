@@ -28,10 +28,12 @@ import quanta.exception.base.RuntimeEx;
 import quanta.util.ExUtil;
 import quanta.util.Util;
 
-// Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
-// see also: ServerMonitorListener to detect heartbeats, etc.
 /**
  * Spring configuration bean responsible for initializing and setting up MongoDD connection.
+ * 
+ * Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
+ * 
+ * see also: ServerMonitorListener to detect heartbeats, etc.
  */
 @Configuration
 @EnableMongoRepositories(basePackages = "quanta.mongo")
@@ -42,6 +44,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     private MongoClient client;
     private GridFsTemplate grid;
     private SimpleMongoClientDatabaseFactory factory;
+
     // we have this so we can set it to true and know that MongoDb failed and gracefully run in case
     // we need to run for debugging purposes.
     public static boolean connectionFailed = false;
@@ -107,8 +110,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 log.info("Connecting to MongoDb: " + uri);
 
                 // This is just to slightly help give the MongoDB replica some time to start
-                // becasue in a docker swarm everying sort of starts simultaneously and there's
-                // no way to define a depends_on in the yaml.
+                // becasue in a docker swarm everything starts simultaneously
                 Util.sleep(5000);
                 // This codec registroy is what allows us to store objects that contain other POJOS, like for
                 // example the way we're storing AccessControl objects in a map inside SubNode

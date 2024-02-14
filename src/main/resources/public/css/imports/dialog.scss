@@ -1,13 +1,13 @@
 .appModalTitleNormal {
     font-size: 130%;
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
+    border-top-left-radius: $dlg-border-radius;
+    border-top-right-radius: $dlg-border-radius;
 }
 
 .appModalTitlePopup {
     font-size: 130%;
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
+    border-top-left-radius: $dlg-border-radius;
+    border-top-right-radius: $dlg-border-radius;
     background-color: $primary;
 }
 
@@ -60,20 +60,18 @@
 }
 
 .appModalContentAreaEmbedMobile {
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
 }
 
 .appModalContentAreaEmbed {
     padding: 0px 12px 12px 0px;
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $dlg-border-radius;
+    border-bottom-right-radius: $dlg-border-radius;
 }
 
 .appModalContentAreaPopup {
     padding: 12px;
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $dlg-border-radius;
+    border-bottom-right-radius: $dlg-border-radius;
 }
 
 .appModalCont {
@@ -81,6 +79,7 @@
     background-color: $modal-content-bg;
     margin: $smallGap auto;
     max-width: 800px;
+    border-radius: $dlg-border-radius;
 }
 
 .dlgContentBorderTopmost {
@@ -104,7 +103,6 @@
     padding: 6px 6px 4px 12px;
     width: 100%;
     border: 1px solid gray;
-    border-radius: $border-radius;
     height: 3rem;
     margin-bottom: $smallGap;
 }
