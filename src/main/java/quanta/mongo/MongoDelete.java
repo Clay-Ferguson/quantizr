@@ -99,29 +99,6 @@ public class MongoDelete extends ServiceBase {
         update.saveSession(ms);
     }
 
-    /*
-     * This is a way to cleanup old records, but it's not needed yet.
-     *
-     * BEWARE: the updating of 'node.hasChildren' will need to be done like we do in other places in
-     * theis file using a batch update. For now this method is not used.
-     */
-    public void cleanupOldTempNodesForUser(MongoSession ms, SubNode userNode) {
-        Query q = new Query();
-        LocalDate ldt = LocalDate.now().minusDays(5);
-        Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(userNode.getPath()))
-                .and(SubNode.MODIFY_TIME).lt(date); //
-        q.addCriteria(crit);
-        // set all the parents of all nodes in 'q' to null child status
-        bulkSetPropValOnParents(ms, q, SubNode.HAS_CHILDREN, null, false);
-        // Example: Time Range check:
-        // query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
-        DeleteResult res = opsw.remove(ms, q, SubNode.class);
-        if (res.getDeletedCount() > 0) {
-            log.debug("Temp Records Deleted (Under User: " + userNode.getIdStr() + "): " + res.getDeletedCount());
-        }
-    }
-
     /**
      * This method assumes security check is already done.
      */
@@ -332,7 +309,6 @@ public class MongoDelete extends ServiceBase {
                         bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
                     }
                     // add bulk ops command to delete this orphan
-
                     bops.getVal().remove(new Query().addCriteria(new Criteria("id").is(node.getId())));
                     // update counters
                     opsPending.inc();
