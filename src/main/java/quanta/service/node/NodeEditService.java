@@ -147,7 +147,9 @@ public class NodeEditService extends ServiceBase {
             if (nodeByName != null) {
                 throw new RuntimeEx("Node name is already in use. Duplicates not allowed.");
             }
-            node.setName(nodeInfo.getName().trim());
+            if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0) {
+                node.setName(nodeInfo.getName().trim());
+            }
         }
 
         String sig = null;

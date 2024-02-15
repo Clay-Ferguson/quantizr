@@ -110,12 +110,12 @@ export class UserProfileDlg extends DialogBase {
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this.save, null, "btn-primary"),
 
                     // only local users might have set their 'home' node (named a node 'home')
-                    localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //
+                    localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserNodeByName(state, "home")) : null, //
 
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", async () => {
                         if (this.currentlyEditingWarning()) return;
-                        this.openUserHomePage(state, "posts");
+                        this.openUserNodeByType(state, J.NodeType.POSTS);
                     }), //
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
@@ -162,15 +162,18 @@ export class UserProfileDlg extends DialogBase {
         this.reload();
     }
 
+    openUserNodeByType = (state: LS, type: string) => {
+        this.close();
+        setTimeout(() => S.nav.openContentNode("~" + state.userProfile.userName + "~" + type, false), 100);
+    }
+
     /**
      * NOTE: There's two different URL formats here because there's two different ways to access
      * a named node (which are: via url, or via a parameter on the url)
      */
-    openUserHomePage = (state: LS, nodeName: string) => {
-        // let url = window.location.origin + "/u/" + state.userProfile.userName + "/" + nodeName;
-        // window.open(url, "_blank");
+    openUserNodeByName = (state: LS, nodeName: string) => {
         this.close();
-        setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName, false), 250);
+        setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName, false), 100);
     }
 
     reload = async () => {

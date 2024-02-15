@@ -335,7 +335,6 @@ public class FriendService extends ServiceBase {
                 } else {
                     parent = read.getParent(ms, node);
                 }
-                boolean top = parent != null && parent.isType(NodeType.POSTS);
                 node = parent;
                 if (node == null) {
                     topReached = true;

@@ -63,6 +63,8 @@ public class SystemService extends ServiceBase {
     // come directly from server memory.
     public static final Object adminNodesCacheLock = new Object();
     public TreeNode adminNodesCache;
+
+    // todo-0: I think this admin cache may not be worth the added complexity.
     public HashMap<String, TreeNode> adminNodesCacheMap;
     private static long lastCacheAdminNodesTime = 0;
     public static long lastAdminOwnedSaveTime = 0;

@@ -3,7 +3,6 @@ package quanta.util;
 import quanta.model.client.PrivilegeType;
 
 public class Const {
-
     public static final String REL_FOREIGN_LINK = "nofollow noopener noreferrer";
     public static final int MAX_BULK_OPS = 500;
     public static final int ONE_MB = 1024 * 1024;

@@ -360,8 +360,7 @@ public class MongoRead extends ServiceBase {
      * 3) global name (name of admin owned node, starts with colon, and only contains one colon)
      * 4) name of user owned node formatted as (":userName:nodeName")
      * 5) name of an admin-owned node formatted as ":nodeName"
-     * 6) special named location, like '~sn:inbox', or '~sn:friendList' (starts with tilde)
-     *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
+     * 6) access node by type '~typeName' (admin account) or '~userName~typeName' (user account)
      * </pre>
      */
     public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth, Val<SubNode> accntNode) {
@@ -372,19 +371,32 @@ public class MongoRead extends ServiceBase {
                     "SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
         }
         SubNode ret = null;
-
         if (identifier.startsWith("~")) {
-            String typeName = identifier.substring(1);
-            if (!typeName.startsWith("sn:")) {
-                typeName = "sn:" + typeName;
+            identifier = identifier.substring(1);
+            int tileIdx = identifier.indexOf("~");
+
+            // if there is both a userName and a typeName in the identifier
+            if (tileIdx != -1) {
+                String userName = identifier.substring(0, tileIdx);
+                String typeName = identifier.substring(tileIdx + 1);
+                ret = getUserNodeByType(ms, userName, null, null, typeName, null, false);
             }
-            ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, false);
-        } //
-        else if (identifier.startsWith(":")) { // Node name lookups are done by prefixing the search with a colon (:)
+            // else just a simple identifier
+            else {
+                String typeName = identifier;
+                ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, false);
+            }
+        }
+        // Node name lookups are done by prefixing the search with a colon (:)
+        else if (identifier.startsWith(":")) {
             ret = getNodeByName(ms, identifier.substring(1), allowAuth, accntNode);
         }
-        // else if search doesn't start with a slash then it's a nodeId and not a path
-        else if (!identifier.startsWith("/")) {
+        // else if search starts with a slash then it's a path
+        else if (identifier.startsWith("/")) {
+            ret = findNodeByPath(ms, identifier, allowAuth);
+        }
+        // else the identifier is a node id
+        else {
             if (readFromAdminCache()) {
                 synchronized (SystemService.adminNodesCacheLock) {
                     TreeNode tn = system.adminNodesCacheMap.get(identifier);
@@ -396,10 +408,6 @@ public class MongoRead extends ServiceBase {
             if (ret == null) {
                 ret = opsw.findById(allowAuth ? ms : null, new ObjectId(identifier));
             }
-        }
-        // otherwise this is a path lookup
-        else {
-            ret = findNodeByPath(ms, identifier, allowAuth);
         }
         return ret;
     }
