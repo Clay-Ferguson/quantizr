@@ -199,7 +199,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
             if (node.getAc().size() == 0) {
                 node.setAc(null);
                 dbObj.put(SubNode.AC, null);
-            } else { // Remove any share to self because that never makes sense
+            } else {
+                // Remove any share to self because that never makes sense
                 if (node.getOwner() != null) {
                     if (node.getAc().remove(node.getOwner().toHexString()) != null) {
                         dbObj.put(SubNode.AC, node.getAc());
