@@ -67,8 +67,6 @@ import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
 import quanta.request.LoginRequest;
 import quanta.request.LogoutRequest;
-import quanta.request.LuceneIndexRequest;
-import quanta.request.LuceneSearchRequest;
 import quanta.request.MoveNodesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.request.NodeSearchRequest;

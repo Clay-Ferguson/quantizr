@@ -514,16 +514,6 @@ export interface LoginRequest extends RequestBase {
 export interface LogoutRequest extends RequestBase {
 }
 
-export interface LuceneIndexRequest extends RequestBase {
-    nodeId: string;
-    path: string;
-}
-
-export interface LuceneSearchRequest extends RequestBase {
-    nodeId: string;
-    text: string;
-}
-
 export interface MoveNodesRequest extends RequestBase {
     targetNodeId: string;
     nodeIds: string[];
@@ -942,12 +932,6 @@ export interface LoginResponse extends ResponseBase {
 }
 
 export interface LogoutResponse extends ResponseBase {
-}
-
-export interface LuceneIndexResponse extends ResponseBase {
-}
-
-export interface LuceneSearchResponse extends ResponseBase {
 }
 
 export interface MoveNodesResponse extends ResponseBase {

@@ -82,13 +82,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     @Autowired
     private AclService acl;
 
-    /**
-     * What we are doing in this method is assigning the ObjectId ourselves, because our path must
-     * include this id at the very end, since the path itself must be unique. So we assign this prior to
-     * persisting so that when we persist everything is perfect.
-     *
-     * WARNING: updating properties on 'node' in here has NO EFFECT. Always update dbObj only!
-     */
     @Override
     public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
         SubNode node = event.getSource();

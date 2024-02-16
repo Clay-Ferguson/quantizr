@@ -101,7 +101,6 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Run DB Conversion", () => S.view.runServerCommand("runConversion", null, "Run DB Conversion", null)), //
                         this.settingsLink("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", null, "Rebuild Indexes Response", null)), //
-                        this.settingsLink("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, null)),
                         this.settingsLink("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", null, "Delete node leaving orphans", null)), //
                     ])
                 ], horzClass),
