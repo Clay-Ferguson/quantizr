@@ -23,7 +23,6 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
 import quanta.service.AttachmentService;
-import quanta.service.SystemService;
 import quanta.util.Const;
 import quanta.util.EventPublisher;
 import quanta.util.SubNodeUtil;
