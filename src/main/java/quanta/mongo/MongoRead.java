@@ -66,10 +66,6 @@ public class MongoRead extends ServiceBase {
         }
     }
 
-    public boolean readFromAdminCache() {
-        return system.adminNodesCacheMap != null && ThreadLocals.getSC() != null && !ThreadLocals.getSC().isAdmin();
-    }
-
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
@@ -162,15 +158,6 @@ public class MongoRead extends ServiceBase {
      * "any children visible to any user" thing.
      */
     public boolean hasChildren(MongoSession ms, SubNode node) {
-        if (readFromAdminCache()) {
-            synchronized (SystemService.adminNodesCacheLock) {
-                TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
-                if (tn != null) {
-                    return tn.children != null;
-                }
-            }
-        }
-
         // if the node knows it's children status (non-null value) return that.
         if (SubNode.USE_HAS_CHILDREN && node.getHasChildren() != null) {
             // calling booleanValue for clarity
@@ -397,14 +384,6 @@ public class MongoRead extends ServiceBase {
         }
         // else the identifier is a node id
         else {
-            if (readFromAdminCache()) {
-                synchronized (SystemService.adminNodesCacheLock) {
-                    TreeNode tn = system.adminNodesCacheMap.get(identifier);
-                    if (tn != null) {
-                        ret = tn.node;
-                    }
-                }
-            }
             if (ret == null) {
                 ret = opsw.findById(allowAuth ? ms : null, new ObjectId(identifier));
             }
@@ -463,18 +442,6 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getParent(MongoSession ms, SubNode node) {
-        if (readFromAdminCache()) {
-            synchronized (SystemService.adminNodesCacheLock) {
-                TreeNode tn = system.adminNodesCacheMap.get(node.getIdStr());
-                // Note this parent check for null here is consistent with the fact that node we might have just
-                // found in the cache might be the root of the cache tree which doesn't keep track of what it's
-                // parent is, so we can only return here in cases where we did find a parent
-                if (tn != null && tn.parent != null) {
-                    return tn.parent.node;
-                }
-            }
-        }
-
         return getParent(ms, node, true);
     }
 
@@ -584,35 +551,6 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip,
             Criteria moreCriteria, boolean allowAuth) {
-
-        if (readFromAdminCache() && moreCriteria == null && sort != null && ordinalSort.equals(sort)) {
-            TreeNode tn = null;
-            synchronized (SystemService.adminNodesCacheLock) {
-                tn = system.adminNodesCacheMap.get(node.getIdStr());
-            }
-
-            if (tn != null) {
-                if (tn.children == null) {
-                    return Collections.<SubNode>emptyList();
-                } else {
-                    List<SubNode> ret = new LinkedList<>();
-                    if (skip < 0)
-                        skip = 0;
-                    int idx = 0;
-
-                    for (TreeNode c : tn.children) {
-                        if (skip > 0) {
-                            skip--;
-                            continue;
-                        }
-                        if (limit <= 0 || idx++ < limit) {
-                            ret.add(c.node);
-                        }
-                    }
-                    return ret;
-                }
-            }
-        }
         if (allowAuth) {
             auth.auth(ms, node, PrivilegeType.READ);
         }

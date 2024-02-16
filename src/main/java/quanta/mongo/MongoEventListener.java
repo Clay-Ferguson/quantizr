@@ -96,7 +96,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
         Document dbObj = event.getDocument();
         ObjectId id = node.getId();
         boolean isNew = false;
-        
+
         if (id == null) {
             id = new ObjectId();
             node.setId(id);
@@ -205,11 +205,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                     }
                 }
             }
-        }
-
-        // If saving an admin owned node, update the lastAdminOwnedSaveTime
-        if (node.getOwner().equals(auth.getAdminSession().getUserNodeId())) {
-            SystemService.lastAdminOwnedSaveTime = System.currentTimeMillis();
         }
         attach.fixAllAttachmentMimes(node);
 

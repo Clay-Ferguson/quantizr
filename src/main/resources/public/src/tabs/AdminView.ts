@@ -94,7 +94,6 @@ export class AdminView extends AppTab<any, AdminView> {
                 this.sectionTitle("Database"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Cache Admin Content", () => S.view.runServerCommand("cacheAdminContent", null, "Cache Admin Content", null)), //
                         this.settingsLink("Validate", () => S.view.runServerCommand("validateDb", null, "Validate DB Response", null)), //
                         this.settingsLink("Repair", () => S.view.runServerCommand("repairDb", null, "Repair DB Response", null)), //
                         this.settingsLink("Compact DB & Cleanup Pins", () => S.view.runServerCommand("compactDb", null, "Compact DB Response", null)), //

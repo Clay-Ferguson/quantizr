@@ -13,7 +13,6 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.mongodb.client.MongoDatabase;
@@ -23,9 +22,7 @@ import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
-import quanta.model.TreeNode;
 import quanta.model.UserStats;
-import quanta.model.client.Attachment;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -44,7 +41,6 @@ import quanta.service.exports.ExportServiceFlexmark;
 import quanta.service.exports.ExportTarService;
 import quanta.service.exports.ExportZipService;
 import quanta.util.Const;
-import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -57,44 +53,6 @@ public class SystemService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(SystemService.class);
     private static final Random rand = new Random();
     private static final int replicaId = rand.nextInt(Integer.MAX_VALUE);
-
-    // These two cache collections are for the purpose of being sure that almost all browsing
-    // of the admin content (landing page, website) can be done without any DB querying at all and
-    // come directly from server memory.
-    public static final Object adminNodesCacheLock = new Object();
-    public TreeNode adminNodesCache;
-
-    // todo-0: I think this admin cache may not be worth the added complexity.
-    public HashMap<String, TreeNode> adminNodesCacheMap;
-    private static long lastCacheAdminNodesTime = 0;
-    public static long lastAdminOwnedSaveTime = 0;
-
-    /*
-     * Every 5mins check if latest admin-owned node save time is after last cacheAdminNodes call time
-     * then force a recache now
-     */
-    @Scheduled(fixedDelay = 5 * DateUtil.MINUTE_MILLIS)
-    public void autoCacheAdminNodes() {
-        if (lastCacheAdminNodesTime > 0 && lastAdminOwnedSaveTime > 0
-                && lastAdminOwnedSaveTime > lastCacheAdminNodesTime) {
-            cacheAdminNodes();
-        }
-    }
-
-    public void cacheAdminNodes() {
-        arun.run(as -> {
-            String id = prop.getUserLandingPageNode();
-            SubNode node = read.getNode(as, id, false);
-            if (node != null) {
-                synchronized (adminNodesCacheLock) {
-                    adminNodesCacheMap = new HashMap<String, TreeNode>();
-                    adminNodesCache = read.getSubGraphTree(as, node.getIdStr(), null, adminNodesCacheMap);
-                    lastCacheAdminNodesTime = System.currentTimeMillis();
-                }
-            }
-            return null;
-        });
-    }
 
     public String rebuildIndexes() {
         ThreadLocals.requireAdmin();
@@ -354,10 +312,6 @@ public class SystemService extends ServiceBase {
                 break;
             case "validateDb":
                 res.getMessages().add(new InfoMessage(system.validateDb(), null));
-                break;
-            case "cacheAdminContent":
-                system.cacheAdminNodes();
-                res.getMessages().add(new InfoMessage("Done", null));
                 break;
             case "repairDb":
                 res.getMessages().add(new InfoMessage(system.repairDb(), null));
