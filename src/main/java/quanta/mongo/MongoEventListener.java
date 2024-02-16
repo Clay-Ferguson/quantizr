@@ -1,7 +1,5 @@
 package quanta.mongo;
 
-import java.util.Calendar;
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -12,22 +10,18 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
-import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
-import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
-import quanta.config.NodePath;
-import quanta.exception.ForbiddenException;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
-import quanta.service.AclService;
-import quanta.service.AttachmentService;
 import quanta.util.Const;
 import quanta.util.EventPublisher;
-import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
-import quanta.util.XString;
+
+// NOTE: Slowly over time I'm moving this functionality over to SubNodUtil.java where we call these
+// methods directly. I don't like this listener patter, because I think ultimately it makes things
+// more complex, not less complex.
 
 /**
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
@@ -56,176 +50,15 @@ import quanta.util.XString;
 @Component
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     private static Logger log = LoggerFactory.getLogger(MongoEventListener.class);
-    private static final boolean verbose = false;
 
     @Autowired
     protected MongoTemplate ops;
 
     @Autowired
-    private MongoRead read;
-
-    @Autowired
     private MongoAuth auth;
 
     @Autowired
-    private MongoUtil mongoUtil;
-
-    @Autowired
-    private SubNodeUtil snUtil;
-
-    @Autowired
     private EventPublisher publisher;
-
-    @Autowired
-    private AttachmentService attach;
-
-    @Autowired
-    private AclService acl;
-
-    @Override
-    public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
-        SubNode node = event.getSource();
-        Document dbObj = event.getDocument();
-        ObjectId id = node.getId();
-        boolean isNew = false;
-
-        if (id == null) {
-            id = new ObjectId();
-            node.setId(id);
-            isNew = true;
-        }
-        dbObj.put(SubNode.ID, id);
-
-        // Extra protection to be sure accounts and repo root can't have any sharing
-        if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
-            node.setAc(null);
-            dbObj.remove(SubNode.AC);
-        }
-
-        if (Const.HOME_NODE_NAME.equalsIgnoreCase(node.getName())) {
-            node.set(NodeProp.UNPUBLISHED, true);
-            dbObj.put(SubNode.PROPS, node.getProps());
-        }
-        if (node.getOrdinal() == null) {
-            node.setOrdinal(0L);
-            dbObj.put(SubNode.ORDINAL, 0L);
-        }
-        // if no owner is assigned
-        if (node.getOwner() == null) {
-            // if we are saving the root node, we make it be the owner of itself. This is also the admin
-            // owner, and we only allow this to run during initialiation when the server may be creating the
-            // database, and is not yet processing user requests
-            if (node.getPath().equals(NodePath.ROOT_PATH) && !MongoRepository.fullInit) {
-                ThreadLocals.requireAdminThread();
-                dbObj.put(SubNode.OWNER, id);
-                node.setOwner(id);
-            } else {
-                if (auth.getAdminSession() != null) {
-                    ObjectId ownerId = auth.getAdminSession().getUserNodeId();
-                    dbObj.put(SubNode.OWNER, ownerId);
-                    node.setOwner(ownerId);
-                    log.debug("Assigning admin as owner of node that had no owner (on save): " + id);
-                }
-            }
-        }
-        Date now = null;
-
-        // If no create/mod time has been set, then set it
-        if (node.getCreateTime() == null) {
-            if (now == null) {
-                now = Calendar.getInstance().getTime();
-            }
-            dbObj.put(SubNode.CREATE_TIME, now);
-            node.setCreateTime(now);
-        }
-        if (node.getModifyTime() == null) {
-            if (now == null) {
-                now = Calendar.getInstance().getTime();
-            }
-            dbObj.put(SubNode.MODIFY_TIME, now);
-            node.setModifyTime(now);
-        }
-
-        // New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
-        // part of the path
-        if (node.getPath().endsWith("/?")) {
-            String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
-            dbObj.put(SubNode.PATH, path);
-            node.setPath(path);
-            isNew = true;
-        }
-        // make sure root node can never have any sharing.
-        if (node.getPath().equals(NodePath.ROOT_PATH) && node.getAc() != null) {
-            dbObj.put(SubNode.AC, null);
-            node.setAc(null);
-        }
-
-        verifyParentExists(node, dbObj, isNew);
-        saveAuthByThread(node, dbObj, isNew);
-
-        // Node name not allowed to contain : or ~
-        String nodeName = node.getName();
-        if (nodeName != null) {
-            nodeName = nodeName.replace(":", "-");
-            nodeName = nodeName.replace("~", "-");
-            nodeName = nodeName.replace("/", "-");
-            // Warning: this is not a redundant null check. Some code in this block CAN set
-            // to null.
-            if (nodeName != null) {
-                dbObj.put(SubNode.NAME, nodeName);
-                node.setName(nodeName);
-            }
-        }
-        if (snUtil.removeDefaultProps(node)) {
-            dbObj.put(SubNode.PROPS, node.getProps());
-        }
-
-        if (node.getAc() != null) {
-            // we need to ensure that we never save an empty Acl, but null instead, because some parts of the
-            // code assume that if the AC is non-null then there ARE some shares on the node.
-            //
-            // This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends
-            // up causing the AC to contain an empty object sometimes
-            if (node.getAc().size() == 0) {
-                node.setAc(null);
-                dbObj.put(SubNode.AC, null);
-            } else {
-                // Remove any share to self because that never makes sense
-                if (node.getOwner() != null) {
-                    if (node.getAc().remove(node.getOwner().toHexString()) != null) {
-                        dbObj.put(SubNode.AC, node.getAc());
-                    }
-                }
-            }
-        }
-        attach.fixAllAttachmentMimes(node);
-
-        // Since we're saving this node already make sure none of our setters above left it flagged
-        // as dirty or it might unnecessarily get saved twice.
-        ThreadLocals.clean(node);
-    }
-
-    private void verifyParentExists(SubNode node, Document dbObj, boolean isNew) {
-        if (!node.getPath().startsWith(NodePath.PENDING_PATH_S) && ThreadLocals.getParentCheckEnabled()
-                && (isNew || node.verifyParentPath)) {
-            try {
-                read.checkParentExists(null, node.getPath());
-            } catch (Exception e) {
-                dbObj.put(SubNode.ID, null);
-                node.setId(null);
-                throw new RuntimeException("Parent path did not exist: " + node.getPath());
-            }
-        }
-    }
-
-    @Override
-    public void onAfterSave(AfterSaveEvent<SubNode> event) {
-        SubNode node = event.getSource();
-        String dbRoot = NodePath.ROOT_PATH;
-        if (dbRoot.equals(node.getPath())) {
-            read.setDbRoot(node);
-        }
-    }
 
     @Override
     public void onAfterLoad(AfterLoadEvent<SubNode> event) {
@@ -274,48 +107,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
                     ThreadLocals.clean(node);
                 }
                 publisher.getPublisher().publishEvent(new MongoDeleteEvent(id));
-            }
-        }
-    }
-
-    /* To save a node you must own the node and have WRITE access to it's parent */
-    public void saveAuthByThread(SubNode node, Document dbObj, boolean isNew) {
-        // during server init no auth is required.
-        if (!MongoRepository.fullInit) {
-            return;
-        }
-        if (node.adminUpdate)
-            return;
-        if (verbose)
-            log.trace("saveAuth in MongoListener");
-
-        MongoSession ms = ThreadLocals.getMongoSession();
-        if (ms != null) {
-            if (ms.isAdmin())
-                return;
-            // Must have write privileges to this node.
-            auth.ownerAuth(node);
-            // only if this is creating a new node do we need to check that the parent will allow it
-            if (isNew && !node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
-                SubNode parent = read.getParent(ms, node);
-                if (parent == null) {
-                    log.debug("This SAVE should get rejected (its parent is missing): " + XString.prettyPrint(node));
-
-                    // Make MongoDB fail to save this by sabatoging the ID here. It's the only way to abort the save.
-                    // Supposedly throwing the Exception which we do below, is supposed to abort saves but it's not
-                    // working where as nullifying the ID does indeed abort the save.
-                    dbObj.put(SubNode.ID, null);
-                    node.setId(null);
-                    throw new RuntimeException("unable to get node parent: " + node.getParentPath());
-                }
-
-                auth.writeAuth(ms, parent);
-                if (acl.isAdminOwned(parent) && !ms.isAdmin()) {
-                    // ditto note above about aborting the save
-                    dbObj.put(SubNode.ID, null);
-                    node.setId(null);
-                    throw new ForbiddenException();
-                }
             }
         }
     }
