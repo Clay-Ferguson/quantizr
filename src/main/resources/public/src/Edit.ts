@@ -1492,7 +1492,13 @@ export class Edit {
             this.recursiveDelete(nodesToDel, ast.node);
 
             this.afterDeleteCleanup(nodesToDel);
-            if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
+            if (ast.activeTab === C.TAB_DOCUMENT) {
+                const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                if (data) {
+                    S.srch.showDocument(data.props.node.id, false);
+                }
+            }
+            else if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
                 // todo-2: Improvement here would be to try to go to the parent of the node, so we could pass
                 // the deletedPageNode indicator to the deleteNodes endpoint and let that signal to it
                 // to pass back to us the ID of the parent node or null if we don't have access to it, but for

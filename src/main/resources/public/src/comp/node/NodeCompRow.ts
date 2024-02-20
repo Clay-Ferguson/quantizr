@@ -156,9 +156,8 @@ export class NodeCompRow extends Div {
         if (allowHeader) {
             // slight special case for now until Document View knows how to delete all the subchilren and not
             // show orphans on the page when something is deleted. Other panels don't have this problem
-            const allowDelete = this.tabData.id !== C.TAB_DOCUMENT;
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(this.node, true, true, this.tabData, showJumpButton, true, allowDelete, this.tabData.id, this.rowCount, indentLevel);
+            header = new NodeCompRowHeader(this.node, true, true, this.tabData, showJumpButton, true, this.tabData.id, this.rowCount, indentLevel);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);

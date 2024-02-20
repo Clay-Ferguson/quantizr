@@ -21,7 +21,7 @@ import { NodeCompContent } from "./NodeCompContent";
 export class NodeCompRowHeader extends Div {
     constructor(private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
-        private allowDelete: boolean, private prefix: string, private idx: number, indentLevel: number) {
+        private prefix: string, private idx: number, indentLevel: number) {
         super(null);
 
         const ast = getAs();
@@ -398,10 +398,6 @@ export class NodeCompRowHeader extends Div {
                 editableNode = type.allowAction(NodeActionType.editNode, this.node);
                 deleteAllowed = type.allowAction(NodeActionType.delete, this.node);
             }
-        }
-
-        if (!this.allowDelete) {
-            deleteAllowed = false;
         }
 
         let jumpButton: Icon = null;

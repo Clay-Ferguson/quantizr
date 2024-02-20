@@ -539,8 +539,6 @@ export class Search {
             S.quanta.fadeStartTime = new Date().getTime();
         }
 
-        const allowDelete = tabData.id !== C.TAB_DOCUMENT;
-
         // this divClass goes on the parent if we have a parentItem, or else on the 'itemDiv' itself if we don't
         let divClass: string = ast.highlightSearchNodeId === node.id ? outterClassHighlight : outterClass;
         divClass = divClass || "";
@@ -565,7 +563,7 @@ export class Search {
 
         const itemDiv = new Div(null, attrs, [
             // we use 2 as 'idx' here becasue we just want anything but 1 (which indicates 'first')
-            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, allowDelete, tabData.id, 2, 1) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, tabData.id, 2, 1) : null,
             allowHeader ? new Clearfix() : null,
             content,
             null,
