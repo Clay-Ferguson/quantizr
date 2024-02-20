@@ -804,6 +804,13 @@ export class Render {
                 onClick: S.edit.endDelete
             })
         ]);
+    }
 
+    getAiNodeFooter(aiServiceDesript: string, node: NodeInfo): Div {
+        if (!node) return null;
+        return new Div(aiServiceDesript, {
+            title: "Click to ask Follow-up Questions",
+            className: "aiAnswerFooter float-end"
+        });
     }
 }

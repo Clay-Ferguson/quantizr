@@ -446,6 +446,9 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getParent(MongoSession ms, SubNode node, boolean allowAuth) {
+        if (node == null)
+            return null;
+
         return getParentByPath(ms, node.getPath(), allowAuth);
     }
 

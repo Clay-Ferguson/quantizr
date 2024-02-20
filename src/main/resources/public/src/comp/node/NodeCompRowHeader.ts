@@ -19,7 +19,6 @@ import { SpanHtml } from "../core/SpanHtml";
 import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompRowHeader extends Div {
-
     constructor(private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabIntf<any>, private jumpButton: boolean, private showThreadButton: boolean,
         private allowDelete: boolean, private prefix: string, private idx: number, indentLevel: number) {
@@ -242,23 +241,13 @@ export class NodeCompRowHeader extends Div {
 
         if (this.jumpButton) {
             // if not on main tab or feed tab show a jump to node icon
-            if (this.tabData.id !== C.TAB_MAIN && this.tabData.id !== C.TAB_FEED) {
+            if (this.tabData.id !== C.TAB_MAIN) {
                 children.push(new Icon({
                     title: "Jump To Node",
                     className: "fa fa-arrow-right fa-lg rowHeaderIcon",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.clickSearchNode
                 }));
-            }
-            // for all other tabs bury the Jump to Node in the dropdown menu
-            else {
-                ddItems.push(new Li(null, { className: "clickable" }, [
-                    new Span("Jump to Node", {
-                        className: "dropdown-item",
-                        [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: S.nav.clickSearchNode
-                    })
-                ]));
             }
         }
 
@@ -291,7 +280,7 @@ export class NodeCompRowHeader extends Div {
         this.addOriginalLinks(ddItems);
 
         if (ddItems.length > 0) {
-            children.push(new DropdownMenu(ddItems));
+            children.push(new DropdownMenu(ddItems, "rowHeaderIcon"));
         }
 
         if (showInfo && priority) {
@@ -415,20 +404,54 @@ export class NodeCompRowHeader extends Div {
             deleteAllowed = false;
         }
 
-        let editButton: Icon = null;
         let jumpButton: Icon = null;
         let pasteButton: Button = null;
+        let insertAllowed = true;
+
+        // if this is our own account node, we can always leave insertAllowed=true
+        if (ast.userProfile?.userNodeId !== this.node.id) {
+            if (type) {
+                insertAllowed = ast.isAdminUser || type.allowAction(NodeActionType.insert, this.node);
+            }
+        }
 
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
-        if (!this.isMainTree && ast.userPrefs.editMode) {
+        if (ast.userPrefs.editMode) {
+
+            let editButton = null;
             if (editingAllowed && editableNode) {
-                editButton = new Icon({
-                    className: "fa fa-edit fa-lg buttonBarIcon ui-edit-node",
-                    onClick: S.edit.runEditNodeByClick,
+                editButton = new Button(null, S.edit.runEditNodeByClick, {
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id
-                });
+                }, "btn-secondary ui-edit-node", "fa-edit");
+            }
+
+            if (this.tabData.id == C.TAB_DOCUMENT && insertAllowed && editInsertAllowed) {
+                children.push(new Button(null, S.edit.newSubNode, {
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    title: "Create new SubNode"
+                }, "btn-secondary ui-new-node-plus", "fa-plus"));
+
+                if (editButton) {
+                    children.push(editButton);
+                }
+
+                // don't show this insert inline button if we are at the root of the page, because 
+                // we wouldn't even be able to see the node after inserting since the document view only shows that node
+                // and it's children.
+                if (this.tabData.props.node.id !== this.node.id) {
+                    children.push(new Button(null, () => {
+                        S.edit.insertNode(this.node.id, 0, ast);
+                    }, {
+                        title: "Insert new node"
+                    }, "btn-secondary  ui-new-node-plus plusButtonFloatRight", "fa-plus"));
+                }
+            }
+            else {
+                if (editButton) {
+                    children.push(editButton);
+                }
             }
 
             if (deleteAllowed && this.node.id !== ast.userProfile?.userNodeId) {
@@ -468,8 +491,8 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        if (editButton || jumpButton) {
-            floatUpperRightDiv.addChildren([pasteButton, editButton, jumpButton]);
+        if (pasteButton || jumpButton) {
+            floatUpperRightDiv.addChildren([pasteButton, jumpButton]);
         }
 
         // for mobile, we don't show this float right component unless in wide-screen orientation.

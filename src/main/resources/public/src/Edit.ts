@@ -19,6 +19,7 @@ import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
+import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
@@ -198,20 +199,14 @@ export class Edit {
         return ast.userName === (node.owner || PrincipalName.ADMIN);
     }
 
-    /*
-    * nodeInsertTarget holds the node that was clicked on at the time the insert was requested, and
-    * is sent to server for ordinal position assignment of new node. Also if this var is null, it indicates we are
-    * creating in a 'create under parent' mode, versus non-null meaning 'insert inline' type of insert.
+    /*  
+      Creates a new node under parentId node. 
+
+      If `insertAtLoc` is non-null it holds the node whose offset is where the new node will be inserted, and this will
+      be an insert inline kind of insert.
     */
-    startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: NodeInfo,
-        nodeInsertTarget: NodeInfo, ordinalOffset: number) => {
-
-        const afterEditJumpToId = createAtTop ? parentNode.id : null;
-
-        if (!S.props.isWritableByMe(parentNode)) {
-            console.log("Rejecting request to edit. Not authorized");
-            return;
-        }
+    startEditingNewNode = async (createAtTop: boolean, parentId: string, siblingId: string, insertAtLoc: NodeInfo, ordinalOffset: number) => {
+        const afterEditJumpToId = createAtTop ? parentId : null;
 
         if (S.util.ctrlKeyCheck()) {
             let blob = null;
@@ -223,26 +218,30 @@ export class Edit {
                 }
             }
 
-            if (nodeInsertTarget) {
+            // doing an inline insert
+            if (insertAtLoc) {
                 const res = await S.rpcUtil.rpc<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: false,
-                    parentId: parentNode.id,
-                    targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                    parentId,
+                    siblingId,
+                    targetOrdinal: insertAtLoc.ordinal + ordinalOffset,
                     newNodeName: "",
-                    typeName: typeName || J.NodeType.NONE,
+                    typeName: J.NodeType.NONE,
                     initialValue: clipboardText
                 });
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 if (blob) {
                     this.insertNodeResponse(res);
                 }
-            } else {
+            }
+            // inserting a subnode under parent
+            else {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
-                    nodeId: parentNode.id,
+                    nodeId: parentId,
                     aiQuestion: null,
                     newNodeName: "",
-                    typeName: typeName || J.NodeType.NONE,
+                    typeName: J.NodeType.NONE,
                     createAtTop,
                     content: clipboardText,
                     typeLock: false,
@@ -264,13 +263,14 @@ export class Edit {
             }
         }
         else {
-            if (nodeInsertTarget) {
+            if (insertAtLoc) {
                 const res = await S.rpcUtil.rpc<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: true,
-                    parentId: parentNode.id,
-                    targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                    parentId,
+                    siblingId,
+                    targetOrdinal: insertAtLoc.ordinal + ordinalOffset,
                     newNodeName: "",
-                    typeName: typeName || J.NodeType.NONE,
+                    typeName: J.NodeType.NONE,
                     initialValue: ""
                 });
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -278,10 +278,10 @@ export class Edit {
             } else {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
-                    nodeId: parentNode.id,
+                    nodeId: parentId,
                     aiQuestion: null,
                     newNodeName: "",
-                    typeName: typeName || J.NodeType.NONE,
+                    typeName: J.NodeType.NONE,
                     createAtTop,
                     content: null,
                     typeLock: false,
@@ -317,25 +317,21 @@ export class Edit {
         }
     }
 
-    saveNodeResponse = async (node: NodeInfo, res: J.SaveNodeResponse,
-        newNodeTargetId: string, newNodeTargetOffset: number) => {
+    saveNodeResponse = async (node: NodeInfo, res: J.SaveNodeResponse, newNodeTargetId: string, newNodeTargetOffset: number) => {
         const ast = getAs();
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
 
-            // if on feed tab, and it became dirty while we were editing then refresh it.
-            // todo-2: shouldn't we do this regardless of which tab is active?
-            if (ast.activeTab === C.TAB_FEED) {
-                if (FeedTab.inst?.props?.feedDirtyList) {
-                    for (const node of FeedTab.inst.props.feedDirtyList) {
-                        // console.log("Force Feed: " + node.content);
-                        S.push.forceFeedItem(node);
-                    }
-                    FeedTab.inst.props.feedDirtyList = null;
-
-                    // all the data in feedData will have been updated by forceFeedItem so force react to render now.
-                    dispatch("ForceFeedResults", _s => { });
+            // if feed tab became dirty while we were editing then refresh it.
+            if (FeedTab.inst?.props?.feedDirtyList) {
+                for (const node of FeedTab.inst.props.feedDirtyList) {
+                    // console.log("Force Feed: " + node.content);
+                    S.push.forceFeedItem(node);
                 }
+                FeedTab.inst.props.feedDirtyList = null;
+
+                // all the data in feedData will have been updated by forceFeedItem so force react to render now.
+                dispatch("ForceFeedResults", _s => { });
             }
 
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
@@ -345,11 +341,11 @@ export class Edit {
 
             const newNode = res.node;
             if (!newNodeTargetId) {
+                // This upates the node in browser memory IF it's already in browser memory.
                 this.injectUpdatedNode(newNode);
             }
 
             S.histUtil.updateNodeHistory(newNode, false);
-
             if (ast.activeTab === C.TAB_MAIN) {
                 // Inject the new node right into the page children
                 if (newNodeTargetId) {
@@ -363,6 +359,12 @@ export class Edit {
                     if (node.type !== J.NodeType.BOOKMARK && !S.nodeUtil.displayingOnTree(node.id)) {
                         S.view.jumpToId(ast.afterEditJumpToId || node.id);
                     }
+                }
+            }
+            else if (ast.activeTab === C.TAB_DOCUMENT) {
+                const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                if (data) {
+                    S.srch.showDocument(data.props.node.id, false);
                 }
             }
 
@@ -621,7 +623,7 @@ export class Edit {
         else if (ast.activeTab === C.TAB_DOCUMENT) {
             const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
             if (data) {
-                S.srch.showDocument(data.props.node.id);
+                S.srch.showDocument(data.props.node.id, true);
             }
         }
         else {
@@ -775,27 +777,25 @@ export class Edit {
         this.initNodeEditResponse(res, encrypt, showJumpButton, afterEditJumpToId);
     }
 
-    insertNode = (id: string, typeName: string, ordinalOffset: number, ast?: AppState) => {
+    /* Inserts a new node as a sibling of 'id' and at id's ordinal + 'ordinalOffset' */
+    insertNode = (id: string, ordinalOffset: number, ast?: AppState) => {
         if (this.checkEditPending()) return;
-
-        ast = ast || getAs();
-        if (!ast.node || !ast.node.children) return;
 
         /*
          * We get the node selected for the insert position by using the uid if one was passed in or using the
          * currently highlighted node if no uid was passed.
          */
-        let node: NodeInfo = null;
-        if (!id) {
-            node = S.nodeUtil.getHighlightedNode();
-        } else {
-            node = MainTab.inst?.findNode(id, ast);
+        let node: NodeInfo = MainTab.inst?.findNode(id, ast);
+        if (!node) {
+            node = DocumentTab.inst.findNode(id);
         }
 
         if (node) {
             S.quanta.newNodeTargetId = id;
             S.quanta.newNodeTargetOffset = ordinalOffset;
-            this.startEditingNewNode(typeName, false, ast.node, node, ordinalOffset);
+
+            // todo-0: try to make this method take not node but instead node's id.
+            this.startEditingNewNode(false, null, node.id, node, ordinalOffset);
         }
     }
 
@@ -810,33 +810,8 @@ export class Edit {
             S.view.jumpToId(id);
         }
         else {
-            this.createSubNode(id, null, true, ast.node);
+            this.startEditingNewNode(true, id || ast.node.id, null, null, 0);
         }
-    }
-
-    createSubNode = (id: any, typeName: string, createAtTop: boolean, parentNode: NodeInfo): any => {
-        const ast = getAs();
-        /*
-         * If no uid provided we deafult to creating a node under the currently viewed node (parent of current page), or any selected
-         * node if there is a selected node.
-         */
-        if (!id) {
-            const node = S.nodeUtil.getHighlightedNode();
-            if (node) {
-                parentNode = node;
-            }
-            else {
-                if (!ast.node || !ast.node.children) return null;
-                parentNode = ast.node;
-            }
-        } else {
-            parentNode = MainTab.inst?.findNode(id, ast);
-            if (!parentNode) {
-                return;
-            }
-        }
-
-        this.startEditingNewNode(typeName, createAtTop, parentNode, null, 0);
     }
 
     // todo-2: method is not used?

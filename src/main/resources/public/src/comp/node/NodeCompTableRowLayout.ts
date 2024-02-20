@@ -125,7 +125,7 @@ export class NodeCompTableRowLayout extends Div {
             if (this.level <= 1) {
                 children.push(new Button(null, () => {
                     if (lastNode) {
-                        S.edit.insertNode(lastNode.id, J.NodeType.NONE, 1 /* isFirst ? 0 : 1 */, ast);
+                        S.edit.insertNode(lastNode.id, 1, ast);
                     } else {
                         S.edit.newSubNode(null, ast.node.id);
                     }

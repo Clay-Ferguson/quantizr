@@ -1,5 +1,7 @@
 import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
+import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { TypeBase } from "./base/TypeBase";
 
@@ -14,8 +16,8 @@ export class OpenAiAnswerType extends TypeBase {
         return "aiAnswer";
     }
 
-    override getCustomFooter(): Div {
-        return new Div("by OpenAI", { className: "aiAnswerFooter float-end" });
+    override getCustomFooter(node: NodeInfo): Div {
+        return S.render.getAiNodeFooter("by OpenAI", node);
     }
 
     override getEditorOptions(): EditorOptions {

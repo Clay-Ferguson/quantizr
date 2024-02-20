@@ -32,9 +32,9 @@
 }
 
 .userFeedItemHighlight {
-    padding-top: 10px;
-    border: 1px solid olivedrab;
-    padding-bottom: $tinyGap;
+    border: 2px solid olivedrab;
+    padding: 10px;
+    border-radius: $border-radius;
 }
 
 .userFeedParent {

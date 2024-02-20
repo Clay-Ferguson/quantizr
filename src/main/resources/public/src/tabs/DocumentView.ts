@@ -62,11 +62,11 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
             ], this.data),
         ];
 
-        this.addPaginationBar(children);
-
         let i = 0;
         let rowCount = 0;
         const startIdx = this.data.props.page * J.ConstantInt.DOC_ITEMS_PER_PAGE;
+        const rows: Comp[] = [];
+        this.addPaginationBar(rows);
         results.forEach(node => {
             if (rowCount >= J.ConstantInt.DOC_ITEMS_PER_PAGE) return;
             if (i >= startIdx) {
@@ -74,14 +74,15 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
                 const c = this.renderItem(node, i, rowCount, true);
                 if (c) {
                     this.configDragAndDrop(c, ast, node.id);
-                    children.push(c);
+                    rows.push(c);
                     rowCount++;
                 }
             }
             i++;
         });
+        this.addPaginationBar(rows);
 
-        this.addPaginationBar(children);
+        children.push(new Div(null, { className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, rows));
         this.setChildren(children);
         return true;
     }

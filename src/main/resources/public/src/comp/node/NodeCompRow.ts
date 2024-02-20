@@ -61,7 +61,7 @@ export class NodeCompRow extends Div {
                 let insertButton: Button = null;
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
                     insertButton = new Button(null, () => {
-                        S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
+                        S.edit.insertNode(this.node.id, 0, ast);
                     }, {
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
                     }, "btn-secondary  ui-new-node-plus " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
@@ -72,7 +72,7 @@ export class NodeCompRow extends Div {
                         // console.log("DROP(d) kind=" + item.kind + " type=" + item.type);
                         if (item.kind === "file") {
                             EditNodeDlg.pendingUploadFile = item.getAsFile();
-                            S.edit.insertNode(this.node.id, J.NodeType.NONE, 0 /* isFirst ? 0 : 1 */, ast);
+                            S.edit.insertNode(this.node.id, 0, ast);
                             return;
                         }
                     }

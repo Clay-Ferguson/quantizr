@@ -478,6 +478,7 @@ export interface InitNodeEditRequest extends RequestBase {
 export interface InsertNodeRequest extends RequestBase {
     pendingEdit: boolean;
     parentId: string;
+    siblingId: string;
     targetOrdinal: number;
     newNodeName: string;
     typeName: string;

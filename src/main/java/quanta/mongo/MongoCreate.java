@@ -3,6 +3,7 @@ package quanta.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -450,11 +451,27 @@ public class MongoCreate extends ServiceBase {
         NodeChanges changes = new NodeChanges();
         res.setNodeChanges(changes);
 
-        String parentNodeId = req.getParentId();
-        log.debug("Inserting under parent: " + parentNodeId);
-        SubNode parentNode = read.getNode(ms, parentNodeId);
+        String parentId = req.getParentId();
+
+        /*
+         * If no parent specified, then we assume the parent of siblingId is our parent, and get parentId
+         * that way.
+         */
+        if (StringUtils.isEmpty(parentId)) {
+            if (StringUtils.isEmpty(req.getSiblingId())) {
+                throw new RuntimeException("No parent or sibling specified for insert");
+            }
+            SubNode siblingNode = read.getNode(ms, req.getSiblingId());
+            SubNode parentNode = read.getParent(ms, siblingNode);
+            if (parentNode == null) {
+                throw new RuntimeException("Unable to find parent note to insert under: " + parentId);
+            }
+            parentId = parentNode.getIdStr();
+        }
+
+        SubNode parentNode = read.getNode(ms, parentId);
         if (parentNode == null) {
-            throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
+            throw new RuntimeException("Unable to find parent note to insert under: " + parentId);
         }
         auth.writeAuth(ms, parentNode);
         parentNode.adminUpdate = true;

@@ -66,7 +66,7 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
-    getCustomFooter(): Div {
+    getCustomFooter(_node: NodeInfo): Div {
         return null;
     }
 
@@ -292,7 +292,7 @@ export class TypeBase implements TypeIntf {
         let comp: Comp = null;
         let urls: Set<string> = null;
         const containerClass = this.getExtraMarkdownClass();
-        const footerComp: Div = this.getCustomFooter();
+        const footerComp: Div = this.getCustomFooter(node);
         const attrs = containerClass ? { className: containerClass } : null;
 
         // tricky and imperfect hack to detect if this is all HTML.

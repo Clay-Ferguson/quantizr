@@ -329,7 +329,7 @@ export class Nav {
 
     openDocumentView = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
-        S.srch.showDocument(id);
+        S.srch.showDocument(id, true);
     }
 
     runTimeline = (evt: Event) => {
@@ -668,7 +668,7 @@ export class Nav {
     openDocViewByClick = (evt: Event) => {
         const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
         if (!nodeId) return;
-        S.srch.showDocument(nodeId);
+        S.srch.showDocument(nodeId, true);
     }
 
     copyNodeNameToClipboard = (evt: Event) => {

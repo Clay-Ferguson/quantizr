@@ -224,7 +224,7 @@ export class Search {
         }
     }
 
-    showDocument = async (rootId: string) => {
+    showDocument = async (rootId: string, scrollToTop: boolean) => {
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
             rootId,
             includeComments: getAs().userPrefs.showReplies
@@ -247,7 +247,9 @@ export class Search {
             DocumentTab.inst.openGraphComps = [];
             const info = DocumentTab.inst.props as DocumentRSInfo;
             info.breadcrumbs = res.breadcrumbs;
-            S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
+            if (scrollToTop) {
+                S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
+            }
 
             // set 'results' if this is the top of page being rendered, or else append results if we
             // were pulling down more items at the end of the doc.

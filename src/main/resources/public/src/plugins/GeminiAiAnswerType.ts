@@ -2,6 +2,8 @@ import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { Div } from "../comp/core/Div";
 import { TypeBase } from "./base/TypeBase";
+import { NodeInfo } from "../JavaIntf";
+import { S } from "../Singletons";
 
 export class GeminiAiAnswerType extends TypeBase {
     constructor() {
@@ -14,8 +16,8 @@ export class GeminiAiAnswerType extends TypeBase {
         return "aiAnswer";
     }
 
-    override getCustomFooter(): Div {
-        return new Div("by Gemini AI", { className: "aiAnswerFooter float-end" });
+    override getCustomFooter(node: NodeInfo): Div {
+        return S.render.getAiNodeFooter("by Gemini AI", node);
     }
 
     override getEditorOptions(): EditorOptions {
