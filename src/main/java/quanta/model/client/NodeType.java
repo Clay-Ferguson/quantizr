@@ -16,6 +16,7 @@ public enum NodeType {
     CALCULATOR("sn:calculator"), //
     CALENDAR("sn:calendar"), //
     COMMENT("sn:comment"), //
+    AI_QUERY("sn:aiQuery"), //
     OPENAI_ANSWER("sn:oaiAns"), //
     PPLXAI_ANSWER("sn:pplxaiAns"), //
     GEMINIAI_ANSWER("sn:geminiaiAns"), //

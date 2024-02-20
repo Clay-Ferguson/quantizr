@@ -14,6 +14,8 @@
 
 .docNodeHighlight {
     border: 2px solid purple;
+    border-radius: $border-radius;
+    padding: $smallGap;
 }
 
 .docIndxLnk:hover {

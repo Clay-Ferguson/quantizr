@@ -767,7 +767,7 @@ export class EditNodeDlg extends DialogBase {
 
             ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", null, {
                 onClick: this.askChatGpt,
-                title: "Ask ChatGPT this Question"
+                title: "Query AI, using Node Content as the Question."
             }) : null,
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary"),

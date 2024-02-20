@@ -25,6 +25,7 @@ import quanta.model.client.PrivilegeType;
 import quanta.model.client.geminiai.GeminiChatResponse;
 import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
+import quanta.model.client.openai.SystemConfig;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
@@ -295,6 +296,14 @@ public class MongoCreate extends ServiceBase {
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
             AIServiceName svc = AIServiceName.fromString(req.getAiQuestion());
+
+            // First scan up the tree to see if we have a svc on the tree and if so use it instead.
+            SystemConfig system = new SystemConfig();
+            aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
+            if (system.getService() != null) {
+                svc = AIServiceName.fromString(system.getService());
+            }
+
             if (svc != null) {
                 switch (svc) {
                     case OPENAI:
@@ -332,7 +341,7 @@ public class MongoCreate extends ServiceBase {
                         typeToCreate = NodeType.OOBAI_ANSWER.s();
                         break;
                     case GEMINI:
-                        geminiAiAns = geminiai.getAnswer(ms, parentNode, null);
+                        geminiAiAns = geminiai.getAnswer(ms, parentNode, null, system);
                         res.setGptCredit(geminiAiAns.credit);
                         typeToCreate = NodeType.GEMINIAI_ANSWER.s();
                         break;

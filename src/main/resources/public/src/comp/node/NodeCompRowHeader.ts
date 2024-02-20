@@ -416,7 +416,7 @@ export class NodeCompRowHeader extends Div {
         if (ast.userPrefs.editMode) {
 
             let editButton = null;
-            if (editingAllowed && editableNode) {
+            if (this.tabData.id !== C.TAB_MAIN && editingAllowed && editableNode) {
                 editButton = new Button(null, S.edit.runEditNodeByClick, {
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id
@@ -450,7 +450,7 @@ export class NodeCompRowHeader extends Div {
                 }
             }
 
-            if (deleteAllowed && this.node.id !== ast.userProfile?.userNodeId) {
+            if (this.tabData.id !== C.TAB_MAIN && deleteAllowed && this.node.id !== ast.userProfile?.userNodeId) {
                 const askDelDiv = this.node.id == ast.nodeClickedToDel ? S.render.makeDeleteQuestionDiv() : null;
                 if (askDelDiv) {
                     floatUpperRightDiv.addChild(askDelDiv);

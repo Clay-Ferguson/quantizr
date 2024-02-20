@@ -177,6 +177,12 @@ export class Props {
         return node?.properties?.find(p => p?.name === propName);
     }
 
+    hasAIConfigProps = (node: NodeInfo): boolean => {
+        return !!this.getPropStr(J.NodeProp.AI, node) || //
+            !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
+            !!this.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
+    }
+
     getPropStr = (propertyName: string, node: NodeInfo): string => {
         return this.getProp(propertyName, node)?.value;
     }
@@ -247,7 +253,7 @@ export class Props {
             J.NodeProp.UNPUBLISHED, //
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI, //
-            J.NodeProp.AI_MODEL
+            J.NodeProp.AI_SERVICE
         ]);
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
@@ -255,7 +261,7 @@ export class Props {
             J.NodeProp.NO_EXPORT, //
             J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI, //
-            J.NodeProp.AI_MODEL
+            J.NodeProp.AI_SERVICE
         ]);
     }
 

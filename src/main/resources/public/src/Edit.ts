@@ -5,7 +5,7 @@ import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
-import { ConfigureGptPromptDlg } from "./dlg/ConfigureGptPromptDlg";
+import { ConfigureAIPromptDlg } from "./dlg/ConfigureAIPromptDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
@@ -1070,7 +1070,7 @@ export class Edit {
     }
 
     configureGpt = async (node: NodeInfo) => {
-        const dlg = new ConfigureGptPromptDlg(node);
+        const dlg = new ConfigureAIPromptDlg(node);
         await dlg.open();
     };
 

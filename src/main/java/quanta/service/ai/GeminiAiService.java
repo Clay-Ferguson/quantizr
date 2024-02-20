@@ -16,6 +16,7 @@ import quanta.config.ServiceBase;
 import quanta.model.client.geminiai.GeminiChatContent;
 import quanta.model.client.geminiai.GeminiChatRequest;
 import quanta.model.client.geminiai.GeminiChatResponse;
+import quanta.model.client.openai.SystemConfig;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
@@ -34,8 +35,7 @@ public class GeminiAiService extends ServiceBase {
      * 
      * You can pass a node, or else 'text' to query about.
      */
-    public GeminiChatResponse getAnswer(MongoSession ms, SubNode node, String question) {
-
+    public GeminiChatResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
@@ -49,7 +49,17 @@ public class GeminiAiService extends ServiceBase {
             buildChatHistory(ms, node, contents);
         }
 
-        String input = node != null ? node.getContent() : question;
+        String input;
+        if (node != null) {
+            if (!StringUtils.isEmpty(system.getTemplate())) {
+                input = system.getTemplate().replace("${content}", node.getContent());
+            } else {
+                input = node.getContent();
+            }
+        } else {
+            input = question;
+        }
+
         contents.add(new GeminiChatContent("user", input));
 
         if (StringUtils.isEmpty(prop.getGeminiAiKey())) {

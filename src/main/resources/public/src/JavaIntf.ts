@@ -251,9 +251,10 @@ export interface SpeechGenRequest {
 
 export interface SystemConfig {
     prompt: string;
+    template: string;
     model: string;
+    service: string;
     temperature: number;
-    configured: boolean;
 }
 
 export interface Usage {
@@ -1301,7 +1302,8 @@ export const enum NodeProp {
     DATE_FULL = "p.date",
     UNPUBLISHED = "unpub",
     AI = "ai",
-    AI_MODEL = "ai-model",
+    AI_SERVICE = "aiService",
+    AI_QUERY_TEMPLATE = "aiTemplate",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
     OPEN_GRAPH = "sn:og",
@@ -1328,6 +1330,7 @@ export const enum NodeType {
     CALCULATOR = "sn:calculator",
     CALENDAR = "sn:calendar",
     COMMENT = "sn:comment",
+    AI_QUERY = "sn:aiQuery",
     OPENAI_ANSWER = "sn:oaiAns",
     PPLXAI_ANSWER = "sn:pplxaiAns",
     GEMINIAI_ANSWER = "sn:geminiaiAns",

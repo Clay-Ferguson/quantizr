@@ -31,16 +31,17 @@ import quanta.service.UserManagerService;
 public class AIUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIUtil.class);
 
-    public void parseAISystemFromContent(SubNode node, SystemConfig system) {
-        if (system.isConfigured())
-            return;
-
+    public void parseAIConfig(SubNode node, SystemConfig system) {
         if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI.s())) {
             system.setPrompt(node.getStr(NodeProp.AI.s()));
         }
 
-        if (StringUtils.isEmpty(system.getModel()) && node.hasProp(NodeProp.AI_MODEL.s())) {
-            system.setModel(node.getStr(NodeProp.AI_MODEL.s()));
+        if (StringUtils.isEmpty(system.getService()) && node.hasProp(NodeProp.AI_SERVICE.s())) {
+            system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
+        }
+
+        if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
+            system.setTemplate(node.getStr(NodeProp.AI_QUERY_TEMPLATE.s()));
         }
     }
 
@@ -50,12 +51,9 @@ public class AIUtil extends ServiceBase {
                 NodeType.GEMINIAI_ANSWER.s().equals(type);
     }
 
-    public void getSystemPromptFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
+    public void getAIConfigFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
         while (node != null) {
-            parseAISystemFromContent(node, system);
-            if (system.isConfigured()) {
-                return;
-            }
+            parseAIConfig(node, system);
             node = read.getParent(ms, node);
         }
     }
@@ -121,9 +119,8 @@ public class AIUtil extends ServiceBase {
             if (req.getNodeIds() != null && !req.getNodeIds().contains(n.getIdStr())) {
                 continue;
             }
-            if (!system.isConfigured()) {
-                aiUtil.parseAISystemFromContent(node, system);
-            }
+
+            aiUtil.parseAIConfig(node, system);
             sb.append(n.getContent() + "\n\n");
             counter++;
 

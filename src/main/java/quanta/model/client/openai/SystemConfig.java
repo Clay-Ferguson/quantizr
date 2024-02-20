@@ -2,7 +2,9 @@ package quanta.model.client.openai;
 
 public class SystemConfig {
     private String prompt; // ex: "you are a helpful assistant"
+    private String template;
     private String model; // ex: "gpt-4"
+    private String service;
 
     // todo-2: add a way for users to alter this.
     private Double temperature = 0.7;
@@ -23,8 +25,12 @@ public class SystemConfig {
         this.model = model;
     }
 
-    public boolean isConfigured() {
-        return prompt != null;
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
     }
 
     public Double getTemperature() {
@@ -33,5 +39,13 @@ public class SystemConfig {
 
     public void setTemperature(Double temperature) {
         this.temperature = temperature;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
     }
 }

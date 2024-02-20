@@ -129,7 +129,8 @@ public enum NodeProp {
 
     UNPUBLISHED("unpub"), //
     AI("ai"), //
-    AI_MODEL("ai-model"), //
+    AI_SERVICE("aiService"), //
+    AI_QUERY_TEMPLATE("aiTemplate"), //
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
 

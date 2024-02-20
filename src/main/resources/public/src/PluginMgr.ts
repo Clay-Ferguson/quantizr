@@ -25,6 +25,7 @@ import { RssType } from "./plugins/RssType";
 import { SchemaOrgType } from "./plugins/SchemaOrgType";
 import { TextType } from "./plugins/TextType";
 import { S } from "./Singletons";
+import { AIQueryType } from "./plugins/AIQueryType";
 
 export class PluginMgr {
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
@@ -71,6 +72,7 @@ export class PluginMgr {
         this.addType(ordinal++, new MarkdownType());
         this.addType(ordinal++, new TextType());
         this.addType(ordinal++, new RssType());
+        this.addType(ordinal++, new AIQueryType());
         this.addType(ordinal++, new CalcType());
         this.addType(ordinal++, new CalendarType());
         this.addType(ordinal++, new RepoRootType());

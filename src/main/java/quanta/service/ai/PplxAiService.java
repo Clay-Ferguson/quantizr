@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -61,11 +62,21 @@ public class PplxAiService extends ServiceBase {
             buildChatHistory(ms, node, messages, system);
         }
 
-        if (!system.isConfigured()) {
+        if (StringUtils.isEmpty(system.getPrompt())) {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
 
-        String input = node != null ? node.getContent() : question;
+        String input;
+        if (node != null) {
+            if (!StringUtils.isEmpty(system.getTemplate())) {
+                input = system.getTemplate().replace("${content}", node.getContent());
+            } else {
+                input = node.getContent();
+            }
+        } else {
+            input = question;
+        }
+
         messages.add(0, new ChatMessage("system", system.getPrompt()));
         messages.add(new ChatMessage("user", input));
         system.setModel(model);
@@ -139,7 +150,7 @@ public class PplxAiService extends ServiceBase {
      * question.
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
-        aiUtil.parseAISystemFromContent(node, system);
+        aiUtil.parseAIConfig(node, system);
         SubNode parent = read.getParent(ms, node);
         int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
 
@@ -151,7 +162,7 @@ public class PplxAiService extends ServiceBase {
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
                 nonAnswerCounter++;
-                aiUtil.parseAISystemFromContent(parent, system);
+                aiUtil.parseAIConfig(parent, system);
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
@@ -168,6 +179,6 @@ public class PplxAiService extends ServiceBase {
         }
 
         // if we still don't have a system prompt check all ancestor nodes
-        aiUtil.getSystemPromptFromAncestorNodes(ms, parent, system);
+        aiUtil.getAIConfigFromAncestorNodes(ms, parent, system);
     }
 }

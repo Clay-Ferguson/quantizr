@@ -17,7 +17,6 @@ import { S } from "../Singletons";
 import * as J from "../JavaIntf";
 
 export class SettingsView extends AppTab<any, SettingsView> {
-
     constructor(data: TabIntf<any, SettingsView>) {
         super(data);
         data.inst = this;
@@ -53,7 +52,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 modelSpecs = "Llama 2: This is the well-known open source Llama 2, which is great for general-purpose tasks.";
                 break;
         }
-        const aiOptions = this.getAiOptions();
+
+        const aiOptions = S.render.getAiOptions();
 
         this.setChildren([
             this.headingBar = new TabHeading([
@@ -160,26 +160,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
             ])
         ]);
         return true;
-    }
-
-    private getAiOptions = (): any[] => {
-        const aiOptions = [];
-        if (S.quanta.config.useOpenAi) {
-            aiOptions.push({ key: J.AIServiceName.OPENAI, val: "OpenAI (Chat)" });
-        }
-
-        if (S.quanta.config.useGeminiAi) {
-            aiOptions.push({ key: J.AIServiceName.GEMINI, val: "Google Gemini (Chat)" });
-        }
-
-        if (S.quanta.config.usePplxAi) {
-            aiOptions.push(//
-                { key: J.AIServiceName.PPLX, val: "Perplexity (Chat)" },
-                { key: J.AIServiceName.PPLX_ONLINE, val: "Perplexity (Recent News)" },
-                { key: J.AIServiceName.PPLX_CODE_LLAMA, val: "Code Llama" },
-                { key: J.AIServiceName.PPLX_LLAMA2, val: "Llama 2" });
-        }
-        return aiOptions;
     }
 
     settingsLink = (name: string, onClick: () => void, moreClasses: string = ""): Div => {

@@ -806,11 +806,39 @@ export class Render {
         ]);
     }
 
-    getAiNodeFooter(aiServiceDesript: string, node: NodeInfo): Div {
+    getAiNodeFooter(aiServiceDescript: string, node: NodeInfo): Div {
         if (!node) return null;
-        return new Div(aiServiceDesript, {
-            title: "Click to ask Follow-up Questions",
-            className: "aiAnswerFooter float-end"
-        });
+        return new Div(null, null, [
+            new Span(S.util.formatDateTime(new Date(node.lastModified)), {
+                className: "aiAnswerFooter"
+            }),
+            new Span(aiServiceDescript, {
+                className: "aiAnswerFooter float-end"
+            })
+        ]);
+    }
+
+    // todo-0: need to have a local data structure in aiUtils,
+    // which has all the service names, descriptions, keys, etc in 
+    // one place, so we can traverse that when doing things like what
+    // this method does.
+    getAiOptions = (): any[] => {
+        const aiOptions = [];
+        if (S.quanta.config.useOpenAi) {
+            aiOptions.push({ key: J.AIServiceName.OPENAI, val: "OpenAI (Chat)" });
+        }
+
+        if (S.quanta.config.useGeminiAi) {
+            aiOptions.push({ key: J.AIServiceName.GEMINI, val: "Google Gemini (Chat)" });
+        }
+
+        if (S.quanta.config.usePplxAi) {
+            aiOptions.push(//
+                { key: J.AIServiceName.PPLX, val: "Perplexity (Chat)" },
+                { key: J.AIServiceName.PPLX_ONLINE, val: "Perplexity (Recent News)" },
+                { key: J.AIServiceName.PPLX_CODE_LLAMA, val: "Code Llama" },
+                { key: J.AIServiceName.PPLX_LLAMA2, val: "Llama 2" });
+        }
+        return aiOptions;
     }
 }

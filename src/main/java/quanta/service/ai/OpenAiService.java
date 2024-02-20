@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -201,11 +202,22 @@ public class OpenAiService extends ServiceBase {
             buildChatHistory(ms, node, messages, system);
         }
 
-        if (!system.isConfigured()) {
+        if (StringUtils.isEmpty(system.getPrompt())) {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
 
-        String input = node != null ? node.getContent() : question;
+        // todo-0: add this to the other services also.
+        String input;
+        if (node != null) {
+            if (!StringUtils.isEmpty(system.getTemplate())) {
+                input = system.getTemplate().replace("${content}", node.getContent());
+            } else {
+                input = node.getContent();
+            }
+        } else {
+            input = question;
+        }
+
         List<Map> sysContent = new ArrayList<>();
         HashMap<String, Object> map = new HashMap<>();
         map.put("type", "text");
@@ -255,13 +267,11 @@ public class OpenAiService extends ServiceBase {
         // Without maxTokens we get comically short answers (like not even the complete first sentence of
         // the response, but a sentence frament), so I'm not sure what to do about if or how end users
         // should be able to tweak this. Before switching to gpt-4 vision we were getting sensible
-        // response
-        // lengths without having to provide a maxTokens value
+        // response lengths without having to provide a maxTokens value
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), 2000);
 
-        log.debug("GPT Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
-                + XString.prettyPrint(request));
+        log.debug("GPT Req: USER: " + ms.getUserName() + " REQ: " + XString.prettyPrint(request));
 
         // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
         // here
@@ -372,7 +382,7 @@ public class OpenAiService extends ServiceBase {
      * question.
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
-        aiUtil.parseAISystemFromContent(node, system);
+        aiUtil.parseAIConfig(node, system);
         SubNode parent = read.getParent(ms, node);
         int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
 
@@ -389,7 +399,7 @@ public class OpenAiService extends ServiceBase {
                 messages.add(0, new ChatMessage("assistant", content));
             } else {
                 nonAnswerCounter++;
-                aiUtil.parseAISystemFromContent(parent, system);
+                aiUtil.parseAIConfig(parent, system);
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.
@@ -411,7 +421,7 @@ public class OpenAiService extends ServiceBase {
         }
 
         // if we still don't have a system prompt check all ancestor nodes
-        aiUtil.getSystemPromptFromAncestorNodes(ms, parent, system);
+        aiUtil.getAIConfigFromAncestorNodes(ms, parent, system);
     }
 
     private double calculateCost(ChatCompletionResponse res) {
