@@ -158,7 +158,7 @@ public class AIUtil extends ServiceBase {
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
                     break;
                 case GEMINI:
-                    geminiAnswer = geminiai.getAnswer(ms, null, sb.toString());
+                    geminiAnswer = geminiai.getAnswer(ms, null, sb.toString(), system);
                     break;
                 default:
                     throw new RuntimeException("Unknown AI service: " + req.getAiService());
