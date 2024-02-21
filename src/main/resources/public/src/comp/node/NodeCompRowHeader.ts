@@ -401,7 +401,6 @@ export class NodeCompRowHeader extends Div {
         }
 
         let jumpButton: Icon = null;
-        let pasteButton: Button = null;
         let insertAllowed = true;
 
         // if this is our own account node, we can always leave insertAllowed=true
@@ -466,12 +465,6 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
-        if (!!ast.nodesToMove && userCanPaste) {
-            pasteButton = new Button("Paste Inside",
-                S.edit.pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton")
-        }
-
         /* If we're not on a search result display (or timeline) and there's a TARGET_ID on the node
         then we need to show the jump button point to it.
         */
@@ -487,8 +480,8 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        if (pasteButton || jumpButton) {
-            floatUpperRightDiv.addChildren([pasteButton, jumpButton]);
+        if (jumpButton) {
+            floatUpperRightDiv.addChildren([jumpButton]);
         }
 
         // for mobile, we don't show this float right component unless in wide-screen orientation.
