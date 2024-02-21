@@ -55,9 +55,10 @@ export class ConfigureAIDlg extends DialogBase {
     }
 
     save = async () => {
-        S.props.setPropVal(J.NodeProp.AI, this.node, ConfigureAIDlg.promptState.getValue());
-        S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue());
-        S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue());
+        // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
+        S.props.setPropVal(J.NodeProp.AI, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue() || "[null]");
         await S.edit.saveNode(this.node, true);
         this.close();
     }

@@ -253,7 +253,8 @@ export class Props {
             J.NodeProp.UNPUBLISHED, //
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI, //
-            J.NodeProp.AI_SERVICE
+            J.NodeProp.AI_SERVICE, //
+            J.NodeProp.AI_QUERY_TEMPLATE //
         ]);
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
@@ -261,7 +262,8 @@ export class Props {
             J.NodeProp.NO_EXPORT, //
             J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI, //
-            J.NodeProp.AI_SERVICE
+            J.NodeProp.AI_SERVICE, //
+            J.NodeProp.AI_QUERY_TEMPLATE //
         ]);
     }
 
