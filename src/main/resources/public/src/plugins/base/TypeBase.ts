@@ -339,7 +339,7 @@ export class TypeBase implements TypeIntf {
             const isRoot = node.id === ast.node?.id;
 
             let aiConfigDiv: Div = null;
-            if (S.props.hasAIConfigProps(node)) {
+            if (S.props.isMine(node) && S.props.hasAIConfigProps(node)) {
                 aiConfigDiv = new Div("AI Config", {
                     onClick: () => S.edit.configureGpt(node),
                     className: "nodeTags aiTags microMarginBottom float-end",
