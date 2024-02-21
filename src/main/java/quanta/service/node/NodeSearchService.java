@@ -67,9 +67,12 @@ public class NodeSearchService extends ServiceBase {
         RenderDocumentResponse res = new RenderDocumentResponse();
         List<NodeInfo> results = new LinkedList<>();
         res.setSearchResults(results);
-        List<SubNode> nodes = read.getFlatSubGraph(ms, req.getRootId(), req.isIncludeComments());
-        int counter = 0;
         SubNode node = read.getNode(ms, req.getRootId());
+        if (node == null) {
+            throw new RuntimeException("Node not found: " + req.getRootId());
+        }
+        List<SubNode> nodes = read.getFlatSubGraph(ms, node.getIdStr(), req.isIncludeComments());
+        int counter = 0;
 
         for (SubNode n : nodes) {
             NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
