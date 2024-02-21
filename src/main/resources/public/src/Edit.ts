@@ -5,7 +5,7 @@ import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
-import { ConfigureAIPromptDlg } from "./dlg/ConfigureAIPromptDlg";
+import { ConfigureAIDlg } from "./dlg/ConfigureAIDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
@@ -48,11 +48,9 @@ export class Edit {
         });
 
         S.nodeUtil.processInboundNode(res.node);
-
         if (res?.code != C.RESPONSE_CODE_OK) {
             return false;
         }
-
         S.render.fadeInId = res.node.id;
 
         // note: newNodeTargetId is only set when we're inserting a new node into the page, and not when we're
@@ -1070,7 +1068,7 @@ export class Edit {
     }
 
     configureGpt = async (node: NodeInfo) => {
-        const dlg = new ConfigureAIPromptDlg(node);
+        const dlg = new ConfigureAIDlg(node);
         await dlg.open();
     };
 

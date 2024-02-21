@@ -99,10 +99,13 @@ public class NodeEditService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(ms, node);
         read.forceCheckHasChildren(ms, node);
+
         // remove orphaned attachments
         attach.removeDeletedAttachments(ms, node, req.getNode().getAttachments());
+
         // set new attachments
         node.setAttachments(req.getNode().getAttachments());
+
         attach.fixAllAttachmentMimes(node);
         node.setLinks(req.getNode().getLinks());
         // The only purpose of this limit is to stop hackers from using up lots of space, because our only

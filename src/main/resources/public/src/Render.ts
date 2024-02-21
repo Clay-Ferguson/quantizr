@@ -824,6 +824,8 @@ export class Render {
     // this method does.
     getAiOptions = (): any[] => {
         const aiOptions = [];
+        aiOptions.push({ key: "[null]", val: "none (inherit)" });
+
         if (S.quanta.config.useOpenAi) {
             aiOptions.push({ key: J.AIServiceName.OPENAI, val: "OpenAI (Chat)" });
         }
