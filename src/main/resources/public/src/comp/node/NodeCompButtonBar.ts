@@ -90,8 +90,8 @@ export class NodeCompButtonBar extends Div {
         }
         */
 
-        const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
-        const allowExpnButton = !ast.isAnonUser && !this.isTableCell && (!layout || layout == "c1");
+        // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
+        const allowExpnButton = !ast.isAnonUser && !this.isTableCell; // && (!layout || layout == "c1");
         let expandChildren = false;
 
         if (allowExpnButton) {
