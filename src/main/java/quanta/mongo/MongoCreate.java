@@ -296,15 +296,13 @@ public class MongoCreate extends ServiceBase {
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
             AIServiceName svc = AIServiceName.fromString(req.getAiQuestion());
-
-            // First scan up the tree to see if we have a svc on the tree and if so use it instead.
-            SystemConfig system = new SystemConfig();
-            aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
-            if (system.getService() != null) {
-                svc = AIServiceName.fromString(system.getService());
-            }
-
             if (svc != null) {
+                // First scan up the tree to see if we have a svc on the tree and if so use it instead.
+                SystemConfig system = new SystemConfig();
+                aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
+                if (system.getService() != null) {
+                    svc = AIServiceName.fromString(system.getService());
+                }
                 switch (svc) {
                     case OPENAI:
                         openAiAns = oai.getAnswer(ms, parentNode, null, null);
