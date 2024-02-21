@@ -169,9 +169,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
         return callProc.run("getMultiRssFeed", false, false, req, session, ms -> {
-            return arun.run(as -> {
-                return rssFeed.getMultiRssFeed(req);
-            });
+            return rssFeed.getMultiRssFeed(req);
         });
     }
 

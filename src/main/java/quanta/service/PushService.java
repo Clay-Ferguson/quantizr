@@ -120,11 +120,27 @@ public class PushService extends ServiceBase {
 
     public void pushInfo(SessionContext sc, ServerPushInfo info) {
         // If user is currently logged in we have a session here.
-        if (sc == null)
+        if (sc == null) {
+            log.error("sc is null");
             return;
+        }
+
+        if (sc.getUserToken() == null) {
+            log.error("sc.userToken is null");
+            return;
+        }
 
         // look for an SseEmitter on this replica, which may or may not exist. We might not be the replica
         // that the browser is connected to for it's SseEmittre
+        if (UserManagerService.pushEmitters == null) {
+            log.error("pushEmitters is null");
+            return;
+        }
+
+        if (UserManagerService.pushEmitters.isEmpty()) {
+            log.error("pushEmitters isEmpty");
+            return;
+        }
         SseEmitter emitter = UserManagerService.pushEmitters.get(sc.getUserToken());
 
         // if we happened to be the right replica to push to browser, then push

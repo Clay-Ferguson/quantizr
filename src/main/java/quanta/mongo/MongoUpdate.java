@@ -90,7 +90,7 @@ public class MongoUpdate extends ServiceBase {
         }
 
         if (!ThreadLocals.hasDirtyNodes()) {
-            log.warn("saveSession called with no dirty nodes");
+            // log.warn("saveSession called with no dirty nodes");
             return;
         }
 

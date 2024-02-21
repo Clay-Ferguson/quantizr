@@ -224,18 +224,21 @@ public class RSSFeedService extends ServiceBase {
             }
 
             if (ThreadLocals.getSC() != null) {
-                push.pushInfo(ThreadLocals.getSC(), new PushPageMessage(
-                        "Reading (" + index + " / " + maxIndex + ") " + url, false, "rssProgressText"));
+                try {
+                    String msg = "Reading (" + index + " / " + maxIndex + ") " + url;
+                    PushPageMessage pushPageMessage = new PushPageMessage(msg, false, "rssProgressText");
+                    push.pushInfo(ThreadLocals.getSC(), pushPageMessage);
+                } catch (Exception e) {
+                    log.debug("Error pushing rssProgressText: " + e.getMessage());
+                }
             }
 
             long start = System.currentTimeMillis();
             WebClient webClient = Util.webClientBuilder().build();
             String response = webClient.get().uri(url).retrieve() //
                     .bodyToMono(String.class).timeout(Duration.ofSeconds(60)).block();
-
             InputStream inputStream = new LimitedInputStreamEx(
                     new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), 100 * Const.ONE_MB);
-
             try {
                 SyndFeedInput input = new SyndFeedInput();
                 inFeed = input.build(new XmlReader(inputStream, true));
@@ -244,17 +247,22 @@ public class RSSFeedService extends ServiceBase {
             }
 
             long time = System.currentTimeMillis() - start;
-            if (time > 2000) {
+            if (time > 3000) {
                 log.debug("Feed Read Time: " + DateUtil.formatDurationMillis(time, true) + " url=" + url);
             }
 
             // we update the cache regardless of 'fromCache' val. this is correct.
             feedCache.put(url, inFeed);
+
             // store knowledge of which feed Title goes with each entry instance.
-            if (inFeed.getEntries() != null) {
+            if (inFeed != null && inFeed.getEntries() != null) {
                 log.debug("Feed items: " + inFeed.getEntries().size());
                 for (SyndEntry se : inFeed.getEntries()) {
                     feedNameOfItem.put(se.getUri(), inFeed.getTitle());
+                }
+            } else {
+                if (debug) {
+                    log.debug("Feed was empty! " + url);
                 }
             }
             return inFeed;
