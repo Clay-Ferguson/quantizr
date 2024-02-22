@@ -864,12 +864,12 @@ export class Edit {
     joinNodes = async (joinToParent: boolean = false) => {
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray();
         if (!selNodesArray || selNodesArray.length === 0) {
-            S.util.showMessage("Select some nodes to join.", "Warning");
+            S.util.showMessage("Select some nodes to " + (joinToParent ? "append" : "join") + ".", "Warning");
             return;
         }
 
         const confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
-        const dlg = new ConfirmDlg(confirmMsg, "Confirm Join");
+        const dlg = new ConfirmDlg(confirmMsg, joinToParent ? "Confirm Append" : "Confirm Join");
         await dlg.open();
         if (dlg.yes) {
             const res = await S.rpcUtil.rpc<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
