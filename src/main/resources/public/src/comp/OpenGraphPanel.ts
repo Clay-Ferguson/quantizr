@@ -31,6 +31,9 @@ export class OpenGraphPanel extends Div {
         if (og) {
             this.mergeState<LS>({ og });
         }
+        else {
+            this.mergeState<LS>({ og: null });
+        }
     }
 
     override domRemoveEvent = () => {
@@ -39,7 +42,9 @@ export class OpenGraphPanel extends Div {
 
     override domAddEvent = () => {
         const elm: HTMLElement = this.getRef();
-        if (!elm || !elm.isConnected || this.getState<LS>().og) return;
+        if (!elm || !elm.isConnected || this.getState<LS>().og) {
+            return;
+        }
         const og = S.quanta.openGraphData.get(this.url);
         if (!og) {
             this.observer = new IntersectionObserver(entries => //
@@ -128,12 +133,11 @@ export class OpenGraphPanel extends Div {
     // the only time this method ever runs will be when browsing an RSS feed.
     queryOpenGraph = async (url: string): Promise<J.OpenGraph> => {
         if (!url) return null;
-
-        // console.log("QUERY OG for " + url);
         try {
             const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
             }, true, false, true, this.getId());
+
             return res.openGraph;
         }
         catch (e) {
@@ -158,7 +162,7 @@ export class OpenGraphPanel extends Div {
         }
 
         /* If neither a description nor image exists, this will not be interesting enough so don't render */
-        if (!state.og.description && !state.og.image) {
+        if (!state.og.description && !state.og.image && !state.og.title) {
             this.setChildren(null);
             return false;
         }
@@ -167,10 +171,11 @@ export class OpenGraphPanel extends Div {
             state.og.url = this.url;
         }
 
-        const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !ast.isAnonUser ? new Icon({
-            className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
-            onClick: () => S.edit.addLinkBookmark(state.og.url, null)
-        }) : null;
+        // todo-0: this is broken, removing for now.
+        // const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !ast.isAnonUser ? new Icon({
+        //     className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
+        //     onClick: () => S.edit.addLinkBookmark(state.og.url, null)
+        // }) : null;
 
         if (state.og?.description?.length > 804) {
             state.og.description = state.og.description.substring(0, 800) + "...";
@@ -217,7 +222,7 @@ export class OpenGraphPanel extends Div {
 
         this.attribs.className = this.wrapperClass;
         this.setChildren([
-            bookmarkIcon,
+            // bookmarkIcon,
             this.showTitle ? (state.og.url ? new Anchor(this.url, state.og.title, {
                 target: "_blank",
                 className: "openGraphTitle"
