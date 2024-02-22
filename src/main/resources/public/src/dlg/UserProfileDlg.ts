@@ -326,7 +326,7 @@ export class UserProfileDlg extends DialogBase {
                         userProfile: state.userProfile
                     });
                 }
-            });
+            }, false);
             dlg.open();
         };
 
@@ -384,7 +384,7 @@ export class UserProfileDlg extends DialogBase {
                             userProfile: state.userProfile
                         });
                     }
-                });
+                }, false);
             dlg.open();
         };
 

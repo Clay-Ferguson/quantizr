@@ -19,7 +19,7 @@ export class Attach {
 
         new UploadFromFileDropzoneDlg(nodeId, "", autoAddFile, false, true, () => {
             S.view.jumpToId(nodeId);
-        }).open();
+        }, true).open();
     };
 
     openUploadFromUrlDlg = (nodeId: string, onUploadFunc: () => void) => {

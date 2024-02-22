@@ -31,16 +31,17 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private attName: string, //
-        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, public afterUploadFunc: () => void) {
+        private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, //
+        public afterUploadFunc: () => void, private showAdvancedOptions: boolean) {
         super(importMode ? "Import File" : "Attach File");
     }
 
     renderDlg(): Comp[] {
         const children = [
             new Div(null, null, [
-                this.buildSourcesComponent(),
+                this.showAdvancedOptions ? this.buildSourcesComponent() : null,
 
-                new Div("From your Computer (Click or Drag-n-Drop)", { className: "marginTop" }),
+                new Div("From your Computer (Click Below or Drag-and-Drop)", { className: "marginTop" }),
 
                 // WARNING: Keep these static IDs here, because when the page rerenders dropzone knows these IDs
                 // and dropzone will malfunction if these IDs change.
@@ -145,7 +146,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     immediateUploadFiles = async (files: File[]) => {
         const ast = getAs();
-        await S.domUtil.uploadFilesToNode(files, ast.editNode.id, false);
+        await S.domUtil.uploadFilesToNode(files, ast.editNode?.id, false);
         this.close();
         if (this.afterUploadFunc) {
             this.afterUploadFunc();

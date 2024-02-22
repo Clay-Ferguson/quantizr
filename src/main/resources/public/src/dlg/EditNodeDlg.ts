@@ -114,7 +114,6 @@ export class EditNodeDlg extends DialogBase {
             setTimeout(() => {
                 // DO NOT DELETE. Leave this here as an FYI.
                 // await this.utl.upload(EditNodeDlg.pendingUploadFile, this);
-
                 this.immediateUploadFiles([EditNodeDlg.pendingUploadFile]);
                 EditNodeDlg.pendingUploadFile = null;
             }, 250);

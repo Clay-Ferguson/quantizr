@@ -95,7 +95,7 @@ export class Edit {
 
         const dlg = new UploadFromFileDropzoneDlg(node.id, "", null, true, true, () => {
             S.view.jumpToId(node.id);
-        });
+        }, true);
         dlg.open();
     }
 

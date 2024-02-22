@@ -878,6 +878,7 @@ export class Util {
         return new Promise<any>((resolve, _reject) => {
             const navigatorAny = navigator as any;
             if (navigatorAny && navigatorAny.clipboard) {
+                window.focus();
                 navigatorAny.clipboard.read().then((data: any) => {
                     let blob = null;
                     const promises = data.map(item => {

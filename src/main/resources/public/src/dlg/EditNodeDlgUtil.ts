@@ -217,7 +217,7 @@ export class EditNodeDlgUtil {
             await S.edit.refreshFromServer(ast.editNode);
             S.edit.updateNode(ast.editNode);
             dlg.binaryDirty = true;
-        });
+        }, true);
         await uploadDlg.open();
     }
 
