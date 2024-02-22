@@ -221,13 +221,15 @@ export class NodeCompMarkdown extends Comp {
                     }
                 });
             },
-            className: "collapsibleMarkdown " + (expanded ? " iconUp" : " iconDown marginBottom"),
+            className: expanded ? "collapsibleMarkdownExpanded iconUp" : "collapsibleMarkdown iconDown",
             title: expanded ? "Click to Collapse" : "Click to Expand"
         }, collapseTitle));
         this.attribs.key = "ncmkd_" + this.node.id + "_" + suffix;
 
         if (expanded) {
-            children.push(createElement(ReactMarkdownComp as any, this.attribs, curBuf));
+            const attribs = { ...this.attribs };
+            attribs.className = attribs.className + " expandedCollapsible";
+            children.push(createElement(ReactMarkdownComp as any, attribs, curBuf));
         }
     }
 

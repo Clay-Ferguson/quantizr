@@ -2,7 +2,6 @@ import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
-import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
@@ -20,7 +19,7 @@ export class OpenGraphPanel extends Div {
     observer: IntersectionObserver;
 
     constructor(private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
-        private imageClass: string, private showTitle: boolean, private allowBookmarkIcon: boolean, private includeImage: boolean) {
+        private imageClass: string, private showTitle: boolean, _allowBookmarkIcon: boolean, private includeImage: boolean) {
         super(null, {
             title: url,
             key

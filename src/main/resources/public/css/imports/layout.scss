@@ -1,7 +1,21 @@
 .collapsibleMarkdown {
     margin-left: $mediumGap;
+    margin-bottom: $smallGap;
     cursor: pointer;
     font-weight: bold;
+}
+
+.collapsibleMarkdownExpanded {
+    margin-left: $mediumGap;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.expandedCollapsible {
+    border: 2px solid $border-color;
+    border-radius: $border-radius;
+    margin-bottom: $smallGap;
+    margin-left: $bigGap;
 }
 
 .aiConfigSection {
