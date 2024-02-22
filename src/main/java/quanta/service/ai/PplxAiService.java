@@ -27,7 +27,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class PplxAiService extends ServiceBase {
     String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
-    public final String PPLX_MODEL_COMPLETION_ONLINE = "pplx-70b-online";
+
+    // todo-0: Once Perplexity fixes their "Gibberish" bug, we can switch back to pplx-70b-online for
+    // the online model.
+    public final String PPLX_MODEL_COMPLETION_ONLINE = "pplx-8x7b-online"; // "pplx-70b-online";
     public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
     public final String PPLX_MODEL_COMPLETION_LLAMA2 = "llama-2-70b-chat";
     public final String PPLX_MODEL_COMPLETION_CHAT = "pplx-70b-chat"; // "mistral-7b-instruct";
