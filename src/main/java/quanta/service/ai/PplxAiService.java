@@ -68,11 +68,7 @@ public class PplxAiService extends ServiceBase {
 
         String input;
         if (node != null) {
-            if (!StringUtils.isEmpty(system.getTemplate())) {
-                input = system.getTemplate().replace("${content}", node.getContent());
-            } else {
-                input = node.getContent();
-            }
+            input = aiUtil.prepareAIQuestionText(node, system);
         } else {
             input = question;
         }

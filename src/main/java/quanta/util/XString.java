@@ -88,10 +88,12 @@ public class XString {
         if (val == null)
             return null;
         int loopSafe = 0;
+        val = val.trim();
 
         while (++loopSafe < 1000) {
             int len = val.length();
-            val = stripIfStartsWith(val.trim(), prefix);
+            val = val.trim();
+            val = stripIfStartsWith(val, prefix);
             // if string remained same length we're done
             if (len == val.length()) {
                 break;

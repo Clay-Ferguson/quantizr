@@ -177,6 +177,18 @@ public class AIUtil extends ServiceBase {
         return res;
     }
 
+    public String prepareAIQuestionText(SubNode node, SystemConfig system) {
+        String content = node.getContent();
+        content = XString.repeatingTrimFromFront(content, "#");
+        String input;
+        if (!StringUtils.isEmpty(system.getTemplate())) {
+            input = system.getTemplate().replace("${content}", content);
+        } else {
+            input = content;
+        }
+        return input;
+    }
+
     public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
         StringBuilder sb = new StringBuilder();
         int counter = 0;

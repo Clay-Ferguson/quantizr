@@ -206,14 +206,9 @@ public class OpenAiService extends ServiceBase {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
 
-        // todo-0: add this to the other services also.
         String input;
         if (node != null) {
-            if (!StringUtils.isEmpty(system.getTemplate())) {
-                input = system.getTemplate().replace("${content}", node.getContent());
-            } else {
-                input = node.getContent();
-            }
+            input = aiUtil.prepareAIQuestionText(node, system);
         } else {
             input = question;
         }
