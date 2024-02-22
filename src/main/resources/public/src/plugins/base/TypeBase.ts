@@ -340,11 +340,15 @@ export class TypeBase implements TypeIntf {
 
             let aiConfigDiv: Div = null;
             if (S.props.isMine(node) && S.props.hasAIConfigProps(node)) {
-                aiConfigDiv = new Div("AI Config", {
-                    onClick: () => S.edit.configureGpt(node),
-                    className: "nodeTags aiTags microMarginBottom float-end",
-                    title: "Configure AI Settings"
-                });
+                const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
+                aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
+                    new Div("AI Config", {
+                        onClick: () => S.edit.configureGpt(node),
+                        className: "nodeTags aiTags microMarginBottom float-end",
+                        title: "Configure AI Settings"
+                    }),
+                    template ? new Div(template, { className: "microMarginBottom" }) : null
+                ]);
             }
 
             // console.log("node [" + node.content + "] tags=" + node.tags)

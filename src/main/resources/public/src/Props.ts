@@ -180,7 +180,8 @@ export class Props {
     hasAIConfigProps = (node: NodeInfo): boolean => {
         return !!this.getPropStr(J.NodeProp.AI, node) || //
             !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
-            !!this.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
+            !!this.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node) || //
+            !!this.getPropStr(J.NodeProp.AI_OVERWRITE, node);
     }
 
     getPropStr = (propertyName: string, node: NodeInfo): string => {

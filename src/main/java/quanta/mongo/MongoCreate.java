@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
+import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
@@ -303,6 +304,7 @@ public class MongoCreate extends ServiceBase {
                 if (system.getService() != null) {
                     svc = AIServiceName.fromString(system.getService());
                 }
+
                 switch (svc) {
                     case OPENAI:
                         openAiAns = oai.getAnswer(ms, parentNode, null, null);
@@ -351,45 +353,35 @@ public class MongoCreate extends ServiceBase {
 
         auth.writeAuth(ms, parentNode);
         parentNode.adminUpdate = true;
+
         // note: redundant security
         if (acl.isAdminOwned(parentNode) && !ms.isAdmin()) {
             throw new ForbiddenException();
         }
-        CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-        SubNode newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
-                null, true, true, nodeChanges);
-        if (req.isPendingEdit()) {
-            mongoUtil.setPendingPath(newNode, true);
-        }
 
-        // OpenAI
-        if (openAiAns != null) {
-            newNode.setContent(aiUtil.formatAnswer(openAiAns, true));
-            newNode.set(NodeProp.OPENAI_RESPONSE, openAiAns);
+        // Get AI_OVERWRITE property from parent node
+        String aiOverwrite = parentNode.getStr(NodeProp.AI_OVERWRITE.s());
+        SubNode newNode = null;
+        if (aiOverwrite == null) {
+            CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
+            newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(), null,
+                    true, true, nodeChanges);
+            if (req.isPendingEdit()) {
+                mongoUtil.setPendingPath(newNode, true);
+            }
+            setAnswerOnNode(req, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, newNode);
+            newNode.touch();
         }
-        // Perplexity AI
-        else if (pplxAiAns != null) {
-            newNode.setContent(aiUtil.formatAnswer(pplxAiAns, true));
-            newNode.set(NodeProp.PPLXAI_RESPONSE, pplxAiAns);
+        // if this AI question is set to overwrite the parent's content do that and then return, we're done.
+        else {
+            setAnswerOnNode(req, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, parentNode);
+            parentNode.touch();
+            update.save(ms, parentNode);
+            NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, parentNode, false,
+                    Convert.LOGICAL_ORDINAL_GENERATE, true, false, false, true);
+            res.setNewNode(nodeInfo);
+            return res;
         }
-        // OobaBooga
-        else if (oobAiAns != null) {
-            newNode.setContent(aiUtil.formatAnswer(oobAiAns, true));
-            newNode.set(NodeProp.OOBAI_RESPONSE, oobAiAns);
-        }
-        // HuggingFace
-        else if (huggingFaceAns != null) {
-            newNode.setContent(huggingFaceAns.getGeneratedText());
-            newNode.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAns);
-        }
-        // Gemini AI
-        else if (geminiAiAns != null) {
-            newNode.setContent(aiUtil.formatAnswer(geminiAiAns, true));
-            newNode.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAns);
-        } else {
-            newNode.setContent(req.getContent() != null ? req.getContent() : "");
-        }
-        newNode.touch();
 
         // NOTE: Be sure to get nodeId off 'req' here, instead of the var
         if (req.isReply() && req.getNodeId() != null) {
@@ -446,6 +438,38 @@ public class MongoCreate extends ServiceBase {
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false));
 
         return res;
+    }
+
+    private void setAnswerOnNode(CreateSubNodeRequest req, ChatCompletionResponse openAiAns,
+            ChatCompletionResponse pplxAiAns, ChatCompletionResponse oobAiAns, HuggingFaceResponse huggingFaceAns,
+            GeminiChatResponse geminiAiAns, SubNode node) {
+        // OpenAI
+        if (openAiAns != null) {
+            node.setContent(aiUtil.formatAnswer(openAiAns, true));
+            node.set(NodeProp.OPENAI_RESPONSE, openAiAns);
+        }
+        // Perplexity AI
+        else if (pplxAiAns != null) {
+            node.setContent(aiUtil.formatAnswer(pplxAiAns, true));
+            node.set(NodeProp.PPLXAI_RESPONSE, pplxAiAns);
+        }
+        // OobaBooga
+        else if (oobAiAns != null) {
+            node.setContent(aiUtil.formatAnswer(oobAiAns, true));
+            node.set(NodeProp.OOBAI_RESPONSE, oobAiAns);
+        }
+        // HuggingFace
+        else if (huggingFaceAns != null) {
+            node.setContent(huggingFaceAns.getGeneratedText());
+            node.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAns);
+        }
+        // Gemini AI
+        else if (geminiAiAns != null) {
+            node.setContent(aiUtil.formatAnswer(geminiAiAns, true));
+            node.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAns);
+        } else {
+            node.setContent(req.getContent() != null ? req.getContent() : "");
+        }
     }
 
     /*

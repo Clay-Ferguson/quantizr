@@ -1035,7 +1035,6 @@ export class Edit {
     }
 
     askAiQuestion = async (nodeId: string) => {
-
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId,

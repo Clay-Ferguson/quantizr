@@ -1304,6 +1304,7 @@ export const enum NodeProp {
     AI = "ai",
     AI_SERVICE = "aiService",
     AI_QUERY_TEMPLATE = "aiTemplate",
+    AI_OVERWRITE = "aiOverwrite",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
     OPEN_GRAPH = "sn:og",

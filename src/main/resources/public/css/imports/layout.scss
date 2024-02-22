@@ -4,6 +4,14 @@
     font-weight: bold;
 }
 
+.aiConfigSection {
+    border: 2px solid $border-color;
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+    margin-left: $smallGap;
+}
+
 .aiImageGenSize {
     width: 15rem;
     padding-left: $bigGap;

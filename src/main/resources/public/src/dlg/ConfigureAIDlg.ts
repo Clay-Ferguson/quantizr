@@ -10,11 +10,14 @@ import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { Selection } from "../comp/core/Selection";
+import { FlexLayout } from "../comp/core/FlexLayout";
+import { Checkbox } from "../comp/core/Checkbox";
 
 export class ConfigureAIDlg extends DialogBase {
     static promptState: Validator = new Validator();
     static templateState: Validator = new Validator();
     static aiServiceState: Validator = new Validator("[null]");
+    static overwriteState: Validator = new Validator(false);
 
     textScrollPos = new ScrollPos();
     queryTemplateScrollPos = new ScrollPos();
@@ -29,7 +32,10 @@ export class ConfigureAIDlg extends DialogBase {
         console.log("rerendering: " + ConfigureAIDlg.aiServiceState.getValue());
         return [
             new Div(null, null, [
-                new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom", ConfigureAIDlg.aiServiceState),
+                new FlexLayout([
+                    new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom bigMarginRight", ConfigureAIDlg.aiServiceState),
+                    new Checkbox("Overwrite Content with Answer", null, ConfigureAIDlg.overwriteState)
+                ]),
                 new TextArea("System Prompt", {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
@@ -52,22 +58,30 @@ export class ConfigureAIDlg extends DialogBase {
         ConfigureAIDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI, this.node));
         ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
         ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
+        ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
     }
 
     save = async () => {
+        const template = ConfigureAIDlg.templateState.getValue();
+        if (template?.includes("${content}") && !!ConfigureAIDlg.overwriteState.getValue()) {
+            ConfigureAIDlg.templateState.setError("Template cannot contain ${content} when Overwrite is enabled.");
+            return;
+        }
+
         // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
         S.props.setPropVal(J.NodeProp.AI, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_OVERWRITE, this.node, !!ConfigureAIDlg.overwriteState.getValue() || "[null]");
         await S.edit.saveNode(this.node, true);
         this.close();
     }
 
     reset = async () => {
-        debugger;
         ConfigureAIDlg.promptState.setValue("");
         ConfigureAIDlg.templateState.setValue("");
         ConfigureAIDlg.aiServiceState.setValue("[null]");
+        ConfigureAIDlg.overwriteState.setValue(false);
 
         // todo-0: we seem to have a bug where setting state on a "Selection" (like aiServiceState) above does not trigger a rerender
         // so by having this here we force a rerender of entire dialog as a workaround.
