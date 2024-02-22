@@ -180,6 +180,7 @@ public class NodeEditService extends ServiceBase {
         if (nodeInfo.getContent() != null && !nodeInfo.getContent().startsWith(Constant.ENC_TAG.s())) {
             node.delete(NodeProp.ENC_KEY);
         }
+
         // If removing encryption, remove it from all the ACL entries too.
         String encKey = node.getStr(NodeProp.ENC_KEY);
         if (encKey == null) {
@@ -187,6 +188,7 @@ public class NodeEditService extends ServiceBase {
         } else /* if node is currently encrypted */ {
             res.setAclEntries(auth.getAclEntries(ms, node));
         }
+
         // If the node being saved is currently in the pending area /p/ then we publish it now, and move
         // it out of pending.
         mongoUtil.setPendingPath(node, false);
@@ -338,9 +340,6 @@ public class NodeEditService extends ServiceBase {
         if (req.getSplitType().equalsIgnoreCase("children")) {
             parentForNewNodes.setHasChildren(true);
         }
-        exec.run(() -> {
-            crypto.signNodesById(ms, sigDirtyNodes);
-        });
         return res;
     }
 

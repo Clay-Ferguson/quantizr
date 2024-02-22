@@ -25,7 +25,6 @@ export class TextType extends TypeBase {
             priority: true,
             wordWrap: true,
             encrypt: true,
-            sign: true
         };
     }
 }

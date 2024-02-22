@@ -33,7 +33,6 @@ export interface EditorOptions {
     priority?: boolean;
     wordWrap?: boolean;
     encrypt?: boolean;
-    sign?: boolean;
 }
 
 export interface FullScreenConfig {

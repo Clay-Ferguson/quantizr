@@ -27,7 +27,6 @@ export class HuggingFaceAnswerType extends TypeBase {
             priority: true,
             wordWrap: true,
             encrypt: true,
-            sign: true
         };
     }
 

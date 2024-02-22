@@ -198,6 +198,11 @@ public class CryptoService extends ServiceBase {
         return new SignNodesResponse();
     }
 
+    /*
+     * DO NOT DELETE
+     * 
+     * this method is not currently used but likey will be in the future.
+     */
     public void signNodesById(MongoSession ms, List<String> ids) {
         if (ids == null || ids.size() == 0)
             return;

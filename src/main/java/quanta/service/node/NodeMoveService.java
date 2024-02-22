@@ -194,10 +194,6 @@ public class NodeMoveService extends ServiceBase {
         targetNode.touch();
         update.saveSession(ms);
         delete.deleteNodes(ms, delIds);
-        final SubNode _targetNode = targetNode;
-        exec.run(() -> {
-            crypto.signNodesById(ms, new ArrayList<>(Collections.singletonList(_targetNode.getIdStr())));
-        });
         return res;
     }
 
@@ -329,9 +325,6 @@ public class NodeMoveService extends ServiceBase {
             });
             curTargetOrdinal++;
         }
-        exec.run(() -> {
-            crypto.signNodesById(ms, nodeIds);
-        });
     }
 
     /*

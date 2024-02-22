@@ -27,7 +27,6 @@ export class GeminiAiAnswerType extends TypeBase {
             priority: true,
             wordWrap: true,
             encrypt: true,
-            sign: true
         };
     }
 

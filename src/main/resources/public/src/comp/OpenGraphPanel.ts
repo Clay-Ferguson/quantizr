@@ -170,7 +170,7 @@ export class OpenGraphPanel extends Div {
             state.og.url = this.url;
         }
 
-        // todo-0: this is broken, removing for now.
+        // todo-1: this is broken, removing for now.
         // const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !ast.isAnonUser ? new Icon({
         //     className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
         //     onClick: () => S.edit.addLinkBookmark(state.og.url, null)

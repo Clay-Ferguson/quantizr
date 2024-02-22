@@ -647,7 +647,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => this.getState<LS>().encryptCheckboxVal
         }) : null;
 
-        const signCheckBox = advancedOpts.sign && S.crypto.avail ? new Checkbox("Sign", null, {
+        const signCheckBox = S.crypto.avail ? new Checkbox("Sign", null, {
             setValue: (checked: boolean) => {
                 if (checked && S.crypto.sigKeyOk()) {
                     this.mergeState({ signCheckboxVal: checked });
