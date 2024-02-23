@@ -56,7 +56,7 @@ export class NodeCompRow extends Div {
 
             const isMine = S.props.isMine(ast.node);
 
-            if (isMine && this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed) {
+            if (isMine && this.allowInlineInsertButton && !isPageRootNode && insertAllowed) {
 
                 let insertButton: Button = null;
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [

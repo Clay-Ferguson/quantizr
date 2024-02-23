@@ -40,6 +40,10 @@ export class GraphTab implements TabIntf<any> {
         return null;
     }
 
+    findNodeByPath = (_path: string): NodeInfo => {
+        return null;
+    }
+
     nodeDeleted = (_ust: AppState, _nodeId: string): void => {
     }
 

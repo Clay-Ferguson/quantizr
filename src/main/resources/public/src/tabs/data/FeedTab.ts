@@ -31,6 +31,10 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         return S.util.searchNodeArray(this.props.results, nodeId);
     }
 
+    findNodeByPath = (_path: string): NodeInfo => {
+        return null;
+    }
+
     nodeDeleted = (_ust: AppState, nodeId: string): void => {
         this.props.results = this.props.results?.filter(n => nodeId !== n.id);
     }

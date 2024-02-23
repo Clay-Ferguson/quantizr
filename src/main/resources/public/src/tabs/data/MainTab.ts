@@ -29,17 +29,22 @@ export class MainTab implements TabIntf<any> {
 
     findNode = (nodeId: string, ast: AppState = null): NodeInfo => {
         ast = ast || getAs();
-        return this.findNodeRecursive(ast.node, nodeId, 0);
+        return this.findNodeRecursive(ast.node, (node: NodeInfo) => node.id == nodeId, 0);
+    }
+
+    findNodeByPath = (path: string, ast: AppState = null): NodeInfo => {
+        ast = ast || getAs();
+        return this.findNodeRecursive(ast.node, (node: NodeInfo) => node.path == path, 0);
     }
 
     // finds a node matching node with 'id' on this node or any of it's children
-    findNodeRecursive = (node: NodeInfo, id: string, level: number): NodeInfo => {
+    findNodeRecursive = (node: NodeInfo, finder: (node: NodeInfo) => boolean, level: number): NodeInfo => {
         if (!node) return null;
-        if (node.id === id) return node;
+        if (finder(node)) return node;
 
         if (node.children) {
             for (const n of node.children) {
-                const found = this.findNodeRecursive(n, id, level + 1);
+                const found = this.findNodeRecursive(n, finder, level + 1);
                 if (found) return found;
             }
         }

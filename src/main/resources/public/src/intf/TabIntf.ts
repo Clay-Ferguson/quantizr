@@ -38,6 +38,7 @@ export interface TabIntf<PT = any, TT = any> {
 
     // tabs are required to be able to search their known nodes and find any that are found, or null if not found
     findNode(nodeId: string): NodeInfo;
+    findNodeByPath(path: string): NodeInfo;
     nodeDeleted(ust: AppState, nodeId: string): void;
     replaceNode(ust: AppState, newNode: NodeInfo): void;
     processNode(ust: AppState, func: (node: NodeInfo) => void): void;

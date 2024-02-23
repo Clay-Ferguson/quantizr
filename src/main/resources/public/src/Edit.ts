@@ -396,45 +396,56 @@ export class Edit {
         node.children.forEach(n => this.replaceNodeRecursive(n, newNode));
     }
 
+    // This must insert newNode into the local browser memory. We know newNodeTargetId is a sibling node of 
+    // newNode, and newNodeTargetOffset is 0 if we're inserting above, and 1 if we're inserting below.
     injectNewNodeIntoChildren = (newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
         // we return the promise from the dispatch and to not wait for it here.
         return promiseDispatch("InjectNewNodeIntoChildren", s => {
-            if (s.node.children) {
-                const newChildren: NodeInfo[] = [];
-
-                // we'll be renumbering ordinals so use this to keep track, by starting at whatever
-                // the first child was at before the insert
-                let ord = s.node.children[0].logicalOrdinal;
-
-                // build newChildren by inserting the 'newNode' into it's proper place into the children array.
-                s.node.children.forEach(child => {
-                    // offset==0 means insert above.
-                    if (newNodeTargetId === child.id && newNodeTargetOffset === 0) {
-                        newNode.logicalOrdinal = ord++;
-                        newChildren.push(newNode);
-                    }
-                    child.logicalOrdinal = ord++;
-                    newChildren.push(child);
-
-                    // offset==0 means insert below.
-                    if (newNodeTargetId === child.id && newNodeTargetOffset === 1) {
-
-                        // if node was the lastChild, we have a new last child.
-                        if (child.lastChild) {
-                            child.lastChild = false;
-                            newNode.lastChild = true;
-                        }
-
-                        newNode.logicalOrdinal = ord++;
-                        newChildren.push(newNode);
-                    }
-                });
-                s.node.children = newChildren;
-            }
-            else {
-                s.node.children = [newNode];
+            const parentPath = S.props.getParentPath(newNode);
+            if (!parentPath) return;
+            const node = MainTab.inst?.findNodeByPath(parentPath, s);
+            if (node) {
+                this.pushNodeIntoChildren(node, newNode, newNodeTargetId, newNodeTargetOffset);
             }
         });
+    }
+
+    pushNodeIntoChildren = (node: NodeInfo, newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): void => {
+        if (node.children) {
+            const newChildren: NodeInfo[] = [];
+
+            // we'll be renumbering ordinals so use this to keep track, by starting at whatever
+            // the first child was at before the insert
+            let ord = node.children[0].logicalOrdinal;
+
+            // build newChildren by inserting the 'newNode' into it's proper place into the children array.
+            node.children.forEach(child => {
+                // offset==0 means insert above.
+                if (newNodeTargetId === child.id && newNodeTargetOffset === 0) {
+                    newNode.logicalOrdinal = ord++;
+                    newChildren.push(newNode);
+                }
+                child.logicalOrdinal = ord++;
+                newChildren.push(child);
+
+                // offset==0 means insert below.
+                if (newNodeTargetId === child.id && newNodeTargetOffset === 1) {
+
+                    // if node was the lastChild, we have a new last child.
+                    if (child.lastChild) {
+                        child.lastChild = false;
+                        newNode.lastChild = true;
+                    }
+
+                    newNode.logicalOrdinal = ord++;
+                    newChildren.push(newNode);
+                }
+            });
+            node.children = newChildren;
+        }
+        else {
+            node.children = [newNode];
+        }
     }
 
     // NOT CURRENTLY USED (but let's keep for future possible needs)
