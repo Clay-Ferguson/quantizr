@@ -28,7 +28,7 @@ export class ConfigureAIDlg extends DialogBase {
     }
 
     renderDlg(): Comp[] {
-        const aiOptions = S.render.getAiOptions();
+        const aiOptions = S.aiUtil.getAiOptions();
         console.log("rerendering: " + ConfigureAIDlg.aiServiceState.getValue());
         return [
             new Div(null, null, [

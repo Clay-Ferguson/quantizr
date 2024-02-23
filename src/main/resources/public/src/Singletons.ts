@@ -19,6 +19,7 @@ import type { Util } from "./Util";
 import type { View } from "./View";
 import { HistoryUtil } from "./HistoryUtil";
 import { Attach } from "./Attach";
+import { AIUtil } from "./AIUtil";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
 to result in any circular-references during load time, because they instantiate only other interfaces 
@@ -30,6 +31,7 @@ export interface Singletons {
     tourUtils: TourUtils;
     plugin: PluginMgr;
     util: Util;
+    aiUtil: AIUtil;
     domUtil: DomUtil;
     rpcUtil: RpcUtil;
     nodeUtil: NodeUtil;

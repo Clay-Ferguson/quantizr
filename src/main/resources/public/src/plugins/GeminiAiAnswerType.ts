@@ -17,7 +17,7 @@ export class GeminiAiAnswerType extends TypeBase {
     }
 
     override getCustomFooter(node: NodeInfo): Div {
-        return S.render.getAiNodeFooter("by Gemini AI", node);
+        return S.aiUtil.getAiNodeFooter("by Gemini AI", node);
     }
 
     override getEditorOptions(): EditorOptions {

@@ -1,4 +1,5 @@
 import { getAs } from "../AppContext";
+import { S } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -13,8 +14,6 @@ import { ManageStorageDlg } from "../dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { TabIntf } from "../intf/TabIntf";
-import { S } from "../Singletons";
-import * as J from "../JavaIntf";
 
 export class SettingsView extends AppTab<any, SettingsView> {
     constructor(data: TabIntf<any, SettingsView>) {
@@ -31,29 +30,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const horzClass = "marginTop marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
-        let modelSpecs = "";
-        switch (getAs().userPrefs.aiService) {
-            case J.AIServiceName.OPENAI:
-                modelSpecs = "OpenAI ChatGPT-4 (Chat): This is the default chatbot and is widely considered the most intelligent general-purpose AI on the market.";
-                break;
-            case J.AIServiceName.GEMINI:
-                modelSpecs = "Gemini AI: This is Google's best general-purpose AI.";
-                break;
-            case J.AIServiceName.PPLX:
-                modelSpecs = "Perplexity AI: This is Perplexity's best high-end powerful general-purpose AI.";
-                break;
-            case J.AIServiceName.PPLX_ONLINE:
-                modelSpecs = "Perplexity AI: This is Perplexity's AI which has access to the latest news and content from from the web.";
-                break;
-            case J.AIServiceName.PPLX_CODE_LLAMA:
-                modelSpecs = "Code Llama: This is the well-known open source Code Llama, which is great for coding and programming tasks.";
-                break;
-            case J.AIServiceName.PPLX_LLAMA2:
-                modelSpecs = "Llama 2: This is the well-known open source Llama 2, which is great for general-purpose tasks.";
-                break;
-        }
-
-        const aiOptions = S.render.getAiOptions();
+        const modelSpecs = S.aiUtil.getServiceByName(getAs().userPrefs.aiService)?.longDescription;
+        const aiOptions = S.aiUtil.getAiOptions();
 
         this.setChildren([
             this.headingBar = new TabHeading([

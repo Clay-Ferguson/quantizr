@@ -20,6 +20,7 @@ let initialized = false;
 const processAppLoad = async () => {
     new Factory();
     S.quanta.config = (window as any).g_config;
+    S.aiUtil.init();
     S.quanta.cfg = S.quanta.config.config || {};
     const root = createRoot(document.getElementById("app"));
     root.render(React.createElement(AppContainer));

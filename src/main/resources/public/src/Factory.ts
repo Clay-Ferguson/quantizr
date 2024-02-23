@@ -7,6 +7,7 @@ WARNING: Singletons (just like in Spring) are not allowed to do any logic that r
 inside their constructors because there is no guarantee that all (or any) of the other Singletons have
 been constructed yet.
 */
+import { AIUtil } from "./AIUtil";
 import { Attach } from "./Attach";
 import { Crypto } from "./Crypto";
 import { DomUtil } from "./DomUtil";
@@ -45,6 +46,7 @@ export class Factory {
             S.tourUtils = new TourUtils();
             S.plugin = new PluginMgr();
             S.util = new Util();
+            S.aiUtil = new AIUtil();
             S.domUtil = new DomUtil();
             S.rpcUtil = new RpcUtil();
             S.tabUtil = new TabUtil();

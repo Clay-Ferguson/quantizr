@@ -17,7 +17,7 @@ export class HuggingFaceAnswerType extends TypeBase {
     }
 
     override getCustomFooter(node: NodeInfo): Div {
-        return S.render.getAiNodeFooter("by HuggingFace AI", node);
+        return S.aiUtil.getAiNodeFooter("by HuggingFace AI", node);
     }
 
     override getEditorOptions(): EditorOptions {

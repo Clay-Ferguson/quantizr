@@ -17,7 +17,7 @@ export class OpenAiAnswerType extends TypeBase {
     }
 
     override getCustomFooter(node: NodeInfo): Div {
-        return S.render.getAiNodeFooter("by OpenAI", node);
+        return S.aiUtil.getAiNodeFooter("by OpenAI", node);
     }
 
     override getEditorOptions(): EditorOptions {

@@ -792,7 +792,7 @@ export class Edit {
             S.quanta.newNodeTargetId = id;
             S.quanta.newNodeTargetOffset = ordinalOffset;
 
-            // todo-0: try to make this method take not node but instead node's id.
+            // todo-1: try to make this method take not node but instead node's id.
             this.startEditingNewNode(false, null, node.id, node, ordinalOffset);
         }
     }

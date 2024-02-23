@@ -17,7 +17,7 @@ export class PplxAiAnswerType extends TypeBase {
     }
 
     override getCustomFooter(node: NodeInfo): Div {
-        return S.render.getAiNodeFooter("by Perplexity AI", node);
+        return S.aiUtil.getAiNodeFooter("by Perplexity AI", node);
     }
 
     override getEditorOptions(): EditorOptions {
