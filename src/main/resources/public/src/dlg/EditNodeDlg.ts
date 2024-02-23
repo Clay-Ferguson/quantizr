@@ -721,6 +721,11 @@ export class EditNodeDlg extends DialogBase {
         const advancedButtons: boolean = !!this.contentEditor;
         const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
 
+        let activeAiService = S.aiUtil.getActiveService()?.description;
+        if (activeAiService) {
+            activeAiService = "Active AI Service: " + activeAiService;
+        }
+
         return new ButtonBar([
             new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
 
@@ -766,7 +771,7 @@ export class EditNodeDlg extends DialogBase {
 
             ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", null, {
                 onClick: this.askChatGpt,
-                title: "Query AI, using Node Content as the Question."
+                title: "Query AI, using this Node as the Question.\n\n" + activeAiService
             }) : null,
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary"),

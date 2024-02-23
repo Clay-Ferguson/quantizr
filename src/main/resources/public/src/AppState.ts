@@ -114,7 +114,7 @@ export class AppState {
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
         mainPanelCols: 6,
-        aiService: "openAi"
+        aiService: J.AIServiceName.OPENAI,
     };
 
     exportSettings: ExportSettings = {

@@ -1,3 +1,4 @@
+import { getAs } from "./AppContext";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Div } from "./comp/core/Div";
@@ -63,8 +64,17 @@ export class AIUtil {
         }
     }
 
+    getActiveService = (): AIService => {
+        return this.getServiceByName(getAs().userPrefs.aiService);
+    }
+
     getServiceByName = (name: string): AIService => {
-        return this.aiServices.find(ai => ai.name === name);
+        if (!this.aiServices) return null;
+        const ret = this.aiServices.find(ai => ai.name === name);
+        if (!ret) {
+            return this.aiServices[0];
+        }
+        return ret;
     }
 
     getAiNodeFooter(aiServiceDescript: string, node: J.NodeInfo): Div {
