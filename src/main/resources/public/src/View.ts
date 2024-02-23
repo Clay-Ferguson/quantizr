@@ -327,13 +327,14 @@ export class View {
         });
     }
 
-    signSubGraph = async (): Promise<any> => {
+    signSubGraph = async (signUnsigned: boolean): Promise<any> => {
         if (!S.crypto.sigKeyOk()) {
             return null;
         }
         const node = S.nodeUtil.getHighlightedNode();
         await S.rpcUtil.rpc<J.SignSubGraphRequest, J.SignSubGraphResponse>("signSubGraph", {
-            nodeId: node ? node.id : null
+            nodeId: node ? node.id : null,
+            signUnsigned
         });
         S.util.showMessage("Signature generation initiated. Leave this browser window open until notified signatures are complete.", "Signatures");
     }

@@ -119,7 +119,8 @@ export class MenuPanel extends Div {
     static showUrls = () => S.render.showNodeUrl(null);
     static nodeStats = () => S.view.getNodeStats();
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
-    static signSubGraph = () => S.view.signSubGraph();
+    static signAllSubGraph = () => S.view.signSubGraph(false);
+    static signUnsignedSubGraph = () => S.view.signSubGraph(true);
 
     override preRender = (): boolean => {
         const ast = getAs();
@@ -328,7 +329,8 @@ export class MenuPanel extends Div {
             ], null));
 
             children.push(new Menu("Signature", [
-                S.crypto.avail ? new MenuItem("Sign", MenuPanel.signSubGraph, selNodeIsMine, null, true) : null, //
+                S.crypto.avail ? new MenuItem("Sign All", MenuPanel.signAllSubGraph, selNodeIsMine, null, true) : null, //
+                S.crypto.avail ? new MenuItem("Sign Unsigned", MenuPanel.signUnsignedSubGraph, selNodeIsMine, null, true) : null, //
                 new MenuItem("Verify", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
                 new MenuItem("Remove", S.view.removeSignatures, onMainTab && selNodeIsMine, null, true), //
             ], null));

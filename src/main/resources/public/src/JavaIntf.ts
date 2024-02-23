@@ -679,6 +679,7 @@ export interface SignNodesRequest extends RequestBase {
 
 export interface SignSubGraphRequest extends RequestBase {
     nodeId: string;
+    signUnsigned: boolean;
 }
 
 export interface SignupRequest extends RequestBase {

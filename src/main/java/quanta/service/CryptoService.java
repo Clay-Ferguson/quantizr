@@ -265,8 +265,12 @@ public class CryptoService extends ServiceBase {
         }
 
         // query all nodes under the path that are owned by 'ms'
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(parent.getPath())).and(SubNode.OWNER)
-                .is(ms.getUserNodeId());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(parent.getPath()))//
+                .and(SubNode.OWNER).is(ms.getUserNodeId());
+
+        if (req.isSignUnsigned()) {
+            crit.and(SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s()).exists(false);
+        }
 
         Query query = new Query();
         crit = auth.addReadSecurity(ms, crit);
