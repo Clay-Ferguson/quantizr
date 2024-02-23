@@ -92,17 +92,16 @@ public class RSSFeedService extends ServiceBase {
             };
     private static final int FEED_ITEMS_PER_PAGE = 75;
     private static final int REFRESH_FREQUENCY_MINS = 480; // 8 hrs
-    static boolean run = false;
+    static Object cacheLock = new Object();
 
     /*
      * Runs immediately at startup, and then every few minutes, to refresh the feedCache.
      */
     @Scheduled(fixedDelay = REFRESH_FREQUENCY_MINS * 60 * 1000)
     public void run() {
-        if (!initComplete || run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
+        if (!initComplete || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
-        try {
-            run = true;
+        synchronized (cacheLock) {
             if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
                 log.debug("ignoring RSSFeedService schedule cycle");
                 return;
@@ -111,8 +110,6 @@ public class RSSFeedService extends ServiceBase {
             refreshFeedCache();
             aggregateCache.clear();
             proxyCache.clear();
-        } finally {
-            run = false;
         }
     }
 
@@ -197,40 +194,42 @@ public class RSSFeedService extends ServiceBase {
     }
 
     public void preCacheAdminFeeds(MongoSession as) {
-        log.debug("preCacheAdminFeeds()");
-        SubNode rootNode = read.getNode(as, "/r");
-        if (rootNode == null) {
-            log.debug("No accountRoot found, so no feeds to cache.");
-            return;
-        }
-
-        // we use a set so there's no duplicates
-        HashSet<String> urlSet = new HashSet<>();
-        Iterable<SubNode> nodes = read.findSubNodesByType(as, rootNode, NodeType.RSS_FEED.s(), true, null, null);
-        for (SubNode node : nodes) {
-            if (!acl.isAdminOwned(node)) {
-                continue;
+        synchronized (cacheLock) {
+            log.debug("preCacheAdminFeeds()");
+            SubNode rootNode = read.getNode(as, "/r");
+            if (rootNode == null) {
+                log.debug("No accountRoot found, so no feeds to cache.");
+                return;
             }
 
-            // get RSS_FEED_SRC property
-            String urls = node.getStr(NodeProp.RSS_FEED_SRC);
-
-            // split url by newline
-            List<String> urlList = XString.tokenize(urls, "\n", true);
-
-            // iterate through each url and cache it
-            for (String url : urlList) {
-                if (url.startsWith("#") || StringUtils.isEmpty(url.trim())) {
+            // we use a set so there's no duplicates
+            HashSet<String> urlSet = new HashSet<>();
+            Iterable<SubNode> nodes = read.findSubNodesByType(as, rootNode, NodeType.RSS_FEED.s(), true, null, null);
+            for (SubNode node : nodes) {
+                if (!acl.isAdminOwned(node)) {
                     continue;
                 }
-                urlSet.add(url);
-            }
-        }
 
-        // cache all the feeds
-        for (String url : urlSet) {
-            log.debug("Caching feed: " + url);
-            getFeed(url, false, 0, 0);
+                // get RSS_FEED_SRC property
+                String urls = node.getStr(NodeProp.RSS_FEED_SRC);
+
+                // split url by newline
+                List<String> urlList = XString.tokenize(urls, "\n", true);
+
+                // iterate through each url and cache it
+                for (String url : urlList) {
+                    if (url.startsWith("#") || StringUtils.isEmpty(url.trim())) {
+                        continue;
+                    }
+                    urlSet.add(url);
+                }
+            }
+
+            // cache all the feeds
+            for (String url : urlSet) {
+                log.debug("Caching feed: " + url);
+                getFeed(url, false, 0, 0);
+            }
         }
     }
 

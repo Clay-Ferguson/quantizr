@@ -10,6 +10,7 @@ import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 
 /**
  * Models the MongoDB repository connection.
@@ -88,6 +89,8 @@ public class MongoRepository extends ServiceBase {
 
             if (prop.getRssPreCacheEnabled()) {
                 exec.run(() -> {
+                    // wait 10 seconds before starting to pre-cache the RSS feeds
+                    Util.sleep(10000);
                     rssFeed.preCacheAdminFeeds(as);
                 });
             }
