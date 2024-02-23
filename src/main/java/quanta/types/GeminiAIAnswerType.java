@@ -14,8 +14,7 @@ public class GeminiAIAnswerType extends TypeBase {
 
     public String formatExportText(String exportType, String content) {
         if (exportType.equalsIgnoreCase("pdf")) {
-            return "<div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>\n" + content
-                    + "\n<div style='text-align: right; margin: 6px;'>by AI</div></div>";
+            return aiUtil.formatExportAnswerSection(content, "by Gemini AI");
         } else {
             return content;
         }

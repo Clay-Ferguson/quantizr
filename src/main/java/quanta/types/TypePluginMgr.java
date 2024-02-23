@@ -22,6 +22,8 @@ public class TypePluginMgr extends ServiceBase {
         friendType.postConstruct();
         rssType.postConstruct();
         aiAnswerType.postConstruct();
+        geminiAiAnswerType.postConstruct();
+        pplxAiAnswerType.postConstruct();
     }
 
     public static void addType(TypeBase type) {

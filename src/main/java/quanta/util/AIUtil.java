@@ -231,4 +231,9 @@ public class AIUtil extends ServiceBase {
         }
         return sb.toString();
     }
+
+    public String formatExportAnswerSection(String content, String aiService) {
+        return "<div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>\n" + content
+                + "\n<div style='text-align: right; margin: 6px;'>" + aiService + "</div></div>";
+    }
 }
