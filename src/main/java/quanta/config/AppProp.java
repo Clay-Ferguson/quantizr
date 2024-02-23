@@ -177,6 +177,10 @@ public class AppProp {
         return Integer.parseInt(env.getProperty("mongodb.port"));
     }
 
+    public boolean getRssPreCacheEnabled() {
+        return "true".equals(env.getProperty("rssPreCacheEnabled"));
+    }
+
     public String getAdminDataFolder() {
         return getPathProperty("adminDataFolder");
     }

@@ -237,6 +237,7 @@ services:
             PPLX_API_KEY: "${PPLX_API_KEY}"
             GEMINI_API_KEY: "${GEMINI_API_KEY}"
             mongoSecurity: "true"
+            rssPreCacheEnabled: "false"
 
             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
             # requireCrypto: "true"

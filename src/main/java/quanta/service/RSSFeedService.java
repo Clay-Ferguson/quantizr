@@ -44,8 +44,9 @@ import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
-import quanta.instrument.PerfMonEvent;
 import quanta.model.NodeMetaInfo;
+import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.RssFeed;
 import quanta.model.client.RssFeedEnclosure;
@@ -192,6 +193,44 @@ public class RSSFeedService extends ServiceBase {
             entries.addAll(pageEntries);
         } catch (Exception e) {
             ExUtil.error(log, "Error: ", e);
+        }
+    }
+
+    public void preCacheAdminFeeds(MongoSession as) {
+        log.debug("preCacheAdminFeeds()");
+        SubNode rootNode = read.getNode(as, "/r");
+        if (rootNode == null) {
+            log.debug("No accountRoot found, so no feeds to cache.");
+            return;
+        }
+
+        // we use a set so there's no duplicates
+        HashSet<String> urlSet = new HashSet<>();
+        Iterable<SubNode> nodes = read.findSubNodesByType(as, rootNode, NodeType.RSS_FEED.s(), true, null, null);
+        for (SubNode node : nodes) {
+            if (!acl.isAdminOwned(node)) {
+                continue;
+            }
+
+            // get RSS_FEED_SRC property
+            String urls = node.getStr(NodeProp.RSS_FEED_SRC);
+
+            // split url by newline
+            List<String> urlList = XString.tokenize(urls, "\n", true);
+
+            // iterate through each url and cache it
+            for (String url : urlList) {
+                if (url.startsWith("#") || StringUtils.isEmpty(url.trim())) {
+                    continue;
+                }
+                urlSet.add(url);
+            }
+        }
+
+        // cache all the feeds
+        for (String url : urlSet) {
+            log.debug("Caching feed: " + url);
+            getFeed(url, false, 0, 0);
         }
     }
 
