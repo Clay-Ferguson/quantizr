@@ -7,7 +7,7 @@ import { S } from "../Singletons";
 
 export class HuggingFaceAnswerType extends TypeBase {
     constructor() {
-        super(J.NodeType.HUGGINGFACE_ANSWER, "AI Answer", "fa-android", false);
+        super(J.NodeType.HUGGINGFACE_ANSWER, "AI Answer (HuggingFace)", "fa-android", false);
     }
 
     // For now i'm not sure how we should indicate visibly that a

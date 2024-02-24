@@ -7,7 +7,7 @@ import { S } from "../Singletons";
 
 export class PplxAiAnswerType extends TypeBase {
     constructor() {
-        super(J.NodeType.PPLXAI_ANSWER, "AI Answer", "fa-android", false);
+        super(J.NodeType.PPLXAI_ANSWER, "AI Answer (Perplex AI)", "fa-android", false);
     }
 
     // For now i'm not sure how we should indicate visibly that a
