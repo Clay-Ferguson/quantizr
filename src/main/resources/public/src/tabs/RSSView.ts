@@ -183,6 +183,12 @@ export class RSSView extends AppTab<any, RSSView> {
         });
     }
 
+    // Repair URLs. This is a hackernoon bug, not a Quanta bug we're working around.
+    urlFix = (url: string): string => {
+        if (!url) return url;
+        return url.replace("https://hackernoon.com/https://cdn.hackernoon.com", "https://cdn.hackernoon.com");
+    }
+
     renderFeed(feed: J.RssFeed, feedSrc: string): Comp {
         const ast = getAs();
         const feedList = new Div("", { className: "rssFeedListing" });
@@ -198,7 +204,7 @@ export class RSSView extends AppTab<any, RSSView> {
         if (feed.image) {
             feedOut.push(new Img({
                 className: "rssFeedImage",
-                src: feed.image
+                src: this.urlFix(feed.image)
                 // align: "left" // causes text to flow around
             }));
         }
@@ -370,7 +376,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     imageShown = true;
                     children.push(new Img({
                         className: "rssFeedImage",
-                        src: enc.url
+                        src: this.urlFix(enc.url)
                     }));
                 }
             });
@@ -380,14 +386,14 @@ export class RSSView extends AppTab<any, RSSView> {
             imageShown = true;
             children.push(new Img({
                 className: "rssFeedImage",
-                src: entry.image
+                src: this.urlFix(entry.image)
             }));
         }
         else if (entry.thumbnail) {
             imageShown = true;
             children.push(new Img({
                 className: "rssFeedImage",
-                src: entry.thumbnail
+                src: this.urlFix(entry.thumbnail)
             }));
         }
 
@@ -401,7 +407,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     imageAdded = true;
                     children.push(new Img({
                         className: "rssFeedImage",
-                        src: mc.url
+                        src: this.urlFix(mc.url)
                     }));
                 }
             });
