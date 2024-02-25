@@ -206,22 +206,33 @@ public class RSSFeedService extends ServiceBase {
             HashSet<String> urlSet = new HashSet<>();
             Iterable<SubNode> nodes = read.findSubNodesByType(as, rootNode, NodeType.RSS_FEED.s(), true, null, null);
             for (SubNode node : nodes) {
-                if (!acl.isAdminOwned(node)) {
-                    continue;
-                }
-
-                // get RSS_FEED_SRC property
-                String urls = node.getStr(NodeProp.RSS_FEED_SRC);
-
-                // split url by newline
-                List<String> urlList = XString.tokenize(urls, "\n", true);
-
-                // iterate through each url and cache it
-                for (String url : urlList) {
-                    if (url.startsWith("#") || StringUtils.isEmpty(url.trim())) {
+                // this try block is so that if one feed fails it doesn't stop the whole process
+                try {
+                    if (!acl.isAdminOwned(node)) {
                         continue;
                     }
-                    urlSet.add(url);
+
+                    // get RSS_FEED_SRC property
+                    String urls = node.getStr(NodeProp.RSS_FEED_SRC);
+                    if (urls == null) {
+                        continue;
+                    }
+
+                    // split url by newline
+                    List<String> urlList = XString.tokenize(urls, "\n", true);
+                    if (urlList == null || urlList.size() == 0) {
+                        continue;
+                    }
+
+                    // iterate through each url and cache it
+                    for (String url : urlList) {
+                        if (url.startsWith("#") || StringUtils.isEmpty(url.trim())) {
+                            continue;
+                        }
+                        urlSet.add(url);
+                    }
+                } catch (Exception e) {
+                    ExUtil.error(log, "Error: ", e);
                 }
             }
 
