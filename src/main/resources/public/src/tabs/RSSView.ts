@@ -459,8 +459,18 @@ export class RSSView extends AppTab<any, RSSView> {
             className: "fa fa-bookmark fa-lg rssBookmarkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
-                let content = "#### " + feed.title + ": " + entry.title + "\n\n" + entry.link;
-                if (audioUrl) content += "\n\n" + audioUrl;
+                let content = "";
+                if (feed.title) content += "#### " + feed.title
+                if (entry.title) content += ": " + entry.title;
+                if (entry.link) {
+                    if (content) content += "\n\n";
+                    content += entry.link;
+                }
+                if (audioUrl) {
+                    if (content) content += "\n\n";
+                    content += audioUrl;
+                }
+
                 S.edit.addLinkBookmark(content, audioUrl);
             }
         }) : null;

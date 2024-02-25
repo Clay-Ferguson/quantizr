@@ -258,8 +258,11 @@ public class MongoCreate extends ServiceBase {
         }
 
         // Node still null, then try other ways of getting it
-        if (parentNode == null && !linkBookmark) {
-            if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
+        if (parentNode == null) {
+            if (linkBookmark) {
+                parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Bookmarks",
+                        NodeType.BOOKMARK_LIST.s(), null, false);
+            } else if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
                 parentNode = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null,
                         false);
             } else {
