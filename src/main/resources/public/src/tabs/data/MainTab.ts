@@ -69,6 +69,7 @@ export class MainTab implements TabIntf<any> {
         return new Div(null, { className: "tabSubOptions" }, [
             !ast.isAnonUser ? new AppNavLink("My Account", S.nav.navToMyAccntRoot, "ui-my-account") : null,
             !ast.isAnonUser ? new AppNavLink("My Posts", () => S.nav.openContentNode("~" + J.NodeType.POSTS, false)) : null,
+            !ast.isAnonUser ? new AppNavLink("My Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, false)) : null,
             ...S.render.buildCustomLinks(S.quanta.cfg.rhsLinks)
         ]);
     };
