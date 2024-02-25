@@ -1209,7 +1209,7 @@ export const enum AIServiceName {
     PPLX = "pplxAi",
     PPLX_ONLINE = "pplxAi_online",
     PPLX_CODE_LLAMA = "pplxAi_codeLlama",
-    PPLX_LLAMA2 = "pplxAi_llama2",
+    PPLX_MIXTRAL = "pplxAi_mixtral",
     HUGGING_FACE = "huggingFace",
     OOBA = "oobAi",
     GEMINI = "geminiAi",

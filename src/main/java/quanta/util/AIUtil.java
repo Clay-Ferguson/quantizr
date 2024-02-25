@@ -154,8 +154,8 @@ public class AIUtil extends ServiceBase {
                 case PPLX_CODE_LLAMA:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
                     break;
-                case PPLX_LLAMA2:
-                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
+                case PPLX_MIXTRAL:
+                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_MIXTRAL);
                     break;
                 case GEMINI:
                     geminiAnswer = geminiai.getAnswer(ms, null, sb.toString(), system);

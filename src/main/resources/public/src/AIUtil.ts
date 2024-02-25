@@ -57,9 +57,9 @@ export class AIUtil {
                     longDescription: "Code Llama: This is the well-known open source Code Llama, which is great for coding and programming tasks."
                 },
                 {
-                    name: J.AIServiceName.PPLX_LLAMA2,
-                    description: "Llama 2",
-                    longDescription: "Llama 2: This is the well-known open source Llama 2, which is great for general-purpose tasks."
+                    name: J.AIServiceName.PPLX_MIXTRAL,
+                    description: "Mixtral",
+                    longDescription: "Mixtral: a high-quality sparse mixture of experts model (SMoE) for generating high-quality code."
                 });
         }
     }

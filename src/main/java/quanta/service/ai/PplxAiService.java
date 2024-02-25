@@ -28,12 +28,10 @@ import reactor.core.publisher.Mono;
 public class PplxAiService extends ServiceBase {
     String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
 
-    // todo-0: Once Perplexity fixes their "Gibberish" bug, we can switch back to pplx-70b-online for
-    // the online model.
-    public final String PPLX_MODEL_COMPLETION_ONLINE = "pplx-8x7b-online"; // "pplx-70b-online";
+    public final String PPLX_MODEL_COMPLETION_ONLINE = "sonar-medium-online"; // 8x7B
     public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
-    public final String PPLX_MODEL_COMPLETION_LLAMA2 = "llama-2-70b-chat";
-    public final String PPLX_MODEL_COMPLETION_CHAT = "pplx-70b-chat"; // "mistral-7b-instruct";
+    public final String PPLX_MODEL_COMPLETION_MIXTRAL = "mixtral-8x7b-instruct";
+    public final String PPLX_MODEL_COMPLETION_CHAT = "sonar-medium-chat"; // 8x7B
     String COST_CODE = "PPX"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -76,7 +74,11 @@ public class PplxAiService extends ServiceBase {
             input = question;
         }
 
-        messages.add(0, new ChatMessage("system", system.getPrompt()));
+        // Perplexity docs say not to use system prompts for the online model
+        if (PPLX_MODEL_COMPLETION_ONLINE.equals(model)) {
+            messages.add(0, new ChatMessage("system", system.getPrompt()));
+        }
+
         messages.add(new ChatMessage("user", input));
         system.setModel(model);
 
@@ -122,9 +124,17 @@ public class PplxAiService extends ServiceBase {
         // We detect using startsWith, because the actual model used will be slightly different than the one
         // specified
         switch (model) {
+            // 8x7B
             case PPLX_MODEL_COMPLETION_CHAT:
+            case PPLX_MODEL_COMPLETION_MIXTRAL:
+                // prices per magatoken
+                inputPpm = 0.6;
+                outputPpm = 1.8;
+                return (usage.getPromptTokens() * inputPpm / 1000000) + //
+                        (usage.getCompletionTokens() * outputPpm / 1000000);
+
+            // 70B
             case PPLX_MODEL_COMPLETION_CODELLAMA:
-            case PPLX_MODEL_COMPLETION_LLAMA2:
                 // prices per magatoken
                 inputPpm = 0.7;
                 outputPpm = 2.8;
@@ -132,7 +142,7 @@ public class PplxAiService extends ServiceBase {
                         (usage.getCompletionTokens() * outputPpm / 1000000);
 
             case PPLX_MODEL_COMPLETION_ONLINE:
-                outputPpm = 2.8;
+                outputPpm = 1.8;
                 inputPricePerReq = 0.005;
                 return inputPricePerReq + (usage.getCompletionTokens() * outputPpm / 1000000);
 

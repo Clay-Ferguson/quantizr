@@ -327,8 +327,8 @@ public class MongoCreate extends ServiceBase {
                         res.setGptCredit(pplxAiAns.userCredit);
                         typeToCreate = NodeType.PPLXAI_ANSWER.s();
                         break;
-                    case PPLX_LLAMA2:
-                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA2);
+                    case PPLX_MIXTRAL:
+                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_MIXTRAL);
                         res.setGptCredit(pplxAiAns.userCredit);
                         typeToCreate = NodeType.PPLXAI_ANSWER.s();
                         break;
