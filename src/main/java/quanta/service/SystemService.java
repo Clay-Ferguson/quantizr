@@ -179,6 +179,8 @@ public class SystemService extends ServiceBase {
             sb.append(arg + "\n");
         }
 
+        sb.append("\nRSS Feed Status: " + rssFeed.getFeedStatus() + "\n");
+
         sb.append("\nEnvironment Vars:\n");
         sb.append(getEnvironment());
 

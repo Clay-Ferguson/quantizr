@@ -23,6 +23,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import com.rometools.modules.content.ContentModuleImpl;
 import com.rometools.modules.itunes.EntryInformationImpl;
 import com.rometools.modules.mediarss.MediaEntryModuleImpl;
@@ -66,6 +68,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import reactor.core.publisher.Mono;
 
 /* Proof of Concept RSS Publishing */
 @Component
@@ -78,7 +81,7 @@ public class RSSFeedService extends ServiceBase {
     private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> feedNameOfItem = new ConcurrentHashMap<>();
     // keep track of which feeds failed so we don't try them again until another 30-min cycle
-    private static final HashSet<String> failedFeeds = new HashSet<>();
+    private static final HashSet<String> failedFeeds = new HashSet<>(); // &&&
     // Cache of all aggregates
     private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
     private static int MAX_CACHE_SIZE = 500;
@@ -111,6 +114,18 @@ public class RSSFeedService extends ServiceBase {
             aggregateCache.clear();
             proxyCache.clear();
         }
+    }
+
+    public String getFeedStatus() {
+        String ret = "";
+        if (failedFeeds.size() == 0) {
+            return "No failed feeds.";
+        }
+        ret += "Failed Feeds: \n";
+        for (String url : failedFeeds) {
+            ret += "    " + url + "\n";
+        }
+        return ret;
     }
 
     public String refreshFeedCache() {
@@ -284,8 +299,36 @@ public class RSSFeedService extends ServiceBase {
 
             long start = System.currentTimeMillis();
             WebClient webClient = Util.webClientBuilder().build();
-            String response = webClient.get().uri(url).retrieve() //
-                    .bodyToMono(String.class).timeout(Duration.ofSeconds(60)).block();
+            String response = null;
+            try {
+                response = webClient.get().uri(url)//
+                        .retrieve() //
+                        .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                            // This will trigger for any response with 4xx or 5xx status codes
+                            return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                                log.debug("Error response from server: " + errorBody);
+                                return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                            });
+                        })//
+                        .bodyToMono(String.class)//
+                        .timeout(Duration.ofSeconds(60))//
+                        .block();
+            } catch (WebClientResponseException e) {
+                // This exception is thrown for HTTP status code errors
+                throw new RuntimeException("Error while calling the RSS feed service: " + e.getMessage()
+                        + " Status Code: " + e.getStatusCode(), e);
+            } catch (WebClientRequestException e) {
+                // This exception is thrown for errors while making the request (e.g., connectivity issues)
+                throw new RuntimeException("Request error while calling the RSS feed service: " + e.getMessage(), e);
+            } catch (Exception e) {
+                // This is a generic exception handler for other exceptions
+                throw new RuntimeException("General error while calling the RSS feed service: " + e.getMessage(), e);
+            }
+
+            if (response == null) {
+                throw new RuntimeException("Could not read feed: " + url);
+            }
+
             InputStream inputStream = new LimitedInputStreamEx(
                     new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), 100 * Const.ONE_MB);
             try {
@@ -327,7 +370,7 @@ public class RSSFeedService extends ServiceBase {
              * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
              */
             // under the admin menu for checking server status info.
-            log.debug("Error reading feed: " + url + " msg: " + e.getMessage());
+            log.debug("Error reading feed: " + url + " msg: " + e.getMessage()); // &&&
             failedFeeds.add(url);
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
             return feedCache.get(url);
@@ -445,7 +488,7 @@ public class RSSFeedService extends ServiceBase {
                 }
             }
         }
-        log.debug("Returning RSS Display: " + XString.prettyPrint(rf));
+        // log.debug("Returning RSS Display: " + XString.prettyPrint(rf));
         return rf;
     }
 
