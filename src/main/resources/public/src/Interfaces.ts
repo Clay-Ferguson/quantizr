@@ -1,4 +1,5 @@
 import * as J from "./JavaIntf";
+import { State } from "./State";
 
 /* These are Client-side only models, and are not seen on the server side ever */
 
@@ -45,6 +46,7 @@ export interface ValueIntf {
     getValue(): any;
     setValue(val: any): void;
     getValidationError?(): string;
+    getState?(): State;
 }
 
 /* Function Prototype/Signatore, It is assumed that a return value of false, will abort the iteration, and true continues iterating */

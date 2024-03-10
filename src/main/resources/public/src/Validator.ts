@@ -1,14 +1,19 @@
 import { State } from "./State";
 import { S } from "./Singletons";
+import { ValueIntf } from "./Interfaces";
 
 /* todo-2: Finish making this type safe, and don't use 'any' inside here */
-export class Validator {
+export class Validator implements ValueIntf {
     v: State = new State();
     e: State = new State();
 
     constructor(val: any = null, public rules: ValidatorRule[] = null) {
         this.setValue(val);
         rules?.forEach(rule => this.ensureDefaultMessage(rule));
+    }
+
+    getState = (): State => {
+        return this.v;
     }
 
     /* Returns true if value is valid */

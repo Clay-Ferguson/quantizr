@@ -24,7 +24,6 @@ export class ConfigureAIDlg extends DialogBase {
 
     constructor(public node: NodeInfo) {
         super("Configure AI", "appModalContMediumWidth");
-        this.mergeState({}); // part of hack mentioned below (Selection state change not triggering rerender)
     }
 
     renderDlg(): Comp[] {
@@ -82,10 +81,6 @@ export class ConfigureAIDlg extends DialogBase {
         ConfigureAIDlg.templateState.setValue("");
         ConfigureAIDlg.aiServiceState.setValue("[null]");
         ConfigureAIDlg.overwriteState.setValue(false);
-
-        // todo-0: we seem to have a bug where setting state on a "Selection" (like aiServiceState) above does not trigger a rerender
-        // so by having this here we force a rerender of entire dialog as a workaround.
-        this.mergeState({});
     }
 
     override async preLoad(): Promise<void> {
