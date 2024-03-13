@@ -126,6 +126,26 @@ export interface UserProfile {
     balance: number;
 }
 
+export interface AnthChatContent {
+    type: string;
+    text: string;
+}
+
+export interface AnthChatResponse {
+    id: string;
+    type: string;
+    role: string;
+    model: string;
+    content: AnthChatContent[];
+    usage: AnthUsage;
+    userCredit: number;
+}
+
+export interface AnthUsage {
+    input_tokens: number;
+    output_tokens: number;
+}
+
 export interface GeminiChatCandidate {
     content: GeminiChatContent;
     finishReason: string;
@@ -1207,6 +1227,8 @@ export interface PrivilegeInfo {
 export const enum AIServiceName {
     OPENAI = "openAi",
     PPLX = "pplxAi",
+    ANTH = "anthAi",
+    ANTH_SONNET = "anthAi_sonnet",
     PPLX_ONLINE = "pplxAi_online",
     PPLX_CODE_LLAMA = "pplxAi_codeLlama",
     PPLX_MIXTRAL = "pplxAi_mixtral",
@@ -1311,6 +1333,7 @@ export const enum NodeProp {
     OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
     OPENAI_RESPONSE = "sn:oaiRes",
+    ANTHAI_RESPONSE = "sn:anthaiRes",
     PPLXAI_RESPONSE = "sn:pplxaiRes",
     GEMINIAI_RESPONSE = "sn:geminiaiRes",
     HUGGINGFACE_RESPONSE = "sn:hfaceRes",
@@ -1335,6 +1358,7 @@ export const enum NodeType {
     AI_QUERY = "sn:aiQuery",
     OPENAI_ANSWER = "sn:oaiAns",
     PPLXAI_ANSWER = "sn:pplxaiAns",
+    ANTHAI_ANSWER = "sn:anthaiAns",
     GEMINIAI_ANSWER = "sn:geminiaiAns",
     HUGGINGFACE_ANSWER = "sn:hfAns",
     OOBAI_ANSWER = "sn:oobAns",

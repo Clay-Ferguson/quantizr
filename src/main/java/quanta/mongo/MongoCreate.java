@@ -23,6 +23,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.anthropic.AnthChatResponse;
 import quanta.model.client.geminiai.GeminiChatResponse;
 import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
@@ -293,6 +294,7 @@ public class MongoCreate extends ServiceBase {
         String typeToCreate = req.getTypeName();
         ChatCompletionResponse openAiAns = null;
         ChatCompletionResponse pplxAiAns = null;
+        AnthChatResponse anthAiAns = null;
         ChatCompletionResponse oobAiAns = null;
         HuggingFaceResponse huggingFaceAns = null;
         // OobaAiResponse oobaAiAnswer = null;
@@ -318,6 +320,18 @@ public class MongoCreate extends ServiceBase {
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                         res.setGptCredit(pplxAiAns.userCredit);
                         typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        break;
+                    case ANTH:
+                        anthAiAns =
+                                anthai.getAnswer(ms, parentNode, null, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
+                        res.setGptCredit(anthAiAns.userCredit);
+                        typeToCreate = NodeType.ANTHAI_ANSWER.s();
+                        break;
+                    case ANTH_SONNET:
+                        anthAiAns =
+                                anthai.getAnswer(ms, parentNode, null, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
+                        res.setGptCredit(anthAiAns.userCredit);
+                        typeToCreate = NodeType.ANTHAI_ANSWER.s();
                         break;
                     case PPLX_ONLINE:
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
@@ -372,12 +386,12 @@ public class MongoCreate extends ServiceBase {
             if (req.isPendingEdit()) {
                 mongoUtil.setPendingPath(newNode, true);
             }
-            setAnswerOnNode(req, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, newNode);
+            setAnswerOnNode(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, newNode);
             newNode.touch();
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
         else {
-            setAnswerOnNode(req, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, parentNode);
+            setAnswerOnNode(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, parentNode);
             parentNode.touch();
             update.save(ms, parentNode);
             NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, parentNode, false,
@@ -443,13 +457,23 @@ public class MongoCreate extends ServiceBase {
         return res;
     }
 
-    private void setAnswerOnNode(CreateSubNodeRequest req, ChatCompletionResponse openAiAns,
-            ChatCompletionResponse pplxAiAns, ChatCompletionResponse oobAiAns, HuggingFaceResponse huggingFaceAns,
-            GeminiChatResponse geminiAiAns, SubNode node) {
+    private void setAnswerOnNode(CreateSubNodeRequest req, //
+            ChatCompletionResponse openAiAns, //
+            AnthChatResponse anthAiAns, //
+            ChatCompletionResponse pplxAiAns, //
+            ChatCompletionResponse oobAiAns, //
+            HuggingFaceResponse huggingFaceAns, //
+            GeminiChatResponse geminiAiAns, //
+            SubNode node) {
         // OpenAI
         if (openAiAns != null) {
             node.setContent(aiUtil.formatAnswer(openAiAns, true));
             node.set(NodeProp.OPENAI_RESPONSE, openAiAns);
+        }
+        // Anthropic
+        else if (anthAiAns != null) {
+            node.setContent(aiUtil.formatAnswer(anthAiAns, true));
+            node.set(NodeProp.ANTHAI_RESPONSE, anthAiAns);
         }
         // Perplexity AI
         else if (pplxAiAns != null) {

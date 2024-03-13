@@ -13,44 +13,42 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
-import quanta.model.client.openai.ChatCompletionResponse;
+import quanta.model.client.anthropic.AnthChatResponse;
+import quanta.model.client.anthropic.AnthUsage;
 import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.SystemConfig;
-import quanta.model.client.openai.Usage;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
 import quanta.util.XString;
 import reactor.core.publisher.Mono;
 
-/* Perplexity */
+/* Anthropic */
 @Component
-public class PplxAiService extends ServiceBase {
-    String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
+public class AnthAiService extends ServiceBase {
+    String ANTH_COMP_URL = "https://api.anthropic.com/v1/messages";
+    String API_VERSION = "2023-06-01";
 
-    public final String PPLX_MODEL_COMPLETION_ONLINE = "sonar-medium-online"; // 8x7B
-    public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
-    public final String PPLX_MODEL_COMPLETION_MIXTRAL = "mixtral-8x7b-instruct";
-    public final String PPLX_MODEL_COMPLETION_CHAT = "sonar-medium-chat"; // 8x7B
-    String COST_CODE = "PPX"; // 3 chars allowed
+    public final String ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229";
+    public final String ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-sonnet-20240229";
+    String COST_CODE = "ANT"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
-    private static Logger log = LoggerFactory.getLogger(PplxAiService.class);
+    private static Logger log = LoggerFactory.getLogger(AnthAiService.class);
 
     /**
-     * Queries PerplexityAI using the 'node.content' as the question to ask.
+     * Queries Anthropic AI using the 'node.content' as the question to ask.
      * 
      * You can pass a node, or else 'text' to query about.
      */
-    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system,
+    public AnthChatResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system,
             String model) {
 
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
-
         BigDecimal balance = aiUtil.getBalance(ms, userNode);
 
         // this will hold all the prior chat history
@@ -75,35 +73,51 @@ public class PplxAiService extends ServiceBase {
             input = question;
         }
 
-        // Perplexity docs say not to use system prompts for the online model
-        if (PPLX_MODEL_COMPLETION_ONLINE.equals(model)) {
-            messages.add(0, new ChatMessage("system", system.getPrompt()));
-        }
+        // I haven't researched whether Anthropic even supports system prompts, but I do know when I tried
+        // this it fails as a bad request (todo-0: look into this)
+        // messages.add(0, new ChatMessage("system", system.getPrompt()));
 
         messages.add(new ChatMessage("user", input));
         system.setModel(model);
 
-        WebClient webClient = Util.webClientBuilder().baseUrl(PPLX_COMP_URL)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader("Authorization", "Bearer " + prop.getPplxAiKey()).build();
+        WebClient webClient = Util.webClientBuilder().baseUrl(ANTH_COMP_URL) //
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) //
+                .defaultHeader("x-api-key", prop.getAnthAiKey()) //
+                .defaultHeader("anthropic-version", API_VERSION) //
+                .build();
 
+        /*
+         * todo-0: do I want maxtokens set at all here? Maybe make it based on how much credit the user has
+         * left? This will be something to think about across all the AI services.
+         */
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), 2000);
 
-        log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
+        request.setUser(null);
+
+        /*
+         * todo-0: use this to be sure we can do good error handling and get the output error text, because
+         * anthropic will fail without max tokens set. Use the recent additions to the RSS feed reader to
+         * see how to do full error handling and I probably need to encapsulate a good WebClient call with
+         * error handling into a reusable method.
+         */
+        // request.setMaxTokens(null);
+
+        request.setTemperature(null);
+
+        log.debug("ANTH Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
         // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
-        // here
-        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-        // fails, but it does fail.
-        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(ChatCompletionResponse.class);
+        // here instead of the stringified version of it. I haven't tried to figure out why the
+        // non-stringified fails, but it does fail.
+        Mono<AnthChatResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+                .retrieve().bodyToMono(AnthChatResponse.class);
 
-        ChatCompletionResponse res = mono.block();
+        AnthChatResponse res = mono.block();
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
-        log.debug("PPLX Res: " + XString.prettyPrint(res));
+        log.debug("ANTH Res: " + XString.prettyPrint(res));
         return res;
 
         // ================================
@@ -112,40 +126,32 @@ public class PplxAiService extends ServiceBase {
         // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
         // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
         // log.debug("RESPONSE: " + response);
+        // return null;
     }
 
-    // https://docs.perplexity.ai/docs/pricing
-    private double calculateCost(ChatCompletionResponse res) {
-        Usage usage = res.getUsage();
+    // https://www.anthropic.com/api
+    private double calculateCost(AnthChatResponse res) {
+        AnthUsage usage = res.getUsage();
         String model = res.getModel().toLowerCase();
         double outputPpm;
         double inputPpm;
-        double inputPricePerReq;
 
-        // We detect using startsWith, because the actual model used will be slightly different than the one
-        // specified
+        // We detect using startsWith, because the actual model used will be slightly different than the
+        // one specified
         switch (model) {
-            // 8x7B
-            case PPLX_MODEL_COMPLETION_CHAT:
-            case PPLX_MODEL_COMPLETION_MIXTRAL:
+            case ANTH_OPUS_MODEL_COMPLETION_CHAT:
                 // prices per magatoken
-                inputPpm = 0.6;
-                outputPpm = 1.8;
-                return (usage.getPromptTokens() * inputPpm / 1000000) + //
-                        (usage.getCompletionTokens() * outputPpm / 1000000);
+                inputPpm = 15;
+                outputPpm = 75;
+                return (usage.getInputTokens() * inputPpm / 1000000) + //
+                        (usage.getOutputTokens() * outputPpm / 1000000);
 
-            // 70B
-            case PPLX_MODEL_COMPLETION_CODELLAMA:
+            case ANTH_SONNET_MODEL_COMPLETION_CHAT:
                 // prices per magatoken
-                inputPpm = 0.7;
-                outputPpm = 2.8;
-                return (usage.getPromptTokens() * inputPpm / 1000000) + //
-                        (usage.getCompletionTokens() * outputPpm / 1000000);
-
-            case PPLX_MODEL_COMPLETION_ONLINE:
-                outputPpm = 1.8;
-                inputPricePerReq = 0.005;
-                return inputPricePerReq + (usage.getCompletionTokens() * outputPpm / 1000000);
+                inputPpm = 3;
+                outputPpm = 15;
+                return (usage.getInputTokens() * inputPpm / 1000000) + //
+                        (usage.getOutputTokens() * outputPpm / 1000000);
 
             default:
                 throw new RuntimeException("Model not supported: " + res.getModel() + " is not supported.");

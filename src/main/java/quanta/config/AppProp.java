@@ -214,6 +214,10 @@ public class AppProp {
         return env.getProperty("PPLX_API_KEY");
     }
 
+    public String getAnthAiKey() {
+        return env.getProperty("ANTH_API_KEY");
+    }
+
     public String getGeminiAiKey() {
         return env.getProperty("GEMINI_API_KEY");
     }

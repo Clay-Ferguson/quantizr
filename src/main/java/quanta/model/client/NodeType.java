@@ -19,6 +19,7 @@ public enum NodeType {
     AI_QUERY("sn:aiQuery"), //
     OPENAI_ANSWER("sn:oaiAns"), //
     PPLXAI_ANSWER("sn:pplxaiAns"), //
+    ANTHAI_ANSWER("sn:anthaiAns"), //
     GEMINIAI_ANSWER("sn:geminiaiAns"), //
     HUGGINGFACE_ANSWER("sn:hfAns"), //
     OOBAI_ANSWER("sn:oobAns"), //

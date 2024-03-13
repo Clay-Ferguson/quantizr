@@ -12,6 +12,8 @@ import quanta.config.ServiceBase;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.anthropic.AnthChatContent;
+import quanta.model.client.anthropic.AnthChatResponse;
 import quanta.model.client.geminiai.GeminiChatCandidate;
 import quanta.model.client.geminiai.GeminiChatContent;
 import quanta.model.client.geminiai.GeminiChatPart;
@@ -48,7 +50,8 @@ public class AIUtil extends ServiceBase {
     public boolean isAnyAnswerType(String type) {
         return NodeType.OPENAI_ANSWER.s().equals(type) || //
                 NodeType.PPLXAI_ANSWER.s().equals(type) || //
-                NodeType.GEMINIAI_ANSWER.s().equals(type);
+                NodeType.GEMINIAI_ANSWER.s().equals(type) || //
+                NodeType.ANTHAI_ANSWER.s().equals(type);
     }
 
     public void getAIConfigFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
@@ -138,6 +141,7 @@ public class AIUtil extends ServiceBase {
         sb.append(req.getQuestion());
 
         ChatCompletionResponse answer = null;
+        AnthChatResponse anthAnswer = null;
         GeminiChatResponse geminiAnswer = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
         if (svc != null) {
@@ -147,6 +151,14 @@ public class AIUtil extends ServiceBase {
                     break;
                 case PPLX:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                    break;
+                case ANTH:
+                    anthAnswer =
+                            anthai.getAnswer(ms, null, sb.toString(), system, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
+                    break;
+                case ANTH_SONNET:
+                    anthAnswer =
+                            anthai.getAnswer(ms, null, sb.toString(), system, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
                     break;
                 case PPLX_ONLINE:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
@@ -168,7 +180,12 @@ public class AIUtil extends ServiceBase {
         if (answer != null) {
             res.setGptCredit(answer.userCredit);
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
-        } else if (geminiAnswer != null) {
+        } //
+        else if (anthAnswer != null) {
+            res.setGptCredit(anthAnswer.userCredit);
+            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(anthAnswer, false));
+        } //
+        else if (geminiAnswer != null) {
             res.setGptCredit(geminiAnswer.credit);
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(geminiAnswer, false));
         } else {
@@ -202,6 +219,25 @@ public class AIUtil extends ServiceBase {
             // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
             if (nullify) {
                 choice.getMessage().setContent(null);
+            }
+            counter++;
+        }
+        return sb.toString();
+    }
+
+    public String formatAnswer(AnthChatResponse acr, boolean nullify) {
+        StringBuilder sb = new StringBuilder();
+        int counter = 0;
+        for (AnthChatContent cont : acr.getContent()) {
+            if (counter > 0) {
+                sb.append("\n\n");
+            }
+            sb.append(/* choice.getMessage().getRole() + ": " + */ cont.getText());
+
+            // Since we store the answer text in the content of the node and also store the answer object
+            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
+            if (nullify) {
+                cont.setText(null);
             }
             counter++;
         }

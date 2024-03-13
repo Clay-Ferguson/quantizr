@@ -7,7 +7,7 @@ public class ChatGPTRequest {
     private String user;
     private String model;
     private List<ChatMessage> messages;
-    private double temperature;
+    private Double temperature;
 
     @JsonProperty("max_tokens")
     private Integer maxTokens;
@@ -47,11 +47,11 @@ public class ChatGPTRequest {
         this.messages = messages;
     }
 
-    public double getTemperature() {
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 

@@ -46,6 +46,7 @@ import quanta.service.ai.HuggingFaceService;
 import quanta.service.ai.OobaAiService;
 import quanta.service.ai.OpenAiService;
 import quanta.service.ai.PplxAiService;
+import quanta.service.ai.AnthAiService;
 import quanta.service.imports.ImportService;
 import quanta.service.node.NodeEditService;
 import quanta.service.node.NodeMoveService;
@@ -54,6 +55,7 @@ import quanta.service.node.NodeSearchService;
 import quanta.test.TestUtil;
 import quanta.types.OpenAIAnswerType;
 import quanta.types.PplxAIAnswerType;
+import quanta.types.AnthAIAnswerType;
 import quanta.types.BookmarkType;
 import quanta.types.CalendarType;
 import quanta.types.FriendType;
@@ -150,6 +152,7 @@ public class ServiceBase {
     public static OpenAIAnswerType aiAnswerType;
     public static GeminiAIAnswerType geminiAiAnswerType;
     public static PplxAIAnswerType pplxAiAnswerType;
+    public static AnthAIAnswerType anthaiAnswerType;
     public static FriendType friendType;
     public static RssFeedType rssType;
     public static MongoTemplateWrapper opsw;
@@ -159,6 +162,7 @@ public class ServiceBase {
     public static SchemaOrgService schema;
     public static OpenAiService oai;
     public static PplxAiService pplxai;
+    public static AnthAiService anthai;
     public static GeminiAiService geminiai;
     public static HuggingFaceService huggingFace;
     public static OobaAiService oobaAi;
@@ -237,6 +241,7 @@ public class ServiceBase {
             aiAnswerType = getBean(ctx, OpenAIAnswerType.class);
             geminiAiAnswerType = getBean(ctx, GeminiAIAnswerType.class);
             pplxAiAnswerType = getBean(ctx, PplxAIAnswerType.class);
+            anthaiAnswerType = getBean(ctx, AnthAIAnswerType.class);
             friendType = getBean(ctx, FriendType.class);
             rssType = getBean(ctx, RssFeedType.class);
             mongoRepo = getBean(ctx, MongoRepository.class);
@@ -248,6 +253,7 @@ public class ServiceBase {
             schema = getBean(ctx, SchemaOrgService.class);
             oai = getBean(ctx, OpenAiService.class);
             pplxai = getBean(ctx, PplxAiService.class);
+            anthai = getBean(ctx, AnthAiService.class);
             geminiai = getBean(ctx, GeminiAiService.class);
             huggingFace = getBean(ctx, HuggingFaceService.class);
             oobaAi = getBean(ctx, OobaAiService.class);

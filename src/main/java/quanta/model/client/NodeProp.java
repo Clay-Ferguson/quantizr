@@ -138,6 +138,7 @@ public enum NodeProp {
     OPEN_GRAPH("sn:og"), //
     TRUNCATED("trunc"), //
     OPENAI_RESPONSE("sn:oaiRes"), //
+    ANTHAI_RESPONSE("sn:anthaiRes"), //
     PPLXAI_RESPONSE("sn:pplxaiRes"), //
     GEMINIAI_RESPONSE("sn:geminiaiRes"), //
     HUGGINGFACE_RESPONSE("sn:hfaceRes"), //

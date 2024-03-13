@@ -42,6 +42,16 @@ export class AIUtil {
         if (S.quanta.config.usePplxAi) {
             this.aiServices.push(//
                 {
+                    name: J.AIServiceName.ANTH,
+                    description: "Claude/Opus (Chat)",
+                    longDescription: "Anthropic AI: This is Anthropic's best-in-class most powerful, and most expensive, general-purpose AI."
+                },
+                {
+                    name: J.AIServiceName.ANTH_SONNET,
+                    description: "Claude/Sonnet (Chat)",
+                    longDescription: "Anthropic AI: This is Anthropic's less powerful, less expensive, general-purpose AI."
+                },
+                {
                     name: J.AIServiceName.PPLX,
                     description: "Perplexity (Chat)",
                     longDescription: "Perplexity AI: This is Perplexity's best high-end powerful general-purpose AI."
