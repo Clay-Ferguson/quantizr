@@ -213,6 +213,7 @@ public class OpenAiService extends ServiceBase {
             input = question;
         }
 
+        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
         List<Map> sysContent = new ArrayList<>();
         HashMap<String, Object> map = new HashMap<>();
         map.put("type", "text");
@@ -264,7 +265,7 @@ public class OpenAiService extends ServiceBase {
         // should be able to tweak this. Before switching to gpt-4 vision we were getting sensible
         // response lengths without having to provide a maxTokens value
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), 2000);
+                ms.getUserNodeId().toHexString(), maxTokens);
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " REQ: " + XString.prettyPrint(request));
 

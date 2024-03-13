@@ -45,6 +45,10 @@ public class AIUtil extends ServiceBase {
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             system.setTemplate(node.getStr(NodeProp.AI_QUERY_TEMPLATE.s()));
         }
+
+        if (system.getMaxWords() == null && node.hasProp(NodeProp.AI_MAX_WORDS.s())) {
+            system.setMaxWords(Integer.valueOf(node.getStr(NodeProp.AI_MAX_WORDS.s())));
+        }
     }
 
     public boolean isAnyAnswerType(String type) {

@@ -128,10 +128,11 @@ public enum NodeProp {
     DATE_FULL("p.date"), //
 
     UNPUBLISHED("unpub"), //
-    AI("ai"), //
+    AI("ai"), // todo-0: rename this to AI_PROMPT
     AI_SERVICE("aiService"), //
     AI_QUERY_TEMPLATE("aiTemplate"), //
     AI_OVERWRITE("aiOverwrite"), //
+    AI_MAX_WORDS("aiMaxWords"), //
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
 

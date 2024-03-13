@@ -56,6 +56,8 @@ public class GeminiAiService extends ServiceBase {
             input = question;
         }
 
+        // todo-0: does Gemini support max_tokens?
+        // Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
         contents.add(new GeminiChatContent("user", input));
 
         if (StringUtils.isEmpty(prop.getGeminiAiKey())) {

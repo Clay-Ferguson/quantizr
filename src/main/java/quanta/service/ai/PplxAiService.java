@@ -74,6 +74,7 @@ public class PplxAiService extends ServiceBase {
         } else {
             input = question;
         }
+        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
 
         // Perplexity docs say not to use system prompts for the online model
         if (PPLX_MODEL_COMPLETION_ONLINE.equals(model)) {
@@ -88,7 +89,7 @@ public class PplxAiService extends ServiceBase {
                 .defaultHeader("Authorization", "Bearer " + prop.getPplxAiKey()).build();
 
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), 2000);
+                ms.getUserNodeId().toHexString(), maxTokens);
 
         log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));

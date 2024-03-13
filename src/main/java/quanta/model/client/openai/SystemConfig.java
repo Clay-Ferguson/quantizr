@@ -5,6 +5,7 @@ public class SystemConfig {
     private String template;
     private String model; // ex: "gpt-4"
     private String service;
+    private Integer maxWords;
 
     // todo-2: add a way for users to alter this.
     private Double temperature = 0.7;
@@ -47,5 +48,13 @@ public class SystemConfig {
 
     public void setTemplate(String template) {
         this.template = template;
+    }
+
+    public Integer getMaxWords() {
+        return maxWords;
+    }
+
+    public void setMaxWords(Integer maxWords) {
+        this.maxWords = maxWords;
     }
 }

@@ -181,6 +181,7 @@ export class Props {
         return !!this.getPropStr(J.NodeProp.AI, node) || //
             !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
             !!this.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node) || //
+            !!this.getPropStr(J.NodeProp.AI_MAX_WORDS, node) || //
             !!this.getPropStr(J.NodeProp.AI_OVERWRITE, node);
     }
 
@@ -255,7 +256,8 @@ export class Props {
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI, //
             J.NodeProp.AI_SERVICE, //
-            J.NodeProp.AI_QUERY_TEMPLATE //
+            J.NodeProp.AI_QUERY_TEMPLATE, //
+            J.NodeProp.AI_MAX_WORDS //
         ]);
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
@@ -264,7 +266,8 @@ export class Props {
             J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI, //
             J.NodeProp.AI_SERVICE, //
-            J.NodeProp.AI_QUERY_TEMPLATE //
+            J.NodeProp.AI_QUERY_TEMPLATE, //
+            J.NodeProp.AI_MAX_WORDS //
         ]);
     }
 

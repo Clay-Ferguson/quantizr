@@ -11,10 +11,12 @@ import { Div } from "../comp/core/Div";
 import { FlexLayout } from "../comp/core/FlexLayout";
 import { Selection } from "../comp/core/Selection";
 import { TextArea } from "../comp/core/TextArea";
+import { TextField } from "../comp/core/TextField";
 
 export class ConfigureAIDlg extends DialogBase {
     static promptState: Validator = new Validator();
     static templateState: Validator = new Validator();
+    static maxWordsState: Validator = new Validator();
     static aiServiceState: Validator = new Validator("[null]");
     static overwriteState: Validator = new Validator(false);
 
@@ -44,6 +46,11 @@ export class ConfigureAIDlg extends DialogBase {
                     rows: 7,
                     placeholder: "${content}"
                 }, ConfigureAIDlg.templateState, null, false, 3, this.queryTemplateScrollPos),
+                new TextField({
+                    label: "Max Response Words",
+                    val: ConfigureAIDlg.maxWordsState,
+                    inputClass: "maxResponseWords",
+                }),
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
                     new Button("Reset", this.reset, null, "btn-secondary"),
@@ -56,6 +63,7 @@ export class ConfigureAIDlg extends DialogBase {
     reload = async () => {
         ConfigureAIDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI, this.node));
         ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
+        ConfigureAIDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
         ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
         ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
     }
@@ -70,6 +78,7 @@ export class ConfigureAIDlg extends DialogBase {
         // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
         S.props.setPropVal(J.NodeProp.AI, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, ConfigureAIDlg.maxWordsState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_OVERWRITE, this.node, !!ConfigureAIDlg.overwriteState.getValue() || "[null]");
         await S.edit.saveNode(this.node, true);
@@ -79,6 +88,7 @@ export class ConfigureAIDlg extends DialogBase {
     reset = async () => {
         ConfigureAIDlg.promptState.setValue("");
         ConfigureAIDlg.templateState.setValue("");
+        ConfigureAIDlg.maxWordsState.setValue("");
         ConfigureAIDlg.aiServiceState.setValue("[null]");
         ConfigureAIDlg.overwriteState.setValue(false);
     }

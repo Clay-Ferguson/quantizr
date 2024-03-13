@@ -274,6 +274,7 @@ export interface SystemConfig {
     template: string;
     model: string;
     service: string;
+    maxWords: number;
     temperature: number;
 }
 
@@ -1328,6 +1329,7 @@ export const enum NodeProp {
     AI_SERVICE = "aiService",
     AI_QUERY_TEMPLATE = "aiTemplate",
     AI_OVERWRITE = "aiOverwrite",
+    AI_MAX_WORDS = "aiMaxWords",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
     OPEN_GRAPH = "sn:og",

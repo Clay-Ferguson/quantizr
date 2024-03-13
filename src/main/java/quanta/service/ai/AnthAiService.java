@@ -69,10 +69,7 @@ public class AnthAiService extends ServiceBase {
             input = question;
         }
 
-        // I haven't researched whether Anthropic even supports system prompts, but I do know when I tried
-        // this it fails as a bad request (todo-0: look into this)
-        // messages.add(0, new ChatMessage("system", system.getPrompt()));
-
+        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
         messages.add(new ChatMessage("user", input));
         system.setModel(model);
 
@@ -87,7 +84,7 @@ public class AnthAiService extends ServiceBase {
          * left? This will be something to think about across all the AI services.
          */
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), 2000);
+                ms.getUserNodeId().toHexString(), maxTokens);
 
         request.setUser(null);
 
