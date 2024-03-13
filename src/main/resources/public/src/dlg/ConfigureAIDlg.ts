@@ -6,12 +6,11 @@ import { Validator } from "../Validator";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Div } from "../comp/core/Div";
-import { Span } from "../comp/core/Span";
-import { TextArea } from "../comp/core/TextArea";
-import { Selection } from "../comp/core/Selection";
-import { FlexLayout } from "../comp/core/FlexLayout";
 import { Checkbox } from "../comp/core/Checkbox";
+import { Div } from "../comp/core/Div";
+import { FlexLayout } from "../comp/core/FlexLayout";
+import { Selection } from "../comp/core/Selection";
+import { TextArea } from "../comp/core/TextArea";
 
 export class ConfigureAIDlg extends DialogBase {
     static promptState: Validator = new Validator();
@@ -39,7 +38,8 @@ export class ConfigureAIDlg extends DialogBase {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
                 }, ConfigureAIDlg.promptState, null, false, 3, this.textScrollPos),
-                new Span("Note: System Prompt is not yet supported for Google Gemini."),
+                new Div("Note 1: System Prompt is not yet supported for Google Gemini."),
+                new Div("Note 2: For Anthropic's Claude AI, the System Prompt is used only as a prompt prefix."),
                 new TextArea("Query Template", {
                     rows: 7,
                     placeholder: "${content}"

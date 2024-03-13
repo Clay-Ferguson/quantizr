@@ -203,6 +203,9 @@ public class AIUtil extends ServiceBase {
         } else {
             input = content;
         }
+        if (!StringUtils.isEmpty(system.getPrompt())) {
+            input = system.getPrompt() + "\n\n" + input;
+        }
         return input;
     }
 

@@ -62,10 +62,6 @@ public class AnthAiService extends ServiceBase {
             buildChatHistory(ms, node, messages, system);
         }
 
-        if (StringUtils.isEmpty(system.getPrompt())) {
-            system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
-        }
-
         String input;
         if (node != null) {
             input = aiUtil.prepareAIQuestionText(node, system);
