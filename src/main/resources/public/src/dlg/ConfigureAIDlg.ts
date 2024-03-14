@@ -24,7 +24,7 @@ export class ConfigureAIDlg extends DialogBase {
     queryTemplateScrollPos = new ScrollPos();
 
     constructor(public node: NodeInfo) {
-        super("Configure AI", "appModalContMediumWidth");
+        super("Configure AI");
     }
 
     renderDlg(): Comp[] {

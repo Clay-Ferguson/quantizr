@@ -127,6 +127,7 @@ public class NodeRenderService extends ServiceBase {
         config.setUseOpenAi(!StringUtils.isEmpty(prop.getOpenAiKey()));
         config.setUsePplxAi(!StringUtils.isEmpty(prop.getPplxAiKey()));
         config.setUseGeminiAi(!StringUtils.isEmpty(prop.getGeminiAiKey()));
+        config.setUseAnthAi(!StringUtils.isEmpty(prop.getAnthAiKey()));
         config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);

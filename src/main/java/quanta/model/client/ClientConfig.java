@@ -10,6 +10,7 @@ public class ClientConfig {
     private boolean useOpenAi;
     private boolean usePplxAi;
     private boolean useGeminiAi;
+    private boolean useAnthAi;
     private String userMsg;
     private String displayUserProfileId;
     private String initialNodeId;
@@ -76,6 +77,14 @@ public class ClientConfig {
 
     public void setUseGeminiAi(boolean useGeminiAi) {
         this.useGeminiAi = useGeminiAi;
+    }
+
+    public boolean isUseAnthAi() {
+        return useAnthAi;
+    }
+
+    public void setUseAnthAi(boolean useAnthAi) {
+        this.useAnthAi = useAnthAi;
     }
 
     public String getUserMsg() {

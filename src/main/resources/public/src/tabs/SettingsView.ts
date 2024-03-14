@@ -1,3 +1,4 @@
+import { AIService } from "../AIUtil";
 import { getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
@@ -30,7 +31,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const horzClass = "marginTop marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
-        const modelSpecs = S.aiUtil.getServiceByName(getAs().userPrefs.aiService)?.longDescription;
+        const aiService: AIService = S.aiUtil.getServiceByName(getAs().userPrefs.aiService);
+        const aiModelInfo = aiService ? aiService.description + " -- " + aiService.longDescription : null;
         const aiOptions = S.aiUtil.getAiOptions();
 
         this.setChildren([
@@ -102,7 +104,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                             setValue: (val: string) => S.edit.setAiService(val),
                             getValue: (): string => "" + getAs().userPrefs.aiService
                         }),
-                        modelSpecs ? new Div(modelSpecs, { className: "bigMarginLeft" }) : null
+                        aiModelInfo ? new Div(aiModelInfo, { className: "bigMarginLeft" }) : null
                     ]),
                     new Div(null, { className: settingsCol }, [
                         ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,

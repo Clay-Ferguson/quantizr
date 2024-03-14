@@ -30,6 +30,7 @@ export interface ClientConfig {
     useOpenAi: boolean;
     usePplxAi: boolean;
     useGeminiAi: boolean;
+    useAnthAi: boolean;
     userMsg: string;
     displayUserProfileId: string;
     initialNodeId: string;
