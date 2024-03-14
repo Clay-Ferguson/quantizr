@@ -61,7 +61,7 @@ export class ConfigureAIDlg extends DialogBase {
     }
 
     reload = async () => {
-        ConfigureAIDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI, this.node));
+        ConfigureAIDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI_PROMPT, this.node));
         ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
         ConfigureAIDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
         ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
@@ -76,7 +76,7 @@ export class ConfigureAIDlg extends DialogBase {
         }
 
         // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
-        S.props.setPropVal(J.NodeProp.AI, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_PROMPT, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, ConfigureAIDlg.maxWordsState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue() || "[null]");

@@ -71,14 +71,6 @@ public class HuggingFaceService extends ServiceBase {
                 .retrieve().bodyToMono(HuggingFaceResponse.class);
         HuggingFaceResponse res = mono.block();
         log.debug("RESPONSE: " + XString.prettyPrint(res));
-
-        // ================================
-        // DO NOT DELETE:
-        // We can use this for debugging to see the raw request and response
-        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
-        // log.debug("RESPONSE: " + response);
-
         return res;
     }
 

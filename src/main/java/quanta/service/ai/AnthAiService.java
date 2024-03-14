@@ -77,10 +77,6 @@ public class AnthAiService extends ServiceBase {
                 .defaultHeader("anthropic-version", API_VERSION) //
                 .build();
 
-        /*
-         * todo-0: do I want maxtokens set at all here? Maybe make it based on how much credit the user has
-         * left? This will be something to think about across all the AI services.
-         */
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), maxTokens);
 
@@ -118,14 +114,6 @@ public class AnthAiService extends ServiceBase {
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("ANTH Res: " + XString.prettyPrint(res));
         return res;
-
-        // ================================
-        // DO NOT DELETE:
-        // We can use this for debugging to see the raw request and response
-        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
-        // log.debug("RESPONSE: " + response);
-        // return null;
     }
 
     // https://www.anthropic.com/api

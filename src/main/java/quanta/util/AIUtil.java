@@ -34,8 +34,8 @@ public class AIUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIUtil.class);
 
     public void parseAIConfig(SubNode node, SystemConfig system) {
-        if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI.s())) {
-            system.setPrompt(node.getStr(NodeProp.AI.s()));
+        if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI_PROMPT.s())) {
+            system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
         }
 
         if (StringUtils.isEmpty(system.getService()) && node.hasProp(NodeProp.AI_SERVICE.s())) {

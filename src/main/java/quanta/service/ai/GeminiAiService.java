@@ -89,14 +89,6 @@ public class GeminiAiService extends ServiceBase {
         res.credit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("Gemini Res: " + XString.prettyPrint(res));
         return res;
-
-        // ================================
-        // DO NOT DELETE:
-        // We can use this for debugging to see the raw request and response
-        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
-        // log.debug("RESPONSE: " + response);
-        // return "";
     }
 
     private double calculateCost(GeminiChatResponse res) {

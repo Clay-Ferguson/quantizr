@@ -32,7 +32,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
         const aiService: AIService = S.aiUtil.getServiceByName(getAs().userPrefs.aiService);
-        const aiModelInfo = aiService ? aiService.description + " -- " + aiService.longDescription : null;
+        const aiModelInfo = aiService && aiService.longDescription ? aiService.description + " -- " + aiService.longDescription : null;
         const aiOptions = S.aiUtil.getAiOptions();
 
         this.setChildren([

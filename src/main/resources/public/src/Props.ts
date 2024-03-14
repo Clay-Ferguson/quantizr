@@ -178,7 +178,7 @@ export class Props {
     }
 
     hasAIConfigProps = (node: NodeInfo): boolean => {
-        return !!this.getPropStr(J.NodeProp.AI, node) || //
+        return !!this.getPropStr(J.NodeProp.AI_PROMPT, node) || //
             !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
             !!this.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node) || //
             !!this.getPropStr(J.NodeProp.AI_MAX_WORDS, node) || //
@@ -254,7 +254,7 @@ export class Props {
             J.NodeProp.PRIORITY, //
             J.NodeProp.UNPUBLISHED, //
             J.NodeProp.CRYPTO_SIG, //
-            J.NodeProp.AI, //
+            J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
             J.NodeProp.AI_QUERY_TEMPLATE, //
             J.NodeProp.AI_MAX_WORDS //
@@ -264,7 +264,7 @@ export class Props {
             J.NodeProp.TYPE_LOCK, //
             J.NodeProp.NO_EXPORT, //
             J.NodeProp.OPENAI_RESPONSE, //
-            J.NodeProp.AI, //
+            J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
             J.NodeProp.AI_QUERY_TEMPLATE, //
             J.NodeProp.AI_MAX_WORDS //

@@ -288,16 +288,6 @@ public class OpenAiService extends ServiceBase {
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("GPT Res: " + XString.prettyPrint(res));
         return res;
-
-        // todo-0: across the board it's probably better to get the string this way and then parse it to
-        // into the object as a second step so that if that parsingn fails we can catch the exception and
-        // log the string that failed
-        // ================================
-        // DO NOT DELETE:
-        // We can use this for debugging to see the raw request and response
-        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
-        // log.debug("RESPONSE: " + response);
     }
 
     private boolean messageListHasImages(List<ChatMessage> messages) {

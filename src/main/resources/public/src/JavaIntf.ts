@@ -1326,7 +1326,7 @@ export const enum NodeProp {
     DATE = "date",
     DATE_FULL = "p.date",
     UNPUBLISHED = "unpub",
-    AI = "ai",
+    AI_PROMPT = "ai",
     AI_SERVICE = "aiService",
     AI_QUERY_TEMPLATE = "aiTemplate",
     AI_OVERWRITE = "aiOverwrite",
