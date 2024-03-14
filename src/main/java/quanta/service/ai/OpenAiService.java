@@ -269,19 +269,29 @@ public class OpenAiService extends ServiceBase {
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " REQ: " + XString.prettyPrint(request));
 
-        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
-        // here
-        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-        // fails, but it does fail.
-        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(ChatCompletionResponse.class);
+        // Mono<ChatCompletionResponse> mono =
+        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .retrieve().bodyToMono(ChatCompletionResponse.class);
+        // ChatCompletionResponse res = mono.block();
 
-        ChatCompletionResponse res = mono.block();
+        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
+                .bodyToMono(String.class).block();
+        ChatCompletionResponse res = null;
+        try {
+            res = (ChatCompletionResponse) Util.mapper.readValue(response, ChatCompletionResponse.class);
+        } catch (Exception e) {
+            log.error("Error parsing response: " + e.getMessage() + " response\n\n" + response);
+            throw new RuntimeException("Error parsing response: " + e.getMessage());
+        }
+
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("GPT Res: " + XString.prettyPrint(res));
         return res;
 
+        // todo-0: across the board it's probably better to get the string this way and then parse it to
+        // into the object as a second step so that if that parsingn fails we can catch the exception and
+        // log the string that failed
         // ================================
         // DO NOT DELETE:
         // We can use this for debugging to see the raw request and response

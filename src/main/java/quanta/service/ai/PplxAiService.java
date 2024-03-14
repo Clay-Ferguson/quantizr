@@ -94,14 +94,21 @@ public class PplxAiService extends ServiceBase {
         log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
-        // here
-        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-        // fails, but it does fail.
-        Mono<ChatCompletionResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(ChatCompletionResponse.class);
+        // Mono<ChatCompletionResponse> mono =
+        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .retrieve().bodyToMono(ChatCompletionResponse.class);
+        // ChatCompletionResponse res = mono.block();
 
-        ChatCompletionResponse res = mono.block();
+        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
+                .bodyToMono(String.class).block();
+        ChatCompletionResponse res = null;
+        try {
+            res = (ChatCompletionResponse) Util.mapper.readValue(response, ChatCompletionResponse.class);
+        } catch (Exception e) {
+            log.error("Error parsing response: " + e.getMessage() + " response\n\n" + response);
+            throw new RuntimeException("Error parsing response: " + e.getMessage());
+        }
+
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("PPLX Res: " + XString.prettyPrint(res));

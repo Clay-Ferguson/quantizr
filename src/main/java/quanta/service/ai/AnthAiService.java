@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
 import quanta.util.XString;
-import reactor.core.publisher.Mono;
 
 /* Anthropic */
 @Component
@@ -101,13 +99,21 @@ public class AnthAiService extends ServiceBase {
         log.debug("ANTH Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
-        // here instead of the stringified version of it. I haven't tried to figure out why the
-        // non-stringified fails, but it does fail.
-        Mono<AnthChatResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(AnthChatResponse.class);
+        // Mono<AnthChatResponse> mono =
+        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .retrieve().bodyToMono(AnthChatResponse.class);
+        // AnthChatResponse res = mono.block();
 
-        AnthChatResponse res = mono.block();
+        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
+                .bodyToMono(String.class).block();
+        AnthChatResponse res = null;
+        try {
+            res = (AnthChatResponse) Util.mapper.readValue(response, AnthChatResponse.class);
+        } catch (Exception e) {
+            log.error("Error parsing response: " + e.getMessage() + " response\n\n" + response);
+            throw new RuntimeException("Error parsing response: " + e.getMessage());
+        }
+
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("ANTH Res: " + XString.prettyPrint(res));

@@ -21,7 +21,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
 import quanta.util.XString;
-import reactor.core.publisher.Mono;
 
 @Component
 public class GeminiAiService extends ServiceBase {
@@ -71,13 +70,21 @@ public class GeminiAiService extends ServiceBase {
         GeminiChatRequest request = new GeminiChatRequest(contents);
         log.debug("Gemini Req: USER: " + ms.getUserName() + ": " + XString.prettyPrint(request));
 
-        // Prior to tweaking the Models to support the new GPT-4 we had been able to just use 'request'
-        // here
-        // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
-        // fails, but it does fail.
-        Mono<GeminiChatResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(GeminiChatResponse.class);
-        GeminiChatResponse res = mono.block();
+        // Mono<GeminiChatResponse> mono =
+        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
+        // .retrieve().bodyToMono(GeminiChatResponse.class);
+        // GeminiChatResponse res = mono.block();
+
+        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
+                .bodyToMono(String.class).block();
+        GeminiChatResponse res = null;
+        try {
+            res = (GeminiChatResponse) Util.mapper.readValue(response, GeminiChatResponse.class);
+        } catch (Exception e) {
+            log.error("Error parsing response: " + e.getMessage() + " response\n\n" + response);
+            throw new RuntimeException("Error parsing response: " + e.getMessage());
+        }
+
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.credit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("Gemini Res: " + XString.prettyPrint(res));
