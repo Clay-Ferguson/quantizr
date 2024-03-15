@@ -33,6 +33,12 @@ import quanta.service.UserManagerService;
 public class AIUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIUtil.class);
 
+    public void ensureDefaults(SystemConfig system) {
+        if (system.getTemperature() == null) {
+            system.setTemperature(0.7);
+        }
+    }
+
     public void parseAIConfig(SubNode node, SystemConfig system) {
         if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI_PROMPT.s())) {
             system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
@@ -48,6 +54,10 @@ public class AIUtil extends ServiceBase {
 
         if (system.getMaxWords() == null && node.hasProp(NodeProp.AI_MAX_WORDS.s())) {
             system.setMaxWords(Integer.valueOf(node.getStr(NodeProp.AI_MAX_WORDS.s())));
+        }
+
+        if (system.getTemperature() == null && node.hasProp(NodeProp.AI_TEMPERATURE.s())) {
+            system.setTemperature(Double.valueOf(node.getStr(NodeProp.AI_TEMPERATURE.s())));
         }
     }
 

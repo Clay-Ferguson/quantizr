@@ -6,9 +6,7 @@ public class SystemConfig {
     private String model; // ex: "gpt-4"
     private String service;
     private Integer maxWords;
-
-    // todo-2: add a way for users to alter this.
-    private Double temperature = 0.7;
+    private Double temperature;
 
     public String getPrompt() {
         return prompt;

@@ -76,6 +76,7 @@ public class AnthAiService extends ServiceBase {
                 .defaultHeader("anthropic-version", API_VERSION) //
                 .build();
 
+        aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), maxTokens);
 

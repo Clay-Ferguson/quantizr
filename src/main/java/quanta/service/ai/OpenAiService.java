@@ -314,10 +314,7 @@ public class OpenAiService extends ServiceBase {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
-        // Without maxTokens we get comically short answers (like not even the complete first sentence of
-        // the response, but a sentence frament), so I'm not sure what to do about if or how end users
-        // should be able to tweak this. Before switching to gpt-4 vision we were getting sensible
-        // response lengths without having to provide a maxTokens value
+        aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), maxTokens);
 

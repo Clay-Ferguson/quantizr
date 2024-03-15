@@ -86,6 +86,7 @@ public class PplxAiService extends ServiceBase {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader("Authorization", "Bearer " + prop.getPplxAiKey()).build();
 
+        aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
                 ms.getUserNodeId().toHexString(), maxTokens);
 
