@@ -67,8 +67,16 @@ public class HuggingFaceService extends ServiceBase {
         // here
         // instead of the stringified version of it. I haven't tried to figure out why the non-stringified
         // fails, but it does fail.
-        Mono<HuggingFaceResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .retrieve().bodyToMono(HuggingFaceResponse.class);
+        Mono<HuggingFaceResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))) //
+                .retrieve() //
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                    // This will trigger for any response with 4xx or 5xx status codes
+                    return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                        log.debug("Error response from server: " + errorBody);
+                        return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                    });
+                }) //
+                .bodyToMono(HuggingFaceResponse.class);
         HuggingFaceResponse res = mono.block();
         log.debug("RESPONSE: " + XString.prettyPrint(res));
         return res;

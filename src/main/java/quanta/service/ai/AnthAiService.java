@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
 import quanta.model.client.anthropic.AnthChatResponse;
@@ -81,27 +80,12 @@ public class AnthAiService extends ServiceBase {
                 ms.getUserNodeId().toHexString(), maxTokens);
 
         request.setUser(null);
-
-        /*
-         * todo-0: use this to be sure we can do good error handling and get the output error text, because
-         * anthropic will fail without max tokens set. Use the recent additions to the RSS feed reader to
-         * see how to do full error handling and I probably need to encapsulate a good WebClient call with
-         * error handling into a reusable method.
-         */
-        // request.setMaxTokens(null);
-
         request.setTemperature(null);
 
         log.debug("ANTH Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        // Mono<AnthChatResponse> mono =
-        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .retrieve().bodyToMono(AnthChatResponse.class);
-        // AnthChatResponse res = mono.block();
-
-        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
-                .bodyToMono(String.class).block();
+        String response = Util.httpCall(webClient, request);
         AnthChatResponse res = null;
         try {
             res = (AnthChatResponse) Util.mapper.readValue(response, AnthChatResponse.class);

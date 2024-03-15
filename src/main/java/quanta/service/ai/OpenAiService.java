@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
@@ -78,8 +80,29 @@ public class OpenAiService extends ServiceBase {
                     .defaultHeader("Authorization", "Bearer " + prop.getOpenAiKey()).build();
 
             SpeechGenRequest request = new SpeechGenRequest(model, prompt, voice);
-            Mono<DataBuffer> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                    .retrieve().bodyToMono(DataBuffer.class);
+            Mono<DataBuffer> mono = null;
+            try {
+                mono = webClient.post() //
+                        .body(BodyInserters.fromValue(XString.prettyPrint(request))) //
+                        .retrieve() //
+                        .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                            // This will trigger for any response with 4xx or 5xx status codes
+                            return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                                log.debug("Error response from server: " + errorBody);
+                                return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                            });
+                        }) //
+                        .bodyToMono(DataBuffer.class);
+            } catch (WebClientResponseException e) {
+                // This exception is thrown for HTTP status code errors
+                throw new RuntimeException("Error: " + e.getMessage() + " Status Code: " + e.getStatusCode(), e);
+            } catch (WebClientRequestException e) {
+                // This exception is thrown for errors while making the request (e.g., connectivity issues)
+                throw new RuntimeException("Error: " + e.getMessage(), e);
+            } catch (Exception e) {
+                // This is a generic exception handler for other exceptions
+                throw new RuntimeException("Error: " + e.getMessage(), e);
+            }
             DataBuffer dataBuffer = mono.block();
             if (dataBuffer != null) {
                 InputStream is = dataBuffer.asInputStream();
@@ -105,11 +128,6 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Error generating speech: " + e.getMessage());
         }
 
-        // NOTE: DO NOT DELETE. Useful for troubleshooting.
-        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
-        // log.debug("Image RESPONSE: " + response);
-
         if (lis != null) {
             BigDecimal cost = getSpeechCost(model, prompt.length());
             aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
@@ -134,18 +152,34 @@ public class OpenAiService extends ServiceBase {
             // WARNING: If you alter the size of the image, you will need to update the pricing calculations
             ImageGenRequest request = new ImageGenRequest("dall-e-3", prompt, 1, size, highDef ? "hd" : null);
 
-            Mono<ImageResponse> mono = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                    .retrieve().bodyToMono(ImageResponse.class);
+            Mono<ImageResponse> mono = null;
+            try {
+                mono = webClient.post() //
+                        .body(BodyInserters.fromValue(XString.prettyPrint(request))) //
+                        .retrieve() //
+                        .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                            // This will trigger for any response with 4xx or 5xx status codes
+                            return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                                log.debug("Error response from server: " + errorBody);
+                                return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                            });
+                        }) //
+                        .bodyToMono(ImageResponse.class);
+            } catch (WebClientResponseException e) {
+                // This exception is thrown for HTTP status code errors
+                throw new RuntimeException("Error: " + e.getMessage() + " Status Code: " + e.getStatusCode(), e);
+            } catch (WebClientRequestException e) {
+                // This exception is thrown for errors while making the request (e.g., connectivity issues)
+                throw new RuntimeException("Error: " + e.getMessage(), e);
+            } catch (Exception e) {
+                // This is a generic exception handler for other exceptions
+                throw new RuntimeException("Error: " + e.getMessage(), e);
+            }
             res = mono.block();
         } catch (Exception e) {
             log.error("Error generating image: " + e.getMessage());
             throw e;
         }
-
-        // NOTE: DO NOT DELETE. Useful for troubleshooting.
-        // String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
-        // log.debug("Image RESPONSE: " + response);
 
         if (res.getData() != null && res.getData().size() > 0) {
             return res.getData().get(0).getUrl();
@@ -246,9 +280,29 @@ public class OpenAiService extends ServiceBase {
                         .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + prop.getOpenAiKey())
                         .baseUrl(OPENAI_MOD_URL).build();
 
-        Mono<ChatGPTModerationResponse> modResponse =
-                webClient.post().body(Mono.just(modRequest), ChatGPTModerationRequest.class).retrieve()
-                        .bodyToMono(ChatGPTModerationResponse.class);
+        Mono<ChatGPTModerationResponse> modResponse = null;
+        try {
+            modResponse = webClient.post() //
+                    .body(Mono.just(modRequest), ChatGPTModerationRequest.class) //
+                    .retrieve() //
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                        // This will trigger for any response with 4xx or 5xx status codes
+                        return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                            log.debug("Error response from server: " + errorBody);
+                            return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                        });
+                    }) //
+                    .bodyToMono(ChatGPTModerationResponse.class);
+        } catch (WebClientResponseException e) {
+            // This exception is thrown for HTTP status code errors
+            throw new RuntimeException("Error: " + e.getMessage() + " Status Code: " + e.getStatusCode(), e);
+        } catch (WebClientRequestException e) {
+            // This exception is thrown for errors while making the request (e.g., connectivity issues)
+            throw new RuntimeException("Error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // This is a generic exception handler for other exceptions
+            throw new RuntimeException("Error: " + e.getMessage(), e);
+        }
 
         ChatGPTModerationResponse modRes = modResponse.block();
 
@@ -269,13 +323,7 @@ public class OpenAiService extends ServiceBase {
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " REQ: " + XString.prettyPrint(request));
 
-        // Mono<ChatCompletionResponse> mono =
-        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .retrieve().bodyToMono(ChatCompletionResponse.class);
-        // ChatCompletionResponse res = mono.block();
-
-        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
-                .bodyToMono(String.class).block();
+        String response = Util.httpCall(webClient, request);
         ChatCompletionResponse res = null;
         try {
             res = (ChatCompletionResponse) Util.mapper.readValue(response, ChatCompletionResponse.class);

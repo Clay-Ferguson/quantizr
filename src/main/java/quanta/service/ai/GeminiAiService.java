@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
 import quanta.model.client.geminiai.GeminiChatContent;
@@ -70,13 +69,7 @@ public class GeminiAiService extends ServiceBase {
         GeminiChatRequest request = new GeminiChatRequest(contents);
         log.debug("Gemini Req: USER: " + ms.getUserName() + ": " + XString.prettyPrint(request));
 
-        // Mono<GeminiChatResponse> mono =
-        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .retrieve().bodyToMono(GeminiChatResponse.class);
-        // GeminiChatResponse res = mono.block();
-
-        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
-                .bodyToMono(String.class).block();
+        String response = Util.httpCall(webClient, request);
         GeminiChatResponse res = null;
         try {
             res = (GeminiChatResponse) Util.mapper.readValue(response, GeminiChatResponse.class);

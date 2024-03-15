@@ -13,8 +13,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +26,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import quanta.mongo.MongoRepository;
+import reactor.core.publisher.Mono;
 
 public class Util {
     @SuppressWarnings("unused")
@@ -40,6 +44,34 @@ public class Util {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.setSerializationInclusion(Include.NON_NULL);
         yamlMapper = new ObjectMapper(new YAMLFactory());
+    }
+
+    public static String httpCall(WebClient webClient, Object request) {
+        String response = null;
+        try {
+            response = webClient.post() //
+                    .body(BodyInserters.fromValue(XString.prettyPrint(request))) //
+                    .retrieve() //
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                        // This will trigger for any response with 4xx or 5xx status codes
+                        return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                            log.debug("Error response from server: " + errorBody);
+                            return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                        });
+                    }) //
+                    .bodyToMono(String.class) //
+                    .block();
+        } catch (WebClientResponseException e) {
+            // This exception is thrown for HTTP status code errors
+            throw new RuntimeException("Error: " + e.getMessage() + " Status Code: " + e.getStatusCode(), e);
+        } catch (WebClientRequestException e) {
+            // This exception is thrown for errors while making the request (e.g., connectivity issues)
+            throw new RuntimeException("Error: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // This is a generic exception handler for other exceptions
+            throw new RuntimeException("Error: " + e.getMessage(), e);
+        }
+        return response;
     }
 
     public static WebClient.Builder webClientBuilder() {

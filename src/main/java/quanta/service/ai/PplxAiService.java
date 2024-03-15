@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
 import quanta.model.client.openai.ChatCompletionResponse;
@@ -22,7 +21,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
 import quanta.util.XString;
-import reactor.core.publisher.Mono;
 
 /* Perplexity */
 @Component
@@ -94,13 +92,7 @@ public class PplxAiService extends ServiceBase {
         log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));
 
-        // Mono<ChatCompletionResponse> mono =
-        // webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-        // .retrieve().bodyToMono(ChatCompletionResponse.class);
-        // ChatCompletionResponse res = mono.block();
-
-        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))).retrieve()
-                .bodyToMono(String.class).block();
+        String response = Util.httpCall(webClient, request);
         ChatCompletionResponse res = null;
         try {
             res = (ChatCompletionResponse) Util.mapper.readValue(response, ChatCompletionResponse.class);

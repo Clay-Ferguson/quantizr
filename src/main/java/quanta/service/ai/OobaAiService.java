@@ -18,6 +18,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
 import quanta.util.XString;
+import reactor.core.publisher.Mono;
 
 /*
  * This is the Oobabooga Text GEneration WebUI support
@@ -81,8 +82,16 @@ public class OobaAiService extends ServiceBase {
         // ================================
         // DO NOT DELETE:
         // We can use this for debugging to see the raw request and response
-        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request)))
-                .accept(MediaType.APPLICATION_JSON).retrieve().bodyToMono(String.class).block();
+        String response = webClient.post().body(BodyInserters.fromValue(XString.prettyPrint(request))) //
+                .accept(MediaType.APPLICATION_JSON).retrieve()//
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                    // This will trigger for any response with 4xx or 5xx status codes
+                    return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                        log.debug("Error response from server: " + errorBody);
+                        return Mono.error(new RuntimeException("Error response from server: " + errorBody));
+                    });
+                }) //
+                .bodyToMono(String.class).block();
         log.debug("RESPONSE: " + response);
 
         // return res;
