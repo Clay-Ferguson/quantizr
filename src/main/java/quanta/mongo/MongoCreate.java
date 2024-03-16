@@ -301,7 +301,7 @@ public class MongoCreate extends ServiceBase {
         GeminiChatResponse geminiAiAns = null;
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
-            AIServiceName svc = AIServiceName.fromString(req.getAiQuestion());
+            AIServiceName svc = AIServiceName.fromString(req.getAiService());
             if (svc != null) {
                 // First scan up the tree to see if we have a svc on the tree and if so use it instead.
                 SystemConfig system = new SystemConfig();
@@ -447,7 +447,7 @@ public class MongoCreate extends ServiceBase {
         }
 
         update.save(ms, newNode);
-        if (req.getAiQuestion() != null && aiUtil.isAnyAnswerType(parentNode.getType())) {
+        if (req.getAiService() != null && aiUtil.isAnyAnswerType(parentNode.getType())) {
             oai.insertAnswerToQuestion(ms, newNode, req, res);
         }
 

@@ -352,7 +352,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeName: string;
     createAtTop: boolean;
     directMessage: boolean;
-    aiQuestion: string;
+    aiService: string;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
@@ -1227,6 +1227,7 @@ export interface PrivilegeInfo {
 }
 
 export const enum AIServiceName {
+    NONE = "[null]",
     OPENAI = "openAi",
     PPLX = "pplxAi",
     ANTH = "anthAi",

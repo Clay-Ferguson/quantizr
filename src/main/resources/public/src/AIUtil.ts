@@ -18,7 +18,7 @@ export class AIUtil {
     init = () => {
         this.aiServices = [];
         this.aiServices.push({
-            name: "[null]",
+            name: J.AIServiceName.NONE,
             description: "none (inherit)",
             longDescription: ""
         });

@@ -3,6 +3,7 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AIServiceName {
+    NONE("[null]"), //
     OPENAI("openAi"), //
     PPLX("pplxAi"), //
     ANTH("anthAi"), // Opus (most powerful)

@@ -237,7 +237,7 @@ export class Edit {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: false,
                     nodeId: parentId,
-                    aiQuestion: null,
+                    aiService: null,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     createAtTop,
@@ -277,7 +277,7 @@ export class Edit {
                 const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
                     nodeId: parentId,
-                    aiQuestion: null,
+                    aiService: null,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     createAtTop,
@@ -1046,10 +1046,16 @@ export class Edit {
     }
 
     askAiQuestion = async (nodeId: string) => {
+        const aiService = getAs().userPrefs.aiService;
+        if (!aiService || aiService === J.AIServiceName.NONE) {
+            S.util.showMessage("You must select an AI Service. Go to `Menu -> Account -> Settings -> AI Service`", "Warning");
+            return;
+        }
+
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId,
-            aiQuestion: getAs().userPrefs.aiService, // openAi, pplxAi, geminiAi, huggingFace, oobAi,
+            aiService: getAs().userPrefs.aiService, // openAi, pplxAi, geminiAi, huggingFace, oobAi,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1104,7 +1110,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
-            aiQuestion: null,
+            aiService: null,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1173,7 +1179,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
-            aiQuestion: null,
+            aiService: null,
             newNodeName: "",
             typeName: J.NodeType.BOOKMARK,
             createAtTop: true,
@@ -1222,7 +1228,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId,
-            aiQuestion: null,
+            aiService: null,
             newNodeName: "",
             typeName: typeName || J.NodeType.NONE,
             createAtTop: true,
@@ -1244,7 +1250,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
-            aiQuestion: null,
+            aiService: null,
             newNodeName: "",
             typeName,
             createAtTop: true,
@@ -1275,7 +1281,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: getAs().fullScreenConfig.nodeId,
-            aiQuestion: null,
+            aiService: null,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
