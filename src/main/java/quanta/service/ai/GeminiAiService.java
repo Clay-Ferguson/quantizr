@@ -81,6 +81,16 @@ public class GeminiAiService extends ServiceBase {
         BigDecimal cost = new BigDecimal(calculateCost(res));
         res.credit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
         log.debug("Gemini Res: " + XString.prettyPrint(res));
+
+        if (res.getCandidates() == null || res.getCandidates().size() == 0) {
+            throw new RuntimeException("No response from Gemini.");
+        }
+
+        if (res.getCandidates() != null && res.getCandidates().size() > 0) {
+            if ("SAFETY".equalsIgnoreCase(res.getCandidates().get(0).getFinishReason())) {
+                throw new RuntimeException("Gemini response was flagged as unsafe.");
+            }
+        }
         return res;
     }
 
