@@ -789,7 +789,7 @@ export class Util {
 
                 // if we have trouble accessing even the anon page just drop out to landing page.
                 if (res?.code == C.RESPONSE_CODE_OK) {
-                    await S.render.renderPage(res, false, null, true, true);
+                    await S.render.renderPage(res, true, null, true, true);
                 }
             }
         }

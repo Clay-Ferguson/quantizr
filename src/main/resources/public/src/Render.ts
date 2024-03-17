@@ -449,9 +449,7 @@ export class Render {
                         s.rendering = true;
                     }
                     else if (allowScroll) {
-                        if (C.DEBUG_SCROLLING) {
-                            console.log("highlight: scrollToSelected");
-                        }
+                        console.log("warning: slow scroll delay");
                         delay = 2000;
                         S.view.scrollToNode(null, delay);
                         s.rendering = true;
