@@ -685,6 +685,10 @@ export class EditNodeDlg extends DialogBase {
         if (savedOk) {
             this.close();
         }
+
+        dispatch("endEditing", s => {
+            s.threadViewQuestionId = null;
+        }, true);
     }
 
     askChatGpt = async () => {
@@ -769,7 +773,7 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
-            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", null, {
+            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask AI", {
                 onClick: this.askChatGpt,
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService
             }) : null,

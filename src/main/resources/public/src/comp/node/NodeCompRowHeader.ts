@@ -275,6 +275,14 @@ export class NodeCompRowHeader extends Div {
                     onClick: S.nav.openDocViewByClick
                 })
             ]));
+
+            ddItems.push(new Li(null, { className: "clickable" }, [
+                new Span("Thread History", {
+                    className: "dropdown-item",
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.showThread
+                })
+            ]));
         }
 
         this.addOriginalLinks(ddItems);

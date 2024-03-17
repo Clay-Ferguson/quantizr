@@ -22,6 +22,7 @@ import { S } from "./Singletons";
 import { DocumentTab } from "./tabs/data/DocumentTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
+import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
 import { DocumentResultSetView } from "./tabs/DocumentResultSetView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
@@ -203,7 +204,8 @@ export class Edit {
       If `insertAtLoc` is non-null it holds the node whose offset is where the new node will be inserted, and this will
       be an insert inline kind of insert.
     */
-    startEditingNewNode = async (createAtTop: boolean, parentId: string, siblingId: string, insertAtLoc: NodeInfo, ordinalOffset: number) => {
+    startEditingNewNode = async (createAtTop: boolean, parentId: string, siblingId: string, insertAtLoc: NodeInfo,
+        ordinalOffset: number, threadViewAiQuestion: boolean) => {
         const afterEditJumpToId = createAtTop ? parentId : null;
 
         if (S.util.ctrlKeyCheck()) {
@@ -250,6 +252,7 @@ export class Edit {
                     directMessage: false,
                     payloadType: null,
                 });
+
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 if (blob) {
                     this.createSubNodeResponse(res, afterEditJumpToId);
@@ -290,7 +293,19 @@ export class Edit {
                     directMessage: false,
                     payloadType: null,
                 });
-                S.nodeUtil.applyNodeChanges(res?.nodeChanges);
+
+                if (threadViewAiQuestion) {
+                    dispatch("AppendToThreadResults", s => {
+                        const data = ThreadTab.inst;
+                        if (!data) return;
+                        data.props.results.push(res.newNode);
+                        s.threadViewQuestionId = res.newNode.id;
+                    });
+                }
+                else {
+                    S.nodeUtil.applyNodeChanges(res?.nodeChanges);
+                }
+
                 this.createSubNodeResponse(res, afterEditJumpToId);
             }
         }
@@ -804,8 +819,15 @@ export class Edit {
             S.quanta.newNodeTargetOffset = ordinalOffset;
 
             // todo-1: try to make this method take not node but instead node's id.
-            this.startEditingNewNode(false, null, node.id, node, ordinalOffset);
+            this.startEditingNewNode(false, null, node.id, node, ordinalOffset, false);
         }
+    }
+
+    askAiFromThreadView = async (evt: Event, id: string) => {
+        if (this.checkEditPending()) return;
+        id = S.util.allowIdFromEvent(evt, id);
+        const ast = getAs();
+        this.startEditingNewNode(true, id || ast.node.id, null, null, 0, true);
     }
 
     newSubNode = async (evt: Event, id: string) => {
@@ -819,7 +841,7 @@ export class Edit {
             S.view.jumpToId(id);
         }
         else {
-            this.startEditingNewNode(true, id || ast.node.id, null, null, 0);
+            this.startEditingNewNode(true, id || ast.node.id, null, null, 0, false);
         }
     }
 
@@ -1068,13 +1090,38 @@ export class Edit {
             directMessage: false,
             payloadType: null
         });
-        S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
         if (res.code == C.RESPONSE_CODE_OK) {
+            let jumpToNode = true;
+            // if we're asking a question from the thread view, we need to append the new node to the thread results
+            const ast = getAs();
+
+            // if user is asking a question and we're not on the thread tab, then jump to the thread tab and display
+            // it from the hiearcharcy above the answer (thread is being displayed for answer node)
+            if (ast.activeTab !== C.TAB_THREAD) {
+                S.srch.showThread(res.newNode.id);
+                jumpToNode = false;
+            }
+            else if (ast.threadViewQuestionId === nodeId && ast.activeTab == C.TAB_THREAD) {
+                dispatch("AppendToThreadResults", s => {
+                    const data = ThreadTab.inst;
+                    if (!data) return;
+                    data.props.results.push(res.newNode);
+                    s.threadViewQuestionId = null;
+                });
+                jumpToNode = false;
+            }
+            else {
+                S.nodeUtil.applyNodeChanges(res?.nodeChanges);
+            }
+
             dispatch("setShowGptCredit", s => {
                 s.showGptCredit = true;
             });
-            S.view.jumpToId(nodeId);
+
+            if (jumpToNode) {
+                S.view.jumpToId(nodeId);
+            }
         }
     }
 

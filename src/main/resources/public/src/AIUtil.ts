@@ -110,4 +110,13 @@ export class AIUtil {
         });
         return aiOptions;
     }
+
+    isAiType = (nodeType: string): boolean => {
+        return nodeType === J.NodeType.OPENAI_ANSWER || //
+            nodeType === J.NodeType.PPLXAI_ANSWER || //
+            nodeType === J.NodeType.ANTHAI_ANSWER || //
+            nodeType === J.NodeType.GEMINIAI_ANSWER || //
+            nodeType === J.NodeType.HUGGINGFACE_ANSWER || //
+            nodeType === J.NodeType.OOBAI_ANSWER;
+    }
 }

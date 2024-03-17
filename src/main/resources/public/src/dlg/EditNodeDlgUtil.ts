@@ -537,6 +537,10 @@ an upload has been added or removed.
         if (dlg.binaryDirty) {
             S.quanta.refresh();
         }
+
+        dispatch("endEditing", s => {
+            s.threadViewQuestionId = null;
+        }, true);
     }
 
     renderLinksEditing = (): Div => {

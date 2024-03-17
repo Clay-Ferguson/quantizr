@@ -63,6 +63,12 @@ export class AppState {
 
     node: NodeInfo;
     highlightNodeId: string = null;
+
+    // if this is non-null when we ask a question with the "AI Ask", button AND we are on the ThreadView tab
+    // then we know that after the node is answered we take the anser and append it to the threadview results and
+    // refresh via dispatch
+    threadViewQuestionId: string = null;
+
     indexHighlightNode: string = null;
     endReached: boolean;
 

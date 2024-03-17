@@ -20,6 +20,7 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.service.AppController;
 import quanta.util.val.Val;
+import quanta.model.client.NodeType;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -30,6 +31,20 @@ import quanta.util.val.Val;
 @Component
 public class SubNodeUtil extends ServiceBase {
     private Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+
+    public boolean isAiResponseType(String type) {
+        switch (NodeType.fromType(type)) {
+            case OPENAI_ANSWER:
+            case PPLXAI_ANSWER:
+            case ANTHAI_ANSWER:
+            case GEMINIAI_ANSWER:
+            case HUGGINGFACE_ANSWER:
+            case OOBAI_ANSWER:
+                return true;
+            default:
+                return false;
+        }
+    }
 
     public void removeProp(List<PropertyInfo> list, String name) {
         if (list == null || name == null) {

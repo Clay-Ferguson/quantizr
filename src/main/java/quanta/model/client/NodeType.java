@@ -17,6 +17,7 @@ public enum NodeType {
     CALENDAR("sn:calendar"), //
     COMMENT("sn:comment"), //
     AI_QUERY("sn:aiQuery"), //
+
     OPENAI_ANSWER("sn:oaiAns"), //
     PPLXAI_ANSWER("sn:pplxaiAns"), //
     ANTHAI_ANSWER("sn:anthaiAns"), //
@@ -40,6 +41,16 @@ public enum NodeType {
 
     private NodeType(String value) {
         this.value = value;
+    }
+
+    public static NodeType fromType(String value) {
+        // instantiate enum from string
+        for (NodeType type : NodeType.values()) {
+            if (type.value.equals(value)) {
+                return type;
+            }
+        }
+        return null;
     }
 
     public String toString() {

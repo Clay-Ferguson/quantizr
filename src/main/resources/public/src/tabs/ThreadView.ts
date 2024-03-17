@@ -64,6 +64,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         ];
 
         const jumpButton = ast.isAdminUser || !this.data.props.searchType;
+        let lastNode: NodeInfo = null;
 
         results.forEach(node => {
             const clazzName = ast.repliesViewNodeId === node.id ? "threadFeedItemTarget" : "threadFeedItem";
@@ -71,6 +72,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
 
             const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, highlightClazzName);
             if (c) {
+                lastNode = node;
                 children.push(c);
             }
 
@@ -88,6 +90,12 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             i++;
             rowCount++;
         });
+
+        if (S.aiUtil.isAiType(lastNode?.type)) {
+            children.push(new Button("Ask AI", S.edit.askAiFromThreadView, {
+                [C.NODE_ID_ATTR]: lastNode.id,
+            }, "btn-secondary ui-new-node-plus marginTop", "fa-plus"));
+        }
 
         this.setChildren(children);
         return true;

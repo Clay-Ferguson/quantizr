@@ -5,26 +5,31 @@
 .threadFeedItemBase {
     margin-top: 8px;
     padding-top: 10px;
-    border-radius: $border-radius;
+    padding-right: 8px;
 }
 
 .threadFeedItem {
     @extend .threadFeedItemBase;
-    border: 1px solid $nodeBorderBottomColor;
+    &:not(:last-child) {
+        border-bottom: 1px solid $nodeBorderBottomColor;
+    }
 }
 
 .threadFeedItemTarget {
     @extend .threadFeedItemBase;
+    border-radius: $border-radius;
     border: 4px solid $nodeBorderBottomColor;
 }
 
 .threadFeedItemHighlight {
     @extend .threadFeedItemBase;
+    border-radius: $border-radius;
     border: 1px solid olivedrab;
 }
 
 .threadFeedItemHighlightTarget {
     @extend .threadFeedItemBase;
+    border-radius: $border-radius;
     border: 4px solid olivedrab;
 }
 

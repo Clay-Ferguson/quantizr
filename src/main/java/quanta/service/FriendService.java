@@ -263,7 +263,7 @@ public class FriendService extends ServiceBase {
      * towards the root of the tree.
      */
     public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
-        boolean debug = true;
+        boolean debug = false;
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
         if (debug) {
@@ -273,16 +273,34 @@ public class FriendService extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         boolean topReached = false;
         ObjectId lastNodeId = null;
-        // todo-2: This is an unfinished work in progress. I was unable to find any foreign posts
-        // that put any messages in their 'replies' collection, or at least when I query collections
-        // I get back an empty array of items for whatever reason.
-        // if (ok(node)) {
-        // readForeignReplies(ms, node);
-        // }
-        // iterate up the parent chain or chain of inReplyTo for ActivityPub
+        boolean isAiConversation = false;
+        int consecutiveNonAnswers = 0;
+
+        // iterate up the parent hierarchy until we reach the top or until we've gathered enough nodes
         while (node != null && (nodes.size() < MAX_THREAD_NODES)) {
             try {
                 NodeInfo info = null;
+                boolean isAiResponse = snUtil.isAiResponseType(node.getType());
+
+                // if we're going up an AI conversation thread, detect two back to back non-answer types and that
+                // indicates we need to stop, becasue we're at the beginning of the conversation.
+                if (isAiConversation) {
+                    if (isAiResponse) {
+                        consecutiveNonAnswers = 0;
+                    } else {
+                        consecutiveNonAnswers++;
+                    }
+                    if (consecutiveNonAnswers > 1) {
+                        topReached = true;
+                        break;
+                    }
+                } else {
+                    // detect if this is an AI conversation (only once, and only if it's not already set to true)
+                    if (isAiResponse) {
+                        isAiConversation = true;
+                    }
+                }
+
                 // note topNode doesn't necessarily mean we're done iterating because it's 'inReplyTo' still may
                 // point to further places 'logically above' (in this conversation thread)
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
@@ -351,7 +369,9 @@ public class FriendService extends ServiceBase {
         res.setNodes(nodes);
         if (nodes.size() > 1) {
             // sort the array
-            nodes.sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
+            // todo-1: this was a bug right? We want hierarchy order to be preserved, so we don't want to sort
+            // nodes.sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
+
             // sort all children also
             for (NodeInfo n : nodes) {
                 if (n.getChildren() != null) {
