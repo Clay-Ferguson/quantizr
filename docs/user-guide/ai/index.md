@@ -1,7 +1,8 @@
 **[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
-* [Artificial Intelligence](#artificial-intelligence)
+* [Artificial Intelligence - LLMs](#artificial-intelligence---llms)
     * [AI Services Supported](#ai-services-supported)
+        * [Anthropic](#anthropic)
         * [OpenAI](#openai)
         * [Perplexity](#perplexity)
         * [Google Gemini](#google-gemini)
@@ -15,14 +16,18 @@
     * [Image Generation](#image-generation)
     * [Speech Generation](#speech-generation)
     * [AI Service Selection](#ai-service-selection)
-        * [AI Services and Pricing](#ai-services-and-pricing)
-    * [Practical Use Case - Writing a Scientific Paper](#practical-use-case---writing-a-scientific-paper)
+        * [AI Services Supported](#ai-services-supported)
+    * [Practical Use Case Example - Writing a Scientific Paper](#practical-use-case-example---writing-a-scientific-paper)
+        * [Configure Document Root Node to have AI Settings](#configure-document-root-node-to-have-ai-settings)
+        * [Generating AI Content in your Documents](#generating-ai-content-in-your-documents)
 
-# Artificial Intelligence
+# Artificial Intelligence - LLMs
 
 Converse with AI, generate images, ask questions about images, generate speech MP3s from text.
 
 Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context".
+
+When you ask a question to the AI you'll automatically be switched over to the `Thread View` tab so you can see the current AI conversation thread all in a simple chronological view, and ask follow up questions, in an "AI Chat". See the [Thread View User Guide Section](/docs/user-guide/thread-view/index.md) for more on how the Thread View itself works.
 
 # AI Services Supported
 
@@ -30,25 +35,32 @@ By a selection in your account in `Menu -> Account -> Settings -> AI -> AI Servi
 
 If you're doing image recognition, image generation, or speech generation, you can only use the "OpenAI" Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use any of the three services.
 
+## Anthropic
+
+Including both **Sonnet** (best combination of performance and speed), and **Opus** (most intelligent and advanced model) Chat models.
+
+<img src='attachments/65f1f0fbe1bcaf0c420fca43-anthropic.png' style='width:20%'/>
+
+
 ## OpenAI
 
 Including Chat Model, Text to Image (Image Generation), Image Understand, Text to Speech (Speech to MP3 Generation)
 
-<img src='attachments/65c5a9043e8c3b6aec82835c-file-p' style='width:25%'/>
+<img src='attachments/65c5a9043e8c3b6aec82835c-file-p' style='width:20%'/>
 
 
 ## Perplexity
 
 Including Chat Model, Online Model (news aware), Code Llama, Llama 2
 
-<img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:25%'/>
+<img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:20%'/>
 
 
 ## Google Gemini
 
 Includes google's new chat model, for interactive chats.
 
-<img src='attachments/65c5a9543e8c3b6aec82835e-file-p' style='width:25%'/>
+<img src='attachments/65c5a9543e8c3b6aec82835e-file-p' style='width:20%'/>
 
 
 Everything in Quanta is offered for free except for AI Capabilities. Since AI is provided by [OpenAI](https://openai.com) and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to `Menu -> Account -> Settings -> Add Credit` to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want.
@@ -101,6 +113,8 @@ If you only want to ask an AI question about a limited subset of nodes you can u
 # Configure AI
 
 Use `Menu -> AI -> Configure AI` to configure a node (any node), so that all questions anywhere on the tree under that node will have the prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers. 
+
+*NOTE: Most of the discussion below describes how 'System Prompt' works for the OpenAI LLM, however when System Prompt is used with Anthropic Models (Sonnet and Opus), the System Prompt is simply added as a prefix to the actual prompt/question, because Anthropic doesn't support System Prompt per se.* 
 
 In other words you can say things like the following examples and the AI will assume this role during all question answering you do anywhere in the subgraph under this node. Once you set this `System Prompt` on the node it gets saved but it doesn't appear on the screen until you come back to the Configure GPT dialog to edit/view it again. 
 
@@ -171,7 +185,7 @@ Quanta can connect to several different AI APIs on the back end, which is what p
 <img src='attachments/65bc2b7bcf425c5fe6f2dde2-file-p' style='width:100%'/>
 
 
-## AI Services and Pricing
+## AI Services Supported
 
 No matter what AI service you use, you will be charged only exactly what you consume based on OpenAI and/or Perplexity's pricing models. Quanta doesn't charge extra for use of AI, but merely passes your costs thru without any markup.
 
@@ -181,6 +195,8 @@ Here's the list of the available AI Services:
 
 | AI Service Name     | Description                                                                       |
 |---------------------|-----------------------------------------------------------------------------------|
+| **Opus (Anthropic Claud 3)** |  Anthropic's most intelligent model, which can handle complex analysis, longer tasks with multiple steps, and higher-order math and coding tasks. |
+| **Sonnet (Anthropic Claud 3)** | Anthropic's best combination of performance and speed for efficient, high-throughput tasks. |
 | **OpenAI (Chat)**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
 | **Google Gemini (Chat)** | Google's best high-end powerful general-purpose AI.                        |
 | **Perplexity (Chat)** | Perplexity's best high-end powerful general-purpose AI.                    |
@@ -188,27 +204,43 @@ Here's the list of the available AI Services:
 | **Code Llama**      | The well-known open source Code Llama, which is great for coding and programming tasks. |
 | **Llama 2**         | The well-known open source Llama 2, which is great for general-purpose tasks. |
 
-# Practical Use Case - Writing a Scientific Paper
+# Practical Use Case Example - Writing a Scientific Paper
 ----
 
-Let's say you are writing a research paper, and you want to get assistance with every paragraph you write. 
+Let's say you're writing a research paper, and you want to get AI assistance with your writing.
 
 In this scenario you would first create the top level "root" of your document on the content tree. You would call it something like `"A Unification Theory: Schrodinger Black Holes"` or whatever. So all your sections, and paragraphs and content will go under that node as a large subgraph representing your document.
 
-You would then select that document root node and apply the "Configure GPT Prompting" settings to instruct the GPT with something like the following: 
+## Configure Document Root Node to have AI Settings
+
+You would then select that document root node and click `Menu -> AI -> Configure AI` settings and enter into that dialog something like the following: 
 
 **System Prompt:**
 
 `"You are a theoretical physics researcher and scientist helping me write a research paper. You will take the text I provide, and rewrite it to make it better."`
 
-Once you've done this, you can just run `Ask Content as Question` on each paragraph you create in the document, and a proposed rewrite will automatically get inserted as a child node.
+The above system prompt at the root of the document gives the AI the ability to apply that system prompt across the entire document as you start generating AI content underneath.
 
-Then if you wanted to keep the entire rewrite of your paragraph, that ChatGPT created, and use that in your document you would use the `Menu -> Edit -> Append to Parent` feature. That function takes the content of the selected node, and appends it to the end of it's parent node's content, and then deletes it. 
+## Generating AI Content in your Documents
 
-However more frequently you'll probably just look at how ChatGPT worded the text, and then get better ideas of your own, and type them in yourself. Or you might realize that since ChatGPT said something you didn't really mean that indicates perhaps a human would likely misunderstand the text as well, and therefore you know you probably need to rephrase it to make it more clear.
+Now let's say your're editing in this document (i.e. creating/modifying nodes under your document rood node), and you want to generate a paragraph of text for the document using AI.
 
-![file-p](attachments/64f7a2a206a5b22fcf329784-file-p)
+The quickest way to get a piece of AI generated content is to create a node that contains your AI query prompt as its content and then click the AI button (Robot button at the bottom of the editor) to ask the question. This will insert the AI-generated answer to the question as a subnode under the question node.
 
+However in this case you've created a node that will be sitting in your document that is an actual question with an answer under it, and that is different from what you would want to see in an actual document about some specific topic.
+
+So if there is a place in your document where you would like to insert some content, that is AI generated, as if it was a piece of the document itself there is a way to do that as well. In this case, what you'd do is configure a node so that it has the description of the content (an AI prompt/question) you like to create as part of the actual node configuration itself.
+
+Let's show an example so that this makes sense. Let's say you're writing a document on something related to Quantum Mechanics and you want to include an AI Generated paragraph or two on the actual definition of QM.
+
+You'd simply create an empty node at that location in your document and again choose `Menu -> AI -> Configure AI`, and then enter the following template:
+
+![file-p](attachments/65d6ef79d711a216791d9556-file-p)
+
+
+Note the checkbox `Overwrite Content with Answer`. This means that whenever you click the `AI Generate` button (the robot icon) at the bottom of the editor for this node, the current content of that node will be overwritten with the response from the selected `AI Service` using the output from the `Query Template`.
+
+Once you've configured the AI settings to be what's shown above you can then click the said robot icon and it will query the AI and then inject the definition of "Quantum Mechanics" into the content of that node. Using this technique you can create documents that seamlessly contain chunks of content that are AI-Generated mixed in with your own words.
 
 **[ChatGPT Example Q&A](/docs/user-guide/addendum/index.md)**
 

@@ -102,4 +102,4 @@ Select `Menu -> Search -> Public Appendable` to display all the nodes you own th
 
 
 ----
-**[Next: Artificial Intelligence](/docs/user-guide/ai/index.md)**
+**[Next: Artificial Intelligence - LLMs](/docs/user-guide/ai/index.md)**

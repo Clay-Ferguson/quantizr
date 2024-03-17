@@ -1,15 +1,18 @@
 **[Quanta](/docs/index.md)**
 
 * [Demo Content](#demo-content)
+    * [News and Podcasts](#news-and-podcasts)
     * [ChatGPT Examples ](#chatgpt-examples-)
     * [War and Peace](#war-and-peace)
-    * [News and Podcasts](#news-and-podcasts)
     * [Sample Video](#sample-video)
     * [Sample Audio](#sample-audio)
 
 # Demo Content
 
-This section shows various kinds of content and lets you explore how to interact with them.
+# News and Podcasts
+
+<img src='attachments/65ecb904f3ea2622c2d01745-News.png' style='width:25%'/>
+
 
 # ChatGPT Examples 
 
@@ -22,11 +25,6 @@ This section shows various kinds of content and lets you explore how to interact
 Use this content to learn how Quanta works with large structured texts...
 
 <img src='attachments/628529ff5b418d47100e0c39-file-p' style='width:25%'/>
-
-
-# News and Podcasts
-
-<img src='attachments/626b08cd795ee9107f1b96d3-file-p' style='width:50px'/>
 
 
 # Sample Video

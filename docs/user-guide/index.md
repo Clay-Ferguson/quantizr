@@ -14,11 +14,13 @@
 
 ### [Sharing](/docs/user-guide/sharing/index.md)
 
-### [Artificial Intelligence](/docs/user-guide/ai/index.md)
+### [Artificial Intelligence - LLMs](/docs/user-guide/ai/index.md)
 
 ### [Content Layout](/docs/user-guide/page-layout/index.md)
 
 ### [Document View](/docs/user-guide/document-view/index.md)
+
+### [Thread View](/docs/user-guide/thread-view/index.md)
 
 ### [Searching](/docs/user-guide/searching/index.md)
 

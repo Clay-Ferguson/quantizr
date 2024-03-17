@@ -35,4 +35,4 @@ Note that in the screenshot above we had switched back to the "Menu" (via radio 
 
 
 ----
-**[Next: Searching](/docs/user-guide/searching/index.md)**
+**[Next: Thread View](/docs/user-guide/thread-view/index.md)**

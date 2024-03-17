@@ -2,10 +2,12 @@
 
 * [Quanta Features](#quanta-features)
     * [Hierarchial CMS](#hierarchial-cms)
-    * [Quantized](#quantized)
+    * [Artificial Intelligence](#artificial-intelligence)
     * [ChatGPT AI](#chatgpt-ai)
+    * [Anthropic AI](#anthropic-ai)
     * [Perplexity AI](#perplexity-ai)
     * [Gemini AI](#gemini-ai)
+    * [Block Editor](#block-editor)
     * [Secure Messaging](#secure-messaging)
     * [Blogs - Notes - Wikis ](#blogs---notes---wikis-)
     * [Advanced Editing](#advanced-editing)
@@ -17,8 +19,9 @@
     * [Speech-to-Text](#speech-to-text)
     * [PDF Creator](#pdf-creator)
     * [Timelines](#timelines)
-    * [Audio and Video Recording](#audio-and-video-recording)
+    * [Thread View](#thread-view)
     * [Interactive Node Graphs](#interactive-node-graphs)
+    * [Audio and Video Recording](#audio-and-video-recording)
     * [Import and Export](#import-and-export)
     * [Mobile Support](#mobile-support)
     * [Semantic Web](#semantic-web)
@@ -34,23 +37,28 @@ When you create an account, you get a root node (i.e. your personal branch of th
 
 You can let any node and all its subnodes represent a wiki, document, photo album, blog, etc. It's just a tree of content, so it's all up to you. For example you could create a node and share it with several people, and then the "Timeline View" of that node would be like a private chat room, or discussion thread.
 
-<img src='attachments/60188ccba7da7d062f8a2707-graph.png' style='width:25%'/>
+<img src='attachments/60188ccba7da7d062f8a2707-file-img1' style='width:25%'/>
 
 
-# Quantized
+# Artificial Intelligence
 
-The name "quanta" comes from how the platform lets you "quantize" content so it's stored in small `chunks or blocks (called Nodes)`. This means you can attach comments underneath individual sentences, or paragraphs (similar to X/Twitter replies hierarchy).
+The Quanta AI can assist you with almost any kind of task, and it retains a memory of the conversation, by using the tree location as a "context" for discussion. Quanta is perhaps the first AI Assistant with a `hierarchical context` (i.e. memory). We support AI chat, question answering, image understanding (asking questions about images), and image generation. You can choose to keep your conversations private or share by sharing branches of your tree.
 
-Every node automatically has it's own URL, so they're easy to link to across the web. Platforms using block editors, similar to Quanta, are becoming very popular, and include for example: [Notion](https://notion.so), [Jupyter Notebooks](https://jupyter.org), and [WordPress Gutenberg](https://wordpress.org/gutenberg).
-
-<img src='attachments/60187b83f5fad05e348a3835-file-p' style='width:25%'/>
+<img src='attachments/65f7233fcb4027493226dd08-quanta-ai-300px.png' style='width:25%'/>
 
 
 # ChatGPT AI
 
-Interact with `OpenAI's ChatGPT AI`, by asking questions on the Quanta Tree and getting answers automatically saved into the tree. The AI can assist you with almost any kind of task, and it retains a memory of the conversation, by using the tree location as a "context" for discussion. Quanta is perhaps the first AI Assistant with a `hierarchical context` (i.e. memory). We support AI chat, question answering, image understanding (asking questions about images), and image generation. You can choose to keep your conversations private or share by sharing branches of your tree.
+Interact with `OpenAI's ChatGPT AI`, by asking questions on the Quanta Tree and getting answers automatically saved into the tree
 
 <img src='attachments/64ebe3e8c33eef3cdbdac6b8-file-p' style='width:25%'/>
+
+
+# Anthropic AI
+
+Use Anthropic's Sonnet (best combination of performance and speed), and Opus (most intelligent and advanced model) Chat models to answer your questions or write documents.
+
+<img src='attachments/65f717dccb4027493226dcff-anthropic.png' style='width:25%'/>
 
 
 # Perplexity AI
@@ -65,6 +73,15 @@ Optionally use `Perplexity` as your AI provider, via a simple selection in your 
 Optionally use `Google's Gemini AI` as your AI provider, via a simple selection in your account settings panel.
 
 <img src='attachments/65c5a60b3e8c3b6aec828355-file-p' style='width:25%'/>
+
+
+# Block Editor
+
+The name "quanta" comes from how the platform lets you "quantize" content so it's stored in small `chunks or blocks (called Nodes)`. This means you can attach comments underneath individual sentences, or paragraphs (similar to X/Twitter replies hierarchy).
+
+Every node automatically has it's own URL, so they're easy to link to across the web. Platforms using block editors, similar to Quanta, are becoming very popular, and include for example: [Notion](https://notion.so), [Jupyter Notebooks](https://jupyter.org), and [WordPress Gutenberg](https://wordpress.org/gutenberg).
+
+<img src='attachments/60187b83f5fad05e348a3835-file-p' style='width:25%'/>
 
 
 # Secure Messaging
@@ -144,11 +161,11 @@ A Timeline is a reverse-chronological listing of all subnodes (including descend
 <img src='attachments/601888bca7da7d062f8a26fd-file-p' style='width:25%'/>
 
 
-# Audio and Video Recording
+# Thread View
 
-When you attach an audio or video file to a node, the platform automatically provides a "player" for watching the video or playing the audio. You can also record Audio or Video directly thru your browser (WebCam/Microphone), and it automatically saves as a node attachment, for later playback or downloading as a file.
+Get a Historical Thread View of the parent node hierarchy (all ancestor nodes listed in order) for any node. On a tree structure, and when doing AI conversations (chats) this view is the best way to view the conversation as a top down vertical list of content.
 
-<img src='attachments/60188b3ea7da7d062f8a2700-file-p' style='width:25%'/>
+<img src='attachments/65f71c1bcb4027493226dd04-file-p' style='width:25%'/>
 
 
 # Interactive Node Graphs
@@ -156,6 +173,13 @@ When you attach an audio or video file to a node, the platform automatically pro
 Work with interactive Graphs of any branch of the tree, or any custom search query, using the search dialog. The Graphs use a physics engine (with Gravitational forces) to position things in the screen space. You can drag nodes in the graph around with the mouse, pan, zoom, hover the mouse for an info popup, or click any element in a graph to jump to that node on the main content tree.
 
 <img src='attachments/60189454a7da7d062f8a2733-graph.png' style='width:25%'/>
+
+
+# Audio and Video Recording
+
+When you attach an audio or video file to a node, the platform automatically provides a "player" for watching the video or playing the audio. You can also record Audio or Video directly thru your browser (WebCam/Microphone), and it automatically saves as a node attachment, for later playback or downloading as a file.
+
+<img src='attachments/60188b3ea7da7d062f8a2700-file-p' style='width:25%'/>
 
 
 # Import and Export
