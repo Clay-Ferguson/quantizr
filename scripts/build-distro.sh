@@ -41,6 +41,7 @@ cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
+cp ${SCRIPTS}/mongo-backup.sh               ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv-run-distro.sh          ${DEPLOY_TARGET}
