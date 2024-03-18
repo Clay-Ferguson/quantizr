@@ -138,12 +138,14 @@ public enum NodeProp {
 
     OPEN_GRAPH("sn:og"), //
     TRUNCATED("trunc"), //
-    OPENAI_RESPONSE("sn:oaiRes"), //
-    ANTHAI_RESPONSE("sn:anthaiRes"), //
-    PPLXAI_RESPONSE("sn:pplxaiRes"), //
-    GEMINIAI_RESPONSE("sn:geminiaiRes"), //
-    HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
-    OOBAI_RESPONSE("sn:oobRes"), //
+
+    // not needed yet (or ever), commenting for now.
+    // OPENAI_RESPONSE("sn:oaiRes"), //
+    // ANTHAI_RESPONSE("sn:anthaiRes"), //
+    // PPLXAI_RESPONSE("sn:pplxaiRes"), //
+    // GEMINIAI_RESPONSE("sn:geminiaiRes"), //
+    // HUGGINGFACE_RESPONSE("sn:hfaceRes"), //
+    // OOBAI_RESPONSE("sn:oobRes"), //
 
     // used to let nodes specify the files and paths for markdown export
     FILE_NAME("file"), //

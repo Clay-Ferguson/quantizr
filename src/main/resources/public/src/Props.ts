@@ -265,7 +265,7 @@ export class Props {
         S.util.addAllToSet(this.hiddenPropertyList, [ //
             J.NodeProp.TYPE_LOCK, //
             J.NodeProp.NO_EXPORT, //
-            J.NodeProp.OPENAI_RESPONSE, //
+            // J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
             J.NodeProp.AI_QUERY_TEMPLATE, //

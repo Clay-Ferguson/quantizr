@@ -496,7 +496,7 @@ public class OpenAiService extends ServiceBase {
                 null, null, true, true, res.getNodeChanges());
 
         newNode.setContent(aiUtil.formatAnswer(aiAnswer, true));
-        newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+        // newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
 
         newNode.touch();
         newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));

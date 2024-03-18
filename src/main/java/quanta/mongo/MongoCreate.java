@@ -468,32 +468,32 @@ public class MongoCreate extends ServiceBase {
         // OpenAI
         if (openAiAns != null) {
             node.setContent(aiUtil.formatAnswer(openAiAns, true));
-            node.set(NodeProp.OPENAI_RESPONSE, openAiAns);
+            // node.set(NodeProp.OPENAI_RESPONSE, openAiAns);
         }
         // Anthropic
         else if (anthAiAns != null) {
             node.setContent(aiUtil.formatAnswer(anthAiAns, true));
-            node.set(NodeProp.ANTHAI_RESPONSE, anthAiAns);
+            // node.set(NodeProp.ANTHAI_RESPONSE, anthAiAns);
         }
         // Perplexity AI
         else if (pplxAiAns != null) {
             node.setContent(aiUtil.formatAnswer(pplxAiAns, true));
-            node.set(NodeProp.PPLXAI_RESPONSE, pplxAiAns);
+            // node.set(NodeProp.PPLXAI_RESPONSE, pplxAiAns);
         }
         // OobaBooga
         else if (oobAiAns != null) {
             node.setContent(aiUtil.formatAnswer(oobAiAns, true));
-            node.set(NodeProp.OOBAI_RESPONSE, oobAiAns);
+            // node.set(NodeProp.OOBAI_RESPONSE, oobAiAns);
         }
         // HuggingFace
         else if (huggingFaceAns != null) {
             node.setContent(huggingFaceAns.getGeneratedText());
-            node.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAns);
+            // node.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAns);
         }
         // Gemini AI
         else if (geminiAiAns != null) {
             node.setContent(aiUtil.formatAnswer(geminiAiAns, true));
-            node.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAns);
+            // node.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAns);
         } else {
             node.setContent(req.getContent() != null ? req.getContent() : "");
         }
