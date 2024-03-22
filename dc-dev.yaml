@@ -82,6 +82,29 @@ services:
         #     retries: 5
         #     start_period: 20s
 
+    # This is only enabled for production, but was tested here using the @reboot schedule    
+    # mongo-backup:
+    #     image: mongo:6.0.8
+    #     command: sh -c "sleep 30s && mongodump --username=root --password=${mongoPassword} --authenticationDatabase=admin --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive='/backup/dump-'`eval date +%Y-%m-%d`'.gz' --verbose >> '/backup/backup-'`eval date +%Y-%m-%d`'.log' 2>&1"
+    #     deploy:
+    #         mode: replicated
+    #         replicas: 1
+    #         restart_policy:
+    #             condition: none
+    #         labels:
+    #             - "swarm.cronjob.enable=true"
+    #             - "swarm.cronjob.schedule=0 0 * * *" # Run every day at midnight
+    #             # For testing in development use this @reboot schedule to force a backup on startup
+    #             # - "swarm.cronjob.schedule=@reboot"
+    #             - "swarm.cronjob.skip-running=true"
+    #     volumes:
+    #         - '${MONGO_BACKUP}:/backup'
+    #     hostname: mongo-backup-host-dev
+    #     networks:
+    #         bridge:
+    #             aliases:
+    #                 - mongo-backup-host-dev
+
     pgdb-dev:
         image: postgres
         deploy:
