@@ -286,9 +286,12 @@ public class CryptoService extends ServiceBase {
             log.debug("signed: nodeId=" + parent.getIdStr() + " sig=" + sig);
         }
 
-        // add in root node first
-        pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), sig));
-        count.inc();
+        if (!req.isSignUnsigned() || !parent.hasProp(NodeProp.CRYPTO_SIG.s())) {
+            // add in root node first
+            pushInfo.getVal().getListToSign().add(new NodeSigData(parent.getIdStr(), sig));
+            count.inc();
+        }
+
         BooleanVal failed = new BooleanVal();
 
         opsw.stream(query, SubNode.class).forEach(node -> {
