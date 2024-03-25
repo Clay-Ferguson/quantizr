@@ -213,7 +213,7 @@
 
 .rowBorderInlineChildren {
     /* If no border is defined here then borders only show up during edit or metadata display modes */
-    border-bottom: 2px solid $nodeBorderBottomColor;
+    // border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
 .rowBorderEdit {

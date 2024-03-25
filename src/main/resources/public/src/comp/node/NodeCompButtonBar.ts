@@ -114,11 +114,16 @@ export class NodeCompButtonBar extends Div {
         on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
         */
         if (this.node.hasChildren && !isPageRootNode) {
-            openButton = new IconButton("fa-folder-open", "Open", {
-                [C.NODE_ID_ATTR]: this.node.id,
-                onClick: S.nav.openNodeById,
-                title: "Explore content of this node"
-            }, "btn-primary");
+            const exp = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+            const isMine = S.props.isMine(this.node);
+
+            if (!(exp && !isMine)) {
+                openButton = new IconButton("fa-folder-open", "Open", {
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.openNodeById,
+                    title: "Explore content of this node"
+                }, "btn-primary");
+            }
 
             expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
                 [C.NODE_ID_ATTR]: this.node.id,
@@ -135,7 +140,7 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (ast.userPrefs.editMode) {
-            if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && ast.userPrefs.editMode) {
+            if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && S.props.isMine(this.node)) {
                 dragIcon = new Icon({
                     className: "bi bi-grip-vertical bi-lg dragIcon",
                     title: "Drag to move this node"
