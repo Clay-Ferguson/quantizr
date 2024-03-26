@@ -435,7 +435,7 @@ export class Render {
                     }
                     else if (allowScroll && targetNodeId) {
                         if (C.DEBUG_SCROLLING) {
-                            console.log("highlight: byId");
+                            console.log("highlight byId: " + targetNodeId);
                         }
 
                         S.nodeUtil.highlightRowById(s, targetNodeId, true);

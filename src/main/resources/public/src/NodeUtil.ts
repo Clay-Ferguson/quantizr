@@ -97,9 +97,12 @@ export class NodeUtil {
                 }
                 else {
                     // if we can't find that node, best behvior is at least to scroll to top.
-                    if (scroll) {
-                        S.view.scrollToTop();
-                    }
+                    // NOTE: This scrollToTop created a bug where on the first CLICK onto a node after scrolling down
+                    // as anonymous user caused the page to scroll to top, loosing scroll position. So I'm commenting
+                    // this out for now. I don't think we need it.
+                    // if (scroll) {
+                    //     S.view.scrollToTop();
+                    // }
                 }
             }, 750);
         }
