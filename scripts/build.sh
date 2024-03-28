@@ -31,7 +31,11 @@ cd ${PRJROOT}/pom/common
 # to simplify the POMs by separately installing all the common stuff
 # from this common pom. Both POMS are necessary!
 echo "mvn install the /pom/common/pom.xml into repo"
+
+# WARNING: DO NOT DELETE: After you upgrade to a new version of Java, you MUST run this command with "clean" in it!
+# mvn -T 1C clean install -Dmaven.javadoc.skip=true
 mvn -T 1C install -Dmaven.javadoc.skip=true
+
 verifySuccess "Maven install common pom"
 
 cd ${PRJROOT}

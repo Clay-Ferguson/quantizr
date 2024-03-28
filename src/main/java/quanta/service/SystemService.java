@@ -368,15 +368,12 @@ public class SystemService extends ServiceBase {
         log.debug("SendEmailTest detected on server.");
         String timeString = new Date().toString();
         synchronized (EmailSender.getLock()) {
-            try {
-                mail.init();
-                mail.sendMail(prop.getDevEmail(), null,
-                        "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
-                                + prop.getConfigText("brandingAppName") + " admin menu.",
-                        "Test Subject");
-            } finally {
-                mail.close();
-            }
+            String devEmail = prop.getDevEmail();
+            String fromAddress = "noreply@quanta.wiki"; // todo-0: put in configurble property
+            mail.sendMail(devEmail, fromAddress,
+                    "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
+                            + prop.getConfigText("brandingAppName") + " admin menu.",
+                    "Test Subject");
         }
         return res;
     }
