@@ -300,7 +300,7 @@ services:
             mail.user: "postmaster@quantizr.com" 
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
-            mail.from: "admin@quanta.wiki"
+            mail.from: "noreply@quanta.wiki"
 
             JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:${PORT_DEBUG},server=y,suspend=n"
 

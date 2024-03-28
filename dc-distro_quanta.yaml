@@ -282,7 +282,7 @@ services:
             mail.user: "postmaster@quantizr.com"
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
-            mail.from: "admin@quanta.wiki"
+            mail.from: "noreply@quanta.wiki"
 
             stripe.apiKey: "${stripeApiKey}"
             stripe.endpointKey: "${stripeEndpointKey}"
