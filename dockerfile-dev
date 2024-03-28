@@ -1,6 +1,5 @@
 # NOTE: Don't try 'slim' jdk. It's missing the code for our captcha image generation
 # and possibly other things
-# FROM openjdk:22-jdk-slim # todo-0: test this
 FROM openjdk:22
 LABEL maintainer="wclayf@gmail.com"
 
