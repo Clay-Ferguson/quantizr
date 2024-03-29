@@ -563,7 +563,7 @@ export class Search {
 
         const itemDiv = new Div(null, attrs, [
             // we use 2 as 'idx' here becasue we just want anything but 1 (which indicates 'first')
-            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, tabData.id, 2, 1) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, tabData, jumpButton, showThreadButton, tabData.id, 2, 1, false) : null,
             allowHeader ? new Clearfix() : null,
             content,
             null,

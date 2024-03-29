@@ -125,11 +125,14 @@ export class NodeCompButtonBar extends Div {
                 }, "btn-primary");
             }
 
-            expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
-                [C.NODE_ID_ATTR]: this.node.id,
-                onClick: S.nav.toggleNodeInlineChildren,
-                title: expandChildren ? "Collapse Children" : "Expand Children"
-            }, "btn-primary") : null;
+            // for now, let's go back to only showing expand/collapse button for our own nodes
+            if (isMine) {
+                expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.toggleNodeInlineChildren,
+                    title: expandChildren ? "Collapse Children" : "Expand Children"
+                }, "btn-primary") : null;
+            }
         }
 
         const iconClazz = ast.mobileMode ? "" : "buttonBarIcon";

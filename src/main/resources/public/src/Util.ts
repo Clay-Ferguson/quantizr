@@ -693,9 +693,12 @@ export class Util {
                 new Notification(title, {
                     body: message,
 
-                    /* Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
-                     both image and icon here and neither works. */
+                    /* todo-2: Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
+                     both image and icon here and neither works. Another issue is that this 'image' property is apparently deprecated
+                     now in current versions of code, so I'm removing it, this is a low priority.
+
                     image: window.location.origin + "/branding/logo-50px-tr.jpg"
+                    */
                 });
             });
         }

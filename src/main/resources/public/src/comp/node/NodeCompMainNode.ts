@@ -65,7 +65,7 @@ export class NodeCompMainNode extends Div {
 
         if (allowHeader) {
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
-            header = new NodeCompRowHeader(node, true, true, this.tabData, showJumpButton, true, this.tabData.id, 1, 1);
+            header = new NodeCompRowHeader(node, true, true, this.tabData, showJumpButton, true, this.tabData.id, 1, 1, false);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);

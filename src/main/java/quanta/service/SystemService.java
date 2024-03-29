@@ -369,7 +369,7 @@ public class SystemService extends ServiceBase {
         String timeString = new Date().toString();
         synchronized (EmailSender.getLock()) {
             String devEmail = prop.getDevEmail();
-            String fromAddress = "noreply@quanta.wiki"; // todo-0: put in configurble property
+            String fromAddress = prop.getMailFrom();
             mail.sendMail(devEmail, fromAddress,
                     "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
                             + prop.getConfigText("brandingAppName") + " admin menu.",
