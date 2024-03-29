@@ -69,8 +69,8 @@ services:
                 condition: none
             labels:
                 - "swarm.cronjob.enable=true"
-                - "swarm.cronjob.schedule=0 0 * * *" # Run every day at midnight
-                # For testing in development use this @reboot schedule to force a backup on startup
+                - "swarm.cronjob.schedule=0 0 * * ?" # Run every day at midnight
+                # For testing use this @reboot schedule to force a backup on startup
                 # - "swarm.cronjob.schedule=@reboot"
                 - "swarm.cronjob.skip-running=true"
         volumes:
