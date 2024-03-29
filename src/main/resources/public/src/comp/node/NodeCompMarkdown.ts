@@ -79,12 +79,13 @@ export class NodeCompMarkdown extends Comp {
     }
 
     translateLaTex = (val: string): string => {
-        val = val.replaceAll("$", "\\$");
-        val = val.replaceAll("\\(", "$");
-        val = val.replaceAll("\\)", "$");
-        val = val.replaceAll("\\[", "$$");
-        val = val.replaceAll("\\]", "$$");
-        return val;
+        // val = val.replaceAll("$", "\\$"); // Note sure what this was for
+        if (val.indexOf("\\") == -1) return val;
+
+        return val.replaceAll("\\(", "$")//
+            .replaceAll("\\)", "$")//
+            .replaceAll("\\[", "$$")//
+            .replaceAll("\\]", "$$");
     }
 
     override preRender = (): boolean => {
