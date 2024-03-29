@@ -1,6 +1,7 @@
 {
   "name": "subnode",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "private": true,
   "scripts": {
@@ -20,6 +21,8 @@
     "@fullcalendar/timegrid": "^6.1.8",
     "@popperjs/core": "^2.11.7",
     "@types/dropzone": "^5.7.4",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
     "bootstrap": "^5.1.3",
     "bootstrap-icons": "^1.11.2",
     "d3": "^7.6.1",
@@ -46,15 +49,13 @@
     "@types/d3": "^7.4.0",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.4",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "sass": "^1.66.1",
-    "typescript": "^5.0.4",
-    "vite": "^4.4.9",
+    "typescript": "5.4",
+    "vite": "^5.2.6",
     "vite-plugin-circular-dependency": "^0.2.1"
   }
 }

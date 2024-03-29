@@ -6,6 +6,7 @@ target/
 
 src/main/resources/public/node_modules
 src/main/resources/public/node_modules/
+src/main/resources/public/.yarn/
 src/main/resources/public/public/node/
 src/main/resources/public/.vscode/
 src/main/resources/public/bundle.js

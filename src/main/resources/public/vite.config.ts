@@ -17,15 +17,7 @@ export default defineConfig({
     build: {
         chunkSizeWarningLimit: 3000,
         minify: process.env.DOCKER_ENV === "dev" ? false : true,
-        sourcemap: process.env.DOCKER_ENV === "dev" ? true : false,
-
-        // ChatGPT suggestion, never vetted
-        // terserOptions: {
-        //     // Prevent 'dropzone' from being minified
-        //     mangle: {
-        //         reserved: ['Dropzone'],
-        //     },
-        // },
+        sourcemap: process.env.DOCKER_ENV === "dev" ? true : false
     },
     plugins: [
         circularDependency({
@@ -38,6 +30,5 @@ export default defineConfig({
             "~bootstrap": path.resolve(__dirname, "node_modules/bootstrap"),
         }
     },
-
     base: "/dist"
 });
