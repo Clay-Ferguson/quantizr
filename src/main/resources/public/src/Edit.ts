@@ -1125,6 +1125,16 @@ export class Edit {
         }
     }
 
+    importJson = async (nodeId: string, type: string) => {
+        const res = await S.rpcUtil.rpc<J.ImportJsonRequest, J.ImportJsonResponse>("importJson", {
+            nodeId,
+            type
+        });
+        if (res.code === C.RESPONSE_CODE_OK) {
+            S.view.jumpToId(res.nodeId);
+        }
+    }
+
     askQuestionAboutSubGraph = async (nodeId: string) => {
         const dlg = new AskAboutSubgraphDlg(nodeId);
         await dlg.open();

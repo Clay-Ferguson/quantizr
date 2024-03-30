@@ -95,6 +95,20 @@ export class MenuPanel extends Div {
     static export = () => S.edit.openExportDlg();
     static viewNodeGraph = () => S.render.showGraph(null, "");
 
+    static importJson = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.edit.importJson(node.id, null);
+        }
+    };
+
+    static importToC = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.edit.importJson(node.id, "toc");
+        }
+    };
+
     static openTtsTab = () => {
         // this ttsTabSelected var is a quick hack to make tab show up, but we really need common
         // forceSelectTab for thsi purpose (or maybe selectTab SHOULD naturally force things? probably so)
@@ -323,6 +337,11 @@ export class MenuPanel extends Div {
 
                 new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
                 new MenuItem("Export", MenuPanel.export, onMainTab && exportFeatureEnabled, null, true),
+                new MenuItemSeparator(), //
+
+                new MenuItem("Import JSON", MenuPanel.importJson, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Import ToC", MenuPanel.importToC, onMainTab && selNodeIsMine, null, true), //
+
 
                 // Removing for now. Our PostIt node icon makes this easy enough.
                 // new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //

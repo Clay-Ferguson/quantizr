@@ -1,14 +1,17 @@
 package quanta.service.node;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
@@ -23,6 +26,7 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeJsonRequest;
+import quanta.request.ImportJsonRequest;
 import quanta.request.InitNodeEditRequest;
 import quanta.request.LikeNodeRequest;
 import quanta.request.LinkNodesRequest;
@@ -32,6 +36,7 @@ import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SetExpandedRequest;
 import quanta.request.SplitNodeRequest;
 import quanta.response.GetNodeJsonResponse;
+import quanta.response.ImportJsonResponse;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.LikeNodeResponse;
 import quanta.response.LinkNodesResponse;
@@ -42,9 +47,9 @@ import quanta.response.SetExpandedResponse;
 import quanta.response.SplitNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.response.base.NodeChanges;
-import quanta.service.AclService;
 import quanta.types.TypeBase;
 import quanta.util.Convert;
+import quanta.util.ExUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -271,6 +276,189 @@ public class NodeEditService extends ServiceBase {
     }
 
     /*
+     * Assumes the node identified in 'req' contains JSON we create a subgraph under the node that's a
+     * representation of the JSON, with each key/value pair (and/or array content) in the JSON being a
+     * node.
+     */
+    public ImportJsonResponse importJson(MongoSession ms, ImportJsonRequest req) {
+        ImportJsonResponse res = new ImportJsonResponse();
+        SubNode node = read.getNode(ms, req.getNodeId());
+        auth.ownerAuth(ms, node);
+
+        HashMap<String, Object> map = null;
+        try {
+            String content = node.getContent();
+            if (content.startsWith("```json")) {
+                content = content.substring(7);
+                if (content.endsWith("```")) {
+                    content = content.substring(0, content.length() - 3);
+                }
+            }
+            map = Util.yamlMapper.readValue(content, new TypeReference<HashMap<String, Object>>() {});
+            if (map != null) {
+                SubNode newNode = null;
+                if ("toc".equalsIgnoreCase(req.getType())) {
+                    newNode = traverseToC(ms, map, node);
+                } else {
+                    newNode = traverseMap(ms, map, node, 0L, 0);
+                }
+                if (newNode != null) {
+                    res.setNodeId(newNode.getIdStr());
+                }
+            }
+        } catch (Exception e) {
+            ExUtil.error(log, "failed parsing yaml", e);
+        }
+
+        // log.debug("Importing JSON for node: " + XString.prettyPrint(map));
+        return res;
+    }
+
+    /* returns the new book node */
+    public SubNode traverseToC(MongoSession ms, Map<String, Object> map, SubNode parentNode) {
+        String title = (String) map.get("title");
+        if (title == null) {
+            log.debug("toc node missing title");
+            return null;
+        }
+
+        SubNode bookNode = addJsonNode(ms, parentNode, title, 0L, "#book");
+        List<Object> chapters = (List<Object>) map.get("chapters");
+        if (chapters == null) {
+            log.debug("toc node missing chapters");
+            return null;
+        }
+
+        long chapterIdx = 0;
+        // todo-0: do extract to method refactor on all the parts of this nested stuff for each level.
+        for (Object chapter : chapters) {
+            Map<String, Object> chapterMap = (Map<String, Object>) chapter;
+            String chapterTitle = (String) chapterMap.get("title");
+            if (chapterTitle == null) {
+                log.debug("toc chapter missing title");
+                continue;
+            }
+            SubNode chapterNode = addJsonNode(ms, bookNode, chapterTitle, chapterIdx * 1000, "#chapter");
+            List<Object> sections = (List<Object>) chapterMap.get("sections");
+            if (sections == null) {
+                log.debug("toc chapter missing sections");
+                continue;
+            }
+
+            long sectionIdx = 0;
+            for (Object section : sections) {
+                if (section instanceof String) {
+                    addJsonNode(ms, chapterNode, (String) section, 0L, "#section");
+                }
+                // todo-0: haven't tested subsections yet.
+                else if (section instanceof Map) {
+                    Map<String, Object> sectionMap = (Map<String, Object>) section;
+                    String sectionTitle = (String) sectionMap.get("title");
+                    if (sectionTitle == null) {
+                        log.debug("toc section missing title");
+                        continue;
+                    }
+                    SubNode sectionNode = addJsonNode(ms, chapterNode, sectionTitle, sectionIdx * 1000, "#section");
+                    List<Object> subsections = (List<Object>) sectionMap.get("subsections");
+                    if (subsections == null) {
+                        log.debug("toc section missing subsections");
+                        continue;
+                    }
+
+                    long subSectionIdx = 0;
+                    for (Object subsection : subsections) {
+                        if (subsection instanceof String) {
+                            addJsonNode(ms, sectionNode, (String) subsection, subSectionIdx * 1000, "#subsection");
+                        } else {
+                            log.debug("toc subsection not a string");
+                        }
+                        subSectionIdx++;
+                    }
+                } else {
+                    log.debug("toc section not a string or map");
+                }
+                sectionIdx++;
+            }
+            chapterIdx++;
+        }
+
+        return bookNode;
+    }
+
+    public SubNode traverseMap(MongoSession ms, Map<String, Object> map, SubNode parentNode, Long ordinal, int level) {
+        if (map == null)
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+        SubNode newNode = addJsonNode(ms, parentNode, "", ordinal, null);
+        Long childOrdinal = 0L;
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+
+            if (value instanceof String) {
+                sb.append(entry.getKey() + ": " + value + "\n\n");
+            } else if (value instanceof HashMap) {
+                // If we have a nested HashMap, recursively traverse it
+                traverseMap(ms, (HashMap<String, Object>) value, newNode, childOrdinal, level + 1);
+            } else if (value instanceof List) {
+                // If we have a List, iterate over it and recursively traverse any Maps or Lists within
+                traverseList(ms, (List<Object>) value, newNode, childOrdinal, level + 1, false);
+            } else {
+                log.debug("json map type not handled: " + value.getClass().getName());
+            }
+            childOrdinal += 1000;
+        }
+
+        newNode.setContent(sb.toString());
+        update.save(ms, newNode);
+        return newNode;
+    }
+
+    private void traverseList(MongoSession ms, List<Object> list, SubNode parentNode, Long ordinal, int level,
+            boolean listInList) {
+        if (list == null)
+            return;
+
+        // if this is a list inside a list, we need to create a new node to represent the list, so we have
+        // correct hierarchy
+        if (listInList) {
+            parentNode = addJsonNode(ms, parentNode, "list...", ordinal, null);
+        }
+
+        ordinal = 0L;
+        for (Object element : list) {
+            if (element instanceof String elementStr) {
+                addJsonNode(ms, parentNode, elementStr, ordinal, null);
+            } else if (element instanceof HashMap) {
+                // If we have a nested HashMap, recursively traverse it
+                traverseMap(ms, (HashMap<String, Object>) element, parentNode, ordinal, level + 1);
+            } else if (element instanceof List) {
+                // If we have a nested List, recursively traverse it
+                traverseList(ms, (List<Object>) element, parentNode, ordinal, level + 1, true);
+            } else {
+                log.debug("json list type not handled: " + element.getClass().getName());
+            }
+            ordinal += 1000;
+        }
+    }
+
+    private SubNode addJsonNode(MongoSession ms, SubNode parentNode, String content, Long ordinal, String tag) {
+        SubNode newNode = create.createNode(ms, parentNode, null, ordinal, CreateNodeLocation.LAST, false, null);
+        newNode.setContent(content);
+        newNode.setAc(parentNode.getAc());
+        newNode.touch();
+
+        if (tag != null) {
+            newNode.setTags(tag);
+        }
+
+        update.save(ms, newNode); // save right away so we get path and ID.
+        // sigDirtyNodes.add(newNode.getIdStr()); // todo-0: add this
+        return newNode;
+    }
+
+    /*
      * When user pastes in a large amount of text and wants to have this text broken out into individual
      * nodes they can pass into here and double spaces become splitpoints, and this splitNode method
      * will break it all up into individual nodes.
@@ -287,13 +475,16 @@ public class NodeEditService extends ServiceBase {
         auth.ownerAuth(ms, node);
         String content = node.getContent();
         boolean containsDelim = content.contains(req.getDelimiter());
+
         // If split will have no effect, just return as if successful.
         if (!containsDelim) {
             return res;
         }
+
         String[] contentParts = StringUtils.splitByWholeSeparator(content, req.getDelimiter());
         SubNode parentForNewNodes = null;
         long firstOrdinal = 0;
+
         // When inserting inline all nodes go in right where the original node is, in order below it as
         // siblings
         if (req.getSplitType().equalsIgnoreCase("inline")) {
@@ -301,12 +492,12 @@ public class NodeEditService extends ServiceBase {
             firstOrdinal = node.getOrdinal();
         }
         // but for a 'child' insert all new nodes are inserted as children of the original node, starting
-        // at
-        // the top (ordinal), regardless of whether this node already has any children or not.
+        // at the top (ordinal), regardless of whether this node already has any children or not.
         else {
             parentForNewNodes = node;
             firstOrdinal = 0L;
         }
+
         int numNewSlots = contentParts.length - 1;
         if (numNewSlots > 0) {
             firstOrdinal = create.insertOrdinal(ms, parentForNewNodes, firstOrdinal, numNewSlots, res.getNodeChanges());

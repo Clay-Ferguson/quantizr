@@ -60,6 +60,7 @@ import quanta.request.GetThreadViewRequest;
 import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.GraphRequest;
+import quanta.request.ImportJsonRequest;
 import quanta.request.InitNodeEditRequest;
 import quanta.request.InsertNodeRequest;
 import quanta.request.JoinNodesRequest;
@@ -917,6 +918,14 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
         return callProc.run("sendLogText", true, true, req, session, ms -> {
             return system.sendLogText(req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/importJson", method = RequestMethod.POST)
+    @ResponseBody
+    public Object splitNode(@RequestBody ImportJsonRequest req, HttpSession session) {
+        return callProc.run("importJson", true, true, req, session, ms -> {
+            return edit.importJson(ms, req);
         });
     }
 

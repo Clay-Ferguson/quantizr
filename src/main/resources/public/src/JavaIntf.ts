@@ -488,6 +488,11 @@ export interface GraphRequest extends RequestBase {
     searchText: string;
 }
 
+export interface ImportJsonRequest extends RequestBase {
+    nodeId: string;
+    type: string;
+}
+
 export interface ImportRequest extends RequestBase {
     nodeId: string;
     sourceFileName: string;
@@ -919,6 +924,10 @@ export interface GetUserProfileResponse extends ResponseBase {
 
 export interface GraphResponse extends ResponseBase {
     rootNode: GraphNode;
+}
+
+export interface ImportJsonResponse extends ResponseBase {
+    nodeId: string;
 }
 
 export interface ImportResponse extends ResponseBase {
