@@ -445,8 +445,9 @@ public class MongoCreate extends ServiceBase {
         if (parentPlugin != null) {
             parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
-
+        setDefaultTags(ms, parentNode, newNode);
         update.save(ms, newNode);
+
         if (req.getAiService() != null && aiUtil.isAnyAnswerType(parentNode.getType())) {
             oai.insertAnswerToQuestion(ms, newNode, req, res);
         }
@@ -455,6 +456,18 @@ public class MongoCreate extends ServiceBase {
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false));
 
         return res;
+    }
+
+    private void setDefaultTags(MongoSession ms, SubNode parentNode, SubNode newNode) {
+        if (parentNode.getTags() != null) {
+            if (parentNode.getTags().contains("#book")) {
+                newNode.setTags("#chapter");
+            } else if (parentNode.getTags().contains("#chapter")) {
+                newNode.setTags("#section");
+            } else if (parentNode.getTags().contains("#section")) {
+                newNode.setTags("#subsection");
+            }
+        }
     }
 
     private void setAnswerOnNode(CreateSubNodeRequest req, //
@@ -584,6 +597,7 @@ public class MongoCreate extends ServiceBase {
             parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
 
+        setDefaultTags(ms, parentNode, newNode);
         // we save right away here so we get the node ID
         update.save(ms, newNode);
 

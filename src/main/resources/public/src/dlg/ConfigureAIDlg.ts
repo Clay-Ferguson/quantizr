@@ -24,13 +24,12 @@ export class ConfigureAIDlg extends DialogBase {
     textScrollPos = new ScrollPos();
     queryTemplateScrollPos = new ScrollPos();
 
-    constructor(public node: NodeInfo) {
+    constructor(public node: NodeInfo, public calledFromEditor: boolean) {
         super("Configure AI");
     }
 
     renderDlg(): Comp[] {
         const aiOptions = S.aiUtil.getAiOptions();
-        console.log("rerendering: " + ConfigureAIDlg.aiServiceState.getValue());
         return [
             new Div(null, null, [
                 new FlexLayout([
@@ -71,11 +70,22 @@ export class ConfigureAIDlg extends DialogBase {
 
     reload = async () => {
         ConfigureAIDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI_PROMPT, this.node));
-        ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
         ConfigureAIDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
         ConfigureAIDlg.temperatureState.setValue(S.props.getPropStr(J.NodeProp.AI_TEMPERATURE, this.node));
         ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
-        ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
+
+        if (!this.calledFromEditor) {
+            ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
+            ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
+        }
+        // slight hack for now, if we're running this from the editor and the template is empty, 
+        // then set template and overwrite to default values appropriate for working on book creation.
+        else {
+            if (!S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node)) {
+                ConfigureAIDlg.templateState.setValue("${bookContext}");
+                ConfigureAIDlg.overwriteState.setValue(true);
+            }
+        }
     }
 
     save = async () => {

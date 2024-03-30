@@ -123,6 +123,7 @@ export class MenuPanel extends Div {
         }
     };
 
+    // todo-0: rename to configureAI
     static configureGpt = () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {

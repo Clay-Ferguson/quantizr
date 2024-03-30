@@ -26,6 +26,7 @@ import { PrincipalName, PropertyInfo } from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { ConfigureAIDlg } from "./ConfigureAIDlg";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
@@ -691,6 +692,7 @@ export class EditNodeDlg extends DialogBase {
         }, true);
     }
 
+    // todo-0: rename this to AskAI
     askChatGpt = async () => {
         // it's important to call saveNode before close, because close destroys some of our state, what we need
         // to complete the updating and page refresh.
@@ -700,6 +702,16 @@ export class EditNodeDlg extends DialogBase {
         }
 
         S.edit.askAiQuestion(getAs().editNode.id);
+    }
+
+    // todo-0: when editing in dialog, for now we'll set 1) overwrite=true, and 2) template=${bookContent}, as the most common
+    // use case but it would be better to call the server and first check that the parent is a section or subsection tag before 
+    // forcing those two deault AI config settings.
+    configAi = async () => {
+        const ast = getAs();
+        const editNode = ast.editNode;
+        const dlg = new ConfigureAIDlg(editNode, true);
+        await dlg.open();
     }
 
     renderButtons(): Comp {
@@ -773,9 +785,15 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
+            // todo-0: this method needs to check if the overwrite content flag is set and if so, prompt user
+            // and warn them with a yes/no dialog about overwriting current node content.
             ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask AI", {
                 onClick: this.askChatGpt,
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService
+            }) : null,
+
+            ast.activeTab !== C.TAB_FEED ? new Button("AI Config", this.configAi, {
+                title: "Configure AI Settings on this node."
             }) : null,
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary"),

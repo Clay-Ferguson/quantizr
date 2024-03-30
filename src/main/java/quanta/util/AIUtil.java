@@ -63,12 +63,14 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public String preProcessTemplate(MongoSession ms, SubNode node, String template) {
+    public String preProcessTemplate(MongoSession ms, final SubNode node, String template) {
         if (template == null) {
             return null;
         }
 
-        // we want bookContext to turn into:
+        SubNode firstParent = null;
+
+        // we want ${bookContext} to turn into:
         // Book Title: ${bookTitle}
         // Chapter Title: ${chapterTitle}
         // Section Title: ${sectionTitle}
@@ -78,19 +80,25 @@ public class AIUtil extends ServiceBase {
             String bookContext = "\n";
             SubNode parent = read.getParent(ms, node);
             while (parent != null) {
+                if (firstParent == null) {
+                    firstParent = parent;
+                }
+
                 // todo-0: check for cases like where we have a subsection but no section, etc.
                 if (parent.getTags() != null) {
-                    if (parent.getTags().contains("#book")) {
-                        bookContext = "Book Title: " + parent.getContent() + "\n" + bookContext;
+                    // get parent with any markdown headings stripped off
+                    String parentContent = XString.repeatingTrimFromFront(parent.getContent(), "#").trim();
 
+                    if (parent.getTags().contains("#book")) {
+                        bookContext = "Book Title: " + parentContent + "\n" + bookContext;
                         // break. we're done if we reach the book node.
                         break;
                     } else if (parent.getTags().contains("#chapter")) {
-                        bookContext = "Chapter Title: " + parent.getContent() + "\n" + bookContext;
+                        bookContext = "Chapter Title: " + parentContent + "\n" + bookContext;
                     } else if (parent.getTags().contains("#section")) {
-                        bookContext = "Section Title: " + parent.getContent() + "\n" + bookContext;
+                        bookContext = "Section Title: " + parentContent + "\n" + bookContext;
                     } else if (parent.getTags().contains("#subsection")) {
-                        bookContext = "Subsection Title: " + parent.getContent() + "\n" + bookContext;
+                        bookContext = "Subsection Title: " + parentContent + "\n" + bookContext;
                     }
                 }
                 parent = read.getParent(ms, parent);
@@ -98,6 +106,43 @@ public class AIUtil extends ServiceBase {
 
             // todo-0: put in docs how this bookContext works.
             template = template.replace("${bookContext}", "\n" + bookContext + "\n");
+
+            // DO NOT DELETE. KEEP THIS EXPERIMENTAL CODE FOR FUTURE REFERENCE.
+            //
+            /*
+             * I had originally used the code below to try to have an "insert here" capability but at least
+             * ChatGPT (not necessarily other AI services) didn't handle this well, so we're no longer doing
+             * this.
+             * 
+             * LLM PROMPT:
+             * 
+             * You are an author helping me write a book. You will look at the Book Title, Chapter Title,
+             * Section Title and/or Subsection Titles provided, to understand which piece of the book you are
+             * writing, and you will generate a paragraph of content, as the proposed paragraph belonging in
+             * that section of the book.
+             * 
+             * If you are given `EXISTING PARAGRAPHS`, then you will generate your new paragraph of content so
+             * that it logically fits into where ${insertContentHere} appears inside the existing paragraphs, to
+             * create the content that would belong there (at the ${insertContentHere} location); otherwise, if
+             * there is no `EXISTING PARAGRAPHS` text provided, then assume you will be writing the first
+             * paragraph (rather than inserting a paragraph), based on the Chapter, Section, and/or Subsection.
+             * 
+             * <end of prompt>
+             */
+            // Iterable<SubNode> children = read.getChildren(ms, firstParent, Sort.by(Sort.Direction.ASC,
+            // SubNode.ORDINAL),
+            // null, 0, null, false);
+            // if (children != null) {
+            // StringBuilder sb = new StringBuilder();
+            // for (SubNode child : children) {
+            // if (child.getId().equals(node.getId())) {
+            // sb.append("${insertContentHere}\n\n");
+            // } else {
+            // sb.append(child.getContent() + "\n\n");
+            // }
+            // }
+            // template += "\n\nEXISTING PARAGRAPHS:\n" + sb.toString();
+            // }
         }
 
         return template;
@@ -261,10 +306,8 @@ public class AIUtil extends ServiceBase {
         }
 
         // todo-0: rethink this. It's duplicating the prompt for ChatGPT. I think this code was only
-        // intended
-        // for AI services that don't support for SystemPrompt, and since we DO have system prompt for
-        // ChatGPT it
-        // is duplicative.
+        // intended for AI services that don't support for SystemPrompt, and since we DO have system prompt
+        // for ChatGPT it is duplicative.
         // if (!StringUtils.isEmpty(system.getPrompt())) {
         // input = system.getPrompt() + "\n\n" + input;
         // }

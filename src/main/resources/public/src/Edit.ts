@@ -1141,7 +1141,7 @@ export class Edit {
     }
 
     configureGpt = async (node: NodeInfo) => {
-        const dlg = new ConfigureAIDlg(node);
+        const dlg = new ConfigureAIDlg(node, false);
         await dlg.open();
     };
 
