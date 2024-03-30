@@ -154,7 +154,7 @@ public class PplxAiService extends ServiceBase {
      * question.
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
-        aiUtil.parseAIConfig(node, system);
+        aiUtil.parseAIConfig(ms, node, system);
         SubNode parent = read.getParent(ms, node);
         int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
 
@@ -166,7 +166,7 @@ public class PplxAiService extends ServiceBase {
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {
                 nonAnswerCounter++;
-                aiUtil.parseAIConfig(parent, system);
+                aiUtil.parseAIConfig(ms, parent, system);
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.

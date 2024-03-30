@@ -236,6 +236,9 @@ public class OpenAiService extends ServiceBase {
             buildChatHistory(ms, node, messages, system);
         }
 
+        // log.debug("messags: " + XString.prettyPrint(messages));
+        // log.debug("system: " + XString.prettyPrint(system));
+
         if (StringUtils.isEmpty(system.getPrompt())) {
             system.setPrompt("You are a helpful assistant, who will answer questions about the following information:");
         }
@@ -246,6 +249,8 @@ public class OpenAiService extends ServiceBase {
         } else {
             input = question;
         }
+
+        // log.debug("input: " + input);
 
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
         List<Map> sysContent = new ArrayList<>();
@@ -423,7 +428,7 @@ public class OpenAiService extends ServiceBase {
      * question.
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
-        aiUtil.parseAIConfig(node, system);
+        aiUtil.parseAIConfig(ms, node, system);
         SubNode parent = read.getParent(ms, node);
         int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
 
@@ -440,7 +445,7 @@ public class OpenAiService extends ServiceBase {
                 messages.add(0, new ChatMessage("assistant", content));
             } else {
                 nonAnswerCounter++;
-                aiUtil.parseAIConfig(parent, system);
+                aiUtil.parseAIConfig(ms, parent, system);
 
                 // if we hit two non-answer nodes in a row that means we're at the top level of
                 // where teh first question was asked, and therefore the beginning of the chat.

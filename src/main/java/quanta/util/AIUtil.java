@@ -39,7 +39,7 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public void parseAIConfig(SubNode node, SystemConfig system) {
+    public void parseAIConfig(MongoSession ms, SubNode node, SystemConfig system) {
         if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI_PROMPT.s())) {
             system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
         }
@@ -49,7 +49,9 @@ public class AIUtil extends ServiceBase {
         }
 
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
-            system.setTemplate(node.getStr(NodeProp.AI_QUERY_TEMPLATE.s()));
+            String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
+            queryTemplate = preProcessTemplate(ms, node, queryTemplate);
+            system.setTemplate(queryTemplate);
         }
 
         if (system.getMaxWords() == null && node.hasProp(NodeProp.AI_MAX_WORDS.s())) {
@@ -61,6 +63,46 @@ public class AIUtil extends ServiceBase {
         }
     }
 
+    public String preProcessTemplate(MongoSession ms, SubNode node, String template) {
+        if (template == null) {
+            return null;
+        }
+
+        // we want bookContext to turn into:
+        // Book Title: ${bookTitle}
+        // Chapter Title: ${chapterTitle}
+        // Section Title: ${sectionTitle}
+        // Subsection Title: ${subsectionTitle}
+        // by starting at this node's parent and walking up the tree to the root document.
+        if (template.contains("${bookContext}")) {
+            String bookContext = "\n";
+            SubNode parent = read.getParent(ms, node);
+            while (parent != null) {
+                // todo-0: check for cases like where we have a subsection but no section, etc.
+                if (parent.getTags() != null) {
+                    if (parent.getTags().contains("#book")) {
+                        bookContext = "Book Title: " + parent.getContent() + "\n" + bookContext;
+
+                        // break. we're done if we reach the book node.
+                        break;
+                    } else if (parent.getTags().contains("#chapter")) {
+                        bookContext = "Chapter Title: " + parent.getContent() + "\n" + bookContext;
+                    } else if (parent.getTags().contains("#section")) {
+                        bookContext = "Section Title: " + parent.getContent() + "\n" + bookContext;
+                    } else if (parent.getTags().contains("#subsection")) {
+                        bookContext = "Subsection Title: " + parent.getContent() + "\n" + bookContext;
+                    }
+                }
+                parent = read.getParent(ms, parent);
+            }
+
+            // todo-0: put in docs how this bookContext works.
+            template = template.replace("${bookContext}", "\n" + bookContext + "\n");
+        }
+
+        return template;
+    }
+
     public boolean isAnyAnswerType(String type) {
         return NodeType.OPENAI_ANSWER.s().equals(type) || //
                 NodeType.PPLXAI_ANSWER.s().equals(type) || //
@@ -70,7 +112,7 @@ public class AIUtil extends ServiceBase {
 
     public void getAIConfigFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
         while (node != null) {
-            parseAIConfig(node, system);
+            parseAIConfig(ms, node, system);
             node = read.getParent(ms, node);
         }
     }
@@ -137,7 +179,7 @@ public class AIUtil extends ServiceBase {
                 continue;
             }
 
-            aiUtil.parseAIConfig(node, system);
+            aiUtil.parseAIConfig(ms, node, system);
             sb.append(n.getContent() + "\n\n");
             counter++;
 
@@ -217,9 +259,15 @@ public class AIUtil extends ServiceBase {
         } else {
             input = content;
         }
-        if (!StringUtils.isEmpty(system.getPrompt())) {
-            input = system.getPrompt() + "\n\n" + input;
-        }
+
+        // todo-0: rethink this. It's duplicating the prompt for ChatGPT. I think this code was only
+        // intended
+        // for AI services that don't support for SystemPrompt, and since we DO have system prompt for
+        // ChatGPT it
+        // is duplicative.
+        // if (!StringUtils.isEmpty(system.getPrompt())) {
+        // input = system.getPrompt() + "\n\n" + input;
+        // }
         return input;
     }
 
