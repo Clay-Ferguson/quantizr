@@ -783,8 +783,6 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
-            // todo-0: this method needs to check if the overwrite content flag is set and if so, prompt user
-            // and warn them with a yes/no dialog about overwriting current node content.
             ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask AI", {
                 onClick: this.askAI,
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService

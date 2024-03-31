@@ -316,13 +316,13 @@ public class NodeEditService extends ServiceBase {
 
     /* returns the new book node */
     public SubNode traverseToC(MongoSession ms, Map<String, Object> map, SubNode parentNode) {
-        String title = (String) map.get("title");
-        if (title == null) {
+        String bookTitle = (String) map.get("title");
+        if (bookTitle == null) {
             log.debug("toc node missing title");
             return null;
         }
 
-        SubNode bookNode = addJsonNode(ms, parentNode, title, 0L, "#book");
+        SubNode bookNode = addJsonNode(ms, parentNode, "# " + bookTitle, 0L, "#book");
         List<Object> chapters = (List<Object>) map.get("chapters");
         if (chapters == null) {
             log.debug("toc node missing chapters");
@@ -338,7 +338,7 @@ public class NodeEditService extends ServiceBase {
                 log.debug("toc chapter missing title");
                 continue;
             }
-            SubNode chapterNode = addJsonNode(ms, bookNode, chapterTitle, chapterIdx * 1000, "#chapter");
+            SubNode chapterNode = addJsonNode(ms, bookNode, "## " + chapterTitle, chapterIdx * 1000, "#chapter");
             List<Object> sections = (List<Object>) chapterMap.get("sections");
             if (sections == null) {
                 log.debug("toc chapter missing sections");
@@ -358,7 +358,9 @@ public class NodeEditService extends ServiceBase {
                         log.debug("toc section missing title");
                         continue;
                     }
-                    SubNode sectionNode = addJsonNode(ms, chapterNode, sectionTitle, sectionIdx * 1000, "#section");
+                    SubNode sectionNode =
+                            addJsonNode(ms, chapterNode, "### " + sectionTitle, sectionIdx * 1000, "#section");
+
                     List<Object> subsections = (List<Object>) sectionMap.get("subsections");
                     if (subsections == null) {
                         log.debug("toc section missing subsections");
@@ -368,7 +370,8 @@ public class NodeEditService extends ServiceBase {
                     long subSectionIdx = 0;
                     for (Object subsection : subsections) {
                         if (subsection instanceof String) {
-                            addJsonNode(ms, sectionNode, (String) subsection, subSectionIdx * 1000, "#subsection");
+                            addJsonNode(ms, sectionNode, (String) "#### " + subsection, subSectionIdx * 1000,
+                                    "#subsection");
                         } else {
                             log.debug("toc subsection not a string");
                         }
