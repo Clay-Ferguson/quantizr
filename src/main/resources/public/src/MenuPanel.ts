@@ -123,11 +123,10 @@ export class MenuPanel extends Div {
         }
     };
 
-    // todo-0: rename to configureAI
-    static configureGpt = () => {
+    static configureAI = () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
-            S.edit.configureGpt(node);
+            S.edit.configureAI(node);
         }
     };
 
@@ -359,7 +358,7 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
             children.push(new Menu("AI", [
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
-                new MenuItem("Configure AI", MenuPanel.configureGpt, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Configure AI", MenuPanel.configureAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

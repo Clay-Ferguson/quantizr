@@ -1098,11 +1098,11 @@ export class Edit {
 
             // if user is asking a question and we're not on the thread tab, then jump to the thread tab and display
             // it from the hiearcharcy above the answer (thread is being displayed for answer node)
-            if (ast.activeTab !== C.TAB_THREAD) {
+            if (!res.aiContentOverwrite && ast.activeTab !== C.TAB_THREAD) {
                 S.srch.showThread(res.newNode.id);
                 jumpToNode = false;
             }
-            else if (ast.threadViewQuestionId === nodeId && ast.activeTab == C.TAB_THREAD) {
+            else if (!res.aiContentOverwrite && ast.threadViewQuestionId === nodeId && ast.activeTab == C.TAB_THREAD) {
                 dispatch("AppendToThreadResults", s => {
                     const data = ThreadTab.inst;
                     if (!data) return;
@@ -1140,8 +1140,8 @@ export class Edit {
         await dlg.open();
     }
 
-    configureGpt = async (node: NodeInfo) => {
-        const dlg = new ConfigureAIDlg(node, false);
+    configureAI = async (node: NodeInfo) => {
+        const dlg = new ConfigureAIDlg(node);
         await dlg.open();
     };
 

@@ -802,6 +802,7 @@ export interface CreateSubNodeResponse extends ResponseBase {
     encrypt: boolean;
     gptCredit: number;
     nodeChanges: NodeChanges;
+    aiContentOverwrite: boolean;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {

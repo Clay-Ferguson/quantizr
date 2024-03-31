@@ -380,4 +380,9 @@ public class AIUtil extends ServiceBase {
         return "<div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>\n" + content
                 + "\n<div style='text-align: right; margin: 6px;'>" + aiService + "</div></div>";
     }
+
+    public boolean hasBookTags(SubNode node) {
+        return node.getTags() != null && (node.getTags().contains("#book") || node.getTags().contains("#chapter")
+                || node.getTags().contains("#section") || node.getTags().contains("#subsection"));
+    }
 }

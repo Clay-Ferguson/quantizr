@@ -393,6 +393,7 @@ public class MongoCreate extends ServiceBase {
         else {
             setAnswerOnNode(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, parentNode);
             parentNode.touch();
+            res.setAiContentOverwrite(true);
             update.save(ms, parentNode);
             NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, parentNode, false,
                     Convert.LOGICAL_ORDINAL_GENERATE, true, false, false, true);
@@ -446,6 +447,11 @@ public class MongoCreate extends ServiceBase {
             parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
         setDefaultTags(ms, parentNode, newNode);
+        if (aiUtil.hasBookTags(parentNode)) {
+            newNode.set(NodeProp.AI_OVERWRITE, true);
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
+        }
+
         update.save(ms, newNode);
 
         if (req.getAiService() != null && aiUtil.isAnyAnswerType(parentNode.getType())) {
@@ -598,6 +604,11 @@ public class MongoCreate extends ServiceBase {
         }
 
         setDefaultTags(ms, parentNode, newNode);
+        if (aiUtil.hasBookTags(parentNode)) {
+            newNode.set(NodeProp.AI_OVERWRITE, true);
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
+        }
+
         // we save right away here so we get the node ID
         update.save(ms, newNode);
 

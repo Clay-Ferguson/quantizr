@@ -325,7 +325,7 @@ export class TypeBase implements TypeIntf {
                 const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
                 aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                     new Div("AI Config", {
-                        onClick: () => S.edit.configureGpt(node),
+                        onClick: () => S.edit.configureAI(node),
                         className: "nodeTags aiTags microMarginBottom float-end",
                         title: "Configure AI Settings"
                     }),

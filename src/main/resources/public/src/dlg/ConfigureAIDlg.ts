@@ -24,7 +24,7 @@ export class ConfigureAIDlg extends DialogBase {
     textScrollPos = new ScrollPos();
     queryTemplateScrollPos = new ScrollPos();
 
-    constructor(public node: NodeInfo, public calledFromEditor: boolean) {
+    constructor(public node: NodeInfo) {
         super("Configure AI");
     }
 
@@ -73,19 +73,8 @@ export class ConfigureAIDlg extends DialogBase {
         ConfigureAIDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
         ConfigureAIDlg.temperatureState.setValue(S.props.getPropStr(J.NodeProp.AI_TEMPERATURE, this.node));
         ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
-
-        if (!this.calledFromEditor) {
-            ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
-            ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
-        }
-        // slight hack for now, if we're running this from the editor and the template is empty, 
-        // then set template and overwrite to default values appropriate for working on book creation.
-        else {
-            if (!S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node)) {
-                ConfigureAIDlg.templateState.setValue("${bookContext}");
-                ConfigureAIDlg.overwriteState.setValue(true);
-            }
-        }
+        ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
+        ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
     }
 
     save = async () => {
@@ -102,6 +91,7 @@ export class ConfigureAIDlg extends DialogBase {
         S.props.setPropVal(J.NodeProp.AI_TEMPERATURE, this.node, ConfigureAIDlg.temperatureState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_OVERWRITE, this.node, !!ConfigureAIDlg.overwriteState.getValue() || "[null]");
+
         await S.edit.saveNode(this.node, true);
         this.close();
     }
