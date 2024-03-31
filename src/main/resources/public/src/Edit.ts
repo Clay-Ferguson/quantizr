@@ -11,6 +11,7 @@ import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { EditTagsDlg } from "./dlg/EditTagsDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
+import { GenerateBookByAIDlg } from "./dlg/GenerateBookByAIDlg";
 import { SetNodeUsingJsonDlg } from "./dlg/SetNodeUsingJsonDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
@@ -1139,6 +1140,11 @@ export class Edit {
         const dlg = new AskAboutSubgraphDlg(nodeId);
         await dlg.open();
     }
+
+    generateBookByAI = async (node: NodeInfo) => {
+        const dlg = new GenerateBookByAIDlg(node);
+        await dlg.open();
+    };
 
     configureAI = async (node: NodeInfo) => {
         const dlg = new ConfigureAIDlg(node);

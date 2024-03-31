@@ -44,6 +44,7 @@ import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.DeleteUserTransactionsRequest;
 import quanta.request.ExportRequest;
+import quanta.request.GenerateBookByAIRequest;
 import quanta.request.GetBookmarksRequest;
 import quanta.request.GetFollowersRequest;
 import quanta.request.GetFollowingRequest;
@@ -923,9 +924,17 @@ public class AppController extends ServiceBase implements ErrorController {
 
     @RequestMapping(value = API_PATH + "/importJson", method = RequestMethod.POST)
     @ResponseBody
-    public Object splitNode(@RequestBody ImportJsonRequest req, HttpSession session) {
+    public Object importJson(@RequestBody ImportJsonRequest req, HttpSession session) {
         return callProc.run("importJson", true, true, req, session, ms -> {
             return edit.importJson(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/generateBookByAI", method = RequestMethod.POST)
+    @ResponseBody
+    public Object generateBookByAI(@RequestBody GenerateBookByAIRequest req, HttpSession session) {
+        return callProc.run("generateBookByAI", true, true, req, session, ms -> {
+            return aiUtil.generateBookByAI(ms, req);
         });
     }
 

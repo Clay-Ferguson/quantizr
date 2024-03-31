@@ -287,13 +287,8 @@ public class NodeEditService extends ServiceBase {
 
         HashMap<String, Object> map = null;
         try {
-            String content = node.getContent();
-            if (content.startsWith("```json")) {
-                content = content.substring(7);
-                if (content.endsWith("```")) {
-                    content = content.substring(0, content.length() - 3);
-                }
-            }
+            String content = XString.extractFirstJsonCodeBlock(node.getContent());
+
             map = Util.yamlMapper.readValue(content, new TypeReference<HashMap<String, Object>>() {});
             if (map != null) {
                 SubNode newNode = null;
@@ -322,7 +317,11 @@ public class NodeEditService extends ServiceBase {
             return null;
         }
 
-        SubNode bookNode = addJsonNode(ms, parentNode, "# " + bookTitle, 0L, "#book");
+        String systemPrompt =
+                "You are an author helping me write a book. You will consider the Book Title, Chapter Title, Section Title and/or Subsection Titles provided, to understand which piece of the book you are writing, and generate content for that part of the book. If you are given further instructions in addition to the Book Title, Chapter Title, Section Title and/or Subsection Title, then follow those instructions, when you create the book content.";
+
+        SubNode bookNode = addJsonNode(ms, parentNode, "# " + bookTitle, 0L, "#book", systemPrompt);
+
         List<Object> chapters = (List<Object>) map.get("chapters");
         if (chapters == null) {
             log.debug("toc node missing chapters");
@@ -330,7 +329,6 @@ public class NodeEditService extends ServiceBase {
         }
 
         long chapterIdx = 0;
-        // todo-0: do extract to method refactor on all the parts of this nested stuff for each level.
         for (Object chapter : chapters) {
             Map<String, Object> chapterMap = (Map<String, Object>) chapter;
             String chapterTitle = (String) chapterMap.get("title");
@@ -338,7 +336,7 @@ public class NodeEditService extends ServiceBase {
                 log.debug("toc chapter missing title");
                 continue;
             }
-            SubNode chapterNode = addJsonNode(ms, bookNode, "## " + chapterTitle, chapterIdx * 1000, "#chapter");
+            SubNode chapterNode = addJsonNode(ms, bookNode, "## " + chapterTitle, chapterIdx * 1000, "#chapter", null);
             List<Object> sections = (List<Object>) chapterMap.get("sections");
             if (sections == null) {
                 log.debug("toc chapter missing sections");
@@ -348,9 +346,11 @@ public class NodeEditService extends ServiceBase {
             long sectionIdx = 0;
             for (Object section : sections) {
                 if (section instanceof String) {
-                    addJsonNode(ms, chapterNode, (String) section, 0L, "#section");
+                    addJsonNode(ms, chapterNode, (String) "### " + section, 0L, "#section", null);
                 }
-                // todo-0: haven't tested subsections yet.
+                // todo-1: haven't tested subsections yet, and we also may not ever really need to go this
+                // deep in the hierarchy, and our prompt to generate the ToC doesn't even mention subsections
+                // either.
                 else if (section instanceof Map) {
                     Map<String, Object> sectionMap = (Map<String, Object>) section;
                     String sectionTitle = (String) sectionMap.get("title");
@@ -359,7 +359,7 @@ public class NodeEditService extends ServiceBase {
                         continue;
                     }
                     SubNode sectionNode =
-                            addJsonNode(ms, chapterNode, "### " + sectionTitle, sectionIdx * 1000, "#section");
+                            addJsonNode(ms, chapterNode, "### " + sectionTitle, sectionIdx * 1000, "#section", null);
 
                     List<Object> subsections = (List<Object>) sectionMap.get("subsections");
                     if (subsections == null) {
@@ -371,7 +371,7 @@ public class NodeEditService extends ServiceBase {
                     for (Object subsection : subsections) {
                         if (subsection instanceof String) {
                             addJsonNode(ms, sectionNode, (String) "#### " + subsection, subSectionIdx * 1000,
-                                    "#subsection");
+                                    "#subsection", null);
                         } else {
                             log.debug("toc subsection not a string");
                         }
@@ -393,7 +393,7 @@ public class NodeEditService extends ServiceBase {
             return null;
 
         StringBuilder sb = new StringBuilder();
-        SubNode newNode = addJsonNode(ms, parentNode, "", ordinal, null);
+        SubNode newNode = addJsonNode(ms, parentNode, "", ordinal, null, null);
         Long childOrdinal = 0L;
 
         for (Map.Entry<String, Object> entry : map.entrySet()) {
@@ -426,13 +426,13 @@ public class NodeEditService extends ServiceBase {
         // if this is a list inside a list, we need to create a new node to represent the list, so we have
         // correct hierarchy
         if (listInList) {
-            parentNode = addJsonNode(ms, parentNode, "list...", ordinal, null);
+            parentNode = addJsonNode(ms, parentNode, "list...", ordinal, null, null);
         }
 
         ordinal = 0L;
         for (Object element : list) {
             if (element instanceof String elementStr) {
-                addJsonNode(ms, parentNode, elementStr, ordinal, null);
+                addJsonNode(ms, parentNode, elementStr, ordinal, null, null);
             } else if (element instanceof HashMap) {
                 // If we have a nested HashMap, recursively traverse it
                 traverseMap(ms, (HashMap<String, Object>) element, parentNode, ordinal, level + 1);
@@ -446,7 +446,8 @@ public class NodeEditService extends ServiceBase {
         }
     }
 
-    private SubNode addJsonNode(MongoSession ms, SubNode parentNode, String content, Long ordinal, String tag) {
+    private SubNode addJsonNode(MongoSession ms, SubNode parentNode, String content, Long ordinal, String tag,
+            String aiSystemPrompt) {
         SubNode newNode = create.createNode(ms, parentNode, null, ordinal, CreateNodeLocation.LAST, false, null);
         newNode.setContent(content);
         newNode.setAc(parentNode.getAc());
@@ -456,8 +457,11 @@ public class NodeEditService extends ServiceBase {
             newNode.setTags(tag);
         }
 
-        update.save(ms, newNode); // save right away so we get path and ID.
-        // sigDirtyNodes.add(newNode.getIdStr()); // todo-0: add this??
+        if (aiSystemPrompt != null) {
+            newNode.set(NodeProp.AI_PROMPT, aiSystemPrompt);
+        }
+
+        update.save(ms, newNode); // save right away so we get path and ID
         return newNode;
     }
 

@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -413,5 +415,27 @@ public class XString {
             }
         }
         return false;
+    }
+
+    public static String extractFirstJsonCodeBlock(String markdown) {
+        if (markdown == null) {
+            return null;
+        }
+        if (!markdown.contains("```json")) {
+            return markdown;
+        }
+
+        // Define the pattern for a JSON code block
+        // This pattern assumes the JSON code block starts with ```json and ends with ```
+        Pattern pattern = Pattern.compile("```json\\s*?(.*?)```", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(markdown);
+
+        if (matcher.find()) {
+            // Return the content of the first matched group, which is the code block without the backticks
+            return matcher.group(1).trim();
+        } else {
+            // If no JSON code block is found, return null or an empty string
+            return null;
+        }
     }
 }

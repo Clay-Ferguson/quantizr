@@ -130,6 +130,13 @@ export class MenuPanel extends Div {
         }
     };
 
+    static generateBookByAI = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.edit.generateBookByAI(node);
+        }
+    };
+
     static showUrls = () => S.render.showNodeUrl(null);
     static nodeStats = () => S.view.getNodeStats();
     static nodeSignatureVerify = () => S.view.getNodeSignatureVerify();
@@ -359,6 +366,7 @@ export class MenuPanel extends Div {
             children.push(new Menu("AI", [
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Configure AI", MenuPanel.configureAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
             ], null));
         }
 

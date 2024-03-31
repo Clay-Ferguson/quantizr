@@ -386,12 +386,14 @@ public class MongoCreate extends ServiceBase {
             if (req.isPendingEdit()) {
                 mongoUtil.setPendingPath(newNode, true);
             }
-            setAnswerOnNode(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, newNode);
+            String answer = getAnswerText(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+            newNode.setContent(answer);
             newNode.touch();
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
         else {
-            setAnswerOnNode(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns, parentNode);
+            String answer = getAnswerText(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+            parentNode.setContent(answer);
             parentNode.touch();
             res.setAiContentOverwrite(true);
             update.save(ms, parentNode);
@@ -476,45 +478,38 @@ public class MongoCreate extends ServiceBase {
         }
     }
 
-    private void setAnswerOnNode(CreateSubNodeRequest req, //
+    public String getAnswerText(CreateSubNodeRequest req, //
             ChatCompletionResponse openAiAns, //
             AnthChatResponse anthAiAns, //
             ChatCompletionResponse pplxAiAns, //
             ChatCompletionResponse oobAiAns, //
             HuggingFaceResponse huggingFaceAns, //
-            GeminiChatResponse geminiAiAns, //
-            SubNode node) {
+            GeminiChatResponse geminiAiAns) {
         // OpenAI
         if (openAiAns != null) {
-            node.setContent(aiUtil.formatAnswer(openAiAns, true));
-            // node.set(NodeProp.OPENAI_RESPONSE, openAiAns);
+            return aiUtil.formatAnswer(openAiAns, true);
         }
         // Anthropic
         else if (anthAiAns != null) {
-            node.setContent(aiUtil.formatAnswer(anthAiAns, true));
-            // node.set(NodeProp.ANTHAI_RESPONSE, anthAiAns);
+            return aiUtil.formatAnswer(anthAiAns, true);
         }
         // Perplexity AI
         else if (pplxAiAns != null) {
-            node.setContent(aiUtil.formatAnswer(pplxAiAns, true));
-            // node.set(NodeProp.PPLXAI_RESPONSE, pplxAiAns);
+            return aiUtil.formatAnswer(pplxAiAns, true);
         }
         // OobaBooga
         else if (oobAiAns != null) {
-            node.setContent(aiUtil.formatAnswer(oobAiAns, true));
-            // node.set(NodeProp.OOBAI_RESPONSE, oobAiAns);
+            return aiUtil.formatAnswer(oobAiAns, true);
         }
         // HuggingFace
         else if (huggingFaceAns != null) {
-            node.setContent(huggingFaceAns.getGeneratedText());
-            // node.set(NodeProp.HUGGINGFACE_RESPONSE, huggingFaceAns);
+            return huggingFaceAns.getGeneratedText();
         }
         // Gemini AI
         else if (geminiAiAns != null) {
-            node.setContent(aiUtil.formatAnswer(geminiAiAns, true));
-            // node.set(NodeProp.GEMINIAI_RESPONSE, geminiAiAns);
+            return aiUtil.formatAnswer(geminiAiAns, true);
         } else {
-            node.setContent(req.getContent() != null ? req.getContent() : "");
+            return req != null && req.getContent() != null ? req.getContent() : "";
         }
     }
 

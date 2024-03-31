@@ -276,7 +276,15 @@ export class EditNodeDlg extends DialogBase {
 
         const allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
         let propEditFieldContainer: Div = null;
+
+        const aiTemplate = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, ast.editNode);
+        let aiTipDiv = null;
+        if (aiTemplate?.indexOf("${bookContext}") != -1 && !!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, ast.editNode)) {
+            aiTipDiv = new Div("To add content to this book, click `Ask AI` and the content will be created based on the Chapter, Section, etc.", { className: "alert alert-info" });
+        }
+
         const children = [
+            aiTipDiv,
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Div(null, null, [
                 new Div(null, {

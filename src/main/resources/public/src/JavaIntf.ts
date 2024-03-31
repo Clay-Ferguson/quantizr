@@ -409,6 +409,12 @@ export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface GenerateBookByAIRequest extends RequestBase {
+    nodeId: string;
+    prompt: string;
+    aiService: string;
+}
+
 export interface GetBookmarksRequest extends RequestBase {
 }
 
@@ -846,6 +852,11 @@ export interface FriendInfo {
     foreignAvatarUrl: string;
     tags: string;
     liked: boolean;
+}
+
+export interface GenerateBookByAIResponse extends ResponseBase {
+    nodeId: string;
+    gptCredit: number;
 }
 
 export interface GetBookmarksResponse extends ResponseBase {

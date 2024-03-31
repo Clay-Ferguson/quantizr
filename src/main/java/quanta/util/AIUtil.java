@@ -3,11 +3,13 @@ package quanta.util;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
@@ -18,6 +20,7 @@ import quanta.model.client.geminiai.GeminiChatCandidate;
 import quanta.model.client.geminiai.GeminiChatContent;
 import quanta.model.client.geminiai.GeminiChatPart;
 import quanta.model.client.geminiai.GeminiChatResponse;
+import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
@@ -26,7 +29,9 @@ import quanta.mongo.model.SubNode;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
 import quanta.request.AskSubGraphRequest;
+import quanta.request.GenerateBookByAIRequest;
 import quanta.response.AskSubGraphResponse;
+import quanta.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
 
 @Component
@@ -84,7 +89,6 @@ public class AIUtil extends ServiceBase {
                     firstParent = parent;
                 }
 
-                // todo-0: check for cases like where we have a subsection but no section, etc.
                 if (parent.getTags() != null) {
                     // get parent with any markdown headings stripped off
                     String parentContent = XString.repeatingTrimFromFront(parent.getContent(), "#").trim();
@@ -104,7 +108,6 @@ public class AIUtil extends ServiceBase {
                 parent = read.getParent(ms, parent);
             }
 
-            // todo-0: put in docs how this bookContext works.
             template = template.replace("${bookContext}", "\n" + bookContext + "\n");
 
             // DO NOT DELETE. KEEP THIS EXPERIMENTAL CODE FOR FUTURE REFERENCE.
@@ -385,4 +388,153 @@ public class AIUtil extends ServiceBase {
         return node.getTags() != null && (node.getTags().contains("#book") || node.getTags().contains("#chapter")
                 || node.getTags().contains("#section") || node.getTags().contains("#subsection"));
     }
+
+    public GenerateBookByAIResponse generateBookByAI(MongoSession ms, GenerateBookByAIRequest req) {
+        GenerateBookByAIResponse res = new GenerateBookByAIResponse();
+
+        // node that will be the parent of the book
+        SubNode parentNode = read.getNode(ms, req.getNodeId());
+        auth.ownerAuth(ms, parentNode);
+
+        ChatCompletionResponse openAiAns = null;
+        ChatCompletionResponse pplxAiAns = null;
+        AnthChatResponse anthAiAns = null;
+        ChatCompletionResponse oobAiAns = null;
+        HuggingFaceResponse huggingFaceAns = null;
+        // OobaAiResponse oobaAiAnswer = null;
+        GeminiChatResponse geminiAiAns = null;
+
+        AIServiceName svc = AIServiceName.fromString(req.getAiService());
+        if (svc != null) {
+            // First scan up the tree to see if we have a svc on the tree and if so use it instead.
+            SystemConfig system = new SystemConfig();
+            aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
+            if (system.getService() != null) {
+                svc = AIServiceName.fromString(system.getService());
+            }
+
+            String prompt = req.getPrompt();
+            // todo-0: needs to be configurable by an admin
+            prompt +=
+                    """
+                            Each chapter will be subdivided into sections too. Can you suggest the names of those chapters, and under each chapter list the section titles that would appear in that chapter. Also please provide this book index as JSON, so that it can be parsed by machine easily.
+
+                            Here's an example of the kind of JSON you should create:
+
+                            ```json
+                            {
+                              "title": "From Java to Python: A Transition Guide for Experts",
+                              "chapters": [
+                                {
+                                  "chapter": 1,
+                                  "title": "Introduction to Python for Java Developers",
+                                  "sections": [
+                                    "Comparing Python with Java",
+                                    "The Zen of Python",
+                                    "Setting up the Python environment",
+                                    "Python versions and compatibility",
+                                    "Key differences in syntax and design philosophy"
+                                  ]
+                                },
+                                {
+                                  "chapter": 2,
+                                  "title": "Python Basics: Variables and Data Types",
+                                  "sections": [
+                                    "Dynamic typing in Python",
+                                    "Primitive data types",
+                                    "Strings and String manipulation",
+                                    "Collections: List, Tuple, Set, Dictionary",
+                                    "Type hinting"
+                                  ]
+                                },
+                                {
+                                  "chapter": 3,
+                                  "title": "Control Flow in Python",
+                                  "sections": [
+                                    "Indentation-based syntax",
+                                    "if, elif, and else statements",
+                                    "for and while loops",
+                                    "List comprehensions",
+                                    "Exception handling differences"
+                                  ]
+                                },
+
+                                ...other chapters omitted
+                              ]
+                            }
+                            ```
+                            """;
+
+            switch (svc) {
+                case OPENAI:
+                    openAiAns = oai.getAnswer(ms, null, prompt, null);
+                    res.setGptCredit(openAiAns.userCredit);
+                    break;
+                case PPLX:
+                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    break;
+                case ANTH:
+                    anthAiAns = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
+                    res.setGptCredit(anthAiAns.userCredit);
+                    break;
+                case ANTH_SONNET:
+                    anthAiAns = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
+                    res.setGptCredit(anthAiAns.userCredit);
+                    break;
+                case PPLX_ONLINE:
+                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    break;
+                case PPLX_CODE_LLAMA:
+                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    break;
+                case PPLX_MIXTRAL:
+                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_MIXTRAL);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    break;
+                // case HUGGING_FACE:
+                // huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
+                // break;
+                // case OOBA:
+                // oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
+                // break;
+                case GEMINI:
+                    geminiAiAns = geminiai.getAnswer(ms, null, prompt, system);
+                    res.setGptCredit(geminiAiAns.credit);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        String answer =
+                create.getAnswerText(null, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+        log.debug("Generated book content: " + answer);
+
+        String extractedJson = XString.extractFirstJsonCodeBlock(answer);
+        log.debug("Extracted JSON: " + extractedJson);
+        if (StringUtils.isEmpty(extractedJson)) {
+            throw new RuntimeException("AI failed to complete Table of Contents phase.");
+        }
+
+        HashMap<String, Object> map = null;
+        try {
+            map = Util.yamlMapper.readValue(extractedJson, new TypeReference<HashMap<String, Object>>() {});
+            log.debug("Parsed JSON: " + XString.prettyPrint(map));
+            if (map != null) {
+                SubNode newNode = edit.traverseToC(ms, map, parentNode);
+
+                if (newNode != null) {
+                    res.setNodeId(newNode.getIdStr());
+                }
+            }
+        } catch (Exception e) {
+            ExUtil.error(log, "failed parsing yaml", e);
+        }
+
+        return res;
+    }
 }
+
