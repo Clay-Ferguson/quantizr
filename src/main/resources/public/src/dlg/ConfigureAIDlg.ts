@@ -40,8 +40,7 @@ export class ConfigureAIDlg extends DialogBase {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
                 }, ConfigureAIDlg.promptState, null, false, 3, this.textScrollPos),
-                new Div("Note 1: System Prompt is not yet supported for Google Gemini."),
-                new Div("Note 2: For Anthropic's Claude AI, the System Prompt is used only as a prompt prefix."),
+                new Div("Note: For Claude, and Gemini, the System Prompt is used only as a prompt prefix."),
                 new TextArea("Query Template", {
                     rows: 7,
                     placeholder: "${content}"
