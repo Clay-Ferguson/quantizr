@@ -10,24 +10,37 @@ import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { dispatch, getAs } from "../AppContext";
+import { FlexLayout } from "../comp/core/FlexLayout";
+import { TextField } from "../comp/core/TextField";
 
 export class GenerateBookByAIDlg extends DialogBase {
     static promptState: Validator = new Validator();
     promptScrollPos = new ScrollPos();
 
+    static numChapters: Validator = new Validator();
+
     constructor(public node: NodeInfo) {
         super("Generate Book using AI");
+        GenerateBookByAIDlg.numChapters.setValue("20");
 
-        GenerateBookByAIDlg.promptState.setValue("I'm creating an online 'book' that is an introduction to Python programming geared towards allowing Java experts to learn Python. Let's say I want to have 20 chapters in this book.");
+        // #ai_prompt
+        GenerateBookByAIDlg.promptState.setValue("I'm creating an online 'book' that is an introduction to Python programming geared towards allowing Java experts to learn Python.");
     }
 
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
+                new Div("You must mention that you're creating a book, describe what the book is about, and who the target audience is. An example is given below, but you can word it however you want and the AI will understand.", { className: "marginBottom" }),
                 new TextArea("Describe Book", {
                     rows: 7,
                 }, GenerateBookByAIDlg.promptState, null, false, 3, this.promptScrollPos),
-
+                new FlexLayout([
+                    new TextField({
+                        label: "Number of Chapters",
+                        val: GenerateBookByAIDlg.numChapters,
+                        inputClass: "numChapters",
+                    })
+                ]),
                 new ButtonBar([
                     new Button("Generate", this.generate, null, "btn-primary"),
                     new Button("Cancel", this.close, null, "btn-secondary float-end")
@@ -37,8 +50,15 @@ export class GenerateBookByAIDlg extends DialogBase {
     }
 
     generate = async () => {
+        const numChapters = parseInt(GenerateBookByAIDlg.numChapters.getValue());
+        if (numChapters < 1 || numChapters > 100) {
+            alert("Try a sensible number of chapters.");
+            return;
+        }
+
         const res = await S.rpcUtil.rpc<J.GenerateBookByAIRequest, J.GenerateBookByAIResponse>("generateBookByAI", {
             nodeId: this.node.id,
+            numChapters,
             prompt: GenerateBookByAIDlg.promptState.getValue(),
             aiService: getAs().userPrefs.aiService
         });

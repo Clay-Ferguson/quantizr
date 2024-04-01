@@ -293,7 +293,7 @@ public class NodeEditService extends ServiceBase {
             if (map != null) {
                 SubNode newNode = null;
                 if ("toc".equalsIgnoreCase(req.getType())) {
-                    newNode = traverseToC(ms, map, node);
+                    newNode = traverseToC(ms, map, node, null);
                 } else {
                     newNode = traverseMap(ms, map, node, 0L, 0);
                 }
@@ -310,7 +310,7 @@ public class NodeEditService extends ServiceBase {
     }
 
     /* returns the new book node */
-    public SubNode traverseToC(MongoSession ms, Map<String, Object> map, SubNode parentNode) {
+    public SubNode traverseToC(MongoSession ms, Map<String, Object> map, SubNode parentNode, String bookMasterPrompt) {
         String bookTitle = (String) map.get("title");
         if (bookTitle == null) {
             log.debug("toc node missing title");
@@ -319,6 +319,12 @@ public class NodeEditService extends ServiceBase {
 
         String systemPrompt =
                 "You are an author helping me write a book. You will consider the Book Title, Chapter Title, Section Title and/or Subsection Titles provided, to understand which piece of the book you are writing, and generate content for that part of the book. If you are given further instructions in addition to the Book Title, Chapter Title, Section Title and/or Subsection Title, then follow those instructions, when you create the book content.";
+
+        if (bookMasterPrompt != null) {
+            systemPrompt +=
+                    "\nBy the way, when you generate this content, keep in mind that the following was the overall purpose for the book:\nPURPOSE:\n"
+                            + bookMasterPrompt;
+        }
 
         SubNode bookNode = addJsonNode(ms, parentNode, "# " + bookTitle, 0L, "#book", systemPrompt);
 

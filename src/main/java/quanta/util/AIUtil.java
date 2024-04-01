@@ -414,7 +414,18 @@ public class AIUtil extends ServiceBase {
             }
 
             String prompt = req.getPrompt();
+
+            if (StringUtils.isEmpty(prompt)) {
+                throw new RuntimeException("Book description is required.");
+            }
+
+            if (!prompt.trim().endsWith(".")) {
+                prompt = prompt.trim() + ". ";
+            }
+            prompt += "I want to have " + req.getNumChapters() + " chapters in this book.\n";
+
             // todo-0: needs to be configurable by an admin
+            // #ai_prompt
             prompt +=
                     """
                             Each chapter will be subdivided into sections too. Can you suggest the names of those chapters, and under each chapter list the section titles that would appear in that chapter. Also please provide this book index as JSON, so that it can be parsed by machine easily.
@@ -458,7 +469,6 @@ public class AIUtil extends ServiceBase {
                                     "Exception handling differences"
                                   ]
                                 },
-
                                 ...other chapters omitted
                               ]
                             }
@@ -524,7 +534,7 @@ public class AIUtil extends ServiceBase {
             map = Util.yamlMapper.readValue(extractedJson, new TypeReference<HashMap<String, Object>>() {});
             log.debug("Parsed JSON: " + XString.prettyPrint(map));
             if (map != null) {
-                SubNode newNode = edit.traverseToC(ms, map, parentNode);
+                SubNode newNode = edit.traverseToC(ms, map, parentNode, req.getPrompt());
 
                 if (newNode != null) {
                     res.setNodeId(newNode.getIdStr());
@@ -533,7 +543,6 @@ public class AIUtil extends ServiceBase {
         } catch (Exception e) {
             ExUtil.error(log, "failed parsing yaml", e);
         }
-
         return res;
     }
 }

@@ -6,6 +6,7 @@ import quanta.request.base.RequestBase;
 public class GenerateBookByAIRequest extends RequestBase {
 	private String nodeId;
 	private String prompt;
+	private Integer numChapters;
 	private String aiService;
 
 	public GenerateBookByAIRequest() {}
@@ -32,5 +33,13 @@ public class GenerateBookByAIRequest extends RequestBase {
 
 	public void setAiService(String aiService) {
 		this.aiService = aiService;
+	}
+
+	public Integer getNumChapters() {
+		return numChapters;
+	}
+
+	public void setNumChapters(Integer numChapters) {
+		this.numChapters = numChapters;
 	}
 }

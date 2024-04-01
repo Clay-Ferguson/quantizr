@@ -412,6 +412,7 @@ export interface FileSystemReindexRequest extends RequestBase {
 export interface GenerateBookByAIRequest extends RequestBase {
     nodeId: string;
     prompt: string;
+    numChapters: number;
     aiService: string;
 }
 

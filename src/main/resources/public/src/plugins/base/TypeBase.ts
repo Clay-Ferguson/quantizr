@@ -321,7 +321,7 @@ export class TypeBase implements TypeIntf {
             const isRoot = node.id === ast.node?.id;
 
             let aiConfigDiv: Div = null;
-            if (S.props.isMine(node) && S.props.hasAIConfigProps(node)) {
+            if (S.props.isMine(node) && S.props.hasAIConfigProps(node) && S.util.showMetaData(ast, node)) {
                 const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
                 aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                     new Div("AI Config", {
@@ -335,7 +335,7 @@ export class TypeBase implements TypeIntf {
 
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
-            if (node.tags && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode)) {
+            if (node.tags && S.util.showMetaData(ast, node)) {
                 return new Div(null, attrs, [
                     comp,
                     choices,
