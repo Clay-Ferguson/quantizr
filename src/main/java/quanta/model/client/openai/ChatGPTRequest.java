@@ -9,18 +9,23 @@ public class ChatGPTRequest {
     private List<ChatMessage> messages;
     private Double temperature;
 
+    // Note: Only Anthropic uses this field. Both OpenAI and PerplexityAI do not use this field, because
+    // they pass system prompt as a message entry.
+    private String system;
+
     @JsonProperty("max_tokens")
     private Integer maxTokens;
 
     public ChatGPTRequest() {}
 
-    public ChatGPTRequest(String model, List<ChatMessage> messages, double temperature, String user,
-            Integer maxTokens) {
+    public ChatGPTRequest(String model, List<ChatMessage> messages, double temperature, String user, Integer maxTokens,
+            String system) {
         this.model = model;
         this.messages = messages;
         this.temperature = temperature;
         this.user = user;
         this.maxTokens = maxTokens;
+        this.system = system;
     }
 
     public String getUser() {
@@ -61,5 +66,13 @@ public class ChatGPTRequest {
 
     public void setMaxTokens(Integer maxTokens) {
         this.maxTokens = maxTokens;
+    }
+
+    public String getSystem() {
+        return system;
+    }
+
+    public void setSystem(String system) {
+        this.system = system;
     }
 }

@@ -226,6 +226,7 @@ export interface ChatGPTRequest {
     model: string;
     messages: ChatMessage[];
     temperature: number;
+    system: string;
     max_tokens: number;
 }
 

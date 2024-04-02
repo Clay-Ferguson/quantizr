@@ -78,7 +78,7 @@ public class AnthAiService extends ServiceBase {
 
         aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), maxTokens);
+                ms.getUserNodeId().toHexString(), maxTokens, system.getPrompt());
 
         request.setUser(null);
         request.setTemperature(null);

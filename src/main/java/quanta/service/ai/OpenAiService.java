@@ -250,8 +250,6 @@ public class OpenAiService extends ServiceBase {
             input = question;
         }
 
-        // log.debug("input: " + input);
-
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
         List<Map> sysContent = new ArrayList<>();
         HashMap<String, Object> map = new HashMap<>();
@@ -321,7 +319,7 @@ public class OpenAiService extends ServiceBase {
 
         aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), maxTokens);
+                ms.getUserNodeId().toHexString(), maxTokens, null);
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " REQ: " + XString.prettyPrint(request));
 

@@ -40,7 +40,6 @@ export class ConfigureAIDlg extends DialogBase {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
                 }, ConfigureAIDlg.promptState, null, false, 3, this.textScrollPos),
-                new Div("Note: For Claude, and Gemini, the System Prompt is used only as a prompt prefix."),
                 new TextArea("Query Template", {
                     rows: 7,
                     placeholder: "${content}"

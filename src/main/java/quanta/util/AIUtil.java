@@ -307,13 +307,6 @@ public class AIUtil extends ServiceBase {
         } else {
             input = content;
         }
-
-        // todo-0: rethink this. It's duplicating the prompt for ChatGPT. I think this code was only
-        // intended for AI services that don't support for SystemPrompt, and since we DO have system prompt
-        // for ChatGPT it is duplicative.
-        // if (!StringUtils.isEmpty(system.getPrompt())) {
-        // input = system.getPrompt() + "\n\n" + input;
-        // }
         return input;
     }
 
