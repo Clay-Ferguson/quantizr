@@ -1,6 +1,21 @@
 **[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
 
+* [How to Build](#how-to-build)
+    * [Front-End Notes](#front-end-notes)
+    * [How to Build Quanta - Dev Mode](#how-to-build-quanta---dev-mode)
+    * [Front-end Hot Deploy](#front-end-hot-deploy)
+    * [Back-end Hot Deploy](#back-end-hot-deploy)
+    * [Production Builds](#production-builds)
+
 # How to Build
+
+# Front-End Notes
+
+* Deployment is build using `vite`
+
+* The project uses `yarn` as the package manager, rather than `npm`.
+
+* It's recommended that you use `nvm` as your way of installing, and managing node versions.
 
 # How to Build Quanta - Dev Mode
 

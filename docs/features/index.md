@@ -35,7 +35,7 @@
 
 When you create an account, you get a root node (i.e. your personal branch of the global tree), and under this account root you create and organize your own content however you want. 
 
-You can let any node and all its subnodes represent a wiki, document, photo album, blog, etc. It's just a tree of content, so it's all up to you. For example you could create a node and share it with several people, and then the "Timeline View" of that node would be like a private chat room, or discussion thread.
+You can let any node and all its subnodes represent a wiki, document, photo album, blog, etc. It's just a tree of content, so it's all up to you.
 
 <img src='attachments/60188ccba7da7d062f8a2707-file-img1' style='width:25%'/>
 

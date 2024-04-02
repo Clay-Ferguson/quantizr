@@ -16,14 +16,20 @@
     * [Image Generation](#image-generation)
     * [Speech Generation](#speech-generation)
     * [AI Service Selection](#ai-service-selection)
-        * [AI Services Supported](#ai-services-supported)
-    * [Practical Use Case Example - Writing a Scientific Paper](#practical-use-case-example---writing-a-scientific-paper)
-        * [Configure Document Root Node to have AI Settings](#configure-document-root-node-to-have-ai-settings)
-        * [Generating AI Content in your Documents](#generating-ai-content-in-your-documents)
+        * [AI Cloud Services Supported](#ai-cloud-services-supported)
+    * [Using AI for Writing](#using-ai-for-writing)
+        * [Writing an Entire Book with AI](#writing-an-entire-book-with-ai)
+            * [Overview of the Writing Process](#overview-of-the-writing-process)
+            * [Example - Write a Book on Bicycling](#example---write-a-book-on-bicycling)
+                * [Step by Step Screenshots](#step-by-step-screenshots)
+            * [Why use Book Writing Features](#why-use-book-writing-features)
+        * [Help with Writing a Scientific Paper](#help-with-writing-a-scientific-paper)
+            * [Configure Document Root Node to have AI Settings](#configure-document-root-node-to-have-ai-settings)
+            * [Generating AI Content in your Documents](#generating-ai-content-in-your-documents)
 
 # Artificial Intelligence - LLMs
 
-Converse with AI, generate images, ask questions about images, generate speech MP3s from text.
+Converse with AI, write books or documents collaboratively with the AI, generate images, ask questions about images, generate speech MP3s from text.
 
 Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context".
 
@@ -51,7 +57,7 @@ Including Chat Model, Text to Image (Image Generation), Image Understand, Text t
 
 ## Perplexity
 
-Including Chat Model, Online Model (news aware), Code Llama, Llama 2
+Including models: Sonar, Sonar Online, Code Llama, and Mixtral
 
 <img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:20%'/>
 
@@ -185,7 +191,7 @@ Quanta can connect to several different AI APIs on the back end, which is what p
 <img src='attachments/65bc2b7bcf425c5fe6f2dde2-file-p' style='width:100%'/>
 
 
-## AI Services Supported
+## AI Cloud Services Supported
 
 No matter what AI service you use, you will be charged only exactly what you consume based on OpenAI and/or Perplexity's pricing models. Quanta doesn't charge extra for use of AI, but merely passes your costs thru without any markup.
 
@@ -195,23 +201,169 @@ Here's the list of the available AI Services:
 
 | AI Service Name     | Description                                                                       |
 |---------------------|-----------------------------------------------------------------------------------|
-| **Opus (Anthropic Claud 3)** |  Anthropic's most intelligent model, which can handle complex analysis, longer tasks with multiple steps, and higher-order math and coding tasks. |
-| **Sonnet (Anthropic Claud 3)** | Anthropic's best combination of performance and speed for efficient, high-throughput tasks. |
-| **OpenAI (Chat)**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
-| **Google Gemini (Chat)** | Google's best high-end powerful general-purpose AI.                        |
-| **Perplexity (Chat)** | Perplexity's best high-end powerful general-purpose AI.                    |
-| **Perplexity (Recent News)** | Perplexity's AI which has access to the latest news and content from the web. |
+| **Anthropic: Claud 3 - Opus** |  Anthropic's most intelligent model, which can handle complex analysis, longer tasks with multiple steps, and higher-order math and coding tasks. |
+| **Anthropic: Claud 3 - Sonnet** | Anthropic's best combination of performance and speed for efficient, high-throughput tasks. |
+| **OpenAI: Sonar**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
+| **Google: Gemini** | Google's best high-end powerful general-purpose AI.                        |
+| **Perplexity: Sonar** | Perplexity's best high-end powerful general-purpose AI.                    |
+| **Perplexity: Sonar Online** | Perplexity's AI which has access to the latest news and content from the web. |
 | **Code Llama**      | The well-known open source Code Llama, which is great for coding and programming tasks. |
-| **Llama 2**         | The well-known open source Llama 2, which is great for general-purpose tasks. |
+| **Mixtral**         | The well-known open source Mixture of Experts, which is great for general-purpose tasks. |
 
-# Practical Use Case Example - Writing a Scientific Paper
-----
+# Using AI for Writing
+
+## Writing an Entire Book with AI
+
+You can use Quanta to write an entire book, on any topic, for any target audience! Here's the general approach for how the writing and creative process works:
+
+*Note: If you're wondering why in the world you'd be interested in "writing a book" when you're not an even author, scroll down to the last section below, where we discuss the power of what's really going on during the "writing" process and how you can use it even if you have no intentions of sharing your "writing".*
+
+### Overview of the Writing Process
+
+First you'll generate the outline for the book by describing what the book will be about, who the intended readers are, and how long (number of chapters) you want the book to be. Once you provide this very high level information, Quanta will scaffold out a sort of `Table of Contents` and then automatically generate the root level book node, all the chapter nodes, and all the section (chapter sub-parts) as well.
+
+Once this book structure has been created you can add more chapters or chapter sections at any time, to make the book what you want it to be. Note that if you're composing some kind of Fiction book, the chapters and sections given to you will just be created out of thin air and will be totally unpredictable except for the fact that it's responsive to your summary of what you said you want the book to be about. 
+
+However, if you are writing a non-fiction book, about a technical subject, or history, or other factual information, the chapters and subsections that are generated for you will be somewhat predictable because they're coming from facts about the world rather than pure fiction.
+
+After this book scaffolding is created you can then drill down into the hierarchy of any location in the book and simply create a new node there. The system will detect that you're in an AI Generated book (the details about that detection process will be described later) and when you click the "Ask AI" button in the node editor of your new node, the AI will analyze everything it knows about the book, and what chapter, section, etc. you're creating content under and then write that entire section of the book for you into your node, and save the node.
+
+There are numerous reasons we considered it better to generate the book content "on demand" rather than all at once, which we'll skip for now (but explain below), but be aware that you can customize the content creation as necessary, by asking for whatever book content you'd like to create at any location in the book. 
+
+The chapters and sections, and the overall purpose of the book (that you provided when you created the initial scaffolding) will always be taken into account as you auto-generate new paragraphs of content, but you can also customize the content creation instructions, specific to each paragraph, as shown in the actual example steps in the screenshots below.
+
+### Example - Write a Book on Bicycling
+
+Let's look at the actual steps to create a book about bicycling for adults getting into the sport. The screenshots below show the process of creating this book from scratch and then generating a couple of nodes of content for it, although you could finish the entire book simply by adding content under each section which only takes a single mouse click to do.
+
+#### Step by Step Screenshots
+
+The next 17 screenshots below show you how to create books (i.e. auto-generate content), or other structured texts using AI.
+
+First we create somewhere to hold our book, and in the image below, as you can see, we'll just put the book in a node we created called `My Books`. Once we click on `My Books` to make it the 'selected' node (as you can see by the blue bar on it's left), we can click the menu item called `Generate Book`.
+
+<img src='attachments/660b34abb2d57601ed092794-step1.png' style='width:100%'/>
+
+
+Next we describe the book we're about to create, in as much detail as we want. You should mention in the description that you're indeed creating a book, what it's about, and who the target audience is. Then simply click the `Generate` button.
+
+<img src='attachments/660b34ddb2d57601ed092797-step2.png' style='width:100%'/>
+
+
+After the `Generate` button ran a process for a few seconds your book scaffolding (i.e. a book `outline` or `Table of Contents`) will have been created. As you can see in the image below we have the top level node representing the entire book, as well as the chapters. We can't see all the chapters without scrolling down of course), but they're there. Also we can expand any of the chapters and see even a further breakdown of each chapter into `sections', and those are there and already generated for us as well!
+
+<img src='attachments/660b350ab2d57601ed09279a-step3.png' style='width:100%'/>
+
+
+So we expand the `Choosing the Right Bicycle` chapter to take a look at the sections. Currently the system doesn't allow you to specify the number of 'sections' in each chapter, but you can set the number of chapters, as you saw above. However you can manually add more `sections` yourself, just by creating a node anywhere you want. Nothing is `fixed` about this tree of content. It's still all editable by you and nothing is permanent. Quanta is just automatically creating nodes of content for you using AI. You can always manually edit anything that got created, add images, move nodes around, etc.
+
+<img src='attachments/660b353db2d57601ed09279d-step4.png' style='width:100%'/>
+
+
+Now we've turned "Edit Mode" back on in the screen shot below, and you can see the screen got a little more cluttered with buttons. We now still have `Types of Bicycles` as the selected node. So we click the `+` (Plus Button) that's right above the chapter text `Types of Bicycles` and that inserts a new node, so we can auto-generate that piece of content for the book, at that location in the book.
+
+<img src='attachments/660b3569b2d57601ed0927a3-step5.png' style='width:100%'/>
+
+
+The system has noticed that we're inside a book, and setup things so that if we simply click `Ask AI` right now it will use the context location of what chapter and section we're in and auto-generate whatever content it thinks should go there. The tip in blue in the editor is telling us this too. So we just click `Ask AI` and wait a few seconds and some new AI-generated content will be inserted.
+
+<img src='attachments/660b3578b2d57601ed0927a6-step6.png' style='width:100%'/>
+
+
+So now we can see the AI has auto-generated content for this location! We can edit this content by hand, if we don't like it. We can also update the specific prompting that generated this text too, and regenerate completely new content to overwrite this content if we want.
+
+<img src='attachments/660b358eb2d57601ed0927a9-step7.png' style='width:100%'/>
+
+
+Next let's look at how to generate some very specific content that not only relies on the chapter and section we're in, but is more specific. In other words we're going to create a paragraph of text that we describe to the AI, but let the AI actually do the writing for us.
+
+The way this is done is that you create an empty node, configure a couple of AI Config settings for it, and then generate, which we will now do.
+
+In the image below you can see where I've created a brand new node directly under the `Joy of Bicycling` chapter itself, and just put in [tbd] for now, because we will configure the node to write something for us, instead of writing it ourselves.
+
+<img src='attachments/660b359eb2d57601ed0927ac-step8.png' style='width:100%'/>
+
+
+As you can see all that's happened, in the screenshot below, is we've simply created a node under `The Joy of Bicycling` and added a simple [tbd] node there. We now make sure that node is highlighted (clicked) and then we choose `Menu -> AI -> Configure AI` which lets us configure how we want to generate content for our [tbd] node.
+
+<img src='attachments/660b35b1b2d57601ed0927af-step9.png' style='width:100%'/>
+
+
+The `Configure AI` menu click opened up the dialog shown below, where we can specifically configure AI settings for the specific node (our [tbd] node in this case).
+
+The important thing to know here is that the `Query Template` is where we describe to the AI what we want to be generated as the content for this specific node. As you can see we're asking for a bit of humor about riding with your cat.
+
+Also note that the "Overwrite" checkbox is checked which means the generated content will overwrite whatever our current content is. So again, in this case, what will currently be overwritten is the text "[tbd]".
+
+<img src='attachments/660b35c7b2d57601ed0927b2-step10.png' style='width:100%'/>
+
+
+Now after we're done configuring that node, since we have "Node Info" enabled (see upper left of screenshot), the `AI Config` that we just wrote is showing up below the "[tbd]", and this AI Config info only shows up if you're the owner of the node too (other readers cannot see your AI Config info). You can click the turquoise colored "AI Config" button at any time to edit the node's AI Config settings as well.
+
+<img src='attachments/660b35dbb2d57601ed0927b5-step11.png' style='width:100%'/>
+
+
+So now the node is configured and it knows how to generate content, by AI, and what the AI should create. So we open the node in the editor again and this time, we simply click "Ask AI". We get a warning reminding us we're about to overwrite our current content on the node (the "[tbd]"), and we click the "Yes", to overwrite.
+
+<img src='attachments/660b35f1b2d57601ed0927b8-step12.png' style='width:100%'/>
+
+
+After clicking "yes" above we wait a few seconds, for the AI to generate, and then it closes the editor and we'll be seeing our new conten, as shown below. We've turned off both "Edit Mode" and "Info Mode" in the screenshot below for a cleaner looking view of the content.
+
+Click the image to enlarge if the text is too small to read, but it went a bit overboard and wrote more than I wanted. So now let's fix that. We can now go back into the AI Config for the node and update the AI's instructions to tell it to just generate **3 sentences**, which is shorter like I wanted.
+
+<img src='attachments/660b3607b2d57601ed0927bb-step13.png' style='width:100%'/>
+
+
+So in the screenshot below you can see we're back in the AI Config of the node again but have added the final sentence (highlighted in blue), to keep this down to 3 sentences.
+
+<img src='attachments/660b3635b2d57601ed0927c1-step15.png' style='width:100%'/>
+
+
+Now after we had gone back into the editor again, and clicked "Ask AI" again, and told it "Yes" we want to overwrite our content again, it discarded it's old writing, and put in new writing with just 3 sentences this time.
+
+<img src='attachments/660b366fb2d57601ed0927ca-step16.png' style='width:100%'/>
+
+
+Just to be clear, in the screen shot below we've turned on "Node Info" again and so we can see the AI's new instructions below (i.e. the text starting with "Write a humorous opening remark...") the content that those instructions created. And again, note that our readers cannot ever see the instructions. Only the author of the content (actually the owner of the node) can see these instructions.
+
+<img src='attachments/660b36ebb2d57601ed0927d3-step17.png' style='width:100%'/>
+
+
+Finally, let's go back and look at the larger scale instructions that are in effect during all of our editing of this book. We do this by going to the root level node (the "Book" node), and opening up the `AI Config` for that root node (which we already know how to do because we did `AI Config` editing above already).
+
+As you can see, the root node (Book Node) has a System Prompt that we never wrote, because it was put there automatically when we first created the Book Scaffolding. This top level (root level) System Prompt is ultimately in control of what happens during all of our `Ask AI` runs we did above, and you can edit these instructions if you want. 
+
+These default instructions were carefully crafted to give the user a good book writing experience, but if you know what you're doing with AI "Prompt Engineering" and you know how "System Prompts" work (primarily using the OpenAI ChatGPT Cloud Service API), then you should be able to edit this content if you need to. Then again, it doesn't really take an engineer either, because you can see it's just giving the AI the larger overall purpose of what it's supposed to be doing so it's fairly obvious how to update that prompt if you think you can improve it, even if you're not an engineer or a rocket scientist.
+
+<img src='attachments/660b36fcb2d57601ed0927d6-step18.png' style='width:100%'/>
+
+
+### Why use Book Writing Features
+
+(If you're not even an author!)
+
+You may be wondering why you even need any Book Writing features if you're not an author? Well first of all you're not really writing a book anyway, you're just creating structured text. The terminology of Book, Chapter, Section, Subsection is just a convenient metaphor to help you interact with the hierarchy and organization of content. In reality, you may be creating a research paper, a document on some subject, or just learning new material, purely for your own private consumption.
+
+If you went thru the screenshots above and followed what was going on you will also realize that what this "Book Authoring" really is doing is walking you thru the process of researching some new thing you may not know about. Think of requesting a book as a very advanced type of Google Search, where the search results that you get back just happens to be a comprehensive outline of some topic, that you can 'fill in' on demand.
+
+For example, as the developer of Quanta myself (a Java developer) the first book I created was one I got with the instructions: `"Create a book on Python programming geared towards expert Java developers who want to learn Python"`. It created a very nice outline for the book. Then I just generated each piece of content on demand (similar to what's shown in the lengthy series of screenshots above). 
+
+When I came up with various pieces of information I wanted to know about, in that Python book example, I would just create a Chapter or Section for that particular sub-topic and request that the AI auto-generate that content right inline in the book. That's just one example of a `book concept` and a `target audience`, but the examples that can be created by LLMs are of course almost infinite.
+
+The fact that you can create your own books is a powerful thing, but what multiplies that power by a factor of 10x or 100x is the fact that you can request any book `for any audience`. For example, you could request a book in Quantum Mechanics for a Junior High level person. That would be quite an interesting book. And the fact that you can customize your own chapters and sections and make the book quite unique to you, albeit hopefully (if LLMs work correctly) a perfectly factual and useful book for everyone else too.
+
+In summary, the reason the Book Writing feature of Quanta is important to authors and non-authors alike is because it's really a powerful research tool, that ends up creating not just answers to your questions about anything in the world, but also helps you organize your information into a hierarchy that you will find useful years into the future, or that you can potentially share with others. 
+
+Remember, there's an "Export to PDF" feature in Quanta too, so if you do want to create something (a book, or document) that's easily shareable outside the Quanta server instance, you can always export it to PDF, and let that be your final product.
+
+## Help with Writing a Scientific Paper
 
 Let's say you're writing a research paper, and you want to get AI assistance with your writing.
 
 In this scenario you would first create the top level "root" of your document on the content tree. You would call it something like `"A Unification Theory: Schrodinger Black Holes"` or whatever. So all your sections, and paragraphs and content will go under that node as a large subgraph representing your document.
 
-## Configure Document Root Node to have AI Settings
+### Configure Document Root Node to have AI Settings
 
 You would then select that document root node and click `Menu -> AI -> Configure AI` settings and enter into that dialog something like the following: 
 
@@ -221,7 +373,7 @@ You would then select that document root node and click `Menu -> AI -> Configure
 
 The above system prompt at the root of the document gives the AI the ability to apply that system prompt across the entire document as you start generating AI content underneath.
 
-## Generating AI Content in your Documents
+### Generating AI Content in your Documents
 
 Now let's say your're editing in this document (i.e. creating/modifying nodes under your document rood node), and you want to generate a paragraph of text for the document using AI.
 
