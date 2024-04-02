@@ -257,7 +257,7 @@ export class Props {
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
-            J.NodeProp.AI_QUERY_TEMPLATE, //
+            J.NodeProp.AI_OVERWRITE, //
             J.NodeProp.AI_MAX_WORDS, //
             J.NodeProp.AI_TEMPERATURE //
         ]);
@@ -268,7 +268,7 @@ export class Props {
             // J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
-            J.NodeProp.AI_QUERY_TEMPLATE, //
+            J.NodeProp.AI_OVERWRITE, //
             J.NodeProp.AI_MAX_WORDS, //
             J.NodeProp.AI_TEMPERATURE, //
         ]);

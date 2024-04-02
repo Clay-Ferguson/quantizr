@@ -280,7 +280,7 @@ export class EditNodeDlg extends DialogBase {
         const aiTemplate = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, ast.editNode);
         let aiTipDiv = null;
         if (aiTemplate?.indexOf("${bookContext}") != -1 && !!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, ast.editNode)) {
-            aiTipDiv = new Div("To add content to this book, click `Ask AI` and the content will be created based on the Chapter, Section, etc.", { className: "alert alert-info" });
+            aiTipDiv = new Div("To generate content, click `Ask AI` and content will be created based on the Chapter, Section, etc. For more control over what 'Ask AI' generates, click 'Show Properties' below, and provide specific instructions to the AI.", { className: "alert alert-info" });
         }
 
         const children = [

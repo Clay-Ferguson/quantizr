@@ -39,7 +39,10 @@ export class TypeBase implements TypeIntf {
     }
 
     getEditLabelForProp(propName: string): string {
-        if (propName === J.NodeProp.DATE) {
+        if (propName === J.NodeProp.AI_QUERY_TEMPLATE) {
+            return "AI Query Template";
+        }
+        else if (propName === J.NodeProp.DATE) {
             return I.DomainType.Date;
         }
         else if (propName === J.NodeProp.DURATION) {
@@ -48,8 +51,13 @@ export class TypeBase implements TypeIntf {
         return propName;
     }
 
-    getEditorRowsForProp(_propName: string): number {
-        return 1;
+    getEditorRowsForProp(propName: string): number {
+        if (propName === J.NodeProp.AI_QUERY_TEMPLATE) {
+            return 5;
+        }
+        else {
+            return 1;
+        }
     }
 
     /* Enables editor to show buttons for adding/deleting custom properties */
