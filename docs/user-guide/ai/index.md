@@ -214,7 +214,12 @@ Here's the list of the available AI Services:
 
 ## Writing an Entire Book with AI
 
+----
+
 You can use Quanta to write an entire book, on any topic, for any target audience! Here's the general approach for how the writing and creative process works:
+
+<img src='attachments/660b1bb8b2d57601ed09274d-' style='width:33%'/>
+
 
 *Note: If you're wondering why in the world you'd be interested in "writing a book" when you're not an even author, scroll down to the last section below, where we discuss the power of what's really going on during the "writing" process and how you can use it even if you have no intentions of sharing your "writing".*
 
@@ -275,62 +280,29 @@ So now we can see the AI has auto-generated content for this location! We can ed
 <img src='attachments/660b358eb2d57601ed0927a9-step7.png' style='width:100%'/>
 
 
-Next let's look at how to generate some very specific content that not only relies on the chapter and section we're in, but is more specific. In other words we're going to create a paragraph of text that we describe to the AI, but let the AI actually do the writing for us.
+Above we generated book content based on the `Book Context` at that location (i.e. simply the Chapter Title, Section Title, etc).
 
-The way this is done is that you create an empty node, configure a couple of AI Config settings for it, and then generate, which we will now do.
+Next let's look at how to generate some very specific content that not only relies on the chapter and section we're in, but is even more specific. In other words we're going to auto-generate content that we describe specifically to the AI, but let the AI actually do the writing for us.
 
-In the image below you can see where I've created a brand new node directly under the `Joy of Bicycling` chapter itself, and just put in [tbd] for now, because we will configure the node to write something for us, instead of writing it ourselves.
+In the image below you can see where we've created a brand new node directly under the `Joy of Bicycling` chapter itself. Note that `AI Query Template` is where we describe to the AI what we want to be generated as the content for this specific node. As you can see we're asking for a bit of humor about riding with your cat.
 
-<img src='attachments/660b359eb2d57601ed0927ac-step8.png' style='width:100%'/>
+The `${bookContext}` that you see here, causes the Chapter Titles and Section Titles to be embedded into the AI's instructions at that location, so the AI will find and use it, if found, to help it understand which part of the book you're working on.
 
+So after typing that Template (the AI's instructions), we just click the `Ask AI` button, and it will generate the content into this node for us.
 
-As you can see all that's happened, in the screenshot below, is we've simply created a node under `The Joy of Bicycling` and added a simple [tbd] node there. We now make sure that node is highlighted (clicked) and then we choose `Menu -> AI -> Configure AI` which lets us configure how we want to generate content for our [tbd] node.
-
-<img src='attachments/660b35b1b2d57601ed0927af-step9.png' style='width:100%'/>
-
-
-The `Configure AI` menu click opened up the dialog shown below, where we can specifically configure AI settings for the specific node (our [tbd] node in this case).
-
-The important thing to know here is that the `Query Template` is where we describe to the AI what we want to be generated as the content for this specific node. As you can see we're asking for a bit of humor about riding with your cat.
-
-Also note that the "Overwrite" checkbox is checked which means the generated content will overwrite whatever our current content is. So again, in this case, what will currently be overwritten is the text "[tbd]".
-
-<img src='attachments/660b35c7b2d57601ed0927b2-step10.png' style='width:100%'/>
+<img src='attachments/660c56934cd11d33319a87a3-file-p' style='width:100%'/>
 
 
-Now after we're done configuring that node, since we have "Node Info" enabled (see upper left of screenshot), the `AI Config` that we just wrote is showing up below the "[tbd]", and this AI Config info only shows up if you're the owner of the node too (other readers cannot see your AI Config info). You can click the turquoise colored "AI Config" button at any time to edit the node's AI Config settings as well.
-
-<img src='attachments/660b35dbb2d57601ed0927b5-step11.png' style='width:100%'/>
-
-
-So now the node is configured and it knows how to generate content, by AI, and what the AI should create. So we open the node in the editor again and this time, we simply click "Ask AI". We get a warning reminding us we're about to overwrite our current content on the node (the "[tbd]"), and we click the "Yes", to overwrite.
-
-<img src='attachments/660b35f1b2d57601ed0927b8-step12.png' style='width:100%'/>
-
-
-After clicking "yes" above we wait a few seconds, for the AI to generate, and then it closes the editor and we'll be seeing our new conten, as shown below. We've turned off both "Edit Mode" and "Info Mode" in the screenshot below for a cleaner looking view of the content.
-
-Click the image to enlarge if the text is too small to read, but it went a bit overboard and wrote more than I wanted. So now let's fix that. We can now go back into the AI Config for the node and update the AI's instructions to tell it to just generate **3 sentences**, which is shorter like I wanted.
-
-<img src='attachments/660b3607b2d57601ed0927bb-step13.png' style='width:100%'/>
-
-
-So in the screenshot below you can see we're back in the AI Config of the node again but have added the final sentence (highlighted in blue), to keep this down to 3 sentences.
-
-<img src='attachments/660b3635b2d57601ed0927c1-step15.png' style='width:100%'/>
-
-
-Now after we had gone back into the editor again, and clicked "Ask AI" again, and told it "Yes" we want to overwrite our content again, it discarded it's old writing, and put in new writing with just 3 sentences this time.
-
-<img src='attachments/660b366fb2d57601ed0927ca-step16.png' style='width:100%'/>
-
+We see the screenshot below after we just now generated using the `Ask AI` above.
 
 Just to be clear, in the screen shot below we've turned on "Node Info" again and so we can see the AI's new instructions below (i.e. the text starting with "Write a humorous opening remark...") the content that those instructions created. And again, note that our readers cannot ever see the instructions. Only the author of the content (actually the owner of the node) can see these instructions.
+
+You can then go back into the node and edit the AI instructions again and regenerate if you want, or you could even directly edit what the AI had created as well.
 
 <img src='attachments/660b36ebb2d57601ed0927d3-step17.png' style='width:100%'/>
 
 
-Finally, let's go back and look at the larger scale instructions that are in effect during all of our editing of this book. We do this by going to the root level node (the "Book" node), and opening up the `AI Config` for that root node (which we already know how to do because we did `AI Config` editing above already).
+Finally, let's go back and look at the larger scale instructions that are in effect during all of our editing of this book. We do this by going to the root level node (the "Book" node), and opening up the `AI Config` for that root node.
 
 As you can see, the root node (Book Node) has a System Prompt that we never wrote, because it was put there automatically when we first created the Book Scaffolding. This top level (root level) System Prompt is ultimately in control of what happens during all of our `Ask AI` runs we did above, and you can edit these instructions if you want. 
 

@@ -5,6 +5,8 @@
 
 Create and share `hierarchically organized content`. Ask questions, or get assistance creating content, using A.I. LLMs (Large Language Models) from your choice of AI Cloud Services including: OpenAI `ChatGPT-4`, Anthropic `Claude 3` (Opus and Sonnet), Google `Gemini`, and Perplxity `Sonar`, `Sonar Online`, `Code Llama`, and `Mixtral`.
 
+##### Check out the latest feature: [Writing Books with AI](https://quanta.wiki/n/ai-generated-books)
+
 <img src='attachments/5f786b72982c4018afcb57fd-eagle-logo-250px-tr.jpg' style='width:20%'/>
 
 
