@@ -45,7 +45,8 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(customTitle: string, private customSubTitle: string, private customDiv: Comp, private sourceUrl: string, private startTimePendingOverride: number) {
+    constructor(customTitle: string, private customSubTitle: string, private customDiv: Comp, private sourceUrl: string, private startTimePendingOverride: number,
+        private playingMemoryBlob: boolean) {
         super(customTitle || "Audio Player");
         this.urlHash = S.util.hashOfString(sourceUrl);
         this.startTimePending = localStorage[this.urlHash];
@@ -154,18 +155,18 @@ export class AudioPlayerDlg extends DialogBase {
                 ]),
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
-                        new Button("Copy", this.copyToClipboard),
-                        !getAs().isAnonUser ? new Button("Post", this.postComment) : null,
+                        !this.playingMemoryBlob ? new Button("Copy", this.copyToClipboard) : null,
+                        !this.playingMemoryBlob && !getAs().isAnonUser ? new Button("Post", this.postComment) : null,
                         new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
-                    new Div(null, { className: "col-3 float-end" }, [
+                    !this.playingMemoryBlob ? new Div(null, { className: "col-3 float-end" }, [
                         this.timeLeftTextField = new TextField({
                             label: "Timer (mins.)",
                             inputClass: "timeRemainingEditField",
                             labelLeft: true,
                             val: this.timeLeftState
                         })
-                    ])
+                    ]) : null
                 ]),
                 this.customDiv
             ])

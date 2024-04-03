@@ -360,7 +360,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     audioUrl = enc.url;
                     const downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
                     const audioButton = new Button("Play Audio", () => {
-                        const dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0);
+                        const dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, false);
                         dlg.open();
                     }, { className: "marginTop" }, "btn-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));

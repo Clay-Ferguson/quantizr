@@ -201,7 +201,7 @@ export class NodeCompBinary extends Div {
                 new FlexRowLayout([
                     new IconButton("fa-play", "Audio", {
                         onClick: () => {
-                            new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0).open();
+                            new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, false).open();
                         }
                     }, "btn-primary marginRight"),
                     new Span(null, {

@@ -737,7 +737,7 @@ export class Util {
             const startTimeStr = this.getParameterByName("t");
             const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
             setTimeout(() => {
-                new AudioPlayerDlg(null, null, null, audioUrl, startTime).open();
+                new AudioPlayerDlg(null, null, null, audioUrl, startTime, false).open();
             }, 500);
         }
     }
