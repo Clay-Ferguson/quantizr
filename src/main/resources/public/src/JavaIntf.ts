@@ -228,6 +228,11 @@ export interface ChatGPTRequest {
     temperature: number;
     system: string;
     max_tokens: number;
+    response_format: ChatGPTResponseFormat;
+}
+
+export interface ChatGPTResponseFormat {
+    type: string;
 }
 
 export interface ChatGPTTextModerationItem {

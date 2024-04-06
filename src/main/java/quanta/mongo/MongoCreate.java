@@ -312,7 +312,7 @@ public class MongoCreate extends ServiceBase {
 
                 switch (svc) {
                     case OPENAI:
-                        openAiAns = oai.getAnswer(ms, parentNode, null, null);
+                        openAiAns = oai.getAnswer(ms, parentNode, null, null, false);
                         res.setGptCredit(openAiAns.userCredit);
                         typeToCreate = NodeType.OPENAI_ANSWER.s();
                         break;

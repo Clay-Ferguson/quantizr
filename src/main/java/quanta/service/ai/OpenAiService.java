@@ -58,7 +58,7 @@ public class OpenAiService extends ServiceBase {
     // Warning: If you change these, you will need to update the pricing calculations
     String OPENAI_MODEL_TTS = "tts-1";
     String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
-    String OPENAI_MODEL_COMPLETION = "gpt-4-1106-preview";
+    String OPENAI_MODEL_COMPLETION = "gpt-4-0125-preview"; // "gpt-4-1106-preview";
     String COST_CODE = "OAI"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -217,7 +217,8 @@ public class OpenAiService extends ServiceBase {
      * 
      * You can pass a node, or else 'text' to query about.
      */
-    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system) {
+    public ChatCompletionResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system,
+            boolean jsonMode) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
@@ -319,7 +320,7 @@ public class OpenAiService extends ServiceBase {
 
         aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), maxTokens, null);
+                ms.getUserNodeId().toHexString(), maxTokens, null, jsonMode ? "json_object" : null);
 
         log.debug("GPT Req: USER: " + ms.getUserName() + " REQ: " + XString.prettyPrint(request));
 
@@ -492,7 +493,7 @@ public class OpenAiService extends ServiceBase {
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
 
-        ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null);
+        ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
         res.setGptCredit(aiAnswer.userCredit);
 
         SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,

@@ -88,7 +88,7 @@ public class PplxAiService extends ServiceBase {
 
         aiUtil.ensureDefaults(system);
         ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), maxTokens, null);
+                ms.getUserNodeId().toHexString(), maxTokens, null, null);
 
         log.debug("PPLX Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
                 + XString.prettyPrint(request));

@@ -52,7 +52,7 @@ export class GenerateBookByAIDlg extends DialogBase {
     generate = async () => {
         const numChapters = parseInt(GenerateBookByAIDlg.numChapters.getValue());
         if (numChapters < 1 || numChapters > 100) {
-            alert("Try a sensible number of chapters.");
+            alert("Too many chapters Max allowed is 100.");
             return;
         }
 

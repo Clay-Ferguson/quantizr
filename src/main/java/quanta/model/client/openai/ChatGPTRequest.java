@@ -16,16 +16,22 @@ public class ChatGPTRequest {
     @JsonProperty("max_tokens")
     private Integer maxTokens;
 
+    @JsonProperty("response_format")
+    private ChatGPTResponseFormat responseFormat;
+
     public ChatGPTRequest() {}
 
     public ChatGPTRequest(String model, List<ChatMessage> messages, double temperature, String user, Integer maxTokens,
-            String system) {
+            String system, String responseFormatType) {
         this.model = model;
         this.messages = messages;
         this.temperature = temperature;
         this.user = user;
         this.maxTokens = maxTokens;
         this.system = system;
+        if (responseFormatType != null) {
+            this.responseFormat = new ChatGPTResponseFormat(responseFormatType);
+        }
     }
 
     public String getUser() {
@@ -67,6 +73,15 @@ public class ChatGPTRequest {
     public void setMaxTokens(Integer maxTokens) {
         this.maxTokens = maxTokens;
     }
+
+    public ChatGPTResponseFormat getResponseFormat() {
+        return responseFormat;
+    }
+
+    public void setResponseFormat(ChatGPTResponseFormat responseFormat) {
+        this.responseFormat = responseFormat;
+    }
+
 
     public String getSystem() {
         return system;

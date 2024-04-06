@@ -251,7 +251,7 @@ public class AIUtil extends ServiceBase {
         if (svc != null) {
             switch (svc) {
                 case OPENAI:
-                    answer = oai.getAnswer(ms, null, sb.toString(), system);
+                    answer = oai.getAnswer(ms, null, sb.toString(), system, false);
                     break;
                 case PPLX:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
@@ -470,7 +470,7 @@ public class AIUtil extends ServiceBase {
 
             switch (svc) {
                 case OPENAI:
-                    openAiAns = oai.getAnswer(ms, null, prompt, null);
+                    openAiAns = oai.getAnswer(ms, null, prompt, null, true);
                     res.setGptCredit(openAiAns.userCredit);
                     break;
                 case PPLX:
