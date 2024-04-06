@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
@@ -54,6 +55,7 @@ import quanta.request.LoginRequest;
 import quanta.request.ResetPasswordRequest;
 import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
+import quanta.request.SendFeedbackRequest;
 import quanta.request.SignupRequest;
 import quanta.response.AddCreditResponse;
 import quanta.response.BlockUserResponse;
@@ -69,6 +71,7 @@ import quanta.response.LogoutResponse;
 import quanta.response.ResetPasswordResponse;
 import quanta.response.SaveUserPreferencesResponse;
 import quanta.response.SaveUserProfileResponse;
+import quanta.response.SendFeedbackResponse;
 import quanta.response.SignupResponse;
 import quanta.response.UpdateAccountInfo;
 import quanta.util.Const;
@@ -1238,5 +1241,20 @@ public class UserManagerService extends ServiceBase {
             res.setUserProfile(userProfile);
         }
         return res;
+    }
+
+    public SendFeedbackResponse sendFeedback(MongoSession ms, SendFeedbackRequest req) {
+        return arun.run(as -> {
+            SendFeedbackResponse res = new SendFeedbackResponse();
+            SubNode feedbackNode =
+                    create.createNode(as, NodePath.ROOT_PATH + "/" + NodePath.FEEDBACK + "/?", NodeType.NONE.s());
+            feedbackNode.setOwner(as.getUserNodeId());
+            feedbackNode.setContent(req.getMessage());
+            if (ms != null && !ms.isAnon()) {
+                feedbackNode.set(NodeProp.USER, ms.getUserName());
+            }
+            update.save(as, feedbackNode);
+            return res;
+        });
     }
 }

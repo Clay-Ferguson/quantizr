@@ -8,6 +8,7 @@ public class NodePath {
     public static final String REMOTE = "R"; // Note: Lower case 'r' is reserved and is 'root'
     public static final String SYSTEM = "sys";
     public static final String PUBLIC = "public";
+    public static final String FEEDBACK = "feedback";
     public static final String OUTBOX = "outbox";
     public static final String HOME = "home";
 

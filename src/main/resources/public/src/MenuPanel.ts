@@ -13,6 +13,7 @@ import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
+import { SendFeedbackDlg } from "./dlg/SendFeedbackDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
@@ -94,6 +95,7 @@ export class MenuPanel extends Div {
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority();
     static export = () => S.edit.openExportDlg();
     static viewNodeGraph = () => S.render.showGraph(null, "");
+    static sendFeedback = () => { new SendFeedbackDlg(null).open(); }
 
     static importJson = () => {
         const node = S.nodeUtil.getHighlightedNode();
@@ -431,6 +433,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //
             new MenuItem("Main Portal Node", S.util.loadAnonPageHome), //
+            new MenuItem("Contact Us", MenuPanel.sendFeedback), //
         ], null));
 
         this.setChildren(children);

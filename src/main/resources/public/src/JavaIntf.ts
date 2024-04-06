@@ -685,6 +685,10 @@ export interface SelectAllNodesRequest extends RequestBase {
     parentNodeId: string;
 }
 
+export interface SendFeedbackRequest extends RequestBase {
+    message: string;
+}
+
 export interface SendLogTextRequest extends RequestBase {
     text: string;
 }
@@ -1088,6 +1092,9 @@ export interface SearchAndReplaceResponse extends ResponseBase {
 
 export interface SelectAllNodesResponse extends ResponseBase {
     nodeIds: string[];
+}
+
+export interface SendFeedbackResponse extends ResponseBase {
 }
 
 export interface SendLogTextResponse extends ResponseBase {

@@ -51,6 +51,7 @@ public class MongoUtil extends ServiceBase {
     private static HashSet<String> testAccountNames = new HashSet<>();
     private static final Random rand = new Random();
     public static SubNode allUsersRootNode = null;
+    public static SubNode feedbackNode = null;
     public static SubNode localUsersNode = null;
     public static SubNode remoteUsersNode = null;
     /*
@@ -804,8 +805,12 @@ public class MongoUtil extends ServiceBase {
                 snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, "Users", null, true, null, null);
         ensureUsersLocalAndRemotePath(ms);
         createPublicNodes(ms);
+
+        feedbackNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.FEEDBACK, "### User Feedback", null,
+                true, null, null);
     }
 
+    // todo-0: we no longer have 'remote' path so we can remove some code accordingly
     public void ensureUsersLocalAndRemotePath(MongoSession ms) {
         localUsersNode =
                 snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, "Local Users", null, true, null, null);

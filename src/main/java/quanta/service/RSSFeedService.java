@@ -81,7 +81,7 @@ public class RSSFeedService extends ServiceBase {
     private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, String> feedNameOfItem = new ConcurrentHashMap<>();
     // keep track of which feeds failed so we don't try them again until another 30-min cycle
-    private static final HashSet<String> failedFeeds = new HashSet<>(); // &&&
+    private static final HashSet<String> failedFeeds = new HashSet<>();
     // Cache of all aggregates
     private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
     private static int MAX_CACHE_SIZE = 500;
@@ -370,7 +370,7 @@ public class RSSFeedService extends ServiceBase {
              * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
              */
             // under the admin menu for checking server status info.
-            log.debug("Error reading feed: " + url + " msg: " + e.getMessage()); // &&&
+            log.debug("Error reading feed: " + url + " msg: " + e.getMessage());
             failedFeeds.add(url);
             // if the feed has failed at least attempt to get from the cache whatever the latest is that we have
             return feedCache.get(url);

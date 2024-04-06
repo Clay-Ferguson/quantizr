@@ -322,7 +322,7 @@ public class NodeEditService extends ServiceBase {
 
         if (bookMasterPrompt != null) {
             systemPrompt +=
-                    "\nBy the way, when you generate this content, keep in mind that the following was the overall purpose for the book:\nPURPOSE:\n"
+                    "\n\nBy the way, when you generate this content, keep in mind that the following was the overall purpose for the book:\n\nPURPOSE:\n"
                             + bookMasterPrompt;
         }
 

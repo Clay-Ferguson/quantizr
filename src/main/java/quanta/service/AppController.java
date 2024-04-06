@@ -87,6 +87,7 @@ import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SelectAllNodesRequest;
+import quanta.request.SendFeedbackRequest;
 import quanta.request.SendLogTextRequest;
 import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
@@ -935,6 +936,14 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object generateBookByAI(@RequestBody GenerateBookByAIRequest req, HttpSession session) {
         return callProc.run("generateBookByAI", true, true, req, session, ms -> {
             return aiUtil.generateBookByAI(ms, req);
+        });
+    }
+
+    @RequestMapping(value = API_PATH + "/sendFeedback", method = RequestMethod.POST)
+    @ResponseBody
+    public Object sendFeedback(@RequestBody SendFeedbackRequest req, HttpSession session) {
+        return callProc.run("sendFeedback", false, false, req, session, ms -> {
+            return user.sendFeedback(ms, req);
         });
     }
 
