@@ -28,6 +28,10 @@ export class HistoryPanel extends Div {
         const children = [];
         children.push(new Div(null, null, [
             new Span("History", { className: "historyPanelTitle" }),
+            new Span("Clear", {
+                className: "clickable",
+                onClick: S.histUtil.clearHistory
+            }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean) => {
                     dispatch("historyLockChanged", s => {

@@ -9,9 +9,11 @@
 }
 
 .historyPanelTitle {
-    font-weight: bold;
+    font-weight: bolder;
     margin-bottom: $smallGap;
+    margin-right: $smallGap;
     display: inline-block;
+    font-size: 110%;
 }
 
 .nodeHistoryPanel {

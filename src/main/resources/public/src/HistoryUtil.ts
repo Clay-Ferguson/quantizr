@@ -22,6 +22,12 @@ export class HistoryUtil {
         }
     }
 
+    clearHistory = async () => {
+        dispatch("clearHistoryData", s => s.nodeHistory = []);
+        await S.localDB.writeObject({ k: HistoryUtil.NODEHISTORY_KEY, v: [] });
+        this.historyDirty = false;
+    }
+
     historySaverFunc = async () => {
         if (!this.historyDirty) return;
         await S.localDB.writeObject({ k: HistoryUtil.NODEHISTORY_KEY, v: getAs().nodeHistory });
