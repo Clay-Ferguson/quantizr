@@ -26,10 +26,22 @@ public class FinancialReport extends ServiceBase {
         sb.append(htmlH(6, "Debits"));
         sb.append(getStatsTable("D"));
 
+        sb.append(htmlH(6, "User Balances"));
+        sb.append(getAllUserBalancesTable());
+
         sb.append(htmlH(6, "All Trans"));
         sb.append(getAllTransactionsTable());
 
         return sb.toString();
+    }
+
+    private String getAllUserBalancesTable() {
+        List<Object[]> results = tranRepository.findAllUserBalances();
+        if (results == null || results.size() == 0) {
+            return "No data available yet.";
+        }
+        return htmlTable(htmlHeader("User Name", "Balance") + //
+                formatTableRows(results));
     }
 
     private String getAllTransactionsTable() {
@@ -37,7 +49,7 @@ public class FinancialReport extends ServiceBase {
         if (results == null || results.size() == 0) {
             return "No data available yet.";
         }
-        return htmlTable(htmlHeader("Trans ID", "Time", "User ID", "User Name", "Code", "Amount") + //
+        return htmlTable(htmlHeader("Trans ID", "Time", "User Name", "Code", "Amount") + //
                 formatTableRows(results));
     }
 
@@ -47,7 +59,7 @@ public class FinancialReport extends ServiceBase {
             return "No data available yet.";
         }
 
-        return htmlTable(htmlHeader("User ID", "User Name", "Code", "Count", "Total", "Avg") + //
+        return htmlTable(htmlHeader("User Name", "Code", "Count", "Total") + //
                 formatTableRows(results));
     }
 }
