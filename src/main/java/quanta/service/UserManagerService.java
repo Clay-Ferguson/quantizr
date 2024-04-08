@@ -394,7 +394,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     public void initNewUser(MongoSession ms, String userName, String password, String email, boolean automated) {
-        SubNode userNode = mongoUtil.createUser(ms, userName, email, password, automated, null, false);
+        SubNode userNode = mongoUtil.createUser(ms, userName, email, password, automated, null);
         if (userNode != null) {
             log.debug("Successful signup complete.");
         }
@@ -476,7 +476,7 @@ public class UserManagerService extends ServiceBase {
         if (ownerNode != null) {
             throw new RuntimeEx("User already exists.");
         }
-        SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false, null, false);
+        SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false, null);
         // It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
         // it's random and tied to this user by definition
         String signupCode = newUserNode.getIdStr();

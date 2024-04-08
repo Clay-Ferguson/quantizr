@@ -322,11 +322,7 @@ public class FriendService extends ServiceBase {
                         }
 
                         String replyTargetId = node.getIdStr();
-
-                        // REGEX path expression to find both /r/usr/L and /r/usr/R as an *or* inside the actual REGEX
-                        // which will combine similar to /r/usr/(L | R), but I'm not sure the syntax yet.
-                        iter = read.findNodesByProp(ms,
-                                NodePath.USERS_PATH + "/(" + NodePath.LOCAL + "|" + NodePath.REMOTE + ")",
+                        iter = read.findNodesByProp(ms, NodePath.USERS_PATH + "/" + NodePath.LOCAL,
                                 NodeProp.INREPLYTO.s(), replyTargetId);
                         for (SubNode child : iter) {
                             // if we didn't already add above, add now

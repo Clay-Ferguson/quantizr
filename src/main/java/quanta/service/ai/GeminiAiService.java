@@ -50,10 +50,6 @@ public class GeminiAiService extends ServiceBase {
         String input;
         if (node != null) {
             input = aiUtil.prepareAIQuestionText(node, system);
-
-            // todo-0: Verify this is true (and make this better instructions for the AI) -> Gemini doesn't
-            // support system prompts, so we'll just prepend it to
-            // the input
             if (!StringUtils.isEmpty(system.getPrompt())) {
                 input = "Here are your instructions for our conversation:\n" + system.getPrompt()
                         + "\nNow, let's begin.\n\n" + input;

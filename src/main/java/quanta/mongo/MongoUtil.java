@@ -52,8 +52,8 @@ public class MongoUtil extends ServiceBase {
     private static final Random rand = new Random();
     public static SubNode allUsersRootNode = null;
     public static SubNode feedbackNode = null;
-    public static SubNode localUsersNode = null;
-    public static SubNode remoteUsersNode = null;
+    public static SubNode usersNode = null;
+
     /*
      * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
      * need very performant way to translate from /r/p to /r path and vice verse
@@ -733,7 +733,7 @@ public class MongoUtil extends ServiceBase {
     }
 
     public SubNode createUser(MongoSession ms, String newUserName, String email, String password, boolean automated,
-            Val<SubNode> postsNodeVal, boolean forceRemoteUser) {
+            Val<SubNode> postsNodeVal) {
         SubNode userNode = read.getAccountByUserName(ms, newUserName, false);
         if (userNode != null) {
             throw new RuntimeException("User already existed: " + newUserName);
@@ -742,11 +742,8 @@ public class MongoUtil extends ServiceBase {
             throw new RuntimeEx("createUser should not be called for admin user.");
         }
         auth.requireAdmin(ms);
-        // todo-2: is user validated here (no invalid characters, etc. and invalid
-        // flowpaths tested?)
-        SubNode parentNode = newUserName.contains("@") || forceRemoteUser ? remoteUsersNode : localUsersNode;
-        userNode = create.createNode(ms, parentNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
-        parentNode.setHasChildren(true);
+        userNode = create.createNode(ms, usersNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
+        usersNode.setHasChildren(true);
         ObjectId id = new ObjectId();
         userNode.setId(id);
         userNode.setOwner(id);
@@ -803,19 +800,14 @@ public class MongoUtil extends ServiceBase {
         }
         allUsersRootNode =
                 snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, "Users", null, true, null, null);
-        ensureUsersLocalAndRemotePath(ms);
+
+        usersNode =
+                snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, "Local Users", null, true, null, null);
+
         createPublicNodes(ms);
 
         feedbackNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.FEEDBACK, "### User Feedback", null,
                 true, null, null);
-    }
-
-    // todo-0: we no longer have 'remote' path so we can remove some code accordingly
-    public void ensureUsersLocalAndRemotePath(MongoSession ms) {
-        localUsersNode =
-                snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, "Local Users", null, true, null, null);
-        remoteUsersNode = snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.REMOTE, "Remote Users", null, true,
-                null, null);
     }
 
     public void createPublicNodes(MongoSession ms) {

@@ -5,7 +5,6 @@ public class NodePath {
     public static final String PENDING = "p";
     public static final String USER = "usr";
     public static final String LOCAL = "L";
-    public static final String REMOTE = "R"; // Note: Lower case 'r' is reserved and is 'root'
     public static final String SYSTEM = "sys";
     public static final String PUBLIC = "public";
     public static final String FEEDBACK = "feedback";
