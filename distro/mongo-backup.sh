@@ -1,5 +1,19 @@
 #!/bin/bash
 
+source setenv-run-distro.sh
+
+# first apply any overrides that exist in this folder
+if [ -f "setenv-quanta-ext.sh" ]; then
+    echo "Overriding secrets with setenv-quanta-ext.sh"
+    source setenv-quanta-ext.sh
+fi
+
+# then apply any overrides from parent folder
+if [ -f "../setenv-quanta-ext.sh" ]; then
+    echo "Overriding secrets with ../setenv-quanta-ext.sh"
+    source ../setenv-quanta-ext.sh
+fi
+
 # Set the image name
 IMAGE_NAME="mongo:6.0.8"
 
@@ -15,4 +29,5 @@ fi
 echo "Container ID: $CONTAINER_ID"
 
 # Execute the backup script inside the container
-docker exec "$CONTAINER_ID" /backup/_backup.sh
+docker exec "$CONTAINER_ID" mongodump --username=root --password=${mongoPassword} --authenticationDatabase=admin \
+    --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive="/backup/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose

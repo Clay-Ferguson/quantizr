@@ -77,10 +77,6 @@ fi
 
 imageCheck ${DOCKER_IMAGE}
 
-# Copy over the Backup/Restore scripts
-cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/backup
-cp ${SCRIPTS}/tools/_restore.sh         ${DEPLOY_TARGET}/backup
-
 echo
 echo "==================== NOTE ======================================="
 echo "Run docker-publish-distro.sh to publish the distro to docker repo"

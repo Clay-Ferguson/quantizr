@@ -59,28 +59,6 @@ services:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
-    mongo-backup-distro:
-        image: mongo:6.0.8
-        command: sh -c "mongodump --username=root --password=${mongoPassword} --authenticationDatabase=admin --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive='/backup/dump-'`eval date +%Y-%m-%d`'.gz' --verbose >> '/backup/backup-'`eval date +%Y-%m-%d`'.log' 2>&1"
-        deploy:
-            mode: replicated
-            replicas: 1
-            restart_policy:
-                condition: none
-            labels:
-                - "swarm.cronjob.enable=true"
-                - "swarm.cronjob.schedule=0 0 * * ?" # Run every day at midnight
-                # For testing use this @reboot schedule to force a backup on startup
-                # - "swarm.cronjob.schedule=@reboot"
-                - "swarm.cronjob.skip-running=true"
-        volumes:
-            - '${MONGO_BACKUP}:/backup'
-        hostname: mongo-backup-host-distro
-        networks:
-            bridge:
-                aliases:
-                    - mongo-backup-host-distro
-
     pgdb-distro:
         image: postgres
         deploy:
