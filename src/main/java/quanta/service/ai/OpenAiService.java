@@ -58,7 +58,7 @@ public class OpenAiService extends ServiceBase {
     // Warning: If you change these, you will need to update the pricing calculations
     String OPENAI_MODEL_TTS = "tts-1";
     String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
-    String OPENAI_MODEL_COMPLETION = "gpt-4-0125-preview"; // "gpt-4-1106-preview";
+    String OPENAI_MODEL_COMPLETION = "gpt-4-turbo-2024-04-09"; // "gpt-4-0125-preview"; // "gpt-4-1106-preview";
     String COST_CODE = "OAI"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -195,9 +195,9 @@ public class OpenAiService extends ServiceBase {
         switch (size) {
             case "1024x1792":
             case "1792x1024":
-                return new BigDecimal(0.01105);
+                return new BigDecimal(0.12);
             case "1024x1024":
-                return new BigDecimal(0.00765);
+                return new BigDecimal(0.08);
             default:
                 throw new RuntimeException("Unsupported image size: " + size);
         }
