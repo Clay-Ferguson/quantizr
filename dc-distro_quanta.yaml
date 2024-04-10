@@ -87,6 +87,8 @@ services:
             - '5432:5432'
         volumes: 
             - '${POSTGRES_DATA}:/var/lib/postgresql/data'
+            # need to rename MONGO_BACKUP to just DB_BACKUP, since it's used for both mongo+postgres
+            - '${MONGO_BACKUP}:/backup'
 
     # Disabled just to save server resources
     # Simply by uncommening this section you can enable pgadmin4

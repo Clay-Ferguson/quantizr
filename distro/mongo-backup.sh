@@ -33,7 +33,7 @@ docker exec "$CONTAINER_ID" mongodump --username=root --password=${mongoPassword
     --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive="/backup/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose
 
 # https://docs.mongodb.com/manual/reference/program/mongoexport
-# The best way to export human-readable text of the entire DB
+#The best way to export human-readable text of the entire DB
 #mongoexport -v --pretty --username=root --password=??? --authenticationDatabase=admin \
 #    --host=${MONGO_HOST} --port=${MONGO_PORT} --collection=nodes --db=database --out="/backup/nodes-"`eval date +%Y-%m-%d-%s`".json"
 
