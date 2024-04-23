@@ -79,7 +79,10 @@ export class NodeCompMarkdown extends Comp {
     }
 
     translateLaTex = (val: string): string => {
-        // val = val.replaceAll("$", "\\$"); // Note sure what this was for
+        // we need this to escape the $ character in the string, because without this the Latex will treat any content
+        // with multiple '$' characters as a Latex expression and try to render it as such.
+        val = val.replaceAll("$", "\\$");
+
         if (val.indexOf("\\") == -1) return val;
 
         return val.replaceAll("\\(", "$")//
