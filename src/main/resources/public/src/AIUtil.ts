@@ -15,6 +15,7 @@ export class AIUtil {
     constructor() {
     }
 
+    // #ai-model
     init = () => {
         this.aiServices = [];
         this.aiServices.push({
@@ -37,6 +38,15 @@ export class AIUtil {
                 description: "Google: Gemini",
                 longDescription: "Google's best general-purpose AI."
             });
+        }
+
+        if (S.quanta.config.usePplxAi) {
+            this.aiServices.push(//
+                {
+                    name: J.AIServiceName.PPLX_LLAMA3,
+                    description: "Meta: Llama 3",
+                    longDescription: "Meta's Open Sourc Llama 3."
+                });
         }
 
         if (S.quanta.config.useAnthAi) {
@@ -112,9 +122,11 @@ export class AIUtil {
     }
 
     isAiType = (nodeType: string): boolean => {
+        // #ai-model
         return nodeType === J.NodeType.OPENAI_ANSWER || //
             nodeType === J.NodeType.PPLXAI_ANSWER || //
             nodeType === J.NodeType.ANTHAI_ANSWER || //
+            nodeType == J.NodeType.LLAMAAI_ANSWER || //
             nodeType === J.NodeType.GEMINIAI_ANSWER || //
             nodeType === J.NodeType.HUGGINGFACE_ANSWER || //
             nodeType === J.NodeType.OOBAI_ANSWER;

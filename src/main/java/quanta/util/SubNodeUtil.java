@@ -33,10 +33,12 @@ public class SubNodeUtil extends ServiceBase {
     private Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
     public boolean isAiResponseType(String type) {
+        // #ai-model
         switch (NodeType.fromType(type)) {
             case OPENAI_ANSWER:
             case PPLXAI_ANSWER:
             case ANTHAI_ANSWER:
+            case LLAMAAI_ANSWER:
             case GEMINIAI_ANSWER:
             case HUGGINGFACE_ANSWER:
             case OOBAI_ANSWER:

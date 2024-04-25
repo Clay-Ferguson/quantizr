@@ -151,9 +151,11 @@ public class AIUtil extends ServiceBase {
         return template;
     }
 
+    // #ai-model
     public boolean isAnyAnswerType(String type) {
         return NodeType.OPENAI_ANSWER.s().equals(type) || //
                 NodeType.PPLXAI_ANSWER.s().equals(type) || //
+                NodeType.LLAMAAI_ANSWER.s().equals(type) || //
                 NodeType.GEMINIAI_ANSWER.s().equals(type) || //
                 NodeType.ANTHAI_ANSWER.s().equals(type);
     }
@@ -249,6 +251,7 @@ public class AIUtil extends ServiceBase {
         GeminiChatResponse geminiAnswer = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
         if (svc != null) {
+            // #ai-model
             switch (svc) {
                 case OPENAI:
                     answer = oai.getAnswer(ms, null, sb.toString(), system, false);
@@ -266,6 +269,9 @@ public class AIUtil extends ServiceBase {
                     break;
                 case PPLX_ONLINE:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                    break;
+                case PPLX_LLAMA3:
+                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
                     break;
                 case PPLX_CODE_LLAMA:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
@@ -417,7 +423,7 @@ public class AIUtil extends ServiceBase {
             }
             prompt += "I want to have " + req.getNumChapters() + " chapters in this book.\n";
 
-            // todo-0: needs to be configurable by an admin
+            // todo-1: needs to be configurable by an admin
             // #ai_prompt
             prompt +=
                     """
@@ -468,6 +474,7 @@ public class AIUtil extends ServiceBase {
                             ```
                             """;
 
+            // #ai-model
             switch (svc) {
                 case OPENAI:
                     openAiAns = oai.getAnswer(ms, null, prompt, null, true);
@@ -487,6 +494,10 @@ public class AIUtil extends ServiceBase {
                     break;
                 case PPLX_ONLINE:
                     pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                    res.setGptCredit(pplxAiAns.userCredit);
+                    break;
+                case PPLX_LLAMA3:
+                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
                     res.setGptCredit(pplxAiAns.userCredit);
                     break;
                 case PPLX_CODE_LLAMA:

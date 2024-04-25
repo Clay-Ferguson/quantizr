@@ -20,6 +20,7 @@ public enum NodeType {
 
     OPENAI_ANSWER("sn:oaiAns"), //
     PPLXAI_ANSWER("sn:pplxaiAns"), //
+    LLAMAAI_ANSWER("sn:llamaaiAns"), //
     ANTHAI_ANSWER("sn:anthaiAns"), //
     GEMINIAI_ANSWER("sn:geminiaiAns"), //
     HUGGINGFACE_ANSWER("sn:hfAns"), //

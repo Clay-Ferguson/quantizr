@@ -29,7 +29,11 @@ public class PplxAiService extends ServiceBase {
 
     public final String PPLX_MODEL_COMPLETION_ONLINE = "sonar-medium-online"; // 8x7B
     public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
+    public final String PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct";
+
+    // todo-0: change to: mixtral-8x22b-instruct, and update pricing
     public final String PPLX_MODEL_COMPLETION_MIXTRAL = "mixtral-8x7b-instruct";
+
     public final String PPLX_MODEL_COMPLETION_CHAT = "sonar-medium-chat"; // 8x7B
     String COST_CODE = "PPX"; // 3 chars allowed
 
@@ -109,6 +113,7 @@ public class PplxAiService extends ServiceBase {
     }
 
     // https://docs.perplexity.ai/docs/pricing
+    // #ai-model
     private double calculateCost(ChatCompletionResponse res) {
         Usage usage = res.getUsage();
         String model = res.getModel().toLowerCase();
@@ -124,22 +129,31 @@ public class PplxAiService extends ServiceBase {
             case PPLX_MODEL_COMPLETION_MIXTRAL:
                 // prices per magatoken
                 inputPpm = 0.6;
-                outputPpm = 1.8;
+                outputPpm = 0.6;
                 return (usage.getPromptTokens() * inputPpm / 1000000) + //
                         (usage.getCompletionTokens() * outputPpm / 1000000);
 
             // 70B
             case PPLX_MODEL_COMPLETION_CODELLAMA:
                 // prices per magatoken
-                inputPpm = 0.7;
-                outputPpm = 2.8;
+                inputPpm = 1.0;
+                outputPpm = 1.0;
+                return (usage.getPromptTokens() * inputPpm / 1000000) + //
+                        (usage.getCompletionTokens() * outputPpm / 1000000);
+
+            case PPLX_MODEL_COMPLETION_LLAMA3:
+                // prices per magatoken
+                inputPpm = 1.0;
+                outputPpm = 1.0;
                 return (usage.getPromptTokens() * inputPpm / 1000000) + //
                         (usage.getCompletionTokens() * outputPpm / 1000000);
 
             case PPLX_MODEL_COMPLETION_ONLINE:
-                outputPpm = 1.8;
+                inputPpm = 0.6;
+                outputPpm = 0.6;
                 inputPricePerReq = 0.005;
-                return inputPricePerReq + (usage.getCompletionTokens() * outputPpm / 1000000);
+                return inputPricePerReq + (usage.getPromptTokens() * inputPpm / 1000000) + //
+                        (usage.getCompletionTokens() * outputPpm / 1000000);
 
             default:
                 throw new RuntimeException("Model not supported: " + res.getModel() + " is not supported.");

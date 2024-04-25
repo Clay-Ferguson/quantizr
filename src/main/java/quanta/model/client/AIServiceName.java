@@ -2,6 +2,7 @@ package quanta.model.client;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
+// #ai-model
 public enum AIServiceName {
     NONE("[null]"), //
     OPENAI("openAi"), //
@@ -10,6 +11,7 @@ public enum AIServiceName {
     ANTH_SONNET("anthAi_sonnet"), // Sonnet
     PPLX_ONLINE("pplxAi_online"), //
     PPLX_CODE_LLAMA("pplxAi_codeLlama"), //
+    PPLX_LLAMA3("llama3"), //
     PPLX_MIXTRAL("pplxAi_mixtral"), //
     HUGGING_FACE("huggingFace"), //
     OOBA("oobAi"), //

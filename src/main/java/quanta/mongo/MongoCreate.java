@@ -310,6 +310,7 @@ public class MongoCreate extends ServiceBase {
                     svc = AIServiceName.fromString(system.getService());
                 }
 
+                // #ai-model
                 switch (svc) {
                     case OPENAI:
                         openAiAns = oai.getAnswer(ms, parentNode, null, null, false);
@@ -337,6 +338,11 @@ public class MongoCreate extends ServiceBase {
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
                         res.setGptCredit(pplxAiAns.userCredit);
                         typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        break;
+                    case PPLX_LLAMA3:
+                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
+                        res.setGptCredit(pplxAiAns.userCredit);
+                        typeToCreate = NodeType.LLAMAAI_ANSWER.s();
                         break;
                     case PPLX_CODE_LLAMA:
                         pplxAiAns =

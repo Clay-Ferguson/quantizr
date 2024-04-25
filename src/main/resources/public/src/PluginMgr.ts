@@ -18,6 +18,7 @@ import { NotesNodeType } from "./plugins/NotesNodeType";
 import { OpenAiAnswerType } from "./plugins/OpenAiAnswerType";
 import { PplxAiAnswerType } from "./plugins/PplxAiAnswerType";
 import { AnthAiAnswerType } from "./plugins/AnthAiAnswerType";
+import { LlamaAiAnswerType } from "./plugins/LlamaAiAnswerType";
 import { GeminiAiAnswerType } from "./plugins/GeminiAiAnswerType";
 import { HuggingFaceAnswerType } from "./plugins/HuggingFaceAnswerType";
 import { PostsType } from "./plugins/PostsType";
@@ -87,6 +88,7 @@ export class PluginMgr {
         this.addType(ordinal++, new CommentType());
         this.addType(ordinal++, new OpenAiAnswerType());
         this.addType(ordinal++, new PplxAiAnswerType());
+        this.addType(ordinal++, new LlamaAiAnswerType());
         this.addType(ordinal++, new AnthAiAnswerType());
         this.addType(ordinal++, new GeminiAiAnswerType());
         this.addType(ordinal++, new HuggingFaceAnswerType());
