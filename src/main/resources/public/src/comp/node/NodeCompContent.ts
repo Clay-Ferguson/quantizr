@@ -122,8 +122,11 @@ export class NodeCompContent extends Div {
             const diffTime = dateVal.getTime() - (new Date().getTime());
             const diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
             let diffStr = "";
+            let modClass;
+
             if (diffDays === 0) {
                 diffStr = " (today)";
+                modClass = "dateTimeToday"
             }
             else if (diffDays > 0) {
                 if (diffDays === 1) {
@@ -132,6 +135,7 @@ export class NodeCompContent extends Div {
                 else {
                     diffStr = " (" + diffDays + " days away)";
                 }
+                modClass = "dateTimeFuture"
             }
             else if (diffDays < 0) {
                 if (diffDays === -1) {
@@ -140,12 +144,25 @@ export class NodeCompContent extends Div {
                 else {
                     diffStr = " (" + Math.abs(diffDays) + " days ago)";
                 }
+
+                if (node.tags) {
+                    const tags: string[] = node.tags.split(" ");
+                    if (tags?.includes("#due")) {
+                        modClass = "dateTimePastDue";
+                    }
+                    else {
+                        modClass = "dateTimePast";
+                    }
+                }
+                else {
+                    modClass = "dateTimePast";
+                }
             }
 
             // if more than two days in future or past we don't show the time, just the date
             const when = (diffDays <= -2 || diffDays >= 2) ? S.util.formatDateShort(dateVal) : S.util.formatDateTime(dateVal);
             children.push(new Div(when + " " + S.util.getDayOfWeek(dateVal) + diffStr, {
-                className: "dateTimeDisplay float-end"
+                className: "dateTimeDisplay " + modClass + " float-end"
             }));
             children.push(new Clearfix());
         }

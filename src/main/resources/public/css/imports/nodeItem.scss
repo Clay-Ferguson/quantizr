@@ -367,9 +367,29 @@ i'm backing out for now
     padding: 0px 8px 0px 8px;
     display: inline-block;
     margin-bottom: $tinyGap;
+    border-radius: 4px;
+}
+
+.dateTimeToday {
+    background-color: yellow;
+    color: black;
+}
+
+.dateTimeFuture {
     background-color: darkgoldenrod;
     color: black;
-    border-radius: 4px;
+}
+
+.dateTimePast {
+    background-color: black;
+    color: green;
+    border: 1px solid green;
+}
+
+.dateTimePastDue {
+    background-color: red;
+    color: white;
+    border: 2px solid white;
 }
 
 .nodeNameDisp {
