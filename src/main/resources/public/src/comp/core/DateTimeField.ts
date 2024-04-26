@@ -1,5 +1,6 @@
 import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
+import { Button } from "./Button";
 import { DateField } from "./DateField";
 import { Span } from "./Span";
 import { TextField } from "./TextField";
@@ -87,7 +88,41 @@ export class DateTimeField extends Span {
                 inputClass: "durationTypeInput",
                 outterTagName: "span",
                 val: this.durationState
-            }) : null
+            }) : null,
+            new Span(null, { className: "bigMarginLeft" }, [
+                new Button("+D", () => {
+                    const date = new Date(this.dateState.getValue());
+                    date.setDate(date.getDate() + 1);
+                    const isoStr = date.toISOString();
+                    const dateStr = isoStr.substring(0, 10);
+                    this.dateState.setValue(dateStr);
+                    S.util.flashMessage("Added one day", "Note", true);
+                }, { title: "Add Day" }, "btn btn-secondary bigMarginLeft"),
+                new Button("+W", () => {
+                    const date = new Date(this.dateState.getValue());
+                    date.setDate(date.getDate() + 7);
+                    const isoStr = date.toISOString();
+                    const dateStr = isoStr.substring(0, 10);
+                    this.dateState.setValue(dateStr);
+                    S.util.flashMessage("Added one week", "Note", true);
+                }, { title: "Add Week" }, "btn btn-secondary"),
+                new Button("+M", () => {
+                    const date = new Date(this.dateState.getValue());
+                    date.setMonth(date.getMonth() + 1);
+                    const isoStr = date.toISOString();
+                    const dateStr = isoStr.substring(0, 10);
+                    this.dateState.setValue(dateStr);
+                    S.util.flashMessage("Added one month", "Note", true);
+                }, { title: "Add Month" }, "btn btn-secondary"),
+                new Button("+Y", () => {
+                    const date = new Date(this.dateState.getValue());
+                    date.setFullYear(date.getFullYear() + 1);
+                    const isoStr = date.toISOString();
+                    const dateStr = isoStr.substring(0, 10);
+                    this.dateState.setValue(dateStr);
+                    S.util.flashMessage("Added one year", "Note", true);
+                }, { title: "Add Year" }, "btn btn-secondary"),
+            ])
         ]);
         return true;
     }
