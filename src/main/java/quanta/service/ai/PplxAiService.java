@@ -30,11 +30,9 @@ public class PplxAiService extends ServiceBase {
     public final String PPLX_MODEL_COMPLETION_ONLINE = "sonar-medium-online"; // 8x7B
     public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
     public final String PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct";
-
-    // todo-0: change to: mixtral-8x22b-instruct, and update pricing
-    public final String PPLX_MODEL_COMPLETION_MIXTRAL = "mixtral-8x7b-instruct";
-
+    public final String PPLX_MODEL_COMPLETION_MIXTRAL = "mixtral-8x22b-instruct";
     public final String PPLX_MODEL_COMPLETION_CHAT = "sonar-medium-chat"; // 8x7B
+
     String COST_CODE = "PPX"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -126,10 +124,17 @@ public class PplxAiService extends ServiceBase {
         switch (model) {
             // 8x7B
             case PPLX_MODEL_COMPLETION_CHAT:
-            case PPLX_MODEL_COMPLETION_MIXTRAL:
                 // prices per magatoken
                 inputPpm = 0.6;
                 outputPpm = 0.6;
+                return (usage.getPromptTokens() * inputPpm / 1000000) + //
+                        (usage.getCompletionTokens() * outputPpm / 1000000);
+
+            // 8x22B
+            case PPLX_MODEL_COMPLETION_MIXTRAL:
+                // prices per magatoken
+                inputPpm = 1.0;
+                outputPpm = 1.0;
                 return (usage.getPromptTokens() * inputPpm / 1000000) + //
                         (usage.getCompletionTokens() * outputPpm / 1000000);
 
