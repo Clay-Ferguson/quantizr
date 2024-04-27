@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.ChatGPTRequest;
 import quanta.model.client.openai.ChatMessage;
@@ -175,12 +176,12 @@ public class PplxAiService extends ServiceBase {
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
         aiUtil.parseAIConfig(ms, node, system);
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
-            if (aiUtil.isAnyAnswerType(parent.getType())) {
+            if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
                 messages.add(0, new ChatMessage("assistant", parent.getContent()));
             } else {

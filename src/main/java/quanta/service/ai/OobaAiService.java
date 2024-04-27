@@ -100,12 +100,12 @@ public class OobaAiService extends ServiceBase {
 
     private void buildChatHistory(MongoSession ms, SubNode node, List<OobAiMessage> messages) {
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
-            if (NodeType.OOBAI_ANSWER.s().equals(parent.getType())) {
+            if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
                 messages.add(0, new OobAiMessage("assistant", parent.getContent()));
             } else {

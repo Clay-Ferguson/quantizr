@@ -17,15 +17,7 @@ public enum NodeType {
     CALENDAR("sn:calendar"), //
     COMMENT("sn:comment"), //
     AI_QUERY("sn:aiQuery"), //
-
-    OPENAI_ANSWER("sn:oaiAns"), //
-    PPLXAI_ANSWER("sn:pplxaiAns"), //
-    LLAMAAI_ANSWER("sn:llamaaiAns"), //
-    ANTHAI_ANSWER("sn:anthaiAns"), //
-    GEMINIAI_ANSWER("sn:geminiaiAns"), //
-    HUGGINGFACE_ANSWER("sn:hfAns"), //
-    OOBAI_ANSWER("sn:oobAns"), //
-
+    AI_ANSWER("sn:aiAns"), //
     RSS_FEED("sn:rssfeed"), //
     FRIEND_LIST("sn:friendList"), //
     BLOCKED_USERS("sn:blockedUsers"), //

@@ -280,7 +280,7 @@ public class FriendService extends ServiceBase {
         while (node != null && (nodes.size() < MAX_THREAD_NODES)) {
             try {
                 NodeInfo info = null;
-                boolean isAiResponse = snUtil.isAiResponseType(node.getType());
+                boolean isAiResponse = NodeType.fromType(node.getType()) == NodeType.AI_ANSWER;
 
                 // if we're going up an AI conversation thread, detect two back to back non-answer types and that
                 // indicates we need to stop, becasue we're at the beginning of the conversation.

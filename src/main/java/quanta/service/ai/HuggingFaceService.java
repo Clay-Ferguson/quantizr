@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.model.client.NodeType;
 import quanta.model.client.huggingface.HuggingFaceRequest;
 import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.mongo.MongoSession;
@@ -88,14 +89,14 @@ public class HuggingFaceService extends ServiceBase {
     private void buildChatHistory(MongoSession ms, SubNode node, List<String> pastUserInputs,
             List<String> generatedResponses) {
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
 
             // we allow either type here (todo-1: add that to the openai stuff too)
-            if (aiUtil.isAnyAnswerType(parent.getType())) {
+            if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
                 generatedResponses.add(0, parent.getContent());
             } else {

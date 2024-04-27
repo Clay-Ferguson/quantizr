@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.model.client.NodeType;
 import quanta.model.client.geminiai.GeminiChatContent;
 import quanta.model.client.geminiai.GeminiChatRequest;
 import quanta.model.client.geminiai.GeminiChatResponse;
@@ -108,12 +109,12 @@ public class GeminiAiService extends ServiceBase {
      */
     private void buildChatHistory(MongoSession ms, SubNode node, List<GeminiChatContent> contents) {
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
-            if (aiUtil.isAnyAnswerType(parent.getType())) {
+            if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
                 contents.add(0, new GeminiChatContent("model", parent.getContent()));
             } else {

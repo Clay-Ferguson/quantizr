@@ -315,58 +315,58 @@ public class MongoCreate extends ServiceBase {
                     case OPENAI:
                         openAiAns = oai.getAnswer(ms, parentNode, null, null, false);
                         res.setGptCredit(openAiAns.userCredit);
-                        typeToCreate = NodeType.OPENAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX:
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                         res.setGptCredit(pplxAiAns.userCredit);
-                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH:
                         anthAiAns =
                                 anthai.getAnswer(ms, parentNode, null, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
                         res.setGptCredit(anthAiAns.userCredit);
-                        typeToCreate = NodeType.ANTHAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH_SONNET:
                         anthAiAns =
                                 anthai.getAnswer(ms, parentNode, null, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
                         res.setGptCredit(anthAiAns.userCredit);
-                        typeToCreate = NodeType.ANTHAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_ONLINE:
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
                         res.setGptCredit(pplxAiAns.userCredit);
-                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_LLAMA3:
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
                         res.setGptCredit(pplxAiAns.userCredit);
-                        typeToCreate = NodeType.LLAMAAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_CODE_LLAMA:
                         pplxAiAns =
                                 pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
                         res.setGptCredit(pplxAiAns.userCredit);
-                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_MIXTRAL:
                         pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_MIXTRAL);
                         res.setGptCredit(pplxAiAns.userCredit);
-                        typeToCreate = NodeType.PPLXAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case HUGGING_FACE:
                         huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
-                        typeToCreate = NodeType.HUGGINGFACE_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case OOBA:
                         oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
-                        typeToCreate = NodeType.OOBAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case GEMINI:
                         geminiAiAns = geminiai.getAnswer(ms, parentNode, null, system);
                         res.setGptCredit(geminiAiAns.credit);
-                        typeToCreate = NodeType.GEMINIAI_ANSWER.s();
+                        typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     default:
                         break;
@@ -387,6 +387,13 @@ public class MongoCreate extends ServiceBase {
         SubNode newNode = null;
         if (aiOverwrite == null) {
             CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
+
+            if (req.getProperties() == null) {
+                req.setProperties(Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService())));
+            } else {
+                req.getProperties().add(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
+
+            }
             newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(), null,
                     true, true, nodeChanges);
             if (req.isPendingEdit()) {
@@ -462,7 +469,7 @@ public class MongoCreate extends ServiceBase {
 
         update.save(ms, newNode);
 
-        if (req.getAiService() != null && aiUtil.isAnyAnswerType(parentNode.getType())) {
+        if (req.getAiService() != null && NodeType.AI_ANSWER.s().equals(parentNode.getType())) {
             oai.insertAnswerToQuestion(ms, newNode, req, res);
         }
 

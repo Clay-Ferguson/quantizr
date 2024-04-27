@@ -151,15 +151,6 @@ public class AIUtil extends ServiceBase {
         return template;
     }
 
-    // #ai-model
-    public boolean isAnyAnswerType(String type) {
-        return NodeType.OPENAI_ANSWER.s().equals(type) || //
-                NodeType.PPLXAI_ANSWER.s().equals(type) || //
-                NodeType.LLAMAAI_ANSWER.s().equals(type) || //
-                NodeType.GEMINIAI_ANSWER.s().equals(type) || //
-                NodeType.ANTHAI_ANSWER.s().equals(type);
-    }
-
     public void getAIConfigFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
         while (node != null) {
             parseAIConfig(ms, node, system);

@@ -1,13 +1,14 @@
+import { AIService } from "../AIUtil";
 import { EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
-import { Div } from "../comp/core/Div";
-import { TypeBase } from "./base/TypeBase";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
+import { Div } from "../comp/core/Div";
+import { TypeBase } from "./base/TypeBase";
 
-export class LlamaAiAnswerType extends TypeBase {
+export class AiAnswerType extends TypeBase {
     constructor() {
-        super(J.NodeType.LLAMAAI_ANSWER, "Llama 3 (Meta)", "fa-android", false);
+        super(J.NodeType.AI_ANSWER, "AI Answer", "fa-android", false);
     }
 
     // For now i'm not sure how we should indicate visibly that a
@@ -17,7 +18,13 @@ export class LlamaAiAnswerType extends TypeBase {
     }
 
     override getCustomFooter(node: NodeInfo): Div {
-        return S.aiUtil.getAiNodeFooter("Llama 3 AI", node);
+        const aiService: AIService = S.aiUtil.getServiceByName(S.props.getPropStr(J.NodeProp.AI_SERVICE, node));
+        if (aiService) {
+            return S.aiUtil.getAiNodeFooter("by AI - " + aiService.description, node);
+        }
+        else {
+            return S.aiUtil.getAiNodeFooter("by AI", node);
+        }
     }
 
     override getEditorOptions(): EditorOptions {
@@ -29,13 +36,4 @@ export class LlamaAiAnswerType extends TypeBase {
             encrypt: true,
         };
     }
-
-    // super_render = this.render;
-    // override render = (node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp => {
-    //     const baseComp = this.super_render(node, tabData, rowStyling, isTreeView);
-    //     return new Div(null, null, [
-    //         baseComp,
-    //         new Span("More Questions?")
-    //     ]);
-    // }
 }

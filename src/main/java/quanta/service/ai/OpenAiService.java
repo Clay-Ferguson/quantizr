@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import quanta.config.ServiceBase;
+import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -429,12 +431,12 @@ public class OpenAiService extends ServiceBase {
     private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
         aiUtil.parseAIConfig(ms, node, system);
         SubNode parent = read.getParent(ms, node);
-        int nonAnswerCounter = aiUtil.isAnyAnswerType(parent.getType()) ? 0 : 1;
+        int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
 
         // this while loop should encounter alternating questions and answer nodes as we go back up
         // the tree building history.
         while (parent != null) {
-            if (aiUtil.isAnyAnswerType(parent.getType())) {
+            if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
                 List<Map> content = new ArrayList<>();
                 HashMap<String, Object> map = new HashMap<>();
@@ -490,14 +492,16 @@ public class OpenAiService extends ServiceBase {
     }
 
     // Assumes node is a question, and inserts the answer under it as a subnode
+    // todo-0: this method is an oddball that doesn't have equivalent in other AI services
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
 
         ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
         res.setGptCredit(aiAnswer.userCredit);
 
-        SubNode newNode = create.createNode(ms, node, null, NodeType.OPENAI_ANSWER.s(), 0L, CreateNodeLocation.FIRST,
-                null, null, true, true, res.getNodeChanges());
+        List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
+        SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
+                null, true, true, res.getNodeChanges());
 
         newNode.setContent(aiUtil.formatAnswer(aiAnswer, true));
         // newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);

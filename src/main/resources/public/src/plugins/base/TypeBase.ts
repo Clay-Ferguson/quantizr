@@ -329,7 +329,7 @@ export class TypeBase implements TypeIntf {
             const isRoot = node.id === ast.node?.id;
 
             let aiConfigDiv: Div = null;
-            if (S.props.isMine(node) && S.props.hasAIConfigProps(node) && S.util.showMetaData(ast, node)) {
+            if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER && S.props.hasAIConfigProps(node) && S.util.showMetaData(ast, node)) {
                 const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
                 aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                     new Div("AI Config", {

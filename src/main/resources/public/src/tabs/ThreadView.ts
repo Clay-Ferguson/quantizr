@@ -11,6 +11,7 @@ import { TabIntf } from "../intf/TabIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
+import * as J from "../JavaIntf";
 
 export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
 
@@ -91,7 +92,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             rowCount++;
         });
 
-        if (S.aiUtil.isAiType(lastNode?.type)) {
+        if (lastNode?.type == J.NodeType.AI_ANSWER) {
             children.push(new Button("Ask AI", S.edit.askAiFromThreadView, {
                 [C.NODE_ID_ATTR]: lastNode.id,
             }, "btn-secondary ui-new-node-plus marginTop", "fa-plus"));
