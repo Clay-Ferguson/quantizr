@@ -13,6 +13,11 @@ import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 
+export type UrlInfo = {
+    url: string;
+    shortOg?: boolean;
+};
+
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeIntf {
     public ordinal: number;
@@ -195,7 +200,7 @@ export class TypeBase implements TypeIntf {
         return true;
     }
 
-    parseUrlsFromHtml = (node: NodeInfo): Set<string> => {
+    parseUrlsFromHtml = (node: NodeInfo): Map<string, UrlInfo> => {
         const val = node.content;
 
         // this is just a performance optimization to bypass the function if we know we can 
@@ -204,7 +209,7 @@ export class TypeBase implements TypeIntf {
 
         const elm = document.createElement("html");
         elm.innerHTML = val;
-        let ret: Set<string> = null
+        let ret: Map<string, UrlInfo> = null
 
         // BEWARE: The elements we scan here are NOT part of the DOM, we are just extracting out
         // the urls here.
@@ -218,28 +223,39 @@ export class TypeBase implements TypeIntf {
             // would make it render it twice because we already know the attachments will rendering.
             if (!S.props.getAttachmentByUrl(node, href)) {
                 // lazy instantiate
-                ret = ret || new Set<string>();
-                ret.add(href);
+                ret = ret || new Map<string, UrlInfo>();
+                ret.set(href, { url: href });
             }
         });
         return ret;
     }
 
-    parseUrlsFromText = (content: string): Set<string> => {
+    parseUrlsFromText = (content: string): Map<string, UrlInfo> => {
         if (!content || content.toLowerCase().indexOf("http") === -1) return null;
 
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
-        let ret: Set<string> = null
+        let ret: Map<string, UrlInfo> = null
         const lines = content.split("\n");
 
         if (lines) {
             lines.forEach(line => {
+                let shortOg = false;
+                // strip out any leading "- " because that dash is how we let users indicate NOT to render the URL itself but only the opengraph
+                if (line.startsWith("- ")) {
+                    line = line.substring(2);
+                }
+                else if (line.startsWith("-- ")) {
+                    shortOg = true;
+                    line = line.substring(3);
+                }
+
                 if (line.startsWith("http://") || line.startsWith("https://")) {
-                    ret = ret || new Set<string>();
-                    ret.add(line.trim());
+                    ret = ret || new Map<string, UrlInfo>();
+                    ret.set(line, { url: line.trim(), shortOg });
                 }
             });
         }
+
         return ret;
     }
 
@@ -280,7 +296,7 @@ export class TypeBase implements TypeIntf {
         }
 
         let comp: Comp = null;
-        let urls: Set<string> = null;
+        let urls: Map<string, UrlInfo> = null;
         const containerClass = this.getExtraMarkdownClass();
         const footerComp: Div = this.getCustomFooter(node);
         const attrs = containerClass ? { className: containerClass } : null;
@@ -308,11 +324,11 @@ export class TypeBase implements TypeIntf {
             const children: Comp[] = [comp, choices];
             let count = 0;
 
-            urls.forEach((url: string) => {
+            urls.forEach((ui: UrlInfo) => {
                 // allow max of 50 urls.
                 if (count++ < 50) {
                     // console.log("OG: id=" + node.id + " url=" + url);
-                    const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), url,
+                    const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), ui,
                         "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 

@@ -6,6 +6,7 @@ import { TabIntf } from "../../intf/TabIntf";
 import { Comp } from "../base/Comp";
 import ReactMarkdownComp from "../core/ReactMarkdownComp";
 import { NodeInfo } from "../../JavaIntf";
+import { UrlInfo } from "../../plugins/base/TypeBase";
 
 interface LS {
     content: string;
@@ -26,7 +27,7 @@ export class NodeCompMarkdown extends Comp {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
-    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabIntf<any>, urls: Set<string>) {
+    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabIntf<any>, urls: Map<string, UrlInfo>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
@@ -59,20 +60,23 @@ export class NodeCompMarkdown extends Comp {
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
     has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
-    preprocessMarkdown(node: NodeInfo, content: string = null, urls: Set<string>): string {
+    preprocessMarkdown(node: NodeInfo, content: string = null, urls: Map<string, UrlInfo>): string {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);
         val = this.translateLaTex(val);
+
+        // NOTE: we must call removeHiddenUrls before insertMarkdownLinks because the latter will insert markdown links
+        val = S.util.removeHiddenUrls(val);
         val = this.insertMarkdownLinks(urls, val);
         return val;
     }
 
-    insertMarkdownLinks = (urls: Set<string>, val: string): string => {
+    insertMarkdownLinks = (urls: Map<string, UrlInfo>, val: string): string => {
         if (!urls || !val) return val;
-        urls.forEach((url: string) => {
-            if (val.indexOf("(" + url) == -1) {
-                val = val.replaceAll(url, `[${url}](${url})`);
+        urls.forEach((ui: UrlInfo) => {
+            if (val.indexOf("(" + ui.url) == -1) {
+                val = val.replaceAll(ui.url, `[${ui.url}](${ui.url})`);
             }
         });
         return val;

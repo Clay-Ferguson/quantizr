@@ -5,6 +5,7 @@ import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
+import { UrlInfo } from "../plugins/base/TypeBase";
 import { S } from "../Singletons";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Html } from "./core/Html";
@@ -18,15 +19,15 @@ export class OpenGraphPanel extends Div {
     loading: boolean;
     observer: IntersectionObserver;
 
-    constructor(private tabData: TabIntf<any>, key: string, private url: string, private wrapperClass: string,
+    constructor(private tabData: TabIntf<any>, key: string, private ui: UrlInfo, private wrapperClass: string,
         private imageClass: string, private showTitle: boolean, _allowBookmarkIcon: boolean, private includeImage: boolean) {
         super(null, {
-            title: url,
+            title: ui.url,
             key
         });
 
         /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed pull of the open graph data should result in og being an empty object and not null. */
-        const og: J.OpenGraph = S.quanta.openGraphData.get(url);
+        const og: J.OpenGraph = S.quanta.openGraphData.get(ui.url);
         if (og) {
             this.mergeState<LS>({ og });
         }
@@ -44,7 +45,7 @@ export class OpenGraphPanel extends Div {
         if (!elm || !elm.isConnected || this.getState<LS>().og) {
             return;
         }
-        const og = S.quanta.openGraphData.get(this.url);
+        const og = S.quanta.openGraphData.get(this.ui.url);
         if (!og) {
             this.observer = new IntersectionObserver(entries => //
                 // note: processOgEntry itself is async but we should not await for it here, because this is part of the
@@ -88,12 +89,12 @@ export class OpenGraphPanel extends Div {
 
     private loadOpenGraph = async () => {
         if (this.loading) return;
-        let og = S.quanta.openGraphData.get(this.url);
+        let og = S.quanta.openGraphData.get(this.ui.url);
         if (!og) {
             if (!this.loading) {
                 try {
                     this.loading = true;
-                    og = await this.queryOpenGraph(this.url);
+                    og = await this.queryOpenGraph(this.ui.url);
                 } finally {
                     this.loading = false;
                 }
@@ -102,11 +103,11 @@ export class OpenGraphPanel extends Div {
                     title: null,
                     description: null,
                     image: null,
-                    url: this.url,
+                    url: this.ui.url,
                     mime: null
                 };
 
-                S.quanta.openGraphData.set(this.url, og);
+                S.quanta.openGraphData.set(this.ui.url, og);
                 // this.processOgImage(o.url, og); // <-- DO NOT DELETE
                 if (!this.getRef()) {
                     return;
@@ -156,7 +157,7 @@ export class OpenGraphPanel extends Div {
         }
 
         if (state.og.mime?.startsWith("image/")) {
-            this.setChildren([new Img({ src: this.url, className: "insImgInRow" })]);
+            this.setChildren([new Img({ src: this.ui.url, className: "insImgInRow" })]);
             return true;
         }
 
@@ -167,7 +168,7 @@ export class OpenGraphPanel extends Div {
         }
 
         if (!state.og.url) {
-            state.og.url = this.url;
+            state.og.url = this.ui.url;
         }
 
         // todo-1: this is broken, removing for now.
@@ -194,7 +195,7 @@ export class OpenGraphPanel extends Div {
                         className: "openGraphImageVert",
                         src: state.og.image
                     }),
-                    new Div(state.og.description)
+                    this.ui?.shortOg ? null : new Div(state.og.description)
                 ]);
             }
             else {
@@ -206,7 +207,7 @@ export class OpenGraphPanel extends Div {
                             src: state.og.image
                         })
                     ]),
-                    new Div(null, { className: "openGraphRhs" }, [
+                    this.ui?.shortOg ? null : new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])
                 ], "smallMarginBottom");
@@ -214,7 +215,7 @@ export class OpenGraphPanel extends Div {
         }
         // if no image just display the description in a div
         else {
-            imgAndDesc = new Div(null, { className: "openGraphNoImage" }, [
+            imgAndDesc = this.ui?.shortOg ? null : new Div(null, { className: "openGraphNoImage" }, [
                 new Div(state.og.description)
             ]);
         }
@@ -222,7 +223,7 @@ export class OpenGraphPanel extends Div {
         this.attribs.className = this.wrapperClass;
         this.setChildren([
             // bookmarkIcon,
-            this.showTitle ? (state.og.url ? new Anchor(this.url, state.og.title, {
+            this.showTitle ? (state.og.url ? new Anchor(this.ui.url, state.og.title, {
                 target: "_blank",
                 className: "openGraphTitle"
             }) : new Div(state.og.title, {

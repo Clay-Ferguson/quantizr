@@ -947,6 +947,31 @@ export class Util {
         return S.nodeUtil.findNode(nodeId);
     }
 
+    // todo-0: document in user guide both that you can use "* " to not do opengraph, and that you can use "- " to 
+    // show opengraph but not link, and "-- " to show opengraph but without long description.
+    removeHiddenUrls = (content: string): string => {
+        if (!content || content.toLowerCase().indexOf("http") === -1) return content;
+
+        // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
+        let ret = "";
+        const lines = content.split("\n");
+
+        if (lines) {
+            lines.forEach(line => {
+                if (line.startsWith("- http://") || line.startsWith("- https://") ||
+                    line.startsWith("-- http://") || line.startsWith("-- https://")) {
+                    return;
+                }
+                if (ret) {
+                    ret += "\n";
+                }
+                ret += line;
+            });
+        }
+        return ret;
+    }
+
+
     // Leave this at the END of the module since it makes calls to methods that might not be created at
     // arbitrary earlier places in the code.
     daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;

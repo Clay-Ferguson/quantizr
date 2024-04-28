@@ -25,7 +25,6 @@ export class NodeCompRowHeader extends Div {
         super(null);
 
         const ast = getAs();
-        // &&&
         this.attribs.className = (!isTableCell && tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? //
             (indentLevel <= 1 && this.idx == 1 ? "rowHeaderEditFirst" : "rowHeaderEdit") : "row-header";
     }

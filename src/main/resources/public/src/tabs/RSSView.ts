@@ -433,7 +433,7 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         if (anchor) {
-            const og = new OpenGraphPanel(MainTab.inst, "og_rss_" + anchor.getId(), entry.link, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
+            const og = new OpenGraphPanel(MainTab.inst, "og_rss_" + anchor.getId(), { url: entry.link }, "openGraphPanelRss", "openGraphImageRss", false, false, !imageShown);
             children.push(og);
 
             if (MainTab.inst) {
