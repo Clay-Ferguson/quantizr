@@ -205,6 +205,8 @@ public class NodeEditService extends ServiceBase {
                 throw new RuntimeException("Signature failed.");
             }
         }
+        openGraph.parseNode(node, true);
+
         TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
         if (plugin != null) {
             plugin.beforeSaveNode(ms, node);

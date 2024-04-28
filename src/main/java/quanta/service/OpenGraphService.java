@@ -1,7 +1,7 @@
 package quanta.service;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.lang3.StringUtils;
@@ -127,15 +127,35 @@ public class OpenGraphService extends ServiceBase {
         ArrayList<String> ogList =
                 reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
 
-        // Adding the " " to the end is a hack because my regex isn't perfect (todo-3: fix the regex)
-        Matcher matcher = urlPattern.matcher(node.getContent() + " ");
+        List<String> urlList = XString.tokenize(node.getContent(), "\n", true);
+        if (urlList == null || urlList.size() == 0) {
+            return;
+        }
 
-        // scan/parse all the URLs in node content
-        while (matcher.find()) {
+        // iterate through each url and cache it
+        for (String line : urlList) {
+            if (!line.contains("http"))
+                continue;
+            String url = null;
+
+            // startingn line with "* http" means do not render opengraph
+            if (line.startsWith("* ")) {
+                continue;
+            } else if (line.startsWith("- ")) {
+                line = line.substring(2);
+            } else if (line.startsWith("-- ")) {
+                line = line.substring(3);
+            }
+
+            if (line.startsWith("http://") || line.startsWith("https://")) {
+                url = line;
+            } else {
+                continue;
+            }
+
             if (ogList == null) {
                 ogList = new ArrayList<>();
             }
-            String url = node.getContent().substring(matcher.start(0), matcher.end(0));
 
             // Stripping trailing slashes is a hack because my regex isn't perfect (todo-3: fix the regex)
             url = XString.stripIfEndsWith(url, "/");

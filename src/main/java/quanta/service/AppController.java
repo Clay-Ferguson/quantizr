@@ -260,6 +260,11 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
+    /*
+     * This method is no longer used in the normal flow of things, because the 'saveNode' method has the
+     * logic to detect URLs and load them into the node itself, so the node will have the entire
+     * OpenGraph response in it immediately once saved, and the client uses it directly
+     */
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
