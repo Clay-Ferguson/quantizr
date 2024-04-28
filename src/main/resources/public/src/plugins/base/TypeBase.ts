@@ -329,7 +329,7 @@ export class TypeBase implements TypeIntf {
                 if (count++ < 50) {
                     // console.log("OG: id=" + node.id + " url=" + url);
                     const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), ui,
-                        "openGraphPanel", "openGraphImage", true, true, true);
+                        ui.shortOg ? "openGraphPanelSimple" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {
