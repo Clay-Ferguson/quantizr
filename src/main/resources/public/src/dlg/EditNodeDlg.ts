@@ -602,6 +602,20 @@ export class EditNodeDlg extends DialogBase {
         return ret;
     }
 
+    hasTag = (tag: string): boolean => {
+        const tags = this.tagsState.getValue().split(" ");
+        return tags.includes(tag);
+    }
+
+    addTag = (tag: string) => {
+        let val = this.tagsState.getValue();
+        val = val.trim();
+        if (val) val += " ";
+        val += tag;
+        this.tagsState.setValue(this.sortTags(val));
+        this.mergeState({});
+    }
+
     removeTag = (removeTag: string) => {
         let val = this.tagsState.getValue();
         val = val.trim();
@@ -622,7 +636,7 @@ export class EditNodeDlg extends DialogBase {
     sortTags = (tagStr: string) => {
         if (!tagStr) return tagStr;
         let tags: string[] = tagStr.split(" ");
-        tags = Array.from(new Set(tags)); // removes dupliates
+        tags = Array.from(new Set(tags)); // removes duplicates
         tags.sort();
         return tags.join(" ");
     }
@@ -888,7 +902,13 @@ export class EditNodeDlg extends DialogBase {
                     this.propStates.set(durationPropEntry.name, durationState);
                 }
             }
-            valEditor = new DateTimeField(propState, durationState, !propConfig || propConfig.showTime);
+
+            let addTagFunc = null;
+            if (propEntry.name === J.NodeProp.DATE && !this.hasTag("#due")) {
+                addTagFunc = this.addTag;
+            }
+
+            valEditor = new DateTimeField(propState, durationState, !propConfig || propConfig.showTime, addTagFunc);
         }
         // TEXT/TEXTAREA TYPE
         else if (propType === I.DomainType.Text) {

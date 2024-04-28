@@ -2,6 +2,7 @@ import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
 import { Button } from "./Button";
 import { DateField } from "./DateField";
+import { IconButton } from "./IconButton";
 import { Span } from "./Span";
 import { TextField } from "./TextField";
 import { TimeField } from "./TimeField";
@@ -11,7 +12,8 @@ export class DateTimeField extends Span {
     timeState: Validator = new Validator();
 
     // dateTimeState holds the string value of the date number milliseconds
-    constructor(private dateTimeState: Validator, private durationState?: Validator, private showTime?: boolean) {
+    constructor(private dateTimeState: Validator, private durationState: Validator,
+        private showTime: boolean, private addTag: (val: string) => void) {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
@@ -122,6 +124,10 @@ export class DateTimeField extends Span {
                     this.dateState.setValue(dateStr);
                     S.util.flashMessage("Added one year", "Note", true);
                 }, { title: "Add Year" }, "btn btn-secondary"),
+                this.addTag ? new IconButton("fa-bell fa-lg", "", {
+                    onClick: () => this.addTag("#due"),
+                    title: "Make this a #due date"
+                }) : null,
             ])
         ]);
         return true;
