@@ -215,6 +215,9 @@ public class NodeMoveService extends ServiceBase {
      */
     private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds,
             boolean copyPaste, MoveNodesResponse res) {
+        if (nodeIds == null || nodeIds.size() == 0) {
+            throw new RuntimeException("No nodes specified to move.");
+        }
         NodeChanges nodeChanges = new NodeChanges();
         res.setNodeChanges(nodeChanges);
         // get targetNode which is node we're pasting at or into.

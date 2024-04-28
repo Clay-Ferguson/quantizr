@@ -1018,6 +1018,14 @@ export class Edit {
     copySelNodes = () => {
         dispatch("CopySelNodes", s => {
             s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
+
+            // use highlihted node if no nodes are selected
+            if (!s.nodesToMove || s.nodesToMove.length === 0) {
+                const node = S.nodeUtil.getHighlightedNode();
+                if (node) {
+                    s.nodesToMove = [node.id];
+                }
+            }
             s.cutCopyOp = "copy";
             s.selectedNodes.clear();
         });
@@ -1043,6 +1051,8 @@ export class Edit {
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
     pasteSelNodes = async (nodeId: string, location: string, ast?: AppState) => {
         ast = ast || getAs();
+        console.log("action nodesToMove: " + S.util.prettyPrint(ast.nodesToMove));
+
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
