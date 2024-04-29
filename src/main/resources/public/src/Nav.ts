@@ -19,6 +19,7 @@ import { S } from "./Singletons";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { SettingsTab } from "./tabs/data/SettingsTab";
+import { AISettingsTab } from "./tabs/data/AISettingsTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
 
 export class Nav {
@@ -279,6 +280,11 @@ export class Nav {
     showUserSettings = () => {
         SettingsTab.tabSelected = true;
         S.tabUtil.selectTab(C.TAB_SETTINGS);
+    }
+
+    showAISettings = () => {
+        AISettingsTab.tabSelected = true;
+        S.tabUtil.selectTab(C.TAB_AI_SETTINGS);
     }
 
     showMainMenu = () => {

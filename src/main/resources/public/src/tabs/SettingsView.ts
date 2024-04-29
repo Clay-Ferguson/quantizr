@@ -96,25 +96,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // S.edit.fullRepositoryExport();") + //
 
                 // -----------------------
-                aiOptions?.length ? this.sectionTitle("AI - Artificial Intelligence") : null,
-                aiOptions?.length ? new FlexRowLayout([
-                    // todo-1: need a way to warn user when something unsupported by their admin configuration is selected
-                    new Div(null, { className: settingsCol }, [
-                        new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
-                            setValue: (val: string) => S.edit.setAiService(val),
-                            getValue: (): string => "" + getAs().userPrefs.aiService
-                        }),
-                        aiModelInfo ? new Div(aiModelInfo, { className: "bigMarginLeft" }) : null
-                    ]),
-                    new Div(null, { className: settingsCol }, [
-                        ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
-                        S.quanta.config.paymentLink ?
-                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
-                    ])
-
-                ], horzClass) : null,
-
-                // -----------------------
                 this.sectionTitle("Tools"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [

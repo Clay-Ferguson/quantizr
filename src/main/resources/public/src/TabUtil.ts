@@ -17,6 +17,7 @@ import { RSSTab } from "./tabs/data/RSSTab";
 import { SearchTab } from "./tabs/data/SearchTab";
 import { ServerInfoTab } from "./tabs/data/ServerInfoTab";
 import { SettingsTab } from "./tabs/data/SettingsTab";
+import { AISettingsTab } from "./tabs/data/AISettingsTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
@@ -83,6 +84,7 @@ export class TabUtil {
                 new TTSTab(),
                 new RSSTab(),
                 new SettingsTab(),
+                new AISettingsTab(),
                 new AdminTab()
 
                 // this is throwing a react error, but we don't need this now anyaay
