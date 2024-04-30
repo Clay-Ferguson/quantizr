@@ -1,8 +1,6 @@
-import { AIService } from "../AIUtil";
 import { getAs } from "../AppContext";
 import { S } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
-import { Button } from "../comp/core/Button";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
@@ -30,10 +28,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const ast = getAs();
         const horzClass = "marginTop marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
-
-        const aiService: AIService = S.aiUtil.getServiceByName(getAs().userPrefs.aiService);
-        const aiModelInfo = aiService && aiService.longDescription ? aiService.description + " -- " + aiService.longDescription : null;
-        const aiOptions = S.aiUtil.getAiOptions();
 
         this.setChildren([
             this.headingBar = new TabHeading([
