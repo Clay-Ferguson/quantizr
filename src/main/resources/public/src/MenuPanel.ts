@@ -324,9 +324,9 @@ export class MenuPanel extends Div {
             children.push(new Menu("Calendar", [
                 new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
                 new MenuItemSeparator(), //
-                new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("Past", MenuPanel.calendarPastDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("Past Due", MenuPanel.calendarPastDueDates, onMainTab && !!hltNode, null, true),
+                new MenuItem("Future", MenuPanel.calendarFutureDates, onMainTab && !!hltNode, null, true),
                 new MenuItem("All", MenuPanel.calendarAllDates, onMainTab && !!hltNode, null, true)
             ]));
         }
