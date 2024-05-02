@@ -29,7 +29,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
-import quanta.service.SystemService;
+import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -777,7 +777,10 @@ public class MongoRead extends ServiceBase {
                     sortDir = "ASC";
                     ands.add(Criteria.where(sortField).gt(new Date().getTime()));
                 } //
-                else if ("pastOnly".equals(timeRangeType)) { //
+                else if ("today".equals(timeRangeType)) {
+                    ands.add(Criteria.where(sortField).gte(DateUtil.getStartOfToday()));
+                    ands.add(Criteria.where(sortField).lt(DateUtil.getEndOfToday()));
+                } else if ("pastOnly".equals(timeRangeType)) { //
                     ands.add(Criteria.where(sortField).lt(new Date().getTime()));
                 } //
                 else if ("pastDue".equals(timeRangeType)) { //

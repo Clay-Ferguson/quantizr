@@ -34,8 +34,11 @@ export class CalendarType extends TypeBase {
                 new Button("Future", () => {
                     S.srch.timeline(node?.id, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
                 }, null),
+                new Button("Today", () => {
+                    S.srch.timeline(node?.id, J.NodeProp.DATE_FULL, "today", "Today's calendar dates", 0, true);
+                }, null),
                 new Button("All", () => {
-                    S.srch.timeline(node?.id, J.NodeProp.DATE_FULL, "all", "All calendar dates (Soonest at the top)", 0, true);
+                    S.srch.timeline(node?.id, J.NodeProp.DATE_FULL, "all", "All calendar dates (Latest/Future at the top)", 0, true);
                 }, null),
                 new Button("Calendar", () => {
                     S.render.showCalendar(node.id);

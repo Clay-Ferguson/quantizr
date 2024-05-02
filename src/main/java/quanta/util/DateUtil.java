@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -77,6 +78,36 @@ public class DateUtil {
     // SST SAMOA STANDARD TIME UTC - 11
     // SDT SAMOA DAYLIGHT TIME UTC - 10
     // CHST CHAMORRO STANDARD TIME UTC +10
+
+    public static long getStartOfToday() {
+        return getStartOfDay(System.currentTimeMillis());
+    }
+
+    public static long getStartOfDay(long timestamp) {
+        Calendar calendar = Calendar.getInstance(); // Get a Calendar instance
+        calendar.setTimeInMillis(timestamp); // Set the calendar time to the provided timestamp
+        calendar.set(Calendar.HOUR_OF_DAY, 0); // Set hour to midnight (0)
+        calendar.set(Calendar.MINUTE, 0); // Set minute to 0
+        calendar.set(Calendar.SECOND, 0); // Set second to 0
+        calendar.set(Calendar.MILLISECOND, 0); // Set millisecond to 0
+        return calendar.getTimeInMillis(); // Return the modified time as a long value
+    }
+
+    public static long getEndOfToday() {
+        return getEndOfDay(System.currentTimeMillis());
+    }
+
+    public static long getEndOfDay(long dateInMillis) {
+        Calendar calendar = Calendar.getInstance(); // gets a Calendar instance using the default time zone and locale.
+        calendar.setTimeInMillis(dateInMillis); // sets the calendar's time with the given date in milliseconds
+
+        // Set the calendar to the last millisecond of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 23); // sets the hour of the day
+        calendar.set(Calendar.MINUTE, 59); // sets the minute within the hour
+        calendar.set(Calendar.SECOND, 59); // sets the second within the minute
+        calendar.set(Calendar.MILLISECOND, 999); // sets the millisecond within the second
+        return calendar.getTimeInMillis();
+    }
 
     public static String getUSTimezone(int hours, boolean dst) {
         return zoneMap.get(String.valueOf(hours) + (dst ? "D" : "S"));
