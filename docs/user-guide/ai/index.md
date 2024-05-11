@@ -6,6 +6,7 @@
         * [OpenAI](#openai)
         * [Perplexity](#perplexity)
         * [Google Gemini](#google-gemini)
+        * [Meta Llama 3](#meta-llama-3)
     * [AI Conversations](#ai-conversations)
     * [A Node that Asks a Question to AI](#a-node-that-asks-a-question-to-ai)
     * [Asking Questions to the AI](#asking-questions-to-the-ai)
@@ -57,7 +58,7 @@ Including Chat Model, Text to Image (Image Generation), Image Understand, Text t
 
 ## Perplexity
 
-Including models: Sonar, Sonar Online, Llama 3
+Including models: Sonar, Sonar Online, Meta's Llama 3
 
 <img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:20%'/>
 
@@ -67,6 +68,13 @@ Including models: Sonar, Sonar Online, Llama 3
 Includes google's new chat model, for interactive chats.
 
 <img src='attachments/65c5a9543e8c3b6aec82835e-file-p' style='width:20%'/>
+
+
+## Meta Llama 3
+
+Meta's best Open Source AI LLM.
+
+<img src='attachments/6629d6a8788a362604b0e264-file-p' style='width:20%'/>
 
 
 Everything in Quanta is offered for free except for AI Capabilities. Since AI is provided by [OpenAI](https://openai.com) and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to `Menu -> Account -> Settings -> Add Credit` to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want.
@@ -203,11 +211,11 @@ Here's the list of the available AI Services:
 |---------------------|-----------------------------------------------------------------------------------|
 | **Anthropic: Claud 3 - Opus** |  Anthropic's most intelligent model, which can handle complex analysis, longer tasks with multiple steps, and higher-order math and coding tasks. |
 | **Anthropic: Claud 3 - Sonnet** | Anthropic's best combination of performance and speed for efficient, high-throughput tasks. |
-| **OpenAI: Sonar**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
+| **OpenAI: ChatGPT**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
 | **Google: Gemini** | Google's best high-end powerful general-purpose AI.                        |
+| **Meta: Llama 3** | Meta's best Open Source general-purpose AI.                        |
 | **Perplexity: Sonar** | Perplexity's best high-end powerful general-purpose AI.                    |
 | **Perplexity: Sonar Online** | Perplexity's AI which has access to the latest news and content from the web. |
-| **Llama 3**      | The well-known open source Llama 3, which is great for coding and programming tasks. |
 
 # Using AI for Writing
 
@@ -369,4 +377,4 @@ Once you've configured the AI settings to be what's shown above you can then cli
 
 
 ----
-**[Next: Content Layout](/docs/user-guide/page-layout/index.md)**
+**[Next: Customizing Content Display](/docs/user-guide/page-layout/index.md)**

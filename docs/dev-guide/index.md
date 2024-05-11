@@ -4,8 +4,6 @@
 
 This section is for software developers who will be working on the Quanta code and/or deploying an instance of the platform.
 
-### [Backup and Restore](/docs/dev-guide/backup-and-restore.md)
-
 ### [Docker Install](/docs/dev-guide/docker-install.md)
 
 ### [How to Build](/docs/dev-guide/how-to-build.md)
@@ -18,4 +16,4 @@ This section is for software developers who will be working on the Quanta code a
 
 
 ----
-**[Next: Backup and Restore](/docs/dev-guide/backup-and-restore.md)**
+**[Next: Docker Install](/docs/dev-guide/docker-install.md)**

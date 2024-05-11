@@ -1,6 +1,6 @@
 **[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
 
-* [Content Layout](#content-layout)
+* [Customizing Content Display](#customizing-content-display)
     * [Image Layout](#image-layout)
         * [Example Layout 1 ](#example-layout-1-)
         * [Example Layout 2](#example-layout-2)
@@ -8,8 +8,9 @@
     * [Node Layout](#node-layout)
     * [Tips](#tips)
     * [Collapsible Sections](#collapsible-sections)
+    * [URL Previews](#url-previews)
 
-# Content Layout
+# Customizing Content Display
 
 How to organize how images and subnodes are displayed.
 
@@ -105,6 +106,12 @@ The content up until the double spaced area (two blank lines) is assumed to be t
 
 
 As you saw in the example above, the expand/collapse link text will be whatever text is between the `-**` and `**-`, which is a syntax that will render just as a normal bold font, on systems that don't support this non-standard Markdown syntax feature.
+
+# URL Previews
+
+When you include a url/link on a line all by itself in the content, it will be rendered as a clickable markdown link, and will also have the Content Preview Image, Title, and Description for that link (whenever that link provides that content preview info of course, because not all URLs do) displayed on the page.
+
+If you want to display just the link itself and not any Preview, then start the line with the url with an asterisk an asterisk and a space (i.e. `"* "`) before the url. To display *only* the Preview and not the link text itself, start the line with `"- "`. If you want only the Preview Image and Title (without the description) then start the line with `"-- "`.
 
 
 ----

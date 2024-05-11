@@ -2,12 +2,13 @@
 
 * [Quanta Features](#quanta-features)
     * [Hierarchial CMS](#hierarchial-cms)
+    * [Block Editor](#block-editor)
     * [Artificial Intelligence](#artificial-intelligence)
     * [ChatGPT AI](#chatgpt-ai)
     * [Anthropic AI](#anthropic-ai)
     * [Perplexity AI](#perplexity-ai)
     * [Gemini AI](#gemini-ai)
-    * [Block Editor](#block-editor)
+    * [Llama 3 AI](#llama-3-ai)
     * [Secure Messaging](#secure-messaging)
     * [Blogs - Notes - Wikis ](#blogs---notes---wikis-)
     * [Advanced Editing](#advanced-editing)
@@ -38,6 +39,15 @@ When you create an account, you get a root node (i.e. your personal branch of th
 You can let any node and all its subnodes represent a wiki, document, photo album, blog, etc. It's just a tree of content, so it's all up to you.
 
 <img src='attachments/60188ccba7da7d062f8a2707-file-img1' style='width:25%'/>
+
+
+# Block Editor
+
+The name "quanta" comes from how the platform lets you "quantize" content so it's stored in small `chunks or blocks (called Nodes)`. This means you can attach comments underneath individual sentences, or paragraphs (similar to X/Twitter replies hierarchy).
+
+Every node automatically has it's own URL, so they're easy to link to across the web. Platforms using block editors, similar to Quanta, are becoming very popular, and include for example: [Notion](https://notion.so), [Jupyter Notebooks](https://jupyter.org), and [WordPress Gutenberg](https://wordpress.org/gutenberg).
+
+<img src='attachments/60187b83f5fad05e348a3835-file-p' style='width:25%'/>
 
 
 # Artificial Intelligence
@@ -75,13 +85,11 @@ Optionally use `Google's Gemini AI` as your AI provider, via a simple selection 
 <img src='attachments/65c5a60b3e8c3b6aec828355-file-p' style='width:25%'/>
 
 
-# Block Editor
+# Llama 3 AI
 
-The name "quanta" comes from how the platform lets you "quantize" content so it's stored in small `chunks or blocks (called Nodes)`. This means you can attach comments underneath individual sentences, or paragraphs (similar to X/Twitter replies hierarchy).
+Optionally use Meta's Open Source Llama 3 as your AI provider.
 
-Every node automatically has it's own URL, so they're easy to link to across the web. Platforms using block editors, similar to Quanta, are becoming very popular, and include for example: [Notion](https://notion.so), [Jupyter Notebooks](https://jupyter.org), and [WordPress Gutenberg](https://wordpress.org/gutenberg).
-
-<img src='attachments/60187b83f5fad05e348a3835-file-p' style='width:25%'/>
+<img src='attachments/662e8d129d3ccb486d35d30b-meta.png' style='width:25%'/>
 
 
 # Secure Messaging

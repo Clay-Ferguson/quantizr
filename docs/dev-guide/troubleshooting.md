@@ -10,6 +10,7 @@
     * [Delete all Images](#delete-all-images)
     * [To Remove Most Running things](#to-remove-most-running-things)
     * [To Cleanup Disk Space](#to-cleanup-disk-space)
+    * [Docker service fails to start](#docker-service-fails-to-start)
 
 # Troubleshooting
 
@@ -115,6 +116,90 @@ Should tell you image is already up to date
 
     docker system prune -a
     docker image prune -a
+
+# Docker service fails to start
+
+Here are some troubleshooting tips from ChatGPT, for the situation where one of the services of the swarm fails to start and `docker ps -a` also doesn't even show the service. The answer below was given to me during troubleshooting why `quanta-stack-distro_quanta-distro` was failing to start, and it ended up being an issue with Certbot configuration in my case, but the troubleshooting below will be helpful for many different scenarios.
+
+When dealing with a Docker service in a Swarm that isn't starting, and where logs aren't showing up, it can be particularly challenging to diagnose the issue. Given that you hinted it might be network-related, especially after recent changes involving certificates and possibly network settings, here are some steps you can follow to troubleshoot the issue:
+
+## 1. Check Service Status
+First, ensure the service is actually recognized and attempted to be started by Docker Swarm:
+
+```bash
+docker service ls
+```
+
+Look for the service `quanta-stack-distro_quanta-distro` and check its REPLICAS column. If the numbers are `0/1` or similar, it means the service is recognized but no instances are running.
+
+## 2. Inspect Service
+Inspect the service to see if there are any configurations that might be causing issues:
+
+```bash
+docker service inspect quanta-stack-distro_quanta-distro
+```
+
+Pay attention to the "Networks" section to see if it's correctly configured. Also, look at the "TaskSpec" to ensure all parameters such as environment variables, mounts, etc., are correctly set.
+
+## 3. Check Service Tasks
+Since `docker service logs` didn't show anything, check the tasks for the service to see their state:
+
+```bash
+docker service ps quanta-stack-distro_quanta-distro --no-trunc
+```
+
+This command shows the tasks and their current state. If tasks are in a "Pending" or "Rejected" state, it can give you clues as to why the service isn't starting.
+
+## 4. Network Troubleshooting
+Since the issue may be network-related:
+
+## a. Network Inspect
+Inspect the network to which the service is connected:
+
+```bash
+docker network inspect [network_name]
+```
+
+Check for any anomalies or misconfigurations, especially related to subnets, gateways, or attached services.
+
+## b. Check Connectivity
+If possible, try pinging or connecting to relevant network resources or services manually from within another container on the same network.
+
+## 5. Check System Resources
+Sometimes, services fail to start because of insufficient system resources (CPU, memory, disk space):
+
+```bash
+df -h
+free -m
+```
+
+## 6. Docker Daemon and System Logs
+Since `docker service logs` isn't showing anything, consider looking at the Docker daemon logs or system logs:
+
+```bash
+## For Docker daemon logs (the exact command can vary by system)
+journalctl -u docker.service
+
+## General system logs
+dmesg
+```
+
+## 7. Configuration Issues
+Review any recent changes to Docker Compose files or Dockerfile. Ensure that environment variables, especially those related to networks or certificates, are correct.
+
+## 8. Restart Docker Swarm Services
+Sometimes, a simple restart can help if there are transient issues:
+
+```bash
+docker service scale quanta-stack-distro_quanta-distro=0
+docker service scale quanta-stack-distro_quanta-distro=1
+```
+
+## 9. Check Certificates and Ports
+Ensure that no other service is using the ports assigned to your service and check that the certificates are correctly mounted and valid.
+
+## Conclusion
+If after all these steps the issue remains unresolved, consider isolating the component outside of Docker Swarm (e.g., in a standalone Docker container) to see if it starts successfully. This can help determine if the issue is with the application itself or the Swarm configuration.
 
 
 ----

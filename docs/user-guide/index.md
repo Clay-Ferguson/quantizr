@@ -16,7 +16,7 @@
 
 ### [Artificial Intelligence - LLMs](/docs/user-guide/ai/index.md)
 
-### [Content Layout](/docs/user-guide/page-layout/index.md)
+### [Customizing Content Display](/docs/user-guide/page-layout/index.md)
 
 ### [Document View](/docs/user-guide/document-view/index.md)
 
