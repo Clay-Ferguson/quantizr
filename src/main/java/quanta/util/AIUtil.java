@@ -264,12 +264,6 @@ public class AIUtil extends ServiceBase {
                 case PPLX_LLAMA3:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
                     break;
-                case PPLX_CODE_LLAMA:
-                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
-                    break;
-                case PPLX_MIXTRAL:
-                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_MIXTRAL);
-                    break;
                 case GEMINI:
                     geminiAnswer = geminiai.getAnswer(ms, null, sb.toString(), system);
                     break;
@@ -489,14 +483,6 @@ public class AIUtil extends ServiceBase {
                     break;
                 case PPLX_LLAMA3:
                     pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
-                    res.setGptCredit(pplxAiAns.userCredit);
-                    break;
-                case PPLX_CODE_LLAMA:
-                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_CODELLAMA);
-                    res.setGptCredit(pplxAiAns.userCredit);
-                    break;
-                case PPLX_MIXTRAL:
-                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_MIXTRAL);
                     res.setGptCredit(pplxAiAns.userCredit);
                     break;
                 // case HUGGING_FACE:

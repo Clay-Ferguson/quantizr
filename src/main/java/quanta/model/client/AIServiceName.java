@@ -10,9 +10,7 @@ public enum AIServiceName {
     ANTH("anthAi"), // Opus (most powerful)
     ANTH_SONNET("anthAi_sonnet"), // Sonnet
     PPLX_ONLINE("pplxAi_online"), //
-    PPLX_CODE_LLAMA("pplxAi_codeLlama"), //
     PPLX_LLAMA3("llama3"), //
-    PPLX_MIXTRAL("pplxAi_mixtral"), //
     HUGGING_FACE("huggingFace"), //
     OOBA("oobAi"), //
     GEMINI("geminiAi");

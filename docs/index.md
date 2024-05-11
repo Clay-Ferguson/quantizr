@@ -3,7 +3,7 @@
 ##### A.I. Powered Collaborative Documents and Messaging
 ----
 
-Create and share `hierarchically organized content`. Ask questions, or get assistance creating content, using A.I. LLMs (Large Language Models) from your choice of AI Cloud Services including: OpenAI `ChatGPT-4`, Anthropic `Claude 3` (Opus and Sonnet), Google `Gemini`, and Perplxity `Sonar`, `Sonar Online`, `Code Llama`, and `Mixtral`.
+Create and share `hierarchically organized content`. Ask questions, or get assistance creating content, using A.I. LLMs (Large Language Models) from your choice of AI Cloud Services including: OpenAI `ChatGPT-4`, Anthropic `Claude 3` (Opus and Sonnet), Google `Gemini`, and Perplxity `Sonar`, `Sonar Online`, `Llama 3`.
 
 ##### Check out the latest feature: [Writing Books with AI](https://quanta.wiki/n/ai-generated-books)
 

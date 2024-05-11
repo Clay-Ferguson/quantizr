@@ -57,7 +57,7 @@ Including Chat Model, Text to Image (Image Generation), Image Understand, Text t
 
 ## Perplexity
 
-Including models: Sonar, Sonar Online, Code Llama, and Mixtral
+Including models: Sonar, Sonar Online, Llama 3
 
 <img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:20%'/>
 
@@ -207,8 +207,7 @@ Here's the list of the available AI Services:
 | **Google: Gemini** | Google's best high-end powerful general-purpose AI.                        |
 | **Perplexity: Sonar** | Perplexity's best high-end powerful general-purpose AI.                    |
 | **Perplexity: Sonar Online** | Perplexity's AI which has access to the latest news and content from the web. |
-| **Code Llama**      | The well-known open source Code Llama, which is great for coding and programming tasks. |
-| **Mixtral**         | The well-known open source Mixture of Experts, which is great for general-purpose tasks. |
+| **Llama 3**      | The well-known open source Llama 3, which is great for coding and programming tasks. |
 
 # Using AI for Writing
 

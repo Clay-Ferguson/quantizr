@@ -9,10 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+// block.xxxinject UserAccount.Imports
 
 @Entity
 @Table(name = "user_accnt")
 public class UserAccount {
+
+    // block.xxxinject UserAccount.Properties
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +40,8 @@ public class UserAccount {
         this.mongoId = mongoId;
         this.userName = userName;
     }
+
+    // block.xxxinject UserAccount.Methods
 
     public Long getId() {
         return id;

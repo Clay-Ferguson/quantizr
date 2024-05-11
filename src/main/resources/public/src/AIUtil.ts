@@ -45,7 +45,7 @@ export class AIUtil {
                 {
                     name: J.AIServiceName.PPLX_LLAMA3,
                     description: "Meta: Llama 3",
-                    longDescription: "Meta's Open Sourc Llama 3."
+                    longDescription: "Meta's Open Source Llama 3."
                 });
         }
 
@@ -74,16 +74,6 @@ export class AIUtil {
                     name: J.AIServiceName.PPLX_ONLINE,
                     description: "Perplexity: Recent News Aware",
                     longDescription: "Perplexity's AI which has access to the latest news and content from from the web."
-                },
-                {
-                    name: J.AIServiceName.PPLX_CODE_LLAMA,
-                    description: "Perplexity: Code Llama",
-                    longDescription: "The open source Code Llama, which is great for coding and programming tasks."
-                },
-                {
-                    name: J.AIServiceName.PPLX_MIXTRAL,
-                    description: "Perplexity: Mixtral",
-                    longDescription: "A high-quality sparse mixture of experts model (SMoE) for generating high-quality code."
                 });
         }
     }

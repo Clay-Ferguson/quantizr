@@ -28,11 +28,10 @@ import quanta.util.XString;
 public class PplxAiService extends ServiceBase {
     String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
 
-    public final String PPLX_MODEL_COMPLETION_ONLINE = "sonar-medium-online"; // 8x7B
-    public final String PPLX_MODEL_COMPLETION_CODELLAMA = "codellama-70b-instruct";
+    // todo-0: These changed. Need to update online docs and project docs.
+    public final String PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online"; // 70B model
     public final String PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct";
-    public final String PPLX_MODEL_COMPLETION_MIXTRAL = "mixtral-8x22b-instruct";
-    public final String PPLX_MODEL_COMPLETION_CHAT = "sonar-medium-chat"; // 8x7B
+    public final String PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"; // 70B model
 
     String COST_CODE = "PPX"; // 3 chars allowed
 
@@ -123,30 +122,15 @@ public class PplxAiService extends ServiceBase {
         // We detect using startsWith, because the actual model used will be slightly different than the one
         // specified
         switch (model) {
-            // 8x7B
+            // 70B model
             case PPLX_MODEL_COMPLETION_CHAT:
                 // prices per magatoken
-                inputPpm = 0.6;
-                outputPpm = 0.6;
-                return (usage.getPromptTokens() * inputPpm / 1000000) + //
-                        (usage.getCompletionTokens() * outputPpm / 1000000);
-
-            // 8x22B
-            case PPLX_MODEL_COMPLETION_MIXTRAL:
-                // prices per magatoken
                 inputPpm = 1.0;
                 outputPpm = 1.0;
                 return (usage.getPromptTokens() * inputPpm / 1000000) + //
                         (usage.getCompletionTokens() * outputPpm / 1000000);
 
-            // 70B
-            case PPLX_MODEL_COMPLETION_CODELLAMA:
-                // prices per magatoken
-                inputPpm = 1.0;
-                outputPpm = 1.0;
-                return (usage.getPromptTokens() * inputPpm / 1000000) + //
-                        (usage.getCompletionTokens() * outputPpm / 1000000);
-
+            // 70B model
             case PPLX_MODEL_COMPLETION_LLAMA3:
                 // prices per magatoken
                 inputPpm = 1.0;
@@ -154,9 +138,10 @@ public class PplxAiService extends ServiceBase {
                 return (usage.getPromptTokens() * inputPpm / 1000000) + //
                         (usage.getCompletionTokens() * outputPpm / 1000000);
 
+            // 70B model
             case PPLX_MODEL_COMPLETION_ONLINE:
-                inputPpm = 0.6;
-                outputPpm = 0.6;
+                inputPpm = 1.0;
+                outputPpm = 1.0;
                 inputPricePerReq = 0.005;
                 return inputPricePerReq + (usage.getPromptTokens() * inputPpm / 1000000) + //
                         (usage.getCompletionTokens() * outputPpm / 1000000);
