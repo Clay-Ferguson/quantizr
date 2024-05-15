@@ -27,7 +27,7 @@ export class AIUtil {
         if (S.quanta.config.useOpenAi) {
             this.aiServices.push({
                 name: J.AIServiceName.OPENAI,
-                description: "OpenAI: ChatGPT-4",
+                description: "OpenAI: ChatGPT-4o",
                 longDescription: "The default chatbot and is widely considered the most intelligent general-purpose AI on the market."
             });
         }

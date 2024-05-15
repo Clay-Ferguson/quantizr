@@ -60,7 +60,7 @@ public class OpenAiService extends ServiceBase {
     // Warning: If you change these, you will need to update the pricing calculations
     String OPENAI_MODEL_TTS = "tts-1";
     String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
-    String OPENAI_MODEL_COMPLETION = "gpt-4-turbo-2024-04-09"; // "gpt-4-0125-preview"; // "gpt-4-1106-preview";
+    String OPENAI_MODEL_COMPLETION = "gpt-4o";
     String COST_CODE = "OAI"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -483,8 +483,8 @@ public class OpenAiService extends ServiceBase {
         // specified
         if (model.startsWith("gpt-4")) {
             // https://openai.com/pricing
-            inputPpk = 0.01;
-            outputPpk = 0.03;
+            inputPpk = 0.005;
+            outputPpk = 0.015;
         } else {
             throw new RuntimeException("Only gpt-4-* is currently supported. " + res.getModel() + " is not supported.");
         }

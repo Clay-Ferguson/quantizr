@@ -215,7 +215,7 @@ export class Util {
         return this.getFileTypeFormFileName(fileName) === "video";
     }
 
-    // note: GPT-4 says this is a better method than the one we have below...
+    // note: AI says this is a better method than the one we have below...
     // _buf2hex = (buffer: Uint8Array): string =>
     //     buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
 
