@@ -279,13 +279,14 @@ export class Props {
     }
 
     isHiddenProp = (prop: PropertyInfo): boolean => {
-        // let admin user see all props.
-        if (getAs().isAdminUser) return false;
+        return this.isHiddenPropName(prop.name);
+    }
 
-        if (this.isSystemProp(prop.name)) {
+    isHiddenPropName = (propName: string): boolean => {
+        if (this.isSystemProp(propName)) {
             return true;
         }
-        return !!S.props.hiddenPropertyList.has(prop.name);
+        return !!S.props.hiddenPropertyList.has(propName);
     }
 
     isSystemProp = (prop: string): boolean => {

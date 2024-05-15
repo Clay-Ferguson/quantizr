@@ -196,8 +196,9 @@ export class TypeBase implements TypeIntf {
         return this.displayName;
     }
 
-    allowPropertyEdit(_propName: string): boolean {
-        return true;
+    allowPropertyEdit(propName: string): boolean {
+        const isHidden = S.props.isHiddenPropName(propName);
+        return !isHidden;
     }
 
     parseUrlsFromHtml = (node: NodeInfo): Map<string, UrlInfo> => {
