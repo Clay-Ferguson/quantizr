@@ -24,7 +24,12 @@ import quanta.util.XString;
 
 @Component
 public class GeminiAiService extends ServiceBase {
-    String GEMINI_COMP_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=";
+
+    // todo-0: This is actually what we needed, with the model name 'gemini-pro', but somehow it works
+    // without
+    // 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=YOUR_API_KEY'
+
+    String GEMINI_COMP_URL = "https://generativelanguage.googleapis.com/v1beta/models/:generateContent?key=";
     String COST_CODE = "GEM"; // 3 chars allowed
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(GeminiAiService.class);
