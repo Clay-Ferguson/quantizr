@@ -72,11 +72,6 @@ export class ExportDlg extends DialogBase {
                 this.contentTypeRadioButton("Files & Folders", "fs")
             ], "radioButtonsBar marginTop"),
 
-            // don't show attachments option for 'md' becasue it's forced to true
-            ast.exportSettings.contentType !== "md" && ast.exportSettings.contentType !== "fs" ? new Checkbox("Attachments Folder", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.attOneFolder = checked; }),
-                getValue: (): boolean => getAs().exportSettings.attOneFolder
-            }) : null,
             ast.exportSettings.contentType === "html" ? new Checkbox("IDs", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
                 getValue: (): boolean => getAs().exportSettings.includeIDs
@@ -128,7 +123,6 @@ export class ExportDlg extends DialogBase {
             includeToc: ast.exportSettings.includeToc,
             includeMetaComments: ast.exportSettings.includeMetaComments,
             includeJypyter: ast.exportSettings.includeJypyter,
-            attOneFolder: ast.exportSettings.attOneFolder,
             contentType: ast.exportSettings.contentType,
             includeIDs: ast.exportSettings.includeIDs,
             dividerLine: ast.exportSettings.dividerLine,

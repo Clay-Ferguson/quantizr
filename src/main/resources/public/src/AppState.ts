@@ -13,7 +13,6 @@ export interface ExportSettings {
     includeToc?: boolean;
     includeMetaComments?: boolean;
     includeJypyter?: boolean;
-    attOneFolder?: boolean;
     contentType?: string; // html, md, json
     includeIDs?: boolean;
     dividerLine?: boolean;
@@ -128,7 +127,6 @@ export class AppState {
         includeToc: true,
         includeMetaComments: true,
         includeJypyter: true,
-        attOneFolder: false,
         contentType: "md", // html, md, json
         includeIDs: true,
         dividerLine: true,

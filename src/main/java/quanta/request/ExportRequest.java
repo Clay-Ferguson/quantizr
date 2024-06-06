@@ -10,7 +10,6 @@ public class ExportRequest extends RequestBase {
 	private String fileName;
 	private boolean includeToc;
 	private boolean includeMetaComments;
-	private boolean attOneFolder;
 	private String contentType;
 	private boolean includeJypyter;
 	private boolean includeIDs;
@@ -43,12 +42,6 @@ public class ExportRequest extends RequestBase {
 		this.includeMetaComments = includeMetaComments;
 	}
 
-	// todo-0: remove this flag. It's just too much complexity in the code. We never need all attachments crammed in a single folder
-	//         so this was always just a bad idea
-	public boolean isAttOneFolder() {
-		return this.attOneFolder;
-	}
-
 	public boolean isIncludeJypyter() {
 		return this.includeJypyter;
 	}
@@ -79,10 +72,6 @@ public class ExportRequest extends RequestBase {
 
 	public void setIncludeToc(final boolean includeToc) {
 		this.includeToc = includeToc;
-	}
-
-	public void setAttOneFolder(final boolean attOneFolder) {
-		this.attOneFolder = attOneFolder;
 	}
 
 	public void setIncludeJypyter(final boolean includeJypyter) {

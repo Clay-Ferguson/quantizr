@@ -397,7 +397,6 @@ export interface ExportRequest extends RequestBase {
     fileName: string;
     includeToc: boolean;
     includeMetaComments: boolean;
-    attOneFolder: boolean;
     contentType: string;
     includeJypyter: boolean;
     includeIDs: boolean;

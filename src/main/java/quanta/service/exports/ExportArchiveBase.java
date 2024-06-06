@@ -126,7 +126,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         // for markdown force updateHeadings and Attachments folder
         if (req.getContentType().equals("md")) {
             req.setUpdateHeadings(true);
-            req.setAttOneFolder(true);
         }
 
         this.req = req;
@@ -537,7 +536,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             if (mdFile != null) {
                 targetFolder = fileUtil.getParentPath(mdFile.fileName);
             } else {
-                targetFolder = req.isAttOneFolder() ? "/attachments" : ("." + parentFolder);
+                targetFolder = "." + parentFolder;
             }
 
             // Process all attachments just to insert File Tags into content
@@ -708,11 +707,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         // Some software chokes on spaces in filenames (like VSCode markdown preview), so don't allow that.
         fileName = fileName.replace(" ", "_");
-
-        // if dumping all attachments into one folder, prepend the node id to the filename
-        if (req.isAttOneFolder()) {
-            fileName = node.getIdStr() + "-" + fileName;
-        }
         return fileName;
     }
 
@@ -757,8 +751,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 binFileName = attFolder + "/attachments/" + attFileName;
             } else {
                 String folder = req.getContentType().equals("fs") ? fileName : node.getIdStr();
-                binFileName = req.isAttOneFolder() ? ("/attachments/" + folder + "-" + att.getKey() + ext)
-                        : (parentFolder + "/" + folder + "/" + attFileName);
+                binFileName = parentFolder + "/" + folder + "/" + attFileName;
             }
 
             if (length > 0) {
@@ -803,7 +796,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (mdFile != null) {
             fullUrl = "attachments/" + attFileName;
         } else {
-            fullUrl = parentFolder + "/" + nodeId + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
+            fullUrl = parentFolder + "/" + nodeId + "/" + att.getKey() + ext;
         }
 
         String relPath = writeFile ? "" : (nodeId + "/");
