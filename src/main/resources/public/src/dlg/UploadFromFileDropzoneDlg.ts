@@ -285,7 +285,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     S.rpcUtil.stopBlockingProcess();
                     if (dlg.sent) {
                         dlg.uploadFailed = true;
-                        S.util.showMessage("Upload failed.", "Warning");
+                        S.util.showMessage("Upload failed (4)", "Warning");
                     }
                 });
 
@@ -301,12 +301,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
 
-                            let msg = "Upload Failed."
+                            let msg = "Upload Complete."
                             if (resp.code == C.RESPONSE_CODE_OUTOFSPACE) {
                                 msg += " You're out of storage space.";
                             }
                             else {
-                                msg += " " + resp.message;
+                                if (resp.message) {
+                                    msg += " " + resp.message;
+                                }
                             }
 
                             S.util.showMessage(msg, "Warning");

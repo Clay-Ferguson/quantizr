@@ -306,7 +306,7 @@ export class DomUtil {
                     }
                 }).catch(() => {
                     this.exitFetch();
-                    S.util.showMessage("Upload failed", "Warning");
+                    S.util.showMessage("Upload failed(1)", "Warning");
                     reject(null);
                 })
         });
@@ -344,13 +344,13 @@ export class DomUtil {
                 }
             }
             else {
-                S.util.showMessage("Upload Failed", "Failed");
+                S.util.showMessage("Upload Failed(2)", "Failed");
             }
         })
             .catch((err: any) => {
                 console.log("ERR: " + S.util.prettyPrint(err));
                 this.exitFetch();
-                S.util.showMessage("Upload failed", "Warning");
+                S.util.showMessage("Upload failed(3)", "Warning");
             });
         return promise;
     }

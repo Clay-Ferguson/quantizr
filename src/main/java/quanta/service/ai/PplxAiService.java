@@ -28,7 +28,6 @@ import quanta.util.XString;
 public class PplxAiService extends ServiceBase {
     String PPLX_COMP_URL = "https://api.perplexity.ai/chat/completions";
 
-    // todo-0: These changed. Need to update online docs and project docs.
     public final String PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online"; // 70B model
     public final String PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct";
     public final String PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"; // 70B model

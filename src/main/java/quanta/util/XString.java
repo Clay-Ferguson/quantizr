@@ -104,6 +104,24 @@ public class XString {
         return val;
     }
 
+    public static String repeatingTrimFromEnd(String val, String ending) {
+        if (val == null)
+            return null;
+        int loopSafe = 0;
+        val = val.trim();
+
+        while (++loopSafe < 1000) {
+            int len = val.length();
+            val = val.trim();
+            val = stripIfEndsWith(val, ending);
+            // if string remained same length we're done
+            if (len == val.length()) {
+                break;
+            }
+        }
+        return val;
+    }
+
     public static List<String> tokenizeWithDelims(String val, String delimiter) {
         if (val == null)
             return null;

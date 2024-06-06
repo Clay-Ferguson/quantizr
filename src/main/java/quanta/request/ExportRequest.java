@@ -43,6 +43,8 @@ public class ExportRequest extends RequestBase {
 		this.includeMetaComments = includeMetaComments;
 	}
 
+	// todo-0: remove this flag. It's just too much complexity in the code. We never need all attachments crammed in a single folder
+	//         so this was always just a bad idea
 	public boolean isAttOneFolder() {
 		return this.attOneFolder;
 	}

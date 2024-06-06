@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import quanta.config.ServiceBase;
 import quanta.model.client.Attachment;
 import quanta.mongo.MongoSession;
@@ -29,34 +30,26 @@ public abstract class ImportArchiveBase extends ServiceBase {
     public String targetPath;
     public MongoSession session;
     public SubNode importRootNode;
-    // JAR path to new nodeId map.
-    public HashMap<String, String> pathToIdMap = new HashMap<>();
+    public SubNode curNode;
 
     public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
         String name = entry.getName();
         int lastSlashIdx = name.lastIndexOf("/");
         String fileName = lastSlashIdx == -1 ? name : name.substring(lastSlashIdx + 1);
-        String path = lastSlashIdx == -1 ? name : name.substring(0, lastSlashIdx);
         log.trace("Import FILE Entry: " + entry.getName());
 
         try {
             ThreadLocals.setParentCheckEnabled(false);
             Val<Boolean> done = new Val<>(false);
-            // First try to attach the file as a binary which will fail gracefully and leave done=false if this
-            // file's filename is not one of the attName(s) of it's attachment list.
-            if (lastSlashIdx != -1) {
-                String nodeId = pathToIdMap.get(path);
-                if (nodeId != null) {
-                    arun.run(as -> {
-                        SubNode node = read.getNode(as, nodeId);
-                        if (node != null) {
-                            if (importBinary(entry, node, zis, fileName)) {
-                                done.setVal(true);
-                            }
-                        }
-                        return null;
-                    });
-                }
+
+            // if this is an attachment on our curNode then import it.
+            if (curNode != null && curNode.getAttachments() != null && curNode.getAttachments().containsKey(fileName)) {
+                arun.run(as -> {
+                    if (importBinary(entry, curNode, zis, fileName)) {
+                        done.setVal(true);
+                    }
+                    return null;
+                });
             }
 
             // if we processed the above as an attachment we're done bail out.
@@ -103,6 +96,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 if (node == null) {
                     throw new RuntimeException("import unmarshalling failed.");
                 }
+                curNode = node;
                 // when importing we want to keep all the attachment info EXCEPT the binary IDs because those will
                 // be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
                 // the obsolete values cannot be reused.
@@ -111,12 +105,27 @@ public abstract class ImportArchiveBase extends ServiceBase {
                         att.setBin(null);
                     });
                 }
-                // NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set
-                // into
-                // the dirty cache either, so we can't call any setters on it UNTIL it's saved here and we get the
-                // DB to give us the new ID for it.
-                update.save(session, node);
-                pathToIdMap.put(path, node.getIdStr());
+                /*
+                 * NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set into
+                 * the dirty cache either, so we can't call any setters on it UNTIL it's saved here and we get the
+                 * DB to give us the new ID for it.
+                 */
+                // put this dupliate name tolerant save into a method we can call.
+                int tries = 0;
+                String nodeName = node.getName();
+                while (tries < 10) {
+                    try {
+                        update.save(session, node);
+                        break;
+                    } catch (DuplicateKeyException ex) {
+                        if (ex.getMessage().contains("unique-node-name")) {
+                            tries++;
+                            node.setName(nodeName + "-" + tries);
+                        } else {
+                            throw ex;
+                        }
+                    }
+                }
             }
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
@@ -131,8 +140,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
      *
      * Returns true only if we imported a file.
      */
-    public boolean importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String fileName) {
-        String attName = fileUtil.stripExtension(fileName);
+    public boolean importBinary(ArchiveEntry entry, SubNode node, InputStream zis, String attName) {
         HashMap<String, Attachment> atts = node.getAttachments();
         if (atts == null)
             return false;
@@ -140,10 +148,12 @@ public abstract class ImportArchiveBase extends ServiceBase {
         // Attachment.name back to what it originally was before the export which is in the JSON, but also
         // on the node we have now.
         Attachment att = atts.get(attName);
-        if (att == null)
+        if (att == null) {
             return false;
+        }
         Long length = att.getSize();
         String mimeType = att.getMime();
+        String fileName = att.getFileName();
         LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
         attach.attachBinaryFromStream(session, true, attName, node, null, fileName, length, lzis, mimeType, -1, -1,
                 false, true, false, true, null, false, null);

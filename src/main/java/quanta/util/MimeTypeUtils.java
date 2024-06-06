@@ -69,4 +69,12 @@ public class MimeTypeUtils {
         }
         return ret;
     }
+
+    public static String getExtensionFromMimeType(String mime) {
+        int index = mime.indexOf("/");
+        if (index == -1) {
+            return "";
+        }
+        return "." + mime.substring(index + 1);
+    }
 }

@@ -948,7 +948,7 @@ export class Util {
     }
 
     // todo-0: document in user guide both that you can use "* " to not do opengraph, and that you can use "- " to 
-    // show opengraph but not link, and "-- " to show opengraph but without long description.
+    // show opengraph but not the link url, and "-- " to show opengraph but without long description and without the link url.
     removeHiddenUrls = (content: string): string => {
         if (!content || content.toLowerCase().indexOf("http") === -1) return content;
 

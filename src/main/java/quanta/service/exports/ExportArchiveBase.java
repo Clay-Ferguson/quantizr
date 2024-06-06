@@ -31,6 +31,7 @@ import quanta.request.ExportRequest;
 import quanta.response.ExportResponse;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
+import quanta.util.MimeTypeUtils;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -52,14 +53,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
     ExportRequest req;
     int baseSlashCount = 0;
 
-    // This master toc works great, but it's a bit confusing having toc type info on each page AND in
-    // a
-    // single file because then there's more than just one obvious 'page flow' to get to any content.
-    // Also if we bring this back we probably need some way to make nodes that have child nodes that
-    // are
-    // all file be excluded from the master index because again it just kind of creates a confusing
-    // flow
-    // for the user
+    /*
+     * This master toc works great, but it's a bit confusing having toc type info on each page AND in a
+     * single file because then there's more than just one obvious 'page flow' to get to any content.
+     * Also if we bring this back we probably need some way to make nodes that have child nodes that are
+     * all file be excluded from the master index because again it just kind of creates a confusing flow
+     * for the user
+     */
     boolean useMasterToc = false;
 
     // warnings and issues will be written to 'problems.txt' if there were any issues with the export
@@ -97,9 +97,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    // It's possible that nodes recursively contained under a given node can have same name, so we
-    // have
-    // to detect that and number them, so we use this hashset to detect existing filenames.
+    /*
+     * It's possible that nodes recursively contained under a given node can have same name, so we have
+     * to detect that and number them, so we use this hashset to detect existing filenames.
+     */
     private final HashSet<String> fileNameSet = new HashSet<>();
     private MongoSession session;
     private StringBuilder fullHtml = new StringBuilder();
@@ -203,9 +204,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 }
             }
 
-            MarkdownFile nextFile = i < pendingFileWrites.size() - 1 ? pendingFileWrites.get(i + 1) : null;
-            if (nextFile != null) {
-                content += "\n\n----\n**[Next: " + nextFile.title + "](" + nextFile.fileName + ")**\n";
+            if (req.isIncludeToc()) {
+                MarkdownFile nextFile = i < pendingFileWrites.size() - 1 ? pendingFileWrites.get(i + 1) : null;
+                if (nextFile != null) {
+                    content += "\n\n----\n**[Next: " + nextFile.title + "](" + nextFile.fileName + ")**\n";
+                }
             }
 
             if (useMasterToc) {
@@ -331,18 +334,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
             markdownFilesByNodeName.put(node.getName(), mdFile);
         }
 
-        // process the current node
-        Val<String> fileName = new Val<>();
         // This is the header row at the top of the page. The rest of the page is children of this node
-        processNodeExport(session, parentFolder, "", node, true, fileName, level, true);
-        String folder = node.getIdStr();
+        boolean doneWithChildren = processNodeExport(session, parentFolder, "", tn, true, level, true);
 
-        if (tn.children != null) {
+        String folder = req.getContentType().equals("fs") ? getFileNameFromNode(node) : node.getIdStr();
+
+        if (!doneWithChildren && tn.children != null) {
             for (TreeNode c : tn.children) {
-                String noExp = c.node.getStr(NodeProp.NO_EXPORT);
-                if (noExp != null) {
+                boolean noExp = c.node.hasProp(NodeProp.NO_EXPORT.s());
+                if (noExp) {
                     continue;
                 }
+
                 nodeStack.add(c.node);
                 recurseNode(rootPath + "../", parentFolder + "/" + folder, c, nodeStack, level + 1, c.node.getIdStr());
                 nodeStack.remove(c.node);
@@ -352,11 +355,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (hasFileProp && mdFile != null) {
             mdFile.title = getShortNodeText(mdFile.content.toString());
 
-            // if we're at root level and have table of contents prepend it.
-            if (mdFile.tocCount > 5) {
-                mdFile.content.insert(0, pathContent + mdFile.toc.toString() + "\n");
-            } else {
-                mdFile.content.insert(0, pathContent);
+            if (req.isIncludeToc()) {
+                // if we're at root level and have table of contents prepend it.
+                if (mdFile.tocCount > 5) {
+                    mdFile.content.insert(0, pathContent + mdFile.toc.toString() + "\n");
+                } else {
+                    mdFile.content.insert(0, pathContent);
+                }
             }
 
             mdFiles.remove(mdFiles.size() - 1);
@@ -368,11 +373,49 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
+    String concatAllChildren(TreeNode tn) {
+        if (tn.children == null || tn.children.size() == 0) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (TreeNode c : tn.children) {
+            sb.append("\n\n");
+            sb.append(c.node.getContent());
+        }
+        return sb.toString();
+    }
+
+    boolean areAllChildrenAreSimpleLeafs(TreeNode tn) {
+        if (tn.children == null)
+            return true;
+        for (TreeNode c : tn.children) {
+            if (c.children != null && c.children.size() > 0
+                    || (c.node.getAttachments() != null && c.node.getAttachments().size() > 0)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String getFileNameFromNode(SubNode node) {
+        String folder = getShortNodeText(node.getContent());
+        if (StringUtils.isEmpty(folder)) {
+            folder = node.getIdStr();
+        }
+
+        long ordinal = node.getOrdinal();
+        // prefix folder with ordinal number left padded with zeroes to 5 digits
+        folder = String.format("%05d", ordinal) + "_" + folder;
+        return folder;
+    }
+
     private String getShortNodeText(String content) {
-        // rip off the first line if it's an xml comment
         if (content == null)
             return "";
         content = content.trim();
+
+        // rip off the first line if it's an xml comment
         int firstNLIdx = content.indexOf("\n");
         int endXmlCommentIdx = content.indexOf("-->\n");
         if (endXmlCommentIdx > 0 && firstNLIdx > 0 && endXmlCommentIdx < firstNLIdx) {
@@ -383,7 +426,23 @@ public abstract class ExportArchiveBase extends ServiceBase {
         linkName = linkName.trim();
         linkName = XString.repeatingTrimFromFront(linkName, "#");
         linkName = linkName.trim();
-        return linkName;
+
+        // For any characters in linkName that are not valid for a filename, replace them with a dash
+        linkName = linkName.replaceAll("[^a-zA-Z0-9-_]", "-");
+
+        // if linkName length is greater than 60, truncate it
+        if (linkName.length() > 60) {
+            linkName = linkName.substring(0, 60);
+
+            // Now try to break at the last dash rather than chopping off in the middle of a word
+            int lastDash = linkName.lastIndexOf("-");
+            if (lastDash > 40) {
+                linkName = linkName.substring(0, lastDash);
+            }
+        }
+
+        linkName = XString.repeatingTrimFromEnd(linkName, "-");
+        return linkName.trim();
     }
 
     private String buildMdPathContent() {
@@ -437,12 +496,22 @@ public abstract class ExportArchiveBase extends ServiceBase {
      *
      * fileNameCont is an output parameter that has the complete filename minus the period and
      * extension.
+     * 
+     * Returns true if the children were processed and no further drill down on the tree is needed
      */
-    private void processNodeExport(MongoSession ms, String parentFolder, String deeperPath, SubNode node,
-            boolean writeFile, Val<String> fileNameCont, int level, boolean isTopRow) {
+    private boolean processNodeExport(MongoSession ms, String parentFolder, String deeperPath, TreeNode tn,
+            boolean writeFile, int level, boolean isTopRow) {
+        boolean ret = false;
         try {
-            String nodeId = node.getIdStr();
-            String fileName = nodeId;
+            SubNode node = tn.node;
+            String concatenatedChildren = "";
+            if (req.getContentType().equals("fs")) {
+                boolean allChildrenAreLeafs = areAllChildrenAreSimpleLeafs(tn);
+                if (allChildrenAreLeafs) {
+                    concatenatedChildren = concatAllChildren(tn);
+                }
+            }
+
             String content = node.getContent() != null ? node.getContent() : "";
             parseMarkdownLinks(content);
             content = content.trim();
@@ -478,8 +547,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (!"ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, true, null, mdContent, deeperPath, targetFolder, writeFile, nodeId, fileName,
-                            att);
+                    handleAttachment(node, true, null, mdContent, deeperPath, targetFolder, writeFile, att);
                 }
             }
 
@@ -493,8 +561,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         if (!"ft".equals(att.getPosition())) {
                             continue;
                         }
-                        handleAttachment(node, true, htmlContent, null, deeperPath, targetFolder, writeFile, nodeId,
-                                fileName, att);
+                        handleAttachment(node, true, htmlContent, null, deeperPath, targetFolder, writeFile, att);
                     }
                 }
                 fullHtml.append(htmlContent.getVal());
@@ -518,8 +585,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if ("ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, false, null, null, deeperPath, targetFolder, writeFile, nodeId, fileName,
-                            att);
+                    handleAttachment(node, false, null, null, deeperPath, targetFolder, writeFile, att);
                 }
             }
 
@@ -527,11 +593,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 fullHtml.append("</div>\n");
             }
             if (writeFile) {
-                writeFilesForNode(ms, parentFolder, node, fileNameCont, fileName, content, atts);
+                if (concatenatedChildren.length() > 0) {
+                    content += concatenatedChildren;
+                    ret = true; // indicates to calling method we're done drilling down
+                }
+                writeFilesForNode(ms, parentFolder, node, content, atts);
             }
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
         }
+        return ret;
     }
 
     private String buildMarkdownHeader(SubNode node) {
@@ -591,13 +662,19 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return lev;
     }
 
-    private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, Val<String> fileNameCont,
-            String fileName, String content, List<Attachment> atts) {
-        String fileNameBase = parentFolder + "/" + fileName + "/" + fileName;
-        fileNameCont.setVal(fileNameBase);
+    private void writeFilesForNode(MongoSession ms, String parentFolder, SubNode node, String content,
+            List<Attachment> atts) {
+        String fileName = getFileNameFromNode(node);
         String json = getNodeJson(node);
-        if (req.getContentType().equals("json")) {
-            addFileEntry(fileNameBase + ".json", json.getBytes(StandardCharsets.UTF_8));
+
+        if (req.getContentType().equals("fs")) {
+            String mdFileName = parentFolder + "/" + fileName + "/content.md";
+            addFileEntry(mdFileName, content.getBytes(StandardCharsets.UTF_8));
+        } //
+        else if (req.getContentType().equals("json")) {
+            String id = node.getIdStr();
+            String fullFileName = parentFolder + "/" + id + "/" + id + ".json";
+            addFileEntry(fullFileName, json.getBytes(StandardCharsets.UTF_8));
         }
         if (atts != null) {
             for (Attachment att : atts) {
@@ -641,51 +718,64 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private void writeAttachmentFileForNode(MongoSession ms, String parentFolder, SubNode node, String fileName,
             Attachment att) {
+        if (att.getMime() == null)
+            return;
         String ext = null;
-        String attFileName = getAttachmentFileName(att, node);
-        ext = FilenameUtils.getExtension(attFileName);
-        if (!StringUtils.isEmpty(ext)) {
-            ext = "." + ext;
+        String attFileName = null;
+
+        // if we want a friendly looking filename, with extension
+        if (req.getContentType().equals("fs")) {
+            attFileName = getAttachmentFileName(att, node);
+            ext = FilenameUtils.getExtension(attFileName);
+            if (!StringUtils.isEmpty(ext)) {
+                ext = "." + ext;
+            } else {
+                ext = MimeTypeUtils.getExtensionFromMimeType(att.getMime());
+                attFileName += ext;
+            }
+        }
+        // else we just need it to be the key
+        else {
+            attFileName = att.getKey();
         }
 
-        if (att.getMime() != null) {
-            InputStream is = null;
-            try {
-                is = attach.getStream(ms, att.getKey(), node, false);
-                if (is == null)
-                    return;
-                BufferedInputStream bis = new BufferedInputStream(is);
-                long length = att != null ? att.getSize() : null;
+        InputStream is = null;
+        try {
+            is = attach.getStream(ms, att.getKey(), node, false);
+            if (is == null)
+                return;
+            BufferedInputStream bis = new BufferedInputStream(is);
+            long length = att != null ? att.getSize() : null;
 
-                String binFileName = null;
-                if (mdFile != null) {
-                    if (!mdFile.attachmentNames.add(attFileName)) {
-                        throw new RuntimeException("Attachment " + attFileName + " is used twice in the same file");
-                    }
-
-                    String attFolder = fileUtil.getParentPath(mdFile.fileName);
-                    binFileName = attFolder + "/attachments/" + attFileName;
-                } else {
-                    binFileName = req.isAttOneFolder() ? ("/attachments/" + fileName + "-" + att.getKey() + ext)
-                            : (parentFolder + "/" + fileName + "/" + att.getKey() + ext);
+            String binFileName = null;
+            if (mdFile != null) {
+                if (!mdFile.attachmentNames.add(attFileName)) {
+                    throw new RuntimeException("Attachment " + attFileName + " is used twice in the same node");
                 }
 
-
-                if (length > 0) {
-                    // NOTE: the archive WILL fail if no length exists in this codepath
-                    addFileEntry(binFileName, bis, length);
-                } else {
-                    // This *should* never happen that we fall back to writing as an array from the input stream
-                    // because
-                    // normally we will always have the length saved on the node. But re are trying to be as resilient
-                    // as possible here falling back to this rather than failing the entire export
-                    addFileEntry(binFileName, IOUtils.toByteArray(bis));
-                }
-            } catch (Exception e) {
-                throw ExUtil.wrapEx(e);
-            } finally {
-                StreamUtil.close(is);
+                String attFolder = fileUtil.getParentPath(mdFile.fileName);
+                binFileName = attFolder + "/attachments/" + attFileName;
+            } else {
+                String folder = req.getContentType().equals("fs") ? fileName : node.getIdStr();
+                binFileName = req.isAttOneFolder() ? ("/attachments/" + folder + "-" + att.getKey() + ext)
+                        : (parentFolder + "/" + folder + "/" + attFileName);
             }
+
+            if (length > 0) {
+                // NOTE: the archive WILL fail if no length exists in this codepath
+                addFileEntry(binFileName, bis, length);
+            } else {
+                /*
+                 * This *should* never happen that we fall back to writing as an array from the input stream because
+                 * normally we will always have the length saved on the node. But are trying to be as resilient as
+                 * possible here falling back to this rather than failing the entire export
+                 */
+                addFileEntry(binFileName, IOUtils.toByteArray(bis));
+            }
+        } catch (Exception e) {
+            throw ExUtil.wrapEx(e);
+        } finally {
+            StreamUtil.close(is);
         }
     }
 
@@ -694,13 +784,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * content and return the content
      */
     private void handleAttachment(SubNode node, boolean injectingTag, Val<String> htmlContent, Val<String> mdContent,
-            String deeperPath, String parentFolder, boolean writeFile, String nodeId, String fileName, Attachment att) {
+            String deeperPath, String parentFolder, boolean writeFile, Attachment att) {
         String ext = null;
+        String nodeId = node.getIdStr();
         String attFileName = getAttachmentFileName(att, node);
 
         ext = FilenameUtils.getExtension(attFileName);
         if (!StringUtils.isEmpty(ext)) {
             ext = "." + ext;
+        } else {
+            ext = MimeTypeUtils.getExtensionFromMimeType(att.getMime());
         }
 
         String displayName = att.getFileName() != null ? att.getFileName() : attFileName;
@@ -710,10 +803,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (mdFile != null) {
             fullUrl = "attachments/" + attFileName;
         } else {
-            fullUrl = parentFolder + "/" + fileName + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
+            fullUrl = parentFolder + "/" + nodeId + (req.isAttOneFolder() ? "-" : "/") + att.getKey() + ext;
         }
 
-        String relPath = writeFile ? "" : (fileName + "/");
+        String relPath = writeFile ? "" : (nodeId + "/");
         String url = att.getUrl();
 
         // if no exernal link, this is a local file so build path to it.
