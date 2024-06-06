@@ -59,7 +59,7 @@ public class OpenAiService extends ServiceBase {
 
     // Warning: If you change these, you will need to update the pricing calculations
     String OPENAI_MODEL_TTS = "tts-1";
-    String OPENAI_MODEL_VISION = "gpt-4-vision-preview";
+    String OPENAI_MODEL_VISION = "gpt-4o";
     String OPENAI_MODEL_COMPLETION = "gpt-4o";
     String COST_CODE = "OAI"; // 3 chars allowed
 
