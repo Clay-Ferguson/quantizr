@@ -264,7 +264,6 @@ export class Props {
 
         S.util.addAllToSet(this.hiddenPropertyList, [ //
             J.NodeProp.TYPE_LOCK, //
-            J.NodeProp.NO_EXPORT, //
             // J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
@@ -298,7 +297,6 @@ export class Props {
             case J.NodeProp.PRIORITY:
             case J.NodeProp.LAYOUT:
             case J.NodeProp.ORDER_BY:
-            case J.NodeProp.NO_EXPORT:
             case J.NodeProp.UNPUBLISHED:
             case J.NodeProp.IN_PENDING_PATH:
             case J.NodeProp.TRUNCATED:
