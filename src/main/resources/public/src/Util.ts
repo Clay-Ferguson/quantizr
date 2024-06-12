@@ -958,9 +958,11 @@ export class Util {
 
         if (lines) {
             lines.forEach(line => {
-                if (line.startsWith("- http://") || line.startsWith("- https://") ||
-                    line.startsWith("-- http://") || line.startsWith("-- https://")) {
-                    return;
+                if (line.startsWith("-")) {
+                    if (line.startsWith("- http://") || line.startsWith("- https://") ||
+                        line.startsWith("-- http://") || line.startsWith("-- https://")) {
+                        return;
+                    }
                 }
                 if (ret) {
                     ret += "\n";

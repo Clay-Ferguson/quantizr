@@ -171,15 +171,14 @@ public class MongoAuth extends ServiceBase {
         return addSecurity(ms, false, crit, ands);
     }
 
-    public Criteria addWriteSecurity(MongoSession ms, Criteria crit, List<Criteria> ands) {
-        return addSecurity(ms, true, crit, ands);
-    }
-
     /*
      * Filters to get only nodes that are public, are shared to the current user, or owned by current
      * user. For single node lookups we won't need this because we can do it the old way and be faster,
      * but for queries of multiple records (page rendering, timeline, search, etc.) we need to build
      * this security right into the query using this method.
+     * 
+     * Takes a `criteria` and optionally some `ands`, and returns a criteria object that is guaranteed
+     * to include any or all of the ands as well as the security criteria.
      */
     public Criteria addSecurity(MongoSession ms, boolean write, Criteria crit, List<Criteria> ands) {
         // admin can bypass all security
@@ -194,7 +193,7 @@ public class MongoAuth extends ServiceBase {
         SessionContext sc = ThreadLocals.getSC();
         SubNode myAcntNode = null;
 
-        // special case where we can collapse this "and (a | b | c)" to just "and a"
+        // if we have no session context, we can't do anything but check for public nodes
         if (sc == null) {
             if (write) {
                 throw new RuntimeException("Unable to build writable query by unknown session context");
@@ -212,7 +211,7 @@ public class MongoAuth extends ServiceBase {
             // if we have a person/account get their account node first
             myAcntNode = read.getNode(ms, sc.getUserNodeId());
 
-            // if unknown person then again only a condition for public what we want
+            // if unknown person then again only a condition for public is what we want
             if (myAcntNode == null) {
                 if (write) {
                     throw new RuntimeException("Unable to build writable query by unknown user");
@@ -225,12 +224,15 @@ public class MongoAuth extends ServiceBase {
                     ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
                     return crit.andOperator(ands);
                 }
-            } else {
-                // if we have a person, set up conditions, for whatever they should be able to see
+            }
+            // if we have a specific user consuming this data, set up conditions, for whatever they should be
+            // able to see
+            else {
                 List<Criteria> ors = new LinkedList<>();
 
                 // if not needing 'write' access then the criteria of "PUBLIC or Shared to Me" is added to OR set.
                 if (!write) {
+                    // node is public
                     ors.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
                     // or node is shared to me
                     ors.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));

@@ -178,11 +178,11 @@ public class UserFeedService extends ServiceBase {
                 blockedIdStrings.add(blockedId.toHexString());
             }
         }
-        // for bidirectional we do an OR of "us to them" and "them to us" kind of sharing to the other
-        // user,
-        // to result in what will end up being all conversations between us and the other person mixed
-        // into
-        // a single rev-chron.
+        /*
+         * for bidirectional we do an OR of "us to them" and "them to us" kind of sharing to the other user,
+         * to result in what will end up being all conversations between us and the other person mixed into
+         * a single rev-chron.
+         */
         else {
             SubNode toUserNode = read.getAccountByUserName(ms, req.getToUser(), false);
             if (myAcntNode == null) {
