@@ -526,7 +526,9 @@ public class NodeEditService extends ServiceBase {
             part = part.trim();
             if (idx == 0) {
                 node.setContent(part);
-                node.setOrdinal(firstOrdinal);
+                if (!nodeId.equals(nodeId)) {
+                    node.setOrdinal(firstOrdinal);
+                }
                 node.touch();
                 update.save(ms, node);
                 sigDirtyNodes.add(node.getIdStr());
