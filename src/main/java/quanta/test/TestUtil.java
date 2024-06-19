@@ -32,7 +32,7 @@ public class TestUtil extends ServiceBase {
     public void runTests() {
         testResults.setLength(0);
         log("*************** Running JUnit tests (t=" + String.valueOf(System.currentTimeMillis()) + ")");
-        runTest("quanta.test.MongoTest");
+        runTest("quanta.test.UnitTest");
         log.debug("***************************************************");
     }
 

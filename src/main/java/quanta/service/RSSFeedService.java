@@ -22,6 +22,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -68,6 +70,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.Val;
 import reactor.core.publisher.Mono;
 
 /* Proof of Concept RSS Publishing */
@@ -82,6 +85,8 @@ public class RSSFeedService extends ServiceBase {
     private static final ConcurrentHashMap<String, String> feedNameOfItem = new ConcurrentHashMap<>();
     // keep track of which feeds failed so we don't try them again until another 30-min cycle
     private static final HashSet<String> failedFeeds = new HashSet<>();
+    private static final HashSet<String> redirects = new HashSet<>();
+
     // Cache of all aggregates
     private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
     private static int MAX_CACHE_SIZE = 500;
@@ -118,12 +123,18 @@ public class RSSFeedService extends ServiceBase {
 
     public String getFeedStatus() {
         String ret = "";
-        if (failedFeeds.size() == 0) {
-            return "No failed feeds.";
+        if (failedFeeds.size() > 0) {
+            ret += "\nFailed Feeds:\n";
+            for (String url : failedFeeds) {
+                ret += "    " + url + "\n";
+            }
         }
-        ret += "Failed Feeds: \n";
-        for (String url : failedFeeds) {
-            ret += "    " + url + "\n";
+
+        if (redirects.size() > 0) {
+            ret += "\nRedirected Feeds:\n";
+            for (String urls : redirects) {
+                ret += "    " + urls + "\n";
+            }
         }
         return ret;
     }
@@ -259,7 +270,9 @@ public class RSSFeedService extends ServiceBase {
         }
     }
 
-    public SyndFeed getFeed(final String url, boolean fromCache, int index, int maxIndex) {
+    public SyndFeed getFeed(String url, boolean fromCache, int index, int maxIndex) {
+        String originalUrl = url;
+
         // if this feed failed don't try it again. Whenever we DO force the system to try a feed again
         // that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
         // feed has failed
@@ -298,31 +311,65 @@ public class RSSFeedService extends ServiceBase {
             }
 
             long start = System.currentTimeMillis();
-            WebClient webClient = Util.webClientBuilder().build();
             String response = null;
-            try {
-                response = webClient.get().uri(url)//
-                        .retrieve() //
-                        .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
-                            // This will trigger for any response with 4xx or 5xx status codes
-                            return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
-                                log.debug("Error response from server: " + errorBody);
-                                return Mono.error(new RuntimeException("Error response from server: " + errorBody));
-                            });
-                        })//
-                        .bodyToMono(String.class)//
-                        .timeout(Duration.ofSeconds(60))//
-                        .block();
-            } catch (WebClientResponseException e) {
-                // This exception is thrown for HTTP status code errors
-                throw new RuntimeException("Error while calling the RSS feed service: " + e.getMessage()
-                        + " Status Code: " + e.getStatusCode(), e);
-            } catch (WebClientRequestException e) {
-                // This exception is thrown for errors while making the request (e.g., connectivity issues)
-                throw new RuntimeException("Request error while calling the RSS feed service: " + e.getMessage(), e);
-            } catch (Exception e) {
-                // This is a generic exception handler for other exceptions
-                throw new RuntimeException("General error while calling the RSS feed service: " + e.getMessage(), e);
+            int tries = 0;
+
+            // we try two times, which is onece for the original call and once more of it's a redirect
+            while (++tries < 3) {
+                Val<String> redirectUrl = new Val<>();
+                String _url = url;
+                WebClient webClient = Util.webClientBuilder().exchangeStrategies(ExchangeStrategies.builder()
+                        .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(100 * 1024 * 1024)).build())
+                        // NOTE: These two 'filter' calls are what is required to detect redirects.
+                        .filter(ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+                            // log.debug("Request URL: " + clientRequest.url());
+                            return Mono.just(clientRequest);
+                        })).filter(ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+                            clientResponse.headers().asHttpHeaders()
+                                    .forEach((name, values) -> values.forEach(value -> log.debug(name + "=" + value)));
+                            if (clientResponse.statusCode().is3xxRedirection()) {
+                                redirectUrl.setVal(clientResponse.headers().header("Location").get(0));
+                                redirects.add(_url + " --> " + redirectUrl.getVal());
+                                // log.debug("Redirected to: " + redirectUrl);
+                            }
+                            return Mono.just(clientResponse);
+                        })).build();
+
+                try {
+                    response = webClient.get().uri(url)//
+                            .retrieve() //
+                            .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                                    clientResponse -> {
+                                        // This will trigger for any response with 4xx or 5xx status codes
+                                        return clientResponse.bodyToMono(String.class).flatMap(errorBody -> {
+                                            log.debug("Error response from server: " + errorBody);
+                                            return Mono.error(
+                                                    new RuntimeException("Error response from server: " + errorBody));
+                                        });
+                                    })//
+                            .bodyToMono(String.class)//
+                            .timeout(Duration.ofSeconds(60))//
+                            .block();
+                } catch (WebClientResponseException e) {
+                    // This exception is thrown for HTTP status code errors
+                    throw new RuntimeException("Error while calling the RSS feed service: " + e.getMessage()
+                            + " Status Code: " + e.getStatusCode(), e);
+                } catch (WebClientRequestException e) {
+                    // This exception is thrown for errors while making the request (e.g., connectivity issues)
+                    throw new RuntimeException("Request error while calling the RSS feed service: " + e.getMessage(),
+                            e);
+                } catch (Exception e) {
+                    // This is a generic exception handler for other exceptions
+                    throw new RuntimeException("General error while calling the RSS feed service: " + e.getMessage(),
+                            e);
+                }
+
+                if (redirectUrl.hasVal()) {
+                    url = redirectUrl.getVal();
+                    log.debug("Redirecting to: " + url + " len of redirect response: " + response.length());
+                } else {
+                    break;
+                }
             }
 
             if (response == null) {
@@ -333,7 +380,8 @@ public class RSSFeedService extends ServiceBase {
                     new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), 100 * Const.ONE_MB);
             try {
                 SyndFeedInput input = new SyndFeedInput();
-                inFeed = input.build(new XmlReader(inputStream, true));
+                XmlReader xmlReader = new XmlReader(inputStream, true);
+                inFeed = input.build(xmlReader);
             } catch (Exception e) {
                 throw new RuntimeException("Could not parse response for feed: " + url, e);
             }
@@ -345,6 +393,11 @@ public class RSSFeedService extends ServiceBase {
 
             // we update the cache regardless of 'fromCache' val. this is correct.
             feedCache.put(url, inFeed);
+
+            // if we did a redirect we can make sure the original url is also cached
+            if (!originalUrl.equals(url)) {
+                feedCache.put(originalUrl, inFeed);
+            }
 
             // store knowledge of which feed Title goes with each entry instance.
             if (inFeed != null && inFeed.getEntries() != null) {

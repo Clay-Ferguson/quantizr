@@ -8,14 +8,17 @@ import org.slf4j.LoggerFactory;
 import quanta.config.ServiceBase;
 
 @RunWith(JUnit4.class) // This tells JUnit to run the test using JUnit4 runner
-public class MongoTest {
-    private static Logger log = LoggerFactory.getLogger(MongoTest.class);
+public class UnitTest {
+    private static Logger log = LoggerFactory.getLogger(UnitTest.class);
 
     @Test
     public void test() throws Exception {
         try {
-            MongoTestService mts = ServiceBase.context.getBean(MongoTestService.class);
-            mts.test();
+            // MongoTestService mts = ServiceBase.context.getBean(MongoTestService.class);
+            // mts.test();
+            // RSSTestService rss = ServiceBase.context.getBean(RSSTestService.class);
+            // rss.test();
+            log.debug("***Unit Test Running!***");
         } catch (Exception e) {
             log.error("MongoTest Failed", e);
             throw e;

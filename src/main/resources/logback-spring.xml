@@ -110,10 +110,10 @@ which is the 'master' copy of the file. -->
         <appender-ref ref="Console" />
     </logger>
 
-    <logger name="com.rometools.modules.content.io.ContentModuleGenerator" level="warn"
+    <!-- <logger name="com.rometools.modules.content.io.ContentModuleGenerator" level="warn"
         additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
-    </logger>
+    </logger> -->
 
 </configuration>
