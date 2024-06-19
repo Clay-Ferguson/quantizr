@@ -204,7 +204,7 @@ public class SystemService extends ServiceBase {
         Map<String, String> env = System.getenv();
         LinkedList<String> envList = new LinkedList<String>();
         env.forEach((k, v) -> {
-            if (k.toLowerCase().contains("pass"))
+            if (k.toLowerCase().contains("pass") || k.endsWith("_API_KEY"))
                 return;
             envList.add(k + ":" + v + "\n");
         });
