@@ -249,7 +249,7 @@ public class UserManagerService extends ServiceBase {
 
     public SubNode getNotesNode(MongoSession ms, String userName, SubNode userNode) {
         return read.getUserNodeByType(ms, userName, userNode, "### Notes", NodeType.NOTES.s(),
-                Arrays.asList(PrivilegeType.READ.s()), true);
+                null, true);
     }
 
     public SubNode getPostsNode(MongoSession ms, String userName, SubNode userNode) {
