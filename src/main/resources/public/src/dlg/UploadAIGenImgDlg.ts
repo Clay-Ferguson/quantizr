@@ -41,7 +41,7 @@ export class UploadAIGenImgDlg extends DialogBase {
                     }),
                     new Selection(null, null, [
                         { key: "1024x1024", val: "Square: 1024x1024" },
-                        { key: "1794x1024", val: "Landscape: 1792x1024" },
+                        { key: "1792x1024", val: "Landscape: 1792x1024" },
                         { key: "1024x1792", val: "Portrait: 1024x1792" },
                     ], null, "aiImageGenSize float-end", {
                         setValue: (val: string) => this.mergeState<LS>({ size: val }),

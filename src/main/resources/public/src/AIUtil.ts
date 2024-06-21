@@ -53,13 +53,13 @@ export class AIUtil {
             this.aiServices.push(//
                 {
                     name: J.AIServiceName.ANTH,
-                    description: "Anthropic: Claude/Opus",
-                    longDescription: "Anthropic's best-in-class most powerful, and most expensive, general-purpose AI."
+                    description: "Anthropic: Claude 3 Opus",
+                    longDescription: "Anthropic's very powerful general-purpose AI."
                 },
                 {
                     name: J.AIServiceName.ANTH_SONNET,
-                    description: "Anthropic: Claude/Sonnet",
-                    longDescription: "Anthropic's less powerful, less expensive, general-purpose AI."
+                    description: "Anthropic: Claude 3.5 Sonnet",
+                    longDescription: "Anthropic's most powerful general-purpose AI."
                 });
         }
 

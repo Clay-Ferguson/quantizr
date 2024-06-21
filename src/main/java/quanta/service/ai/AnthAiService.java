@@ -29,7 +29,7 @@ public class AnthAiService extends ServiceBase {
     String API_VERSION = "2023-06-01";
 
     public final String ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229";
-    public final String ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-sonnet-20240229";
+    public final String ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620";
     String COST_CODE = "ANT"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -102,7 +102,7 @@ public class AnthAiService extends ServiceBase {
         return res;
     }
 
-    // https://www.anthropic.com/api
+    // https://www.anthropic.com/pricing#anthropic-api
     private double calculateCost(AnthChatResponse res) {
         AnthUsage usage = res.getUsage();
         String model = res.getModel().toLowerCase();
