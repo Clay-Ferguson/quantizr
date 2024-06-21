@@ -505,7 +505,7 @@ public class RSSFeedService extends ServiceBase {
             RssFeed rssFeed = convertToFeed(feed, addFeedTitles);
             res.setFeed(rssFeed);
         }
-        log.debug("FEED RES: " + XString.prettyPrint(res));
+        // log.debug("FEED RES: " + XString.prettyPrint(res));
         return res;
     }
 
@@ -533,7 +533,7 @@ public class RSSFeedService extends ServiceBase {
                 }
                 try {
                     if (processEntry(entry, e)) {
-                        log.debug("Build RSS Ret Obj: " + e.getTitle());
+                        // log.debug("Build RSS Ret Obj: " + e.getTitle());
                         rssEntries.add(e);
                     }
                 } catch (Exception ex) {
