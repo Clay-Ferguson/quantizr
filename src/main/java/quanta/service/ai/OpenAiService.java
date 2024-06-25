@@ -254,14 +254,14 @@ public class OpenAiService extends ServiceBase {
         }
 
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
-        List<Map> sysContent = new ArrayList<>();
-        HashMap<String, Object> map = new HashMap<>();
+        List<Map<String, String>> sysContent = new ArrayList<>();
+        HashMap<String, String> map = new HashMap<>();
         map.put("type", "text");
         map.put("text", system.getPrompt());
         sysContent.add(map);
         messages.add(0, new ChatMessage("system", sysContent));
 
-        List<Map> content = new ArrayList<>();
+        List<Map<String,String>> content = new ArrayList<>();
         map = new HashMap<>();
         map.put("type", "text");
         map.put("text", input);
@@ -367,7 +367,7 @@ public class OpenAiService extends ServiceBase {
         return false;
     }
 
-    private void addAttachments(List<Map> content, SubNode node) {
+    private void addAttachments(List<Map<String,String>> content, SubNode node) {
         if (node == null)
             return;
         if (node.getAttachments() != null) {
@@ -375,7 +375,7 @@ public class OpenAiService extends ServiceBase {
                 if (att.getMime().startsWith("image")) {
                     // add url if the attachment is a simple url
                     if (att.getUrl() != null) {
-                        HashMap<String, Object> map = new HashMap<>();
+                        HashMap<String, String> map = new HashMap<>();
                         map.put("type", "image_url");
                         map.put("image_url", att.getUrl());
                         content.add(map);
@@ -386,7 +386,7 @@ public class OpenAiService extends ServiceBase {
                                 + "&token="
                                 + URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
                         String src = prop.getProtocolHostAndPort() + path;
-                        HashMap<String, Object> map = new HashMap<>();
+                        HashMap<String, String> map = new HashMap<>();
                         map.put("type", "image_url");
                         map.put("image_url", src);
                         content.add(map);
@@ -438,8 +438,8 @@ public class OpenAiService extends ServiceBase {
         while (parent != null) {
             if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
-                List<Map> content = new ArrayList<>();
-                HashMap<String, Object> map = new HashMap<>();
+                List<Map<String,String>> content = new ArrayList<>();
+                HashMap<String, String> map = new HashMap<>();
                 map.put("type", "text");
                 map.put("text", parent.getContent());
                 content.add(map);
@@ -454,8 +454,8 @@ public class OpenAiService extends ServiceBase {
                     break;
                 }
 
-                List<Map> content = new ArrayList<>();
-                HashMap<String, Object> map = new HashMap<>();
+                List<Map<String,String>> content = new ArrayList<>();
+                HashMap<String, String> map = new HashMap<>();
                 map.put("type", "text");
                 map.put("text", parent.getContent());
                 content.add(map);
