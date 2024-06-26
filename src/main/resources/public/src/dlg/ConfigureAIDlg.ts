@@ -32,8 +32,6 @@ export class ConfigureAIDlg extends DialogBase {
         const aiOptions = S.aiUtil.getAiOptions();
         return [
             new Div(null, null, [
-                // todo-0: need to make this string configurable, maybe in yaml file? (NOTE: This appears twice in the code)
-                new Div("Tip: Anthropic's Claude 3.5 Sonnet is currently the most powerful AI in the world.", { className: "marginBottom" }),
                 new FlexLayout([
                     new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom bigMarginRight", ConfigureAIDlg.aiServiceState),
                     new Checkbox("Overwrite Content with Answer", null, ConfigureAIDlg.overwriteState)

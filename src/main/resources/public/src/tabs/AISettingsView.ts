@@ -38,8 +38,6 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                 // -----------------------
                 aiOptions?.length ? this.sectionTitle("AI - Artificial Intelligence") : null,
                 aiOptions?.length ? new FlexRowLayout([
-                    // todo-0: need to make this string configurable, maybe in yaml file? (NOTE: This appears twice in the code)
-                    new Div("Tip: Anthropic's Claude 3.5 Sonnet is currently the most powerful AI in the world.", { className: "marginBottom" }),
                     // todo-1: need a way to warn user when something unsupported by their admin configuration is selected
                     new Div(null, { className: settingsCol }, [
                         new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
