@@ -181,7 +181,7 @@ public class ExportServiceFlexmark extends ServiceBase {
         String content = node.getContent();
         TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
         if (plugin != null) {
-            content = plugin.formatExportText(format, content);
+            content = plugin.formatExportText(format, node);
         }
 
         if (content != null && req.isUpdateHeadings()) {

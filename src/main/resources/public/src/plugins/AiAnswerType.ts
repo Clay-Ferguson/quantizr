@@ -18,7 +18,7 @@ export class AiAnswerType extends TypeBase {
     }
 
     override getCustomFooter(node: NodeInfo): Div {
-        const aiService: AIService = S.aiUtil.getServiceByName(S.props.getPropStr(J.NodeProp.AI_SERVICE, node));
+        const aiService: AIService = S.aiUtil.getServiceByName(S.props.getPropStr(J.NodeProp.AI_SERVICE, node)); // &&&
         if (aiService) {
             return S.aiUtil.getAiNodeFooter("by AI - " + aiService.description, node);
         }

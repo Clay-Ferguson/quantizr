@@ -4,22 +4,25 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 // #ai-model
 public enum AIServiceName {
-    NONE("[null]"), //
-    OPENAI("openAi"), //
-    PPLX("pplxAi"), //
-    ANTH("anthAi"), // Opus (most powerful)
-    ANTH_SONNET("anthAi_sonnet"), // Sonnet
-    PPLX_ONLINE("pplxAi_online"), //
-    PPLX_LLAMA3("llama3"), //
-    HUGGING_FACE("huggingFace"), //
-    OOBA("oobAi"), //
-    GEMINI("geminiAi");
+    NONE("[null]", null), //
+    OPENAI("openAi", "OpenAI: ChatGPT-4o"), //
+    PPLX("pplxAi", "Perplexity: Basic"), //
+    ANTH("anthAi", "Anthropic: Claude 3 Opus"), // Opus (most powerful)
+    ANTH_SONNET("anthAi_sonnet", "Anthropic: Claude 3.5 Sonnet"), // Sonnet
+    PPLX_ONLINE("pplxAi_online", "Perplexity: Recent News Aware"), //
+    PPLX_LLAMA3("llama3", "Meta: Llama 3"), //
+    HUGGING_FACE("huggingFace", "Hugging Face"), //
+    OOBA("oobAi", "ooba"), //
+    GEMINI("geminiAi", "Google: Gemini");
 
     @JsonValue
     private final String value;
 
-    private AIServiceName(String value) {
+    private final String description;
+
+    private AIServiceName(String value, String description) {
         this.value = value;
+        this.description = description;
     }
 
     public static AIServiceName fromString(String name) {
@@ -32,6 +35,10 @@ public enum AIServiceName {
             }
         }
         return null;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public String toString() {

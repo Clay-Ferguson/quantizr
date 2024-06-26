@@ -37,7 +37,7 @@ public abstract class TypeBase extends ServiceBase {
     public void beforeSaveNode(MongoSession ms, SubNode node) {}
 
     // export type will be something like "PDF, ZIP, HTML, etc."
-    public String formatExportText(String exportType, String content) {
-        return content;
+    public String formatExportText(String exportType, SubNode node) {
+        return node.getContent();
     }
 }
