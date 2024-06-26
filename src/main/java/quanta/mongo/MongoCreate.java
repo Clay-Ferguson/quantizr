@@ -459,7 +459,7 @@ public class MongoCreate extends ServiceBase {
         update.save(ms, newNode);
 
         if (req.getAiService() != null && NodeType.AI_ANSWER.s().equals(parentNode.getType())) {
-            oai.insertAnswerToQuestion(ms, newNode, req, res);
+            aiUtil.insertAnswerToQuestion(ms, newNode, req, res);
         }
 
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //

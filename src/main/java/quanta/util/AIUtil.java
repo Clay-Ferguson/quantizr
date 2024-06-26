@@ -3,6 +3,7 @@ package quanta.util;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.model.PropertyInfo;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -24,13 +26,16 @@ import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
+import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
 import quanta.request.AskSubGraphRequest;
+import quanta.request.CreateSubNodeRequest;
 import quanta.request.GenerateBookByAIRequest;
 import quanta.response.AskSubGraphResponse;
+import quanta.response.CreateSubNodeResponse;
 import quanta.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
 
@@ -525,6 +530,26 @@ public class AIUtil extends ServiceBase {
             ExUtil.error(log, "failed parsing yaml", e);
         }
         return res;
+    }
+
+    // Assumes node is a question, and inserts the answer under it as a subnode
+    public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
+            CreateSubNodeResponse res) {
+
+        ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
+        res.setGptCredit(aiAnswer.userCredit);
+
+        List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
+        SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
+                null, true, true, res.getNodeChanges());
+
+        newNode.setContent(aiUtil.formatAnswer(aiAnswer, true));
+        // newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+
+        newNode.touch();
+        newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+        acl.inheritSharingFromParent(ms, res, node, newNode);
+        update.save(ms, newNode);
     }
 }
 

@@ -6,7 +6,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import quanta.config.ServiceBase;
-import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
-import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.ChatGPTModerationRequest;
@@ -37,11 +34,8 @@ import quanta.model.client.openai.ImageResponse;
 import quanta.model.client.openai.SpeechGenRequest;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.client.openai.Usage;
-import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.CreateSubNodeRequest;
-import quanta.response.CreateSubNodeResponse;
 import quanta.service.AppController;
 import quanta.util.Const;
 import quanta.util.LimitedInputStreamEx;
@@ -489,26 +483,5 @@ public class OpenAiService extends ServiceBase {
             throw new RuntimeException("Only gpt-4-* is currently supported. " + res.getModel() + " is not supported.");
         }
         return (usage.getPromptTokens() * inputPpk / 1000) + (usage.getCompletionTokens() * outputPpk / 1000);
-    }
-
-    // Assumes node is a question, and inserts the answer under it as a subnode
-    // todo-0: this method is an oddball that doesn't have equivalent in other AI services
-    public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
-            CreateSubNodeResponse res) {
-
-        ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
-        res.setGptCredit(aiAnswer.userCredit);
-
-        List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
-        SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
-                null, true, true, res.getNodeChanges());
-
-        newNode.setContent(aiUtil.formatAnswer(aiAnswer, true));
-        // newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
-
-        newNode.touch();
-        newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-        acl.inheritSharingFromParent(ms, res, node, newNode);
-        update.save(ms, newNode);
     }
 }
