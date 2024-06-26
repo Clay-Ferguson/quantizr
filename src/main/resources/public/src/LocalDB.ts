@@ -157,7 +157,7 @@ export class LocalDB {
         }
     }
 
-    public writeObject = async (obj: IndexedDBObj, storeName: string = null): Promise<void> => {
+    private writeObject = async (obj: IndexedDBObj, storeName: string = null): Promise<void> => {
         if (!storeName) storeName = this.STORE_DEFAULT;
         if (!obj.k) {
             console.error("key property 'k' is missing from object: " + S.util.prettyPrint(obj));

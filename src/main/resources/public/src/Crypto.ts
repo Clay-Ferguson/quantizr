@@ -274,7 +274,7 @@ export class Crypto {
 
         if (publicKey && privateKey) {
             const newKeyPair: EncryptionKeyPair = new EncryptionKeyPair(publicKey, privateKey);
-            await S.localDB.writeObject({ k: keyName, v: newKeyPair });
+            await S.localDB.setVal(keyName, newKeyPair);
         }
         return true;
     }
@@ -421,7 +421,7 @@ export class Crypto {
         }
         else {
             const key: CryptoKey = await this.genSymKey();
-            await S.localDB.writeObject({ k: this.STORE_SYMKEY, v: key });
+            await S.localDB.setVal(this.STORE_SYMKEY, key);
         }
     }
 
@@ -456,7 +456,7 @@ export class Crypto {
         if (forceUpdate || !keyPair) {
             keyPair = await crypto.subtle.generateKey(this.SIG_ALGO_OBJ, true, this.OP_SIGN_VERIFY);
 
-            await S.localDB.writeObject({ k: this.STORE_SIGKEY, v: keyPair });
+            await S.localDB.setVal(this.STORE_SIGKEY, keyPair);
 
             const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(pubKeyDat);
@@ -511,7 +511,7 @@ export class Crypto {
                 hash: { name: this.HASH_ALGO } //
             }, true, this.OP_ENC_DEC);
 
-            await S.localDB.writeObject({ k: this.STORE_ASYMKEY, v: keyPair });
+            await S.localDB.setVal(this.STORE_ASYMKEY, keyPair);
 
             const pubKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(pubKeyDat);

@@ -50,7 +50,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
     }
 
     newKey = async () => {
-        const dlg = new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
+        const dlg = new ConfirmDlg("Gernerate new Crypto Key Pair?", "Warning",
             "btn-danger", "alert alert-danger");
         await dlg.open();
         if (!dlg.yes) return;
