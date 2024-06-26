@@ -39,6 +39,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
             }),
             new ButtonBar([
                 new Button("New Key", this.newKey),
+                // new Button("Remove Key", this.removeKey),
                 state.keyType !== "sym" ? new Button("Publish Public Key", this.publishKey) : null,
                 new Button("Import Key", this.importKey)
             ], "marginBottom"),
@@ -47,6 +48,31 @@ export class ManageCryptoKeysDlg extends DialogBase {
                 new Button("Close", this.close)
             ], "marginTop")
         ];
+    }
+
+    /* UNUSED: but do not delete. This is not a good usable feature because we regenerate keys as needed.
+     I wrote this as part of testing crypto stuff locally, before I remembered that not only do we generate keys
+     automaitcally I also can't even test this on localhost because browsers require `https` and I don't have a 
+     way do do https locally currently. So, long story short, I might end up needing this method in the future */
+    removeKey = async () => {
+        const dlg = new ConfirmDlg("Remove Crypto Key?", "Warning",
+            "btn-danger", "alert alert-danger");
+        await dlg.open();
+        if (!dlg.yes) return;
+        const state: LS = this.getState<LS>();
+        switch (state.keyType) {
+            case "sig":
+                await S.localDB.removeByKey(S.crypto.STORE_SIGKEY);
+                break;
+            case "asym":
+                await S.localDB.removeByKey(S.crypto.STORE_ASYMKEY);
+                break;
+            case "sym":
+                await S.localDB.removeByKey(S.crypto.STORE_SYMKEY);
+                break;
+            default: break;
+        }
+        this.preLoad();
     }
 
     newKey = async () => {

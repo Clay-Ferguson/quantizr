@@ -157,6 +157,35 @@ export class LocalDB {
         }
     }
 
+     // removes the value under this key 
+     public removeByKey = async (k: string, storeName: string = null) => {
+        if (!storeName) storeName = this.STORE_DEFAULT;
+        await this.removeObject(k, storeName);
+    }
+
+    private removeObject = async (k: IDBValidKey, storeName: string = null): Promise<void> => {
+        if (!storeName) storeName = this.STORE_DEFAULT;
+        if (!k) {
+            console.error("key property 'k' is missing");
+            return;
+        }
+        return new Promise<void>((resolve) => {
+            this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
+                (store: IDBObjectStore) => {
+                    if (this.debug) {
+                        console.log("remove key: " + k);
+                    }
+                    const req = store.delete(k);
+                    req.onsuccess = () => {
+                        resolve();
+                    };
+                    req.onerror = () => {
+                        resolve();
+                    };
+                });
+        });
+    }
+
     private writeObject = async (obj: IndexedDBObj, storeName: string = null): Promise<void> => {
         if (!storeName) storeName = this.STORE_DEFAULT;
         if (!obj.k) {
