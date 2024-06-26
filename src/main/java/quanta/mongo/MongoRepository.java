@@ -89,8 +89,8 @@ public class MongoRepository extends ServiceBase {
 
             if (prop.getRssPreCacheEnabled()) {
                 exec.run(() -> {
-                    // wait 10 seconds before starting to pre-cache the RSS feeds
-                    Util.sleep(10000);
+                    // wait 120 seconds before starting to pre-cache the RSS feeds
+                    Util.sleep(120000);
                     rssFeed.preCacheAdminFeeds(as);
                 });
             }
