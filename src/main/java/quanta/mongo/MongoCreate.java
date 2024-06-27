@@ -29,6 +29,7 @@ import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.SystemConfig;
 import quanta.mongo.model.AccessControl;
+import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.CreateSubNodeRequest;
 import quanta.rest.request.InsertNodeRequest;

@@ -1,4 +1,4 @@
-package quanta.mongo;
+package quanta.config;
 
 import org.springframework.context.ApplicationEvent;
 

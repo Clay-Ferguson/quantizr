@@ -33,6 +33,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
+import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.SignupRequest;
 import quanta.util.Const;
