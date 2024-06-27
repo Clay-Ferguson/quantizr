@@ -1,4 +1,4 @@
-package quanta.mail;
+package quanta.service;
 
 import java.util.LinkedList;
 import java.util.Properties;
@@ -13,8 +13,10 @@ import jakarta.mail.BodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import quanta.AppServer;
+import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -24,8 +26,8 @@ import quanta.util.LimitedInputStream;
  * Deamon for sending emails.
  */
 @Component
-public class EmailSender extends ServiceBase {
-    private static Logger log = LoggerFactory.getLogger(EmailSender.class);
+public class EmailService extends ServiceBase {
+    private static Logger log = LoggerFactory.getLogger(EmailService.class);
     private int runCounter = 0;
     public static final int INTERVAL_SECONDS = 10;
     private int runCountdown = INTERVAL_SECONDS;
@@ -38,6 +40,9 @@ public class EmailSender extends ServiceBase {
     public boolean debug = true;
     private JavaMailSenderImpl mailSender = null;
 
+    private String mailBatchSize = "10";
+    private static SubNode outboxNode = null;
+    private static final Object outboxLock = new Object();
 
     /*
      * Note: Spring does correctly protect against concurrent runs. It will always wait until the last
@@ -71,7 +76,7 @@ public class EmailSender extends ServiceBase {
             if (--runCountdown <= 0) {
                 runCountdown = INTERVAL_SECONDS;
                 arun.run(as -> {
-                    LinkedList<SubNode> mailNodes = mongoUtil.asList(outbox.getMailNodes(as));
+                    LinkedList<SubNode> mailNodes = mongoUtil.asList(getMailNodes(as));
                     if (mailNodes.size() > 0) {
                         sendAllMail(as, mailNodes);
                     }
@@ -183,5 +188,64 @@ public class EmailSender extends ServiceBase {
             log.error("Failed to upload", e);
         }
         return cont.toString();
+    }
+
+        /**
+     * Sends an email notification to the user associated with 'toUserNode' (a person's account root
+     * node), telling them that 'fromUserName' has shared a node with them, and including a link to the
+     * shared node in the email.
+     */
+    public void sendEmailNotification(MongoSession ms, String fromUserName, SubNode toUserNode, SubNode node) {
+        String email = toUserNode.getStr(NodeProp.EMAIL);
+        String toUserName = toUserNode.getStr(NodeProp.USER);
+        String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
+        String content = String.format(
+                prop.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
+                        "%s",
+                fromUserName, toUserName, nodeUrl);
+        queueMail(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!", content);
+    }
+
+    public void queueEmail(String recipients, String subject, String content) {
+        arun.run(as -> {
+            queueMail(as, recipients, subject, content);
+            return null;
+        });
+    }
+
+    private void queueMail(MongoSession ms, String recipients, String subject, String content) {
+        SubNode outboxNode = getSystemOutbox(ms);
+        SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
+        outboundEmailNode.setOwner(ms.getUserNodeId());
+        outboundEmailNode.set(NodeProp.EMAIL_CONTENT, content);
+        outboundEmailNode.set(NodeProp.EMAIL_SUBJECT, subject);
+        outboundEmailNode.set(NodeProp.EMAIL_RECIP, recipients);
+        update.save(ms, outboundEmailNode);
+        email.setOutboxDirty();
+    }
+
+    /*
+     * Loads only up to mailBatchSize emails at a time
+     */
+    public Iterable<SubNode> getMailNodes(MongoSession ms) {
+        SubNode outboxNode = getSystemOutbox(ms);
+        int mailBatchSizeInt = Integer.parseInt(mailBatchSize);
+        return read.getChildren(ms, outboxNode, null, mailBatchSizeInt, 0, false);
+    }
+
+    public SubNode getSystemOutbox(MongoSession ms) {
+        if (outboxNode != null) {
+            return outboxNode;
+        }
+        synchronized (outboxLock) {
+            // yep it's correct threading to check the node value again once inside the lock
+            if (outboxNode != null) {
+                return outboxNode;
+            }
+            snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX, "Outbox", null, true, null, null);
+            outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH,
+                    NodePath.OUTBOX + "/" + NodePath.SYSTEM, "System Messages", null, true, null, null);
+            return outboxNode;
+        }
     }
 }

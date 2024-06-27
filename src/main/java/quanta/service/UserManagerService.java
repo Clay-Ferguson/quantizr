@@ -470,12 +470,12 @@ public class UserManagerService extends ServiceBase {
      * Adds user to the list of pending accounts and they will stay in pending status until their
      * signupCode has been used to validate their email address.
      */
-    public void initiateSignup(MongoSession ms, String userName, String password, String email) {
+    public void initiateSignup(MongoSession ms, String userName, String password, String emailAdr) {
         SubNode ownerNode = read.getAccountByUserName(ms, userName, false);
         if (ownerNode != null) {
             throw new RuntimeEx("User already exists.");
         }
-        SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false, null);
+        SubNode newUserNode = mongoUtil.createUser(ms, userName, emailAdr, password, false, null);
         // It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
         // it's random and tied to this user by definition
         String signupCode = newUserNode.getIdStr();
@@ -487,7 +487,7 @@ public class UserManagerService extends ServiceBase {
         content = "Welcome to " + brandingAppName + ", " + userName + "!"
                 + "<p>\nUse this link to complete the signup: <br>\n" + signupLink;
         if (!StringUtils.isEmpty(prop.getMailHost())) {
-            outbox.queueEmail(email, brandingAppName + " - Account Signup", content);
+            email.queueEmail(emailAdr, brandingAppName + " - Account Signup", content);
         }
     }
 
@@ -553,8 +553,8 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public void addCreditByEmail(MongoSession as, String email, BigDecimal amount, Long timestamp) {
-        SubNode ownerNode = read.getLocalUserNodeByProp(as, NodeProp.EMAIL.s(), email, false, false);
+    public void addCreditByEmail(MongoSession as, String emailAdr, BigDecimal amount, Long timestamp) {
+        SubNode ownerNode = read.getLocalUserNodeByProp(as, NodeProp.EMAIL.s(), emailAdr, false, false);
         if (ownerNode != null) {
             String userName = ownerNode.getStr(NodeProp.USER);
             addCreditInternal(as, ownerNode.getIdStr(), amount, timestamp);
@@ -564,14 +564,14 @@ public class UserManagerService extends ServiceBase {
                 String content = "Thanks for using " + brandingAppName + ", " + userName + "!" + "<p>\nA payment of $"
                         + amount + " has been applied to your account.";
 
-                outbox.queueEmail(email, brandingAppName + " - Account Credit", content);
+                email.queueEmail(emailAdr, brandingAppName + " - Account Credit", content);
             }
 
             BigDecimal credit = tranRepository.getBalByMongoId(ownerNode.getIdStr());
             UpdateAccountInfo pushInfo = new UpdateAccountInfo(ownerNode.getIdStr(), credit);
             push.pushInfo(ThreadLocals.getSC(), pushInfo);
         } else {
-            log.debug("addCreditByEmail: user not found for email: " + email);
+            log.debug("addCreditByEmail: user not found for email: " + emailAdr);
         }
     }
 
@@ -972,7 +972,7 @@ public class UserManagerService extends ServiceBase {
         ResetPasswordResponse res = new ResetPasswordResponse();
         arun.run(as -> {
             String user = req.getUser();
-            String email = req.getEmail();
+            String emailAdr = req.getEmail();
             // make sure username itself is acceptalbe
             if (!isNormalUserName(user)) {
                 res.error("User name is illegal.");
@@ -987,7 +987,7 @@ public class UserManagerService extends ServiceBase {
             //
             // verify that the email address provides IS A MATCH to the email address for this user!
             String nodeEmail = ownerNode.getStr(NodeProp.EMAIL);
-            if (nodeEmail == null || !nodeEmail.equals(email)) {
+            if (nodeEmail == null || !nodeEmail.equals(emailAdr)) {
                 res.error("Wrong user name and/or email.");
                 return null;
             }
@@ -1010,7 +1010,7 @@ public class UserManagerService extends ServiceBase {
             String content = //
                     "Password reset was requested on " + brandingAppName + " account: " + user
                             + "<p>\nGo to this link to reset your password: <br>\n" + link;
-            outbox.queueEmail(email, brandingAppName + " Password Reset", content);
+            email.queueEmail(emailAdr, brandingAppName + " Password Reset", content);
             res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
             return null;
         });

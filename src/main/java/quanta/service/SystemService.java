@@ -20,7 +20,6 @@ import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
-import quanta.mail.EmailSender;
 import quanta.model.UserStats;
 import quanta.mongo.MongoAppConfig;
 import quanta.mongo.MongoSession;
@@ -367,7 +366,7 @@ public class SystemService extends ServiceBase {
         ThreadLocals.requireAdmin();
         log.debug("SendEmailTest detected on server.");
         String timeString = new Date().toString();
-        synchronized (EmailSender.getLock()) {
+        synchronized (EmailService.getLock()) {
             String devEmail = prop.getDevEmail();
             String fromAddress = prop.getMailFrom();
             email.sendMail(devEmail, fromAddress,
