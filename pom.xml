@@ -267,8 +267,7 @@
 							-->
 							<classPatterns>
 								<pattern>quanta.model.client.**</pattern>
-								<pattern>quanta.request.**</pattern>
-								<pattern>quanta.response.**</pattern>
+								<pattern>quanta.rest.**</pattern>
 							</classPatterns>
 							<outputKind>module</outputKind>
 							<outputFile>src/main/resources/public/src/JavaIntf.ts</outputFile>

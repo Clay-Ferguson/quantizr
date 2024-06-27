@@ -31,12 +31,12 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
-import quanta.request.AskSubGraphRequest;
-import quanta.request.CreateSubNodeRequest;
-import quanta.request.GenerateBookByAIRequest;
-import quanta.response.AskSubGraphResponse;
-import quanta.response.CreateSubNodeResponse;
-import quanta.response.GenerateBookByAIResponse;
+import quanta.rest.request.AskSubGraphRequest;
+import quanta.rest.request.CreateSubNodeRequest;
+import quanta.rest.request.GenerateBookByAIRequest;
+import quanta.rest.response.AskSubGraphResponse;
+import quanta.rest.response.CreateSubNodeResponse;
+import quanta.rest.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
 
 @Component

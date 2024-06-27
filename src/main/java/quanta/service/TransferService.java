@@ -13,8 +13,8 @@ import quanta.model.client.PrivilegeType;
 import quanta.model.client.TransferOp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.TransferNodeRequest;
-import quanta.response.TransferNodeResponse;
+import quanta.rest.request.TransferNodeRequest;
+import quanta.rest.response.TransferNodeResponse;
 import quanta.util.val.IntVal;
 
 @Component

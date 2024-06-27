@@ -16,8 +16,8 @@ import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.OpenGraph;
 import quanta.mongo.model.SubNode;
-import quanta.request.GetOpenGraphRequest;
-import quanta.response.GetOpenGraphResponse;
+import quanta.rest.request.GetOpenGraphRequest;
+import quanta.rest.response.GetOpenGraphResponse;
 import quanta.util.Util;
 import quanta.util.XString;
 

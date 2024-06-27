@@ -14,9 +14,9 @@ import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoSession;
 import quanta.perf.PerfMon;
 import quanta.perf.PerfMonEvent;
-import quanta.request.LogoutRequest;
-import quanta.request.base.RequestBase;
-import quanta.response.base.ResponseBase;
+import quanta.rest.request.LogoutRequest;
+import quanta.rest.request.base.RequestBase;
+import quanta.rest.response.base.ResponseBase;
 
 @Component
 public class CallProcessor extends ServiceBase {

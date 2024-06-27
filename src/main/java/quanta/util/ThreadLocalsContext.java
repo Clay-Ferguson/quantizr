@@ -8,7 +8,7 @@ import quanta.config.SessionContext;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.perf.PerfMonEvent;
-import quanta.response.base.ResponseBase;
+import quanta.rest.response.base.ResponseBase;
 
 /**
  * Holder for transferring ThreadLocals values from one thread to another.

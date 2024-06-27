@@ -17,7 +17,7 @@ import quanta.config.ServiceBase;
 import quanta.model.client.SchemaOrgClass;
 import quanta.model.client.SchemaOrgProp;
 import quanta.model.client.SchemaOrgRange;
-import quanta.response.GetSchemaOrgTypesResponse;
+import quanta.rest.response.GetSchemaOrgTypesResponse;
 import quanta.util.StreamUtil;
 import quanta.util.Util;
 import quanta.util.XString;

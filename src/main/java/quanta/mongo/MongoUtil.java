@@ -34,7 +34,7 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.request.SignupRequest;
+import quanta.rest.request.SignupRequest;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;

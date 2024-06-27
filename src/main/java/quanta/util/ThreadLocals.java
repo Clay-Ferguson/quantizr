@@ -12,7 +12,7 @@ import quanta.exception.ForbiddenException;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.perf.PerfMonEvent;
-import quanta.response.base.ResponseBase;
+import quanta.rest.response.base.ResponseBase;
 
 /**
  * Thread Local Storage

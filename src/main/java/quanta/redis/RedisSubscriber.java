@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
-import quanta.response.FeedPushInfo;
+import quanta.rest.response.FeedPushInfo;
 import quanta.service.PushService;
 import quanta.util.Util;
 import quanta.util.XString;
