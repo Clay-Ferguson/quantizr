@@ -61,7 +61,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
                 log.debug("Unexpected executor: " + executor.getClass().getName());
             }
         }
-        AppConfiguration.shutdown();
+        
         log.debug("GracefulShudown: complete");
     }
 }

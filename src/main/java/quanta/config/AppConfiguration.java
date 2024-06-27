@@ -13,10 +13,8 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -50,9 +48,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private UtilFilter utilFilter;
-
-    private static Object execInitLock = new Object();
-    private static ThreadPoolTaskExecutor executor;
 
     @Bean
     public FilterRegistrationBean<AppFilter> appFilterRegistration() {
@@ -94,43 +89,12 @@ public class AppConfiguration implements WebMvcConfigurer {
         return reg;
     }
 
-    // To avoid error message during startup
-    // "No qualifying bean of type 'org.springframework.scheduling.TaskScheduler' available" we have to
-    // provide spring with a Task Scheduler.
     @Bean
-    public TaskScheduler taskScheduler() {
-        return new ConcurrentTaskScheduler(); // single threaded by default
-    }
-
-    // This method is not perfectly thread-safe but Spring initializes this during context
-    // initialization only so it's ok
-    @Bean(name = "threadPoolTaskExecutor")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
-        if (executor != null) {
-            return executor;
-        }
-        synchronized (execInitLock) {
-            ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
-
-            // note: Unless proven otherwise, default this to the number of CPU cores.
-            exec.setCorePoolSize(4);
-
-            // t.setAwaitTerminationSeconds(20);
-            // t.setAllowCoreThreadTimeOut(true);
-            // t.setKeepAliveSeconds(120);
-            // only set the instance variable once the object is fully ready.
-            executor = exec;
-            log.debug("Created threadPoolTaskExecutor: hashCode=" + exec.hashCode());
-            return exec;
-        }
-    }
-
-    public static void shutdown() {
-        if (executor != null) {
-            log.debug("Shutting down global executor: executor.hashCode=" + executor.hashCode() + " class="
-                    + executor.getClass().getName());
-            executor.shutdown();
-        }
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
+        ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
+        return threadPoolTaskScheduler;
     }
 
     // DO NOT DELETE (keep for future reference)

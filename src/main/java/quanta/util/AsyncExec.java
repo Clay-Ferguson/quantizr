@@ -1,10 +1,10 @@
 package quanta.util;
 
-import java.util.concurrent.Executor;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
@@ -19,8 +19,7 @@ public class AsyncExec extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AsyncExec.class);
 
     @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    public Executor executor;
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     // Reflects the true concurrently count, and should represent the current number of running threads
     // at all times.
@@ -36,7 +35,7 @@ public class AsyncExec extends ServiceBase {
         // what was actually happening that launched the executor/thread that failed.
         String stackTrace = ExUtil.getStackTrace(null);
 
-        executor.execute(new Runnable() {
+        Runnable r = new Runnable() {
             public void run() {
                 try {
                     execCounter++;
@@ -56,6 +55,15 @@ public class AsyncExec extends ServiceBase {
                     // log.error("AsyncExec exiting. Started by: " + stackTrace);
                 }
             }
-        });
+        };
+
+        // DO NOTE DELETE
+        // NOTE: You can also pass triggers like this instead of 'instant' below.
+        // PeriodicTrigger periodicTrigger 
+        //     = new PeriodicTrigger(2000, TimeUnit.MICROSECONDS);
+
+        // get instant from current time
+        Instant instant = Instant.now(); // we start now, but we could add time if we wanted to delay
+        threadPoolTaskScheduler.schedule(r, instant);
     }
 }
