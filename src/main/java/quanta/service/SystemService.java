@@ -370,7 +370,7 @@ public class SystemService extends ServiceBase {
         synchronized (EmailSender.getLock()) {
             String devEmail = prop.getDevEmail();
             String fromAddress = prop.getMailFrom();
-            mail.sendMail(devEmail, fromAddress,
+            email.sendMail(devEmail, fromAddress,
                     "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
                             + prop.getConfigText("brandingAppName") + " admin menu.",
                     "Test Subject");

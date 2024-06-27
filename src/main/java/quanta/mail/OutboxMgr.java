@@ -128,7 +128,7 @@ public class OutboxMgr extends ServiceBase {
         outboundEmailNode.set(NodeProp.EMAIL_SUBJECT, subject);
         outboundEmailNode.set(NodeProp.EMAIL_RECIP, recipients);
         update.save(ms, outboundEmailNode);
-        notify.setOutboxDirty();
+        email.setOutboxDirty();
     }
 
     /*

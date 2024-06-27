@@ -10,7 +10,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import quanta.mail.EmailSender;
-import quanta.mail.EmailSenderDaemon;
 import quanta.mail.OutboxMgr;
 import quanta.mongo.AdminRun;
 import quanta.mongo.MongoAppConfig;
@@ -117,8 +116,7 @@ public class ServiceBase {
     public static FriendService friend;
     public static Validator validator;
     public static OutboxMgr outbox;
-    public static EmailSenderDaemon notify;
-    public static EmailSender mail;
+    public static EmailSender email;
     public static PushService push;
     public static GraphNodesService graphNodes;
     public static EnglishDictionary english;
@@ -205,8 +203,7 @@ public class ServiceBase {
             friend = getBean(ctx, FriendService.class);
             validator = getBean(ctx, Validator.class);
             outbox = getBean(ctx, OutboxMgr.class);
-            notify = getBean(ctx, EmailSenderDaemon.class);
-            mail = getBean(ctx, EmailSender.class);
+            email = getBean(ctx, EmailSender.class);
             push = getBean(ctx, PushService.class);
             graphNodes = getBean(ctx, GraphNodesService.class);
             english = getBean(ctx, EnglishDictionary.class);

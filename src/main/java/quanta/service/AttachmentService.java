@@ -115,7 +115,7 @@ public class AttachmentService extends ServiceBase {
 
             try {
                 LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(uploadFile.getInputStream(), maxFileSize);
-                String mkdown = mail.convertEmailToMarkdown(limitedIs);
+                String mkdown = email.convertEmailToMarkdown(limitedIs);
                 payloads.add(mkdown);
             } catch (Exception e) {
                 throw ExUtil.wrapEx(e);
@@ -223,7 +223,7 @@ public class AttachmentService extends ServiceBase {
         }
         if (allowEmailParse && "message/rfc822".equals(mimeType)) {
             // this is EML file format.
-            String mkdown = mail.convertEmailToMarkdown(is);
+            String mkdown = email.convertEmailToMarkdown(is);
             node.setContent(mkdown);
             update.save(ms, node);
         } //
