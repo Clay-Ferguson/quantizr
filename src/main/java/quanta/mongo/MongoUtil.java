@@ -443,7 +443,7 @@ public class MongoUtil extends ServiceBase {
         // DO NOT DELETE. This is able to check contstraint volations.
         // read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
 
-        createUniqueIndex(ms, SubNode.class, SubNode.PATH);
+        createUniqueIndex(ms, SubNode.PATH);
 
         // Other indexes that *could* be added but we don't, just as a performance enhancer is
         // Unique node names: Key = node.owner+node.name (or just node.name for admin)
@@ -453,9 +453,9 @@ public class MongoUtil extends ServiceBase {
         // createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." +
         // NodeProp.OBJECT_ID.s());
 
-        createPartialIndex(ms, "unique-replyto", SubNode.class, SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
-        createPartialIndex(ms, "rdf-i", SubNode.class, SubNode.LINKS + "." + NodeLink.ID);
-        createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),
+        createPartialIndex(ms, "unique-replyto", SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
+        createPartialIndex(ms, "rdf-i", SubNode.LINKS + "." + NodeLink.ID);
+        createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.PROPS + "." + NodeProp.USER.s(),
                 NodeType.ACCOUNT.s());
         // DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations
         // prior
@@ -471,15 +471,15 @@ public class MongoUtil extends ServiceBase {
         // NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of
         // the
         // user. That is, prefixed by their username followed by two dashes.
-        createIndex(ms, SubNode.class, SubNode.NAME);
-        createIndex(ms, SubNode.class, SubNode.TYPE);
-        createIndex(ms, SubNode.class, SubNode.OWNER);
-        createIndex(ms, SubNode.class, SubNode.XFR);
-        createIndex(ms, SubNode.class, SubNode.ORDINAL);
-        createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
-        createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
-        createTextIndexes(ms, SubNode.class);
-        logIndexes(ms, SubNode.class);
+        createIndex(ms, SubNode.NAME);
+        createIndex(ms, SubNode.TYPE);
+        createIndex(ms, SubNode.OWNER);
+        createIndex(ms, SubNode.XFR);
+        createIndex(ms, SubNode.ORDINAL);
+        createIndex(ms, SubNode.MODIFY_TIME, Direction.DESC);
+        createIndex(ms, SubNode.CREATE_TIME, Direction.DESC);
+        createTextIndexes(ms);
+        logIndexes(ms);
         log.debug("finished checking all indexes.");
     }
 
@@ -522,8 +522,7 @@ public class MongoUtil extends ServiceBase {
         opsw.indexOps().dropAllIndexes();
     }
 
-    // todo-0: remove clazz
-    public void dropIndex(MongoSession ms, Class<?> clazz, String indexName) {
+    public void dropIndex(MongoSession ms, String indexName) {
         try {
             auth.requireAdmin(ms);
             log.debug("Dropping index: " + indexName);
@@ -533,8 +532,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    // todo-0: remove clazz
-    public void logIndexes(MongoSession ms, Class<?> clazz) {
+    public void logIndexes(MongoSession ms) {
         StringBuilder sb = new StringBuilder();
         sb.append("INDEXES LIST\n:");
         List<IndexInfo> indexes = opsw.indexOps().getIndexInfo();
@@ -553,10 +551,8 @@ public class MongoUtil extends ServiceBase {
     /*
      * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
      * needing any compound indexes (yet)
-     * 
-     * todo-0: remove clazz
      */
-    public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1,
+    public void createPartialUniqueIndexComp2(MongoSession ms, String name, String property1,
             String property2) {
         auth.requireAdmin(ms);
         try {
@@ -573,11 +569,9 @@ public class MongoUtil extends ServiceBase {
 
     /*
      * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
-     * works,
-     * 
-     * todo-0: remove clazz
+     * works
      */
-    public void createPartialIndex(MongoSession ms, String name, Class<?> clazz, String property) {
+    public void createPartialIndex(MongoSession ms, String name, String property) {
         log.debug("Ensuring partial index named: " + name);
         auth.requireAdmin(ms);
         try {
@@ -595,10 +589,8 @@ public class MongoUtil extends ServiceBase {
     /*
      * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
      * works
-     * 
-     * todo-0: remove clazz
      */
-    public void createPartialUniqueIndex(MongoSession ms, String name, Class<?> clazz, String property) {
+    public void createPartialUniqueIndex(MongoSession ms, String name, String property) {
         log.debug("Ensuring unique partial index named: " + name);
         auth.requireAdmin(ms);
         try {
@@ -613,8 +605,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    // todo-0: remove clazz
-    public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property,
+    public void createPartialUniqueIndexForType(MongoSession ms, String name, String property,
             String type) {
         log.debug("Ensuring unique partial index (for type) named: " + name);
         auth.requireAdmin(ms);
@@ -629,8 +620,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    // todo-0: remove clazz
-    public void createUniqueIndex(MongoSession ms, Class<?> clazz, String property) {
+    public void createUniqueIndex(MongoSession ms, String property) {
         log.debug("Ensuring unique index on: " + property);
         try {
             auth.requireAdmin(ms);
@@ -640,8 +630,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    // todo-0: remove clazz
-    public void createIndex(MongoSession ms, Class<?> clazz, String property) {
+    public void createIndex(MongoSession ms, String property) {
         log.debug("createIndex: " + property);
         try {
             auth.requireAdmin(ms);
@@ -651,8 +640,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    // todo-0: remove clazz
-    public void createIndex(MongoSession ms, Class<?> clazz, String property, Direction dir) {
+    public void createIndex(MongoSession ms, String property, Direction dir) {
         log.debug("createIndex: " + property + " dir=" + dir);
         try {
             auth.requireAdmin(ms);
@@ -692,8 +680,7 @@ public class MongoUtil extends ServiceBase {
     // opsw.indexOps(clazz).ensureIndex(textIndex);
     // }
 
-    // todo-0: remove clazz
-    public void createTextIndexes(MongoSession ms, Class<?> clazz) {
+    public void createTextIndexes(MongoSession ms) {
         log.debug("creatingText Indexes.");
         auth.requireAdmin(ms);
         try {
@@ -714,8 +701,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    // todo-0: remove clazz
-    public void dropCollection(MongoSession ms, Class<?> clazz) {
+    public void dropCollection(MongoSession ms) {
         auth.requireAdmin(ms);
         opsw.dropCollection();
     }

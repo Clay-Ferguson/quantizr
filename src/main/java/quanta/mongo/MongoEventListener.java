@@ -10,44 +10,13 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
-import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
-import quanta.util.EventPublisher;
 import quanta.util.ThreadLocals;
 
-// NOTE: Slowly over time I'm moving this functionality over to SubNodUtil.java where we call these
-// methods directly. I don't like this listener patter, because I think ultimately it makes things
-// more complex, not less complex.
-// todo-0: finish removing this class.
-
-/**
- * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
- * persistence (reads/writes) of the MongoDB objects.
- *
- * WARNING: This will NOT get called for bulk operations so all we should do in here is things
- * related to when a user is manipulating objects one at a time.
- * 
- * Listener Lifecycle Events:
- *
- * onBeforeConvert: Called in MongoTemplate insert, insertList, and save operations before the
- * object is converted to a Document by a MongoConverter.
- *
- * onBeforeSave: Called in MongoTemplate insert, insertList, and save operations before inserting or
- * saving the Document in the database.
- *
- * onAfterSave: Called in MongoTemplate insert, insertList, and save operations after inserting or
- * saving the Document in the database.
- *
- * onAfterLoad: Called in MongoTemplate find, findAndRemove, findOne, and getCollection methods
- * after the Document has been retrieved from the database.
- *
- * onAfterConvert: Called in MongoTemplate find, findAndRemove, findOne, and getCollection methods
- * after the Document has been retrieved from the database was converted to a POJO.
- */
 @Component
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     private static Logger log = LoggerFactory.getLogger(MongoEventListener.class);
