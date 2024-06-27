@@ -1,4 +1,4 @@
-package quanta.instrument;
+package quanta.perf;
 
 import java.util.Collections;
 import java.util.LinkedList;

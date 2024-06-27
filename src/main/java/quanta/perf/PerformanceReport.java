@@ -1,4 +1,4 @@
-package quanta.instrument;
+package quanta.perf;
 
 import static quanta.util.HtmlUtil.htmlH;
 import static quanta.util.HtmlUtil.htmlHeader;

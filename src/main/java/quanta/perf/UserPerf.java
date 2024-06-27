@@ -1,4 +1,4 @@
-package quanta.instrument;
+package quanta.perf;
 
 public class UserPerf {
 
