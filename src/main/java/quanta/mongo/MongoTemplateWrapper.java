@@ -51,7 +51,6 @@ public class MongoTemplateWrapper extends ServiceBase {
 
     public long count(MongoSession ms, Query query) {
         long start = 0L;
-        // not needed -> secure(ms, query, true, true, true);
         if (logging) {
             log("count", ms, query);
             start = System.currentTimeMillis();
@@ -67,7 +66,6 @@ public class MongoTemplateWrapper extends ServiceBase {
 
     public boolean exists(MongoSession ms, Query query) {
         long start = 0L;
-        // not needed -> secure(ms, query, true, true, true);
         if (logging) {
             log("exists", ms, query);
             start = System.currentTimeMillis();
@@ -122,15 +120,6 @@ public class MongoTemplateWrapper extends ServiceBase {
         return obj;
     }
 
-    private void log(String name, MongoSession ms, Query query) {
-        log.debug("MQ: cmd:" + //
-                (ThreadLocals.getSC() != null && ThreadLocals.getSC().getCommand() != null
-                        ? ThreadLocals.getSC().getCommand()
-                        : "?")
-                + " u:" + (ms == null || ms.getUserName() == null ? "null" : ms.getUserName()) + " q:" + name + " "
-                + query.toString());
-    }
-
     public BulkOperations bulkOps(BulkMode bulkMode) {
         return mt.bulkOps(bulkMode, SubNode.class);
     }
@@ -139,8 +128,8 @@ public class MongoTemplateWrapper extends ServiceBase {
         return mt.aggregate(aggregation, SubNode.class, SubNode.class);
     }
 
-    public <T> T save(T objectToSave) {
-        return mt.save(objectToSave);
+    public SubNode save(SubNode node) {
+        return mt.save(node);
     }
 
     public IndexOperations indexOps() {
@@ -159,11 +148,16 @@ public class MongoTemplateWrapper extends ServiceBase {
         return mt.findAndModify(query, update, SubNode.class);
     }
 
-    public <T> void dropCollection() {
+    public void dropCollection() {
         mt.dropCollection(SubNode.class);
     }
 
-    public <T> void dropCollection(String collectionName) {
-        mt.dropCollection(collectionName);
+    private void log(String name, MongoSession ms, Query query) {
+        log.debug("MQ: cmd:" + //
+                (ThreadLocals.getSC() != null && ThreadLocals.getSC().getCommand() != null
+                        ? ThreadLocals.getSC().getCommand()
+                        : "?")
+                + " u:" + (ms == null || ms.getUserName() == null ? "null" : ms.getUserName()) + " q:" + name + " "
+                + query.toString());
     }
 }
