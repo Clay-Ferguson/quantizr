@@ -139,14 +139,14 @@ public class MongoUpdate extends ServiceBase {
         Query query = new Query();
         Update upd = new Update();
         upd.set(SubNode.HAS_CHILDREN, null);
-        opsw.findAndModify(query, upd, SubNode.class);
+        opsw.findAndModify(query, upd);
     }
 
     // returns a new BulkOps if one not yet existing
     public BulkOperations bulkOpSetPropVal(MongoSession ms, BulkOperations bops, ObjectId id, String prop, Object val,
             boolean addSecurity) {
         if (bops == null) {
-            bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+            bops = opsw.bulkOps(BulkMode.UNORDERED);
         }
         Criteria crit = new Criteria("id").is(id);
         if (addSecurity) {
@@ -160,7 +160,7 @@ public class MongoUpdate extends ServiceBase {
 
     public BulkOperations bulkOpDelProp(MongoSession ms, BulkOperations bops, ObjectId id, String prop) {
         if (bops == null) {
-            bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+            bops = opsw.bulkOps(BulkMode.UNORDERED);
         }
         Criteria crit = new Criteria("id").is(id);
         Query query = new Query().addCriteria(crit);

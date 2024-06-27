@@ -406,13 +406,13 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).is(path);
         q.addCriteria(crit);
-        return opsw.exists(ms, q, SubNode.class);
+        return opsw.exists(ms, q);
     }
 
     public boolean nodeExists(MongoSession ms, ObjectId id) {
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.ID).is(id));
-        return opsw.exists(ms, q, SubNode.class);
+        return opsw.exists(ms, q);
     }
 
     public SubNode getNode(MongoSession ms, ObjectId objId) {
@@ -867,7 +867,7 @@ public class MongoRead extends ServiceBase {
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
         Aggregation agg = Aggregation.newAggregation(aggOps);
-        AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
+        AggregationResults<SubNode> results = opsw.aggregate(agg);
         return results.getMappedResults();
     }
 
@@ -893,7 +893,7 @@ public class MongoRead extends ServiceBase {
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
         Aggregation agg = Aggregation.newAggregation(aggOps);
-        AggregationResults<SubNode> results = opsw.aggregate(agg, SubNode.class, SubNode.class);
+        AggregationResults<SubNode> results = opsw.aggregate(agg);
         return results.getMappedResults();
     }
 
@@ -1229,7 +1229,7 @@ public class MongoRead extends ServiceBase {
             q.addCriteria(textCriteria);
         }
 
-        return opsw.count(ms, q, SubNode.class);
+        return opsw.count(ms, q);
     }
 
     // (not currently used)

@@ -34,89 +34,6 @@ public class MongoTemplateWrapper extends ServiceBase {
     @Autowired
     MongoTemplate mt;
 
-    public DeleteResult remove(MongoSession ms, Query query, Class<?> entityClass) {
-        long start = 0L;
-        if (logging) {
-            log("remove", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        DeleteResult res = mt.remove(query, entityClass);
-        if (logging) {
-            log.debug("removed=" + res.getDeletedCount() + "time="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return res;
-    }
-
-    public long count(MongoSession ms, Query query, Class<?> entityClass) {
-        long start = 0L;
-        // not needed -> secure(ms, query, true, true, true);
-        if (logging) {
-            log("count", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        long count = count(null, query);
-        if (logging) {
-            log.debug(
-                    "count=" + count + "t=" + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return count;
-    }
-
-    public boolean exists(MongoSession ms, Query query, Class<?> entityClass) {
-        long start = 0L;
-        // not needed -> secure(ms, query, true, true, true);
-        if (logging) {
-            log("exists", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        boolean exists = mt.exists(query, entityClass);
-        if (logging) {
-            log.debug("exists: " + exists + "t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return exists;
-    }
-
-    public <T> List<T> find(MongoSession ms, Query query, Class<T> entityClass) {
-        return find(ms, query, entityClass, true, true, true);
-    }
-
-    public <T> List<T> find(MongoSession ms, Query query, Class<T> entityClass, boolean allowPublic, boolean toMe,
-            boolean mine) {
-        long start = 0L;
-        if (logging) {
-            log("find", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        List<T> res = mt.find(query, entityClass);
-        long count = res != null ? res.size() : 0;
-        if (logging) {
-            log.debug(
-                    "count: " + count + "t=" + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return res;
-    }
-
-    public <T> T findOne(MongoSession ms, Query query, Class<T> entityClass) {
-        long start = 0L;
-        if (logging) {
-            log("findOne", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        T obj = mt.findOne(query, entityClass);
-        if (logging) {
-            log.debug((obj != null ? "found " : "not found ") + "t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return obj;
-    }
-
     public DeleteResult remove(MongoSession ms, Query query) {
         long start = 0L;
         if (logging) {
@@ -214,40 +131,36 @@ public class MongoTemplateWrapper extends ServiceBase {
                 + query.toString());
     }
 
-    public BulkOperations bulkOps(BulkMode bulkMode, Class<?> entityClass) {
-        return mt.bulkOps(bulkMode, entityClass);
+    public BulkOperations bulkOps(BulkMode bulkMode) {
+        return mt.bulkOps(bulkMode, SubNode.class);
     }
 
-    public <O> AggregationResults<O> aggregate(Aggregation aggregation, Class<?> inputType, Class<O> outputType) {
-        return mt.aggregate(aggregation, inputType, outputType);
+    public AggregationResults<SubNode> aggregate(Aggregation aggregation) {
+        return mt.aggregate(aggregation, SubNode.class, SubNode.class);
     }
 
     public <T> T save(T objectToSave) {
         return mt.save(objectToSave);
     }
 
-    public IndexOperations indexOps(Class<?> entityClass) {
-        return mt.indexOps(entityClass);
-    }
-
-    public <T> List<T> findAll(Class<T> entityClass) {
-        return mt.findAll(entityClass);
+    public IndexOperations indexOps() {
+        return mt.indexOps(SubNode.class);
     }
 
     public DeleteResult remove(Object object) {
         return mt.remove(object);
     }
 
-    public <T> Stream<T> stream(Query query, Class<T> entityType) {
-        return mt.stream(query, entityType);
+    public Stream<SubNode> stream(Query query) {
+        return mt.stream(query, SubNode.class);
     }
 
-    public <T> T findAndModify(Query query, UpdateDefinition update, Class<T> entityClass) {
-        return mt.findAndModify(query, update, entityClass);
+    public SubNode findAndModify(Query query, UpdateDefinition update) {
+        return mt.findAndModify(query, update, SubNode.class);
     }
 
-    public <T> void dropCollection(Class<T> entityClass) {
-        mt.dropCollection(entityClass);
+    public <T> void dropCollection() {
+        mt.dropCollection(SubNode.class);
     }
 
     public <T> void dropCollection(String collectionName) {

@@ -200,7 +200,7 @@ public class MongoCreate extends ServiceBase {
                 false)) {
             // lazy create bulkOps
             if (bops == null) {
-                bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+                bops = opsw.bulkOps(BulkMode.UNORDERED);
             }
 
             Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));

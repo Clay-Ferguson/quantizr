@@ -346,7 +346,7 @@ public class NodeRenderService extends ServiceBase {
                     lastOrdinal++;
                     // add to bulk ops this: n.ordinal = lastOrdinal + 1;
                     if (bops == null) {
-                        bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+                        bops = opsw.bulkOps(BulkMode.UNORDERED);
                     }
                     Criteria crit = new Criteria("id").is(n.getId());
                     crit = auth.addReadSecurity(ms, crit);

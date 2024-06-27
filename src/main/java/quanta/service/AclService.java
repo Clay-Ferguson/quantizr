@@ -83,7 +83,7 @@ public class AclService extends ServiceBase {
             if (batchMode) {
                 // lazy instantiate
                 if (bops == null) {
-                    bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+                    bops = opsw.bulkOps(BulkMode.UNORDERED);
                 }
                 try {
                     auth.ownerAuth(ms, n);

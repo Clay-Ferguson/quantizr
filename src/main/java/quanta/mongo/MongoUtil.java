@@ -174,7 +174,7 @@ public class MongoUtil extends ServiceBase {
                 Criteria.where(SubNode.PATH).is(path), //
                 Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
         Query q = new Query(crit);
-        return !opsw.exists(auth.getAdminSession(), q, SubNode.class);
+        return !opsw.exists(auth.getAdminSession(), q);
     }
 
     /*
@@ -359,9 +359,9 @@ public class MongoUtil extends ServiceBase {
         IntVal batchSize = new IntVal();
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.TYPE).is(NodeType.ACCOUNT.s()));
-        BulkOperations bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+        BulkOperations bops = opsw.bulkOps(BulkMode.UNORDERED);
 
-        opsw.stream(q, SubNode.class).forEach(node -> {
+        opsw.stream(q).forEach(node -> {
             String userName = node.getStr(NodeProp.USER);
             if (!userName.startsWith("."))
                 return;
@@ -494,7 +494,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         String indexName = "unique-friends";
         try {
-            opsw.indexOps(SubNode.class).ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC)
+            opsw.indexOps().ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC)
                     .on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC).unique().named(indexName)
                     .partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
         } catch (Exception e) {
@@ -508,7 +508,7 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         String indexName = "unique-node-name";
         try {
-            opsw.indexOps(SubNode.class)
+            opsw.indexOps()
                     .ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC).on(SubNode.NAME, Direction.ASC).unique()
                             .named(indexName).partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
         } catch (Exception e) {
@@ -519,23 +519,25 @@ public class MongoUtil extends ServiceBase {
     public void dropAllIndexes(MongoSession ms) {
         log.debug("dropAllIndexes");
         auth.requireAdmin(ms);
-        opsw.indexOps(SubNode.class).dropAllIndexes();
+        opsw.indexOps().dropAllIndexes();
     }
 
+    // todo-0: remove clazz
     public void dropIndex(MongoSession ms, Class<?> clazz, String indexName) {
         try {
             auth.requireAdmin(ms);
             log.debug("Dropping index: " + indexName);
-            opsw.indexOps(clazz).dropIndex(indexName);
+            opsw.indexOps().dropIndex(indexName);
         } catch (Exception e) {
             ExUtil.error(log, "exception in dropIndex: " + indexName, e);
         }
     }
 
+    // todo-0: remove clazz
     public void logIndexes(MongoSession ms, Class<?> clazz) {
         StringBuilder sb = new StringBuilder();
         sb.append("INDEXES LIST\n:");
-        List<IndexInfo> indexes = opsw.indexOps(clazz).getIndexInfo();
+        List<IndexInfo> indexes = opsw.indexOps().getIndexInfo();
 
         for (IndexInfo idx : indexes) {
             List<IndexField> indexFields = idx.getIndexFields();
@@ -551,13 +553,15 @@ public class MongoUtil extends ServiceBase {
     /*
      * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
      * needing any compound indexes (yet)
+     * 
+     * todo-0: remove clazz
      */
     public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1,
             String property2) {
         auth.requireAdmin(ms);
         try {
             // Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
-            opsw.indexOps(clazz).ensureIndex(
+            opsw.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property1, Direction.ASC).on(property2, Direction.ASC).unique().named(name).partial(
                             PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
@@ -570,13 +574,15 @@ public class MongoUtil extends ServiceBase {
     /*
      * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
      * works,
+     * 
+     * todo-0: remove clazz
      */
     public void createPartialIndex(MongoSession ms, String name, Class<?> clazz, String property) {
         log.debug("Ensuring partial index named: " + name);
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
-            opsw.indexOps(clazz).ensureIndex(
+            opsw.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).named(name)
                             .partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
@@ -588,14 +594,16 @@ public class MongoUtil extends ServiceBase {
 
     /*
      * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
-     * works,
+     * works
+     * 
+     * todo-0: remove clazz
      */
     public void createPartialUniqueIndex(MongoSession ms, String name, Class<?> clazz, String property) {
         log.debug("Ensuring unique partial index named: " + name);
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
-            opsw.indexOps(clazz).ensureIndex(
+            opsw.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name)
                             .partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
@@ -605,13 +613,14 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
+    // todo-0: remove clazz
     public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property,
             String type) {
         log.debug("Ensuring unique partial index (for type) named: " + name);
         auth.requireAdmin(ms);
         try {
             // Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
-            opsw.indexOps(clazz).ensureIndex(
+            opsw.indexOps().ensureIndex(
                     // Note: also instead of exists, something like ".gt('')" would probably work too
                     new Index().on(property, Direction.ASC).unique().named(name).partial(PartialIndexFilter.of( //
                             Criteria.where(SubNode.TYPE).is(type).and(property).exists(true))));
@@ -620,31 +629,34 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
+    // todo-0: remove clazz
     public void createUniqueIndex(MongoSession ms, Class<?> clazz, String property) {
         log.debug("Ensuring unique index on: " + property);
         try {
             auth.requireAdmin(ms);
-            opsw.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
+            opsw.indexOps().ensureIndex(new Index().on(property, Direction.ASC).unique());
         } catch (Exception e) {
             ExUtil.error(log, "Failed in createUniqueIndex: " + property, e);
         }
     }
 
+    // todo-0: remove clazz
     public void createIndex(MongoSession ms, Class<?> clazz, String property) {
         log.debug("createIndex: " + property);
         try {
             auth.requireAdmin(ms);
-            opsw.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
+            opsw.indexOps().ensureIndex(new Index().on(property, Direction.ASC));
         } catch (Exception e) {
             ExUtil.error(log, "Failed in createIndex: " + property, e);
         }
     }
 
+    // todo-0: remove clazz
     public void createIndex(MongoSession ms, Class<?> clazz, String property, Direction dir) {
         log.debug("createIndex: " + property + " dir=" + dir);
         try {
             auth.requireAdmin(ms);
-            opsw.indexOps(clazz).ensureIndex(new Index().on(property, dir));
+            opsw.indexOps().ensureIndex(new Index().on(property, dir));
         } catch (Exception e) {
             ExUtil.error(log, "Failed in createIndex: " + property + " dir=" + dir, e);
         }
@@ -679,6 +691,8 @@ public class MongoUtil extends ServiceBase {
     //
     // opsw.indexOps(clazz).ensureIndex(textIndex);
     // }
+
+    // todo-0: remove clazz
     public void createTextIndexes(MongoSession ms, Class<?> clazz) {
         log.debug("creatingText Indexes.");
         auth.requireAdmin(ms);
@@ -693,16 +707,17 @@ public class MongoUtil extends ServiceBase {
                     .build();
             // TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().onAllFields().build();
 
-            opsw.indexOps(clazz).ensureIndex(textIndex);
+            opsw.indexOps().ensureIndex(textIndex);
             log.debug("createTextIndex successful.");
         } catch (Exception e) {
             log.debug("createTextIndex failed.");
         }
     }
 
+    // todo-0: remove clazz
     public void dropCollection(MongoSession ms, Class<?> clazz) {
         auth.requireAdmin(ms);
-        opsw.dropCollection(clazz);
+        opsw.dropCollection();
     }
 
     /*

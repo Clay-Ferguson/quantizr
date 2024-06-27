@@ -364,7 +364,7 @@ public class NodeMoveService extends ServiceBase {
             }
 
             if (bops == null) {
-                bops = opsw.bulkOps(BulkMode.UNORDERED, SubNode.class);
+                bops = opsw.bulkOps(BulkMode.UNORDERED);
             }
 
             Criteria crit = new Criteria("id").is(node.getId());

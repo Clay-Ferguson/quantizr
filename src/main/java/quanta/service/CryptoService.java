@@ -294,7 +294,7 @@ public class CryptoService extends ServiceBase {
 
         BooleanVal failed = new BooleanVal();
 
-        opsw.stream(query, SubNode.class).forEach(node -> {
+        opsw.stream(query).forEach(node -> {
             // make sure session is still alive
             if (failed.getVal() || !sc.isLive())
                 return;
@@ -382,14 +382,14 @@ public class CryptoService extends ServiceBase {
         Query query = new Query();
         query.addCriteria(crit);
 
-        Val<BulkOperations> bops = new Val<>(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
+        Val<BulkOperations> bops = new Val<>(opsw.bulkOps(BulkMode.UNORDERED));
         update.bulkOpDelProp(ms, bops.getVal(), node.getId(), sigProp);
         IntVal batchSize = new IntVal(1);
 
-        opsw.stream(query, SubNode.class).forEach(n -> {
+        opsw.stream(query).forEach(n -> {
             // lazy create bops
             if (!bops.hasVal()) {
-                bops.setVal(opsw.bulkOps(BulkMode.UNORDERED, SubNode.class));
+                bops.setVal(opsw.bulkOps(BulkMode.UNORDERED));
             }
 
             update.bulkOpDelProp(ms, bops.getVal(), n.getId(), sigProp);

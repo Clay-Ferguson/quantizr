@@ -58,9 +58,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
     @Autowired
     private MongoAuth auth;
 
-    @Autowired
-    private EventPublisher publisher;
-
     @Override
     public void onAfterLoad(AfterLoadEvent<SubNode> event) {
         Document dbObj = event.getDocument();
@@ -91,24 +88,5 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
         node.fixAttachments();
         node.verifyParentPath = StringUtils.isEmpty(node.getPath());
-    }
-
-    @Override
-    public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
-        if (!MongoRepository.fullInit)
-            return;
-        Document doc = event.getDocument();
-        if (doc != null) {
-            Object id = doc.get("_id");
-            if (id instanceof ObjectId) {
-                SubNode node = ops.findById(id, SubNode.class);
-                if (node != null) {
-                    log.trace("MDB del: " + node.getPath());
-                    auth.ownerAuth(node);
-                    ThreadLocals.clean(node);
-                }
-                publisher.getPublisher().publishEvent(new MongoDeleteEvent(id));
-            }
-        }
     }
 }
