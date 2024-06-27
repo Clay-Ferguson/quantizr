@@ -20,7 +20,6 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.service.AppController;
 import quanta.util.val.Val;
-import quanta.model.client.NodeType;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -241,10 +240,11 @@ public class SubNodeUtil extends ServiceBase {
             }
         }
         return sb.toString();
-        // WARNING: I remember there are some cases where SecureRandom can hang on non-user machines (i.e.
-        // production servers), as they rely no some OS level sources of entropy that may be dormant at
-        // the
-        // time. Be careful. here's another way to generate a random 64bit number...
+        /*
+         * WARNING: I remember there are some cases where SecureRandom can hang on non-user machines (i.e.
+         * production servers), as they rely no some OS level sources of entropy that may be dormant at the
+         * time. Be careful. here's another way to generate a random 64bit number...
+         */
         // if (no(prng )) {
         // prng = SecureRandom.getInstance("SHA1PRNG");
         // }

@@ -97,9 +97,11 @@ public abstract class ImportArchiveBase extends ServiceBase {
                     throw new RuntimeException("import unmarshalling failed.");
                 }
                 curNode = node;
-                // when importing we want to keep all the attachment info EXCEPT the binary IDs because those will
-                // be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
-                // the obsolete values cannot be reused.
+                /*
+                 * when importing we want to keep all the attachment info EXCEPT the binary IDs because those will
+                 * be changing and obsolete for the imported data, will be reassigned. Nullifying those makes sure
+                 * the obsolete values cannot be reused.
+                 */
                 if (node.getAttachments() != null) {
                     node.getAttachments().forEach((String key, Attachment att) -> {
                         att.setBin(null);

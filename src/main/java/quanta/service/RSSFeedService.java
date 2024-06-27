@@ -453,9 +453,10 @@ public class RSSFeedService extends ServiceBase {
         html = quoteFix(html);
         if (policy == null) {
             synchronized (policyLock) {
-                // I have removed IMAGES only because it looks silly when we display an image that's also
-                // displayed
-                // as part of the feed formatting
+                /*
+                 * I have removed IMAGES only because it looks silly when we display an image that's also displayed
+                 * as part of the feed formatting
+                 */
                 policy = /* .and(Sanitizers.IMAGES) *///
                         Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.LINKS).and(Sanitizers.STYLES)
                                 .and(Sanitizers.TABLES);
@@ -799,25 +800,26 @@ public class RSSFeedService extends ServiceBase {
                     entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl()
                             : prop.getProtocolHostAndPort());
 
-                    // todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
-                    // GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
-                    // optional property which can be set on any node to override this.
-                    //
-                    // UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
-                    // dialog) we can use that as our publish time here, and allow that to be the override for the
-                    // date
-                    // on the node.
+                    /*
+                     * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
+                     * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
+                     * optional property which can be set on any node to override this.
+                     * 
+                     * UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
+                     * dialog) we can use that as our publish time here, and allow that to be the override for the date
+                     * on the node.
+                     */
                     entry.setPublishedDate(n.getCreateTime());
                     SyndContent description = new SyndContentImpl();
 
-                    // todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
-                    // it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions,
-                    // but
-                    // this is low priority for now so I'm not doing it yet.
-                    //
-                    // todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so
-                    // I
-                    // need to check what I'm doing here and see if we need "HTML" now here instead.
+                    /*
+                     * todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
+                     * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
+                     * this is low priority for now so I'm not doing it yet.
+                     * 
+                     * todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so I
+                     * need to check what I'm doing here and see if we need "HTML" now here instead.
+                     */
                     description.setType("text/plain");
                     description.setType("text/html");
                     description

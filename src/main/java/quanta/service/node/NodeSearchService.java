@@ -254,11 +254,11 @@ public class NodeSearchService extends ServiceBase {
         List<NodeInfo> searchResults = new LinkedList<>();
         res.setSearchResults(searchResults);
         int counter = 0;
-        // DO NOT DELETE (may want searching under selected node as an option some day) we can remove
-        // nodeId
-        // from req, because we always search from account root now.
-        // SubNode searchRoot = api.getNode(session, req.getNodeId());
-        // search under account root only
+        /*
+         * DO NOT DELETE (may want searching under selected node as an option some day) we can remove nodeId
+         * from req, because we always search from account root now. SubNode searchRoot =
+         * api.getNode(session, req.getNodeId()); search under account root only
+         */
         SubNode searchRoot = read.getNode(ms, ThreadLocals.getSC().getUserNodeId());
         // todo-2: Eventually we want two ways of searching here.
         //

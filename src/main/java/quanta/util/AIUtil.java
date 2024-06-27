@@ -413,7 +413,7 @@ public class AIUtil extends ServiceBase {
             }
             prompt += "I want to have " + req.getNumChapters() + " chapters in this book.\n";
 
-            // todo-1: needs to be configurable by an admin
+            // todo-0: put in template file
             // #ai_prompt
             prompt +=
                     """

@@ -111,7 +111,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private MarkdownFile mdFile = null;
     private List<MarkdownFile> mdFiles = new ArrayList<>();
     private List<MarkdownFile> pendingFileWrites = new ArrayList<>();
-
     private HashMap<String, MarkdownFile> markdownFilesByNodeName = new HashMap<>();
 
     // markdown links keyed by link url
@@ -188,6 +187,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void writePendingFiles() {
         for (int i = 0; i < pendingFileWrites.size(); i++) {
             MarkdownFile mdf = pendingFileWrites.get(i);
@@ -236,7 +236,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             addFileEntry("/" + rootFolder + "/table-of-contents.md", toc.toString().getBytes(StandardCharsets.UTF_8));
         }
     }
-
 
     private String translateToMarkdownLink(String link) {
         // for now this will only always work for '/n/link' type links owned by admin
@@ -362,7 +361,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     mdFile.content.insert(0, pathContent);
                 }
             }
-
             mdFiles.remove(mdFiles.size() - 1);
             mdFile = mdFiles.size() > 0 ? mdFiles.get(mdFiles.size() - 1) : null;
         }
@@ -827,7 +825,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 }
                 processMdAtt(injectingTag, mdContent, att, mdLink);
             }
-        } else {
+        } //
+        else {
             if (req.getContentType().equals("html")) {
                 String htmlLink = appendNonImgLink(displayName, fullUrl);
                 processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
@@ -865,9 +864,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private String insertHtmlLink(String content, Attachment att, String imgLink) {
         if ("ft".equals(att.getPosition())) {
-            // This replacement is kind of tricky because we have to close out the markdown div
-            // then inject our HTML, and then reopen a new div so keep the markdown separate from the
-            // RAW html "imgLink" we're inserting here.
+            /*
+             * This replacement is kind of tricky because we have to close out the markdown div then inject our
+             * HTML, and then reopen a new div so keep the markdown separate from the RAW html "imgLink" we're
+             * inserting here.
+             */
             content = content.replace("{{" + att.getFileName() + "}}",
                     "\n</div>" + imgLink + "<div class='markdown container'>\n");
         }

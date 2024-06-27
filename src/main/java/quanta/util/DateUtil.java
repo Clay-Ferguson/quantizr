@@ -39,11 +39,12 @@ public class DateUtil {
     public static final Locale DATE_FORMAT_LOCALE = Locale.US;
     private static final HashMap<String, String> zoneMap = new HashMap<>();
 
-    // Date APIs have deprecated the use of short abbreviations for timezones, but we preferr to still
-    // have them shown for at least United States timezones, so we have to implement our own way of
-    // detecting the proper one and also consider proper Daylight Savings Time value, which is of
-    // course
-    // coming from the browser.
+    /*
+     * Date APIs have deprecated the use of short abbreviations for timezones, but we preferr to still
+     * have them shown for at least United States timezones, so we have to implement our own way of
+     * detecting the proper one and also consider proper Daylight Savings Time value, which is of course
+     * coming from the browser.
+     */
     static {
         zoneMap.put("-4S", "AST"); // ATLANTIC STANDARD TIME UTC - 4
         zoneMap.put("-5S", "EST"); // EASTERN STANDARD TIME UTC - 5

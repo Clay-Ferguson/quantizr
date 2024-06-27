@@ -62,18 +62,21 @@ public class Convert extends ServiceBase {
         // this can be enabled/disabled easily by admin
         if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
                 (sig == null || sigFail) && !sc.isAdmin()) {
-            // todo-1: This is designed to silently fail here and not show the nodes where a signature is
-            // failing and a possible database hack, however on a clean install when an anon user visits the
-            // site and the 'home' node is not yet signed we get this error with no explaination of why.
+            /*
+             * todo-1: This is designed to silently fail here and not show the nodes where a signature is
+             * failing and a possible database hack, however on a clean install when an anon user visits the
+             * site and the 'home' node is not yet signed we get this error with no explaination of why.
+             */
 
             log.error("Bad Signature on Admin Node: " + node.getIdStr());
-            // todo-2: we need a special global counter for when this happens, so the server info can show it.
-            // if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
-            // ordinary user, because this means an 'admin' node is failing it's signature, and is an
-            // indication
-            // of a server DB being potentially hacked so we completely refuse to display this content to the
-            // user by returning null here. We only show 'signed' admin nodes to users. If we're logged in as
-            // admin we will be allowed to see even nodes that are failing their signature check, or unsigned.
+            /*
+             * todo-2: we need a special global counter for when this happens, so the server info can show it.
+             * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
+             * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
+             * of a server DB being potentially hacked so we completely refuse to display this content to the
+             * user by returning null here. We only show 'signed' admin nodes to users. If we're logged in as
+             * admin we will be allowed to see even nodes that are failing their signature check, or unsigned.
+             */
             return null;
         }
 
@@ -110,19 +113,18 @@ public class Convert extends ServiceBase {
             owner = nameProp;
         }
 
-        // todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent
-        // back
-        // to client packaged in this response, so that tooltip on the browser can display it, and the
-        // browser will simply contain this same 'map' that maps userIds to profile text, for good
-        // performance.
-        //
-        // log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" +
-        // sc.getRootId() + " node.content="
-        // + node.getContent() + " owner=" + owner);
-        //
-        // If the node is not owned by the person doing the browsing we need to extract the key from ACL
-        // and
-        // put in cipherKey, so send back so the user can decrypt the node.
+        /*
+         * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
+         * to client packaged in this response, so that tooltip on the browser can display it, and the
+         * browser will simply contain this same 'map' that maps userIds to profile text, for good
+         * performance.
+         * 
+         * log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" +
+         * sc.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
+         * 
+         * If the node is not owned by the person doing the browsing we need to extract the key from ACL and
+         * put in cipherKey, so send back so the user can decrypt the node.
+         */
         String cipherKey = null;
         if (!ownerId.equals(sc.getUserNodeId()) && node.getAc() != null) {
             AccessControl ac = node.getAc().get(sc.getUserNodeId());

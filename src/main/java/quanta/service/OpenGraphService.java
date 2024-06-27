@@ -72,9 +72,10 @@ public class OpenGraphService extends ServiceBase {
         OpenGraph openGraph = new OpenGraph();
         Connection con = Jsoup.connect(urlStr);
         con.timeout(5000);
-        // this browseragent thing is important to trick servers into sending us the LARGEST versions of
-        // the
-        // images
+        /*
+         * this browseragent thing is important to trick servers into sending us the LARGEST versions of the
+         * images
+         */
         con.userAgent(BROWSER_USER_AGENT);
         Document doc = con.get();
 
@@ -103,12 +104,14 @@ public class OpenGraphService extends ServiceBase {
         return elm != null ? elm.attr("content") : null;
     }
 
-    // Parses the content for any HTML links and attempts to get the OpenGraph from the network
-    // and puts the opengraph object into node properties.
-    //
-    // todo-3: for now this method is 'cumulative' and never removes unused OG entries like if a node
-    // is edited (unless all HTTPs text is removed), but we will take care of that when we are calling
-    // this during SAVEs.
+    /*
+     * Parses the content for any HTML links and attempts to get the OpenGraph from the network and puts
+     * the opengraph object into node properties.
+     * 
+     * todo-3: for now this method is 'cumulative' and never removes unused OG entries like if a node is
+     * edited (unless all HTTPs text is removed), but we will take care of that when we are calling this
+     * during SAVEs.
+     */
     public void parseNode(SubNode node, boolean reset) {
         if (StringUtils.isEmpty(node.getContent())) {
             if (reset) {

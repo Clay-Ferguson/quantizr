@@ -1,9 +1,6 @@
 package quanta.mongo;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -151,9 +148,11 @@ public class MongoDelete extends ServiceBase {
         auth.ownerAuth(ms, node);
         log.debug("Deleting under path: " + node.getPath());
         update.saveSession(ms);
-        // First delete all the children of the node by using the path, knowing all their paths 'start
-        // with' (as substring) this path. Note how efficient it is that we can delete an entire subgraph in
-        // one single operation!
+        /*
+         * First delete all the children of the node by using the path, knowing all their paths 'start with'
+         * (as substring) this path. Note how efficient it is that we can delete an entire subgraph in one
+         * single operation!
+         */
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         crit = auth.addWriteSecurity(ms, crit);
@@ -161,10 +160,12 @@ public class MongoDelete extends ServiceBase {
         DeleteResult res = opsw.remove(ms, q, SubNode.class);
         log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
         long totalDelCount = res.getDeletedCount();
-        // Yes we DO have to remove the node itself separate from the remove of all it's subgraph, because
-        // in order to be perfectly safe the recursive subgraph regex MUST designate the slash AFTER the
-        // root path to be sure we get the correct node, other wise deleting /ab would also delete /abc
-        // for example. so we must have our recursive delete identify deleting "/ab" as starting with "/ab/"
+        /*
+         * Yes we DO have to remove the node itself separate from the remove of all it's subgraph, because
+         * in order to be perfectly safe the recursive subgraph regex MUST designate the slash AFTER the
+         * root path to be sure we get the correct node, other wise deleting /ab would also delete /abc for
+         * example. so we must have our recursive delete identify deleting "/ab" as starting with "/ab/"
+         */
         if (!childrenOnly) {
             DeleteResult ret = delete(ms, node);
             totalDelCount += ret.getDeletedCount();
@@ -478,15 +479,19 @@ public class MongoDelete extends ServiceBase {
 
             nodes.add(node);
 
-            // if 'add' returns true that means this IS the first encounter and so we add to the operations
-            // the call to set it's hasChildren to null. Note setting HAS_CHILDREN to null doesn't indicate we
-            // think there's no chilren it indicates we don't KNOW if it still has children or not.
+            /*
+             * if 'add' returns true that means this IS the first encounter and so we add to the operations the
+             * call to set it's hasChildren to null. Note setting HAS_CHILDREN to null doesn't indicate we think
+             * there's no chilren it indicates we don't KNOW if it still has children or not.
+             */
             if (parent != null && parentIds.add(parent.getId())) {
                 bops = update.bulkOpSetPropVal(ms, bops, parent.getId(), SubNode.HAS_CHILDREN, null, false);
             }
-            // we remove the actual specified nodes synchronously here (instead of including root in
-            // deleteSubGraphChildren below), so that the client can refresh as soon as it wants and get back
-            // correct results.
+            /*
+             * we remove the actual specified nodes synchronously here (instead of including root in
+             * deleteSubGraphChildren below), so that the client can refresh as soon as it wants and get back
+             * correct results.
+             */
             bops = bulkOpRemoveNode(ms, bops, node.getId());
             if (++batchSize > Const.MAX_BULK_OPS) {
                 bops.execute();
@@ -574,9 +579,11 @@ public class MongoDelete extends ServiceBase {
             boolean caseSensitive, String timeRangeType, boolean recursive, boolean requirePriority) {
         ThreadLocals.requireAdmin();
         List<CriteriaDefinition> criterias = new LinkedList<>();
-        // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
-        // its children.
+        /*
+         * This regex finds all that START WITH path, have some characters after path, before the end of the
+         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+         * children.
+         */
         Criteria crit = null;
         if (recursive) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
@@ -584,12 +591,14 @@ public class MongoDelete extends ServiceBase {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()));
         }
 
-        // Only allow deleting of TEXT-ish type node!!! Bad things can happen if we delete other nodes,
-        // even that contain "bad" content (N-word racial slur, etc.), because when people put those same
-        // words in their BLOCKED WORDS list in their accounts we don't want to mistake that for actual USE
-        // of the word, or for places where people might have blocked someone with an offensive username, we
-        // don't want to DELETE those blocked user nodes either, so for now we just delete if the type is a
-        // comment
+        /*
+         * Only allow deleting of TEXT-ish type node!!! Bad things can happen if we delete other nodes, even
+         * that contain "bad" content (N-word racial slur, etc.), because when people put those same words
+         * in their BLOCKED WORDS list in their accounts we don't want to mistake that for actual USE of the
+         * word, or for places where people might have blocked someone with an offensive username, we don't
+         * want to DELETE those blocked user nodes either, so for now we just delete if the type is a
+         * comment
+         */
         crit = Criteria.where(SubNode.TYPE).in(NodeType.COMMENT.s(), NodeType.NONE.s(), NodeType.PLAIN_TEXT.s());
         criterias.add(crit);
         if (!StringUtils.isEmpty(text)) {
@@ -609,16 +618,20 @@ public class MongoDelete extends ServiceBase {
                 // .matching("search term") // matches any that contain "search" OR "term"
                 // .matchingPhrase("search term")
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
-                // If searching for a pure tag name or a username (no spaces in search string), be smart enough to
-                // enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up
-                // finding also just instances of mytag (not a tag) which is incorrect.
+                /*
+                 * If searching for a pure tag name or a username (no spaces in search string), be smart enough to
+                 * enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up finding
+                 * also just instances of mytag (not a tag) which is incorrect.
+                 */
                 if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
                     text = "\"" + text + "\"";
                 }
-                // This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is sure seems like a
-                // MongoDb bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically
-                // impossible to do an OR search on strings containing special characters, without the special
-                // characters basically being ignored.
+                /*
+                 * This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is sure seems like a
+                 * MongoDb bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible
+                 * to do an OR search on strings containing special characters, without the special characters
+                 * basically being ignored.
+                 */
                 // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);

@@ -181,9 +181,11 @@ public class XString {
         int len = val.length();
         int idx = 0;
         char c = 0;
-        // we have 'len-2' here because in an example like "## a" this is a heading "a", and we don't need
-        // to try to iterate into the final " a" part so we know we should always iterate only out to two
-        // chars from the end of the string
+        /*
+         * we have 'len-2' here because in an example like "## a" this is a heading "a", and we don't need
+         * to try to iterate into the final " a" part so we know we should always iterate only out to two
+         * chars from the end of the string
+         */
         while (idx < len - 2 && (c = val.charAt(idx)) == '#') {
             idx++;
             // if we've counted the max number of headings levels, just point 'c' to the next char

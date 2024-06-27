@@ -78,10 +78,12 @@ public class MongoUtil extends ServiceBase {
         // this just helps us avoide redundant delete attempts
         HashSet<String> pathsRemoved = new HashSet<>();
         paths.add(rootNode.getPath());
+
         // Add all the paths
         for (SubNode node : nodes) {
             paths.add(node.getPath());
         }
+
         // now identify all nodes that don't have a parent in the list
         for (SubNode node : nodes) {
             String parentPath = node.getParentPath();
@@ -112,11 +114,11 @@ public class MongoUtil extends ServiceBase {
      * scratch.
      */
     public String findAvailablePath(String path) {
-        // If the path we want doesn't exist at all we can use it, so check that case first, but only if
-        // we
-        // don't have a path ending with slash because that means we KNOW we need to always find a new
-        // child
-        // regardless of any existing ones
+        /*
+         * If the path we want doesn't exist at all we can use it, so check that case first, but only if we
+         * don't have a path ending with slash because that means we KNOW we need to always find a new child
+         * regardless of any existing ones
+         */
         if (!path.endsWith("/") && pathIsAvailable(path)) {
             // we must proactively delete any orphaned nodes that might be existing and would be 'ressurected'
             // which would be BAD!
@@ -132,9 +134,10 @@ public class MongoUtil extends ServiceBase {
             // Append one random char to path. Statistically if we keep adding characters it becomes
             // exponentially more likely we find an unused path.
             path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
-            // if we encountered two misses, start adding two characters per iteration (at least), because
-            // this
-            // node has lots of children
+            /*
+             * if we encountered two misses, start adding two characters per iteration (at least), because this
+             * node has lots of children
+             */
             if (tries >= 2) {
                 path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
             }
@@ -161,10 +164,11 @@ public class MongoUtil extends ServiceBase {
 
     public boolean pathIsAvailable(String path) {
         Criteria crit = new Criteria();
-        // Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists
-        // even
-        // as an orphan (which can definitely happen) then this path it not available. So even orphaned
-        // nodes can keep us from being able to consider a path 'available for use'
+        /*
+         * Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
+         * as an orphan (which can definitely happen) then this path it not available. So even orphaned
+         * nodes can keep us from being able to consider a path 'available for use'
+         */
         crit = crit.orOperator( //
                 Criteria.where(SubNode.PATH).is(path), //
                 Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
@@ -349,7 +353,7 @@ public class MongoUtil extends ServiceBase {
     }
 
     // DO NOT DELETE
-    // Leave as an example for future DB Conversions
+    // Leave as an example for future DB Conversions, which can update lots of nodes efficiently
     public void deleteNostrUsers(MongoSession ms) {
         IntVal batchSize = new IntVal();
         Query q = new Query();

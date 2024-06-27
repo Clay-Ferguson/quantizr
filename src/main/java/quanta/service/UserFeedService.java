@@ -48,9 +48,10 @@ public class UserFeedService extends ServiceBase {
         String pathToSearch = NodePath.USERS_PATH;
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch)); //
-        // limit to just markdown types and comments, because we need to avoid everything else since we
-        // are
-        // searching from the root of all user accounts.
+        /*
+         * limit to just markdown types and comments, because we need to avoid everything else since we are
+         * searching from the root of all user accounts.
+         */
         crit = crit.and(SubNode.TYPE).in(NodeType.NONE.s(), NodeType.COMMENT.s());
         // DO NOT DELETE (keep as example)
         // This pattern is what is required when you have multiple conditions added to a single field.
@@ -83,9 +84,10 @@ public class UserFeedService extends ServiceBase {
      * person or that person to us queried in a single list.
      */
     public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
-        // if bidirectional means query for the conversation between me and the other person (both
-        // senders),
-        // and we do that always for now when toUser is present.
+        /*
+         * if bidirectional means query for the conversation between me and the other person (both senders),
+         * and we do that always for now when toUser is present.
+         */
         boolean bidirectional = StringUtils.isNotEmpty(req.getToUser());
         SessionContext sc = ThreadLocals.getSC();
         sc.setViewingFeed(true);
@@ -97,8 +99,7 @@ public class UserFeedService extends ServiceBase {
         int counter = 0;
         List<Criteria> orCriteria = new LinkedList<>();
         // 2: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking for
-        // all
-        // public nodes why "OR" into that any friends?
+        // all public nodes why "OR" into that any friends?
         if (req.getToPublic()) {
             orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
         }
@@ -115,10 +116,11 @@ public class UserFeedService extends ServiceBase {
                 long lastActiveTime = sc.getLastActiveTime();
                 // do this work in async thread to make this query more performant
                 exec.run(() -> {
-                    // setting last active time to this current time, will stop the GUI from showing the user an
-                    // indication that they have new messages, because we know they're querying messages NOW, so this
-                    // is
-                    // a way to reset
+                    /*
+                     * setting last active time to this current time, will stop the GUI from showing the user an
+                     * indication that they have new messages, because we know they're querying messages NOW, so this is
+                     * a way to reset
+                     */
                     _myAcntNode.set(NodeProp.LAST_ACTIVE_TIME, lastActiveTime);
                     update.save(_s, _myAcntNode);
                 });
@@ -154,11 +156,12 @@ public class UserFeedService extends ServiceBase {
         // users may be following a user that will effectively be blocked
         HashSet<String> blockedIdStrings = new HashSet<>();
         HashSet<ObjectId> blockedUserIds = new HashSet<>();
-        // We block the "remote users" and "local users" by blocking any admin owned nodes, but we also
-        // just
-        // want to in general for other reasons block any admin-owned nodes from showing up in feeds.
-        // Feeds
-        // are always only about user content.
+
+        /*
+         * We block the "remote users" and "local users" by blocking any admin owned nodes, but we also just
+         * want to in general for other reasons block any admin-owned nodes from showing up in feeds. Feeds
+         * are always only about user content.
+         */
         blockedUserIds.add(auth.getAdminSession().getUserNodeId());
 
         if (!bidirectional) {

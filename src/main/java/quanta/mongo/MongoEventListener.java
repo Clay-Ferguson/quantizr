@@ -22,6 +22,7 @@ import quanta.util.ThreadLocals;
 // NOTE: Slowly over time I'm moving this functionality over to SubNodUtil.java where we call these
 // methods directly. I don't like this listener patter, because I think ultimately it makes things
 // more complex, not less complex.
+// todo-0: finish removing this class.
 
 /**
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the

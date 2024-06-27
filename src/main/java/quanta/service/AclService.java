@@ -71,9 +71,10 @@ public class AclService extends ServiceBase {
         CopySharingResponse res = new CopySharingResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
         BulkOperations bops = null;
-        // todo-2: It seems like maybe batching can't update a collection property? so for now I'm
-        // disabling
-        // batch mode which makes this code work.
+        /*
+         * todo-2: It seems like maybe batching can't update a collection property? so for now I'm disabling
+         * batch mode which makes this code work.
+         */
         boolean batchMode = false;
         Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
         int batchSize = 0;
@@ -220,11 +221,11 @@ public class AclService extends ServiceBase {
                 principal = principalNode.getStr(NodeProp.USER);
             }
             mapKey = principalNode.getIdStr();
-            // If this node is encrypted we get the public key of the user being shared with to send back to
-            // the
-            // client, which will then use it to encrypt the symmetric key to the data, and then send back up
-            // to
-            // the server to store in this sharing entry
+            /*
+             * If this node is encrypted we get the public key of the user being shared with to send back to the
+             * client, which will then use it to encrypt the symmetric key to the data, and then send back up to
+             * the server to store in this sharing entry
+             */
             if (cipherKey != null) {
                 String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
                 if (principalPubKey == null) {
@@ -371,10 +372,11 @@ public class AclService extends ServiceBase {
             List<MongoPrincipal> principals = getNodePrincipals(ms, node);
 
             for (MongoPrincipal p : principals) {
-                // todo-3: this is a spot that can be optimized. We should be able to send just the userNodeId
-                // back
-                // to client, and the client should be able to deal with that (i think). depends on how much
-                // ownership info we need to show user. ownerSet.add(p.getUserNodeId());
+                /*
+                 * todo-3: this is a spot that can be optimized. We should be able to send just the userNodeId back
+                 * to client, and the client should be able to deal with that (i think). depends on how much
+                 * ownership info we need to show user. ownerSet.add(p.getUserNodeId());
+                 */
                 SubNode userNode = read.getNode(ms, p.getUserNodeId());
                 String userName = userNode.getStr(NodeProp.USER);
                 ownerSet.add(userName);

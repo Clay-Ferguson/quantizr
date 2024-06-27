@@ -559,9 +559,11 @@ public class MongoAuth extends ServiceBase {
         if (pathToSearch == null) {
             pathToSearch = NodePath.USERS_PATH;
         }
-        // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
-        // its children.
+        /*
+         * This regex finds all that START WITH path, have some characters after path, before the end of the
+         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+         * children.
+         */
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch));
 
         ands.add(Criteria.where(SubNode.AC).ne(null));

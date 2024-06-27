@@ -248,8 +248,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     public SubNode getNotesNode(MongoSession ms, String userName, SubNode userNode) {
-        return read.getUserNodeByType(ms, userName, userNode, "### Notes", NodeType.NOTES.s(),
-                null, true);
+        return read.getUserNodeByType(ms, userName, userNode, "### Notes", NodeType.NOTES.s(), null, true);
     }
 
     public SubNode getPostsNode(MongoSession ms, String userName, SubNode userNode) {
@@ -992,14 +991,15 @@ public class UserManagerService extends ServiceBase {
                 res.error("Wrong user name and/or email.");
                 return null;
             }
-            // if we make it to here the user and email are both correct, and we can initiate the password
-            // reset. We pick some random time between 1 and 2 days from now into the future to serve as the
-            // unguessable auth code AND the expire time for it. Later we can create a deamon processor that
-            // cleans up expired authCodes, but for now we just need to HAVE the auth code.
-            //
-            // User will be emailed this code and we will perform reset when we see it, and the user has
-            // entered
-            // new password we can use.
+            /*
+             * if we make it to here the user and email are both correct, and we can initiate the password
+             * reset. We pick some random time between 1 and 2 days from now into the future to serve as the
+             * unguessable auth code AND the expire time for it. Later we can create a deamon processor that
+             * cleans up expired authCodes, but for now we just need to HAVE the auth code.
+             * 
+             * User will be emailed this code and we will perform reset when we see it, and the user has entered
+             * new password we can use.
+             */
             int oneDayMillis = 60 * 60 * 1000;
             long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
             ownerNode.set(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE, String.valueOf(authCode));

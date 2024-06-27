@@ -104,9 +104,11 @@ public class MongoUpdate extends ServiceBase {
                         }
                     });
 
-                    // We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
-                    // node will have the side effect of removing it from dirtyNodes, and that can't happen during the
-                    // loop below because we're iterating over dirtyNodes.
+                    /*
+                     * We use 'nodes' list to avoid a concurrent modification exception, because calling 'save()' on a
+                     * node will have the side effect of removing it from dirtyNodes, and that can't happen during the
+                     * loop below because we're iterating over dirtyNodes.
+                     */
                     List<SubNode> nodes = new LinkedList<>();
 
                     // check that we are allowed to write all, before we start writing any
@@ -191,9 +193,11 @@ public class MongoUpdate extends ServiceBase {
         }
         // if no owner is assigned
         if (node.getOwner() == null) {
-            // if we are saving the root node, we make it be the owner of itself. This is also the admin
-            // owner, and we only allow this to run during initialiation when the server may be creating the
-            // database, and is not yet processing user requests
+            /*
+             * if we are saving the root node, we make it be the owner of itself. This is also the admin owner,
+             * and we only allow this to run during initialiation when the server may be creating the database,
+             * and is not yet processing user requests
+             */
             if (node.getPath().equals(NodePath.ROOT_PATH) && !MongoRepository.fullInit) {
                 ThreadLocals.requireAdminThread();
                 node.setOwner(id);
@@ -251,11 +255,13 @@ public class MongoUpdate extends ServiceBase {
         snUtil.removeDefaultProps(node);
 
         if (node.getAc() != null) {
-            // we need to ensure that we never save an empty Acl, but null instead, because some parts of the
-            // code assume that if the AC is non-null then there ARE some shares on the node.
-            //
-            // This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends
-            // up causing the AC to contain an empty object sometimes
+            /*
+             * we need to ensure that we never save an empty Acl, but null instead, because some parts of the
+             * code assume that if the AC is non-null then there ARE some shares on the node.
+             * 
+             * This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends
+             * up causing the AC to contain an empty object sometimes
+             */
             if (node.getAc().size() == 0) {
                 node.setAc(null);
             } else {
@@ -311,9 +317,11 @@ public class MongoUpdate extends ServiceBase {
                 if (parent == null) {
                     log.debug("This SAVE should get rejected (its parent is missing): " + XString.prettyPrint(node));
 
-                    // Make MongoDB fail to save this by sabatoging the ID here. It's the only way to abort the save.
-                    // Supposedly throwing the Exception which we do below, is supposed to abort saves but it's not
-                    // working where as nullifying the ID does indeed abort the save.
+                    /*
+                     * Make MongoDB fail to save this by sabatoging the ID here. It's the only way to abort the save.
+                     * Supposedly throwing the Exception which we do below, is supposed to abort saves but it's not
+                     * working where as nullifying the ID does indeed abort the save.
+                     */
                     node.setId(null);
                     throw new RuntimeException("unable to get node parent: " + node.getParentPath());
                 }

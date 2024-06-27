@@ -535,10 +535,12 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
     public void getBinary(@PathVariable("binId") String binId,
             @RequestParam(value = "nodeId", required = false) String nodeId,
-            // The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
-            // it's generated from HTML intermediate file what has all the links in it for accessing binary
-            // content, and as the PDF is being generated calls are made to this endpoint for each image, or
-            // other file so we use the token to auth the request
+            /*
+             * The "Export To PDF" feature relies on sending this 'token' as it's form of access/auth because
+             * it's generated from HTML intermediate file what has all the links in it for accessing binary
+             * content, and as the PDF is being generated calls are made to this endpoint for each image, or
+             * other file so we use the token to auth the request
+             */
             @RequestParam(value = "token", required = false) String token,
             @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {

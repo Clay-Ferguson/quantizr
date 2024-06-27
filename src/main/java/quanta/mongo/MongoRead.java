@@ -489,7 +489,6 @@ public class MongoRead extends ServiceBase {
         }
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
-
         Iterable<SubNode> iter = opsw.find(ms, q);
         List<String> nodeIds = new LinkedList<>();
 
@@ -662,9 +661,11 @@ public class MongoRead extends ServiceBase {
             auth.auth(ms, node, PrivilegeType.READ);
         }
         Query q = new Query();
-        // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
-        // its children.
+        /*
+         * This regex finds all that START WITH path, have some characters after path, before the end of the
+         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+         * children.
+         */
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         if (publicOnly) {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
@@ -704,9 +705,11 @@ public class MongoRead extends ServiceBase {
         List<Criteria> ands = new LinkedList<>();
         TextCriteria textCriteria = null;
         Sort sort = null;
-        // This regex finds all that START WITH path, have some characters after path, before the end of
-        // the string. Without the trailing (.+)$ we would be including the node itself in addition to all
-        // its children.
+        /*
+         * This regex finds all that START WITH path, have some characters after path, before the end of the
+         * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+         * children.
+         */
         Criteria crit = null;
         if (recursive) {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
@@ -739,10 +742,12 @@ public class MongoRead extends ServiceBase {
                 if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
                     text = "\"" + text + "\"";
                 }
-                // his reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
-                // bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do
-                // an OR search on strings containing special characters, without the special characters basically
-                // being ignored.
+                /*
+                 * this reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
+                 * bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an
+                 * OR search on strings containing special characters, without the special characters basically
+                 * being ignored.
+                 */
                 //
                 // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
                 textCriteria.matching(text);
@@ -778,7 +783,8 @@ public class MongoRead extends ServiceBase {
                 else if ("today".equals(timeRangeType)) {
                     ands.add(Criteria.where(sortField).gte(DateUtil.getStartOfToday()));
                     ands.add(Criteria.where(sortField).lt(DateUtil.getEndOfToday()));
-                } else if ("pastOnly".equals(timeRangeType)) { //
+                } //
+                else if ("pastOnly".equals(timeRangeType)) { //
                     ands.add(Criteria.where(sortField).lt(new Date().getTime()));
                 } //
                 else if ("pastDue".equals(timeRangeType)) { //
@@ -996,11 +1002,9 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit;
         if (caseSensitive) {
-            // Case sensitive query
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
                     .and(SubNode.PROPS + "." + propName).is(propVal);
         } else {
-            // Case insensitive query
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
                     .and(SubNode.PROPS + "." + propName).regex("^" + Pattern.quote(propVal) + "$", "i");
         }
@@ -1142,7 +1146,6 @@ public class MongoRead extends ServiceBase {
         return q;
     }
 
-    // ========================================================================
     /*
      * Returns one (or first) node contained directly under path (non-recursively) that has a matching
      * propName and propVal
@@ -1227,7 +1230,6 @@ public class MongoRead extends ServiceBase {
 
         return opsw.count(ms, q, SubNode.class);
     }
-
 
     // (not currently used)
     public SubNode findByCID(MongoSession ms, String cid) {

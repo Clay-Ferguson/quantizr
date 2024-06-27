@@ -83,7 +83,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.LongVal;
-import quanta.util.val.Val;
 
 /**
  * Service for managing node attachments.
@@ -134,9 +133,11 @@ public class AttachmentService extends ServiceBase {
         }
 
         try {
-            // NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
-            // UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
-            // which will be even more strict.
+            /*
+             * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
+             * UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
+             * which will be even more strict.
+             */
             boolean allowEmailParse = false;
             SubNode node = read.getNode(ms, nodeId, false, null);
             if (node == null) {
@@ -146,12 +147,13 @@ public class AttachmentService extends ServiceBase {
             long maxFileSize = user.getUserStorageRemaining(ms);
             int imageCount = 0;
 
-            // if uploading multiple files check quota first, to make sure there's space for all files before
-            // we start uploading any of them If there's only one file, the normal flow will catch an out of
-            // space problem, so we don't need to do it in advance in here as we do for multiple file uploads
-            // only.
-            //
-            // Also we only do this check if not admin. Admin can upload unlimited amounts.
+            /*
+             * if uploading multiple files check quota first, to make sure there's space for all files before we
+             * start uploading any of them If there's only one file, the normal flow will catch an out of space
+             * problem, so we don't need to do it in advance in here as we do for multiple file uploads only.
+             * 
+             * Also we only do this check if not admin. Admin can upload unlimited amounts.
+             */
             if (!ms.isAdmin() && files.length > 1) {
                 SubNode userNode = read.getAccountByUserName(null, null, false);
                 // get how many bytes of storage the user currently holds
@@ -485,15 +487,17 @@ public class AttachmentService extends ServiceBase {
             // todo-2: when we detect this and then stream back some data should be just go ahead and SET the
             // correct 'size' on the node at that point?
             if (size > 0) {
-                // todo-2: I'm getting the "disappearing image" (from the browser) network problem related to size
-                // (content length), but not calling 'contentLength()' below is a workaround.
-                //
-                // You get this error if you just wait about 30s to 1 minute, and maybe scroll out of view and
-                // back into view the images. What happens is the image loads just fine but then some background
-                // thread in Chrome looks at content lengths and finds some thing off somehoe and decides to make
-                // the image just disappear and show a broken link icon instead.
-                //
-                // Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
+                /*
+                 * todo-2: I'm getting the "disappearing image" (from the browser) network problem related to size
+                 * (content length), but not calling 'contentLength()' below is a workaround.
+                 * 
+                 * You get this error if you just wait about 30s to 1 minute, and maybe scroll out of view and back
+                 * into view the images. What happens is the image loads just fine but then some background thread
+                 * in Chrome looks at content lengths and finds some thing off somehoe and decides to make the image
+                 * just disappear and show a broken link icon instead.
+                 * 
+                 * Chrome shows this: Failed to load resource: net::ERR_CONTENT_LENGTH_MISMATCH
+                 */
                 response.setContentLength((int) size);
             }
             if (download) {
@@ -625,9 +629,10 @@ public class AttachmentService extends ServiceBase {
     }
 
     private ResourceRegion resourceRegion(Resource resource, HttpHeaders headers) throws IOException {
-        // todo-2: Will a smaller chunk size be better to get the video playing sooner after first
-        // clicked,
-        // or will it do that at the cost of less overall resource effeciency? Need to research
+        /*
+         * todo-2: Will a smaller chunk size be better to get the video playing sooner after first clicked,
+         * or will it do that at the cost of less overall resource effeciency? Need to research
+         */
         long chunkSize = 500000L;
         long contentLength = resource.contentLength();
         HttpRange httpRange = headers.getRange().stream().findFirst().get();
@@ -739,10 +744,12 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    // FYI: Warning: this way of getting content type doesn't work.
-    // String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
-    //
-    // returns true if it was detected AND saved as an image
+    /*
+     * FYI: Warning: this way of getting content type doesn't work. String mimeType =
+     * URLConnection.guessContentTypeFromStream(inputStream);
+     * 
+     * returns true if it was detected AND saved as an image
+     */
     private boolean detectAndSaveImage(MongoSession ms, String nodeId, String attKey, String sourceUrl, URL url,
             boolean storeLocally) {
         ImageInputStream is = null;
@@ -991,10 +998,11 @@ public class AttachmentService extends ServiceBase {
                     if (node == null) {
                         throw new RuntimeException("Node not found.");
                     }
-                    // if there's no sharing at all on the node, then we do the token check, otherwise we allow
-                    // access.
-                    // This is for good fediverse interoperability but still with a level of privacy for completely
-                    // unshared nodes.
+                    /*
+                     * if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
+                     * This is for good fediverse interoperability but still with a level of privacy for completely
+                     * unshared nodes.
+                     */
                     if (node.getAc() == null || node.getAc().size() == 0) {
                         user.authBearer();
                         crypto.authSig();

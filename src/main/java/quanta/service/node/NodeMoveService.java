@@ -1,7 +1,6 @@
 package quanta.service.node;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -104,10 +103,11 @@ public class NodeMoveService extends ServiceBase {
             return;
         }
         create.insertOrdinal(ms, parentNode, 0L, 1L, nodeChanges);
-        // todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as
-        // part
-        // of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
-        // get to it.
+        /*
+         * todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as part
+         * of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
+         * get to it.
+         */
         update.saveSession(ms);
         node.setOrdinal(0L);
         update.saveSession(ms);

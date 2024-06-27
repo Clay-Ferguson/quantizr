@@ -48,9 +48,11 @@ public class SubNode {
     // This optimization is optional and we have this flag if we need to turn it off.
     public static final boolean USE_HAS_CHILDREN = true;
 
-    // This tells all parts of the code that any changes being made on this node can be accepted
-    // without further auth checks. important for when a user thread is doing something but that causes
-    // us to need to modify some node that user is not expected to also own
+    /*
+     * This tells all parts of the code that any changes being made on this node can be accepted without
+     * further auth checks. important for when a user thread is doing something but that causes us to
+     * need to modify some node that user is not expected to also own
+     */
     @Transient
     @JsonIgnore
     public boolean adminUpdate = false;
@@ -522,8 +524,7 @@ public class SubNode {
                     ThreadLocals.dirty(this);
                 }
             }
-        } //
-        else if (create || forceNew) {
+        } else if (create || forceNew) {
             ret = new Attachment(this);
             attachments = new HashMap<>();
             attachments.put(name, ret);
@@ -717,6 +718,7 @@ public class SubNode {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Transient
     @JsonIgnore
     public synchronized <T> T getObj(String key, Class<T> classType) {

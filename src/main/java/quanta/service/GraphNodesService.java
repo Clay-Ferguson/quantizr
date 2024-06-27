@@ -97,14 +97,13 @@ public class GraphNodesService extends ServiceBase {
         for (String path : mapByPath.keySet()) {
             keys.add(path);
         }
-        // First scan to create any parents that don't exist, putting them in mapByPath. Since the query
-        // to
-        // get nodes wasn't a pure recursive method we can have nodes in 'mapByPath' which don't have
-        // their
-        // parent in mapByPath, so we want to pull all those parents into 'mapByPath' too, to be sure we
-        // have a an actual proper directed graph to send back to client (no orphans in it, not connected
-        // to
-        // root)
+        /*
+         * First scan to create any parents that don't exist, putting them in mapByPath. Since the query to
+         * get nodes wasn't a pure recursive method we can have nodes in 'mapByPath' which don't have their
+         * parent in mapByPath, so we want to pull all those parents into 'mapByPath' too, to be sure we
+         * have a an actual proper directed graph to send back to client (no orphans in it, not connected to
+         * root)
+         */
         for (String path : keys) {
             ensureEnoughParents(rootPath, rootLevel, path, mapByPath);
         }
@@ -132,9 +131,11 @@ public class GraphNodesService extends ServiceBase {
             return;
         GraphNode parent = mapByPath.get(parentPath);
         if (parent == null) {
-            // We only need guid on this name, to ensure D3 works, but the actual name on these
-            // is queries for during mouseover because otherwise it could be a large number
-            // of queries to populate them here now, when that's not needed.
+            /*
+             * We only need guid on this name, to ensure D3 works, but the actual name on these is queries for
+             * during mouseover because otherwise it could be a large number of queries to populate them here
+             * now, when that's not needed.
+             */
             parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,
                     StringUtils.countMatches(parentPath, "/") - rootLevel, false, null);
             mapByPath.put(parentPath, parent);

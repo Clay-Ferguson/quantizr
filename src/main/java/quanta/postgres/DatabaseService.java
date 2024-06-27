@@ -18,6 +18,7 @@ public class DatabaseService extends ServiceBase {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     @Transactional
     public List<String> getAllTableNames() {
         return entityManager

@@ -121,13 +121,15 @@ public class ExportServiceFlexmark extends ServiceBase {
             // This numbering works in the TOC but I haven't figured out how to number the
             // actual headings in the body of the document itself.
             // options.set(TocExtension.IS_NUMBERED, true);
+
             Parser parser = Parser.builder(options).build();
             HtmlRenderer renderer = HtmlRenderer.builder(options).build();
-            // if this is the node being exported. PDF generator uses this special '[TOC]' (via TocExtension)
-            // as
-            // the place where we want the table of contents injected so we can click the "Table of Contents"
-            // checkbox in the export, or theoretically we would also insert this [TOC] somewhere else in the
-            // text.
+            /*
+             * if this is the node being exported. PDF generator uses this special '[TOC]' (via TocExtension) as
+             * the place where we want the table of contents injected so we can click the "Table of Contents"
+             * checkbox in the export, or theoretically we would also insert this [TOC] somewhere else in the
+             * text.
+             */
             if ("pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
                 markdown.append("[TOC]");
             }
@@ -282,6 +284,7 @@ public class ExportServiceFlexmark extends ServiceBase {
         return ret;
     }
 }
+
 ////////////////////////////////////////////////////////////////
 // DO NOT DELETE
 //

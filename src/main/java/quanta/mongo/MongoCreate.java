@@ -159,12 +159,13 @@ public class MongoCreate extends ServiceBase {
         long minOrdinal = read.getMinChildOrdinal(ms, node);
         // default new ordinal to ordinal
         long newOrdinal = ordinal;
-        // We detect the special case where we're attempting to insert at 'top' ordinals and if we find
-        // room to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries
-        // to leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
-        // 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we
-        // end up trying to insert above it.
-        // if we're inserting a single node
+        /*
+         * We detect the special case where we're attempting to insert at 'top' ordinals and if we find room
+         * to grab an ordinal at minOrdinal-1 then we do so. Whenever Quanta renumbers nodes it tries to
+         * leave RESERVE_BLOCK_SIZE at the head so that inserts "at top" will alway some in as 999, 998,
+         * 997, etc, until it's forced to renumber, when the top node happens to have zero ordinal and we
+         * end up trying to insert above it. if we're inserting a single node
+         */
         if (rangeSize == 1) {
             // if the target ordinal is at or below the current minimum
             if (ordinal <= minOrdinal) {
@@ -245,9 +246,11 @@ public class MongoCreate extends ServiceBase {
         if (req.isReply()) {
             nodeBeingRepliedTo = read.getNode(ms, nodeId);
         }
-        // If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
-        // "My Posts" node, and the other case is if we are doing a reply we also will put the reply in
-        // the user's POSTS node.
+        /*
+         * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
+         * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
+         * user's POSTS node.
+         */
         if (nodeId == null && !linkBookmark) {
             parentNode = read.getUserNodeByType(ms, null, null, "### Posts", NodeType.POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s()), true);
