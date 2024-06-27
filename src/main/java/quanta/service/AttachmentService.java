@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -56,7 +57,6 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.AIGenImageRequest;
@@ -223,6 +223,7 @@ public class AttachmentService extends ServiceBase {
         if (mimeType == null) {
             mimeType = Util.getMimeFromFileType(fileName);
         }
+
         if (allowEmailParse && "message/rfc822".equals(mimeType)) {
             // this is EML file format.
             String mkdown = email.convertEmailToMarkdown(is);
@@ -465,7 +466,7 @@ public class AttachmentService extends ServiceBase {
             }
 
             if (allowAuth) {
-                auth.auth(ms, node, PrivilegeType.READ);
+                auth.readAuth(ms, node);
             }
             String mimeTypeProp = att.getMime();
             if (mimeTypeProp == null) {
@@ -482,10 +483,12 @@ public class AttachmentService extends ServiceBase {
             }
             long size = att.getSize();
             response.setContentType(mimeTypeProp);
-            // we gracefully tolerate the case where no size is available but normally it will be there.
-            //
-            // todo-2: when we detect this and then stream back some data should be just go ahead and SET the
-            // correct 'size' on the node at that point?
+            /*
+             * we gracefully tolerate the case where no size is available but normally it will be there.
+             * 
+             * todo-2: when we detect this and then stream back some data should be just go ahead and SET the
+             * correct 'size' on the node at that point?
+             */
             if (size > 0) {
                 /*
                  * todo-2: I'm getting the "disappearing image" (from the browser) network problem related to size
@@ -572,12 +575,16 @@ public class AttachmentService extends ServiceBase {
             if (disposition == null) {
                 disposition = "inline";
             }
-            // I think we could be using the MultipartFileSender here, eventually but not until we decople it
-            // from reading directly from filesystem
+            /*
+             * I think we could be using the MultipartFileSender here, eventually but not until we decople it
+             * from reading directly from filesystem
+             */
             AutoCloseInputStream acis = new AutoCloseInputStream(new FileInputStream(fullFileName));
-            // I'm not sure if FileSystemResource is better than StreamingResponseBody, but i do know
-            // StreamingResponseBody does EXACTLY what is needed which is to use a small buffer size and never
-            // hold entire media file all in memory
+            /*
+             * I'm not sure if FileSystemResource is better than StreamingResponseBody, but i do know
+             * StreamingResponseBody does EXACTLY what is needed which is to use a small buffer size and never
+             * hold entire media file all in memory
+             */
             StreamingResponseBody stream = os -> {
                 IOUtils.copy(acis, os);
                 os.flush();
@@ -603,7 +610,7 @@ public class AttachmentService extends ServiceBase {
             Attachment att = node.getAttachment(attName, false, false);
             if (att == null)
                 throw ExUtil.wrapEx("no attachment info found");
-            auth.auth(ms, node, PrivilegeType.READ);
+            auth.readAuth(ms, node);
             String mimeTypeProp = att.getMime();
             if (mimeTypeProp == null) {
                 throw ExUtil.wrapEx("unable to find mimeType property");
@@ -711,7 +718,7 @@ public class AttachmentService extends ServiceBase {
         ms = ThreadLocals.ensure(ms);
         LimitedInputStreamEx limitedIs = null;
         try {
-            URL url = new URL(sourceUrl);
+            URL url = new URI(sourceUrl).toURL(); 
             int timeout = 20;
             // if this is an image extension, handle it in a special way, mainly to extract the width, height
             // from it
@@ -844,7 +851,7 @@ public class AttachmentService extends ServiceBase {
 
     public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean allowAuth) {
         if (allowAuth) {
-            auth.auth(ms, node, PrivilegeType.READ);
+            auth.readAuth(ms, node);
         }
         Attachment att = node.getAttachment(attName, false, false);
         if (att == null)

@@ -115,7 +115,7 @@ public class MongoTemplateWrapper extends ServiceBase {
             return null;
         SubNode obj = mt.findById(id, SubNode.class);
         if (obj != null && ms != null) {
-            auth.auth(ms, obj, PrivilegeType.READ);
+            auth.readAuth(ms, obj);
         }
         return obj;
     }

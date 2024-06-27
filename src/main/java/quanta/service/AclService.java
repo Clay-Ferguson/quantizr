@@ -336,6 +336,7 @@ public class AclService extends ServiceBase {
                 ac.setPrvs(newPrivs);
                 acl.put(principalNodeId, ac);
             }
+            
             // if there are now no acls at all left set the ACL to null, so it is completely removed from the
             // node
             if (acl.isEmpty()) {

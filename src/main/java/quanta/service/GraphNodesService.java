@@ -50,7 +50,7 @@ public class GraphNodesService extends ServiceBase {
             // Construct the GraphNode object for each result and add to mapByPath
             for (SubNode n : results) {
                 try {
-                    auth.auth(ms, node, PrivilegeType.READ);
+                    auth.readAuth(ms, node);
                     GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(),
                             StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
                     mapByPath.put(gn.getPath(), gn);

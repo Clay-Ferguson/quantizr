@@ -291,7 +291,17 @@ public class MongoAuth extends ServiceBase {
         try {
             auth(ms, node, PrivilegeType.WRITE);
         } catch (RuntimeException e) {
-            log.debug("session: " + ms.getUserName() + " tried to create a node under nodeId " + node.getIdStr()
+            log.debug("session: " + ms.getUserName() + " tried to write to nodeId " + node.getIdStr()
+                    + " and was refused.");
+            throw e;
+        }
+    }
+
+    public void readAuth(MongoSession ms, SubNode node) {
+        try {
+            auth(ms, node, PrivilegeType.READ);
+        } catch (RuntimeException e) {
+            log.debug("session: " + ms.getUserName() + " tried to read nodeId " + node.getIdStr()
                     + " and was refused.");
             throw e;
         }

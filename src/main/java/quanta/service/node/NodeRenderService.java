@@ -240,9 +240,11 @@ public class NodeRenderService extends ServiceBase {
                         node = parent;
                     }
                 } catch (Exception e) {
-                    // failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not
-                    // something we decided to to inside this method based on trying not to render a page with no
-                    // children showing.
+                    /*
+                     * failing to get parent is only an "auth" problem if this was an ACTUAL uplevel request, and not
+                     * something we decided to to inside this method based on trying not to render a page with no
+                     * children showing.
+                     */
                     if (isActualUplevelRequest) {
                         throw new ForbiddenException();
                     }
@@ -275,9 +277,10 @@ public class NodeRenderService extends ServiceBase {
             return nodeInfo;
         }
         nodeInfo.setChildren(new LinkedList<>());
-        // If we are scanning to a node we know we need to start from zero offset, or else we use the
-        // offset
-        // passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
+        /*
+         * If we are scanning to a node we know we need to start from zero offset, or else we use the offset
+         * passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
+         */
         int offset = scanToNode != null ? 0 : req.getOffset();
         if (offset < 0) {
             offset = 0;
@@ -479,9 +482,11 @@ public class NodeRenderService extends ServiceBase {
             dir = orderBy.substring(spaceIdx + 1);
             sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
                     SubNode.PROPS + "." + orderByProp);
-            // when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes
-            // appear at top. todo-2: probably would be better to to just make this orderBy parser handle
-            // comma-delimited sort list which is not a difficult change
+            /*
+             * when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes
+             * appear at top. todo-2: probably would be better to to just make this orderBy parser handle
+             * comma-delimited sort list which is not a difficult change
+             */
             if (orderByProp.equals(NodeProp.PRIORITY.s())) {
                 sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
             }
@@ -573,8 +578,7 @@ public class NodeRenderService extends ServiceBase {
                     } else {
                         content = "";
                     }
-                } //
-                else if (content.startsWith(Constant.ENC_TAG.s())) {
+                } else if (content.startsWith(Constant.ENC_TAG.s())) {
                     content = "[encrypted]";
                 } else {
                     content = getFirstLineAbbreviation(content, 25);

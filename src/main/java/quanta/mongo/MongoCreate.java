@@ -174,7 +174,7 @@ public class MongoCreate extends ServiceBase {
                 if (minOrdinal > 0) {
                     long ret = minOrdinal - 1;
                     // always grab the index at halfway to zero so we can leave room for for future inserts to
-                    // get lucky and have a place to land without cusing a multi record node renumbering.
+                    // get lucky and have a place to land without causing a multi-node renumbering.
                     if (ret > 0) {
                         ret = ret / 2;
                     }
@@ -188,7 +188,7 @@ public class MongoCreate extends ServiceBase {
                 }
             }
         }
-        auth.auth(ms, node, PrivilegeType.READ);
+        auth.readAuth(ms, node);
         // save all if there's any to save.
         update.saveSession(ms);
         Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);

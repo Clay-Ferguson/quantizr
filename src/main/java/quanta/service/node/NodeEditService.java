@@ -169,9 +169,11 @@ public class NodeEditService extends ServiceBase {
                 if ("[null]".equals(property.getValue())) {
                     node.delete(property.getName());
                 } else {
-                    // save only if server determines the property is savable. Just protection. Client shouldn't be
-                    // trying to save stuff that is illegal to save, but we have to assume the worst behavior from
-                    // client code, for security and robustness.
+                    /*
+                     * save only if server determines the property is savable. Just protection. Client shouldn't be
+                     * trying to save stuff that is illegal to save, but we have to assume the worst behavior from
+                     * client code, for security and robustness.
+                     */
                     if (ms.isAdmin() || SubNodeUtil.isReadonlyProp(property.getName())) {
                         node.set(property.getName(), property.getValue());
                     } else {
@@ -392,7 +394,6 @@ public class NodeEditService extends ServiceBase {
             }
             chapterIdx++;
         }
-
         return bookNode;
     }
 

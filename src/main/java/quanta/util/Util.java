@@ -1,6 +1,7 @@
 package quanta.util;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
@@ -217,7 +218,8 @@ public class Util {
         if (StringUtils.isEmpty(mimeType)) {
             int timeout = 60; // seconds
             try {
-                URLConnection conn = new URL(url).openConnection();
+                URL urlObj = new URI(url).toURL(); 
+                URLConnection conn = urlObj.openConnection();
                 conn.setConnectTimeout(timeout * 1000);
                 conn.setReadTimeout(timeout * 1000);
                 mimeType = conn.getContentType();
