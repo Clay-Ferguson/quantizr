@@ -84,14 +84,6 @@ import quanta.util.Validator;
  * Services are a type of class that really never need to derive from other base classes, it's
  * perfectly acceptable to use the same base class across all of them so they can all reference each
  * other using a simple "object.property" syntax.
- *
- * Another reason this class is good is that it gives every object a way to call methods on itself
- * AND have AOP methods (like @PerfMon-driven ones) be capable of working. If you don't call a
- * method thru it's proxy object then Spring AOP does NOT work, and this is a problem because in
- * Spring normally when you call a method in the same object you're calling from Spring WILL NOT go
- * thru the proxy. As an example if we called a method in UserFeedService from inside that same
- * service, then unless we call like this: userFeed.myMethod(), then the proxy-based AOP stuff will
- * not execute, because it won't be called thru a proxy.
  */
 public class ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ServiceBase.class);
@@ -178,11 +170,12 @@ public class ServiceBase {
     // optionally overridden
     public void postConstruct() {}
 
-    // Note: All` @EventListener public void handleContextRefresh(ContextRefreshedEvent event)` should
-    // call this method immediately before doing anything else, and this is fine because nothing
-    // happens on subsequent runs. The reason is because we cannot predict WHICH @EventListener will be
-    // called first, so we must allow any sequence that Spring happens to run with, in a
-    // non-deterministic way.
+    /*
+     * Note: All` @EventListener public void handleContextRefresh(ContextRefreshedEvent event)` should
+     * call this method immediately before doing anything else, and this is fine because nothing happens
+     * on subsequent runs. The reason is because we cannot predict WHICH @EventListener will be called
+     * first, so we must allow any sequence that Spring happens to run with, in a non-deterministic way.
+     */
     public static void initBeans(ApplicationContext ctx) {
         synchronized (initLock) {
             if (initComplete) {

@@ -13,21 +13,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 @Configuration
 public class JacksonConfig {
 
-    // This never worked keeping just for future reference.
-    // extends WebMvcConfigurationSupport {
-    // @Override
-    // protected void extendMessageConverters(List<HttpMessageConverter<?>>
-    // converters) {
-    // super.addDefaultHttpMessageConverters(converters);
-    // for (HttpMessageConverter<?> converter : converters) {
-    // if (converter instanceof MappingJackson2HttpMessageConverter) {
-    // MappingJackson2HttpMessageConverter jacksonConverter =
-    // (MappingJackson2HttpMessageConverter) converter;
-    // jacksonConverter.setPrettyPrint(true);
-    // }
-    // }
-    // }
-
     @Bean
     public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();

@@ -28,9 +28,6 @@ import quanta.service.UtilFilter;
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
  */
-// DO NOT DELETE (this is diagnostic code. See Instrument.java for more info)
-// import org.springframework.context.annotation.EnableAspectJAutoProxy;
-// @EnableAspectJAutoProxy // (proxyTargetClass = true)
 @Configuration
 @EnableAsync
 public class AppConfiguration implements WebMvcConfigurer {
@@ -42,7 +39,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     @Autowired
     private AppFilter appFilter;
 
-    // // DO NOT DELETE (this is diagnostic code)
+    // DO NOT DELETE (this is diagnostic code)
     // @Autowired
     // private DataTransferRateFilter dataTransferRateFilter;
 

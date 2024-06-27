@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,13 @@ import quanta.util.Util;
 @Component
 public class AppProp {
     private static Logger log = LoggerFactory.getLogger(AppProp.class);
+
+    // Custom types to represent the nested structure
+    private static class ClassConfig extends LinkedHashMap<String, PropertyConfig> {
+    }
+
+    private static class PropertyConfig extends LinkedHashMap<String, Object> {
+    }
 
     @Autowired
     private Environment env;
@@ -66,10 +74,16 @@ public class AppProp {
     }
 
     private void setPropertyOrdinals() {
-        LinkedHashMap<String, LinkedHashMap> classes = (LinkedHashMap) configMap.get("props");
-        for (LinkedHashMap<String, LinkedHashMap> clazz : classes.values()) {
+        @SuppressWarnings("unchecked")
+        Map<String, ClassConfig> classes = (Map<String, ClassConfig>) configMap.get("props");
+
+        if (classes == null) {
+            return;
+        }
+
+        for (ClassConfig classConfig : classes.values()) {
             int attIdx = 1;
-            for (LinkedHashMap<String, Object> prop : clazz.values()) {
+            for (PropertyConfig prop : classConfig.values()) {
                 prop.put("ord", attIdx++);
             }
         }

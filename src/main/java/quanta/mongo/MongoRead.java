@@ -329,12 +329,10 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getNode(MongoSession ms, String identifier) {
-        // calling thru proxy for AOP here.
         return getNode(ms, identifier, true, null);
     }
 
     public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
-        // calling thru proxy for AOP here.
         return getNode(ms, identifier, allowAuth, null);
     }
 

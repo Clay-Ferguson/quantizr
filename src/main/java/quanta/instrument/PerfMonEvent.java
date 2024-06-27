@@ -34,7 +34,7 @@ public class PerfMonEvent {
             this.duration = duration;
             this.event = event;
 
-            Instrument.add(this);
+            PerfMon.add(this);
             PerfMonEvent rootEvent = ThreadLocals.getRootEvent();
 
             // if there's no root event for this thread make this one the root.

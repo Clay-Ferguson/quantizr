@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.instrument.PerfMon;
 import quanta.model.client.NodeType;
 import quanta.request.AIGenImageRequest;
 import quanta.request.AIGenSpeechRequest;
@@ -138,7 +137,6 @@ public class AppController extends ServiceBase implements ErrorController {
      *
      * Renders with Thymeleaf.
      */
-    @PerfMon
     @RequestMapping({"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
     public String index( //
             // =======================================================================================
@@ -514,7 +512,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    @PerfMon
     @RequestMapping({FILE_PATH + "/id/{id}", FILE_PATH + "/{nameOnAdminNode}",
             FILE_PATH + "/{userName}/{nameOnUserNode}"})
     public void attachment(
@@ -607,7 +604,6 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
-    @PerfMon
     @RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
     public ResponseEntity<ResourceRegion> streamMultiPart(@PathVariable("fileName") String fileName,
             @RequestParam("nodeId") String nodeId, //

@@ -26,8 +26,8 @@ public class PerformanceReport {
 
     public static String clearData() {
         ThreadLocals.requireAdmin();
-        synchronized (Instrument.data) {
-            Instrument.data.clear();
+        synchronized (PerfMon.data) {
+            PerfMon.data.clear();
         }
         DataTransferRateFilter.reset();
         return getReport();
@@ -45,12 +45,12 @@ public class PerformanceReport {
 
         // Sort list by whichever are consuming the most time (i.e. by duration, descending order)
         List<PerfMonEvent> orderedData;
-        synchronized (Instrument.data) {
-            if (Instrument.data.size() == 0) {
+        synchronized (PerfMon.data) {
+            if (PerfMon.data.size() == 0) {
                 sb.append("No data available yet.");
                 return sb.toString();
             }
-            orderedData = new ArrayList<>(Instrument.data);
+            orderedData = new ArrayList<>(PerfMon.data);
             orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
         }
 
@@ -128,7 +128,7 @@ public class PerformanceReport {
     public static String getTimesPerCategory() {
         HashMap<String, MethodStat> stats = new HashMap<>();
 
-        for (PerfMonEvent event : Instrument.data) {
+        for (PerfMonEvent event : PerfMon.data) {
             MethodStat stat = stats.get(event.event);
             if (stat == null) {
                 stats.put(event.event, stat = new MethodStat());
