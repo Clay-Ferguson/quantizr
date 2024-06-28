@@ -45,8 +45,8 @@ export class NodeCompTableRowLayout extends Div {
         let lastNode: NodeInfo = null;
         let rowIdx = 0;
 
-        // This boolean helps us keep from putting two back to back vertical spaces which would otherwise be able to happen.
-        // let inVerticalSpace = false;
+        // This boolean helps us keep from putting two back to back vertical spaces which would
+        // otherwise be able to happen. let inVerticalSpace = false;
 
         this.node.children?.forEach(n => {
             if (!n) return;
@@ -60,7 +60,8 @@ export class NodeCompTableRowLayout extends Div {
 
                 const type = S.plugin.getType(n.type);
 
-                // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.
+                // special case where we aren't in edit mode, and we run across a markdown type with
+                // blank content AND no attachment, then don't even render it.
                 if (type?.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
                     // do nothing
                 }
@@ -77,8 +78,8 @@ export class NodeCompTableRowLayout extends Div {
                     rowCount++;
                 }
 
-                // if we have any children on the node they will always have been loaded to be displayed so display them
-                // This is the linline children
+                // if we have any children on the node they will always have been loaded to be
+                // displayed so display them This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
 
@@ -114,8 +115,8 @@ export class NodeCompTableRowLayout extends Div {
 
         const isMine = S.props.isMine(ast.node);
 
-        /* I'll leave this block here, for future reference, but it's dead code. If editMode is on we never do the
-        table layout but show each node as if it were vertical layout instead */
+        /* I'll leave this block here, for future reference, but it's dead code. If editMode is on
+        we never do the table layout but show each node as if it were vertical layout instead */
         if (isMine && this.allowHeaders && allowInsert && !ast.isAnonUser && ast.userPrefs.editMode) {
             const attribs = {};
             if (ast.userPrefs.editMode) {

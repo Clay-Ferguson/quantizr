@@ -10,8 +10,9 @@ export interface LS { // Local State
     amount: string
 }
 
-/* When this dialog returns the caller should be able to either get one property name from nameState, or
-else get the list of properties from LS.selections, depending on which user has selected. */
+/* When this dialog returns the caller should be able to either get one property name from
+nameState, or else get the list of properties from LS.selections, depending on which user has
+selected. */
 export class AddCreditDlg extends DialogBase {
     amtState: Validator = new Validator("");
 

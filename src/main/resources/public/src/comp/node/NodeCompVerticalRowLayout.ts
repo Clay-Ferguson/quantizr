@@ -36,7 +36,8 @@ export class NodeCompVerticalRowLayout extends Div {
                 // console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
                 const type = S.plugin.getType(n.type);
 
-                // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                // special case where we aren't in edit mode, and we run across a markdown type with
+                // blank content, then don't render it.
                 if (type && type.getTypeName() === J.NodeType.NONE && !n.content && !ast.userPrefs.editMode && !S.props.hasBinary(n)) {
                     // do nothing
                 }
@@ -57,8 +58,8 @@ export class NodeCompVerticalRowLayout extends Div {
                     // inVerticalSpace = false;
                 }
 
-                // if we have any children on the node they will always have been loaded to be displayed so display them
-                // This is the linline children
+                // if we have any children on the node they will always have been loaded to be
+                // displayed so display them This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
 

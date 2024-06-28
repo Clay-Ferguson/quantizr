@@ -84,8 +84,8 @@ export class HistoryUtil {
     }
 
     // If 'addLater=true' this means we can't alter state right now, because it could destroy text
-    // the user is tempting to 'mouse select' and so we just get ready to add to history
-    // the next chance we get.
+    // the user is tempting to 'mouse select' and so we just get ready to add to history the next
+    // chance we get.
     updateNodeHistory = (node: NodeInfo, addLater: boolean) => {
         if (!node || !node.id || getAs().nodeHistoryLocked ||
             S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) {

@@ -49,9 +49,9 @@ export class RSSView extends AppTab<any, RSSView> {
             feedSrcHash = S.util.hashOfString(feedSrc);
 
             /*
-            If we find the RSS feed in the cache, use it.
-            disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
-            figure this out yet.
+            If we find the RSS feed in the cache, use it. disabling cache for now: somehow the "Play
+            Button" never works (onClick not wired) whenever it renders from the cache and i haven't
+            had time to figure this out yet.
             */
             if (ast.rssFeedCache[feedSrcHash] === "failed") {
                 feedContent = new Div("Feed Failed: " + feedSrc, {
@@ -228,8 +228,9 @@ export class RSSView extends AppTab<any, RSSView> {
             feedOut.push(new Html(feed.description));
         }
 
-        // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
-        // is even undesirable for now. Also the newline check is to not show the feed urls if this is a multi RSS feed one
+        // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could
+        // publish this but no need to and is even undesirable for now. Also the newline check is to
+        // not show the feed urls if this is a multi RSS feed one
         if (feedSrc.indexOf("/multiRss?id=") === -1 && feedSrc.indexOf("\n") === -1) {
             feedOut.push(new Div(feedSrc));
         }
@@ -306,10 +307,9 @@ export class RSSView extends AppTab<any, RSSView> {
         const headerDivChildren = [];
         let imageShown = false;
 
-        /* todo-2: Sometimes entry.category can be an Object (not a String) here which will
-        make React fail badly and render the entire page blank,
-        blowing up the hole app, so we need probably validate EVERY
-        property on entry with 'instanceof' like we're doing here to protect
+        /* todo-2: Sometimes entry.category can be an Object (not a String) here which will make
+        React fail badly and render the entire page blank, blowing up the hole app, so we need
+        probably validate EVERY property on entry with 'instanceof' like we're doing here to protect
         against that kind of chaos */
         // if (entry.category instanceof Object) {
         //     // todo-2: put this kind of typeof in "S.util.isString"
@@ -401,8 +401,8 @@ export class RSSView extends AppTab<any, RSSView> {
             let imageAdded = false;
             imageShown = true;
             entry.mediaContent.forEach(mc => {
-                /* some feeds have the same image multiple times for some reason so we
-                    use imageAdded to keep it from appearing twice */
+                /* some feeds have the same image multiple times for some reason so we use
+                    imageAdded to keep it from appearing twice */
                 if (mc.medium === "image" && !imageAdded) {
                     imageAdded = true;
                     children.push(new Img({
@@ -488,8 +488,8 @@ export class RSSView extends AppTab<any, RSSView> {
         return new Div(null, { className: "rssFeedItem" }, children);
     }
 
-    /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
-    otherwise we can get rediculously large images. */
+    /* This will process all the images loaded by the RSS Feed content to make sure they're all
+    300px wide because otherwise we can get rediculously large images. */
     domPreUpdateFunction(parent: Comp): void {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
@@ -502,14 +502,15 @@ export class RSSView extends AppTab<any, RSSView> {
                 return;
             }
 
-            /* Because some feeds use the same image in the header and content we try to detect that here
-            and remove any but the first ocurrance of any given image on the entire page.
+            /* Because some feeds use the same image in the header and content we try to detect that
+            here and remove any but the first ocurrance of any given image on the entire page.
 
-            NOTE: For now I decided it's a bit confusing to the user to have images disappar from the page, and it's
-            better to allow duplicate images to show up than to have some mysteriously not showing up.
+            NOTE: For now I decided it's a bit confusing to the user to have images disappar from
+            the page, and it's better to allow duplicate images to show up than to have some
+            mysteriously not showing up.
 
-            todo-2: We could use this same logic on each individual FEED ITEM (fediverse), but for now I decided not to
-            hide any dupliate images so this is commented out for now.
+            todo-2: We could use this same logic on each individual FEED ITEM (fediverse), but for
+            now I decided not to hide any dupliate images so this is commented out for now.
             */
             // const src: string = (el as any).src;
             // if (urlSet.has(src)) {
@@ -532,8 +533,9 @@ export class RSSView extends AppTab<any, RSSView> {
             el.style.marginBottom = "12px";
 
             /* Setting width and removing height ensures the image does fit into our colum display
-            and also will not stretch. We set images to max of 50% because for displaying RSS feeds we don't
-            want any huge images going full width of the view. It hinders scrolling, by just consuming too much space. */
+            and also will not stretch. We set images to max of 50% because for displaying RSS feeds
+            we don't want any huge images going full width of the view. It hinders scrolling, by
+            just consuming too much space. */
             el.style.maxWidth = "50%";
             delete el.style.width;
             el.removeAttribute("height");

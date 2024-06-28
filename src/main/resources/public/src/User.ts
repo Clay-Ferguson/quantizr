@@ -32,9 +32,9 @@ export class User {
     }
 
     /*
-     * for testing purposes, I want to allow certain users additional privileges. A bit of a hack because it will go
-     * into production, but on my own production these are my "testUserAccounts", so no real user will be able to
-     * use these names
+     * for testing purposes, I want to allow certain users additional privileges. A bit of a hack
+     * because it will go into production, but on my own production these are my "testUserAccounts",
+     * so no real user will be able to use these names
      */
     isTestUserAccount = (): boolean => {
         const lcUserName = getAs().userName.toLowerCase();
@@ -83,8 +83,9 @@ export class User {
             }
 
             if (usingCredentials) {
-                // Note: If user entered wrong case-sentitivity string on login dialog they can still login
-                // but this res.userName however will have the correct name (case-sensitive) here now.
+                // Note: If user entered wrong case-sentitivity string on login dialog they can
+                // still login but this res.userName however will have the correct name
+                // (case-sensitive) here now.
                 await this.loginResponse(res, res.userProfile.userName, callPwd, false);
             } else {
                 if (res.code == C.RESPONSE_CODE_OK) {
@@ -153,8 +154,9 @@ export class User {
                 setTimeout(() => {
                     S.push.init(res.authToken);
 
-                    // NOTE: All these are async methods, but we don't use 'await' because we can let them
-                    // execute in parallel and not wait for any of them to complete before any of the others.
+                    // NOTE: All these are async methods, but we don't use 'await' because we can
+                    // let them execute in parallel and not wait for any of them to complete before
+                    // any of the others.
                     if (usr !== PrincipalName.ADMIN) {
                         this.checkMessages();
                     }

@@ -6,8 +6,9 @@ import { S } from "./Singletons";
 export class Props {
     readOnlyPropertyList: Set<string> = new Set<string>();
 
-    /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
-    that it would never make sense to display an edit field for editing their value in the editor */
+    /* Holds the list of properties that are edited using something like a checkbox, or dropdown
+    menu, or whatever, such that it would never make sense to display an edit field for editing
+    their value in the editor */
     controlBasedPropertyList: Set<string> = new Set<string>();
 
     hiddenPropertyList: Set<string> = new Set<string>();
@@ -36,9 +37,10 @@ export class Props {
         return node.clientProps.find(p => p.name === propName);
     }
 
-    /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is the owner of the
-    node this simply returns the ENC_KEY property but if not we look up in the ACL on the node a copy of the encrypted
-    key that goes with the current user (us, logged in user), which should decrypt using our private key.
+    /* Gets the crypto key from this node that will allow user to decrypt the node. If the user is
+    the owner of the node this simply returns the ENC_KEY property but if not we look up in the ACL
+    on the node a copy of the encrypted key that goes with the current user (us, logged in user),
+    which should decrypt using our private key.
     */
     getCryptoKey = (node: NodeInfo) => {
         if (!node) return null;
@@ -339,8 +341,9 @@ export class Props {
         if (typesArray.length >= 9) {
             typesArray.pop();
         }
-        // at this type to front of list (Note this ordering is not what controls GUI display ordering,
-        // but is still significant for keeping 'Most Recently Used 10' algo functional for this list)
+        // at this type to front of list (Note this ordering is not what controls GUI display
+        // ordering, but is still significant for keeping 'Most Recently Used 10' algo functional
+        // for this list)
         typesArray.unshift(type);
         ast.userProfile.recentTypes = typesArray.join(",");
 

@@ -142,9 +142,9 @@ export class NodeCompMarkdown extends Comp {
         return createElement(ReactMarkdownComp as any, this.attribs, state.content);
     }
 
-    /* When any markdown content contains something like "-**My Section Title**-" that will be rendered as a 
-        collapsible section where everhthing below the section title, up to a double blank line, will be hidden
-        until the user clicks the section title to expand it. 
+    /* When any markdown content contains something like "-**My Section Title**-" that will be
+        rendered as a collapsible section where everhthing below the section title, up to a double
+        blank line, will be hidden until the user clicks the section title to expand it. 
     */
     buildWithCollapsibles = (state: LS) => {
         state.content = state.content || "";
@@ -159,8 +159,8 @@ export class NodeCompMarkdown extends Comp {
         lines?.forEach((line, i) => {
             if (line.startsWith(NodeCompMarkdown.COLLAPSE_TITLE_START) && //
                 line.endsWith(NodeCompMarkdown.COLLAPSE_TITLE_END)) {
-                // if we ran into another collapsible before the last one ended, end it now. It should've ended with
-                // two blank lines but that's ok, we can end it anyway.
+                // if we ran into another collapsible before the last one ended, end it now. It
+                // should've ended with two blank lines but that's ok, we can end it anyway.
                 if (inCollapse && curBuf) {
                     this.addCollapsible(children, curBuf, collapseTitle, "_" + i);
                     curBuf = "";

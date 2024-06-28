@@ -13,7 +13,8 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
 // https://developers.google.com/web/fundamentals/media/recording-audio
-// Need to persist in LOCAL browser storage which input selections (audio/video) are the current choice at all times.
+// Need to persist in LOCAL browser storage which input selections (audio/video) are the current
+// choice at all times.
 
 // todo-2: there should be a cleaner way to get this MediaRecorder
 declare const MediaRecorder: any;
@@ -32,7 +33,8 @@ export class MediaRecorderDlg extends DialogBase {
     chunks: any[] = [];
     recorder: any;
 
-    // this timer is also used as a way to detect if we are currently recording. This will be null always if not currently recording.
+    // this timer is also used as a way to detect if we are currently recording. This will be null
+    // always if not currently recording.
     recordingTimer: any;
     recordingTime: number = 0;
     continuable: boolean = false;
@@ -118,7 +120,8 @@ export class MediaRecorderDlg extends DialogBase {
     renderDlg(): Comp[] {
         const state: any = this.getState<LS>();
 
-        // This creates the video display showing just the live feed of the camera always, regardless of whether currently recrding.
+        // This creates the video display showing just the live feed of the camera always,
+        // regardless of whether currently recrding.
         if (this.videoMode) {
             this.videoPlayer = new VideoPlayer({
                 style: {
@@ -139,9 +142,10 @@ export class MediaRecorderDlg extends DialogBase {
                 // "preload": "auto"
             });
 
-            /* this is required to get the video live after every re-render, but I really need to learn react 'refs'
-            to do this slightly cleaner without a onMount. We have to call this even if we didn't just create
-            the video element because react can unmount the old one during re-renders. */
+            /* this is required to get the video live after every re-render, but I really need to
+            learn react 'refs' to do this slightly cleaner without a onMount. We have to call this
+            even if we didn't just create the video element because react can unmount the old one
+            during re-renders. */
             this.displayStream();
         }
 
@@ -177,8 +181,9 @@ export class MediaRecorderDlg extends DialogBase {
                 new ButtonBar([
                     state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this.newRecording, null, "btn-primary"),
 
-                    // This didn't work for video (only audio) which actually means my wild guess to just combine chunks isn't the correct way
-                    // to accomplish this, and so I"m just disabling it until I have time to research.
+                    // This didn't work for video (only audio) which actually means my wild guess to
+                    // just combine chunks isn't the correct way to accomplish this, and so I"m just
+                    // disabling it until I have time to research.
                     // state.recording || !this.continuable ? null : new Button("Continue Recording", this.continueRecording, null),
 
                     state.recording ? new Button("Stop", this.stop, null) : null,
@@ -229,9 +234,10 @@ export class MediaRecorderDlg extends DialogBase {
 
     continueRecording = async () => {
         if (!this.recorder) {
-            // I experimented with passing mimeTypes to Chrome and only the webm one seems to be supported, so we don't need
-            // these options. May be smarter to just let the browser use it's default anyway for all sorts of other reasons.
-            // Note: Browser can set to: "video/webm;codecs=vp8,opus", which is only valid mime after truncating at ';' char.
+            // I experimented with passing mimeTypes to Chrome and only the webm one seems to be
+            // supported, so we don't need these options. May be smarter to just let the browser use
+            // it's default anyway for all sorts of other reasons. Note: Browser can set to:
+            // "video/webm;codecs=vp8,opus", which is only valid mime after truncating at ';' char.
             // let options = { mimeType: "audio/ogg" };
             // this.recorder = new MediaRecorder(this.stream, options);
             this.recorder = new MediaRecorder(this.stream);
@@ -251,8 +257,8 @@ export class MediaRecorderDlg extends DialogBase {
 
         this.mergeState<LS>({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
 
-        // todo-1: need code to enforce the call to clear this timer, no matter when or how this dialog vanishes.
-        // probably needs to be a react hook
+        // todo-1: need code to enforce the call to clear this timer, no matter when or how this
+        // dialog vanishes. probably needs to be a react hook
         this.recordingTimer = setInterval(this.recordingTimeslice, 1000);
     }
 

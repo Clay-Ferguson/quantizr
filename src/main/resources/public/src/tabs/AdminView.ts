@@ -64,15 +64,16 @@ export class AdminView extends AppTab<any, AdminView> {
                         }),
                         this.settingsLink("Text to Speech", async () => {
                             const tts = window.speechSynthesis;
-                            // /// let voices = tts.getVoices();
-                            // /// for (let i = 0; i < voices.length; i++) {
-                            // ///     let voice = voices[i];
-                            // ///     // Google UK English Female (en-GB)
-                            // ///     console.log("Voice: " + voice.name + " (" + voice.lang + ") " + (voice.default ? "<-- Default" : ""));
+                            // /// let voices = tts.getVoices(); /// for (let i = 0; i <
+                            // voices.length; i++) { ///     let voice = voices[i]; ///     //
+                            // Google UK English Female (en-GB) ///     console.log("Voice: " +
+                            // voice.name + " (" + voice.lang + ") " + (voice.default ? "<--
+                            // Default" : ""));
                             // /// }
 
-                            /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
-                            on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
+                            /* WARNING: speechSynthesis seems to crash very often and leave hung
+                            processes, eating up CPU, at least on my Ubuntu 18.04, machine, so for
+                            now any TTS development is on hold. */
                             const sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
                             tts.speak(sayThis);
                         })

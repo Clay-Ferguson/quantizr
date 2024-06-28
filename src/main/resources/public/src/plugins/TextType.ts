@@ -7,7 +7,8 @@ import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
-/* Type for 'untyped' types. That is, if the user has not set a type explicitly this type will be the default */
+/* Type for 'untyped' types. That is, if the user has not set a type explicitly this type will be
+the default */
 export class TextType extends TypeBase {
     constructor() {
         super(J.NodeType.PLAIN_TEXT, "Text", "fa-file-text", true);

@@ -154,8 +154,8 @@ export class Nav {
         });
         S.nodeUtil.processInboundNode(res.node);
 
-        // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
-        // the actual RSS feed that this node defines.
+        // if jumpToRss that means we don't want to display the node, but jump straight to the RSS
+        // Tab and display the actual RSS feed that this node defines.
         if (jumpToRss && res?.rssNode) {
             dispatch("LoadingFeed", s => {
                 s.rssNode = res.node;

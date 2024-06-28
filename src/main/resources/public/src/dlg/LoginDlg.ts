@@ -55,15 +55,16 @@ export class LoginDlg extends DialogBase {
     login = async () => {
         let usr = this.userState.getValue();
 
-        /* The word admin is not a secret so let's make it easy for the admin to login using only his password */
+        /* The word admin is not a secret so let's make it easy for the admin to login using only
+        his password */
         if (usr === "a") {
             usr = J.PrincipalName.ADMIN;
         }
 
         await S.localDB.setUser(usr);
 
-        // if the password field is empty, or CTRL key is down, and a username is provided, then get the password from the browser
-        // and ignore the password field.
+        // if the password field is empty, or CTRL key is down, and a username is provided, then get
+        // the password from the browser and ignore the password field.
         if ((!this.pwdState.getValue() || S.util.ctrlKeyCheck()) && usr) {
             // this is kind of ugly but we need to set localDb userName for keys to generate properly
 

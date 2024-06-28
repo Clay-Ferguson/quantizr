@@ -4,7 +4,8 @@ import { S } from "./Singletons";
 
 // We need to prefix the store name and not the individual keys.
 
-/* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
+/* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API
+*/
 export class LocalDB {
     debug: boolean = false;
     db: IDBDatabase = null;

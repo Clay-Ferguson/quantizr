@@ -108,10 +108,12 @@ export class NodeCompButtonBar extends Div {
         }
 
         /*
-        We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
-        truly any files in there or not because we really cannot possibly know until we look. The only way to make this Open button
-        ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
-        on a page and we don't want to burn that much CPU just to prevent empty-folders from being explored. Empty folders are rare.
+        We always enable for fs:folder, to that by clicking to open a folder that will cause the
+        server to re-check and see if there are truly any files in there or not because we really
+        cannot possibly know until we look. The only way to make this Open button ONLY show when
+        there ARE truly children fore sure would be to force a check of the file system for every
+        folder type that is ever rendered on a page and we don't want to burn that much CPU just to
+        prevent empty-folders from being explored. Empty folders are rare.
         */
         if (this.node.hasChildren && !isPageRootNode) {
             const exp = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
@@ -138,9 +140,9 @@ export class NodeCompButtonBar extends Div {
         const iconClazz = ast.mobileMode ? "" : "buttonBarIcon";
 
         /*
-         * If in edit mode we always at least create the potential (buttons) for a user to insert content, and if
-         * they don't have privileges the server side security will let them know. In the future we can add more
-         * intelligence to when to show these buttons or not.
+         * If in edit mode we always at least create the potential (buttons) for a user to insert
+         * content, and if they don't have privileges the server side security will let them know.
+         * In the future we can add more intelligence to when to show these buttons or not.
          */
         if (ast.userPrefs.editMode) {
             if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && S.props.isMine(this.node)) {
@@ -206,8 +208,9 @@ export class NodeCompButtonBar extends Div {
                     addCut = true;
                 }
 
-                /* the 'level < 2' check is because we only allow moving up/down on the main children of the page for now
-                    todo-2: consider allowing moving up/down on all nodes
+                /* the 'level < 2' check is because we only allow moving up/down on the main
+                    children of the page for now todo-2: consider allowing moving up/down on all
+                    nodes
                 */
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove && this.level < 2) {
                     if (this.node.logicalOrdinal > 0) {

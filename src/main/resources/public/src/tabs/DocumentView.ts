@@ -14,7 +14,7 @@ import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TabIntf } from "../intf/TabIntf";
 
-/* This class does client-side paging so that we don't overload React renderer with too many items. 
+/* This class does client-side paging so that we don't overload React renderer with too many items.
 which can render too slow, so we max out at only 100 items per page. */
 export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> extends AppTab<PT, TT> {
     allowTopMoreButton: boolean = true;
@@ -100,8 +100,8 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
     }
 
     /* overridable (don't use arrow function) */
-    // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
-    // it's essentially to support DOM finding.
+    // Note: It's important to have 'this.data.id' as a classname on every item, even though it's
+    // not for styling, it's essentially to support DOM finding.
     renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
         const ast = getAs();
         const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);

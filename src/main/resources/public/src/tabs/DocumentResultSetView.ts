@@ -24,14 +24,14 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
     override renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
 
         const ast = getAs();
-        // Our header base in this scenario has the edit controls intermingled with the rest, so for now if either
-        // of these user prefs is active we show the header bar.
+        // Our header base in this scenario has the edit controls intermingled with the rest, so for
+        // now if either of these user prefs is active we show the header bar.
         const allowHeader = S.util.showMetaData(ast, node) || ast.userPrefs.editMode;
 
-        // we have 'marginButtom' on these just to add extra space between paragraphs for a less compact view. We could
-        // make this paragraph spacing a user preference...some day.
-        // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
-        // it's essentially to support DOM finding.
+        // we have 'marginButtom' on these just to add extra space between paragraphs for a less
+        // compact view. We could make this paragraph spacing a user preference...some day. Note:
+        // It's important to have 'this.data.id' as a classname on every item, even though it's not
+        // for styling, it's essentially to support DOM finding.
         const itemClass = (allowHeader ? "userFeedItem" : "marginBottom");
         const itemClassHighlight = (allowHeader ? "userFeedItemHighlight" : "marginBottom");
 

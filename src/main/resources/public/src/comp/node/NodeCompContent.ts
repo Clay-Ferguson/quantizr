@@ -49,8 +49,9 @@ export class NodeCompContent extends Div {
         type = type || S.plugin.getType(J.NodeType.NONE);
         this.domPreUpdateFunc = type.domPreUpdateFunction;
 
-        /* if node owner matches node id this is someone's account root node, so what we're doing here is not
-        showing the normal attachment for this node, because that will the same as the avatar */
+        /* if node owner matches node id this is someone's account root node, so what we're doing
+        here is not showing the normal attachment for this node, because that will the same as the
+        avatar */
         const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
         const showImages = (ast.docImages || this.tabData.id !== C.TAB_DOCUMENT) && S.props.hasBinary(this.node) && !isAccountNode;
         if (showImages) {
@@ -97,11 +98,11 @@ export class NodeCompContent extends Div {
             attachments.forEach(att => {
                 if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
 
-                // having 'att.key' is a client-side only hack, and only generated during the ordering,
-                // so we break a bit of type safety here.
+                // having 'att.key' is a client-side only hack, and only generated during the
+                // ordering, so we break a bit of type safety here.
 
-                // show it here only if there's no "position(p)" for it, because the positioned ones are layed out
-                // via html in 'render.injectSubstitutions'
+                // show it here only if there's no "position(p)" for it, because the positioned ones
+                // are layed out via html in 'render.injectSubstitutions'
                 if (!att.p || att.p === "auto") {
                     attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, null));
                 }

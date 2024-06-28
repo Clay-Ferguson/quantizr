@@ -11,8 +11,8 @@ export class AiAnswerType extends TypeBase {
         super(J.NodeType.AI_ANSWER, "AI Answer", "fa-android", false);
     }
 
-    // For now i'm not sure how we should indicate visibly that a
-    // node is a comment, so I'm just not doing it, but this code DOES work.
+    // For now i'm not sure how we should indicate visibly that a node is a comment, so I'm just not
+    // doing it, but this code DOES work.
     override getExtraMarkdownClass(): string {
         return "aiAnswer";
     }

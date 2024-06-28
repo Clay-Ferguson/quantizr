@@ -25,8 +25,9 @@ export class AppState {
     }
 
     // this will be true only if screen width greater than 1024px. In desktop mode we have the RHS
-    // panel in a popup, and if this var is false that means we're allowing the RHS only in this popup panel
-    // that can be triggered by the sitemap button on the upper left. For mobile mode this is always true.
+    // panel in a popup, and if this var is false that means we're allowing the RHS only in this
+    // popup panel that can be triggered by the sitemap button on the upper left. For mobile mode
+    // this is always true.
     showRhs = true;
 
     appInitComplete = false;
@@ -44,10 +45,10 @@ export class AppState {
     /* text at top of page, when user tries to upLevel too far etc */
     pageMessage: string = null;
 
-    /* This allows us to detect when we're rendering the main page so we can set it to hidden visibilty until the scrolling
-    has been done, or else we can get a bad flicker effect when page renders at wrong scroll position and then scrolls
-    while the user is watching. With this flag it helps us just pop up instantly to the correct content AND scrolled to exactly
-    where we want it.
+    /* This allows us to detect when we're rendering the main page so we can set it to hidden
+    visibilty until the scrolling has been done, or else we can get a bad flicker effect when page
+    renders at wrong scroll position and then scrolls while the user is watching. With this flag it
+    helps us just pop up instantly to the correct content AND scrolled to exactly where we want it.
     */
     rendering: boolean = false;
 
@@ -63,9 +64,9 @@ export class AppState {
     node: NodeInfo;
     highlightNodeId: string = null;
 
-    // if this is non-null when we ask a question with the "AI Ask", button AND we are on the ThreadView tab
-    // then we know that after the node is answered we take the anser and append it to the threadview results and
-    // refresh via dispatch
+    // if this is non-null when we ask a question with the "AI Ask", button AND we are on the
+    // ThreadView tab then we know that after the node is answered we take the anser and append it
+    // to the threadview results and refresh via dispatch
     threadViewQuestionId: string = null;
 
     indexHighlightNode: string = null;
@@ -78,13 +79,15 @@ export class AppState {
     activeTab: string = null;
     savedActiveTab: string = null;
 
-    /* data for each tab, which we DO want to keep separate from the GUI view components themselves */
+    /* data for each tab, which we DO want to keep separate from the GUI view components themselves
+    */
     tabData: TabIntf[] = [];
 
     // null means we haven't read the yet and the server will get them as needed.
     friendHashTags: string[] = null;
 
-    // This determines what thing is being displayed fullscreen, and can only be one thing at a time.
+    // This determines what thing is being displayed fullscreen, and can only be one thing at a
+    // time.
     fullScreenConfig: FullScreenConfig = { type: FullScreenType.NONE };
 
     graphSearchText: string = null;
@@ -177,15 +180,18 @@ export class AppState {
     attractionLinksInGraph: boolean = true;
     graphPowerFactor: string = "constant";
 
-    // holds nodeId of the current conversation thread leaf node. The one the thread view was 'executed' on.
+    // holds nodeId of the current conversation thread leaf node. The one the thread view was
+    // 'executed' on.
     threadViewFromNodeId: string = null;
 
-    // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
+    // when we open the Thread View we record here what Tab we were on so that the "Go back", button
+    // can switch to it.
     threadViewFromTab: string = null;
 
     searchViewFromNode: NodeInfo = null; // rename to searchViewFromNode
 
-    // when we open the Thread View we record here what Tab we were on so that the "Go back", button can switch to it.
+    // when we open the Thread View we record here what Tab we were on so that the "Go back", button
+    // can switch to it.
     searchViewFromTab: string = null;
 
     repliesViewNodeId: string = null;
@@ -199,8 +205,8 @@ export class AppState {
     morePanelExpanded: boolean;
     propsPanelExpanded: boolean;
 
-    // When this is on null it means user is in the process of linking two nodes, and we're
-    // ready for them to select the target node to finish linking the linkSource to the target node
+    // When this is on null it means user is in the process of linking two nodes, and we're ready
+    // for them to select the target node to finish linking the linkSource to the target node
     linkSource: string = null;
 
     nodeHistory: NodeHistoryItem[] = [];

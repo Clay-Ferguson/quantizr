@@ -33,16 +33,16 @@ import { NodeCompContent } from "./comp/node/NodeCompContent";
 export class Render {
     private debug: boolean = false;
 
-    // After adding the breadcrumb query it's a real challenge to get this fading to work right, so for now
-    // I'm disabling it entirely with this flag.
+    // After adding the breadcrumb query it's a real challenge to get this fading to work right, so
+    // for now I'm disabling it entirely with this flag.
     enableRowFading: boolean = true;
 
     fadeInId: string;
     allowFadeInId: boolean = false;
 
     injectSubstitutions = (node: NodeInfo, val: string): string => {
-        // note: this is only here to get the markdown renderer to have padding in plain text, but also
-        // it means we can leave off the language type and get a plaintext as default
+        // note: this is only here to get the markdown renderer to have padding in plain text, but
+        // also it means we can leave off the language type and get a plaintext as default
         val = val.replaceAll("```txt\n", "```plaintext\n");
 
         val = val.replaceAll("{{locationOrigin}}", window.location.origin);
@@ -475,9 +475,10 @@ export class Render {
                         this.allowFadeInId = true;
                     }
 
-                    // only focus the TAB if we're not editing, because if editing the edit field will be focused. In other words,
-                    // if we're about to initiate editing a TextArea field will be getting focus
-                    // so we don't want to set the MAIN tab as the focus and mess that up.
+                    // only focus the TAB if we're not editing, because if editing the edit field
+                    // will be focused. In other words, if we're about to initiate editing a
+                    // TextArea field will be getting focus so we don't want to set the MAIN tab as
+                    // the focus and mess that up.
                     // console.log("focus MAIN_TAB during render.");
                     if (!s.editNode) {
                         S.domUtil.focusId(C.TAB_MAIN);
@@ -494,13 +495,14 @@ export class Render {
         if (!node || !node.children) return null;
 
         /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
-         * the client side for various reasons.
+         * Number of rows that have actually made it onto the page to far. Note: some nodes get
+         * filtered out on the client side for various reasons.
          */
         const layout = S.props.getPropStr(J.NodeProp.LAYOUT, node);
         const ast = getAs();
 
-        /* Note: for edit mode (and our own node), or on mobile devices, always use vertical layout. */
+        /* Note: for edit mode (and our own node), or on mobile devices, always use vertical layout.
+        */
         if ((ast.userPrefs.editMode && S.props.isMine(node)) || ast.mobileMode || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, tabData, level, allowNodeMove, true);
         }
@@ -544,7 +546,8 @@ export class Render {
             return null;
         }
 
-        // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+        // Note: we DO have the image width/height set on the node object (node.width, node.hight)
+        // but we don't need it for anything currently
         return new Img({
             src,
             // For Transfer in Progress need a RED border here.

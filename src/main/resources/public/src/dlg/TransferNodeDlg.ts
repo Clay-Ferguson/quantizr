@@ -35,7 +35,8 @@ export class TransferNodeDlg extends DialogBase {
         return [
             new Div(null, null, [
                 this.operation === "transfer" ? new FlexRowLayout([
-                    // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
+                    // Only the admin user can transfer from anyone to anyone. Other users can only
+                    // transfer nodes they own
                     getAs().isAdminUser ? new TextField({ label: "From User", val: this.fromUserState, outterClass: "marginRight" }) : null,
                     new TextField({ label: "To User", val: this.toUserState })
                 ]) : null,

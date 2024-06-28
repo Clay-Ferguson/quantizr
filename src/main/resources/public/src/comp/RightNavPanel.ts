@@ -110,7 +110,8 @@ export class RightNavPanel extends Div {
             className: "fa fa-volume-up fa-lg marginRight clickable",
 
             // This mouseover stuff is compensating for the fact that when the onClick gets called
-            // it's a problem that by then the text selection "might" have gotten lost. This can happen.
+            // it's a problem that by then the text selection "might" have gotten lost. This can
+            // happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
             onClick: () => S.speech.speakSelOrClipboard(false),
@@ -240,7 +241,8 @@ export class RightNavPanel extends Div {
                 attr.title = "Click to edit your Profile Info";
             }
 
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            // Note: we DO have the image width/height set on the node object (node.width,
+            // node.hight) but we don't need it for anything currently
             return new Img(attr);
         }
         else {

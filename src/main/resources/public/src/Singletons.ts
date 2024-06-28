@@ -21,8 +21,9 @@ import { HistoryUtil } from "./HistoryUtil";
 import { Attach } from "./Attach";
 import { AIUtil } from "./AIUtil";
 
-/* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
-to result in any circular-references during load time, because they instantiate only other interfaces 
+/* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and
+guaranteed not to result in any circular-references during load time, because they instantiate only
+other interfaces 
 
 IMPORTANT: These are all initialied in Factory.ts
 */

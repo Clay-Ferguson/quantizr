@@ -4,9 +4,9 @@ import { Div } from "./Div";
 export class ButtonBar extends Comp {
 
     // wrapperClass can be 'text-center' for centering.
-    /* WARNING: There's a flawed edge case where if you have only ONE button, and it happens to be 'float-end' then
-     the button bar ends up taking up ZERO height, and breaks the layout. The solution is to add a "new Clearfix()"
-     after the ButtonBar (below the ButtonBar) */
+    /* WARNING: There's a flawed edge case where if you have only ONE button, and it happens to be
+     'float-end' then the button bar ends up taking up ZERO height, and breaks the layout. The
+     solution is to add a "new Clearfix()" after the ButtonBar (below the ButtonBar) */
     constructor(buttons: Comp[] = null, private wrapperClass: string = null, private extraClass: string = null) {
         super(null);
         this.setChildren(buttons);

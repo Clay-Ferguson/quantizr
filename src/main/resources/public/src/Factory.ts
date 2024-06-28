@@ -1,11 +1,11 @@
 /*
-This is a 'Factory', but the main thing it does is manage the singletons, somewhat analoglous to a SpringContext (in Java)
-but actually existing for mostly different reasons having to do with our need to support circular
-references.
+This is a 'Factory', but the main thing it does is manage the singletons, somewhat analoglous to a
+SpringContext (in Java) but actually existing for mostly different reasons having to do with our
+need to support circular references.
 
-WARNING: Singletons (just like in Spring) are not allowed to do any logic that requires other modules
-inside their constructors because there is no guarantee that all (or any) of the other Singletons have
-been constructed yet.
+WARNING: Singletons (just like in Spring) are not allowed to do any logic that requires other
+modules inside their constructors because there is no guarantee that all (or any) of the other
+Singletons have been constructed yet.
 */
 import { AIUtil } from "./AIUtil";
 import { Attach } from "./Attach";
@@ -35,8 +35,8 @@ console.log("Factory.ts imports complete");
 export class Factory {
 
     /*
-     * Just like in a SpringContext, we init all singletons up front and this allows circular references
-     * to exist in any of the imports with no problems.
+     * Just like in a SpringContext, we init all singletons up front and this allows circular
+     * references to exist in any of the imports with no problems.
      */
     constructor() {
         try {

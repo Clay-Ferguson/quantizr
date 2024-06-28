@@ -134,8 +134,9 @@ export class ExportDlg extends DialogBase {
 
     exportResponse = (res: J.ExportResponse) => {
         const hostAndPort: string = S.util.getHostAndPort();
-        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
-        the plan is to have the export return the actual md5 of the export for use here */
+        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
+        eventually the plan is to have the export return the actual md5 of the export for use here
+        */
 
         // disp=inline (is the other)
         const downloadLink = hostAndPort + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;

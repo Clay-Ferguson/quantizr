@@ -63,11 +63,12 @@ export class EditNodeDlg extends DialogBase {
 
     pendingEncryptionChange: boolean = false;
 
-    // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
+    // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if
+    // they don't click save.
     binaryDirty: boolean = false;
 
-    /* Since some of our property editing (the Selection components) modify properties 'in-place' in the node we have
-    this initialProps clone so we can 'rollback' properties if use clicks cancel */
+    /* Since some of our property editing (the Selection components) modify properties 'in-place' in
+    the node we have this initialProps clone so we can 'rollback' properties if use clicks cancel */
     initialProps: PropertyInfo[];
 
     allowEditAllProps: boolean = false;
@@ -83,12 +84,14 @@ export class EditNodeDlg extends DialogBase {
         let signCheckboxVal = false;
         let encryptCheckboxVal = false;
         if (S.crypto.avail) {
-            // set checkbox to always on if this is admin user, otherwise set based on if it's already signed or not
+            // set checkbox to always on if this is admin user, otherwise set based on if it's
+            // already signed or not
             signCheckboxVal = ast.isAdminUser ? true : !!S.props.getPropStr(J.NodeProp.CRYPTO_SIG, ast.editNode);
             encryptCheckboxVal = S.props.isEncrypted(ast.editNode);
         }
 
-        // we have this inst just so we can let the autoSaveTimer be static and always reference the latest one.
+        // we have this inst just so we can let the autoSaveTimer be static and always reference the
+        // latest one.
         EditNodeDlg.currentInst = this;
 
         this.mergeState<LS>({
@@ -122,8 +125,9 @@ export class EditNodeDlg extends DialogBase {
 
         // create one timer one time (singleton pattern)
         if (!EditNodeDlg.autoSaveTimer) {
-            // save editor state every few seconds so user can recover editing if anything goes wrong.
-            // This should be CLEARED upon successful saves only, and have this static var set back to null
+            // save editor state every few seconds so user can recover editing if anything goes
+            // wrong. This should be CLEARED upon successful saves only, and have this static var
+            // set back to null
             EditNodeDlg.autoSaveTimer = setInterval(() => {
                 const ast = getAs();
                 if (!ast || !ast.editNode) return;
@@ -315,7 +319,8 @@ export class EditNodeDlg extends DialogBase {
             });
 
             propsTable = propsParent;
-            // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
+            // This is the container that holds the custom properties if provided, or else the
+            // name+content textarea at the top of not
             mainPropsTable = new Div(null, {
                 className: "marginBottom"
             });
@@ -702,8 +707,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     save = async () => {
-        // it's important to call saveNode before close, because close destroys some of our state, what we need
-        // to complete the updating and page refresh.
+        // it's important to call saveNode before close, because close destroys some of our state,
+        // what we need to complete the updating and page refresh.
         const savedOk: boolean = await this.utl.saveNode(this);
         if (savedOk) {
             this.close();
@@ -724,8 +729,8 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        // it's important to call saveNode before close, because close destroys some of our state, what we need
-        // to complete the updating and page refresh.
+        // it's important to call saveNode before close, because close destroys some of our state,
+        // what we need to complete the updating and page refresh.
         const savedOk: boolean = await this.utl.saveNode(this);
         if (savedOk) {
             this.close();
@@ -863,8 +868,9 @@ export class EditNodeDlg extends DialogBase {
         allowCheckbox: boolean, rows: number, flexPropsEditPanel: boolean): Div => {
         const ast = getAs();
 
-        // Warning: Don't put any left/right margins on this row because the widths to allow widths that sum to
-        // precisely 100% to work correctly. Adding a margin would make it wrap prematurely.
+        // Warning: Don't put any left/right margins on this row because the widths to allow widths
+        // that sum to precisely 100% to work correctly. Adding a margin would make it wrap
+        // prematurely.
         const rowAttribs: any = { className: "marginBottom" };
         const propConfig = type?.getPropConfig(propEntry.name);
         const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
@@ -891,8 +897,8 @@ export class EditNodeDlg extends DialogBase {
         let valEditor: Comp = null;
         const multiLine = rows > 1;
 
-        // We have the one special case that a property named 'date' is assumed to be a "Date" type always
-        // DATE TYPE
+        // We have the one special case that a property named 'date' is assumed to be a "Date" type
+        // always DATE TYPE
         if (propType === I.DomainType.Date || propEntry.name === J.NodeProp.DATE) {
             let durationState: Validator = null;
             if (durationPropEntry) {

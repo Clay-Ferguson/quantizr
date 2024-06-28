@@ -35,7 +35,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
             ], null),
 
             new Div(null, { className: "settingsPanel" }, [
-                // -----------------------
+                
                 this.sectionTitle("Account"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
@@ -55,7 +55,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     ])
                 ], horzClass),
 
-                // -----------------------
                 this.sectionTitle("View"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
@@ -89,7 +88,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
 
-                // -----------------------
                 this.sectionTitle("Tools"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
@@ -102,7 +100,6 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     ])
                 ], horzClass),
 
-                // -----------------------
                 this.sectionTitle("Danger Zone"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [

@@ -91,13 +91,14 @@ export class Crypto {
         }
 
         /*
-        Note: This vector is merely required
-        to be large enough and random enough, but is not required to be secret. 16 randomly chosen prime numbers.
-        WARNING: If you change this you will NEVER be able to recover any data encrypted with it in effect, even with the correct password. So
-        beware if you change this you've basically lost ALL your passwords. So just don't change it.
+        Note: This vector is merely required to be large enough and random enough, but is not
+        required to be secret. 16 randomly chosen prime numbers. WARNING: If you change this you
+        will NEVER be able to recover any data encrypted with it in effect, even with the correct
+        password. So beware if you change this you've basically lost ALL your passwords. So just
+        don't change it.
 
-        todo-2: According to some crypto experts, this initialization vector should not be reused like this but instead stored
-        along with the encryption key.
+        todo-2: According to some crypto experts, this initialization vector should not be reused
+        like this but instead stored along with the encryption key.
         */
         // iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
@@ -116,8 +117,8 @@ export class Crypto {
 
     /* Runs a full test of all encryption code.
 
-       Assumes that Encryption.initKeys() has previously been called, which is
-       safe to assume because we run it during app initialization.
+       Assumes that Encryption.initKeys() has previously been called, which is safe to assume
+       because we run it during app initialization.
     */
     encryptionTest = async (): Promise<string> => {
         this.runConversionTest();
@@ -322,8 +323,8 @@ export class Crypto {
             });
 
             if (res.code == C.RESPONSE_CODE_OK) {
-                // note, even though we only update these if successful on the server the client side will still definitely
-                // have the new keys in the LocalDB already
+                // note, even though we only update these if successful on the server the client
+                // side will still definitely have the new keys in the LocalDB already
                 if (newAsymEncKey) {
                     S.crypto.asymEncKey = newAsymEncKey;
                 }
@@ -577,7 +578,8 @@ export class Crypto {
     }
 
     /**
-     * Returns a string the user can save locally containing all encryption keys stored  in the browser.
+     * Returns a string the user can save locally containing all encryption keys stored  in the
+     * browser.
      *
      * Export is in JWK format: https://tools.ietf.org/html/rfc7517
      */
@@ -660,23 +662,24 @@ export class Crypto {
     }
 
     /**
-     * This is the primary way of encrypting data that uses a randomly generated symmetric key to
-     * do the encryption and then encrypts that symmetric key itself using the Public Key provided, or
+     * This is the primary way of encrypting data that uses a randomly generated symmetric key to do
+     * the encryption and then encrypts that symmetric key itself using the Public Key provided, or
      * public key of current user.
      *
-     * This is a very standard approach in the crypto world, and it allows the owner of the associated
-     * keypair (i.e. private key) to be able to share the data securely with arbitrary other users by simply publishing
-     * this symmetric key (to the actual data) to individuals by encrypting said symmetric key with that
-     * user's public key.
+     * This is a very standard approach in the crypto world, and it allows the owner of the
+     * associated keypair (i.e. private key) to be able to share the data securely with arbitrary
+     * other users by simply publishing this symmetric key (to the actual data) to individuals by
+     * encrypting said symmetric key with that user's public key.
      *
-     * Of course, this means the process is that when a user wants to read data shared to them they just use
-     * their private key to decrypt the symmetric key to the data, and use that key to get the data.
+     * Of course, this means the process is that when a user wants to read data shared to them they
+     * just use their private key to decrypt the symmetric key to the data, and use that key to get
+     * the data.
      *
-     * This function returns an object that contains two properties: ciphertext, cipherkey, which is the encrypted data
-     * and the encrypted "JWK" formatted key to the data, respectively
+     * This function returns an object that contains two properties: ciphertext, cipherkey, which is
+     * the encrypted data and the encrypted "JWK" formatted key to the data, respectively
      *
-     * 'publicKey' argument should be the public key of the person doing the encryption (the person doing the encryption)
-     * and if null, it's automatically retrieved from the localDB
+     * 'publicKey' argument should be the public key of the person doing the encryption (the person
+     * doing the encryption) and if null, it's automatically retrieved from the localDB
      */
     encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
         publicKey = publicKey || await this.getPublicEncKey();
@@ -786,8 +789,7 @@ export class Crypto {
         }
     }
 
-    // NOTE: TextEncoder() and TextDecoder() don't support this yet, so we have these two
-    // functions.
+    // NOTE: TextEncoder() and TextDecoder() don't support this yet, so we have these two functions.
     // This can work?? in browser?
     // const messageData = new TextEncoder().encode(message);
     convertStringToByteArray = (str: string): Uint8Array => {
@@ -806,7 +808,8 @@ export class Crypto {
         return str;
     }
 
-    /* This method will simply sign all the strings in 'dataToSign' and then send it up to the server when done */
+    /* This method will simply sign all the strings in 'dataToSign' and then send it up to the
+    server when done */
     generateAndSendSigs = async (dataToSign: J.NodeSigPushInfo): Promise<void> => {
 
         if (!this.sigKeyOk()) {

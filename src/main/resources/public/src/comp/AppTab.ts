@@ -4,9 +4,9 @@ import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 
-/* NOTE: All classes derived from AppTab should have each top-level (in the vertical dimension) item having
-a class 'data.id' tacked on to it. This class is expected to be there for managing scrolling, and also the
-IDs on each of those elements needs to be repeatable across all renders. */
+/* NOTE: All classes derived from AppTab should have each top-level (in the vertical dimension) item
+having a class 'data.id' tacked on to it. This class is expected to be there for managing scrolling,
+and also the IDs on each of those elements needs to be repeatable across all renders. */
 
 // PT=Properties Type, TT=Tab Type
 export class AppTab<PT = any, TT = any> extends Div {
@@ -64,13 +64,14 @@ export class AppTab<PT = any, TT = any> extends Div {
             // headingBar is not fixed height so we get it's hight in realtime here.
             const headingBarHeight = this.headingBar?.getRef()?.offsetHeight || 0;
 
-            // we scroll up the additional 12 pixels just to make a slight gap between top row border
-            // and heading border, because it's slightly better looking that way.
+            // we scroll up the additional 12 pixels just to make a slight gap between top row
+            // border and heading border, because it's slightly better looking that way.
             let top = elm.offsetTop - headingBarHeight - 12;
             if (top < 0) top = 0;
 
             // If we were gonna scroll somewhere near the top of the page go ahead and scroll to the
-            // the top and the node we're interested in will be no lower than the middle of the screen.
+            // the top and the node we're interested in will be no lower than the middle of the
+            // screen.
             if (top < window.innerHeight / 2) {
                 top = 0;
             }

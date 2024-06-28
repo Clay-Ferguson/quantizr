@@ -60,8 +60,8 @@ export class Search {
     }
 
     showThread = async (nodeId: string) => {
-        // First call the server in case it has enough data already to render the Thread, in which case
-        // we don't need to load any events from relays via client
+        // First call the server in case it has enough data already to render the Thread, in which
+        // case we don't need to load any events from relays via client
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
             // if 'loadOthers' is true we add more tree content at more levels up the tree rather than the pure history of replies
@@ -263,9 +263,9 @@ export class Search {
     /* prop = mtm (modification time) | ctm (create time) */
     timeline = async (nodeId: string, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
 
-        /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
-        including when the page==0 because user is just jumping to beginning. Need a specific param for saying
-        it's ok to reset node or not */
+        /* this code AND other similar code needs a way to lockin the node, here so it can't change
+        during pagination including when the page==0 because user is just jumping to beginning. Need
+        a specific param for saying it's ok to reset node or not */
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
@@ -278,8 +278,8 @@ export class Search {
             return;
         }
 
-        // Note: we don't need to pass 'searchRoot' to the browser, but we do set it in this view's data property
-        // because we need it on the client side
+        // Note: we don't need to pass 'searchRoot' to the browser, but we do set it in this view's
+        // data property because we need it on the client side
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot: null,
             page,

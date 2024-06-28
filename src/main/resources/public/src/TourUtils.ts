@@ -51,9 +51,10 @@ export class TourUtils {
                         console.log("Class Found: " + elms[i].id);
                         elms[i].classList.add("tourHighlight");
 
-                        // TODO: This will be more challenging, because we might need to allow the user to make
-                        // multiple clicks to reach that desired 'state' to move forward, so let's require
-                        // a manual click of the "Next Step" button for now.
+                        // TODO: This will be more challenging, because we might need to allow the
+                        // user to make multiple clicks to reach that desired 'state' to move
+                        // forward, so let's require a manual click of the "Next Step" button for
+                        // now.
                         //
                         // // Advancees to next step automatically, although this may not necessarily
                         // // always work.

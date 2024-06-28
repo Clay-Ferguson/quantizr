@@ -5,7 +5,7 @@ interface LS { // Local State
 }
 
 export class Span extends Comp {
-    constructor(content: string = "", attribs: Attribs = {}, children: Comp[] = null) {
+    constructor(content: string = "", attribs: Attribs = null, children: Comp[] = null) {
         super(attribs);
         this.mergeState<LS>({ content });
         this.setTag("span");

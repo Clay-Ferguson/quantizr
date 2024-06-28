@@ -38,8 +38,8 @@ export class ServerPush {
 
         this.eventSource.onerror = (e: any) => {
             console.log("ServerPush.onerror: token=" + authToken + " e=" + S.util.prettyPrint(e));
-            // if server push is failing try to recover in 5 seconds by creating new instance, we wait 5 secs
-            // just because my paranoia tells me to fear endless loops
+            // if server push is failing try to recover in 5 seconds by creating new instance, we
+            // wait 5 secs just because my paranoia tells me to fear endless loops
             this.eventSource = null;
             setTimeout(() => {
                 this.init(S.quanta.authToken);
@@ -73,7 +73,8 @@ export class ServerPush {
             this.nodePushed(data.nodeInfo);
         }, false);
 
-        // This is where we receive signing requests pushed from the server to be signed by the browser and pushed back up.
+        // This is where we receive signing requests pushed from the server to be signed by the
+        // browser and pushed back up.
         this.eventSource.addEventListener("sigPush", async (e: any) => {
             const data: J.NodeSigPushInfo = JSON.parse(e.data);
             await S.crypto.generateAndSendSigs(data);
@@ -148,8 +149,8 @@ export class ServerPush {
                     this.pushToLiveTab(nodeInfo, TimelineTab.inst);
                 }
 
-                // we only forcably update FeedTab if the node is mine, because the filtering is complex, and the
-                // server sends us all the nodes regardless of filter.
+                // we only forcably update FeedTab if the node is mine, because the filtering is
+                // complex, and the server sends us all the nodes regardless of filter.
                 if (isMine) {
                     this.pushToLiveTab(nodeInfo, FeedTab.inst);
                 }

@@ -87,8 +87,8 @@ export class View {
         });
         S.nodeUtil.processInboundNode(res.node);
 
-        // if jumpToRss that means we don't want to display the node, but jump straight to the RSS Tab and display
-        // the actual RSS feed that this node defines.
+        // if jumpToRss that means we don't want to display the node, but jump straight to the RSS
+        // Tab and display the actual RSS feed that this node defines.
         if (a.jumpToRss && res?.rssNode) {
             dispatch("LoadingFeed", s => {
                 s.savedActiveTab = s.activeTab;
@@ -141,8 +141,8 @@ export class View {
         // this.loadPage(true, targetOffset, state);
     }
 
-    /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page and we
-    need to load more records automatically, and add to existing page records */
+    /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page
+    and we need to load more records automatically, and add to existing page records */
     growPage = () => {
         const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
@@ -151,7 +151,8 @@ export class View {
         }
     }
 
-    /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
+    /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the
+    current view */
     private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean) => {
         const ast = getAs();
 
@@ -173,8 +174,9 @@ export class View {
 
         // if this is an "infinite scroll" call to load in additional nodes
         if (growingPage) {
-            /* if the response has some children, and we already have local children we can add to, and we haven't reached
-            max dynamic rows yet, then make our children equal the concatenation of existing rows plus new rows */
+            /* if the response has some children, and we already have local children we can add to,
+            and we haven't reached max dynamic rows yet, then make our children equal the
+            concatenation of existing rows plus new rows */
             if (res?.node?.children && ast?.node?.children) {
                 // create a set for duplicate detection
                 const idSet: Set<string> = new Set<string>();
@@ -269,9 +271,9 @@ export class View {
                 be what user wants to see */
                 node = node || S.nodeUtil.getHighlightedNode();
 
-                /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
-                 a case where the user is editing a node and we KNOW we don't need to scroll after editing,
-                 so this is where we detect and reset that scenario. */
+                /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able
+                 to detect a case where the user is editing a node and we KNOW we don't need to
+                 scroll after editing, so this is where we detect and reset that scenario. */
                 if (!node || node.id === S.quanta.noScrollToId) {
                     return;
                 }

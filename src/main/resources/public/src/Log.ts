@@ -20,9 +20,9 @@ export class Log {
 
     public static log(msg: any): any {
 
-        // This allows for alertDebug=1 param to be able to be
-        // set on the URL to debug with alerts on platforms where there's
-        // a problem starting up the app, and even the JS console is not usable.
+        // This allows for alertDebug=1 param to be able to be set on the URL to debug with alerts
+        // on platforms where there's a problem starting up the app, and even the JS console is not
+        // usable.
         if (!Log.paramsChecked) {
             Log.paramsChecked = true;
             if (S.util.getParameterByName("alertDebug")) {

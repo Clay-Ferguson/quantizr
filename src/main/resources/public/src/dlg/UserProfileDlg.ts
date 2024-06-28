@@ -31,8 +31,8 @@ export class UserProfileDlg extends DialogBase {
     displayNameState: Validator = new Validator();
     textScrollPos = new ScrollPos();
 
-    /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
-    some other user, and this dialog should be readOnly */
+    /* If no userNodeId is specified this dialog defaults to the current logged in user, or else
+    will be some other user, and this dialog should be readOnly */
     constructor(private userNodeId: string) {
         super("User Profile", "appModalCont");
         const ast = getAs();
@@ -168,8 +168,8 @@ export class UserProfileDlg extends DialogBase {
     }
 
     /**
-     * NOTE: There's two different URL formats here because there's two different ways to access
-     * a named node (which are: via url, or via a parameter on the url)
+     * NOTE: There's two different URL formats here because there's two different ways to access a
+     * named node (which are: via url, or via a parameter on the url)
      */
     openUserNodeByName = (state: LS, nodeName: string) => {
         this.close();
@@ -340,7 +340,8 @@ export class UserProfileDlg extends DialogBase {
                 att.title = "Click to upload Avatar Image";
             }
 
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            // Note: we DO have the image width/height set on the node object (node.width,
+            // node.hight) but we don't need it for anything currently
             return new Img(att);
         }
         else {
@@ -398,7 +399,8 @@ export class UserProfileDlg extends DialogBase {
                 att.title = "Click to upload Header Image";
             }
 
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            // Note: we DO have the image width/height set on the node object (node.width,
+            // node.hight) but we don't need it for anything currently
             return new Img(att);
         }
         else {

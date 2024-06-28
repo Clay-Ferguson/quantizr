@@ -77,15 +77,15 @@ export class EditNodeDlgUtil {
         this.saveAttFileNamesToNode(editNode, dlg);
 
         /*
-        Note: if this is an encrypted node we will be signing the cipher text (encrypted string), 
+        Note: if this is an encrypted node we will be signing the cipher text (encrypted string),
         because content has already  been encrypted just above.
-        
+
         todo-2: Note: We only sign if admin for now, by design */
 
         if (dlg.getState<EditNodeDlgState>().signCheckboxVal) {
             if (S.crypto.avail) {
-                // Note: this needs to come AFTER the 'savePropsToNode' call above because we're overriding what was
-                // possibly in there.
+                // Note: this needs to come AFTER the 'savePropsToNode' call above because we're
+                // overriding what was possibly in there.
                 await S.crypto.signNode(editNode);
             }
         }
@@ -105,7 +105,8 @@ export class EditNodeDlgUtil {
             const propState = dlg.propStates.get(prop.name);
 
             if (propState) {
-                // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
+                // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON
+                // types to properties)
                 if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
                     try {
                         prop.value = parseInt(propState.getValue());
@@ -279,9 +280,9 @@ export class EditNodeDlgUtil {
             try {
                 /* If we're turning off encryption for the node */
                 if (!encrypt) {
-                    /* Take what's in the editor and put
-                    that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
-                    in the case where the user made some changes before disabling encryption. */
+                    /* Take what's in the editor and put that into this.node.content, because it's
+                    the correct and only place the correct updated text is guaranteed to be in the
+                    case where the user made some changes before disabling encryption. */
                     ast.editNode.content = dlg.contentEditor.getValue();
                     S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, null);
                 }
@@ -295,9 +296,10 @@ export class EditNodeDlgUtil {
                         if (skdp.cipherKey && skdp.cipherKey) {
                             ast.editNode.content = J.Constant.ENC_TAG + skdp.cipherText;
 
-                            /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
-                            the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
-                            and so can only be decrypted with their private key. */
+                            /* Set ENC_KEY to be the encrypted key, which when decrypted can be used
+                            to decrypt the content of the node. This ENC_KEY was encrypted with the
+                            public key of the owner of this node, and so can only be decrypted with
+                            their private key. */
                             S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, skdp.cipherKey);
                         }
                     }
@@ -431,10 +433,11 @@ export class EditNodeDlgUtil {
         this.initPropStates(dlg, ast.editNode);
     }
 
-    /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
-the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
-an upload has been added or removed.
-*/
+    /* Initializes the propStates for every property in 'node', and optionally if
+    'onlyBinaries==true' then we process ONLY the properties on node that are in
+    'S.props.allBinaryProps' list, which is how we have to update the propStates after an upload has
+    been added or removed.
+    */
     initPropStates = (dlg: EditNodeDlg, node: NodeInfo): any => {
         const type = S.plugin.getType(node.type);
         if (type) {
@@ -486,8 +489,8 @@ an upload has been added or removed.
 
     insertEmoji = async (dlg: EditNodeDlg) => {
         if (!dlg.contentEditor) return;
-        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
-        // loose the cursor position.
+        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus
+        // will make us also loose the cursor position.
         const selStart = dlg.contentEditor.getSelStart();
         const eDlg: EmojiPickerDlg = new EmojiPickerDlg();
         await eDlg.open();
@@ -500,8 +503,8 @@ an upload has been added or removed.
         if (!dlg.contentEditor) return;
         // get the selStart immediately or it can be wrong, after renders.
         const selStart = dlg.contentEditor.getSelStart();
-        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus will make us also
-        // loose the cursor position.
+        // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus
+        // will make us also loose the cursor position.
 
         const friendsDlg: FriendsDlg = new FriendsDlg("Friends", null, false);
         await friendsDlg.open();

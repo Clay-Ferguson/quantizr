@@ -53,8 +53,8 @@ export class FeedTab implements TabIntf<FeedViewProps> {
         const ast = getAs();
 
         return new Div(null, { className: "tabSubOptions" }, [
-            // todo-1: we'll eventually have this as an admin option,
-            // but for now allow it only for admin user
+            // todo-1: we'll eventually have this as an admin option, but for now allow it only for
+            // admin user
             ast.isAdminUser ? new AppNavLink("Public Posts", S.nav.messagesFediverse) : null,
 
             ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),

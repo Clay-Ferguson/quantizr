@@ -10,8 +10,8 @@ export class PubSub {
     // (each element holds an array of functions)
     private static registryOnce: any = {};
 
-    // allows only ONE function at a time to subscribe to any given event. Last sub overrides any previous or pending ones
-    // (each element holds a function, not an array)
+    // allows only ONE function at a time to subscribe to any given event. Last sub overrides any
+    // previous or pending ones (each element holds a function, not an array)
     private static registrySingleOnce: any = {};
 
     private static lastFires: any = {};

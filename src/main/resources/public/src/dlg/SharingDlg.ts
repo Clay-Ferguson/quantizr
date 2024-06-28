@@ -170,7 +170,8 @@ export class SharingDlg extends DialogBase {
         }
 
         /*
-         * Add privilege and then reload share nodes dialog from scratch doing another callback to server
+         * Add privilege and then reload share nodes dialog from scratch doing another callback to
+         * server
          *
          * TODO: this additional call can be avoided as an optimization
          */
@@ -180,7 +181,8 @@ export class SharingDlg extends DialogBase {
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
-        // Since this is a common usage pattern, let's automatically set the unpublished and recursive flags
+        // Since this is a common usage pattern, let's automatically set the unpublished and
+        // recursive flags
         if (userName == PrincipalName.PUBLIC) {
             this.mergeState<LS>({ recursive: true });
             S.props.setPropVal(J.NodeProp.UNPUBLISHED, ast.editNode, "true");

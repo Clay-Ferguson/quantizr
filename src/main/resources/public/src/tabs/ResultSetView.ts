@@ -38,8 +38,8 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
 
         /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-         * client side for various reasons.
+         * Number of rows that have actually made it onto the page to far. Note: some nodes get
+         * filtered out on the client side for various reasons.
          */
         let rowCount = 0;
 
@@ -128,8 +128,8 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     }
 
     /* overridable (don't use arrow function) */
-    // Note: It's important to have 'this.data.id' as a classname on every item, even though it's not for styling,
-    // it's essentially to support DOM finding.
+    // Note: It's important to have 'this.data.id' as a classname on every item, even though it's
+    // not for styling, it's essentially to support DOM finding.
     renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
         const ast = getAs();
         const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
@@ -159,9 +159,9 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                     const observer = new IntersectionObserver(entries => {
                         entries.forEach((entry: any) => {
                             if (entry.isIntersecting) {
-                                // if this button comes into visibility within 2 seconds of it being created
-                                // that means it was rendered visible without user scrolling so in this case
-                                // we want to disallow the auto loading
+                                // if this button comes into visibility within 2 seconds of it being
+                                // created that means it was rendered visible without user scrolling
+                                // so in this case we want to disallow the auto loading
                                 if (new Date().getTime() - buttonCreateTime < 2000) {
                                     observer.disconnect();
                                 }

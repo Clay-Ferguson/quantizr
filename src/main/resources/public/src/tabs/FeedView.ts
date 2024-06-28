@@ -29,8 +29,8 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         const ast = getAs();
 
         /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-         * client side for various reasons.
+         * Number of rows that have actually made it onto the page to far. Note: some nodes get
+         * filtered out on the client side for various reasons.
          */
         let rowCount = 0;
 
@@ -42,9 +42,9 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         //     });
         // }
 
-        /* If the user has 'tagged' one or more of their Friends Nodes (by setting a tag value in the editor)
-        by editing one of their friends nodes, then we show a dropdown letting the user quickly choose which
-        tag/category of friends they want to see the feed of */
+        /* If the user has 'tagged' one or more of their Friends Nodes (by setting a tag value in
+        the editor) by editing one of their friends nodes, then we show a dropdown letting the user
+        quickly choose which tag/category of friends they want to see the feed of */
         let friendsTagDropDown: Selection = null;
         if (ast.friendHashTags && ast.friendHashTags.length > 0 && this.data.props.name === J.Constant.FEED_FROMFRIENDS) {
             const items: any[] = [
@@ -152,7 +152,8 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 rowCount++;
             });
 
-            // only show "More" button if we aren't currently editing. Wouldn't make sense to navigate while editing.
+            // only show "More" button if we aren't currently editing. Wouldn't make sense to
+            // navigate while editing.
             if (!ast.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
                 const moreButton = new IconButton("fa-angle-right", "More", {
                     onClick: (event: Event) => {
@@ -171,9 +172,10 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
                                 entries.forEach((entry: any) => {
                                     if (entry.isIntersecting) {
-                                        // if this button comes into visibility within 2 seconds of it being created
-                                        // that means it was rendered visible without user scrolling so in this case
-                                        // we want to disallow the auto loading
+                                        // if this button comes into visibility within 2 seconds of
+                                        // it being created that means it was rendered visible
+                                        // without user scrolling so in this case we want to
+                                        // disallow the auto loading
                                         if (new Date().getTime() - buttonCreateTime < 2000) {
                                             observer.disconnect();
                                         }

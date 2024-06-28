@@ -35,10 +35,11 @@ export class App extends Main {
             return true;
         }
 
-        /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render anything else at all */
+        /* For mobile mode we render just the topmost dialog, if dialogs exist, and don't render
+        anything else at all */
         if (ast.mobileMode && ast.dialogStack.length > 0) {
-            // eventually ONLY mobile will do this 'top-only' display, and desktop mode will have all dialog
-            // divs simultaneously onscreen in background of top one.
+            // eventually ONLY mobile will do this 'top-only' display, and desktop mode will have
+            // all dialog divs simultaneously onscreen in background of top one.
             const dialog = ast.dialogStack[ast.dialogStack.length - 1];
             if (dialog && dialog.mode !== DialogMode.POPUP) {
                 this.setChildren([dialog]);
@@ -82,8 +83,8 @@ export class App extends Main {
         return true;
     }
 
-    /* This is where we send an event that lets code hook into the render cycle to process whatever needs
-        to be done AFTER the main render is complete, like doing scrolling for example */
+    /* This is where we send an event that lets code hook into the render cycle to process whatever
+        needs to be done AFTER the main render is complete, like doing scrolling for example */
     override domUpdateEvent = () => {
         PubSub.pub(C.PUBSUB_mainWindowScroll);
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
@@ -124,8 +125,9 @@ export class App extends Main {
                 onClick: S.user.userLogin
             }) : null;
 
-            // for mobile mode don't try to fit the signup button in the header bar, because the header bar needs
-            // to be fixed height and signup won't fit. There's a signup button on the Login so users can signup
+            // for mobile mode don't try to fit the signup button in the header bar, because the
+            // header bar needs to be fixed height and signup won't fit. There's a signup button on
+            // the Login so users can signup
             const signupButton = ast.isAnonUser && !ast.mobileMode ? new Div("Signup", {
                 className: "marginTop marginRight clickable",
                 id: "loginButton",

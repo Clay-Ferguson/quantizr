@@ -14,7 +14,8 @@ export class ListBox extends Div {
 
     // Handler to update state
     updateVal(value: string): void {
-        /* For list boxes that just present a list and don't have the goal of letting the user 'choose' one, we won't have a valueIntf */
+        /* For list boxes that just present a list and don't have the goal of letting the user
+        'choose' one, we won't have a valueIntf */
         if (this.valueIntf) {
             this.valueIntf.setValue(value);
             this.mergeState({ value });

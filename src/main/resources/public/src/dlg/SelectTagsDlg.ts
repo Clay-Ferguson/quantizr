@@ -162,8 +162,8 @@ export class SelectTagsDlg extends DialogBase {
                 // ignore comments
             }
             else {
-                // additional lines below a heading to describe the heading can be done as long as they are indented by
-                // at least one space on lines below the heading
+                // additional lines below a heading to describe the heading can be done as long as
+                // they are indented by at least one space on lines below the heading
                 if (line && !line.startsWith(" ")) {
                     tags.push({ description: line });
                 }

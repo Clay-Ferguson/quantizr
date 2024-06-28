@@ -52,7 +52,8 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         // let header: Div = null;
         this.setChildren([
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
-            // blogs and other content of that sort which don't need to say "Quanta" (branding name) at top
+            // blogs and other content of that sort which don't need to say "Quanta" (branding name)
+            // at top
             !ast.node ? null : (this.headingBar = new TabHeading([
                 new Div(null, { className: "float-end" }, [
                     new Icon({

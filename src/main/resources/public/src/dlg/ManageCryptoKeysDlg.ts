@@ -50,10 +50,11 @@ export class ManageCryptoKeysDlg extends DialogBase {
         ];
     }
 
-    /* UNUSED: but do not delete. This is not a good usable feature because we regenerate keys as needed.
-     I wrote this as part of testing crypto stuff locally, before I remembered that not only do we generate keys
-     automaitcally I also can't even test this on localhost because browsers require `https` and I don't have a 
-     way do do https locally currently. So, long story short, I might end up needing this method in the future */
+    /* UNUSED: but do not delete. This is not a good usable feature because we regenerate keys as
+     needed. I wrote this as part of testing crypto stuff locally, before I remembered that not only
+     do we generate keys automaitcally I also can't even test this on localhost because browsers
+     require `https` and I don't have a way do do https locally currently. So, long story short, I
+     might end up needing this method in the future */
     removeKey = async () => {
         const dlg = new ConfirmDlg("Remove Crypto Key?", "Warning",
             "btn-danger", "alert alert-danger");

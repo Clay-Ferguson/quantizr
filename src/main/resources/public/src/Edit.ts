@@ -55,8 +55,8 @@ export class Edit {
         }
         S.render.fadeInId = res.node.id;
 
-        // note: newNodeTargetId is only set when we're inserting a new node into the page, and not when we're
-        // expanding a node that's already on the page. Ditto for newNodeTargetOffset.
+        // note: newNodeTargetId is only set when we're inserting a new node into the page, and not
+        // when we're expanding a node that's already on the page. Ditto for newNodeTargetOffset.
         await S.edit.saveNodeResponse(res.node, res, S.quanta.newNodeTargetId, S.quanta.newNodeTargetOffset);
         S.util.notifyNodeUpdated(res.node.id, res.node.type);
     }
@@ -202,8 +202,8 @@ export class Edit {
     /*  
       Creates a new node under parentId node. 
 
-      If `insertAtLoc` is non-null it holds the node whose offset is where the new node will be inserted, and this will
-      be an insert inline kind of insert.
+      If `insertAtLoc` is non-null it holds the node whose offset is where the new node will be
+      inserted, and this will be an insert inline kind of insert.
     */
     startEditingNewNode = async (createAtTop: boolean, parentId: string, siblingId: string, insertAtLoc: NodeInfo,
         ordinalOffset: number, threadViewAiQuestion: boolean) => {
@@ -348,8 +348,8 @@ export class Edit {
                 dispatch("ForceFeedResults", _s => { });
             }
 
-            // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
-            // and so before refreshing the screen we check for that edge case.
+            // It's possible to end up editing a node that's not even on the page, or a child of a
+            // node on the page, and so before refreshing the screen we check for that edge case.
             const parentPath = S.props.getParentPath(node);
             if (!parentPath) return;
 
@@ -367,9 +367,9 @@ export class Edit {
                 }
                 // any kind of insert that's not a new node injected into the page ends up here.
                 else {
-                    // Note the special case here for bookmark. We never want to jump to a bookmark just
-                    // because it got updated. That would take us away from whatever we're working on and
-                    // is never right.
+                    // Note the special case here for bookmark. We never want to jump to a bookmark
+                    // just because it got updated. That would take us away from whatever we're
+                    // working on and is never right.
                     if (node.type !== J.NodeType.BOOKMARK && !S.nodeUtil.displayingOnTree(node.id)) {
                         S.view.jumpToId(ast.afterEditJumpToId || node.id);
                     }
@@ -412,8 +412,9 @@ export class Edit {
         node.children.forEach(n => this.replaceNodeRecursive(n, newNode));
     }
 
-    // This must insert newNode into the local browser memory. We know newNodeTargetId is a sibling node of 
-    // newNode, and newNodeTargetOffset is 0 if we're inserting above, and 1 if we're inserting below.
+    // This must insert newNode into the local browser memory. We know newNodeTargetId is a sibling
+    // node of newNode, and newNodeTargetOffset is 0 if we're inserting above, and 1 if we're
+    // inserting below.
     injectNewNodeIntoChildren = (newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
         // we return the promise from the dispatch and to not wait for it here.
         return promiseDispatch("InjectNewNodeIntoChildren", s => {
@@ -540,20 +541,21 @@ export class Edit {
         const ast = getAs();
 
         // in this loop record the currently topmost visible element in each tab, so we can scroll
-        // those back it view after doing some change to the DOM that will potentially cause the page
-        // to jump to a different effective scroll position.
+        // those back it view after doing some change to the DOM that will potentially cause the
+        // page to jump to a different effective scroll position.
         for (const data of ast.tabData) {
-            // Warning: Uninitialized tabs will have 'scrollPos==undefined' here, so we check for that case, because
-            // otherwise it will get interpreted as a number
-            // We do nothing if user hasn't scrolled down enough to loose their place when the screen rerenders.
+            // Warning: Uninitialized tabs will have 'scrollPos==undefined' here, so we check for
+            // that case, because otherwise it will get interpreted as a number We do nothing if
+            // user hasn't scrolled down enough to loose their place when the screen rerenders.
             if (data.scrollPos == null || data.scrollPos === undefined || data.scrollPos < window.innerHeight / 2) {
                 // do nothing, if window isn't scrolled hafway at least
             }
             else {
                 doScrolling = true;
-                // NOTE: This is tricky here, but correct. The first 'id' is an ID, and the second one is a "class" (passed as arguments
-                // into findFirstVisibleElm), and this is not a bug. It's just a coincidence that 'data.id' is the correct thing
-                // to use for both parameters per what's in the DOM.
+                // NOTE: This is tricky here, but correct. The first 'id' is an ID, and the second
+                // one is a "class" (passed as arguments into findFirstVisibleElm), and this is not
+                // a bug. It's just a coincidence that 'data.id' is the correct thing to use for
+                // both parameters per what's in the DOM.
                 const elm = S.util.findFirstVisibleElm(data.id, data.id);
                 data.topmostVisibleElmId = elm?.id;
             }
@@ -604,8 +606,9 @@ export class Edit {
         }
     }
 
-    // We allow a function (func) to run here in such a way that the scroll positions of every tab panel are
-    // maintained so the user doesn't loose their place after the screen completely updates.
+    // We allow a function (func) to run here in such a way that the scroll positions of every tab
+    // panel are maintained so the user doesn't loose their place after the screen completely
+    // updates.
     setUserPreferenceVal = (mod: StateModFunc) => {
         this.runScrollAffectingOp(() => {
             S.util.saveUserPrefs(mod);
@@ -742,9 +745,9 @@ export class Edit {
     }
 
     runEditNodeByClick = async (evt: Event, id: string) => {
-        // This is a hindrance when going down thru a page and editing all the content, so just for this case
-        // I'll allow the abandoment of any content being edited, and start editing a new node editing without
-        // asking user to confirm.
+        // This is a hindrance when going down thru a page and editing all the content, so just for
+        // this case I'll allow the abandoment of any content being edited, and start editing a new
+        // node editing without asking user to confirm.
         // if (this.checkEditPending()) return;
         if (getAs().editNode) {
             EditNodeDlg.currentInst.utl.cancelEdit(EditNodeDlg.currentInst);
@@ -932,8 +935,8 @@ export class Edit {
         }
     }
 
-    // clears selections before deleting so only the id passed or the id on the event can be deleted.
-    // This is because non-tree views don't have the checkbox for even multiselecting
+    // clears selections before deleting so only the id passed or the id on the event can be
+    // deleted. This is because non-tree views don't have the checkbox for even multiselecting
     deleteOneNode = async (evt: Event = null, id: string = null) => {
         await promiseDispatch("ClearSelectNode", s => {
             s.selectedNodes.clear();
@@ -944,8 +947,8 @@ export class Edit {
     }
 
     /*
-     * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
-     * has currenly selected (via checkboxes)
+     * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever
+     * the user has currenly selected (via checkboxes)
      */
     deleteSelNodes = async (evt: Event = null, id: string = null) => {
         id = S.util.allowIdFromEvent(evt, id);
@@ -1054,9 +1057,9 @@ export class Edit {
         console.log("action nodesToMove: " + S.util.prettyPrint(ast.nodesToMove));
 
         /*
-         * For now, we will just cram the nodes onto the end of the children of the currently selected
-         * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
-         * nodes.
+         * For now, we will just cram the nodes onto the end of the children of the currently
+         * selected page (for the 'inside' option). Later on we can get more specific about allowing
+         * precise destination location for moved nodes.
          */
         const res = await S.rpcUtil.rpc<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId: nodeId,
@@ -1107,8 +1110,9 @@ export class Edit {
             // if we're asking a question from the thread view, we need to append the new node to the thread results
             const ast = getAs();
 
-            // if user is asking a question and we're not on the thread tab, then jump to the thread tab and display
-            // it from the hiearcharcy above the answer (thread is being displayed for answer node)
+            // if user is asking a question and we're not on the thread tab, then jump to the thread
+            // tab and display it from the hiearcharcy above the answer (thread is being displayed
+            // for answer node)
             if (!res.aiContentOverwrite && ast.activeTab !== C.TAB_THREAD) {
                 S.srch.showThread(res.newNode.id);
                 jumpToNode = false;
@@ -1465,10 +1469,11 @@ export class Edit {
         await sharingDlg.open();
     }
 
-    /* Whenever we share an encrypted node to a another user, this is the final operation we run which
-   generates a key to the data which is encrypted with the public key of the person (identified by principalNodeId)
-   the node is shared to. Then publishes that key info into the DB, so that only the other person who this node is shared to
-   can use their private key to decrypt the key to the data, to view the node.
+    /* Whenever we share an encrypted node to a another user, this is the final operation we run
+   which generates a key to the data which is encrypted with the public key of the person
+   (identified by principalNodeId) the node is shared to. Then publishes that key info into the DB,
+   so that only the other person who this node is shared to can use their private key to decrypt the
+   key to the data, to view the node.
    */
     addCipherKeyToNode = async (node: NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
         if (principalNodeId === PrincipalName.PUBLIC || !S.crypto.avail) {
@@ -1495,8 +1500,9 @@ export class Edit {
         // now re-encrypt this clearTextKey using the public key (of the user being shared to).
         const userCipherKey = await S.crypto.asymEncryptString(principalPublicKey, clearKey);
 
-        /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will
-        then store this key alongside the ACL (access control list) for the sharing entry for this user */
+        /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the
+        server which will then store this key alongside the ACL (access control list) for the
+        sharing entry for this user */
         await S.rpcUtil.rpc<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
             nodeId: node.id,
             principalNodeId,
@@ -1586,10 +1592,11 @@ export class Edit {
                 }
             }
             else if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
-                // todo-2: Improvement here would be to try to go to the parent of the node, so we could pass
-                // the deletedPageNode indicator to the deleteNodes endpoint and let that signal to it
-                // to pass back to us the ID of the parent node or null if we don't have access to it, but for
-                // now if user deletes their page root node we take them to their account node.
+                // todo-2: Improvement here would be to try to go to the parent of the node, so we
+                // could pass the deletedPageNode indicator to the deleteNodes endpoint and let that
+                // signal to it to pass back to us the ID of the parent node or null if we don't
+                // have access to it, but for now if user deletes their page root node we take them
+                // to their account node.
                 S.nav.navToMyAccntRoot();
             }
             else if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {

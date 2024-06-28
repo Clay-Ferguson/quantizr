@@ -40,25 +40,27 @@ export class Quanta {
 
     private static lastKeyDownTime: number = 0;
 
-    /* We want to only be able to drag nodes by clicking on their TYPE ICON, and we accomplish that by using the mouseover/mouseout
-    on those icons to detect an 'is mouse over' condition any time a drag attempt is started on a row and only allow it if mouse
-    is over the icon */
+    /* We want to only be able to drag nodes by clicking on their TYPE ICON, and we accomplish that
+    by using the mouseover/mouseout on those icons to detect an 'is mouse over' condition any time a
+    drag attempt is started on a row and only allow it if mouse is over the icon */
     public draggingId: string = null;
 
-    // use this to know how long to delay the refresh for breadrumbs should wait to keep from interrupting the fade effect
-    // by doing which would happen if it rendered before the fade effect was complete. (see fadeInRowBkgClz)
+    // use this to know how long to delay the refresh for breadrumbs should wait to keep from
+    // interrupting the fade effect by doing which would happen if it rendered before the fade
+    // effect was complete. (see fadeInRowBkgClz)
     public fadeStartTime: number = 0;
 
     public currentFocusId: string = null;
 
-    /* We save userName+password in these vars to pass in every request
-    so that we can log back in again silently after any session timeout */
+    /* We save userName+password in these vars to pass in every request so that we can log back in
+    again silently after any session timeout */
     userName: string = PrincipalName.ANON;
     authToken: string;
     loggingOut: boolean;
 
-    // WARNING: Call S.util.ctrlKeyCheck() to check for ctrlKey and NOT just the state of this.
-    // (I should've just used a timer to set back to false, but instead for now it's checked by calling ctrlKeyCheck)
+    // WARNING: Call S.util.ctrlKeyCheck() to check for ctrlKey and NOT just the state of this. (I
+    // should've just used a timer to set back to false, but instead for now it's checked by calling
+    // ctrlKeyCheck)
     ctrlKey: boolean;
     ctrlKeyTime: number;
 
@@ -156,8 +158,8 @@ export class Quanta {
             // }
 
             /*
-            NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work
-            in the context of SPAs
+            NOTE: This works in conjunction with pushState, and is part of what it takes to make the
+            back button (browser hisotry) work in the context of SPAs
             */
             window.onpopstate = (event) => {
                 Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
@@ -346,9 +348,10 @@ export class Quanta {
     }
 
     addPageLevelEventListeners = () => {
-        /* We have to run this timer to wait for document.body to exist because we load our JS in the HTML HEAD
-            because we need our styling in place BEFORE the page renders or else you get that
-            well-known issue of a momentarily unstyled render before the page finishes loading */
+        /* We have to run this timer to wait for document.body to exist because we load our JS in
+            the HTML HEAD because we need our styling in place BEFORE the page renders or else you
+            get that well-known issue of a momentarily unstyled render before the page finishes
+            loading */
         const interval = setInterval(() => {
             if (!document?.body) {
                 console.log("Waiting for document.body");
@@ -375,10 +378,11 @@ export class Quanta {
                 this.currentFocusId = e.target.id;
             });
 
-            // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
-            // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
-            // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
-            // capture events going to dialogs / edit fields
+            // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node. WARNING: even
+            // with tabIndex added none of the other DIVS react renders seem to be able to accept an
+            // onKeyDown event. Todo: before enabling this need to make sure 1) the Main Tab is
+            // selected and 2) No Dialogs are Open, because this WILL capture events going to
+            // dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
                 let ast = getAs();
 
@@ -457,12 +461,11 @@ export class Quanta {
         return false;
     }
 
-    /* The overlayCounter allows recursive operations which show/hide the overlay
-    to happen such that if something has already shown the overlay and not hidden it yet, then
-    any number of 'sub-processes' (functionality) cannot distrupt the proper state. This is just
-    the standard sort of 'reference counting' sort of algo here. Note that we initialize
-    the counter to '1' and not zero since the overlay is initially visible so that's the correct
-    counter state to start with.
+    /* The overlayCounter allows recursive operations which show/hide the overlay to happen such
+    that if something has already shown the overlay and not hidden it yet, then any number of
+    'sub-processes' (functionality) cannot distrupt the proper state. This is just the standard sort
+    of 'reference counting' sort of algo here. Note that we initialize the counter to '1' and not
+    zero since the overlay is initially visible so that's the correct counter state to start with.
     */
     static overlayCounter: number = 1; // this starting value is important.
     setOverlay = (showOverlay: boolean) => {
@@ -475,9 +478,10 @@ export class Quanta {
 
         if (Quanta.overlayCounter === 1) {
 
-            /* Whenever we are about to show the overlay always give the app 0.7 seconds before showing the overlay in case
-            the app did something real fast and the display of the overlay would have just been a wasted annoyance (visually)
-            and just simply caused a bit of unnecessary eye strain
+            /* Whenever we are about to show the overlay always give the app 0.7 seconds before
+            showing the overlay in case the app did something real fast and the display of the
+            overlay would have just been a wasted annoyance (visually) and just simply caused a bit
+            of unnecessary eye strain
             */
             setTimeout(() => {
                 // after the timer we check for the counter still being greater than zero (not an ==1 this time).

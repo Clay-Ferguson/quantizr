@@ -29,8 +29,8 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         }
 
         /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-         * client side for various reasons.
+         * Number of rows that have actually made it onto the page to far. Note: some nodes get
+         * filtered out on the client side for various reasons.
          */
         let rowCount = 0;
         let i = 0;

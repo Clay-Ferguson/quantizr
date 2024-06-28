@@ -114,7 +114,8 @@ export class MenuPanel extends Div {
 
     static openTtsTab = () => {
         // this ttsTabSelected var is a quick hack to make tab show up, but we really need common
-        // forceSelectTab for thsi purpose (or maybe selectTab SHOULD naturally force things? probably so)
+        // forceSelectTab for thsi purpose (or maybe selectTab SHOULD naturally force things?
+        // probably so)
         TTSTab.ttsTabSelected = true;
         S.tabUtil.selectTab(C.TAB_TTS);
     };

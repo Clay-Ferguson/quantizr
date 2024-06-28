@@ -34,9 +34,10 @@ export abstract class DialogBase extends Comp {
     titleDiv: Div;
 
     /*
-    NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
-    which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
-    experimental overrideClass used for testing was "embedded-dlg"
+    NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing
+    is needed which is to store the browser scroll position in the dialog, so it can be restored
+    back after editing is complete, and the experimental overrideClass used for testing was
+    "embedded-dlg"
     */
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: string = null, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
@@ -49,13 +50,13 @@ export abstract class DialogBase extends Comp {
         }
     }
 
-    /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is
-    closed. */
+    /* To open any dialog all we do is construct the object and call open(). Returns a promise that
+    resolves when the dialog is closed. */
     open = (): Promise<DialogBase> => {
         this.opened = true;
 
-        // We use an actual Promise and not async/await because our resolve function is held long term, and
-        // represents the closing of the dialog.
+        // We use an actual Promise and not async/await because our resolve function is held long
+        // term, and represents the closing of the dialog.
         return new Promise<DialogBase>(resolve => {
             if (this.mode === DialogMode.POPUP) {
                 this.zIndex = ++DialogBase.backdropZIndex;
@@ -80,9 +81,9 @@ export abstract class DialogBase extends Comp {
         });
     }
 
-    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
-    get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data
-    from the server before displaying */
+    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render in case
+    we need to get information from the server before displaying the dialog. This is optional. Many
+    dialogs of course don't need to get data from the server before displaying */
     async preLoad(): Promise<any> {
         return null;
     }
@@ -310,10 +311,10 @@ export abstract class DialogBase extends Comp {
                 const elm: HTMLElement = this.getRef();
                 if (!elm) return;
 
-                /* If the dialog panel container scrolling area has been scrolled the only reason for doing
-                that would be to see more of the dialog itself, so if user starts dragging it in this case
-                we always just want to reset scrolling back to zero and reposition from scratch as if
-                dialog had just now come up. */
+                /* If the dialog panel container scrolling area has been scrolled the only reason
+                for doing that would be to see more of the dialog itself, so if user starts dragging
+                it in this case we always just want to reset scrolling back to zero and reposition
+                from scratch as if dialog had just now come up. */
                 if (elm.scrollTop > 0 || elm.scrollLeft > 0) {
                     elm.scrollTop = 0;
                     elm.scrollLeft = 0;

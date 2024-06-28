@@ -28,8 +28,8 @@ export class DocIndexPanel extends Div {
         let count = 0;
         const baseSlashCount = S.util.countChars(info.results[0].path, "/");
 
-        // Since we can have a large number of items we use a single HTML string for performance. This is a very special case
-        // and is not a pattern to be followed in general.
+        // Since we can have a large number of items we use a single HTML string for performance.
+        // This is a very special case and is not a pattern to be followed in general.
         for (const node of info.results) {
             if (node.hasChildren) {
                 const level = S.util.countChars(node.path, "/") - baseSlashCount;

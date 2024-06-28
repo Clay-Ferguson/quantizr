@@ -17,19 +17,20 @@ export class RpcUtil {
     unauthMessageShowing: boolean = false;
 
     /*
-    * We use this variable to determine if we are waiting for an ajax call, but the server also enforces that each
-    * session is only allowed one concurrent call and simultaneous calls just "queue up".
+    * We use this variable to determine if we are waiting for an ajax call, but the server also
+    * enforces that each session is only allowed one concurrent call and simultaneous calls just
+    * "queue up".
     */
     rpcCounter: number = 0;
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
     RPC_TIMER_INTERVAL = 1000;
 
-    // Setting to zero disables the ability for the server to 'retry' RPC calls
-    // Until we have AppVersion embedded in the Redis Objects, and also into all request
-    // objects it won't be safe to yet to allow this retry feature because it would be able to
-    // cause the browser to keep running with outdated interfaces instead of foring it to reload 
-    // whenver it truly needs to reload.
+    // Setting to zero disables the ability for the server to 'retry' RPC calls Until we have
+    // AppVersion embedded in the Redis Objects, and also into all request objects it won't be safe
+    // to yet to allow this retry feature because it would be able to cause the browser to keep
+    // running with outdated interfaces instead of foring it to reload whenver it truly needs to
+    // reload.
     RPC_RETRIES: number = 0;
     SLOW_INTERVAL = 1000;
     FAST_INTERVAL = 10;
@@ -42,9 +43,9 @@ export class RpcUtil {
     lifoQueuePush = (qi: RpcQueueItem) => {
         this.lifoQueue.push(qi);
 
-        // Currently this queue processes just OpenGraph querying from the server and we 
-        // dont't allow more than MAX_LIFO_SIZE to be queued up at a time before we start dropping them.
-        // This is because as users navigate around real fast this queue could just create a ton of 
+        // Currently this queue processes just OpenGraph querying from the server and we dont't
+        // allow more than MAX_LIFO_SIZE to be queued up at a time before we start dropping them.
+        // This is because as users navigate around real fast this queue could just create a ton of
         // wasted queries to the server. 
         if (this.lifoQueue.length > RpcUtil.MAX_LIFO_SIZE) {
             this.lifoQueue.shift();
@@ -106,10 +107,11 @@ export class RpcUtil {
         return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/api/");
     }
 
-    /* RPC calls to server that support retries. Retries are currently disabled, but when enabled it makes
-    the browser smart enough to continue working seamlessly even during a server restart, and even with the server
-    is retstarting a SINGLE REPLICA swarm. (i.e. Zero Downtime even for single replia swarm)
-    
+    /* RPC calls to server that support retries. Retries are currently disabled, but when enabled it
+    makes the browser smart enough to continue working seamlessly even during a server restart, and
+    even with the server is retstarting a SINGLE REPLICA swarm. (i.e. Zero Downtime even for single
+    replia swarm)
+
     NOTE: Currently getOpenGraph is the only call that has queue=true.
 
     'compId' is the elementId of the element requesting the data, such that if we detect the element
@@ -163,8 +165,8 @@ export class RpcUtil {
                         if (this.RPC_RETRIES == 0) reject(error);
                         let retries = 0;
 
-                        // if we did get a response with a status we can immediately call reject(), but otherwise
-                        // that indicates server was unreachable so we start retrying 
+                        // if we did get a response with a status we can immediately call reject(),
+                        // but otherwise that indicates server was unreachable so we start retrying 
                         if (error?.response?.status) {
                             reject(error);
                             return;
@@ -279,8 +281,8 @@ export class RpcUtil {
                     }
                 })
                 .then((json: string) => {
-                    /* if we did a reject above in the first 'then' we will get here with json undefined
-                    so we ignore that */
+                    /* if we did a reject above in the first 'then' we will get here with json
+                    undefined so we ignore that */
                     if (json) {
                         const obj = JSON.parse(json);
                         resolve(obj);
@@ -365,8 +367,8 @@ export class RpcUtil {
     }
 
     /**
-     * We should only reach here when there's an actual failure to call the server, and is completely
-     * separete from the server perhaps haveing an exception where it sent back an error.
+     * We should only reach here when there's an actual failure to call the server, and is
+     * completely separete from the server perhaps haveing an exception where it sent back an error.
      */
     rpcFail = (error: any, background: boolean, allowErrorDlg: boolean, postName: string, postData: any) => {
         try {
@@ -446,7 +448,8 @@ export class RpcUtil {
     }
 
     initRpcTimer = () => {
-        // This timer is a singleton that runs always so we don't need to ever clear the timeout. Not a resource leak.
+        // This timer is a singleton that runs always so we don't need to ever clear the timeout.
+        // Not a resource leak.
         this.timer = setInterval(this.progressInterval, this.RPC_TIMER_INTERVAL);
     }
 

@@ -23,9 +23,10 @@ export class State {
         });
     }
 
-    /* We start out with this initial function which will allow us to set a state even before the 'useState' has been called
-      because for functional components (which we're using) the useState hook won't (and cannot) be even called ever until
-      the react function itself is currently executing (per the "Rules of Hooks")
+    /* We start out with this initial function which will allow us to set a state even before the
+      'useState' has been called because for functional components (which we're using) the useState
+      hook won't (and cannot) be even called ever until the react function itself is currently
+      executing (per the "Rules of Hooks")
     */
     private setStateEx(state: (s?: any) => void) {
         this.state = state(this.state);

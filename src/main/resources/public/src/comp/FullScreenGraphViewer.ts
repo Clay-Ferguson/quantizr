@@ -24,8 +24,9 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    // This technique of overriding the domUpdateEvent() method is used to ensure that the Graphg DOM element
-    // which is not managed by react, is always maintained across renders, so that it doesn't loose state
+    // This technique of overriding the domUpdateEvent() method is used to ensure that the Graphg
+    // DOM element which is not managed by react, is always maintained across renders, so that it
+    // doesn't loose state
     override domUpdateEvent = () => {
         const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected) return;
@@ -44,15 +45,17 @@ export class FullScreenGraphViewer extends Main {
         }
 
         if (S.view.docElm) {
-            // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just
-            // setting scrollTop on it directly like this, instead of calling 'elm.setScrollTop()'
+            // NOTE: Since the docElm component doesn't manage scroll position, we can get away with
+            // just setting scrollTop on it directly like this, instead of calling
+            // 'elm.setScrollTop()'
             S.view.docElm.scrollTop = 0;
         }
     }
 
     forceDirectedTree = () => {
-        /* We use 'thiz' to capture 'this' because the methods below to expect to have their own 'this'
-         that will be set based on code outside our control that is expected by the Graph Implementation itself. */
+        /* We use 'thiz' to capture 'this' because the methods below to expect to have their own
+         'this' that will be set based on code outside our control that is expected by the Graph
+         Implementation itself. */
         const thiz = this;
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
@@ -88,8 +91,9 @@ export class FullScreenGraphViewer extends Main {
             const links: any = root.links();
             const nodes: any = root.descendants();
 
-            // Sort nodes by level so that the higher level nodes are drawn on top of lower level nodes.
-            // we need do to this so we can always grab a clump of nodes centered around their parent for example
+            // Sort nodes by level so that the higher level nodes are drawn on top of lower level
+            // nodes. we need do to this so we can always grab a clump of nodes centered around
+            // their parent for example
             nodes.sort((a, b) => b.data.level - a.data.level);
 
             const nodeLinks: any = [];

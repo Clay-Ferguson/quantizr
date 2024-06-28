@@ -35,7 +35,6 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
             ], null),
 
             new Div(null, { className: "settingsPanel" }, [
-                // -----------------------
                 aiOptions?.length ? this.sectionTitle("AI - Artificial Intelligence") : null,
                 aiOptions?.length ? new FlexRowLayout([
                     // todo-1: need a way to warn user when something unsupported by their admin configuration is selected

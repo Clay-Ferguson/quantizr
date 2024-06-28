@@ -6,7 +6,7 @@ interface LS { // Local State
 
 export class Svg extends Comp {
 
-    constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
+    constructor(content: string = "", attribs: any = null, children: Comp[] = null) {
         super(attribs);
         this.setChildren(children);
         this.mergeState<LS>({ content });

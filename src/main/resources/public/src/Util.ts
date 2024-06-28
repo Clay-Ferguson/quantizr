@@ -23,9 +23,10 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export class Util {
-    // I'd like to enable this but if we don't load the tree right away we have to check the 200ish places in the code where
-    // we are doing things like state.node.id, and assuming there IS a node on the state, and that will take more testing
-    // than I have time for righ tnow, so we can't do the 'default to feed" functionality for now.
+    // I'd like to enable this but if we don't load the tree right away we have to check the 200ish
+    // places in the code where we are doing things like state.node.id, and assuming there IS a node
+    // on the state, and that will take more testing than I have time for right now, so we can't do
+    // the 'default to feed" functionality for now.
     sendAnonUsersToFeed = false;
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -81,10 +82,11 @@ export class Util {
         if (parent) {
             const containerRect = parent.getBoundingClientRect();
 
-            // This logic is making the assumption that getElementsByClassName() returns elements on top-down order
-            // so it can find the topmost one without verifying by position which is topmost, and I think browsers
-            // are required to implement the deterministic ordering in this way. (if not we would have to scan all elements
-            // here to find which one had the smallest 'top')
+            // This logic is making the assumption that getElementsByClassName() returns elements on
+            // top-down order so it can find the topmost one without verifying by position which is
+            // topmost, and I think browsers are required to implement the deterministic ordering in
+            // this way. (if not we would have to scan all elements here to find which one had the
+            // smallest 'top')
             const elements = document.getElementsByClassName(childrenClass);
             if (!elements) return;
             for (const e of elements) {
@@ -104,10 +106,11 @@ export class Util {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
 
-    /* To allow functions to be attached directly to any node, without having to create a NEW function for each use
-    we call this function to grab the ID off the actual HTML element itself. This is the only time and place we ever
-    do this kind of hack, and it's purely for performances and make HTML renders significantly faster by avoiding 100s of
-    function object creates per page render */
+    /* To allow functions to be attached directly to any node, without having to create a NEW
+    function for each use we call this function to grab the ID off the actual HTML element itself.
+    This is the only time and place we ever do this kind of hack, and it's purely for performances
+    and make HTML renders significantly faster by avoiding 100s of function object creates per page
+    render */
     allowIdFromEvent = (evt: Event, id: string): string => {
         if (id) return id;
         return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
@@ -181,8 +184,8 @@ export class Util {
         return this.hashOfString(this.stringifyObject(obj));
     }
 
-    /** Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can either be an actual
-    extension or else a full filename including extension */
+    /* Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can
+    either be an actual extension or else a full filename including extension */
     getFileTypeFormFileName = (fileName: string): string => {
         const ext: string = this.getFileExtensionFromFileName(fileName);
         if (!ext) return;
@@ -355,7 +358,8 @@ export class Util {
         }
     }
 
-    /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor to be all prettyPrint */
+    /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor
+    to be all prettyPrint */
     prettyPrint = (obj: any): string => {
         return obj ? JSON.stringify(obj, null, 4) : "null"
     }
@@ -399,11 +403,10 @@ export class Util {
     }
 
     /*
-     * We could have put this logic inside the json method itself, but I can forsee cases where we don't want a
-     * message to appear when the json response returns success==false, so we will have to call checkSuccess inside
-     * every response method instead, if we want that response to print a message to the user when fail happens.
-     *
-     * requires: res.success res.message
+     * We could have put this logic inside the json method itself, but I can forsee cases where we
+     * don't want a message to appear when the json response returns success==false, so we will have
+     * to call checkSuccess inside every response method instead, if we want that response to print
+     * a message to the user when fail happens.
      */
     checkSuccess = (opFriendlyName: string, res: J.ResponseBase): boolean => {
         if ((!res || res.code != C.RESPONSE_CODE_OK) && !(res as any).errorShown) {
@@ -457,8 +460,8 @@ export class Util {
         return true;
     }
 
-    /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as part of processing
-    so it's debatable wether the overhead of that is better for large objects */
+    /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as
+    part of processing so it's debatable wether the overhead of that is better for large objects */
     getPropertyCount = (obj: any): number => {
         if (!obj) return 0;
         const names: string[] = Object.getOwnPropertyNames(obj);
@@ -471,7 +474,8 @@ export class Util {
         if (!obj) return;
         const names: any[] = Object.getOwnPropertyNames(obj);
         names?.forEach(prop => {
-            /* we use the unusual '== false' here so that returning a value is optional, but if you return false it terminates looping */
+            /* we use the unusual '== false' here so that returning a value is optional, but if you
+            return false it terminates looping */
             if (callback(prop, obj[prop]) === false) return;
         });
     }
@@ -498,7 +502,7 @@ export class Util {
     }
 
     /* Programatically creates objects by name, similar to what Java reflection does
-    
+
     * ex: let example = InstanceLoader.getInstance<NamedThing>(window, 'ExampleClass', args...);
     */
     getInstance = <T>(context: any, name: string, ...args: any[]): T => {
@@ -673,9 +677,10 @@ export class Util {
         window.open(mailtoLink, "_blank");
     }
 
-    // Used to sent a message to the server simply to log into the log file as DEBUG, INFO, TRACE, for the purpose of
-    // either checking that logging is working, after a live edit of the logger config file or as a text marker
-    // for identifying when specific things are happening by injecting into log file some notes or text.
+    // Used to sent a message to the server simply to log into the log file as DEBUG, INFO, TRACE,
+    // for the purpose of either checking that logging is working, after a live edit of the logger
+    // config file or as a text marker for identifying when specific things are happening by
+    // injecting into log file some notes or text.
     sendLogText = async () => {
         const text = window.prompt("Enter text to log on server: ");
         if (text) {
@@ -693,9 +698,10 @@ export class Util {
                 new Notification(title, {
                     body: message,
 
-                    /* todo-2: Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
-                     both image and icon here and neither works. Another issue is that this 'image' property is apparently deprecated
-                     now in current versions of code, so I'm removing it, this is a low priority.
+                    /* todo-2: Chrome is showing it's own icon/image instead of the custom one and
+                     I'm not sure why. I've tried both image and icon here and neither works.
+                     Another issue is that this 'image' property is apparently deprecated now in
+                     current versions of code, so I'm removing it, this is a low priority.
 
                     image: window.location.origin + "/branding/logo-50px-tr.jpg"
                     */

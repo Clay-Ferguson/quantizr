@@ -66,9 +66,10 @@ export class SignupDlg extends DialogBase {
 
     signup = () => {
         if (this.adminCreatingUser) {
-            // this string is just to make the validator succeed, and used as an extra confirmation on the server
-            // that the intent of the admin is the creation of a new user. This is not a security risk, but is safe
-            // in terms of security, because the server side also confirms independently that this is the admin doing this.
+            // this string is just to make the validator succeed, and used as an extra confirmation
+            // on the server that the intent of the admin is the creation of a new user. This is not
+            // a security risk, but is safe in terms of security, because the server side also
+            // confirms independently that this is the admin doing this.
             this.captchaState.setValue("adminCreatingUser");
         }
 

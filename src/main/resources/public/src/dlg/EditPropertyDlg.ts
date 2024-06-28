@@ -16,8 +16,9 @@ export interface LS { // Local State
     selections?: Map<string, J.SchemaOrgProp>;
 }
 
-/* When this dialog returns the caller should be able to either get one property name from nameState, or
-else get the list of properties from LS.selections, depending on which user has selected. */
+/* When this dialog returns the caller should be able to either get one property name from
+nameState, or else get the list of properties from LS.selections, depending on which user has
+selected. */
 export class EditPropertyDlg extends DialogBase {
 
     nameState: Validator = new Validator("");
@@ -31,7 +32,8 @@ export class EditPropertyDlg extends DialogBase {
         }
         this.mergeState<LS>({ selections: new Map<string, J.SchemaOrgProp>() });
 
-        // if this is a schema.org node go ahead and turn on the display of all those properties automatically
+        // if this is a schema.org node go ahead and turn on the display of all those properties
+        // automatically
         if (type.schemaOrg) {
             asyncDispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = true; });
         }

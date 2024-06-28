@@ -10,18 +10,19 @@ export class SpeechEngine {
     // I'm disabling the dual voice thing for now
     public USE_VOICE2: boolean = false;
 
-    // we keep this array here and not in AppState, because changes to this will never need to directly
-    // trigger a DOM change.
+    // we keep this array here and not in AppState, because changes to this will never need to
+    // directly trigger a DOM change.
     public queuedSpeech: string[] = null;
 
     private voices: SpeechSynthesisVoice[] = null;
 
-    // this is a guess (and recommendation from online sources) at how long a sentence we can get away with
-    // and still avoid the Chrome bug which cuts off long sentences. If sentence is short enough we push the
-    // whole thing. There's a tradeoff here where you can set a large number for this (like well over 200), which causes
-    // the ttsTimer (below) to activate a lot with "i think" can cause a slight speaker popping, --OR-- you can set this
-    // value to like 200, and the popping will definitely not happen, but the sentence structure won't be perfect (meaning
-    // the speaking voice may pause at awkward times every now and then)
+    // this is a guess (and recommendation from online sources) at how long a sentence we can get
+    // away with and still avoid the Chrome bug which cuts off long sentences. If sentence is short
+    // enough we push the whole thing. There's a tradeoff here where you can set a large number for
+    // this (like well over 200), which causes the ttsTimer (below) to activate a lot with "i think"
+    // can cause a slight speaker popping, --OR-- you can set this value to like 200, and the
+    // popping will definitely not happen, but the sentence structure won't be perfect (meaning the
+    // speaking voice may pause at awkward times every now and then)
     MAX_UTTERANCE_CHARS: number = 250;
 
     // add type-safety here (TS can find type easily)
@@ -70,8 +71,8 @@ export class SpeechEngine {
             // console.log("speech onStart.");
         };
 
-        // This gets called basically at the end of every sentence as you're dictating content,
-        // and paused between sentences, so we have to call start() again in here to start recording
+        // This gets called basically at the end of every sentence as you're dictating content, and
+        // paused between sentences, so we have to call start() again in here to start recording
         // another sentence
         this.recognition.onend = () => {
             // console.log("speech onEnd.");
@@ -225,9 +226,9 @@ export class SpeechEngine {
             S.tabUtil.selectTab(C.TAB_TTS);
         }
 
-        // only because speech has had bugs over the years and one bug report I saw claimed putting the call
-        // in a timeout helped, I'm doing that here, because I had a hunch this was best even before I saw someone
-        // else make the claim.
+        // only because speech has had bugs over the years and one bug report I saw claimed putting
+        // the call in a timeout helped, I'm doing that here, because I had a hunch this was best
+        // even before I saw someone else make the claim.
         setTimeout(() => {
             this.getVoices();
             if (!this.voices) {
@@ -331,9 +332,9 @@ export class SpeechEngine {
                     }
                 }
                 this.ttsRunning = true;
-                // Get started by uttering idx=0, and the rest of the sentences will follow
-                // in a chain reaction every time utterFunc gets called via the 'onend' listener of
-                // the most recently completed utterance
+                // Get started by uttering idx=0, and the rest of the sentences will follow in a
+                // chain reaction every time utterFunc gets called via the 'onend' listener of the
+                // most recently completed utterance
                 utterFunc();
 
             });
@@ -355,8 +356,8 @@ export class SpeechEngine {
                         this.ttsSpeakingTime = 0;
 
                         // todo-2: need to research this "fix" even more, because it appears even
-                        // pausing for 10 seconds makes the TTS engine break, and if the only fix
-                        // to that breaking is a resume again, that means we simply CANNOT use pause.
+                        // pausing for 10 seconds makes the TTS engine break, and if the only fix to
+                        // that breaking is a resume again, that means we simply CANNOT use pause.
                         // Must stop and restart to simulate a pause
                         this.tts.pause();
                         this.tts.resume();
@@ -554,8 +555,8 @@ export class SpeechEngine {
             if (para.length < 3) return;
             this.fragmentizeSentencesToQueue(para);
 
-            // This is a harmless trick/hack where we avoid a significant complexity jump by doing something
-            // slightly anti-patternish, but is good in this case, for now
+            // This is a harmless trick/hack where we avoid a significant complexity jump by doing
+            // something slightly anti-patternish, but is good in this case, for now
             this.queuedSpeech.push(C.TTS_BREAK);
         });
     }
@@ -596,9 +597,10 @@ export class SpeechEngine {
         return ret;
     }
 
-    // The Chrome Speech engine will stop working unless you send it relatively short chunks of text. It's basically
-    // a time related thing where if it speaks for more than about 10 seconds at a time it hangs.
-    // See the setInterval function in this class for more on the tradeoffs/workarounds related to this.
+    // The Chrome Speech engine will stop working unless you send it relatively short chunks of
+    // text. It's basically a time related thing where if it speaks for more than about 10 seconds
+    // at a time it hangs. See the setInterval function in this class for more on the
+    // tradeoffs/workarounds related to this.
     fragmentizeSentencesToQueue = (text: string) => {
         const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
@@ -637,9 +639,9 @@ export class SpeechEngine {
         });
     }
 
-    // We have this push function basically so we can split up quotations. This splitting is what allows
-    // us to switch voices if we went to (for quotations) but is also a way to keep the utterances as short
-    // ass possible, which is needed to help Chrome not hang.
+    // We have this push function basically so we can split up quotations. This splitting is what
+    // allows us to switch voices if we went to (for quotations) but is also a way to keep the
+    // utterances as short ass possible, which is needed to help Chrome not hang.
     pushTextToQueue = (text: string) => {
         if (!this.USE_VOICE2) {
             this.queuedSpeech.push(text);
@@ -656,8 +658,8 @@ export class SpeechEngine {
     }
 
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those
-    // states correct, because TRUST ME at least on Chrome the states are unreliable.
-    // If you know you're about to speak some new text you can pass in that text to update screen ASAP
+    // states correct, because TRUST ME at least on Chrome the states are unreliable. If you know
+    // you're about to speak some new text you can pass in that text to update screen ASAP
     stopSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = false;

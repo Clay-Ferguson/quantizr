@@ -26,7 +26,9 @@ export class OpenGraphPanel extends Div {
             key
         });
 
-        /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed pull of the open graph data should result in og being an empty object and not null. */
+        /* The state should always contain loading==true (if currently querying the server) or a
+        non-null 'og'. A completed but failed pull of the open graph data should result in og being
+        an empty object and not null. */
         const og: J.OpenGraph = S.quanta.openGraphData.get(ui.url);
         if (og) {
             this.mergeState<LS>({ og });
@@ -48,8 +50,8 @@ export class OpenGraphPanel extends Div {
         const og = S.quanta.openGraphData.get(this.ui.url);
         if (!og) {
             this.observer = new IntersectionObserver(entries => //
-                // note: processOgEntry itself is async but we should not await for it here, because this is part of the
-                // intersection observer we don't want to block.
+                // note: processOgEntry itself is async but we should not await for it here, because
+                // this is part of the intersection observer we don't want to block.
                 entries.forEach(entry => this.processOgEntry(entry, elm)));
             this.observer.observe(elm.parentElement);
         }
@@ -67,8 +69,9 @@ export class OpenGraphPanel extends Div {
 
     /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
     performance optimization to help the user experience and is not a core part of the logic for
-     'correct' functioning, but it does offer an extremely nice smooth experience when scrolling down thru content
-     even including content with lots and lots of openGraph queries happening in the background. */
+    'correct' functioning, but it does offer an extremely nice smooth experience when scrolling down
+    thru content even including content with lots and lots of openGraph queries happening in the
+    background. */
     loadNext = async () => {
         let found = false;
         let count = 0;
@@ -128,9 +131,10 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    // Queries the url for 'Open Graph' data and sendes it back using the callback. All types of NodeInfo objects
-    // we ever get from the server should already have the open graph property (sn:og) set on them so normally
-    // the only time this method ever runs will be when browsing an RSS feed.
+    // Queries the url for 'Open Graph' data and sendes it back using the callback. All types of
+    // NodeInfo objects we ever get from the server should already have the open graph property
+    // (sn:og) set on them so normally the only time this method ever runs will be when browsing an
+    // RSS feed.
     queryOpenGraph = async (url: string): Promise<J.OpenGraph> => {
         if (!url) return null;
         try {
@@ -150,8 +154,8 @@ export class OpenGraphPanel extends Div {
         const state = this.getState<LS>();
         const ast = getAs();
         if (state.loading || !state.og) {
-            // be sure to return true to let this render or else we won't get the observer callback, because
-            // the observer callback is only called when the element is rendered.
+            // be sure to return true to let this render or else we won't get the observer callback,
+            // because the observer callback is only called when the element is rendered.
             this.setChildren(null);
             return true;
         }
@@ -161,7 +165,8 @@ export class OpenGraphPanel extends Div {
             return true;
         }
 
-        /* If neither a description nor image exists, this will not be interesting enough so don't render */
+        /* If neither a description nor image exists, this will not be interesting enough so don't
+        render */
         if (!state.og.description && !state.og.image && !state.og.title) {
             this.setChildren(null);
             return false;
@@ -183,9 +188,10 @@ export class OpenGraphPanel extends Div {
 
         let imgAndDesc: Comp = null;
         if (state.og.image && this.includeImage) {
-            // According to my test results this can cause a scrolling glitch, where the browser throws an error and somehow
-            // apparently that interfered with rendering. Wasn't able to repro on localhost because of using http I think, so
-            // this code is probably harmless even if I'm making a mistake blaming the scrolling glitch on this.
+            // According to my test results this can cause a scrolling glitch, where the browser
+            // throws an error and somehow apparently that interfered with rendering. Wasn't able to
+            // repro on localhost because of using http I think, so this code is probably harmless
+            // even if I'm making a mistake blaming the scrolling glitch on this.
             state.og.image = state.og.image.replaceAll("http://", "https://");
 
             // if mobile portrait mode render image above (not beside) description

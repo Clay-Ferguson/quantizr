@@ -23,8 +23,8 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         if (!results) return false;
 
         /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-         * client side for various reasons.
+         * Number of rows that have actually made it onto the page to far. Note: some nodes get
+         * filtered out on the client side for various reasons.
          */
         let rowCount = 0;
         let i = 0;

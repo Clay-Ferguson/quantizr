@@ -16,8 +16,8 @@ export class Value<T> implements ValueIntf {
         return this.comp.getState()[this.propName];
     }
 
-    /* This is kind of confusing, but by convention we have the validation error for any property specified as the property
-    of the same name that ends with ValidationError */
+    /* This is kind of confusing, but by convention we have the validation error for any property
+    specified as the property of the same name that ends with ValidationError */
     getValidationError(): string {
         return this.comp.getState()[this.propName + "ValidationError"];
     }

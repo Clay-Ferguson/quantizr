@@ -46,7 +46,8 @@ export class TTSView extends AppTab<any, TTSView> {
         const speakBtn = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-2x clickable",
             // This mouseover stuff is compensating for the fact that when the onClick gets called
-            // it's a problem that by then the text selection "might" have gotten lost. This can happen.
+            // it's a problem that by then the text selection "might" have gotten lost. This can
+            // happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
             onClick: () => S.speech.speakSelOrClipboard(true),
@@ -67,7 +68,8 @@ export class TTSView extends AppTab<any, TTSView> {
         const appendTextBtn = !ast.mobileMode && S.speech.queuedSpeech?.length > 0 ? new Icon({
             className: "fa fa-plus-circle fa-2x clickable bigMarginRight",
             // This mouseover stuff is compensating for the fact that when the onClick gets called
-            // it's a problem that by then the text selection "might" have gotten lost. This can happen.
+            // it's a problem that by then the text selection "might" have gotten lost. This can
+            // happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
             onClick: () => S.speech.appendSelOrClipboard(),

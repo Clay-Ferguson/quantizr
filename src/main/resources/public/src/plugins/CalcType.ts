@@ -76,9 +76,9 @@ export class CalcType extends TypeBase {
         return new Div(null, null, [markdown ? new Markdown(markdown) : null, outputComp]);
     }
 
-    // Prints the values of all properts that were assigned to 'qc' during the running of the script, so that
-    // instead of logging a value by calling q.log, you can just make sure the variable is one like 'q.myVar' and
-    // it's final value will always be printed.
+    // Prints the values of all properts that were assigned to 'qc' during the running of the
+    // script, so that instead of logging a value by calling q.log, you can just make sure the
+    // variable is one like 'q.myVar' and it's final value will always be printed.
     addFinalScript = (script: string) => {
         return script + `\n
             for (let prop in q) {

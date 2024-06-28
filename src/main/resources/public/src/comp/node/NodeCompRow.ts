@@ -45,8 +45,8 @@ export class NodeCompRow extends Div {
         if (this.allowHeaders && ast.userPrefs.editMode) {
             let insertAllowed = true;
 
-            /* if we are at level one that means state.node is the parent of 'this.node' so that's what determines if we
-            can insert or not */
+            /* if we are at level one that means state.node is the parent of 'this.node' so that's
+            what determines if we can insert or not */
             if (this.level === 1) {
                 const parentType = S.plugin.getType(ast.node.type);
                 if (parentType) {
@@ -102,8 +102,9 @@ export class NodeCompRow extends Div {
             allowHeader = this.allowHeaders && S.util.showMetaData(ast, this.node) && (this.type == null || this.type?.getAllowRowHeader())
         }
 
-        // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
-        // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
+        // if this node has children as columnar layout, and is rendering as the root node of a page
+        // or a node that is expanded inline, that means there will be a grid below this node so we
+        // don't show the border (bottom divider line) because it's more attractive not to.
         if (this.isTableCell) {
             // do nothing
         }
@@ -154,8 +155,9 @@ export class NodeCompRow extends Div {
         let jumpButton: Comp = null;
 
         if (allowHeader) {
-            // slight special case for now until Document View knows how to delete all the subchilren and not
-            // show orphans on the page when something is deleted. Other panels don't have this problem
+            // slight special case for now until Document View knows how to delete all the
+            // subchilren and not show orphans on the page when something is deleted. Other panels
+            // don't have this problem
             const showJumpButton = this.tabData.id !== C.TAB_MAIN;
             header = new NodeCompRowHeader(this.node, true, true, this.tabData, showJumpButton, true, this.tabData.id, this.rowCount, indentLevel, this.isTableCell);
         }

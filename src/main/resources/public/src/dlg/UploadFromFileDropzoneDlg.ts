@@ -43,8 +43,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 new Div("From your Computer (Click Below or Drag-and-Drop)", { className: "marginTop" }),
 
-                // WARNING: Keep these static IDs here, because when the page rerenders dropzone knows these IDs
-                // and dropzone will malfunction if these IDs change.
+                // WARNING: Keep these static IDs here, because when the page rerenders dropzone
+                // knows these IDs and dropzone will malfunction if these IDs change.
                 this.dropzoneDiv = new Div("", { id: "dropzone", className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { id: "dropzoneInput", style: { display: "none" } }),
 

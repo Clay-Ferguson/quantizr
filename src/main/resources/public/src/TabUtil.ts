@@ -29,9 +29,9 @@ export class TabUtil {
         if (!tabName) return;
         /* if tab is already active no need to update state now
 
-        SOME codepaths like (openNode) are currently relying on selectTab
-        to cause the dispatch/update, even when tab isn't changing, so need
-        to find all those before we can optimize here to ignore setting to same tab.
+        SOME codepaths like (openNode) are currently relying on selectTab to cause the
+        dispatch/update, even when tab isn't changing, so need to find all those before we can
+        optimize here to ignore setting to same tab.
         */
         dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
@@ -53,8 +53,8 @@ export class TabUtil {
         const ast = getAs();
         if (tabName === C.TAB_MAIN && !ast.node) {
 
-            // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
-            // an error that we did a dispatch in a dispatch.
+            // we need to run immediately but in a timer so it doesn't happen in this call stack and
+            // trigger an error that we did a dispatch in a dispatch.
             setTimeout(() => {
                 S.nav.navToMyAccntRoot();
             }, 1);
@@ -136,9 +136,8 @@ export class TabUtil {
         return data?.props?.results?.length > 0;
     }
 
-    /* This function manages persisting the scroll position when switching
-    from one tab to another, to automatically restore the scroll position that was
-    last scroll position on any given tab */
+    /* This function manages persisting the scroll position when switching from one tab to another,
+    to automatically restore the scroll position that was last scroll position on any given tab */
     tabChanging = (prevTab: string, newTab: string) => {
 
         /* Don't run any code here if we aren't actually changing tabs */

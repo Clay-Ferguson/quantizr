@@ -13,13 +13,15 @@ import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
 /**
- * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does functionally work!), but croud sourcing
- * the collection of the time-offsets of the begin/end array of commercial segments has not yet been implemented. Also I decided
- * creating technology to destroy podcast's ability to collect ad-revenue is counter-productive to the entire podcasting industry
- * which is an industry i love, and I won't want to be associated with such a hostile act against podcasters as trying to eliminate
- * their ads!! So the ad-skipping technology in here is disabled.
+ * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does
+ * functionally work!), but croud sourcing the collection of the time-offsets of the begin/end array
+ * of commercial segments has not yet been implemented. Also I decided creating technology to
+ * destroy podcast's ability to collect ad-revenue is counter-productive to the entire podcasting
+ * industry which is an industry i love, and I won't want to be associated with such a hostile act
+ * against podcasters as trying to eliminate their ads!! So the ad-skipping technology in here is
+ * disabled.
  *
- * https://www.w3.org/2010/05/video/mediaevents.html
+ * https://www.w3.org/2010/05/video/mediaevents.html 
  * See also: VideoPlayerDlg (which is very similar)
  */
 export class AudioPlayerDlg extends DialogBase {
@@ -29,8 +31,9 @@ export class AudioPlayerDlg extends DialogBase {
     startTimePending: number = null;
 
     /*
-    If the 'adSegments' array variable below contains an array of start/stop times then during playback this player will seamlessly and autmatically
-    jump over those time ranges in the audio during playing just like they didn't even exist, basically censoring out those time ranges.
+    If the 'adSegments' array variable below contains an array of start/stop times then during
+    playback this player will seamlessly and autmatically jump over those time ranges in the audio
+    during playing just like they didn't even exist, basically censoring out those time ranges.
     Currently we aren't using this at all, because it's not friendly to the podcasting industry!
     */
     private adSegments: I.AdSegment[] = null;
@@ -294,8 +297,9 @@ export class AudioPlayerDlg extends DialogBase {
                     /* jump to end of audio if rest is an add, with logic of -3 to ensure we don't
                     go into a loop jumping to end over and over again */
                     if (seg.endTime < 0 && this.player.currentTime < this.player.duration - 3) {
-                        /* jump to last to seconds of audio, i'll do this instead of pausing, in case
-                         there are is more audio automatically about to play, we don't want to halt it all */
+                        /* jump to last to seconds of audio, i'll do this instead of pausing, in
+                         case there are is more audio automatically about to play, we don't want to
+                         halt it all */
                         this.player.loop = false;
                         this.player.currentTime = this.player.duration - 2;
                     }
@@ -311,8 +315,9 @@ export class AudioPlayerDlg extends DialogBase {
 
     saveTime = () => {
         if (this.player && !this.player.paused) {
-            /* this safety check to be sure no hidden audio can still be playing should no longer be needed
-            now that I have the close listener even on the dialog, but i'll leave this here anyway. Can't hurt. */
+            /* this safety check to be sure no hidden audio can still be playing should no longer be
+            needed now that I have the close listener even on the dialog, but i'll leave this here
+            anyway. Can't hurt. */
             if (!S.util.isElmVisible(this.player)) {
                 this.player.pause();
             }

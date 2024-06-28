@@ -3,7 +3,8 @@ import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 
 /*
- * Notification Dialog that pops up and displays for a short time and then automatically destroys itself
+ * Notification Dialog that pops up and displays for a short time and then automatically destroys
+ * itself
  */
 export class NotificationPopupDlg extends DialogBase {
 

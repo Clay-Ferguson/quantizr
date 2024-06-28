@@ -80,9 +80,9 @@ export class NodeUtil {
         if (node) {
             this.highlightNode(node, scroll, ast);
         } else {
-            // This code path should really never happen, but we're looking out for future cases where
-            // the 'ast' passed into here might not yet have a findable node 'in findNode' below and we
-            // try again on a delay.
+            // This code path should really never happen, but we're looking out for future cases
+            // where the 'ast' passed into here might not yet have a findable node 'in findNode'
+            // below and we try again on a delay.
             setTimeout(() => {
                 ast = getAs();
                 node = MainTab.inst?.findNode(id, ast);
@@ -96,10 +96,11 @@ export class NodeUtil {
                     this.highlightNode(node, scroll, ast);
                 }
                 else {
-                    // if we can't find that node, best behvior is at least to scroll to top.
-                    // NOTE: This scrollToTop created a bug where on the first CLICK onto a node after scrolling down
-                    // as anonymous user caused the page to scroll to top, loosing scroll position. So I'm commenting
-                    // this out for now. I don't think we need it.
+                    // if we can't find that node, best behvior is at least to scroll to top. NOTE:
+                    // This scrollToTop created a bug where on the first CLICK onto a node after
+                    // scrolling down as anonymous user caused the page to scroll to top, loosing
+                    // scroll position. So I'm commenting this out for now. I don't think we need
+                    // it.
                     // if (scroll) {
                     //     S.view.scrollToTop();
                     // }
@@ -118,8 +119,8 @@ export class NodeUtil {
             S.histUtil.updateHistory(node);
         }
 
-        // this highlightNodeId is only really used to ensure state change happens, but really everything always
-        // keys off parentIdToFocusNodeMap actually reading the value.
+        // this highlightNodeId is only really used to ensure state change happens, but really
+        // everything always keys off parentIdToFocusNodeMap actually reading the value.
         dispatch("highlightNode", s => s.highlightNodeId = node.id);
         S.quanta.parentIdToFocusNodeMap.set(ust.node.id, node.id);
 
@@ -316,10 +317,10 @@ export class NodeUtil {
                         title
                     }
                 }
-                // todo-2: Else this is a foreign user, so is there a way to set a link
-                // here to a foreign account, or should we basically run the equivalent
-                // of a user search here, probably best done with a modifiction to the
-                // UserPreferences server call and dialog
+                // todo-2: Else this is a foreign user, so is there a way to set a link here to a
+                // foreign account, or should we basically run the equivalent of a user search here,
+                // probably best done with a modifiction to the UserPreferences server call and
+                // dialog
                 else {
                     props = {
                         className: "sharingName",

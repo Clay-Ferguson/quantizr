@@ -51,8 +51,9 @@ export class NodeCompRowHeader extends Div {
         let avatarImg: Img = null;
         const type = S.plugin.getType(this.node.type);
 
-        // we always enable showInfo even on Tree Tab, so that we can have anonymous users comming to a shared tree link
-        // and they can see whose node it is rather than seeing just content on the page that's confusing who it came from or what it is.
+        // we always enable showInfo even on Tree Tab, so that we can have anonymous users comming
+        // to a shared tree link and they can see whose node it is rather than seeing just content
+        // on the page that's confusing who it came from or what it is.
         const showInfo = S.util.showMetaData(ast, this.node) || this.tabData.id === C.TAB_FEED || this.tabData.id === C.TAB_THREAD || this.tabData.id === C.TAB_REPLIES;
 
         if (showInfo && this.allowAvatars && this.node.owner !== PrincipalName.ADMIN) {
@@ -191,10 +192,10 @@ export class NodeCompRowHeader extends Div {
                 ]));
             }
 
-            // Because the POSTS node will be at a depth like this: "/r/usr/L/b/q", we require
-            // the path to be at least deeper than that to show the history button.
-            // L = Local Users, then: [UserNode]/[PostsNode]/[ActualNode]
-            // Also if we have 'inReplyTo' that will also enable the button.
+            // Because the POSTS node will be at a depth like this: "/r/usr/L/b/q", we require the
+            // path to be at least deeper than that to show the history button. L = Local Users,
+            // then: [UserNode]/[PostsNode]/[ActualNode] Also if we have 'inReplyTo' that will also
+            // enable the button.
             const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
             const adminNode = this.node.owner === PrincipalName.ADMIN;
@@ -418,8 +419,9 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        /* Note: if this is on the main tree then we don't show the edit button here because it'll be
-        showing up in a different place. We show here only for timeline, or search results views */
+        /* Note: if this is on the main tree then we don't show the edit button here because it'll
+        be showing up in a different place. We show here only for timeline, or search results views
+        */
         if (ast.userPrefs.editMode) {
 
             let editButton = null;
@@ -440,9 +442,9 @@ export class NodeCompRowHeader extends Div {
                     children.push(editButton);
                 }
 
-                // don't show this insert inline button if we are at the root of the page, because 
-                // we wouldn't even be able to see the node after inserting since the document view only shows that node
-                // and it's children.
+                // don't show this insert inline button if we are at the root of the page, because
+                // we wouldn't even be able to see the node after inserting since the document view
+                // only shows that node and it's children.
                 if (this.tabData.props.node.id !== this.node.id) {
                     children.push(new Button(null, () => {
                         S.edit.insertNode(this.node.id, 0, ast);
