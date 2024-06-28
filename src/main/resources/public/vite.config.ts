@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import circularDependency from "vite-plugin-circular-dependency";
+// import circularDependency from "vite-plugin-circular-dependency";
 
 // This will show up as an error, in VSCode which is fine because VSCode is seeing the
 // non-Node version of the tsconfig which is fine and can't really be fixed.
@@ -20,9 +20,11 @@ export default defineConfig({
         sourcemap: process.env.DOCKER_ENV === "dev" ? true : false
     },
     plugins: [
-        circularDependency({
-            exclude: "/node_modules/"
-        }),
+        // Latest version of this plugin is able to ignore node_modules any longer so it throws a false positive.
+        // circularDependency({
+        //     exclude: "./src/main/resources/public/node_modules",
+        //     outputFilePath: './src/main/resources/public/.circleDep'
+        // }),
         react()
     ],
     resolve: {
