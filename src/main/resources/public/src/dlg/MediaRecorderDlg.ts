@@ -77,7 +77,6 @@ export class MediaRecorderDlg extends DialogBase {
         const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
         devices.forEach(device => {
-            // console.log("Device Kind: " + device.kind);
             if (device.kind === "audioinput") {
                 // take the first one here
                 if (!audioInput) {

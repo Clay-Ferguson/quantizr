@@ -44,7 +44,6 @@ export class LoginDlg extends DialogBase {
     }
 
     override preLoad = async () => {
-        // console.log("Preloading creds from local db");
         const user = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
         const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
 

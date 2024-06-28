@@ -146,7 +146,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
             // finally here's where we render the feed items
             this.data.props.results.forEach(node => {
-                // console.log("FEED: node id=" + node.id + " content: " + node.content);
                 children.push(S.srch.renderSearchResultAsListItem(node, this.data, true, true, true, "userFeedItem", "userFeedItemHighlight", null));
                 i++;
                 rowCount++;
@@ -180,7 +179,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                                             observer.disconnect();
                                         }
                                         else {
-                                            // console.log("Loading more...")
                                             moreButton.replaceWithWaitIcon();
                                             S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true);
                                         }

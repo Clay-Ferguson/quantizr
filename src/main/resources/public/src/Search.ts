@@ -71,8 +71,6 @@ export class Search {
 
         const node = res.nodes?.length > 0 ? res.nodes[res.nodes.length - 1] : null;
 
-        // console.log("res=" + S.util.prettyPrint(res));
-
         if (res.nodes?.length > 0) {
             dispatch("RenderThreadResults", s => {
                 s.highlightSearchNodeId = node.id;

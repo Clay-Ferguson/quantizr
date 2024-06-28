@@ -423,11 +423,9 @@ export class Render {
                     }
 
                     if (S.quanta.pendingLocationHash) {
-                        // console.log("highlight: pendingLocationHash");
                         window.location.hash = S.quanta.pendingLocationHash;
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
-                            // console.log("highlight: pendingLocationHash (allowScroll)");
                             S.nodeUtil.highlightRowById(s, S.quanta.pendingLocationHash.substring(1), true);
                             s.rendering = true;
                         }
@@ -479,7 +477,6 @@ export class Render {
                     // will be focused. In other words, if we're about to initiate editing a
                     // TextArea field will be getting focus so we don't want to set the MAIN tab as
                     // the focus and mess that up.
-                    // console.log("focus MAIN_TAB during render.");
                     if (!s.editNode) {
                         S.domUtil.focusId(C.TAB_MAIN);
                     }

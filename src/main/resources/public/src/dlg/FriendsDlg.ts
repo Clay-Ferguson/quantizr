@@ -79,7 +79,6 @@ export class FriendsDlg extends DialogBase {
             type: "friends"
         });
 
-        // console.log("FriendsDlg getPeople(): " + S.util.prettyPrint(res));
         await promiseDispatch("SetFriendHashTags", s => { s.friendHashTags = res.friendHashTags; });
 
         let friends: J.FriendInfo[] = [];

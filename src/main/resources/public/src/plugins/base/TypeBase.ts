@@ -328,7 +328,6 @@ export class TypeBase implements TypeIntf {
             urls.forEach((ui: UrlInfo) => {
                 // allow max of 50 urls.
                 if (count++ < 50) {
-                    // console.log("OG: id=" + node.id + " url=" + url);
                     const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), ui,
                         ui.shortOg ? "openGraphPanelSimple" : "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
@@ -358,7 +357,6 @@ export class TypeBase implements TypeIntf {
                 ]);
             }
 
-            // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && S.util.showMetaData(ast, node)) {
                 return new Div(null, attrs, [

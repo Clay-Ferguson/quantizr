@@ -60,7 +60,7 @@ export class User {
             return;
         }
 
-        // console.log("refreshLogin: user=" + usr + " pwd=" + pwd);
+        // console.log("refreshLogin: user=" + usr);
         const usingCredentials: boolean = usr && pwd;
 
         try {

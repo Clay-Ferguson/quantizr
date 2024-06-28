@@ -339,7 +339,6 @@ export class Edit {
             // if feed tab became dirty while we were editing then refresh it.
             if (FeedTab.inst?.props?.feedDirtyList) {
                 for (const node of FeedTab.inst.props.feedDirtyList) {
-                    // console.log("Force Feed: " + node.content);
                     S.push.forceFeedItem(node);
                 }
                 FeedTab.inst.props.feedDirtyList = null;

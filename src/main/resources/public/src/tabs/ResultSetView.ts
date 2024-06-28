@@ -167,7 +167,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                                 }
                                 else {
                                     moreButton.replaceWithWaitIcon()
-                                    // console.log("Loading more...");
                                     this.pageChange(1);
                                 }
                             }

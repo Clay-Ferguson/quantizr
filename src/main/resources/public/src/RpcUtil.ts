@@ -61,7 +61,6 @@ export class RpcUtil {
             const idx = this.lifoQueue.length - 1;
             if (this.lifoQueue[idx].func && this.lifoQueue[idx].promise) {
                 const qi = this.lifoQueue.pop();
-                // console.log("Run Queue Item [size=" + this.lifoQueue.length + "]: " + qi.info);
                 qi.func();
             }
         }
@@ -126,7 +125,7 @@ export class RpcUtil {
             qi = new RpcQueueItem();
             qi.info = postName;
             qi.compId = compId;
-            // console.log("Queueing: " + postName);
+            // Queueing postName
             this.lifoQueuePush(qi);
         }
 
@@ -175,7 +174,6 @@ export class RpcUtil {
                         let retrying = false;
 
                         const timeoutId = setInterval(() => {
-                            // console.log("Still waiting for a retry.");
                             if (retrying) return;
                             retries++;
 

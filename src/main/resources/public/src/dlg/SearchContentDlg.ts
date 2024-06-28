@@ -50,7 +50,6 @@ export class SearchContentDlg extends DialogBase {
     constructor(private searchRoot: NodeInfo = null) {
         super("Search");
         this.onMount(() => {
-            // console.log("************** searchTextField focus");
             this.searchTextField?.focus();
         });
         this.mergeState<LS>(SearchContentDlg.dlgState);

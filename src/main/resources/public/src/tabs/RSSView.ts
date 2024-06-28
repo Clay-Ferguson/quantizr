@@ -141,7 +141,6 @@ export class RSSView extends AppTab<any, RSSView> {
                         urls,
                         page
                     }, true);
-                    // console.log("returned from getMultiRssFeed: " + S.util.prettyPrint(res));
                 }
                 finally {
                     RSSView.loading = false;
@@ -149,7 +148,6 @@ export class RSSView extends AppTab<any, RSSView> {
 
                 if (!res || !res.feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
-                    // console.log(err.message || "RSS Feed failed to load.");
                     dispatch("RSSUpdated", s => {
                         s.rssFeedCache[feedSrcHash] = "failed";
                         s.rssProgressText = null;
@@ -527,7 +525,6 @@ export class RSSView extends AppTab<any, RSSView> {
             // DO NOT DELETE: This is an important example of how to detect dupliate images
             // urlSet.add(src);
 
-            // console.log("IMG SRC: " + (el as any).src);
             el.style.borderRadius = ".6em";
             el.style.border = "1px solid gray";
             el.style.marginBottom = "12px";

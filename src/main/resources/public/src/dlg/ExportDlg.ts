@@ -34,10 +34,10 @@ export class ExportDlg extends DialogBase {
             new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new Heading(5, "File Type", { className: "bigMarginTop" }),
             new RadioButtonGroup([
-                this.fileTypeRadioButton("ZIP", "zip"),
-                this.fileTypeRadioButton("TAR", "tar"),
-                this.fileTypeRadioButton("TAR.GZ", "tar.gz"),
-                this.fileTypeRadioButton("PDF", "pdf")
+                this.makeFileTypeRadioBtn("ZIP", "zip"),
+                this.makeFileTypeRadioBtn("TAR", "tar"),
+                this.makeFileTypeRadioBtn("TAR.GZ", "tar.gz"),
+                this.makeFileTypeRadioBtn("PDF", "pdf")
             ], "radioButtonsBar marginTop"),
 
             exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.makeArchiveOptions() : null,
@@ -101,7 +101,7 @@ export class ExportDlg extends DialogBase {
         ]);
     }
 
-    fileTypeRadioButton = (name: string, exportType: string) => {
+    makeFileTypeRadioBtn = (name: string, exportType: string) => {
         return new Span(null, null, [
             new RadioButton(name, false, "exportTypeGroup", null, {
                 setValue: (checked: boolean) => {

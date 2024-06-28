@@ -125,7 +125,6 @@ export class SharingDlg extends DialogBase {
         this.super_close();
 
         if (this.dirty) {
-            // console.log("Sharing dirty=true. Full refresh pending.");
             if (this.getState<LS>().recursive) {
                 setTimeout(() => {
                     const ast = getAs();

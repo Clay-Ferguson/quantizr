@@ -579,11 +579,9 @@ export class EditNodeDlg extends DialogBase {
 
             // This loop creates all the editor input fields for all the properties
             ast.editNode.properties.forEach(prop => {
-                // console.log("prop=" + S.util.prettyPrint(prop));
                 if (prop.name === durationProp?.name) return;
 
                 if (!this.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name)) {
-                    // console.log("Hiding property: " + prop.name);
                     return;
                 }
 
@@ -602,7 +600,6 @@ export class EditNodeDlg extends DialogBase {
                 }
             });
         }
-
         _.propsParent.ordinalSortChildren();
         return ret;
     }
@@ -735,7 +732,6 @@ export class EditNodeDlg extends DialogBase {
         if (savedOk) {
             this.close();
         }
-
         S.edit.askAiQuestion(getAs().editNode.id);
     }
 

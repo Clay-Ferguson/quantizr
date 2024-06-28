@@ -525,7 +525,6 @@ export class Util {
         try {
             // Use the Clipboard API to write text
             await navigator?.clipboard?.writeText(text);
-            // console.log("Text copied to clipboard");
             S.util.flashMessage("Copied to Clipboard: " + text, "Clipboard", true);
         } catch (err) {
             console.error("Failed to copy text to clipboard", err);

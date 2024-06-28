@@ -197,7 +197,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     configureDropZone = () => {
         /* Limit based on user quota for our user accounts */
         const maxFileSize = getAs().userPrefs.maxUploadFileSize;
-        // console.log("configureDropZone: maxFileSize="+maxUploadSize);
 
         let action;
         if (this.importMode) {
@@ -265,8 +264,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 this.on("sending", function (file: File, _xhr: any, formData: any) {
                     dlg.sent = true;
-                    // console.log("sending file: " + file.name);
-
                     formData.append("files", file);
 
                     // It's important to check before calling append on this formData, because when uploading multiple files
@@ -295,7 +292,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 // });
 
                 this.on("success", function (_file: File, resp: J.ResponseBase, _evt: ProgressEvent) {
-                    // console.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
                     if (resp.code != C.RESPONSE_CODE_OK) {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
@@ -330,7 +326,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         };
 
         this.dropzoneDiv.domPreUpdateEvent = (): void => {
-            // console.log("Setting up Dropzone for ID: " + this.dropzoneDiv.getId());
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
             const maxUploadSize = getAs().userPrefs.maxUploadFileSize;
 

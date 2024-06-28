@@ -311,11 +311,9 @@ export class Crypto {
 
             S.crypto.sigKey = newSigKey;
             S.crypto.userSignature = newUserSignature;
-            // console.log("newSigKey: user=" + user + " key=" + newSigKey);
         }
 
         if (republish && (newAsymEncKey || newSigKey)) {
-            // console.log("Pushing PublicKeys");
             const res = await S.rpcUtil.rpc<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKeys", {
                 // todo-2: I'm not sure I want to keep these as escaped JSON or convert to hex
                 asymEncKey: newAsymEncKey,
@@ -385,7 +383,6 @@ export class Crypto {
             return null;
         }
         else {
-            // console.log("getPrivateKey returning: " + S.util.prettyPrint(val.val.privateKey));
             return val.v.privateKey;
         }
     }
@@ -439,7 +436,6 @@ export class Crypto {
         let pubKeyStr: string = null;
 
         if (!forceUpdate) {
-            // console.log("force update key");
             /* Check to see if there is a key stored, and if not force it to be created
                val.val is the EncryptionKeyPair here.
             */
@@ -473,7 +469,6 @@ export class Crypto {
         if (!pubKeyStr) {
             const publicKeyDat = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
             pubKeyStr = JSON.stringify(publicKeyDat);
-            // console.log("jwk: " + pubKeyStr);
         }
 
         return pubKeyStr;
@@ -715,7 +710,7 @@ export class Crypto {
         let ret = S.quanta.decryptCache.get(cipherHash);
         // if we have already decrypted this data return the result.
         if (ret) {
-            // console.log("decryption cache hit!");
+            // decryption cache hit
             return ret;
         }
 
@@ -737,7 +732,6 @@ export class Crypto {
             const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
             const symKey = await crypto.subtle.importKey("jwk", symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
             ret = await this.symDecryptString(symKey, skpd.cipherText);
-            // console.log("            output: [" + ret + "]");
             S.quanta.decryptCache.set(cipherHash, ret);
             return ret;
         }
