@@ -47,7 +47,7 @@ cd ${PRJROOT}
 # mvn dependency:tree clean exec:exec package -DskipTests=true -Dverbose
 
 # This build command creates the SpringBoot fat jar in the /target/ folder.
-echo "Maven CLEAN package ${mvn_profile}"
+echo "Maven package ${mvn_profile}"
 # This run is required only to ensure TypeScript generated files are up to date.
 # Always do the same profile here (dev-vscode)
 mvn -T 1C package -DskipTests=true -Pdev-vscode
