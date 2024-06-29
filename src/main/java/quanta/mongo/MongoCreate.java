@@ -459,7 +459,6 @@ public class MongoCreate extends ServiceBase {
             newNode.set(NodeProp.AI_OVERWRITE, true);
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
         }
-
         update.save(ms, newNode);
 
         if (req.getAiService() != null && NodeType.AI_ANSWER.s().equals(parentNode.getType())) {
@@ -597,7 +596,6 @@ public class MongoCreate extends ServiceBase {
             plugin.preCreateNode(ms, vcNode, null, false);
             parentNode = vcNode.getVal();
         }
-
         TypeBase parentPlugin = typePluginMgr.getPluginByType(parentNode.getType());
 
         if (parentPlugin != null) {

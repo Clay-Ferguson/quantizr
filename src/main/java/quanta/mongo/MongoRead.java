@@ -27,7 +27,6 @@ import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
@@ -38,7 +37,7 @@ import quanta.util.val.Val;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
- * <p>
+ * 
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
@@ -533,7 +532,6 @@ public class MongoRead extends ServiceBase {
         if (sort != null) {
             q.with(sort);
         }
-
         if (allowAuth) {
             crit = auth.addReadSecurity(ms, crit);
         }
@@ -681,7 +679,6 @@ public class MongoRead extends ServiceBase {
         if (moreCriteria != null) {
             q.addCriteria(moreCriteria);
         }
-
         if (sort != null) {
             q.with(sort);
         }
@@ -713,7 +710,7 @@ public class MongoRead extends ServiceBase {
          */
         Criteria crit = null;
         if (recursive) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath())); //
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         } else {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()));
         }
@@ -866,6 +863,7 @@ public class MongoRead extends ServiceBase {
         aggOps.add(Aggregation.sort(sort));
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
+
         Aggregation agg = Aggregation.newAggregation(aggOps);
         AggregationResults<SubNode> results = opsw.aggregate(agg);
         return results.getMappedResults();
@@ -892,6 +890,7 @@ public class MongoRead extends ServiceBase {
         aggOps.add(Aggregation.sort(sort));
         aggOps.add(Aggregation.skip((long) skip));
         aggOps.add(Aggregation.limit(limit));
+
         Aggregation agg = Aggregation.newAggregation(aggOps);
         AggregationResults<SubNode> results = opsw.aggregate(agg);
         return results.getMappedResults();
@@ -940,7 +939,6 @@ public class MongoRead extends ServiceBase {
         crit = crit.and(SubNode.MODIFY_TIME).ne(null);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
-
         q.addCriteria(Criteria.where(SubNode.PROPS + "." + NodeProp.DATE).ne(null));
         return opsw.find(ms, q);
     }
@@ -991,7 +989,6 @@ public class MongoRead extends ServiceBase {
             }
             update.save(ms, node);
         }
-
         return node;
     }
 
@@ -1080,8 +1077,9 @@ public class MongoRead extends ServiceBase {
         }
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath())).and(SubNode.TYPE)
-                .is(type).and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()))//
+                .and(SubNode.TYPE).is(type)//
+                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         SubNode ret = opsw.findOne(ms, q);
@@ -1097,8 +1095,8 @@ public class MongoRead extends ServiceBase {
         }
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit =
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath())).and(SubNode.TYPE).is(type);
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()))//
+                .and(SubNode.TYPE).is(type);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
         return opsw.findOne(ms, q);
@@ -1156,7 +1154,7 @@ public class MongoRead extends ServiceBase {
             return null;
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath()))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getPath())) //
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
@@ -1174,7 +1172,7 @@ public class MongoRead extends ServiceBase {
             return Collections.<SubNode>emptyList();
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(path)) //
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
@@ -1207,7 +1205,6 @@ public class MongoRead extends ServiceBase {
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
         }
-
         if (limit != null && limit.intValue() > 0) {
             q.limit(limit.intValue());
         }
@@ -1228,28 +1225,7 @@ public class MongoRead extends ServiceBase {
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
         }
-
         return opsw.count(ms, q);
-    }
-
-    // (not currently used)
-    public SubNode findByCID(MongoSession ms, String cid) {
-        Query q = new Query();
-        // Match the PIN to cid
-        // need to add an index for this field if we ever start using it.
-        Criteria crit = Criteria.where(SubNode.MCID).is(cid);
-        q.addCriteria(crit);
-        SubNode ret = opsw.findOne(ms, q);
-        auth.readAuth(ms, ret);
-        return ret;
-    }
-
-    // (not currently used)
-    public Iterable<SubNode> findAllWithCids() {
-        Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.MCID).ne(null);
-        q.addCriteria(crit);
-        return opsw.find(null, q);
     }
 
     // If optional idMap is passed in non-null it gets loaded with a map from nodeId to TreeNode
@@ -1328,7 +1304,6 @@ public class MongoRead extends ServiceBase {
         if (tn.children == null) {
             return;
         }
-
         tn.children.sort((a, b) -> a.node.getOrdinal().compareTo(b.node.getOrdinal()));
 
         for (TreeNode tni : tn.children) {

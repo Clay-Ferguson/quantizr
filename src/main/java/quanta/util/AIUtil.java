@@ -201,7 +201,6 @@ public class AIUtil extends ServiceBase {
 
         // Eventually we will add to this information about the gpt request too. Entire Q & A
         // debit.setDetail(mapper.valueToTree(res));
-
         tranRepository.save(debit);
         return curBal.subtract(cost);
     }

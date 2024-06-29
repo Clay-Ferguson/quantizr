@@ -189,7 +189,6 @@ public class MongoAuth extends ServiceBase {
                 return crit;
             }
         }
-
         SessionContext sc = ThreadLocals.getSC();
         SubNode myAcntNode = null;
 

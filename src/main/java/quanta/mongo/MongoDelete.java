@@ -102,8 +102,8 @@ public class MongoDelete extends ServiceBase {
     public long deleteUnderPath(MongoSession ms, String path) {
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(path)));
-
         SubNode parent = read.getNode(ms, path);
+
         if (parent != null) {
             parent.setHasChildren(false);
         }
@@ -284,6 +284,7 @@ public class MongoDelete extends ServiceBase {
         LongVal opsPending = new LongVal();
         LongVal deletesInPass = new LongVal();
         int passes = 0;
+
         // run up to 5 passes over the whole DB (orphan trees deeper than 5 levels deep
         // won't all be cleaned but that's ok, they will get pruned off in future runs.
         while (passes++ < 5) {
@@ -361,7 +362,6 @@ public class MongoDelete extends ServiceBase {
      * same kind of logic.
      */
     public void deleteNodeOrphans_fast() {
-        log.debug("deleteNodeOrphans()");
         Val<BulkOperations> bops = new Val<>(null);
         IntVal nodesProcessed = new IntVal();
         LongVal opsPending = new LongVal();
@@ -476,7 +476,6 @@ public class MongoDelete extends ServiceBase {
                 long totalBytes = attach.getTotalAttachmentBytes(ms, node);
                 user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
             }
-
             nodes.add(node);
 
             /*
@@ -523,13 +522,10 @@ public class MongoDelete extends ServiceBase {
             // it's ok to call ops and not opsw here
             opsw.remove(node);
         }
-
         Query q = new Query();
         log.debug("DEL SUBGRAPH: " + node.getPath());
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(node.getPath()));
         q.addCriteria(crit);
-
-        // it's ok to call ops and not opsw here
         opsw.remove(ms, q);
     }
 

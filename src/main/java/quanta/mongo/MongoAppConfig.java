@@ -87,10 +87,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         if (connectionFailed)
             return null;
         if (client == null) {
-            log.debug("create mongoClient");
             MongoCredential credential = null;
             if (appProp.getMongoSecurity()) {
-                log.debug("MongoSecurity enabled.");
                 String password = appProp.getMongoPassword();
                 credential = MongoCredential.createCredential("root", "admin", password.toCharArray());
             } else {
@@ -112,6 +110,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 // This is just to slightly help give the MongoDB replica some time to start
                 // becasue in a docker swarm everything starts simultaneously
                 Util.sleep(5000);
+
                 // This codec registroy is what allows us to store objects that contain other POJOS, like for
                 // example the way we're storing AccessControl objects in a map inside SubNode
                 CodecRegistry codecReg = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
@@ -150,7 +149,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
     @Bean
     public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {
         if (ops == null) {
-            log.debug("create mongoTemplate");
             ops = super.mongoTemplate(databaseFactory, converter);
             ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
         }
@@ -162,7 +160,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         if (connectionFailed)
             return null;
         if (grid == null) {
-            log.debug("create gridFsTemplate");
             MongoDatabaseFactory mdbf = mongoDbFactory();
             if (mdbf != null) {
                 grid = new GridFsTemplate(mdbf, converter);
