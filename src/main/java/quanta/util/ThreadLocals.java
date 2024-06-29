@@ -142,10 +142,6 @@ public class ThreadLocals {
         rootEvent.set(res);
     }
 
-    public static PerfEvent getRootEvent() {
-        return rootEvent.get();
-    }
-
     public static void setResponse(ResponseBase res) {
         response.set(res);
     }

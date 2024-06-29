@@ -58,10 +58,9 @@ public class CallProcessor extends ServiceBase {
          */
         ResponseBase orb = new ResponseBase();
         Object ret = null;
-        long startTime = System.currentTimeMillis();
         String userName = null;
 
-        try {
+        try (PerfEvent pe = new PerfEvent("rpc." + command, userName)) {
             if (req instanceof LogoutRequest) {
                 // Note: all this run will be doing in this case is a session invalidate.
                 ret = runner.run(null);
@@ -95,12 +94,7 @@ public class CallProcessor extends ServiceBase {
             } else {
                 log.debug("ERROR: " + ExceptionUtils.getStackTrace(e));
             }
-        } finally {
-            int duration = (int) (System.currentTimeMillis() - startTime);
-            if (duration > PerfData.CAPTURE_THRESHOLD) {
-                new PerfEvent(duration, "callProc." + command, userName);
-            }
-        }
+        } 
 
         if (ret instanceof ResponseBase _ret) {
             String callId = ThreadLocals.getServletRequest().getHeader("callId");

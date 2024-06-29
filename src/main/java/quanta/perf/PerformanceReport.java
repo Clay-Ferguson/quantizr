@@ -54,11 +54,10 @@ public class PerformanceReport {
             orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
         }
 
-        int counter = 0;
         String rows = "";
         for (PerfEvent se : orderedData) {
             if (se.duration > REPORT_THRESHOLD) {
-                rows += formatEvent(se, counter++ < 20, false);
+                rows += formatEvent(se);
             }
         }
 
@@ -149,38 +148,11 @@ public class PerformanceReport {
         return htmlH(3, "Times Per Category") + htmlTable(table);
     }
 
-    // returns as an HTML Row (user, event, rootEvent, eventId
-    public static String formatEvent(PerfEvent se, boolean showSubEvents, boolean isSubItem) {
+    public static String formatEvent(PerfEvent se) {
         String tr = "";
-        // too verbose, keeping this capability turned off for now.)
-        boolean embedSubEvents = false;
-        if (!isSubItem) {
-            tr += htmlTd(se.user != null ? se.user : PrincipalName.ANON.s());
-        }
-        // If this event happens to be the head/root of a series of events
-        String set = "";
-        if (embedSubEvents) {
-            String rows = "";
-            if (showSubEvents && se.root != null && se.root.subEvents != null) {
-                // sb.append("\n Set:\n");
-
-                for (PerfEvent subEvent : se.root.subEvents) {
-                    // if we run across same 'se' we're processing, skip it
-                    if (subEvent != se) {
-                        rows += formatEvent(subEvent, false, true);
-                    }
-                }
-                if (!rows.isEmpty()) {
-                    set += "<br>" + htmlTable(htmlTr(htmlHeader("user", "Event", "Time", "Root Id", "Event Id")) + rows)
-                            + "<br>";
-                }
-            }
-        }
-        tr += htmlTd(se.event + set);
+        tr += htmlTd(se.user != null ? se.user : PrincipalName.ANON.s());
+        tr += htmlTd(se.event);
         tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration, true));
-        if (!isSubItem && se.root != null) {
-            tr += htmlTdRt(String.valueOf(se.root.hashCode()));
-        }
         tr += htmlTdRt(String.valueOf(se.hashCode()));
         return htmlTr(tr);
     }

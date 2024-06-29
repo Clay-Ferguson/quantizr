@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 public class PerfData {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(PerfData.class);
-    public static final int CAPTURE_THRESHOLD = 10; // 10 for prod
     private static final int MAX_EVENTS = 10000;
     public static List<PerfEvent> data = Collections.synchronizedList(new LinkedList<>());
 

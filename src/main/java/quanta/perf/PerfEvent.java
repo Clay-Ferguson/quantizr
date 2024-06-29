@@ -1,61 +1,27 @@
 package quanta.perf;
 
-import java.util.LinkedList;
-import java.util.List;
-import quanta.util.ThreadLocals;
-
-/**
- * Example Use:
- * 
- * <pre>
- *  long start = System.currentTimeMillis(); 
- * ...do something to be time new
- * PerfMonEvent(System.currentTimeMillis() - start, "Thing that was timed", sc.getUserName());
- * </pre>
- */
-public class PerfEvent {
-
-    public PerfEvent root;
-    public List<PerfEvent> subEvents;
+public class PerfEvent implements AutoCloseable {
+    public static final int CAPTURE_THRESHOLD = 1000; // 10ms
 
     // NO GETTERS/SETTERS. Not needed or wanted.
     public long duration;
     public String event;
     public String user;
-    public long lastTime;
+    public long startTime;
 
     // Pass event as 'null' to start a chaining set of event timings, where this constructor
     // doesn't represent processing done, but the beginning of a set of operations
-    public PerfEvent(long duration, String event, String user) {
+    public PerfEvent(String event, String user) {
         this.user = user;
-        lastTime = System.currentTimeMillis();
-
-        if (event != null) {
-            this.duration = duration;
-            this.event = event;
-
-            PerfData.add(this);
-            PerfEvent rootEvent = ThreadLocals.getRootEvent();
-
-            // if there's no root event for this thread make this one the root.
-            if (rootEvent == null) {
-                ThreadLocals.setRootEvent(this);
-            }
-            // else add this even to the subevents.
-            else {
-                // create lazily
-                if (rootEvent.subEvents == null) {
-                    rootEvent.subEvents = new LinkedList<>();
-                }
-                rootEvent.subEvents.add(this);
-                root = rootEvent;
-            }
-        }
+        this.event = event;
+        startTime = System.currentTimeMillis();
     }
 
-    public void chain(String event) {
-        long nowTime = System.currentTimeMillis();
-        new PerfEvent(nowTime - lastTime, event, this.user);
-        lastTime = nowTime;
+    @Override
+    public void close() throws Exception {
+        duration = System.currentTimeMillis() - startTime;
+        if (duration > CAPTURE_THRESHOLD) {
+            PerfData.add(this);
+        }
     }
 }

@@ -1,7 +1,9 @@
 package quanta.mongo;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Component;
 import com.mongodb.client.result.DeleteResult;
 import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
-import quanta.util.DateUtil;
+import quanta.perf.PerfEvent;
 import quanta.util.ThreadLocals;
 
 /**
@@ -33,90 +35,54 @@ public class MongoTemplateWrapper extends ServiceBase {
     @Autowired
     MongoTemplate mt;
 
-    public DeleteResult remove(MongoSession ms, Query query) {
-        long start = 0L;
-        if (logging) {
-            log("remove", ms, query);
-            start = System.currentTimeMillis();
-        }
+    private <T> T executeOperation(MongoSession ms, Query query, String operationName, Supplier<T> operation) {
+        String user = (ms == null || ms.getUserName() == null ? "null" : ms.getUserName());
+        try (PerfEvent pe = new PerfEvent(operationName, user)) {
+            if (logging) {
+                log(operationName, ms, query);
+            }
 
-        DeleteResult res = mt.remove(query, SubNode.class);
-        if (logging) {
-            log.debug("removed: " + res.getDeletedCount() + "t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
+            return operation.get();
+        } catch (Exception e) {
+            log.error("Mongo OP failed: " + operationName + "\n" + ExceptionUtils.getStackTrace(e));
+            throw new RuntimeException(e);
         }
-        return res;
+    }
+
+    public DeleteResult remove(MongoSession ms, Query query) {
+        return executeOperation(ms, query, "remove", () -> mt.remove(query, SubNode.class));
     }
 
     public long count(MongoSession ms, Query query) {
-        long start = 0L;
-        if (logging) {
-            log("count", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        long count = mt.count(query, SubNode.class);
-        if (logging) {
-            log.debug("count: " + count + " t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return count;
+        return executeOperation(ms, query, "count", () -> mt.count(query, SubNode.class));
     }
 
     public boolean exists(MongoSession ms, Query query) {
-        long start = 0L;
-        if (logging) {
-            log("exists", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        boolean exists = mt.exists(query, SubNode.class);
-        if (logging) {
-            log.debug("exists: " + exists + " t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return exists;
+        return executeOperation(ms, query, "exists", () -> mt.exists(query, SubNode.class));
     }
 
     public List<SubNode> find(MongoSession ms, Query query) {
-        long start = 0L;
-        if (logging) {
-            log("find", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        List<SubNode> res = mt.find(query, SubNode.class);
-        long count = res != null ? res.size() : 0;
-        if (logging) {
-            log.debug("count: " + count + " t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return res;
+        return executeOperation(ms, query, "find", () -> mt.find(query, SubNode.class));
     }
 
     public SubNode findOne(MongoSession ms, Query query) {
-        long start = 0L;
-        if (logging) {
-            log("findOne", ms, query);
-            start = System.currentTimeMillis();
-        }
-
-        SubNode obj = mt.findOne(query, SubNode.class);
-        if (logging) {
-            log.debug((obj != null ? ("found: " + obj.getIdStr()) : "not found") + " t="
-                    + DateUtil.formatDurationMillis(System.currentTimeMillis() - start, true));
-        }
-        return obj;
+        return executeOperation(ms, query, "findOne", () -> mt.findOne(query, SubNode.class));
     }
 
     public SubNode findById(MongoSession ms, Object id) {
         if (id == null)
             return null;
-        SubNode obj = mt.findById(id, SubNode.class);
-        if (obj != null && ms != null) {
-            auth.readAuth(ms, obj);
-        }
-        return obj;
+
+        return executeOperation(ms, null, "findById", () -> {
+            SubNode obj = mt.findById(id, SubNode.class);
+
+            // Note: Since this method doesn't accept a query object, we can't have secured the query before
+            // calling this method like all other class methods do, so we check 'readAuth' here
+            if (obj != null && ms != null) {
+                auth.readAuth(ms, obj);
+            }
+            return obj;
+        });
     }
 
     public BulkOperations bulkOps(BulkMode bulkMode) {
@@ -152,11 +118,15 @@ public class MongoTemplateWrapper extends ServiceBase {
     }
 
     private void log(String name, MongoSession ms, Query query) {
-        log.debug("MQ: cmd:" + //
+        String msg = "MQ: cmd:" + //
                 (ThreadLocals.getSC() != null && ThreadLocals.getSC().getCommand() != null
                         ? ThreadLocals.getSC().getCommand()
                         : "?")
-                + " u:" + (ms == null || ms.getUserName() == null ? "null" : ms.getUserName()) + " q:" + name + " "
-                + query.toString());
+                + " u:" + (ms == null || ms.getUserName() == null ? "null" : ms.getUserName()) + " q:" + name + " ";
+
+        if (query != null) {
+            msg += query.toString();
+        }
+        log.debug(msg);
     }
 }

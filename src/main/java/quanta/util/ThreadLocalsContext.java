@@ -21,7 +21,6 @@ public class ThreadLocalsContext {
     private MongoSession session;
     private String reqBearerToken;
     private String reqSig;
-    private PerfEvent rootEvent;
     private HashMap<ObjectId, SubNode> dirtyNodes;
     private Boolean parentCheckEnabled;
 
@@ -33,7 +32,6 @@ public class ThreadLocalsContext {
         session = ThreadLocals.getMongoSession();
         reqBearerToken = ThreadLocals.getReqBearerToken();
         reqSig = ThreadLocals.getReqSig();
-        rootEvent = ThreadLocals.getRootEvent();
         dirtyNodes = null; // Use thread's own private scope of dirty nodes.
         parentCheckEnabled = ThreadLocals.getParentCheckEnabled();
     }
@@ -46,7 +44,6 @@ public class ThreadLocalsContext {
         ThreadLocals.setMongoSession(session);
         ThreadLocals.setReqBearerToken(reqBearerToken);
         ThreadLocals.setReqSig(reqSig);
-        ThreadLocals.setRootEvent(rootEvent);
         ThreadLocals.setDirtyNodes(dirtyNodes);
         ThreadLocals.setParentCheckEnabled(parentCheckEnabled);
     }
