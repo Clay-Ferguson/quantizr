@@ -26,8 +26,8 @@ public class PerformanceReport {
 
     public static String clearData() {
         ThreadLocals.requireAdmin();
-        synchronized (PerfMon.data) {
-            PerfMon.data.clear();
+        synchronized (PerfData.data) {
+            PerfData.data.clear();
         }
         DataTransferRateFilter.reset();
         return getReport();
@@ -44,19 +44,19 @@ public class PerformanceReport {
                         + " KBps"));
 
         // Sort list by whichever are consuming the most time (i.e. by duration, descending order)
-        List<PerfMonEvent> orderedData;
-        synchronized (PerfMon.data) {
-            if (PerfMon.data.size() == 0) {
+        List<PerfEvent> orderedData;
+        synchronized (PerfData.data) {
+            if (PerfData.data.size() == 0) {
                 sb.append("No data available yet.");
                 return sb.toString();
             }
-            orderedData = new ArrayList<>(PerfMon.data);
+            orderedData = new ArrayList<>(PerfData.data);
             orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
         }
 
         int counter = 0;
         String rows = "";
-        for (PerfMonEvent se : orderedData) {
+        for (PerfEvent se : orderedData) {
             if (se.duration > REPORT_THRESHOLD) {
                 rows += formatEvent(se, counter++ < 20, false);
             }
@@ -69,7 +69,7 @@ public class PerformanceReport {
         // calculate totals per person
         HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
 
-        for (PerfMonEvent se : orderedData) {
+        for (PerfEvent se : orderedData) {
             String user = se.user != null ? se.user : PrincipalName.ANON.s();
             UserPerf up = userPerfInfo.get(user);
             if (up == null) {
@@ -128,7 +128,7 @@ public class PerformanceReport {
     public static String getTimesPerCategory() {
         HashMap<String, MethodStat> stats = new HashMap<>();
 
-        for (PerfMonEvent event : PerfMon.data) {
+        for (PerfEvent event : PerfData.data) {
             MethodStat stat = stats.get(event.event);
             if (stat == null) {
                 stats.put(event.event, stat = new MethodStat());
@@ -150,7 +150,7 @@ public class PerformanceReport {
     }
 
     // returns as an HTML Row (user, event, rootEvent, eventId
-    public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean isSubItem) {
+    public static String formatEvent(PerfEvent se, boolean showSubEvents, boolean isSubItem) {
         String tr = "";
         // too verbose, keeping this capability turned off for now.)
         boolean embedSubEvents = false;
@@ -164,7 +164,7 @@ public class PerformanceReport {
             if (showSubEvents && se.root != null && se.root.subEvents != null) {
                 // sb.append("\n Set:\n");
 
-                for (PerfMonEvent subEvent : se.root.subEvents) {
+                for (PerfEvent subEvent : se.root.subEvents) {
                     // if we run across same 'se' we're processing, skip it
                     if (subEvent != se) {
                         rows += formatEvent(subEvent, false, true);

@@ -13,10 +13,10 @@ import quanta.util.ThreadLocals;
  * PerfMonEvent(System.currentTimeMillis() - start, "Thing that was timed", sc.getUserName());
  * </pre>
  */
-public class PerfMonEvent {
+public class PerfEvent {
 
-    public PerfMonEvent root;
-    public List<PerfMonEvent> subEvents;
+    public PerfEvent root;
+    public List<PerfEvent> subEvents;
 
     // NO GETTERS/SETTERS. Not needed or wanted.
     public long duration;
@@ -26,7 +26,7 @@ public class PerfMonEvent {
 
     // Pass event as 'null' to start a chaining set of event timings, where this constructor
     // doesn't represent processing done, but the beginning of a set of operations
-    public PerfMonEvent(long duration, String event, String user) {
+    public PerfEvent(long duration, String event, String user) {
         this.user = user;
         lastTime = System.currentTimeMillis();
 
@@ -34,8 +34,8 @@ public class PerfMonEvent {
             this.duration = duration;
             this.event = event;
 
-            PerfMon.add(this);
-            PerfMonEvent rootEvent = ThreadLocals.getRootEvent();
+            PerfData.add(this);
+            PerfEvent rootEvent = ThreadLocals.getRootEvent();
 
             // if there's no root event for this thread make this one the root.
             if (rootEvent == null) {
@@ -55,7 +55,7 @@ public class PerfMonEvent {
 
     public void chain(String event) {
         long nowTime = System.currentTimeMillis();
-        new PerfMonEvent(nowTime - lastTime, event, this.user);
+        new PerfEvent(nowTime - lastTime, event, this.user);
         lastTime = nowTime;
     }
 }

@@ -369,8 +369,14 @@ public class AIUtil extends ServiceBase {
     }
 
     public String formatExportAnswerSection(String content, String aiService) {
-        return "<div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>\n" + content
-                + "\n<div style='text-align: right; margin: 6px;'>" + aiService + "</div></div>";
+        return """
+<div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>
+    %s
+    <div style='text-align: right; margin: 6px;'>
+    %s
+    </div>
+</div>
+""".formatted(content, aiService);
     }
 
     public boolean hasBookTags(SubNode node) {

@@ -11,7 +11,7 @@ import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.perf.PerfMonEvent;
+import quanta.perf.PerfEvent;
 import quanta.rest.response.base.ResponseBase;
 
 /**
@@ -39,7 +39,7 @@ public class ThreadLocals {
      * will be added as top level children under it. Currently we don't do a hierarchy, but just one
      * level of containment
      */
-    private static final ThreadLocal<PerfMonEvent> rootEvent = new ThreadLocal<>();
+    private static final ThreadLocal<PerfEvent> rootEvent = new ThreadLocal<>();
 
     /*
      * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
@@ -138,11 +138,11 @@ public class ThreadLocals {
         return servletRequest.get();
     }
 
-    public static void setRootEvent(PerfMonEvent res) {
+    public static void setRootEvent(PerfEvent res) {
         rootEvent.set(res);
     }
 
-    public static PerfMonEvent getRootEvent() {
+    public static PerfEvent getRootEvent() {
         return rootEvent.get();
     }
 

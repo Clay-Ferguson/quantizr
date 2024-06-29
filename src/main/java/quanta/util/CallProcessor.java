@@ -12,8 +12,8 @@ import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoSession;
-import quanta.perf.PerfMon;
-import quanta.perf.PerfMonEvent;
+import quanta.perf.PerfData;
+import quanta.perf.PerfEvent;
 import quanta.rest.request.LogoutRequest;
 import quanta.rest.request.base.RequestBase;
 import quanta.rest.response.base.ResponseBase;
@@ -97,8 +97,8 @@ public class CallProcessor extends ServiceBase {
             }
         } finally {
             int duration = (int) (System.currentTimeMillis() - startTime);
-            if (duration > PerfMon.CAPTURE_THRESHOLD) {
-                new PerfMonEvent(duration, "callProc." + command, userName);
+            if (duration > PerfData.CAPTURE_THRESHOLD) {
+                new PerfEvent(duration, "callProc." + command, userName);
             }
         }
 

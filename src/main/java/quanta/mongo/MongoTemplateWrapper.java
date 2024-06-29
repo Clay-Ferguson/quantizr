@@ -1,6 +1,5 @@
 package quanta.mongo;
 
-import com.mongodb.client.result.DeleteResult;
 import java.util.List;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -15,8 +14,8 @@ import org.springframework.data.mongodb.core.index.IndexOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
+import com.mongodb.client.result.DeleteResult;
 import quanta.config.ServiceBase;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;

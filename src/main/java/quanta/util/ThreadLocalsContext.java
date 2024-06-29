@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import quanta.config.SessionContext;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.perf.PerfMonEvent;
+import quanta.perf.PerfEvent;
 import quanta.rest.response.base.ResponseBase;
 
 /**
@@ -21,7 +21,7 @@ public class ThreadLocalsContext {
     private MongoSession session;
     private String reqBearerToken;
     private String reqSig;
-    private PerfMonEvent rootEvent;
+    private PerfEvent rootEvent;
     private HashMap<ObjectId, SubNode> dirtyNodes;
     private Boolean parentCheckEnabled;
 

@@ -11,11 +11,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 
-/**
- * Implements the captcha image as seen on the Signup Page. I would normally use some existing
- * framework for something like this but I wrote this a long time ago and it works well, so I always
- * kept it. It's just too simple for me to have found fault with.
- */
 public class CaptchaMaker {
     private static final Random rand = new Random();
 
@@ -34,6 +29,9 @@ public class CaptchaMaker {
     public static final int CAPTCHA_CHAR_SIZE = 40;
     public static final int CAPTCHA_NUM_CHARS = 6;
 
+    /**
+     * Create a GIF image with the given CAPTCHA string.
+     */
     public static byte[] makeCaptcha(String captchaString) throws IOException {
         // Dimensions for the CAPTCHA images
         int width = 80;
@@ -46,28 +44,34 @@ public class CaptchaMaker {
         // Create a buffered image to draw the first frame (empty frame) and initialize GifSequenceWriter
         BufferedImage first = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         GifSequenceWriter writer = new GifSequenceWriter(output, first.getType(), 500, true);
+        Graphics2D g = null;
+        try {
+            // Write the first (empty) frame with a 2 seconds delay to allow users to focus
+            g = first.createGraphics();
+            g.setColor(Color.LIGHT_GRAY); // assuming white background
+            g.fillRect(0, 0, width, height);
+            writer.writeToSequence(first);
 
-        // Write the first (empty) frame with a 2 seconds delay to allow users to focus
-        Graphics2D g = first.createGraphics();
-        g.setColor(Color.LIGHT_GRAY); // assuming white background
-        g.fillRect(0, 0, width, height);
-        g.dispose();
-        writer.writeToSequence(first);
+            BufferedImage space = createImageWithCharacter(' ', width, height);
+            // For each character in the captcha string, create an image and write to the sequence
+            for (char character : captchaString.toCharArray()) {
+                BufferedImage image = createImageWithCharacter(character, width, height);
+                writer.writeToSequence(image);
 
-        BufferedImage space = createImageWithCharacter(' ', width, height);
-        // For each character in the captcha string, create an image and write to the sequence
-        for (char character : captchaString.toCharArray()) {
-            BufferedImage image = createImageWithCharacter(character, width, height);
-            writer.writeToSequence(image);
-
-            image = createImageWithCharacter(' ', width, height);
+                image = createImageWithCharacter(' ', width, height);
+                writer.writeToSequence(space);
+            }
             writer.writeToSequence(space);
-        }
-        writer.writeToSequence(space);
+        } finally {
+            if (g != null)
+                g.dispose();
 
-        // Close the writer to complete the GIF
-        writer.close();
-        output.close();
+            // Close the writer to complete the GIF
+            if (writer != null)
+                writer.close();
+            if (output != null)
+                output.close();
+        }
 
         // Return the byte array containing the GIF data
         return bos.toByteArray();
@@ -76,16 +80,22 @@ public class CaptchaMaker {
     private static BufferedImage createImageWithCharacter(char character, int width, int height) {
         // This method should create an image with a single character
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = image.createGraphics();
-        g.setColor(Color.LIGHT_GRAY); // assuming white background
-        g.fillRect(0, 0, width, height);
-        g.setColor(Color.BLACK); // assuming black text
-        g.setFont(new Font("Courier New", Font.BOLD, 24));
-        FontMetrics fm = g.getFontMetrics();
-        int x = (width - fm.charWidth(character)) / 2;
-        int y = ((height - fm.getHeight()) / 2) + fm.getAscent();
-        g.drawString(String.valueOf(character), x, y);
-        g.dispose();
+        Graphics2D g = null;
+        try {
+            g = image.createGraphics();
+            g.setColor(Color.LIGHT_GRAY); // assuming white background
+            g.fillRect(0, 0, width, height);
+            g.setColor(Color.BLACK); // assuming black text
+            g.setFont(new Font("Courier New", Font.BOLD, 24));
+            FontMetrics fm = g.getFontMetrics();
+            int x = (width - fm.charWidth(character)) / 2;
+            int y = ((height - fm.getHeight()) / 2) + fm.getAscent();
+            g.drawString(String.valueOf(character), x, y);
+        } finally {
+            if (g != null)
+                g.dispose();
+        }
+
         return image;
     }
 
