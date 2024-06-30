@@ -49,12 +49,12 @@ public class Convert extends ServiceBase {
      */
     public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, MongoSession ms, SubNode node,
             boolean initNodeEdit, long logicalOrdinal, boolean allowInlineChildren, boolean lastChild,
-            boolean getFollowers, boolean loadLikes) {
+            boolean getFollowers, boolean loadLikes, HashMap<String, SubNode> nodeMap) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
         // if we have a signature, check it.
         boolean sigFail = false;
-        if (sig != null && !crypto.nodeSigVerify(node, sig)) {
+        if (sig != null && !crypto.nodeSigVerify(node, sig, nodeMap)) {
             sigFail = true;
         }
 
@@ -178,7 +178,7 @@ public class Convert extends ServiceBase {
                 SubNode linkNode = read.getNode(ms, link.getNodeId());
                 if (linkNode != null) {
                     NodeInfo info = convert.toNodeInfo(false, sc, ms, linkNode, false, Convert.LOGICAL_ORDINAL_IGNORE,
-                            false, false, false, true);
+                            false, false, false, true, null);
                     if (info != null) {
                         linkedNodes.add(info);
                     }
@@ -228,7 +228,7 @@ public class Convert extends ServiceBase {
                 }
                 SubNode n = iterator.next();
                 NodeInfo info = toNodeInfo(false, sc, ms, n, initNodeEdit, inlineOrdinal++, allowInlineChildren,
-                        lastChild, false, loadLikes);
+                        lastChild, false, loadLikes, null);
                 if (info != null) {
                     nodeInfo.safeGetChildren().add(info);
                 }

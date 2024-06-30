@@ -404,7 +404,7 @@ public class MongoCreate extends ServiceBase {
             res.setAiContentOverwrite(true);
             update.save(ms, parentNode);
             NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, parentNode, false,
-                    Convert.LOGICAL_ORDINAL_GENERATE, true, false, false, true);
+                    Convert.LOGICAL_ORDINAL_GENERATE, true, false, false, true, null);
             res.setNewNode(nodeInfo);
             return res;
         }
@@ -466,7 +466,7 @@ public class MongoCreate extends ServiceBase {
         }
 
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false));
+                req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, null));
 
         return res;
     }
@@ -612,7 +612,7 @@ public class MongoCreate extends ServiceBase {
         update.save(ms, newNode);
 
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //
-                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false));
+                Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, null));
         return res;
     }
 }

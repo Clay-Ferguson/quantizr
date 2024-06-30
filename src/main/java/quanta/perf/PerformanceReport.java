@@ -21,8 +21,6 @@ import quanta.util.Util;
 public class PerformanceReport {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(PerformanceReport.class);
-    // Any calls that complete faster than this time, are not even considered. They're not a problem.
-    public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 
     public static String clearData() {
         ThreadLocals.requireAdmin();
@@ -56,14 +54,12 @@ public class PerformanceReport {
 
         String rows = "";
         for (PerfEvent se : orderedData) {
-            if (se.duration > REPORT_THRESHOLD) {
-                rows += formatEvent(se);
-            }
+            rows += formatEvent(se);
         }
 
         if (!rows.isEmpty()) {
             sb.append(htmlH(3, "Slow Ops"));
-            sb.append(htmlTable(htmlHeader("user", "Event", "Time", "Root Id", "Event Id") + rows));
+            sb.append(htmlTable(htmlHeader("User", "Event", "Time") + rows));
         }
         // calculate totals per person
         HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
@@ -153,7 +149,6 @@ public class PerformanceReport {
         tr += htmlTd(se.user != null ? se.user : PrincipalName.ANON.s());
         tr += htmlTd(se.event);
         tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration, true));
-        tr += htmlTdRt(String.valueOf(se.hashCode()));
         return htmlTr(tr);
     }
 }

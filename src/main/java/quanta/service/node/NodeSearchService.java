@@ -76,7 +76,7 @@ public class NodeSearchService extends ServiceBase {
 
         for (SubNode n : nodes) {
             NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, n, false, counter + 1, false, false,
-                    false, false);
+                    false, false, null);
             if (info != null) {
                 results.add(info);
             }
@@ -105,7 +105,7 @@ public class NodeSearchService extends ServiceBase {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false);
+                        false, false, false, null);
                 if (info != null) {
                     res.setNode(info);
                     searchResults.add(info);
@@ -124,7 +124,7 @@ public class NodeSearchService extends ServiceBase {
             SubNode node = read.getNode(ms, searchText, true, null);
             if (node != null) {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false);
+                        false, false, false, null);
                 if (info != null) {
                     res.setNode(info);
                     searchResults.add(info);
@@ -154,7 +154,7 @@ public class NodeSearchService extends ServiceBase {
                 }
 
                 NodeInfo rootInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, searchRoot, false, counter + 1,
-                        false, false, false, false);
+                        false, false, false, false, null);
                 if (rootInfo != null) {
                     res.setNode(rootInfo);
                 }
@@ -175,7 +175,7 @@ public class NodeSearchService extends ServiceBase {
                             req.isRequireAttachment(), req.isRequireDate())) {
                         try {
                             NodeInfo info = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-                                    counter + 1, false, false, false, false);
+                                    counter + 1, false, false, false, false, null);
                             if (info != null) {
                                 searchResults.add(info);
                             }
@@ -194,7 +194,7 @@ public class NodeSearchService extends ServiceBase {
         for (SubNode node : read.getLinkedNodes(ms, req.getNodeId(), req.getSearchText())) {
             try {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false);
+                        false, false, false, null);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -209,7 +209,7 @@ public class NodeSearchService extends ServiceBase {
         for (SubNode node : read.getRdfSubjects(ms, req.getNodeId())) {
             try {
                 NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                        false, false, false);
+                        false, false, false, null);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -237,7 +237,7 @@ public class NodeSearchService extends ServiceBase {
             for (SubNode node : accountNodes.getVal()) {
                 try {
                     NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false,
-                            false, false, false);
+                            false, false, false, null);
                     if (info != null) {
                         searchResults.add(info);
                     }
@@ -291,7 +291,7 @@ public class NodeSearchService extends ServiceBase {
                 }
             }
             NodeInfo info = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, node, false, counter + 1, false, false,
-                    false, false);
+                    false, false, null);
             if (info != null) {
                 searchResults.add(info);
             }
@@ -444,6 +444,7 @@ public class NodeSearchService extends ServiceBase {
             String sig = node.getStr(NodeProp.CRYPTO_SIG);
             if (sig != null) {
                 stats.signedNodeCount++;
+                // we can add a node cache here to this line? third arg.
                 if (!crypto.nodeSigVerify(node, sig)) {
                     stats.failedSigCount++;
                 }

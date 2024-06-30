@@ -155,6 +155,8 @@ public class NodeRenderService extends ServiceBase {
         boolean showReplies = true;
         boolean adminOnly = false;
         SessionContext sc = ThreadLocals.getSC();
+        HashMap<String, SubNode> nodeMap = new HashMap<>();
+
         // this is not anon user, we set the flag based on their preferences
         if (sc != null && !sc.isAnonUser()) {
             showReplies = sc.getUserPreferences().isShowReplies();
@@ -173,7 +175,7 @@ public class NodeRenderService extends ServiceBase {
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
             res.setRssNode(true);
             NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true);
+                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, nodeMap);
             res.setNode(nodeInfo);
             return res;
         }
@@ -192,7 +194,7 @@ public class NodeRenderService extends ServiceBase {
         if (req.isSingleNode()) {
             // that loads these all asynchronously.
             NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false,
-                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true);
+                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, nodeMap);
             res.setNode(nodeInfo);
             return res;
         }
@@ -257,7 +259,7 @@ public class NodeRenderService extends ServiceBase {
         res.setBreadcrumbs(breadcrumbs);
         render.getBreadcrumbs(ms, node, breadcrumbs);
         NodeInfo nodeInfo =
-                render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies);
+                render.processRenderNode(adminOnly, ms, req, res, node, scanToNode, -1, 0, limit, showReplies, nodeMap);
         if (nodeInfo != null) {
             res.setNode(nodeInfo);
         } else {
@@ -267,9 +269,10 @@ public class NodeRenderService extends ServiceBase {
     }
 
     public NodeInfo processRenderNode(boolean adminOnly, MongoSession ms, RenderNodeRequest req, RenderNodeResponse res,
-            SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies) {
+            SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies,
+            HashMap<String, SubNode> nodeMap) {
         NodeInfo nodeInfo = convert.toNodeInfo(adminOnly, ThreadLocals.getSC(), ms, node, false, logicalOrdinal,
-                level > 0, false, false, true);
+                level > 0, false, false, true, nodeMap);
         if (nodeInfo == null) {
             return null;
         }
@@ -381,7 +384,7 @@ public class NodeRenderService extends ServiceBase {
                                 SubNode sn = slidingWindow.get(i);
                                 relativeIdx--;
                                 ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, relativeIdx,
-                                        level + 1, limit, showReplies);
+                                        level + 1, limit, showReplies, nodeMap);
                                 nodeInfo.getChildren().add(0, ninfo);
 
                                 /*
@@ -419,7 +422,7 @@ public class NodeRenderService extends ServiceBase {
                 }
             }
             // if we get here we're accumulating rows
-            ninfo = render.processRenderNode(adminOnly, ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies);
+            ninfo = render.processRenderNode(adminOnly, ms, req, res, n, null, idx - 1L, level + 1, limit, showReplies, nodeMap);
             nodeInfo.getChildren().add(ninfo);
             if (!iterator.hasNext()) {
                 // since we query for 'limit+1', we will end up here if we're at the true end of the records.
@@ -442,7 +445,7 @@ public class NodeRenderService extends ServiceBase {
                     SubNode sn = slidingWindow.get(i);
                     relativeIdx--;
                     ninfo = render.processRenderNode(adminOnly, ms, req, res, sn, null, (long) relativeIdx, level + 1,
-                            limit, showReplies);
+                            limit, showReplies, nodeMap);
                     nodeInfo.getChildren().add(0, ninfo);
                     // If we have enough records we're done
                     if (nodeInfo.getChildren().size() >= limit) {

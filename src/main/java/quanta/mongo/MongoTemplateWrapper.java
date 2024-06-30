@@ -36,7 +36,7 @@ public class MongoTemplateWrapper extends ServiceBase {
     MongoTemplate mt;
 
     private <T> T executeOperation(MongoSession ms, Query query, String operationName, Supplier<T> operation) {
-        String user = (ms == null || ms.getUserName() == null ? "null" : ms.getUserName());
+        String user = (ms == null || ms.getUserName() == null ? "admin" : ms.getUserName());
         try (PerfEvent pe = new PerfEvent(operationName, user)) {
             if (logging) {
                 log(operationName, ms, query);

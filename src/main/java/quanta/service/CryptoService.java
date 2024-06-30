@@ -10,6 +10,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -64,14 +65,34 @@ public class CryptoService extends ServiceBase {
     int SIGN_BLOCK_SIZE = 100;
 
     public boolean nodeSigVerify(SubNode node, String sig) {
+        return nodeSigVerify(node, sig, null);
+    }
+
+    /*
+     * For locations where we know we can reuse a mapping of IDs to nodew we have the option to pass in
+     * nodeMap to this method for a performance boost
+     */
+    public boolean nodeSigVerify(SubNode node, String sig, HashMap<String, SubNode> nodeMap) {
         if (sig == null || node == null)
             return false;
         PublicKey pubKey = null;
         try {
-            SubNode ownerAccntNode = arun.run(as -> read.getNode(as, node.getOwner()));
+            SubNode ownerAccntNode = nodeMap != null ? nodeMap.get(node.getOwner().toHexString()) : null;
+
+            // if we didn't have a cache or didn't find in cache try to get node from db
             if (ownerAccntNode == null) {
-                log.error("sig check failed. Can't find owner of node: " + node.getIdStr());
-                return false;
+                // log.debug("Cache Miss: " + node.getOwner());
+                ownerAccntNode = arun.run(as -> read.getNode(as, node.getOwner()));
+                if (ownerAccntNode == null) {
+                    log.error("sig check failed. Can't find owner of node: " + node.getIdStr());
+                    return false;
+                } else {
+                    if (nodeMap != null) {
+                        nodeMap.put(ownerAccntNode.getIdStr(), ownerAccntNode);
+                    }
+                }
+            } else {
+                // log.debug("Cache Hit: " + ownerAccntNode.getIdStr());
             }
             String pubKeyJson = ownerAccntNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
 
