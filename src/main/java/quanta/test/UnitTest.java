@@ -18,7 +18,6 @@ public class UnitTest {
             // mts.test();
             RSSTestService rss = ServiceBase.context.getBean(RSSTestService.class);
             rss.test();
-            log.debug("***Unit Test Running!***");
         } catch (Exception e) {
             log.error("MongoTest Failed", e);
             throw e;

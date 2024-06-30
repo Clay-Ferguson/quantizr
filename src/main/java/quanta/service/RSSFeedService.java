@@ -359,6 +359,13 @@ public class RSSFeedService extends ServiceBase {
                     throw new RuntimeException("Request error while calling the RSS feed service: " + e.getMessage(),
                             e);
                 } catch (Exception e) {
+                    /* Note: A common failure scenario here happens when servers opt to return HTML that does a redirect
+                     * in an apparent attempt to stop RSS readers from being able to use the feed, and instead expect their
+                     * browsers to be used. This is a common tactic used by sites that want to track users, or force them to
+                     * view ads, or simply stop their RSS feeds from being used by other sites.
+                     * 
+                     * First known example of this tactic for me was: https://defence-blog.com/feed
+                     */
                     // This is a generic exception handler for other exceptions
                     throw new RuntimeException("General error while calling the RSS feed service: " + e.getMessage(),
                             e);
@@ -375,6 +382,7 @@ public class RSSFeedService extends ServiceBase {
             if (response == null) {
                 throw new RuntimeException("Could not read feed: " + url);
             }
+            // log.debug("RSS Response: " + response);
 
             InputStream inputStream = new LimitedInputStreamEx(
                     new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)), 100 * Const.ONE_MB);

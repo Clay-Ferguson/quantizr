@@ -1,7 +1,7 @@
 package quanta.perf;
 
 public class PerfEvent implements AutoCloseable {
-    public static final int CAPTURE_THRESHOLD = 0; // 1000; // 10ms
+    public static final int CAPTURE_THRESHOLD = 1000; // 10ms
 
     // NO GETTERS/SETTERS. Not needed or wanted.
     public long duration;
