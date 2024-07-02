@@ -519,14 +519,6 @@ export class Render {
         ]);
     }
 
-    getAvatarImgUrlByNode = (node: NodeInfo): string => {
-        const avatarUrl = S.props.getPropStr(J.NodeProp.USER_ICON_URL, node);
-        if (avatarUrl) {
-            return avatarUrl;
-        }
-        return this.getAvatarImgUrl(node.ownerId, node.avatarVer);
-    }
-
     getAvatarImgUrl = (ownerId: string, avatarVer: string) => {
         if (!avatarVer) return null;
         return S.rpcUtil.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
@@ -538,7 +530,7 @@ export class Render {
     }
 
     makeHeaderAvatar = (node: NodeInfo) => {
-        const src: string = node.apAvatar || this.getAvatarImgUrlByNode(node);
+        const src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
         }

@@ -56,15 +56,11 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
         if (!accntUser) {
             return null;
         }
-        let imgSrc = S.props.getClientPropStr(J.NodeProp.USER_ICON_URL, node);
-
-        /* If not ActivityPub try as local user */
-        if (!imgSrc) {
-            const avatarVer: string = S.props.getClientPropStr("avatarVer", node);
-            const accntId: string = S.props.getClientPropStr("accntId", node);
-            if (avatarVer) {
-                imgSrc = S.render.getAvatarImgUrl(accntId, avatarVer);
-            }
+        let imgSrc = null;
+        const avatarVer: string = S.props.getClientPropStr("avatarVer", node);
+        const accntId: string = S.props.getClientPropStr("accntId", node);
+        if (avatarVer) {
+            imgSrc = S.render.getAvatarImgUrl(accntId, avatarVer);
         }
 
         return S.render.renderUser(null, accntUser, null, imgSrc,

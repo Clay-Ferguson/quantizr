@@ -87,7 +87,7 @@ export class RightNavPanel extends Div {
                         }
                     }
                 }
-                S.edit.addNode("~" + J.NodeType.NOTES, null, false, content, null, false, false);
+                S.edit.addNode("~" + J.NodeType.NOTES, null, content, null);
             },
             title: "Create new Private Note\n(Hold down CTRL key to attach from clipboard)"
         }) : null;
@@ -99,7 +99,7 @@ export class RightNavPanel extends Div {
 
                     if (item.kind === "file") {
                         EditNodeDlg.pendingUploadFile = item.getAsFile();
-                        S.edit.addNode("~" + J.NodeType.NOTES, null, false, null, null, false, false);
+                        S.edit.addNode("~" + J.NodeType.NOTES, null, null, null);
                         return;
                     }
                 }
@@ -216,16 +216,8 @@ export class RightNavPanel extends Div {
 
     makeRHSAvatarDiv = (): Comp => {
         const ast = getAs();
-        let src: string = null;
         if (!ast.userProfile) return null;
-
-        // if ActivityPub icon exists, we know that's the one to use.
-        if (ast.userProfile.apIconUrl) {
-            src = ast.userProfile.apIconUrl;
-        }
-        else {
-            src = S.render.getAvatarImgUrl(ast.userProfile.userNodeId, ast.userProfile.avatarVer);
-        }
+        let src: string = S.render.getAvatarImgUrl(ast.userProfile.userNodeId, ast.userProfile.avatarVer);
 
         if (src) {
             const attr: any = {

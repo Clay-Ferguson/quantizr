@@ -77,7 +77,7 @@ public class NodeInfo {
             String displayName, String owner, String ownerId, String transferFromId, Long ordinal, Date lastModified,
             List<PropertyInfo> properties, HashMap<String, Attachment> attachments, List<NodeLink> links,
             List<AccessControlInfo> ac, List<String> likes, boolean hasChildren, String type, long logicalOrdinal,
-            boolean lastChild, String cipherKey, String avatarVer, String apAvatar, String apImage) {
+            boolean lastChild, String cipherKey, String avatarVer) {
         this.id = id;
         this.path = path;
         this.name = name;
@@ -105,8 +105,6 @@ public class NodeInfo {
         this.logicalOrdinal = logicalOrdinal;
         this.cipherKey = cipherKey;
         this.avatarVer = avatarVer;
-        this.apAvatar = apAvatar;
-        this.apImage = apImage;
     }
 
     @Transient

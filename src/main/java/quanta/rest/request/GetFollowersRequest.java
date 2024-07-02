@@ -5,10 +5,8 @@ import quanta.rest.request.base.RequestBase;
 
 public class GetFollowersRequest extends RequestBase {
     private int page;
-    /*
-     * user to get followers of (if this is a foreign user, of course it needs to go thru ActivityPub)
-     */
-    private String targetUserName;
+   
+    private String targetUserName; // todo-0: still used? or was part of actpub?
     
     public int getPage() {
         return this.page;

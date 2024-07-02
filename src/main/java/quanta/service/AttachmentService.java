@@ -441,7 +441,7 @@ public class AttachmentService extends ServiceBase {
                 throw ExUtil.wrapEx("node not found.");
             }
             Attachment att = null;
-            // todo-2: put this in a method (finding attachment by binId)
+            // todo-0: put this in a method (finding attachment by binId)
             if (node.getAttachments() != null) {
                 for (String key : node.getAttachments().keySet()) {
                     Attachment curAtt = node.getAttachments().get(key);
@@ -976,7 +976,7 @@ public class AttachmentService extends ServiceBase {
 
     /*
      * An alternative way to get the binary attachment from a node allowing more friendly url format
-     * (named nodes). Note, currently this is the format we use for generated ActivityPub objects.
+     * (named nodes). 
      */
     public void getAttachment(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
             String download, String gid, String attName, HttpServletRequest req, HttpServletResponse response) {
@@ -984,10 +984,7 @@ public class AttachmentService extends ServiceBase {
             if (StringUtils.isEmpty(attName)) {
                 attName = Constant.ATTACHMENT_PRIMARY.s();
             }
-            // NOTE: Don't check token here, because we need this to be accessible by foreign fediverse
-            // servers,
-            // but check below only after knowing whether the node has any sharing on it at all or not.
-            //
+          
             // Node Names are identified using a colon in front of it, to make it detectable
             if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
                 id = ":" + userName + ":" + nameOnUserNode;
@@ -1005,11 +1002,7 @@ public class AttachmentService extends ServiceBase {
                     if (node == null) {
                         throw new RuntimeException("Node not found.");
                     }
-                    /*
-                     * if there's no sharing at all on the node, then we do the token check, otherwise we allow access.
-                     * This is for good fediverse interoperability but still with a level of privacy for completely
-                     * unshared nodes.
-                     */
+                   
                     if (node.getAc() == null || node.getAc().size() == 0) {
                         user.authBearer();
                         crypto.authSig();

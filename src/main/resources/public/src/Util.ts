@@ -644,11 +644,7 @@ export class Util {
             S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false");
         });
     }
-
-    isLocalUserName = (userName: string): boolean => {
-        return userName && userName.indexOf("@") === -1;
-    }
-
+    
     sendTestEmail = async () => {
         await S.rpcUtil.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         this.showMessage("Send Test Email Initiated.", "Note");

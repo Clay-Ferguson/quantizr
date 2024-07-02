@@ -244,9 +244,7 @@ public class MongoCreate extends ServiceBase {
         // that will HOLD the reply, but may not always be WHAT is being replied to.
         SubNode parentNode = null;
         SubNode nodeBeingRepliedTo = null;
-        if (req.isReply()) {
-            nodeBeingRepliedTo = read.getNode(ms, nodeId);
-        }
+
         /*
          * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
          * "My Posts" node, and the other case is if we are doing a reply we also will put the reply in the
@@ -409,11 +407,6 @@ public class MongoCreate extends ServiceBase {
             return res;
         }
 
-        // NOTE: Be sure to get nodeId off 'req' here, instead of the var
-        if (req.isReply() && req.getNodeId() != null) {
-            newNode.set(NodeProp.INREPLYTO, req.getNodeId());
-        }
-
         if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
             newNode.set(NodeProp.TARGET_ID, req.getNodeId());
             // adding bookmark should disallow sharing.
@@ -437,14 +430,12 @@ public class MongoCreate extends ServiceBase {
                 newNode.setAc(ac);
             }
             // isReply really also can mean !parentNode.isMine for current user
-            else if (!acl.userOwnsNode(ms, parentNode) || req.isReply() || forceInheritSharing) {
+            else if (!acl.userOwnsNode(ms, parentNode) || forceInheritSharing) {
                 acl.inheritSharingFromParent(ms, res, nodeBeingRepliedTo, newNode);
             }
 
             // Always make public if we're replying to public node or posting under our POSTs node
-            if (!req.isDirectMessage()
-                    && (makePublicWritable || (req.isReply() && AclService.isPublic(nodeBeingRepliedTo))
-                            || parentNode.isType(NodeType.POSTS))) {
+            if ((makePublicWritable || AclService.isPublic(nodeBeingRepliedTo)) || parentNode.isType(NodeType.POSTS)) {
                 acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(), null,
                         Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
             }

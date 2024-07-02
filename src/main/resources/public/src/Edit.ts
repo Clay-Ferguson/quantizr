@@ -39,7 +39,7 @@ export class Edit {
         }
         else {
             const info = TimelineTab.inst.props as TimelineRSInfo;
-            S.edit.addNode(info.node.id, J.NodeType.COMMENT, true, null, null, true, false);
+            S.edit.addNode(info.node.id, J.NodeType.COMMENT, null, null);
         }
     }
 
@@ -248,9 +248,6 @@ export class Edit {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null,
-                    fediSend: false,
-                    reply: false,
-                    directMessage: false,
                     payloadType: null,
                 });
 
@@ -289,9 +286,6 @@ export class Edit {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null,
-                    fediSend: false,
-                    reply: false,
-                    directMessage: false,
                     payloadType: null,
                 });
 
@@ -820,8 +814,6 @@ export class Edit {
         if (node) {
             S.quanta.newNodeTargetId = id;
             S.quanta.newNodeTargetOffset = ordinalOffset;
-
-            // todo-1: try to make this method take not node but instead node's id.
             this.startEditingNewNode(false, null, node.id, node, ordinalOffset, false);
         }
     }
@@ -1098,9 +1090,6 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            fediSend: false,
-            reply: false,
-            directMessage: false,
             payloadType: null
         });
 
@@ -1194,9 +1183,6 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            fediSend: false,
-            reply: false,
-            directMessage: false,
             payloadType: null
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1264,9 +1250,6 @@ export class Edit {
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
-            fediSend: false,
-            reply: false,
-            directMessage: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
@@ -1293,8 +1276,7 @@ export class Edit {
         });
     }
 
-    addNode = async (nodeId: string, typeName: string, reply: boolean, content: string, shareToUserId: string,
-        fediSend: boolean, directMessage: boolean) => {
+    addNode = async (nodeId: string, typeName: string, content: string, shareToUserId: string) => {
 
         // auto-enable edit mode
         if (!getAs().userPrefs.editMode) {
@@ -1312,9 +1294,6 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId,
-            fediSend,
-            reply,
-            directMessage,
             payloadType: null
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1335,9 +1314,6 @@ export class Edit {
             properties: null,
             payloadType: null,
             shareToUserId: null,
-            fediSend: false,
-            reply: false,
-            directMessage: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
@@ -1365,9 +1341,6 @@ export class Edit {
             typeLock: true,
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
-            fediSend: false,
-            reply: false,
-            directMessage: false,
             payloadType: null
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1621,7 +1594,7 @@ export class Edit {
         else {
             const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
             if (!nodeId) return;
-            S.edit.addNode(nodeId, J.NodeType.COMMENT, true, null, null, true, false);
+            S.edit.addNode(nodeId, J.NodeType.COMMENT, null, null);
         }
     }
 

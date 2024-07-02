@@ -117,8 +117,6 @@ export interface UserProfile {
     avatarVer: string;
     headerImageVer: string;
     userNodeId: string;
-    apIconUrl: string;
-    apImageUrl: string;
     followerCount: number;
     followingCount: number;
     following: boolean;
@@ -357,14 +355,11 @@ export interface CreateSubNodeRequest extends RequestBase {
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;
-    directMessage: boolean;
     aiService: string;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
-    fediSend: boolean;
     payloadType: string;
-    reply: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -859,7 +854,6 @@ export interface FriendInfo {
     avatarVer: string;
     userNodeId: string;
     friendNodeId: string;
-    foreignAvatarUrl: string;
     tags: string;
     liked: boolean;
 }
@@ -1229,7 +1223,6 @@ export interface AccessControlInfo {
     principalName: string;
     principalNodeId: string;
     avatarVer: string;
-    foreignAvatarUrl: string;
     privileges: PrivilegeInfo[];
     publicKey: string;
 }
@@ -1281,7 +1274,7 @@ export const enum Constant {
     SEARCH_TYPE_RDF_SUBJECTS = "rdfSubjects",
     ENC_TAG = "<[ENC]>",
     FEED_NEW = "myNewMessages",
-    FEED_PUB = "publicFediverse",
+    FEED_PUB = "publicPosts",
     FEED_TOFROMME = "toFromMe",
     FEED_TOME = "toMe",
     FEED_FROMMETOUSER = "fromMeToUser",
@@ -1300,9 +1293,6 @@ export const enum ConstantInt {
 }
 
 export const enum NodeProp {
-    INREPLYTO = "ap:objInReplyTo",
-    USER_ICON_URL = "ap:userIcon",
-    USER_BANNER_URL = "ap:userImage",
     ENC_KEY = "sn:encKey",
     CRYPTO_SIG = "sn:sig",
     SUBGRAPH_HASH = "sn:rSHA256",

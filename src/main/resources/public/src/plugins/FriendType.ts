@@ -60,14 +60,11 @@ export class FriendType extends TypeBase {
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);
         const displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
-        let imgSrc = S.props.getClientPropStr(J.NodeProp.USER_ICON_URL, node);
+        let imgSrc = null;
 
-        /* If not ActivityPub try as local user */
-        if (!imgSrc) {
-            const avatarVer: string = S.props.getClientPropStr("avatarVer", node);
-            if (avatarVer) {
-                imgSrc = S.render.getAvatarImgUrl(userNodeId, avatarVer);
-            }
+        const avatarVer: string = S.props.getClientPropStr("avatarVer", node);
+        if (avatarVer) {
+            imgSrc = S.render.getAvatarImgUrl(userNodeId, avatarVer);
         }
 
         // Note: we pass showMessageButton as true when isTreeView is true only.

@@ -51,10 +51,7 @@ public class FriendService extends ServiceBase {
             List<PropertyInfo> properties = new LinkedList<>();
             properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
             properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
-            String userImgUrl = userNode.getStr(NodeProp.USER_ICON_URL);
-            if (!StringUtils.isEmpty(userImgUrl)) {
-                properties.add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userImgUrl));
-            }
+
             SubNode friendNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
                     CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true, null);
             friendNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
@@ -81,10 +78,6 @@ public class FriendService extends ServiceBase {
         return res;
     }
 
-    /*
-     * Whenever a friend node is saved, we send the "following" request to the foreign ActivityPub
-     * server
-     */
     public void updateSavedFriendNode(String userDoingAction, SubNode node) {
         String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
         String friendUserName = node.getStr(NodeProp.USER);
@@ -192,25 +185,13 @@ public class FriendService extends ServiceBase {
             fi.setFriendNodeId(friendNode.getIdStr());
             fi.setUserName(userName);
             fi.setTags(friendNode.getTags());
-            fi.setForeignAvatarUrl(friendNode.getStr(NodeProp.USER_ICON_URL));
             String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
             SubNode friendAccountNode = read.getNode(ms, userNodeId, false, null);
             if (friendAccountNode != null) {
                 fi.setDisplayName(user.getFriendlyNameFromNode(friendAccountNode));
-
-                // if a local user use BIN property on node (account node BIN property is the Avatar)
-                if (userName.indexOf("@") == -1) {
-                    Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-                    if (att != null) {
-                        fi.setAvatarVer(att.getBin());
-                    }
-                }
-                // Otherwise the avatar will be specified as a remote user's Icon.
-                else {
-                    // set avatar here only if we didn't set it above already
-                    if (fi.getForeignAvatarUrl() == null) {
-                        fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.USER_ICON_URL));
-                    }
+                Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+                if (att != null) {
+                    fi.setAvatarVer(att.getBin());
                 }
             } else {
                 return null;
@@ -321,16 +302,6 @@ public class FriendService extends ServiceBase {
                             }
                         }
 
-                        String replyTargetId = node.getIdStr();
-                        iter = read.findNodesByProp(ms, NodePath.USERS_PATH + "/" + NodePath.LOCAL,
-                                NodeProp.INREPLYTO.s(), replyTargetId);
-                        for (SubNode child : iter) {
-                            // if we didn't already add above, add now
-                            if (!childIds.contains(child.getIdStr())) {
-                                children.add(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, child, false,
-                                        Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, null));
-                            }
-                        }
                         if (children.size() > 0) {
                             info.setChildren(children);
                         }

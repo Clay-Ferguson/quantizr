@@ -10,7 +10,7 @@ public enum Constant {
     SEARCH_TYPE_RDF_SUBJECTS("rdfSubjects"), //
     ENC_TAG("<[ENC]>"), //
     FEED_NEW("myNewMessages"), //
-    FEED_PUB("publicFediverse"), //
+    FEED_PUB("publicPosts"), //
     FEED_TOFROMME("toFromMe"), //
     FEED_TOME("toMe"), //
     FEED_FROMMETOUSER("fromMeToUser"), //

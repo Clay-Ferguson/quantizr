@@ -300,8 +300,8 @@ public class MongoAuth extends ServiceBase {
         try {
             auth(ms, node, PrivilegeType.READ);
         } catch (RuntimeException e) {
-            log.debug("session: " + ms.getUserName() + " tried to read nodeId " + node.getIdStr()
-                    + " and was refused.");
+            log.debug(
+                    "session: " + ms.getUserName() + " tried to read nodeId " + node.getIdStr() + " and was refused.");
             throw e;
         }
     }
@@ -448,7 +448,6 @@ public class MongoAuth extends ServiceBase {
         String principalName = null;
         String publicKey = null;
         String avatarVer = null;
-        String foreignAvatarUrl = null;
 
         // If this is a share to public we don't need to lookup a user name
         if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
@@ -463,15 +462,11 @@ public class MongoAuth extends ServiceBase {
             principalName = principalNode.getStr(NodeProp.USER);
             displayName = principalNode.getStr(NodeProp.DISPLAY_NAME);
             publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY);
-            // This will be null if it's a local node, and this is fine
-            foreignAvatarUrl = principalNode.getStr(NodeProp.USER_ICON_URL);
-            if (foreignAvatarUrl == null) {
-                Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-                avatarVer = att != null ? att.getBin() : null;
-            }
+            Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+            avatarVer = att != null ? att.getBin() : null;
         }
         AccessControlInfo info =
-                new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer, foreignAvatarUrl);
+                new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer);
         info.addPrivilege(new PrivilegeInfo(authType));
         return info;
     }

@@ -18,10 +18,6 @@ public class UserProfile {
     private String avatarVer;
     private String headerImageVer;
     private String userNodeId;
-    /* for foreign users this will point to their user avatar image */
-    private String apIconUrl;
-    /* for foreign users this will point to their user image (i.e. header image) */
-    private String apImageUrl;
 
     private int followerCount;
     private int followingCount;
@@ -72,14 +68,6 @@ public class UserProfile {
 
     public String getUserNodeId() {
         return this.userNodeId;
-    }
-
-    public String getApIconUrl() {
-        return this.apIconUrl;
-    }
-
-    public String getApImageUrl() {
-        return this.apImageUrl;
     }
 
     public int getFollowerCount() {
@@ -140,14 +128,6 @@ public class UserProfile {
 
     public void setUserNodeId(final String userNodeId) {
         this.userNodeId = userNodeId;
-    }
-
-    public void setApIconUrl(final String apIconUrl) {
-        this.apIconUrl = apIconUrl;
-    }
-
-    public void setApImageUrl(final String apImageUrl) {
-        this.apImageUrl = apImageUrl;
     }
 
     public void setFollowerCount(final int followerCount) {

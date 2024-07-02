@@ -96,8 +96,6 @@ public class Convert extends ServiceBase {
         String avatarVer = null;
         String nameProp = null;
         String displayName = null;
-        String apAvatar = null;
-        String apImage = null;
         String owner = PrincipalName.ADMIN.s();
         SubNode ownerAccnt = read.getOwner(ms, node, false);
 
@@ -108,8 +106,6 @@ public class Convert extends ServiceBase {
                 avatarVer = userAtt.getBin();
             }
             displayName = user.getFriendlyNameFromNode(ownerAccnt);
-            apAvatar = ownerAccnt.getStr(NodeProp.USER_ICON_URL);
-            apImage = ownerAccnt.getStr(NodeProp.USER_BANNER_URL);
             owner = nameProp;
         }
 
@@ -148,7 +144,7 @@ public class Convert extends ServiceBase {
                 node.getOrdinal(), //
                 node.getModifyTime(), //
                 propList, node.getAttachments(), node.getLinks(), acList, likes, hasChildren, node.getType(), //
-                logicalOrdinal, lastChild, cipherKey, avatarVer, apAvatar, apImage);
+                logicalOrdinal, lastChild, cipherKey, avatarVer);
 
         if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
             if (!ms.isAdmin()) {

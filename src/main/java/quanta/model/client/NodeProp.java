@@ -3,12 +3,6 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
-    INREPLYTO("ap:objInReplyTo"), //
-
-    USER_ICON_URL("ap:userIcon"), //
-
-    USER_BANNER_URL("ap:userImage"), //
-
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using the private key of
      * the owner of the node. When nodes are shared to other users the cleartext copy of this key is
@@ -109,6 +103,7 @@ public enum NodeProp {
      * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey"
      * props are the keys used and only the public key exists on the server for that E2E encryption.
      */
+    // todo-0: these can be deleted, but be careful not to break any existing encryption
     CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic"), //
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate"), //
 

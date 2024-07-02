@@ -807,8 +807,6 @@ public class UserManagerService extends ServiceBase {
                     userProfile.setHeaderImageVer(headerAtt.getBin());
                 }
                 userProfile.setUserNodeId(userNode.getIdStr());
-                userProfile.setApIconUrl(userNode.getStr(NodeProp.USER_ICON_URL));
-                userProfile.setApImageUrl(userNode.getStr(NodeProp.USER_BANNER_URL));
 
                 if (!abbreviated) {
                     SubNode userHomeNode = read.getNodeByName(as, nodeUserName + ":" + Const.HOME_NODE_NAME);
@@ -1069,14 +1067,12 @@ public class UserManagerService extends ServiceBase {
         fi.setUserName(displayName);
         fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
         fi.setUserNodeId(userNode.getIdStr());
-        fi.setForeignAvatarUrl(userNode.getStr(NodeProp.USER_ICON_URL));
-        String userName = userNode.getStr(NodeProp.USER);
-        if (userName.indexOf("@") == -1) {
-            Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
-            if (att != null) {
-                fi.setAvatarVer(att.getBin());
-            }
+
+        Attachment att = userNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
+        if (att != null) {
+            fi.setAvatarVer(att.getBin());
         }
+
         return fi;
     }
 

@@ -42,7 +42,6 @@ public class FriendType extends TypeBase {
              * demand. The "Client Props" is a completely different set than the actual node properties
              */
             if (accountNode != null) {
-                /* NOTE: This will be the bio for both ActivityPub users and local users */
                 String userBio = accountNode.getStr(NodeProp.USER_BIO);
                 if (userBio != null) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
@@ -59,16 +58,6 @@ public class FriendType extends TypeBase {
                 String friendDisplayName = user.getFriendlyNameFromNode(accountNode);
                 if (friendDisplayName != null) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
-                }
-
-                /*
-                 * Note: for ActivityPub foreign users we have this property on their account node that points to
-                 * the live URL of their account avatar as it was found in their Actor object
-                 */
-
-                String userIconUrl = accountNode.getStr(NodeProp.USER_ICON_URL);
-                if (userIconUrl != null) {
-                    nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_ICON_URL.s(), userIconUrl));
                 }
             }
         }

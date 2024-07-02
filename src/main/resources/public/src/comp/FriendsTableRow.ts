@@ -24,12 +24,7 @@ export class FriendsTableRow extends ListBoxRow {
         const ast = getAs();
         let src: string = null;
 
-        // foreign users have this kind of avatar
-        if (this.friend.foreignAvatarUrl) {
-            src = this.friend.foreignAvatarUrl;
-        }
-        // local users will have this kind of avatar
-        else if (this.friend.avatarVer) {
+        if (this.friend.avatarVer) {
             src = S.render.getAvatarImgUrl(this.friend.userNodeId, this.friend.avatarVer);
         }
         else {

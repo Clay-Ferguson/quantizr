@@ -453,7 +453,6 @@ public class MongoUtil extends ServiceBase {
         // createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." +
         // NodeProp.OBJECT_ID.s());
 
-        createPartialIndex(ms, "unique-replyto", SubNode.PROPS + "." + NodeProp.INREPLYTO.s());
         createPartialIndex(ms, "rdf-i", SubNode.LINKS + "." + NodeLink.ID);
         createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.PROPS + "." + NodeProp.USER.s(),
                 NodeType.ACCOUNT.s());

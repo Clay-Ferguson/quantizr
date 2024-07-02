@@ -560,7 +560,7 @@ export class Nav {
         });
     }
 
-    messagesFediverse = async () => {
+    publicPosts = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }

@@ -65,8 +65,7 @@ export class UserProfileDlg extends DialogBase {
 
         const profileHeaderImg = this.makeProfileHeaderImg();
         const profileImg = this.makeProfileImg(!!profileHeaderImg);
-        const localUser = S.util.isLocalUserName(state.userProfile.userName);
-
+    
         const children = [
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
@@ -104,13 +103,13 @@ export class UserProfileDlg extends DialogBase {
                         rows: 5
                     }, this.bioState, null, false, 3, this.textScrollPos),
 
-                getAs().isAdminUser && localUser ? new UserAdminPanel(this) : null,
+                getAs().isAdminUser ? new UserAdminPanel(this) : null,
 
                 new ButtonBar([
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this.save, null, "btn-primary"),
 
                     // only local users might have set their 'home' node (named a node 'home')
-                    localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserNodeByName(state, "home")) : null, //
+                    state.userProfile.homeNodeId ? new Button("Home", () => this.openUserNodeByName(state, "home")) : null, //
 
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", async () => {
@@ -250,7 +249,7 @@ export class UserProfileDlg extends DialogBase {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
-            S.edit.addNode(null, NodeType.COMMENT, false, null, this.userNodeId, false, true);
+            S.edit.addNode(null, NodeType.COMMENT, null, this.userNodeId);
         }, 10);
     }
 
@@ -299,17 +298,9 @@ export class UserProfileDlg extends DialogBase {
     }
 
     makeProfileImg(_hasHeaderImg: boolean): Comp {
-        let src: string = null;
         const state: LS = this.getState<LS>();
-
-        // if ActivityPub icon exists, we know that's the one to use.
-        if (state.userProfile.apIconUrl) {
-            src = state.userProfile.apIconUrl;
-        }
-        else {
-            const avatarVer = state.userProfile.avatarVer;
-            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId, avatarVer);
-        }
+        const avatarVer = state.userProfile.avatarVer;
+        let src: string = S.render.getAvatarImgUrl(state.userProfile.userNodeId, avatarVer);
 
         const onClick = async () => {
             if (this.readOnly) return;

@@ -8,7 +8,6 @@ public class FriendInfo {
     private String avatarVer;
     private String userNodeId;
     private String friendNodeId;
-    private String foreignAvatarUrl;
     private String tags;
     // indicates this user liked some node, and is dependent upon use case where this FriendInfo is
     // being used
@@ -36,10 +35,6 @@ public class FriendInfo {
     
     public String getFriendNodeId() {
         return this.friendNodeId;
-    }
-    
-    public String getForeignAvatarUrl() {
-        return this.foreignAvatarUrl;
     }
     
     public String getTags() {
@@ -72,10 +67,6 @@ public class FriendInfo {
     
     public void setFriendNodeId(final String friendNodeId) {
         this.friendNodeId = friendNodeId;
-    }
-    
-    public void setForeignAvatarUrl(final String foreignAvatarUrl) {
-        this.foreignAvatarUrl = foreignAvatarUrl;
     }
     
     public void setTags(final String tags) {

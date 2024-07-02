@@ -11,7 +11,6 @@ import * as J from "../../JavaIntf";
 import { NodeInfo, NodeType, PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
-import { Anchor } from "../core/Anchor";
 import { Button } from "../core/Button";
 import { DropdownMenu } from "../core/DropdownMenu";
 import { Li } from "../core/Li";
@@ -37,13 +36,6 @@ export class NodeCompRowHeader extends Div {
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
         if (!displayName) {
             displayName = this.node.owner;
-        }
-
-        if (displayName) {
-            const atIdx = displayName.indexOf("@");
-            if (atIdx !== -1) {
-                displayName = displayName.substring(0, atIdx);
-            }
         }
 
         const isMine = S.props.isMine(this.node);
@@ -192,15 +184,10 @@ export class NodeCompRowHeader extends Div {
                 ]));
             }
 
-            // Because the POSTS node will be at a depth like this: "/r/usr/L/b/q", we require the
-            // path to be at least deeper than that to show the history button. L = Local Users,
-            // then: [UserNode]/[PostsNode]/[ActualNode] Also if we have 'inReplyTo' that will also
-            // enable the button.
-            const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
             const slashCount = S.util.countChars(this.node.path, "/");
             const adminNode = this.node.owner === PrincipalName.ADMIN;
 
-            if (!adminNode && showInfo && this.showThreadButton && (slashCount > 4 || !!inReplyTo)) {
+            if (!adminNode && showInfo && this.showThreadButton && slashCount > 4) {
                 if (ast.mobileMode) {
                     const iconProps = {
                         title: likeDisplay ? likeDisplay : "Show Thread",
@@ -285,8 +272,6 @@ export class NodeCompRowHeader extends Div {
                 })
             ]));
         }
-
-        this.addOriginalLinks(ddItems);
 
         if (ddItems.length > 0) {
             children.push(new DropdownMenu(ddItems, "rowHeaderIcon"));
@@ -502,24 +487,6 @@ export class NodeCompRowHeader extends Div {
 
         this.setChildren(children);
         return true;
-    }
-
-    addOriginalLinks = (ddItems: Comp[]) => {
-        if (this.node.owner.indexOf("@") !== -1) {
-            const inReplyTo = S.props.getPropStr(J.NodeProp.INREPLYTO, this.node);
-            if (inReplyTo) {
-                // if this is a URL and not our own host then show the Remote Parent link
-                if (inReplyTo.indexOf(":") !== -1 && inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
-                    ddItems.push(new Li(null, { className: "clickable" }, [
-                        new Anchor(inReplyTo, "Original Post Parent", {
-                            className: "dropdown-item",
-                            target: "_blank",
-                            title: "Go to post's parent on it's home Fediverse instance"
-                        })
-                    ]));
-                }
-            }
-        }
     }
 
     getTextContent = (): string => {

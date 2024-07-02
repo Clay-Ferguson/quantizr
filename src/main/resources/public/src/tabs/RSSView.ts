@@ -449,7 +449,7 @@ export class RSSView extends AppTab<any, RSSView> {
             className: "fa fa-comment fa-lg rssPostIcon",
             title: "Post a comment about this Article/Link",
             onClick: () => {
-                S.edit.addNode(null, J.NodeType.COMMENT, false, entry.title + "\n\n" + entry.link, null, false, false);
+                S.edit.addNode(null, J.NodeType.COMMENT, entry.title + "\n\n" + entry.link, null);
             }
         }) : null;
 
@@ -506,9 +506,6 @@ export class RSSView extends AppTab<any, RSSView> {
             NOTE: For now I decided it's a bit confusing to the user to have images disappar from
             the page, and it's better to allow duplicate images to show up than to have some
             mysteriously not showing up.
-
-            todo-2: We could use this same logic on each individual FEED ITEM (fediverse), but for
-            now I decided not to hide any dupliate images so this is commented out for now.
             */
             // const src: string = (el as any).src;
             // if (urlSet.has(src)) {

@@ -424,11 +424,6 @@ public class MongoRead extends ServiceBase {
         return opsw.findById(allowAuth ? ms : null, node.getOwner());
     }
 
-    /*
-     * todo-2: Need to implement a save hook/callback capability in the MongoListener so we can get
-     * notifications sent to any threads that are waiting to lookup a node once it exists, but we will
-     * STILL probably need to DO the lookup so we don't have concurrent access threading bug.
-     */
     public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth, int retries) {
         SubNode ret = opsw.findById(allowAuth ? ms : null, objId);
 
@@ -633,8 +628,7 @@ public class MongoRead extends ServiceBase {
         if (node.getOrdinal() == null) {
             node.setOrdinal(0L);
         }
-        // todo-2: research if there's a way to query for just one, rather than simply
-        // calling findOne at the end? What's best practice here?
+        
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));

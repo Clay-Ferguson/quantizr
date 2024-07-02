@@ -13,7 +13,6 @@ public class CreateSubNodeRequest extends RequestBase {
     private String newNodeName;
     private String typeName;
     private boolean createAtTop;
-    private boolean directMessage;
 
     // If this is non-null it means we're asking a question on the parent, and the answer will come in
     // as a child. The string value determines the type of AI that will be asked to (OpenAI or
@@ -37,15 +36,9 @@ public class CreateSubNodeRequest extends RequestBase {
     // for a DM this can be optionally provided to share the node with this person immediately
     private String shareToUserId;
 
-    // send out over Fediverse only if this is true. Will generally be either something created by a
-    // "Post" button or a "Reply" button only
-    private boolean fediSend;
-
     /* special purpose values for when creating special types of nodes */
     @Nullable
     private String payloadType;
-
-    private boolean reply;
 
     public String getNodeId() {
         return this.nodeId;
@@ -71,14 +64,6 @@ public class CreateSubNodeRequest extends RequestBase {
         return this.createAtTop;
     }
 
-    public boolean isDirectMessage() {
-        return directMessage;
-    }
-
-    public void setDirectMessage(boolean directMessage) {
-        this.directMessage = directMessage;
-    }
-
     public boolean isTypeLock() {
         return this.typeLock;
     }
@@ -91,17 +76,9 @@ public class CreateSubNodeRequest extends RequestBase {
         return this.shareToUserId;
     }
 
-    public boolean isFediSend() {
-        return this.fediSend;
-    }
-
     @Nullable
     public String getPayloadType() {
         return this.payloadType;
-    }
-
-    public boolean isReply() {
-        return this.reply;
     }
 
     public void setNodeId(final String nodeId) {
@@ -140,16 +117,8 @@ public class CreateSubNodeRequest extends RequestBase {
         this.shareToUserId = shareToUserId;
     }
 
-    public void setFediSend(final boolean fediSend) {
-        this.fediSend = fediSend;
-    }
-
     public void setPayloadType(@Nullable final String payloadType) {
         this.payloadType = payloadType;
-    }
-
-    public void setReply(final boolean reply) {
-        this.reply = reply;
     }
 
     public CreateSubNodeRequest() {}

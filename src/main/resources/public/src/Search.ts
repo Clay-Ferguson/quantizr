@@ -336,7 +336,6 @@ export class Search {
             FeedTab.inst.props.refreshCounter++;
         }
 
-        // If user enters the url for a fediverse page we try to load it and display it.
         const searchText = FeedTab.inst.props.searchTextState.getValue();
         await promiseDispatch("RefreshFeed", s => {
             FeedTab.inst.props.feedLoading = true;
