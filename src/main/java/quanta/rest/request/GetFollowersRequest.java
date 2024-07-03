@@ -6,7 +6,7 @@ import quanta.rest.request.base.RequestBase;
 public class GetFollowersRequest extends RequestBase {
     private int page;
    
-    private String targetUserName; // todo-0: still used? or was part of actpub?
+    private String targetUserName; 
     
     public int getPage() {
         return this.page;

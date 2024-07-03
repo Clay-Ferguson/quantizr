@@ -441,7 +441,6 @@ public class AttachmentService extends ServiceBase {
                 throw ExUtil.wrapEx("node not found.");
             }
             Attachment att = null;
-            // todo-0: put this in a method (finding attachment by binId)
             if (node.getAttachments() != null) {
                 for (String key : node.getAttachments().keySet()) {
                     Attachment curAtt = node.getAttachments().get(key);
