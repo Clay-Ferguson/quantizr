@@ -298,7 +298,6 @@ public class UserManagerService extends ServiceBase {
             userNode.setIfNotExist(NodeProp.USER_PREF_PUBLIC_SIG_KEY, sigKey);
         ThreadLocals.getSC().setPubSigKeyJson(null);
         res.setUserProfile(user.getUserProfile(userNode.getIdStr(), userNode, true));
-        crypto.ensureValidCryptoKeys(userNode);
 
         @SuppressWarnings("unused")
         SubNode notesNode = user.getNotesNode(ms, userName, userNode);

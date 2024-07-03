@@ -1337,8 +1337,6 @@ export const enum NodeProp {
     BIN_QUOTA = "sn:binQuota",
     LAST_LOGIN_TIME = "sn:lastLogin",
     LAST_ACTIVE_TIME = "sn:lastActive",
-    CRYPTO_KEY_PUBLIC = "sn:cryptoKeyPublic",
-    CRYPTO_KEY_PRIVATE = "sn:cryptoKeyPrivate",
     INLINE_CHILDREN = "inlineChildren",
     EXPANSION_BY_USER = "expansionByUser",
     PRIORITY = "priority",

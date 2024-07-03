@@ -514,28 +514,6 @@ public class CryptoService extends ServiceBase {
         return res;
     }
 
-    /*
-     * Creates crypto key properties if not already existing
-     *
-     * no longer used.
-     */
-    public void ensureValidCryptoKeys(SubNode userNode) {
-        try {
-            String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC);
-            if (publicKey == null) {
-                KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-                kpg.initialize(2048);
-                KeyPair pair = kpg.generateKeyPair();
-                publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
-                String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
-                userNode.set(NodeProp.CRYPTO_KEY_PUBLIC, publicKey);
-                userNode.set(NodeProp.CRYPTO_KEY_PRIVATE, privateKey);
-            }
-        } catch (Exception e) {
-            log.error("failed creating crypto keys", e);
-        }
-    }
-
     public SavePublicKeyResponse savePublicKeys(SavePublicKeyRequest req) {
         SavePublicKeyResponse res = new SavePublicKeyResponse();
         String userName = ThreadLocals.getSC().getUserName();

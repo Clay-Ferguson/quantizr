@@ -386,7 +386,6 @@ public class SubNode {
 
     public synchronized void clearSecretProperties() {
         if (props != null) {
-            props.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
             props.remove(NodeProp.EMAIL.s());
             props.remove(NodeProp.CODE.s());
             props.remove(NodeProp.ENC_KEY.s());

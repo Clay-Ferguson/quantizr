@@ -189,7 +189,6 @@ public class Convert extends ServiceBase {
         if (props == null)
             return;
 
-        snUtil.removeProp(props, NodeProp.CRYPTO_KEY_PRIVATE.s());
         snUtil.removeProp(props, NodeProp.EMAIL.s());
         snUtil.removeProp(props, NodeProp.CODE.s());
         snUtil.removeProp(props, NodeProp.ENC_KEY.s());

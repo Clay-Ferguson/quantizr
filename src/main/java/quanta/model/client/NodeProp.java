@@ -97,16 +97,6 @@ public enum NodeProp {
     LAST_LOGIN_TIME("sn:lastLogin"), //
     LAST_ACTIVE_TIME("sn:lastActive"), //
 
-    /*
-     * NOTE: These two crypto keys are ONLY used for ActivityPub.
-     *
-     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" and "sn:publicSigKey"
-     * props are the keys used and only the public key exists on the server for that E2E encryption.
-     */
-    // todo-0: these can be deleted, but be careful not to break any existing encryption
-    CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic"), //
-    CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate"), //
-
     INLINE_CHILDREN("inlineChildren"), //
     EXPANSION_BY_USER("expansionByUser"),
 
