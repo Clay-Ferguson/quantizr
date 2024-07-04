@@ -602,8 +602,6 @@ public class MongoRead extends ServiceBase {
         if (node.getOrdinal() == null) {
             node.setOrdinal(0L);
         }
-        // todo-2: research if there's a way to query for just one, rather than simply
-        // calling findOne at the end? What's best practice here?
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));

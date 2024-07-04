@@ -199,7 +199,7 @@ public class NodeEditService extends ServiceBase {
         // If the node being saved is currently in the pending area /p/ then we publish it now, and move
         // it out of pending.
         node.setPath(mongoUtil.setPendingPathState(node.getPath(), false));
-        // todo-2: for now only admin user is REQUIRED to have signed nodes.
+        // for now only admin user is REQUIRED to have signed nodes.
         if (prop.isRequireCrypto() && ms.isAdmin()) {
             if (!crypto.nodeSigVerify(node, sig)) {
                 // stop this node from being saved with 'clean'

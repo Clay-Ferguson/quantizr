@@ -527,9 +527,6 @@ public class RSSFeedService extends ServiceBase {
         if (feed.getImage() != null) {
             rf.setImage(feed.getImage().getUrl());
         }
-        // I was trying to get the "image" for peter schiff's Feed (not items, but feed itself), and this
-        // was my first attempt, and it didn't work. Not sure if his feed is bad or what. Will come back to
-        // this later, RSS is good enough for now. todo-2.
         // processModules(feed, rf);
         rf.setLink(feed.getLink());
         List<RssFeedEntry> rssEntries = new LinkedList<>();
@@ -820,14 +817,6 @@ public class RSSFeedService extends ServiceBase {
                     entry.setPublishedDate(n.getCreateTime());
                     SyndContent description = new SyndContentImpl();
 
-                    /*
-                     * todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
-                     * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
-                     * this is low priority for now so I'm not doing it yet.
-                     * 
-                     * todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so I
-                     * need to check what I'm doing here and see if we need "HTML" now here instead.
-                     */
                     description.setType("text/plain");
                     description.setType("text/html");
                     description

@@ -33,9 +33,6 @@ public class ExportJsonService extends ServiceBase {
     private static final ObjectWriter jsonWriter = Util.mapper.writerWithDefaultPrettyPrinter();
 
     /*
-     * todo-2: need capability to handle binary files also, but before implementing that look for any
-     * export options on the grid api itself.
-     *
      * Dumps all nodes that have property "pth" starting with 'pathPrefix', or all nodes if pathPrefix
      * is null.
      */
