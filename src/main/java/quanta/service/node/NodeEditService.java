@@ -198,7 +198,7 @@ public class NodeEditService extends ServiceBase {
 
         // If the node being saved is currently in the pending area /p/ then we publish it now, and move
         // it out of pending.
-        mongoUtil.setPendingPath(node, false);
+        node.setPath(mongoUtil.setPendingPathState(node.getPath(), false));
         // todo-2: for now only admin user is REQUIRED to have signed nodes.
         if (prop.isRequireCrypto() && ms.isAdmin()) {
             if (!crypto.nodeSigVerify(node, sig)) {
@@ -358,7 +358,7 @@ public class NodeEditService extends ServiceBase {
                 if (section instanceof String) {
                     addJsonNode(ms, chapterNode, (String) "### " + section, 0L, "#section", null);
                 }
-                // todo-1: haven't tested subsections yet, and we also may not ever really need to go this
+                // todo-2: haven't tested subsections yet, and we also may not ever really need to go this
                 // deep in the hierarchy, and our prompt to generate the ToC doesn't even mention subsections
                 // either.
                 else if (section instanceof Map sectionMap) {

@@ -9,6 +9,7 @@ import java.security.Signature;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -58,6 +59,8 @@ public class CryptoService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(CryptoService.class);
 
     public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
+    public final HashSet<String> failedSigNodes = new HashSet<>();
+
     private static final Random rand = new Random();
     private static boolean debugSigning = false;
     int SIGN_BLOCK_SIZE = 100;

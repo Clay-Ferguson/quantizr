@@ -227,18 +227,19 @@ public class MongoUtil extends ServiceBase {
      * 'p' means pending, and indicates user has not yet saved a new node they're currently editing, and
      * if they cancel the node gets orphaned and eventually cleaned up by the system automatically.
      */
-    public void setPendingPath(SubNode node, boolean pending) {
+    public String setPendingPathState(String path, boolean pending) {
         // ensure node starts with /r/p
-        if (pending && !node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
-            node.setPath(node.getPath().replace(NodePath.ROOT_PATH_S, NodePath.PENDING_PATH_S));
+        if (pending && !path.startsWith(NodePath.PENDING_PATH_S)) {
+            return path.replace(NodePath.ROOT_PATH_S, NodePath.PENDING_PATH_S);
         }
         // ensure node starts with /r and not /r/p
-        else if (!pending && node.getPath().startsWith(NodePath.PENDING_PATH_S)) {
+        else if (!pending && path.startsWith(NodePath.PENDING_PATH_S)) {
             // get pending path out of the path, first
-            String path = node.getPath().replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
-            path = findAvailablePath(path);
-            node.setPath(path);
+            String p = path.replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
+            p = findAvailablePath(p);
+            return p;
         }
+        return path;
     }
 
     /* Root path will start with '/' and then contain no other slashes */
@@ -507,9 +508,8 @@ public class MongoUtil extends ServiceBase {
         auth.requireAdmin(ms);
         String indexName = "unique-node-name";
         try {
-            opsw.indexOps()
-                    .ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC).on(SubNode.NAME, Direction.ASC).unique()
-                            .named(indexName).partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
+            opsw.indexOps().ensureIndex(new Index().on(SubNode.OWNER, Direction.ASC).on(SubNode.NAME, Direction.ASC)
+                    .unique().named(indexName).partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
         } catch (Exception e) {
             ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
         }
@@ -551,8 +551,7 @@ public class MongoUtil extends ServiceBase {
      * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
      * needing any compound indexes (yet)
      */
-    public void createPartialUniqueIndexComp2(MongoSession ms, String name, String property1,
-            String property2) {
+    public void createPartialUniqueIndexComp2(MongoSession ms, String name, String property1, String property2) {
         auth.requireAdmin(ms);
         try {
             // Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
@@ -567,8 +566,7 @@ public class MongoUtil extends ServiceBase {
     }
 
     /*
-     * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
-     * works
+     * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid works
      */
     public void createPartialIndex(MongoSession ms, String name, String property) {
         log.debug("Ensuring partial index named: " + name);
@@ -586,8 +584,7 @@ public class MongoUtil extends ServiceBase {
     }
 
     /*
-     * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
-     * works
+     * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid works
      */
     public void createPartialUniqueIndex(MongoSession ms, String name, String property) {
         log.debug("Ensuring unique partial index named: " + name);
@@ -604,8 +601,7 @@ public class MongoUtil extends ServiceBase {
         }
     }
 
-    public void createPartialUniqueIndexForType(MongoSession ms, String name, String property,
-            String type) {
+    public void createPartialUniqueIndexForType(MongoSession ms, String name, String property, String type) {
         log.debug("Ensuring unique partial index (for type) named: " + name);
         auth.requireAdmin(ms);
         try {

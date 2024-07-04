@@ -183,6 +183,8 @@ public class SystemService extends ServiceBase {
         sb.append("\nEnvironment Vars:\n");
         sb.append(getEnvironment());
 
+        sb.append(getFailedSigInfo());
+
         // Run command inside container
         // sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
         return sb.toString();
@@ -194,6 +196,16 @@ public class SystemService extends ServiceBase {
         List<SessionContext> list = redis.query("*");
         for (SessionContext sc : list) {
             sb.append("    " + sc.getUserName() + " " + sc.getUserToken() + "\n");
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
+    public String getFailedSigInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nFailed Signature Node IDs: \n");
+        for (String nodeId : crypto.failedSigNodes) {      
+            sb.append("    " + nodeId + "\n");
         }
         sb.append("\n");
         return sb.toString();

@@ -389,7 +389,7 @@ public class MongoCreate extends ServiceBase {
             newNode = create.createNode(ms, parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(), null,
                     true, true, nodeChanges);
             if (req.isPendingEdit()) {
-                mongoUtil.setPendingPath(newNode, true);
+                newNode.setPath(mongoUtil.setPendingPathState(newNode.getPath(), true));
             }
             String answer = getAnswerText(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
             newNode.setContent(answer);
@@ -558,7 +558,7 @@ public class MongoCreate extends ServiceBase {
         newNode.touch();
         // pending path (nodes not yet saved by user, being edited/created by users)
         if (req.isPendingEdit()) {
-            mongoUtil.setPendingPath(newNode, true);
+            newNode.setPath(mongoUtil.setPendingPathState(newNode.getPath(), true));
         }
         boolean allowSharing = true;
         if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {

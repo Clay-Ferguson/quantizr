@@ -80,7 +80,6 @@ public class AppProp {
                 }
             }
         }
-
         // log.debug("configMap: " + XString.prettyPrint(configMap));
     }
 
