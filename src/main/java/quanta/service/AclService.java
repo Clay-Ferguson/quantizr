@@ -103,7 +103,6 @@ public class AclService extends ServiceBase {
                     // ignore
                 }
             }
-            // not an error, we just can't properties on nodes we don't own, so we skip them
             else {
                 auth.ownerAuth(ms, n);
                 n.set(NodeProp.UNPUBLISHED, unpublished ? unpublished : null);
@@ -509,7 +508,7 @@ public class AclService extends ServiceBase {
         }
         if (principalId != null) {
             arun.run(s -> {
-                // todo-2: if the actual user account has been delete we can get here and end up with null user name
+                // todo-2: if the actual user account has been deleted we can get here and end up with null user name
                 // I think. Look into it.
                 if (PrincipalName.PUBLIC.s().equals(principalId)) {
                     acInfo.setPrincipalName(PrincipalName.PUBLIC.s());

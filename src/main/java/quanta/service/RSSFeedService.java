@@ -426,9 +426,6 @@ public class RSSFeedService extends ServiceBase {
              * 
              * This error can happen a lot since feeds out on the wild are so chaotic so we won't bother to
              * clutter our logs with a stack trace here, and just log the message.
-             * 
-             * todo-2: Actually it would be better to put this entire string being logged here into a hashset to
-             * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
              */
             // under the admin menu for checking server status info.
             log.debug("Error reading feed: " + url + " msg: " + e.getMessage());
