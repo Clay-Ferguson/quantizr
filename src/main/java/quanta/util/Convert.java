@@ -63,7 +63,7 @@ public class Convert extends ServiceBase {
         if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
                 (sig == null || sigFail) && !sc.isAdmin()) {
             /*
-             * todo-1: This is designed to silently fail here and not show the nodes where a signature is
+             * todo-2: This is designed to silently fail here and not show the nodes where a signature is
              * failing and a possible database hack, however on a clean install when an anon user visits the
              * site and the 'home' node is not yet signed we get this error with no explaination of why.
              */

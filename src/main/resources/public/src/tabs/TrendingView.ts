@@ -34,7 +34,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
 
         const tagPanel = new Div(null, { className: "trendingWordStatsArea" });
 
-        // todo-1: add back in when votes are implemented
+        // todo-2: add back in when votes are implemented
         // if (this.res.topVotes?.length > 0) {
         //     tagPanel.addChild(new Heading(6, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
         //     this.res.topVotes.forEach(word => {
