@@ -18,14 +18,13 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class AccessControl {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(AccessControl.class);
+    
     public static final String FIELD_PRVS = "prvs";
-
     @Field(FIELD_PRVS)
     private String prvs;
 
     // This is Encryption Cypher key for this ACL entry.
     public static final String FIELD_KEY = "key";
-
     @Field(FIELD_KEY)
     private String key;
 

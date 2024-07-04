@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
@@ -868,7 +869,6 @@ public class SubNode {
     public void setTags(String tags) {
         if (Util.equalObjs(tags, this.tags))
             return;
-        // temporary hack (I saw empty tags prop in some JSON)
         if ("".equals(tags))
             tags = null;
         ThreadLocals.dirty(this);

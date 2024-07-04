@@ -834,6 +834,7 @@ public class MongoRead extends ServiceBase {
         return opsw.find(ms, q);
     }
 
+    // todo-0: refactor to get rid of ands.
     private Iterable<SubNode> queryByTreeDepthOrder(MongoSession ms, int limit, int skip, List<Criteria> ands,
             TextCriteria textCriteria, Sort sort) {
         List<AggregationOperation> aggOps = new LinkedList<>();
