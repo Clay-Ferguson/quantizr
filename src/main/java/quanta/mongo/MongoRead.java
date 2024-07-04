@@ -816,7 +816,10 @@ public class MongoRead extends ServiceBase {
     private Iterable<SubNode> basicQuery(MongoSession ms, int limit, int skip, List<Criteria> ands,
             TextCriteria textCriteria, Sort sort) {
         Query q = new Query();
-        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+        Criteria c = auth.addReadSecurity(ms, new Criteria());
+        if (ands != null && ands.size() > 0) {
+            c = c.andOperator(ands);
+        }
         q.addCriteria(c);
 
         if (textCriteria != null) {
@@ -834,7 +837,6 @@ public class MongoRead extends ServiceBase {
         return opsw.find(ms, q);
     }
 
-    // todo-0: refactor to get rid of ands.
     private Iterable<SubNode> queryByTreeDepthOrder(MongoSession ms, int limit, int skip, List<Criteria> ands,
             TextCriteria textCriteria, Sort sort) {
         List<AggregationOperation> aggOps = new LinkedList<>();
@@ -844,7 +846,11 @@ public class MongoRead extends ServiceBase {
             aggOps.add(Aggregation.match(textCriteria));
         }
 
-        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+        Criteria c = auth.addReadSecurity(ms, new Criteria());
+        if (ands != null && ands.size() > 0) {
+            c = c.andOperator(ands);
+        }
+
         aggOps.add(Aggregation.match(c));
 
         aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("size(split(pth, '/'))")
@@ -871,7 +877,10 @@ public class MongoRead extends ServiceBase {
             aggOps.add(Aggregation.match(textCriteria));
         }
 
-        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
+        Criteria c = auth.addReadSecurity(ms, new Criteria());
+        if (ands != null && ands.size() > 0) {
+            c = c.andOperator(ands);
+        }
         aggOps.add(Aggregation.match(c));
 
         // calculate contentLength
