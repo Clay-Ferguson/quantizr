@@ -3,7 +3,6 @@ package quanta.service;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -335,10 +334,6 @@ public class FriendService extends ServiceBase {
         res.setTopReached(topReached);
         res.setNodes(nodes);
         if (nodes.size() > 1) {
-            // sort the array
-            // todo-1: this was a bug right? We want hierarchy order to be preserved, so we don't want to sort
-            // nodes.sort((n1, n2) -> (int) n1.getLastModified().compareTo(n2.getLastModified()));
-
             // sort all children also
             for (NodeInfo n : nodes) {
                 if (n.getChildren() != null) {

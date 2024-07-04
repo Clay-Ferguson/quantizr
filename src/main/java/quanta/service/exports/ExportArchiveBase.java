@@ -66,6 +66,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
     StringBuilder problems = new StringBuilder();
 
     private class MarkdownLink {
+        @SuppressWarnings("unused")
         String description;
         String link;
 

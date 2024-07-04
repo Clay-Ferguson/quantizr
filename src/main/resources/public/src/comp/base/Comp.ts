@@ -132,20 +132,6 @@ export abstract class Comp {
             ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
         }
 
-        // if (!ret) { const elm: HTMLElement = document.getElementById(this.getId()); if (elm) {
-        //     console.log("Repaired ref: " + this.getId() + "\n" + (new Error().stack));
-
-        //         // I tried to simply "repair" the 'ref' in this oddball case, but the message
-        //         below is shown // if I do, so for now I'm just setting the return value leaving
-        //         attribs alone. // Warning: Unexpected ref object provided for div. Use either a
-        //         ref-setter function or React.createRef(). // this.attribs.ref = elm; ret = elm;
-        //     }
-        // }
-
-        // if (!ret && this.mounted) { console.log("getRef failed on " + this.getCompClass() + "
-        //     mounted=" + this.mounted + "\nELEMENTS Stack: " + this.getAncestry());
-        // }
-
         return ret;
     }
 

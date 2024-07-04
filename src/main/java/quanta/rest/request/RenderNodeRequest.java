@@ -1,7 +1,6 @@
 
 package quanta.rest.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import quanta.rest.request.base.RequestBase;
 
 public class RenderNodeRequest extends RequestBase {

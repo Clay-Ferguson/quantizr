@@ -246,6 +246,9 @@
 						<version>3.2.1263</version>
 						<executions>
 							<execution>
+								<!-- This 'ignore' line is a fix for an apparent bug in VSCode (or maven) intrepretatino of this line
+								 and is only here to stop the IDE from reporting a warning here. -->
+								<?m2e ignore?>
 								<id>generate</id>
 								<goals>
 									<goal>generate</goal>

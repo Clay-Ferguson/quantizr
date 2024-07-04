@@ -30,7 +30,6 @@ import quanta.mongo.MongoRepository;
 import reactor.core.publisher.Mono;
 
 public class Util {
-    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(Util.class);
 
     private static final Random rand = new Random();

@@ -127,6 +127,7 @@ public class OpenGraphService extends ServiceBase {
             return;
         }
 
+        @SuppressWarnings("unchecked")
         ArrayList<String> ogList =
                 reset ? null : (ArrayList<String>) node.getObj(NodeProp.OPEN_GRAPH.s(), ArrayList.class);
 

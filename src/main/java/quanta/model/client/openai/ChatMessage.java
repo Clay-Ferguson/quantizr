@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ChatMessage {
+    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(ChatMessage.class);
 
     private String role;

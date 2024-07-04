@@ -66,6 +66,7 @@ public class StreamUtil {
         }
     }
 
+    @SuppressWarnings("resource")
     public static boolean streamsIdentical(InputStream a, InputStream b) {
         // wrap in Buffered streams only if not currently buffered
         BufferedInputStream aBuffered = (a instanceof BufferedInputStream o) ? o : new BufferedInputStream(a);

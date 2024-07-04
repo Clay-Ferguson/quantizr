@@ -20,7 +20,6 @@ import quanta.config.ServiceBase;
 
 @Controller
 public class StripeController extends ServiceBase implements ErrorController {
-    @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(StripeController.class);
 
     @PostMapping("/stripe/webhook")

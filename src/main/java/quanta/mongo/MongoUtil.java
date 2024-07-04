@@ -222,7 +222,7 @@ public class MongoUtil extends ServiceBase {
     }
 
     /*
-     * Make node either start with /r/p/ or ensure that it does NOT start with /r/p
+     * Make node either start with /r/p/ or else ensure that it does NOT start with /r/p
      *
      * 'p' means pending, and indicates user has not yet saved a new node they're currently editing, and
      * if they cancel the node gets orphaned and eventually cleaned up by the system automatically.

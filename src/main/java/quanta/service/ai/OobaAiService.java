@@ -48,14 +48,14 @@ public class OobaAiService extends ServiceBase {
             throw new RuntimeException("Unknown user.");
         }
 
-        // todo-1: need API KEY
+        // todo-2: need API KEY
         // String apiKey = "";
         // if (apiKey == null || apiKey.isEmpty())
         // throw new RuntimeException("Oobabooga currently not enabled. No API Key");
 
         WebClient webClient = Util.webClientBuilder().baseUrl(COMP_URL)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                // .defaultHeader("Authorization", "Bearer " + apiKey) // todo-1: need API KEY
+                // .defaultHeader("Authorization", "Bearer " + apiKey) // todo-2: need API KEY
                 .build();
 
         String input = node != null ? node.getContent() : question;

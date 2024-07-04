@@ -81,7 +81,8 @@ public class RedisService extends ServiceBase {
             Date now = new Date();
 
             rops.execute(new SessionCallback<List<Object>>() {
-                public List<Object> execute(RedisOperations rops) throws DataAccessException {
+                @Override
+                public <K, V> List<Object> execute(RedisOperations<K, V> operations) throws DataAccessException {
                     rops.multi();
 
                     for (SessionContext sc : list) {

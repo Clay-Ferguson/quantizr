@@ -14,7 +14,6 @@ import quanta.rest.request.base.RequestBase;
 public class InsertNodeRequest extends RequestBase {
 	// this means the node is new and has not yet been "saved" by the user, and has a pending path on
 	// it.
-	// todo-1: can we replace this with a check for the pending path, instead '/p/'?
 	private boolean pendingEdit;
 
 	private String parentId;

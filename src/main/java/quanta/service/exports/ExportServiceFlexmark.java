@@ -52,7 +52,6 @@ public class ExportServiceFlexmark extends ServiceBase {
     private StringBuilder markdown = new StringBuilder();
     private String format;
     private ExportRequest req;
-    private ExportResponse res;
     int baseSlashCount = 0;
 
     /*
@@ -66,7 +65,7 @@ public class ExportServiceFlexmark extends ServiceBase {
         this.session = ms;
         this.format = format;
         this.req = req;
-        this.res = res;
+    
         String nodeId = req.getNodeId();
         if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
             throw ExUtil.wrapEx("adminDataFolder does not exist");

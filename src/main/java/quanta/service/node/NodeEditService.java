@@ -332,7 +332,7 @@ public class NodeEditService extends ServiceBase {
 
         SubNode bookNode = addJsonNode(ms, parentNode, "# " + bookTitle, 0L, "#book", systemPrompt);
 
-        List<Object> chapters = (List<Object>) map.get("chapters");
+        List<?> chapters = (List<?>) map.get("chapters");
         if (chapters == null) {
             log.debug("toc node missing chapters");
             return null;
@@ -340,14 +340,14 @@ public class NodeEditService extends ServiceBase {
 
         long chapterIdx = 0;
         for (Object chapter : chapters) {
-            Map<String, Object> chapterMap = (Map<String, Object>) chapter;
+            Map<?, ?> chapterMap = (Map<?, ?>) chapter;
             String chapterTitle = (String) chapterMap.get("title");
             if (chapterTitle == null) {
                 log.debug("toc chapter missing title");
                 continue;
             }
             SubNode chapterNode = addJsonNode(ms, bookNode, "## " + chapterTitle, chapterIdx * 1000, "#chapter", null);
-            List<Object> sections = (List<Object>) chapterMap.get("sections");
+            List<?> sections = (List<?>) chapterMap.get("sections");
             if (sections == null) {
                 log.debug("toc chapter missing sections");
                 continue;
@@ -361,8 +361,7 @@ public class NodeEditService extends ServiceBase {
                 // todo-1: haven't tested subsections yet, and we also may not ever really need to go this
                 // deep in the hierarchy, and our prompt to generate the ToC doesn't even mention subsections
                 // either.
-                else if (section instanceof Map) {
-                    Map<String, Object> sectionMap = (Map<String, Object>) section;
+                else if (section instanceof Map sectionMap) {
                     String sectionTitle = (String) sectionMap.get("title");
                     if (sectionTitle == null) {
                         log.debug("toc section missing title");
@@ -371,7 +370,7 @@ public class NodeEditService extends ServiceBase {
                     SubNode sectionNode =
                             addJsonNode(ms, chapterNode, "### " + sectionTitle, sectionIdx * 1000, "#section", null);
 
-                    List<Object> subsections = (List<Object>) sectionMap.get("subsections");
+                    List<?> subsections = (List<?>) sectionMap.get("subsections");
                     if (subsections == null) {
                         log.debug("toc section missing subsections");
                         continue;
@@ -397,7 +396,7 @@ public class NodeEditService extends ServiceBase {
         return bookNode;
     }
 
-    public SubNode traverseMap(MongoSession ms, Map<String, Object> map, SubNode parentNode, Long ordinal, int level) {
+    public SubNode traverseMap(MongoSession ms, Map<?, ?> map, SubNode parentNode, Long ordinal, int level) {
         if (map == null)
             return null;
 
@@ -405,17 +404,17 @@ public class NodeEditService extends ServiceBase {
         SubNode newNode = addJsonNode(ms, parentNode, "", ordinal, null, null);
         Long childOrdinal = 0L;
 
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
             Object value = entry.getValue();
 
             if (value instanceof String) {
                 sb.append(entry.getKey() + ": " + value + "\n\n");
             } else if (value instanceof HashMap) {
                 // If we have a nested HashMap, recursively traverse it
-                traverseMap(ms, (HashMap<String, Object>) value, newNode, childOrdinal, level + 1);
+                traverseMap(ms, (HashMap<?,?>) value, newNode, childOrdinal, level + 1);
             } else if (value instanceof List) {
                 // If we have a List, iterate over it and recursively traverse any Maps or Lists within
-                traverseList(ms, (List<Object>) value, newNode, childOrdinal, level + 1, false);
+                traverseList(ms, (List<?>) value, newNode, childOrdinal, level + 1, false);
             } else {
                 log.debug("json map type not handled: " + value.getClass().getName());
             }
@@ -427,7 +426,7 @@ public class NodeEditService extends ServiceBase {
         return newNode;
     }
 
-    private void traverseList(MongoSession ms, List<Object> list, SubNode parentNode, Long ordinal, int level,
+    private void traverseList(MongoSession ms, List<?> list, SubNode parentNode, Long ordinal, int level,
             boolean listInList) {
         if (list == null)
             return;
@@ -444,10 +443,10 @@ public class NodeEditService extends ServiceBase {
                 addJsonNode(ms, parentNode, elementStr, ordinal, null, null);
             } else if (element instanceof HashMap) {
                 // If we have a nested HashMap, recursively traverse it
-                traverseMap(ms, (HashMap<String, Object>) element, parentNode, ordinal, level + 1);
+                traverseMap(ms, (HashMap<?, ?>) element, parentNode, ordinal, level + 1);
             } else if (element instanceof List) {
                 // If we have a nested List, recursively traverse it
-                traverseList(ms, (List<Object>) element, parentNode, ordinal, level + 1, true);
+                traverseList(ms, (List<?>) element, parentNode, ordinal, level + 1, true);
             } else {
                 log.debug("json list type not handled: " + element.getClass().getName());
             }

@@ -65,14 +65,23 @@ public class AppProp {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void setPropertyOrdinals() {
-        LinkedHashMap<String, LinkedHashMap> classes = (LinkedHashMap) configMap.get("props");
-        for (LinkedHashMap<String, LinkedHashMap> clazz : classes.values()) {
-            int attIdx = 1;
-            for (LinkedHashMap<String, Object> prop : clazz.values()) {
-                prop.put("ord", attIdx++);
+        Object classes = configMap.get("props");
+        if (classes instanceof LinkedHashMap _classes) {
+            for (Object clazz : _classes.values()) {
+                if (clazz instanceof LinkedHashMap _clazz) {
+                    int attIdx = 1;
+                    for (Object prop : _clazz.values()) {
+                        if (prop instanceof HashMap _prop) {
+                            ((HashMap<String, Object>) _prop).put("ord", attIdx++);
+                        }
+                    }
+                }
             }
         }
+
+        // log.debug("configMap: " + XString.prettyPrint(configMap));
     }
 
     // Gets config text from external file if found, and it not gets property from internal

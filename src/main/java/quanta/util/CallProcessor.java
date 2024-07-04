@@ -1,18 +1,17 @@
 package quanta.util;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoSession;
-import quanta.perf.PerfData;
 import quanta.perf.PerfEvent;
 import quanta.rest.request.LogoutRequest;
 import quanta.rest.request.base.RequestBase;

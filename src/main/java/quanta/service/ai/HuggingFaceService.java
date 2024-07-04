@@ -42,7 +42,7 @@ public class HuggingFaceService extends ServiceBase {
             throw new RuntimeException("Unknown user.");
         }
 
-        // todo-1: The last step to finializing the HuggingFace integration is to handle defining this
+        // todo-2: The last step to finializing the HuggingFace integration is to handle defining this
         // API key in the configs (this is partially done AppProp can already hold it)
         String apiKey = "";
         if (apiKey == null || apiKey.isEmpty())
@@ -95,7 +95,7 @@ public class HuggingFaceService extends ServiceBase {
         // the tree building history.
         while (parent != null) {
 
-            // we allow either type here (todo-1: add that to the openai stuff too)
+            // we allow either type here (todo-2: add that to the openai stuff too)
             if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
                 generatedResponses.add(0, parent.getContent());

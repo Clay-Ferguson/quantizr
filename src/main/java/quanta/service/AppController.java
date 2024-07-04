@@ -606,6 +606,7 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
+    @SuppressWarnings("unchecked")
     @RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
     public ResponseEntity<ResourceRegion> streamMultiPart(@PathVariable("fileName") String fileName,
             @RequestParam("nodeId") String nodeId, //

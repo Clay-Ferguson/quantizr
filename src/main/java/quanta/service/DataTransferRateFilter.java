@@ -64,7 +64,7 @@ public class DataTransferRateFilter extends GenericFilterBean {
         if (httpReq.getQueryString() != null) {
             prefix += " q=" + httpReq.getQueryString();
         }
-        Map params = httpReq.getParameterMap();
+        Map<?,?> params = httpReq.getParameterMap();
         if (params != null && params.size() > 0) {
             prefix += "\n    Params: " + XString.prettyPrint(httpReq.getParameterMap());
         }
