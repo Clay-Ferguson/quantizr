@@ -103,7 +103,6 @@ public class NodeInfo {
         this.hasChildren = hasChildren;
         this.lastChild = lastChild;
         this.type = type;
-        this.logicalOrdinal = logicalOrdinal;
         this.cipherKey = cipherKey;
         this.avatarVer = avatarVer;
     }

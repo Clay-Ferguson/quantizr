@@ -37,6 +37,7 @@ import quanta.types.TypeBase;
 public class Convert extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(Convert.class);
 
+    // todo-0: rethink these. Is this a good design. I found a bug where -2 was making it all the way to the gui.
     // indicates we don't need to worry about sending back a good logicalOrdinal
     public static int LOGICAL_ORDINAL_IGNORE = -1;
     // indicates we need generate the correct logicalOrdinal
@@ -138,6 +139,10 @@ public class Convert extends ServiceBase {
         }
         String content = node.getContent();
         String renderContent = null;
+
+        if (logicalOrdinal == LOGICAL_ORDINAL_GENERATE) {
+			logicalOrdinal = read.generateLogicalOrdinal(ms, node);
+		}
 
         NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), content, renderContent, //
                 node.getTags(), displayName, //
