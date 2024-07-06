@@ -147,7 +147,7 @@ public class UserFeedService extends ServiceBase {
         // orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).is(null));
         // // this regex simly is "Starts with a period"
         // orCrit.add(new Criteria(SubNode.PROPS + "." + NodeProp.OBJECT_ID).not().regex("^\\."));
-        // crit = crit.orOperator(orCrit));
+        // ands.add(new Criteria().orOperator(orCrit));
 
         // Don't show UNPUBLISHED nodes. The whole point of having the UNPUBLISHED feature for nodes is so
         // we can do this criteria right here and not show those in feeds.
@@ -287,7 +287,7 @@ public class UserFeedService extends ServiceBase {
             }
         }
         if (orCriteria.size() > 0) {
-            crit = crit.orOperator(orCriteria);
+            ands.add(new Criteria().orOperator(orCriteria));
         }
 
         TextCriteria textCriteria = null;
@@ -330,10 +330,7 @@ public class UserFeedService extends ServiceBase {
             q.addCriteria(textCriteria);
         }
 
-        crit = auth.addReadSecurity(ms, crit);
-        if (ands != null && ands.size() > 0) {
-            crit = crit.andOperator(ands);
-        }
+        crit = auth.addReadSecurity(ms, crit, ands);
         q.addCriteria(crit);
         q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 

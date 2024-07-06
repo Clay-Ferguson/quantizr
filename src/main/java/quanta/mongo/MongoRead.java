@@ -816,10 +816,7 @@ public class MongoRead extends ServiceBase {
     private Iterable<SubNode> basicQuery(MongoSession ms, int limit, int skip, List<Criteria> ands,
             TextCriteria textCriteria, Sort sort) {
         Query q = new Query();
-        Criteria c = auth.addReadSecurity(ms, new Criteria());
-        if (ands != null && ands.size() > 0) {
-            c = c.andOperator(ands);
-        }
+        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
         q.addCriteria(c);
 
         if (textCriteria != null) {
@@ -846,11 +843,7 @@ public class MongoRead extends ServiceBase {
             aggOps.add(Aggregation.match(textCriteria));
         }
 
-        Criteria c = auth.addReadSecurity(ms, new Criteria());
-        if (ands != null && ands.size() > 0) {
-            c = c.andOperator(ands);
-        }
-
+        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
         aggOps.add(Aggregation.match(c));
 
         aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS).andExpression("size(split(pth, '/'))")
@@ -877,10 +870,7 @@ public class MongoRead extends ServiceBase {
             aggOps.add(Aggregation.match(textCriteria));
         }
 
-        Criteria c = auth.addReadSecurity(ms, new Criteria());
-        if (ands != null && ands.size() > 0) {
-            c = c.andOperator(ands);
-        }
+        Criteria c = auth.addReadSecurity(ms, new Criteria(), ands);
         aggOps.add(Aggregation.match(c));
 
         // calculate contentLength

@@ -160,11 +160,15 @@ public class MongoAuth extends ServiceBase {
     }
 
     public Criteria addReadSecurity(MongoSession ms, Criteria crit) {
-        return addSecurity(ms, false, crit);
+        return addSecurity(ms, false, crit, null);
     }
 
     public Criteria addWriteSecurity(MongoSession ms, Criteria crit) {
-        return addSecurity(ms, true, crit);
+        return addSecurity(ms, true, crit, null);
+    }
+
+    public Criteria addReadSecurity(MongoSession ms, Criteria crit, List<Criteria> ands) {
+        return addSecurity(ms, false, crit, ands);
     }
 
     /*
@@ -176,10 +180,14 @@ public class MongoAuth extends ServiceBase {
      * Takes a `criteria` and optionally some `ands`, and returns a criteria object that is guaranteed
      * to include any or all of the ands as well as the security criteria.
      */
-    public Criteria addSecurity(MongoSession ms, boolean write, Criteria crit) {
+    public Criteria addSecurity(MongoSession ms, boolean write, Criteria crit, List<Criteria> ands) {
         // admin can bypass all security
         if (ms != null && ms.isAdmin()) {
-            return crit;
+            if (ands != null && ands.size() > 0) {
+                return crit.andOperator(ands);
+            } else {
+                return crit;
+            }
         }
         SessionContext sc = ThreadLocals.getSC();
         SubNode myAcntNode = null;
@@ -190,8 +198,14 @@ public class MongoAuth extends ServiceBase {
                 throw new RuntimeException("Unable to build writable query by unknown session context");
             }
 
-            // if unknown person the simple requirement is to be public
-            return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+            // if we have no 'ands', just tack on to existing criteria
+            if (ands == null) {
+                // if unknown person the simple requirement is to be public
+                return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+            } else {
+                ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+                return crit.andOperator(ands);
+            }
         } else {
             // if we have a person/account get their account node first
             myAcntNode = read.getNode(ms, sc.getUserNodeId());
@@ -202,7 +216,13 @@ public class MongoAuth extends ServiceBase {
                     throw new RuntimeException("Unable to build writable query by unknown user");
                 }
 
-                return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+                // if we have no 'ands', just tack on to existing criterial
+                if (ands == null) {
+                    return crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+                } else {
+                    ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+                    return crit.andOperator(ands);
+                }
             }
             // if we have a specific user consuming this data, set up conditions, for whatever they should be
             // able to see
@@ -220,7 +240,12 @@ public class MongoAuth extends ServiceBase {
                 ors.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
                 // or node was Transferred by me
                 ors.add(Criteria.where(SubNode.XFR).is(myAcntNode.getOwner()));
-                return crit.orOperator(ors);
+
+                if (ands == null) {
+                    ands = new LinkedList<Criteria>();
+                }
+                ands.add(new Criteria().orOperator(ors));
+                return crit.andOperator(ands);
             }
         }
     }
@@ -440,7 +465,8 @@ public class MongoAuth extends ServiceBase {
             Attachment att = principalNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
             avatarVer = att != null ? att.getBin() : null;
         }
-        AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer);
+        AccessControlInfo info =
+                new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer);
         info.addPrivilege(new PrivilegeInfo(authType));
         return info;
     }
@@ -494,15 +520,12 @@ public class MongoAuth extends ServiceBase {
             for (String share : sharedToAny) {
                 orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
             }
-            crit = crit.orOperator(orCriteria);
+            ands.add(new Criteria().orOperator(orCriteria));
         }
         if (ownerIdMatch != null) {
             ands.add(Criteria.where(SubNode.OWNER).is(ownerIdMatch));
         }
-        crit = auth.addReadSecurity(ms, crit);
-        if (ands != null && ands.size() > 0) {
-            crit = crit.andOperator(ands);
-        }
+        crit = auth.addReadSecurity(ms, crit, ands);
         q.addCriteria(crit);
         return q;
     }
@@ -552,10 +575,7 @@ public class MongoAuth extends ServiceBase {
             ands.add(Criteria.where(SubNode.OWNER).is(ownerIdMatch));
         }
 
-        crit = auth.addReadSecurity(ms, crit);
-        if (ands != null && ands.size() > 0) {
-            crit = crit.andOperator(ands);
-        }
+        crit = auth.addReadSecurity(ms, crit, ands);
         q.addCriteria(crit);
         return q;
     }
