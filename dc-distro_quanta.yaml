@@ -52,8 +52,11 @@ services:
             - '${MONGO_DATA}:/data/db'
             - '${MONGOD_CONF}:/etc/mongod.conf'
             - '${MONGO_BACKUP}:/backup'
+            - '${MONGO_KEY}:/data/mongo-key:ro'
+            - '${INIT_REPLICA}:/init/init-replica.sh'
 
-        command: mongod --config /etc/mongod.conf
+        # command: mongod --config /etc/mongod.conf
+        command: ["--config", "/etc/mongod.conf"]
 
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
@@ -222,7 +225,6 @@ services:
             # Using '|' there instead would preserve the newlines after read in
             # The '-' after either of those removes any trailing newline
             testUserAccounts: >-
-                FollowBot:${adminPassword}:${devEmail},
                 adam:${testPassword}:${devEmail},
                 bob:${testPassword}:${devEmail},
                 cory:${testPassword}:${devEmail},

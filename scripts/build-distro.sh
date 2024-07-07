@@ -62,6 +62,8 @@ mkdir -p ${POSTGRES_DATA}
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
 
+genInitReplica
+makeMongoKeyFile
 genMongoConfig
 
 if [ "${COMPILE}" == "yes" ]; then

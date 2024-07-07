@@ -68,19 +68,28 @@ services:
             - '${MONGO_DATA}:/data/db'
             - '${MONGOD_CONF}:/etc/mongod.conf'
             - '${MONGO_BACKUP}:/backup'
+            - '${MONGO_KEY}:/data/mongo-key:ro'
+            - '${INIT_REPLICA}:/init/init-replica.sh:ro'
 
-        command: mongod --config /etc/mongod.conf
+        # command: mongod --config /etc/mongod.conf
+        command: ["--config", "/etc/mongod.conf"]
 
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
+        # NOTE: I'm keeping this disabled just because it might interfere with the init-replica.sh script
+        #       and I haven't had time to be sure that it never will.
         # healthcheck:
-        #     test: echo 'db.runCommand("ping").ok' | mongo mongo:27016/test --quiet
+        #     test: ["CMD", "mongosh", 
+        #         "-u", "root", 
+        #         "-p", "${mongoPassword}", 
+        #         "--port", "${MONGO_PORT}",
+        #         "--host", "${MONGO_HOST}",
+        #         "--quiet", "--eval", "rs.status()"]
         #     interval: 10s
-        #     timeout: 10s
-        #     retries: 5
-        #     start_period: 20s
+        #     timeout: 5s
+        #     retries: 30
 
     pgdb-dev:
         image: postgres
@@ -248,7 +257,6 @@ services:
             # Using '|' there instead would preserve the newlines after read in
             # The '-' after either of those removes any trailing newline
             testUserAccounts: >-
-                FollowBot:${adminPassword}:${devEmail},
                 adam:${testPassword}:${devEmail},
                 bob:${testPassword}:${devEmail},
                 cory:${testPassword}:${devEmail},

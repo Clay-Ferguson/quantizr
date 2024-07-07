@@ -53,6 +53,8 @@ export MONGO_PORT=27016
 
 # NOTE: This file gets *generated* by the build.
 export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
+export MONGO_KEY=${PRJPARENT}/secrets/mongo-key-dev
+export INIT_REPLICA=${PRJPARENT}/secrets/init-replica-dev.sh
 
 # Sets a base location for MongoDB
 export MONGO_DATA=${PRJPARENT}/dev-vols/mongodb

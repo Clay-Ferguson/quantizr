@@ -27,10 +27,17 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.x
 cd ${PRJROOT}
 dockerDown
 
+# To remove the mongo data and start fresh, uncomment the following lines. This is helpful especially when
+# troubleshooting or verifying the automatic init-replica.sh script running.
+# sudo rm -r ${MONGO_DATA}
+# mkdir ${MONGO_DATA}
+
 # Build the application from source
 cd ${PRJROOT}
 . ${SCRIPTS}/build.sh
 
+genInitReplica
+makeMongoKeyFile
 genMongoConfig
 
 # IMPORTANT: Use this to troubleshoot the variable substitutions in the yaml file
@@ -44,13 +51,17 @@ echo "Docker build complete..."
 imageCheck ${DOCKER_IMAGE}
 echo "Image is in repo: ${DOCKER_IMAGE}"
 
+# Uncomment this to see the final docker-compose file
+# docker-compose -f ${dc_yaml} config > final-${dc_yaml}
+
 # Start the app
 dockerUp
 
 serviceCheck ${docker_stack}_quanta-dev
 serviceCheck ${docker_stack}_mongo-dev
+runInitReplica
 
-echo "Waiting 12s for server to initialize..."
-sleep 12s
+echo "Waiting 20s for server to initialize..."
+sleep 20s
 
 printUrlsMessage

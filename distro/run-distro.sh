@@ -40,11 +40,14 @@ sudo chown -R 5050:5050 ${PGADMIN_DATA}
 # docker-compose -f ${dc_yaml} config --no-cache > final-${dc_yaml}
 docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
+genInitReplica
+makeMongoKeyFile
 genMongoConfig
 
 dockerUp
 
 serviceCheck ${docker_stack}_quanta-distro
 serviceCheck ${docker_stack}_mongo-distro
+runInitReplica
 
 printUrlsMessage

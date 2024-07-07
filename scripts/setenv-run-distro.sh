@@ -29,6 +29,11 @@ export XMX=2g
 
 export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
+
+# we dump this key into the root, and will not use it, but in real environments you'll put this key in some secure location
+export MONGO_KEY=/mongo-key-distro
+
+export INIT_REPLICA=${DEPLOY_TARGET}/init-replica-distro.sh
 export MONGO_BACKUP=${DEPLOY_TARGET}/backup
 
 export POSTGRES_DATA=${DEPLOY_TARGET}/postgres

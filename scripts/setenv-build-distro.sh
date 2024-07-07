@@ -46,6 +46,11 @@ export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
 export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
 
+# we dump this key into the root, and will not use it, but in real environments you'll put this key in some secure location
+export MONGO_KEY=/mongo-key-distro
+
+export INIT_REPLICA=${DEPLOY_TARGET}/init-replica-distro.sh
+
 export POSTGRES_DATA=${DEPLOY_TARGET}/postgres
 export PGADMIN_DATA=${DEPLOY_TARGET}/pgadmin
 

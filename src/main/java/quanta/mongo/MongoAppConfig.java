@@ -2,6 +2,7 @@ package quanta.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import java.util.concurrent.TimeUnit;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.event.ClusterDescriptionChangedEvent;
+import com.mongodb.event.ClusterListener;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -82,6 +85,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return new MongoEventListener();
     }
 
+    @Bean
+    CustomMongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
+        return new CustomMongoTransactionManager(dbFactory);
+    }
+
     @Override
     public MongoClient mongoClient() {
         if (connectionFailed)
@@ -95,52 +103,72 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
                 log.debug("MongoSecurity disabled.");
             }
 
-            try {
-                String host = appProp.getMongoDbHost();
-                Integer port = appProp.getMongoDbPort();
-                if (host == null) {
-                    throw new RuntimeEx("mongodb.host property is missing");
-                }
-                if (port == null) {
-                    throw new RuntimeEx("mongodb.port property is missing");
-                }
-                String uri = "mongodb://" + host + ":" + String.valueOf(port);
-                log.info("Connecting to MongoDb: " + uri);
+            String host = appProp.getMongoDbHost();
+            Integer port = appProp.getMongoDbPort();
+            if (host == null) {
+                throw new RuntimeEx("mongodb.host property is missing");
+            }
+            if (port == null) {
+                throw new RuntimeEx("mongodb.port property is missing");
+            }
+            String uri = "mongodb://" + host + ":" + String.valueOf(port);
 
-                // This is just to slightly help give the MongoDB replica some time to start
-                // becasue in a docker swarm everything starts simultaneously
-                Util.sleep(5000);
+            int attempt = 0;
+            while (client == null && attempt < 30) {
+                attempt++;
+                try {
+                    // This is just to slightly help give the MongoDB replica some time to start
+                    // becasue in a docker swarm everything starts simultaneously
+                    Util.sleep(5000);
+                    log.info("Connecting to MongoDb (attempt " + attempt + "): " + uri);
 
-                // This codec registroy is what allows us to store objects that contain other POJOS, like for
-                // example the way we're storing AccessControl objects in a map inside SubNode
-                CodecRegistry codecReg = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-                        fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-                MongoClientSettings.Builder builder = MongoClientSettings.builder();
-                if (credential != null) {
-                    builder = builder.credential(credential);
-                }
-                builder = builder.applyConnectionString(new ConnectionString(uri)); //
-                builder = builder.codecRegistry(codecReg); //
-                MongoClientSettings settings = builder.build();
-                client = MongoClients.create(settings);
-
-                if (client != null) {
+                    // This codec registroy is what allows us to store objects that contain other POJOS, like for
+                    // example the way we're storing AccessControl objects in a map inside SubNode
+                    CodecRegistry codecReg = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+                            fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+                    MongoClientSettings.Builder builder = MongoClientSettings.builder();
                     if (credential != null) {
-                        for (String db : client.listDatabaseNames()) {
-                            log.debug("MONGO DB NAME: " + db);
-                        }
+                        builder = builder.credential(credential);
                     }
-                    log.info("Connected to Mongo OK.");
-                } else {
-                    connectionFailed = true;
-                    log.error("Unable to connect MongoClient");
+                    builder = builder.applyConnectionString(new ConnectionString(uri));
+                    builder = builder.applyToClusterSettings(b -> b.requiredReplicaSetName("rs0"));
+                    builder = builder.applyToClusterSettings(b -> b.addClusterListener(new ClusterListener() {
+                        @Override
+                        public void clusterDescriptionChanged(ClusterDescriptionChangedEvent event) {
+                            log.debug("Cluster description changed: " + event);
+                        }
+                    }));
+                    builder = builder.retryWrites(true);
+                    builder =
+                            builder.applyToClusterSettings(b -> b.serverSelectionTimeout(10000, TimeUnit.MILLISECONDS));
+                    builder = builder.codecRegistry(codecReg);
+
+                    MongoClientSettings settings = builder.build();
+                    client = MongoClients.create(settings);
+
+                    if (client != null) {
+                        if (credential != null) {
+                            for (String db : client.listDatabaseNames()) {
+                                log.debug("MONGO DB NAME: " + db);
+                            }
+                        }
+                        log.info("Connected to Mongo OK.");
+                    }
+                    if (client != null) {
+                        log.debug("Successfully connected to MongoDb on attempt " + attempt);
+                    }
+                } catch (Exception e) {
+                    ExUtil.error(log, "********** Unable to connect to MongoDb on attempt " + attempt + ". **********",
+                            e);
                 }
-            } catch (Exception e) {
-                connectionFailed = true;
-                ExUtil.error(log, "********** Unable to connect to MongoDb. **********", e);
-                throw e;
             }
         }
+
+        if (client == null) {
+            connectionFailed = true;
+            throw new RuntimeException("Unable to connect to MongoDb");
+        }
+
         return client;
     }
 

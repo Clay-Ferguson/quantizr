@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -411,7 +412,7 @@ public class NodeEditService extends ServiceBase {
                 sb.append(entry.getKey() + ": " + value + "\n\n");
             } else if (value instanceof HashMap) {
                 // If we have a nested HashMap, recursively traverse it
-                traverseMap(ms, (HashMap<?,?>) value, newNode, childOrdinal, level + 1);
+                traverseMap(ms, (HashMap<?, ?>) value, newNode, childOrdinal, level + 1);
             } else if (value instanceof List) {
                 // If we have a List, iterate over it and recursively traverse any Maps or Lists within
                 traverseList(ms, (List<?>) value, newNode, childOrdinal, level + 1, false);
@@ -678,6 +679,7 @@ public class NodeEditService extends ServiceBase {
      * todo-2: we should be using a bulk update in here and using a streaming resultset instead of
      * holding it all in memory
      */
+    @Transactional
     public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
         SearchAndReplaceResponse res = new SearchAndReplaceResponse();
         int replacements = 0;

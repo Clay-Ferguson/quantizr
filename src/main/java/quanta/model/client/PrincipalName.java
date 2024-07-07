@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum PrincipalName {
     // FollowBot is the account admins can use to "curate" the public
     // Fediverse feed.
-    FOLLOW_BOT("FollowBot"), //
+    FOLLOW_BOT("FollowBot"), // todo-0: delete this user.
     ANON("anonymous"), //
     ADMIN("admin"), //
     PUBLIC("public");
