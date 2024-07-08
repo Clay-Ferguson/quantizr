@@ -31,7 +31,7 @@ public class OpenGraphService extends ServiceBase {
     public static final String BROWSER_USER_AGENT =
             "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
 
-    public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
+    public GetOpenGraphResponse cm_getOpenGraph(GetOpenGraphRequest ogReq) {
         GetOpenGraphResponse res = new GetOpenGraphResponse();
         res.setOpenGraph(getOpenGraph(ogReq.getUrl()));
         return res;

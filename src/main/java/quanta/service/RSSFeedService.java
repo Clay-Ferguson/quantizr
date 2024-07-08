@@ -474,7 +474,7 @@ public class RSSFeedService extends ServiceBase {
         return html;
     }
 
-    public GetMultiRssResponse getMultiRssFeed(GetMultiRssRequest req) {
+    public GetMultiRssResponse cm_getMultiRssFeed(GetMultiRssRequest req) {
         GetMultiRssResponse res = new GetMultiRssResponse();
 
         // parse out list of URLs, and remove commented lines

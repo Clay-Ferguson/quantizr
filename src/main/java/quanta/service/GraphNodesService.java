@@ -22,7 +22,7 @@ public class GraphNodesService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(GraphNodesService.class);
     static int guid = 0;
 
-    public GraphResponse graphNodes(MongoSession ms, GraphRequest req) {
+    public GraphResponse cm_graphNodes(MongoSession ms, GraphRequest req) {
         HashMap<String, GraphNode> mapByPath = new HashMap<>();
         GraphResponse res = new GraphResponse();
         ms = ThreadLocals.ensure(ms);

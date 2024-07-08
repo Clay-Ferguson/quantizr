@@ -224,7 +224,7 @@ public class SchemaOrgService extends ServiceBase {
         }
     }
 
-    public GetSchemaOrgTypesResponse getSchemaOrgTypes() {
+    public GetSchemaOrgTypesResponse cm_getSchemaOrgTypes() {
         GetSchemaOrgTypesResponse res = new GetSchemaOrgTypesResponse();
         res.setClasses(classList);
         return res;

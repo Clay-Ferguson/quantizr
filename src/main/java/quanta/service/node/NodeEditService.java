@@ -65,7 +65,7 @@ import quanta.util.XString;
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
-    public LikeNodeResponse likeNode(MongoSession ms, LikeNodeRequest req) {
+    public LikeNodeResponse cm_likeNode(MongoSession ms, LikeNodeRequest req) {
         LikeNodeResponse res = new LikeNodeResponse();
         exec.run(() -> {
             arun.run(as -> {
@@ -98,7 +98,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
+    public SaveNodeResponse cm_saveNode(MongoSession ms, SaveNodeRequest req) {
         SaveNodeResponse res = new SaveNodeResponse();
         NodeInfo nodeInfo = req.getNode();
         String nodeId = nodeInfo.getId();
@@ -235,7 +235,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public SetExpandedResponse toggleExpanded(MongoSession ms, SetExpandedRequest req) {
+    public SetExpandedResponse cm_toggleExpanded(MongoSession ms, SetExpandedRequest req) {
         SetExpandedResponse res = new SetExpandedResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
 
@@ -285,7 +285,7 @@ public class NodeEditService extends ServiceBase {
      * representation of the JSON, with each key/value pair (and/or array content) in the JSON being a
      * node.
      */
-    public ImportJsonResponse importJson(MongoSession ms, ImportJsonRequest req) {
+    public ImportJsonResponse cm_importJson(MongoSession ms, ImportJsonRequest req) {
         ImportJsonResponse res = new ImportJsonResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
         auth.ownerAuth(ms, node);
@@ -481,7 +481,7 @@ public class NodeEditService extends ServiceBase {
      *
      * req.splitType == 'inline' || 'children'
      */
-    public SplitNodeResponse splitNode(MongoSession ms, SplitNodeRequest req) {
+    public SplitNodeResponse cm_splitNode(MongoSession ms, SplitNodeRequest req) {
         SplitNodeResponse res = new SplitNodeResponse();
         NodeChanges nodeChanges = new NodeChanges();
         res.setNodeChanges(nodeChanges);
@@ -552,7 +552,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public LinkNodesResponse linkNodes(MongoSession ms, LinkNodesRequest req) {
+    public LinkNodesResponse cm_linkNodes(MongoSession ms, LinkNodesRequest req) {
         LinkNodesResponse res = new LinkNodesResponse();
         SubNode sourceNode = read.getNode(ms, req.getSourceNodeId());
         if (sourceNode != null) {
@@ -569,7 +569,7 @@ public class NodeEditService extends ServiceBase {
      * This makes ALL the headings of all the sibling nodes match the heading level of the req.nodeId
      * passed in.
      */
-    public UpdateHeadingsResponse updateHeadings(MongoSession ms, String nodeId) {
+    public UpdateHeadingsResponse cm_updateHeadings(MongoSession ms, String nodeId) {
         SubNode node = read.getNode(ms, nodeId, true, null);
         auth.ownerAuth(ms, node);
         String content = node.getContent();
@@ -680,7 +680,7 @@ public class NodeEditService extends ServiceBase {
      * holding it all in memory
      */
     @Transactional
-    public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
+    public SearchAndReplaceResponse cm_searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
         SearchAndReplaceResponse res = new SearchAndReplaceResponse();
         int replacements = 0;
         int cachedChanges = 0;
@@ -722,7 +722,7 @@ public class NodeEditService extends ServiceBase {
         return false;
     }
 
-    public GetNodeJsonResponse getNodeJson(MongoSession ms, GetNodeJsonRequest req) {
+    public GetNodeJsonResponse cm_getNodeJson(MongoSession ms, GetNodeJsonRequest req) {
         GetNodeJsonResponse res = new GetNodeJsonResponse();
         ThreadLocals.requireAdmin();
         SubNode node = read.getNode(ms, req.getNodeId(), false, null);
@@ -732,7 +732,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public SaveNodeJsonResponse saveNodeJson(MongoSession ms, SaveNodeJsonRequest req) {
+    public SaveNodeJsonResponse cm_saveNodeJson(MongoSession ms, SaveNodeJsonRequest req) {
         SaveNodeJsonResponse res = new SaveNodeJsonResponse();
         ThreadLocals.requireAdmin();
 
@@ -745,7 +745,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
+    public InitNodeEditResponse cm_initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
         InitNodeEditResponse res = new InitNodeEditResponse();
         String nodeId = req.getNodeId();
 

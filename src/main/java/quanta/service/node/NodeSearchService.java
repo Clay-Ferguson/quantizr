@@ -63,7 +63,7 @@ public class NodeSearchService extends ServiceBase {
      */
     static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
-    public RenderDocumentResponse renderDocument(MongoSession ms, RenderDocumentRequest req) {
+    public RenderDocumentResponse cm_renderDocument(MongoSession ms, RenderDocumentRequest req) {
         RenderDocumentResponse res = new RenderDocumentResponse();
         List<NodeInfo> results = new LinkedList<>();
         res.setSearchResults(results);
@@ -87,7 +87,7 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
-    public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
+    public NodeSearchResponse cm_search(MongoSession ms, NodeSearchRequest req) {
         NodeSearchResponse res = new NodeSearchResponse();
         String searchText = req.getSearchText();
 
@@ -248,7 +248,7 @@ public class NodeSearchService extends ServiceBase {
         }
     }
 
-    public GetSharedNodesResponse getSharedNodes(MongoSession ms, GetSharedNodesRequest req) {
+    public GetSharedNodesResponse cm_getSharedNodes(MongoSession ms, GetSharedNodesRequest req) {
         GetSharedNodesResponse res = new GetSharedNodesResponse();
         ms = ThreadLocals.ensure(ms);
         List<NodeInfo> searchResults = new LinkedList<>();
@@ -300,7 +300,7 @@ public class NodeSearchService extends ServiceBase {
         return res;
     }
 
-    public GetBookmarksResponse getBookmarks(MongoSession ms, GetBookmarksRequest req) {
+    public GetBookmarksResponse cm_getBookmarks(MongoSession ms, GetBookmarksRequest req) {
         List<Bookmark> bookmarks = new LinkedList<>();
         List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, null, NodeType.BOOKMARK_LIST.s(), null, true, null);
         if (bookmarksNode != null) {
@@ -334,7 +334,7 @@ public class NodeSearchService extends ServiceBase {
         int failedSigCount = 0;
     }
 
-    public GetNodeStatsResponse getNodeStats(MongoSession ms, GetNodeStatsRequest req) {
+    public GetNodeStatsResponse cm_getNodeStats(MongoSession ms, GetNodeStatsRequest req) {
         GetNodeStatsResponse res = new GetNodeStatsResponse();
         boolean countVotes = true;
 

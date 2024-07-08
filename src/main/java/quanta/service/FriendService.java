@@ -66,7 +66,7 @@ public class FriendService extends ServiceBase {
         }
     }
 
-    public UpdateFriendNodeResponse updateFriendNode(MongoSession ms, UpdateFriendNodeRequest req) {
+    public UpdateFriendNodeResponse cm_updateFriendNode(MongoSession ms, UpdateFriendNodeRequest req) {
         UpdateFriendNodeResponse res = new UpdateFriendNodeResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
         auth.ownerAuth(ms, node);
@@ -95,7 +95,7 @@ public class FriendService extends ServiceBase {
         }
     }
 
-    public DeleteFriendResponse deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
+    public DeleteFriendResponse cm_deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
         DeleteFriendResponse res = new DeleteFriendResponse();
         ms = ThreadLocals.ensure(ms);
         Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(delUserNodeId); //
@@ -165,7 +165,7 @@ public class FriendService extends ServiceBase {
         if (!userDoingFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
             // We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
             // the DB enforcing this.
-            deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
+            cm_deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
         }
         log.trace("Creating friendNode for " + userToFollow);
         friendNode = createFriendNode(ms, followerFriendList, userToFollow, tags);
@@ -204,7 +204,7 @@ public class FriendService extends ServiceBase {
      * Adds all the users in 'req.userName' (as a newline elimited list) as new friends of the current
      * user
      */
-    public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
+    public AddFriendResponse cm_addFriend(MongoSession ms, AddFriendRequest req) {
         AddFriendResponse res = new AddFriendResponse();
         String userDoingAction = ThreadLocals.getSC().getUserName();
         final List<String> users = XString.tokenize(req.getUserName().trim(), "\n", true);
@@ -222,7 +222,7 @@ public class FriendService extends ServiceBase {
 
     private static final int MAX_THREAD_NODES = 200;
 
-    public GetThreadViewResponse getNodeReplies(MongoSession ms, String nodeId) {
+    public GetThreadViewResponse cm_getNodeReplies(MongoSession ms, String nodeId) {
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
         // get node that's going to have it's ancestors gathered
@@ -242,7 +242,7 @@ public class FriendService extends ServiceBase {
      * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
      * towards the root of the tree.
      */
-    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
+    public GetThreadViewResponse cm_getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
         boolean debug = false;
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
@@ -361,7 +361,7 @@ public class FriendService extends ServiceBase {
         return opsw.find(ms, q);
     }
 
-    public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
+    public GetFollowersResponse cm_getFollowers(MongoSession ms, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
         return arun.run(as -> {
             Query q = getPeopleByUserName_query(as, null, req.getTargetUserName());
@@ -425,7 +425,7 @@ public class FriendService extends ServiceBase {
      * it to be the odd man out which will eventually need to support paging (currently doesn't) and go
      * ahead and duplicate that functionality here in a way analogous to getFollowers
      */
-    public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
+    public GetFollowingResponse cm_getFollowing(MongoSession ms, GetFollowingRequest req) {
         GetFollowingResponse res = new GetFollowingResponse();
         return arun.run(as -> {
             Query q = findFollowingOfUser_query(as, req.getTargetUserName());

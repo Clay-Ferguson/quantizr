@@ -181,7 +181,7 @@ public class CaptchaMaker {
     // return tmp.toByteArray();
     // }
 
-    public static Object getCaptcha() {
+    public static Object cm_getCaptcha() {
         String captcha = CaptchaMaker.createCaptchaString();
         ThreadLocals.getHttpSession().setAttribute("captcha", captcha);
         try {

@@ -55,7 +55,7 @@ import quanta.util.val.Val;
 public class NodeRenderService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
-    public String getIndexPage(String nameOnAdminNode, String nameOnUserNode, String userName, String id, String search,
+    public String cm_getIndexPage(String nameOnAdminNode, String nameOnUserNode, String userName, String id, String search,
             String name, String signupCode, String login, String view, Model model) {
         HashMap<String, Object> attrs = getThymeleafAttribs();
         boolean isHomeNodeRequest = false;
@@ -149,7 +149,7 @@ public class NodeRenderService extends ServiceBase {
      * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
      * page, this method gets called once per page and retrieves all the data for that page.
      */
-    public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
+    public RenderNodeResponse cm_renderNode(MongoSession ms, RenderNodeRequest req) {
         RenderNodeResponse res = new RenderNodeResponse();
         // by default we do showReplies
         boolean showReplies = true;
@@ -502,7 +502,7 @@ public class NodeRenderService extends ServiceBase {
      * when a non-logged in user (i.e. anonymouse user) is browsing the site, and this method retrieves
      * that page data.
      */
-    public RenderNodeResponse anonPageLoad(MongoSession ms, RenderNodeRequest req) {
+    public RenderNodeResponse cm_anonPageLoad(MongoSession ms, RenderNodeRequest req) {
         ms = ThreadLocals.ensure(ms);
         if (req.getNodeId() == null) {
             String id = prop.getUserLandingPageNode();
@@ -512,7 +512,7 @@ public class NodeRenderService extends ServiceBase {
             // }
             req.setNodeId(id);
         }
-        return renderNode(ms, req);
+        return cm_renderNode(ms, req);
     }
 
     public void populateSocialCardProps(SubNode node, Model model) {
@@ -528,7 +528,7 @@ public class NodeRenderService extends ServiceBase {
         model.addAttribute("ogUrl", metaInfo.getUrl());
     }
 
-    public RenderCalendarResponse renderCalendar(MongoSession ms, RenderCalendarRequest req) {
+    public RenderCalendarResponse cm_renderCalendar(MongoSession ms, RenderCalendarRequest req) {
         RenderCalendarResponse res = new RenderCalendarResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
         if (node == null) {

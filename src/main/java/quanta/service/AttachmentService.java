@@ -99,7 +99,7 @@ public class AttachmentService extends ServiceBase {
     @Autowired
     public GridFsTemplate grid;
 
-    public UploadResponse parseUploadFiles(MongoSession ms, MultipartFile[] uploadFiles) {
+    public UploadResponse cm_parseUploadFiles(MongoSession ms, MultipartFile[] uploadFiles) {
         UploadResponse resp = new UploadResponse();
         List<String> payloads = new LinkedList<String>();
         resp.setPayloads(payloads);
@@ -126,7 +126,7 @@ public class AttachmentService extends ServiceBase {
     /*
      * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
      */
-    public ResponseBase uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] files,
+    public ResponseBase cm_uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] files,
             boolean explodeZips) {
         if (nodeId == null) {
             throw ExUtil.wrapEx("target nodeId not provided");
@@ -393,7 +393,7 @@ public class AttachmentService extends ServiceBase {
     /*
      * Removes the attachment from the node specified in the request.
      */
-    public DeleteAttachmentResponse deleteAttachment(MongoSession ms, DeleteAttachmentRequest req) {
+    public DeleteAttachmentResponse cm_deleteAttachment(MongoSession ms, DeleteAttachmentRequest req) {
         DeleteAttachmentResponse res = new DeleteAttachmentResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
@@ -521,7 +521,7 @@ public class AttachmentService extends ServiceBase {
     /**
      * Downloads a file by name that is expected to be in the Admin Data Folder
      */
-    public void getFile(MongoSession ms, String fileName, String disposition, HttpServletResponse response) {
+    public void cm_getFile(MongoSession ms, String fileName, String disposition, HttpServletResponse response) {
         if (fileName.contains(".."))
             throw ExUtil.wrapEx("bad request.");
         BufferedInputStream inStream = null;
@@ -596,7 +596,7 @@ public class AttachmentService extends ServiceBase {
         }
     }
 
-    public Object getStreamResource(MongoSession ms, HttpHeaders headers, String nodeId, String attName) {
+    public Object cm_getStreamResource(MongoSession ms, HttpHeaders headers, String nodeId, String attName) {
         BufferedInputStream inStream = null;
         ResponseEntity<ResourceRegion> ret = null;
 
@@ -657,7 +657,7 @@ public class AttachmentService extends ServiceBase {
      * Uploads an attachment not from the user's machine but from some arbitrary internet URL they have
      * provided, that could be pointing to an image or any other kind of content actually.
      */
-    public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
+    public UploadFromUrlResponse cm_readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
         UploadFromUrlResponse res = new UploadFromUrlResponse();
         if (req.getSourceUrl() != null) {
             readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally(), null);
@@ -665,14 +665,14 @@ public class AttachmentService extends ServiceBase {
         return res;
     }
 
-    public AIGenImageResponse aiGenImage(MongoSession ms, AIGenImageRequest req) {
+    public AIGenImageResponse cm_aiGenImage(MongoSession ms, AIGenImageRequest req) {
         AIGenImageResponse res = new AIGenImageResponse();
         String url = oai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef(), req.getSize());
         readFromUrl(ms, url, null, req.getNodeId(), null, null, 0, true, req.getOpenAiPrompt());
         return res;
     }
 
-    public AIGenSpeechResponse aiGenSpeech(MongoSession ms, AIGenSpeechRequest req) {
+    public AIGenSpeechResponse cm_aiGenSpeech(MongoSession ms, AIGenSpeechRequest req) {
         AIGenSpeechResponse res = new AIGenSpeechResponse();
         oai.generateSpeech(ms, req.getOpenAiPrompt(), req.getVoice(), req.getNodeId());
         return res;
@@ -977,7 +977,7 @@ public class AttachmentService extends ServiceBase {
      * An alternative way to get the binary attachment from a node allowing more friendly url format
      * (named nodes). 
      */
-    public void getAttachment(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
+    public void cm_getAttachment(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
             String download, String gid, String attName, HttpServletRequest req, HttpServletResponse response) {
         try {
             if (StringUtils.isEmpty(attName)) {
@@ -1041,7 +1041,7 @@ public class AttachmentService extends ServiceBase {
      * binId param not uses currently but the client will send either the gridId of the node depending
      * on which type of attachment it sees on the node
      */
-    public void getBinary(String binId, String nodeId, String token, String download, HttpSession session,
+    public void cm_getBinary(String binId, String nodeId, String token, String download, HttpSession session,
             HttpServletResponse response) {
         if (token == null) {
             // Check if this is an 'avatar' request and if so bypass security
@@ -1110,7 +1110,7 @@ public class AttachmentService extends ServiceBase {
         return totalBytes.getVal();
     }
 
-    public PasteAttachmentsResponse pasteAttachments(MongoSession ms, PasteAttachmentsRequest req) {
+    public PasteAttachmentsResponse cm_pasteAttachments(MongoSession ms, PasteAttachmentsRequest req) {
         PasteAttachmentsResponse res = new PasteAttachmentsResponse();
         SubNode sourceNode = read.getNode(ms, req.getSourceNodeId());
         if (sourceNode == null) {

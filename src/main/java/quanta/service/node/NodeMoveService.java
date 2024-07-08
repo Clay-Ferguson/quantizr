@@ -47,7 +47,7 @@ public class NodeMoveService extends ServiceBase {
      * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be the
      * first node under its parent.
      */
-    public SetNodePositionResponse setNodePosition(MongoSession ms, SetNodePositionRequest req) {
+    public SetNodePositionResponse cm_setNodePosition(MongoSession ms, SetNodePositionRequest req) {
         SetNodePositionResponse res = new SetNodePositionResponse();
         NodeChanges nodeChanges = new NodeChanges();
         res.setNodeChanges(nodeChanges);
@@ -129,7 +129,7 @@ public class NodeMoveService extends ServiceBase {
      * 
      * If join to parent is true, that means we merge all the NodeIds onto their parent.
      */
-    public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
+    public JoinNodesResponse cm_joinNodes(MongoSession ms, JoinNodesRequest req) {
         JoinNodesResponse res = new JoinNodesResponse();
         LinkedList<String> delIds = new LinkedList<>();
         // add to list because we will sort
@@ -200,7 +200,7 @@ public class NodeMoveService extends ServiceBase {
     /*
      * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
      */
-    public MoveNodesResponse moveNodes(MongoSession ms, MoveNodesRequest req) {
+    public MoveNodesResponse cm_moveNodes(MongoSession ms, MoveNodesRequest req) {
         MoveNodesResponse res = new MoveNodesResponse();
         ms = ThreadLocals.ensure(ms);
         moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), req.isCopyPaste(), res);
@@ -391,7 +391,7 @@ public class NodeMoveService extends ServiceBase {
         }
     }
 
-    public SelectAllNodesResponse selectAllNodes(MongoSession ms, SelectAllNodesRequest req) {
+    public SelectAllNodesResponse cm_selectAllNodes(MongoSession ms, SelectAllNodesRequest req) {
         SelectAllNodesResponse res = new SelectAllNodesResponse();
         ms = ThreadLocals.ensure(ms);
         String nodeId = req.getParentNodeId();

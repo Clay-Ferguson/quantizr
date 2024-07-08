@@ -59,7 +59,7 @@ public class AclService extends ServiceBase {
     /**
      * Returns the privileges that exist on the node identified in the request.
      */
-    public GetNodePrivilegesResponse getNodePrivileges(MongoSession ms, GetNodePrivilegesRequest req) {
+    public GetNodePrivilegesResponse cm_getNodePrivileges(MongoSession ms, GetNodePrivilegesRequest req) {
         GetNodePrivilegesResponse res = new GetNodePrivilegesResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
@@ -67,7 +67,7 @@ public class AclService extends ServiceBase {
         return res;
     }
 
-    public CopySharingResponse copySharing(MongoSession ms, CopySharingRequest req) {
+    public CopySharingResponse cm_copySharing(MongoSession ms, CopySharingRequest req) {
         CopySharingResponse res = new CopySharingResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
         BulkOperations bops = null;
@@ -121,7 +121,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new privilege to a node
      */
-    public AddPrivilegeResponse addPrivilege(MongoSession ms, AddPrivilegeRequest req) {
+    public AddPrivilegeResponse cm_addPrivilege(MongoSession ms, AddPrivilegeRequest req) {
         AddPrivilegeResponse res = new AddPrivilegeResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
@@ -141,7 +141,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new privilege to a node
      */
-    public SetUnpublishedResponse setUnpublished(MongoSession ms, SetUnpublishedRequest req) {
+    public SetUnpublishedResponse cm_setUnpublished(MongoSession ms, SetUnpublishedRequest req) {
         SetUnpublishedResponse res = new SetUnpublishedResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
@@ -153,7 +153,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new encryption key to a node
      */
-    public SetCipherKeyResponse setCipherKey(MongoSession ms, SetCipherKeyRequest req) {
+    public SetCipherKeyResponse cm_setCipherKey(MongoSession ms, SetCipherKeyRequest req) {
         SetCipherKeyResponse res = new SetCipherKeyResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
@@ -350,7 +350,7 @@ public class AclService extends ServiceBase {
     /*
      * Removes the privilege specified in the request from the node specified in the request
      */
-    public RemovePrivilegeResponse removePrivilege(MongoSession ms, RemovePrivilegeRequest req) {
+    public RemovePrivilegeResponse cm_removePrivilege(MongoSession ms, RemovePrivilegeRequest req) {
         RemovePrivilegeResponse res = new RemovePrivilegeResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);

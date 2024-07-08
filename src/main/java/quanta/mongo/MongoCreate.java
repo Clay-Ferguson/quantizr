@@ -231,7 +231,7 @@ public class MongoCreate extends ServiceBase {
      * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
      * by the controller that accepts a node being created by the GUI/user
      */
-    public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
+    public CreateSubNodeResponse cm_createSubNode(MongoSession ms, CreateSubNodeRequest req) {
         CreateSubNodeResponse res = new CreateSubNodeResponse();
         NodeChanges nodeChanges = new NodeChanges();
         res.setNodeChanges(nodeChanges);
@@ -515,7 +515,7 @@ public class MongoCreate extends ServiceBase {
      * node specified in the request. Should ONLY be called by the controller that accepts a node being
      * created by the GUI/user
      */
-    public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
+    public InsertNodeResponse cm_insertNode(MongoSession ms, InsertNodeRequest req) {
         InsertNodeResponse res = new InsertNodeResponse();
         NodeChanges changes = new NodeChanges();
         res.setNodeChanges(changes);

@@ -40,7 +40,7 @@ public class UserFeedService extends ServiceBase {
     // private static List<String> excludeTypes = Arrays.asList( //
     // NodeType.FRIEND.s(), //
     // NodeType.POSTS.s());
-    public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
+    public CheckMessagesResponse cm_checkMessages(MongoSession ms, CheckMessagesRequest req) {
         SessionContext sc = ThreadLocals.getSC();
         CheckMessagesResponse res = new CheckMessagesResponse();
         if (sc.isAnonUser())
@@ -83,7 +83,7 @@ public class UserFeedService extends ServiceBase {
      * Note: When 'req.toUser' is set we query actually for the bidiretional conversatio of us to that
      * person or that person to us queried in a single list.
      */
-    public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
+    public NodeFeedResponse cm_generateFeed(MongoSession ms, NodeFeedRequest req) {
         /*
          * if bidirectional means query for the conversation between me and the other person (both senders),
          * and we do that always for now when toUser is present.

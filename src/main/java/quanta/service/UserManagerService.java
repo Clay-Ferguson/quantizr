@@ -166,7 +166,7 @@ public class UserManagerService extends ServiceBase {
      * Note that this function does 'succeed' even with ANON user given, and just considers that an
      * anonymouse user
      */
-    public LoginResponse login(HttpServletRequest httpReq, LoginRequest req) {
+    public LoginResponse cm_login(HttpServletRequest httpReq, LoginRequest req) {
         LoginResponse res = new LoginResponse();
         SessionContext sc = ThreadLocals.getSC();
         Val<SubNode> userNodeVal = new Val<>();
@@ -304,7 +304,7 @@ public class UserManagerService extends ServiceBase {
         update.save(ms, userNode);
     }
 
-    public CloseAccountResponse closeAccount(CloseAccountRequest req, HttpSession session) {
+    public CloseAccountResponse cm_closeAccount(CloseAccountRequest req, HttpSession session) {
         CloseAccountResponse res = new CloseAccountResponse();
         log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
         arun.run(as -> {
@@ -412,7 +412,7 @@ public class UserManagerService extends ServiceBase {
      * all other user accounts all information specific to that user that we currently know is held in
      * that node (i.e. preferences)
      */
-    public SignupResponse signup(SignupRequest req, boolean automated) {
+    public SignupResponse cm_signup(SignupRequest req, boolean automated) {
         SignupResponse res = new SignupResponse();
         res.setCode(HttpServletResponse.SC_OK);
         arun.run(as -> {
@@ -495,7 +495,7 @@ public class UserManagerService extends ServiceBase {
         prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
     }
 
-    public GetUserAccountInfoResponse getUserAccountInfo(GetUserAccountInfoRequest req) {
+    public GetUserAccountInfoResponse cm_getUserAccountInfo(GetUserAccountInfoRequest req) {
         GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
         String userName = ThreadLocals.getSC().getUserName();
         arun.run(as -> {
@@ -535,14 +535,14 @@ public class UserManagerService extends ServiceBase {
         return false;
     }
 
-    public DeleteUserTransactionsResponse deleteUserTransactions(MongoSession as, DeleteUserTransactionsRequest req) {
+    public DeleteUserTransactionsResponse cm_deleteUserTransactions(MongoSession as, DeleteUserTransactionsRequest req) {
         ThreadLocals.requireAdmin();
         DeleteUserTransactionsResponse res = new DeleteUserTransactionsResponse();
         userRepository.deleteByMongoId(req.getUserId());
         return res;
     }
 
-    public AddCreditResponse addCredit(MongoSession as, String userId, BigDecimal amount) {
+    public AddCreditResponse cm_addCredit(MongoSession as, String userId, BigDecimal amount) {
         ThreadLocals.requireAdmin();
         AddCreditResponse res = new AddCreditResponse();
         addCreditInternal(as, userId, amount, null);
@@ -597,7 +597,7 @@ public class UserManagerService extends ServiceBase {
         log.debug("TRAN: " + XString.prettyPrint(credit));
     }
 
-    public SaveUserPreferencesResponse saveUserPreferences(SaveUserPreferencesRequest req) {
+    public SaveUserPreferencesResponse cm_saveUserPreferences(SaveUserPreferencesRequest req) {
         SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
         UserPreferences userPrefs = ThreadLocals.getSC().getUserPreferences();
         // note: This will be null if session has timed out.
@@ -636,7 +636,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public SaveUserProfileResponse saveUserProfile(SaveUserProfileRequest req) {
+    public SaveUserProfileResponse cm_saveUserProfile(SaveUserProfileRequest req) {
         SaveUserProfileResponse res = new SaveUserProfileResponse();
         String userName = ThreadLocals.getSC().getUserName();
         arun.run(as -> {
@@ -682,7 +682,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     /* The code pattern here is very similar to addFriendInternal */
-    public BlockUserResponse blockUsers(MongoSession ms, BlockUserRequest req) {
+    public BlockUserResponse cm_blockUsers(MongoSession ms, BlockUserRequest req) {
         BlockUserResponse res = new BlockUserResponse();
         String userName = ThreadLocals.getSC().getUserName();
         ObjectId accntIdDoingBlock = new ObjectId(ThreadLocals.getSC().getUserNodeId());
@@ -713,7 +713,7 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
-    public void exportPeople(MongoSession ms, HttpServletResponse response, String disposition, String listType) {
+    public void cm_exportPeople(MongoSession ms, HttpServletResponse response, String disposition, String listType) {
         try {
             StringBuilder sb = new StringBuilder();
             Criteria moreCriteria = null;
@@ -909,7 +909,7 @@ public class UserManagerService extends ServiceBase {
     /*
      * Runs when user is doing the 'change password' or 'reset password'
      */
-    public ChangePasswordResponse changePassword(MongoSession ms, ChangePasswordRequest req) {
+    public ChangePasswordResponse cm_changePassword(MongoSession ms, ChangePasswordRequest req) {
         ChangePasswordResponse res = new ChangePasswordResponse();
         ms = ThreadLocals.ensure(ms);
         Val<SubNode> userNode = new Val<>();
@@ -965,7 +965,7 @@ public class UserManagerService extends ServiceBase {
                 && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
     }
 
-    public ResetPasswordResponse resetPassword(ResetPasswordRequest req) {
+    public ResetPasswordResponse cm_resetPassword(ResetPasswordRequest req) {
         ResetPasswordResponse res = new ResetPasswordResponse();
         arun.run(as -> {
             String user = req.getUser();
@@ -1106,7 +1106,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public Object getPeople(GetPeopleRequest req, MongoSession ms) {
+    public Object cm_getPeople(GetPeopleRequest req, MongoSession ms) {
         GetPeopleResponse ret = null;
         if (req.getNodeId() != null) {
             ret = user.getPeopleOnNode(ms, req.getNodeId());
@@ -1221,7 +1221,7 @@ public class UserManagerService extends ServiceBase {
         return quota - binTotal;
     }
 
-    public Object logout(HttpSession session) {
+    public Object cm_logout(HttpSession session) {
         redis.delete(ThreadLocals.getSC());
         ThreadLocals.getSC().forceAnonymous();
         session.invalidate();
@@ -1229,7 +1229,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public Object getUserProfile(GetUserProfileRequest req) {
+    public Object cm_getUserProfile(GetUserProfileRequest req) {
         GetUserProfileResponse res = new GetUserProfileResponse();
         UserProfile userProfile = user.getUserProfile(req.getUserId(), null, false);
         if (userProfile != null) {
@@ -1238,7 +1238,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    public SendFeedbackResponse sendFeedback(MongoSession ms, SendFeedbackRequest req) {
+    public SendFeedbackResponse cm_sendFeedback(MongoSession ms, SendFeedbackRequest req) {
         return arun.run(as -> {
             SendFeedbackResponse res = new SendFeedbackResponse();
             SubNode feedbackNode =

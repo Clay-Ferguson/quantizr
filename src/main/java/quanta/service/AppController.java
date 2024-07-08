@@ -162,7 +162,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "view", required = false) String view, //
             HttpSession session, //
             Model model) {
-        return render.getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode, login, view,
+        return render.cm_getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode, login, view,
                 model);
     }
 
@@ -170,7 +170,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
         return callProc.run("getMultiRssFeed", false, false, req, session, ms -> {
-            return rssFeed.getMultiRssFeed(req);
+            return rssFeed.cm_getMultiRssFeed(req);
         });
     }
 
@@ -179,7 +179,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object signup(@RequestBody SignupRequest req, HttpSession session) {
         return callProc.run("signup", false, false, req, session, ms -> {
             boolean automated = ms.isAdmin() && "adminCreatingUser".equals(req.getCaptcha());
-            return user.signup(req, automated);
+            return user.cm_signup(req, automated);
         });
     }
 
@@ -187,7 +187,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
         return callProc.run("login", false, false, req, session, ms -> {
-            return user.login(httpReq, req);
+            return user.cm_login(httpReq, req);
         });
     }
 
@@ -195,7 +195,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
         return callProc.run("closeAccount", true, true, req, session, ms -> {
-            return user.closeAccount(req, session);
+            return user.cm_closeAccount(req, session);
         });
     }
 
@@ -204,7 +204,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
             HttpSession session) {
         return callProc.run("logout", true, false, req, session, ms -> {
-            return user.logout(session);
+            return user.cm_logout(session);
         });
     }
 
@@ -213,7 +213,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, HttpServletRequest httpReq,
             HttpSession session) {
         return callProc.run("renderCalendar", true, true, req, session, ms -> {
-            return render.renderCalendar(ms, req);
+            return render.cm_renderCalendar(ms, req);
         });
     }
 
@@ -222,7 +222,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object likeNode(@RequestBody LikeNodeRequest req, //
             HttpServletRequest httpReq, HttpSession session) {
         return callProc.run("likeNode", false, false, req, session, ms -> {
-            return edit.likeNode(ms, req);
+            return edit.cm_likeNode(ms, req);
         });
     }
 
@@ -230,7 +230,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
         return callProc.run("getNodeThreadView", false, false, req, session, ms -> {
-            return friend.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
+            return friend.cm_getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
         });
     }
 
@@ -238,7 +238,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeRepliesView(@RequestBody GetThreadViewRequest req, HttpSession session) {
         return callProc.run("getNodeRepliesView", false, false, req, session, ms -> {
-            return friend.getNodeReplies(ms, req.getNodeId());
+            return friend.cm_getNodeReplies(ms, req.getNodeId());
         });
     }
 
@@ -246,7 +246,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object renderNode(@RequestBody RenderNodeRequest req, HttpServletRequest httpReq, HttpSession session) {
         return callProc.run("renderNode", false, false, req, session, ms -> {
-            return render.renderNode(ms, req);
+            return render.cm_renderNode(ms, req);
         });
     }
 
@@ -254,7 +254,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
         return callProc.run("initNodeEdit", true, true, req, session, ms -> {
-            return edit.initNodeEdit(ms, req);
+            return edit.cm_initNodeEdit(ms, req);
         });
     }
 
@@ -267,7 +267,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
         return callProc.run("getOpenGraph", false, false, req, session, ms -> {
-            return openGraph.getOpenGraph(req);
+            return openGraph.cm_getOpenGraph(req);
         });
     }
 
@@ -275,7 +275,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getSchemaOrgTypes(@RequestBody GetSchemaOrgTypesRequest req, HttpSession session) {
         return callProc.run("getSchemaOrgTypes", false, false, req, session, ms -> {
-            return schema.getSchemaOrgTypes();
+            return schema.cm_getSchemaOrgTypes();
         });
     }
 
@@ -283,7 +283,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
         return callProc.run("getNodePrivileges", true, true, req, session, ms -> {
-            return acl.getNodePrivileges(ms, req);
+            return acl.cm_getNodePrivileges(ms, req);
         });
     }
 
@@ -291,7 +291,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
         return callProc.run("getPeople", false, false, req, session, ms -> {
-            return user.getPeople(req, ms);
+            return user.cm_getPeople(req, ms);
         });
     }
 
@@ -299,7 +299,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
         return callProc.run("addPrivilege", true, true, req, session, ms -> {
-            return acl.addPrivilege(ms, req);
+            return acl.cm_addPrivilege(ms, req);
         });
     }
 
@@ -307,7 +307,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object setUnpublished(@RequestBody SetUnpublishedRequest req, HttpSession session) {
         return callProc.run("setUnpublished", true, true, req, session, ms -> {
-            return acl.setUnpublished(ms, req);
+            return acl.cm_setUnpublished(ms, req);
         });
     }
 
@@ -315,7 +315,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object copySharing(@RequestBody CopySharingRequest req, HttpSession session) {
         return callProc.run("copySharing", true, true, req, session, ms -> {
-            return acl.copySharing(ms, req);
+            return acl.cm_copySharing(ms, req);
         });
     }
 
@@ -323,7 +323,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
         return callProc.run("removePrivilege", true, true, req, session, ms -> {
-            return acl.removePrivilege(ms, req);
+            return acl.cm_removePrivilege(ms, req);
         });
     }
 
@@ -331,7 +331,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object savePublicKeys(@RequestBody SavePublicKeyRequest req, HttpSession session) {
         return callProc.run("savePublicKeys", true, false, req, session, ms -> {
-            return crypto.savePublicKeys(req);
+            return crypto.cm_savePublicKeys(req);
         });
     }
 
@@ -339,7 +339,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
         return callProc.run("setCipherKey", true, true, req, session, ms -> {
-            return acl.setCipherKey(ms, req);
+            return acl.cm_setCipherKey(ms, req);
         });
     }
 
@@ -347,7 +347,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object export(@RequestBody ExportRequest req, HttpSession session) {
         return callProc.run("export", true, true, req, session, ms -> {
-            return system.export(req, ms);
+            return system.cm_export(req, ms);
         });
     }
 
@@ -355,7 +355,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object subGraphHash(@RequestBody SubGraphHashRequest req, HttpSession session) {
         return callProc.run("subGraphHash", true, true, req, session, ms -> {
-            return crypto.subGraphHash(ms, req);
+            return crypto.cm_subGraphHash(ms, req);
         });
     }
 
@@ -363,7 +363,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
         return callProc.run("export", true, true, req, session, ms -> {
-            return transfer.transferNode(ms, req);
+            return transfer.cm_transferNode(ms, req);
         });
     }
 
@@ -371,7 +371,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
         return callProc.run("searchAndReplace", true, true, req, session, ms -> {
-            return edit.searchAndReplace(ms, req);
+            return edit.cm_searchAndReplace(ms, req);
         });
     }
 
@@ -380,7 +380,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object streamImport(@RequestParam(value = "nodeId", required = true) String nodeId,
             @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
         return callProc.run("streamImport", true, true, null, session, ms -> {
-            return importService.streamImport(ms, nodeId, uploadFiles);
+            return importService.cm_streamImport(ms, nodeId, uploadFiles);
         });
     }
 
@@ -388,7 +388,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
         return callProc.run("setNodePosition", true, true, req, session, ms -> {
-            return move.setNodePosition(ms, req);
+            return move.cm_setNodePosition(ms, req);
         });
     }
 
@@ -396,7 +396,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
         return callProc.run("createSubNode", true, true, req, session, ms -> {
-            return create.createSubNode(ms, req);
+            return create.cm_createSubNode(ms, req);
         });
     }
 
@@ -404,7 +404,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
         return callProc.run("insertNode", true, true, req, session, ms -> {
-            return create.insertNode(ms, req);
+            return create.cm_insertNode(ms, req);
         });
     }
 
@@ -412,7 +412,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
         return callProc.run("deleteNodes", true, true, req, session, ms -> {
-            return delete.delete(req, ms);
+            return delete.cm_delete(req, ms);
         });
     }
 
@@ -420,7 +420,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
         return callProc.run("joinNodes", true, true, req, session, ms -> {
-            return move.joinNodes(ms, req);
+            return move.cm_joinNodes(ms, req);
         });
     }
 
@@ -428,7 +428,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
         return callProc.run("selectAllNodes", true, true, req, session, ms -> {
-            return move.selectAllNodes(ms, req);
+            return move.cm_selectAllNodes(ms, req);
         });
     }
 
@@ -436,7 +436,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
         return callProc.run("updateHeadings", true, true, req, session, ms -> {
-            return edit.updateHeadings(ms, req.getNodeId());
+            return edit.cm_updateHeadings(ms, req.getNodeId());
         });
     }
 
@@ -444,7 +444,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
         return callProc.run("moveNodes", true, true, req, session, ms -> {
-            return move.moveNodes(ms, req);
+            return move.cm_moveNodes(ms, req);
         });
     }
 
@@ -452,7 +452,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object moveNodes(@RequestBody PasteAttachmentsRequest req, HttpSession session) {
         return callProc.run("pasteAttachments", true, true, req, session, ms -> {
-            return attach.pasteAttachments(ms, req);
+            return attach.cm_pasteAttachments(ms, req);
         });
     }
 
@@ -460,7 +460,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object linkNodes(@RequestBody LinkNodesRequest req, HttpSession session) {
         return callProc.run("linkNodes", true, true, req, session, ms -> {
-            return edit.linkNodes(ms, req);
+            return edit.cm_linkNodes(ms, req);
         });
     }
 
@@ -468,7 +468,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
         return callProc.run("deleteProperties", true, true, req, session, ms -> {
-            return delete.deleteProperties(ms, req);
+            return delete.cm_deleteProperties(ms, req);
         });
     }
 
@@ -476,7 +476,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object updateFriendNode(@RequestBody UpdateFriendNodeRequest req, HttpSession session) {
         return callProc.run("updateFriendNode", true, true, req, session, ms -> {
-            return friend.updateFriendNode(ms, req);
+            return friend.cm_updateFriendNode(ms, req);
         });
     }
 
@@ -484,7 +484,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
         return callProc.run("saveNode", true, true, req, session, ms -> {
-            return edit.saveNode(ms, req);
+            return edit.cm_saveNode(ms, req);
         });
     }
 
@@ -492,7 +492,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object toggleNodeExpanded(@RequestBody SetExpandedRequest req, HttpSession session) {
         return callProc.run("toggleNodeExpanded", true, true, req, session, ms -> {
-            return edit.toggleExpanded(ms, req);
+            return edit.cm_toggleExpanded(ms, req);
         });
     }
 
@@ -500,7 +500,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
         return callProc.run("changePassword", false, false, req, session, ms -> {
-            return user.changePassword(ms, req);
+            return user.cm_changePassword(ms, req);
         });
     }
 
@@ -508,7 +508,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
         return callProc.run("resetPassword", false, false, req, session, ms -> {
-            return user.resetPassword(req);
+            return user.cm_resetPassword(req);
         });
     }
 
@@ -529,7 +529,7 @@ public class AppController extends ServiceBase implements ErrorController {
             // defaults to "p" (primary)
             @RequestParam(value = "att", required = false) String attName, HttpSession session, HttpServletRequest req,
             HttpServletResponse response) {
-        attach.getAttachment(nameOnAdminNode, nameOnUserNode, userName, id, download, gid, attName, req, response);
+        attach.cm_getAttachment(nameOnAdminNode, nameOnUserNode, userName, id, download, gid, attName, req, response);
     }
 
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
@@ -544,7 +544,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "token", required = false) String token,
             @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {
-        attach.getBinary(binId, nodeId, token, download, session, response);
+        attach.cm_getBinary(binId, nodeId, token, download, session, response);
     }
 
     /*
@@ -565,7 +565,7 @@ public class AppController extends ServiceBase implements ErrorController {
         }
 
         callProc.run("file", false, false, null, session, ms -> {
-            attach.getFile(ms, fileName, disposition, response);
+            attach.cm_getFile(ms, fileName, disposition, response);
             return null;
         });
     }
@@ -583,7 +583,7 @@ public class AppController extends ServiceBase implements ErrorController {
         }
 
         callProc.run("exportFriends", false, false, null, session, ms -> {
-            user.exportPeople(ms, response, disposition, NodeType.FRIEND_LIST.s());
+            user.cm_exportPeople(ms, response, disposition, NodeType.FRIEND_LIST.s());
             return null;
         });
     }
@@ -601,7 +601,7 @@ public class AppController extends ServiceBase implements ErrorController {
         }
 
         callProc.run("exportBlocks", false, false, null, session, ms -> {
-            user.exportPeople(ms, response, disposition, NodeType.BLOCKED_USERS.s());
+            user.cm_exportPeople(ms, response, disposition, NodeType.BLOCKED_USERS.s());
             return null;
         });
     }
@@ -615,7 +615,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestHeader HttpHeaders headers, //
             HttpServletRequest request, HttpServletResponse response, HttpSession session) {
         return (ResponseEntity<ResourceRegion>) callProc.run("stream", false, false, null, session, ms -> {
-            return attach.getStreamResource(ms, headers, nodeId, attName);
+            return attach.cm_getStreamResource(ms, headers, nodeId, attName);
         });
     }
 
@@ -624,7 +624,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object parseFiles(@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,
             HttpSession session) {
         return callProc.run("parseFiles", true, true, null, session, ms -> {
-            return attach.parseUploadFiles(ms, uploadFiles);
+            return attach.cm_parseUploadFiles(ms, uploadFiles);
         });
     }
 
@@ -636,7 +636,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
         final String _attName = attName == null ? "" : attName;
         return callProc.run("upload", true, true, null, session, ms -> {
-            return attach.uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
+            return attach.cm_uploadMultipleFiles(ms, _attName, nodeId, uploadFiles, //
                     "true".equalsIgnoreCase(explodeZips));
         });
     }
@@ -645,7 +645,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
         return callProc.run("deleteAttachment", true, true, req, session, ms -> {
-            return attach.deleteAttachment(ms, req);
+            return attach.cm_deleteAttachment(ms, req);
         });
     }
 
@@ -653,7 +653,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object aiGenImage(@RequestBody AIGenImageRequest req, HttpSession session) {
         return callProc.run("aiGenImage", true, true, req, session, ms -> {
-            return attach.aiGenImage(ms, req);
+            return attach.cm_aiGenImage(ms, req);
         });
     }
 
@@ -661,7 +661,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object aiGenSpeech(@RequestBody AIGenSpeechRequest req, HttpSession session) {
         return callProc.run("aiGenSpeech", true, true, req, session, ms -> {
-            return attach.aiGenSpeech(ms, req);
+            return attach.cm_aiGenSpeech(ms, req);
         });
     }
 
@@ -669,7 +669,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
         return callProc.run("uploadFromUrl", true, true, req, session, ms -> {
-            return attach.readFromUrl(ms, req);
+            return attach.cm_readFromUrl(ms, req);
         });
     }
 
@@ -677,7 +677,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
         return callProc.run("anonPageLoad", false, false, req, session, ms -> {
-            return render.anonPageLoad(null, req);
+            return render.cm_anonPageLoad(null, req);
         });
     }
 
@@ -685,7 +685,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
         return callProc.run("nodeSearch", false, false, req, session, ms -> {
-            return search.search(ms, req);
+            return search.cm_search(ms, req);
         });
     }
 
@@ -693,7 +693,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
         return callProc.run("renderDocument", false, false, req, session, ms -> {
-            return search.renderDocument(ms, req);
+            return search.cm_renderDocument(ms, req);
         });
     }
 
@@ -701,7 +701,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object askSubGraph(@RequestBody AskSubGraphRequest req, HttpSession session) {
         return callProc.run("askSubGraph", false, false, req, session, ms -> {
-            return aiUtil.askSubGraph(ms, req);
+            return aiUtil.cm_askSubGraph(ms, req);
         });
     }
 
@@ -709,7 +709,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
         return callProc.run("getFollowers", false, false, req, session, ms -> {
-            return friend.getFollowers(ms, req);
+            return friend.cm_getFollowers(ms, req);
         });
     }
 
@@ -717,7 +717,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
         return callProc.run("getFollowing", false, false, req, session, ms -> {
-            return friend.getFollowing(ms, req);
+            return friend.cm_getFollowing(ms, req);
         });
     }
 
@@ -725,7 +725,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
         return callProc.run("nodeFeed", false, false, req, session, ms -> {
-            return userFeed.generateFeed(ms, req);
+            return userFeed.cm_generateFeed(ms, req);
         });
     }
 
@@ -733,7 +733,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
         return callProc.run("checkMessages", true, true, req, session, ms -> {
-            return userFeed.checkMessages(ms, req);
+            return userFeed.cm_checkMessages(ms, req);
         });
     }
 
@@ -741,7 +741,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
         return callProc.run("getSharedNodes", false, false, req, session, ms -> {
-            return search.getSharedNodes(ms, req);
+            return search.cm_getSharedNodes(ms, req);
         });
     }
 
@@ -749,7 +749,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
         return callProc.run("saveUserPreferences", true, true, req, session, ms -> {
-            return user.saveUserPreferences(req);
+            return user.cm_saveUserPreferences(req);
         });
     }
 
@@ -757,7 +757,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteUserTransactions(@RequestBody DeleteUserTransactionsRequest req, HttpSession session) {
         return callProc.run("deleteUserTransactions", true, true, req, session, ms -> {
-            return user.deleteUserTransactions(ms, req);
+            return user.cm_deleteUserTransactions(ms, req);
         });
     }
 
@@ -765,7 +765,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object addCredit(@RequestBody AddCreditRequest req, HttpSession session) {
         return callProc.run("addCredit", true, true, req, session, ms -> {
-            return user.addCredit(ms, req.getUserId(), req.getAmount());
+            return user.cm_addCredit(ms, req.getUserId(), req.getAmount());
         });
     }
 
@@ -773,7 +773,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
         return callProc.run("getUserProfile", false, false, req, session, ms -> {
-            return user.getUserProfile(req);
+            return user.cm_getUserProfile(req);
         });
     }
 
@@ -781,7 +781,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
         return callProc.run("saveUserProfile", true, true, req, session, ms -> {
-            return user.saveUserProfile(req);
+            return user.cm_saveUserProfile(req);
         });
     }
 
@@ -789,7 +789,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
         return callProc.run("addFriend", true, true, req, session, ms -> {
-            return friend.addFriend(ms, req);
+            return friend.cm_addFriend(ms, req);
         });
     }
 
@@ -797,7 +797,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
         return callProc.run("deleteFriend", true, true, req, session, ms -> {
-            return friend.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
+            return friend.cm_deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
         });
     }
 
@@ -805,7 +805,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
         return callProc.run("blockUser", true, true, req, session, ms -> {
-            return user.blockUsers(ms, req);
+            return user.cm_blockUsers(ms, req);
         });
     }
 
@@ -813,7 +813,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
         return callProc.run("unblockUser", true, true, req, session, ms -> {
-            return friend.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
+            return friend.cm_deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
         });
     }
 
@@ -821,7 +821,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
         return callProc.run("getUserAcccountInfo", false, false, req, session, ms -> {
-            return user.getUserAccountInfo(req);
+            return user.cm_getUserAccountInfo(req);
         });
     }
 
@@ -829,7 +829,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
         return callProc.run("getBookmarks", true, true, req, session, ms -> {
-            return search.getBookmarks(ms, req);
+            return search.cm_getBookmarks(ms, req);
         });
     }
 
@@ -837,7 +837,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
         return callProc.run("signNodes", true, true, req, session, ms -> {
-            return crypto.signNodes(ms, req);
+            return crypto.cm_signNodes(ms, req);
         });
     }
 
@@ -845,7 +845,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object signSubGraph(@RequestBody SignSubGraphRequest req, HttpSession session) {
         return callProc.run("signSubGraph", true, true, req, session, ms -> {
-            return crypto.signSubGraph(req, ms);
+            return crypto.cm_signSubGraph(req, ms);
         });
     }
 
@@ -853,7 +853,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object removeSignatures(@RequestBody RemoveSignaturesRequest req, HttpSession session) {
         return callProc.run("removeSignatures", false, false, req, session, ms -> {
-            return crypto.removeSignatures(ms, req);
+            return crypto.cm_removeSignatures(ms, req);
         });
     }
 
@@ -861,7 +861,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
         return callProc.run("getNodeStats", false, false, req, session, ms -> {
-            return search.getNodeStats(ms, req);
+            return search.cm_getNodeStats(ms, req);
         });
     }
 
@@ -869,7 +869,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getNodeJson(@RequestBody GetNodeJsonRequest req, HttpSession session) {
         return callProc.run("getNodeJson", false, false, req, session, ms -> {
-            return edit.getNodeJson(ms, req);
+            return edit.cm_getNodeJson(ms, req);
         });
     }
 
@@ -877,7 +877,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object saveNodeJson(@RequestBody SaveNodeJsonRequest req, HttpSession session) {
         return callProc.run("SaveNodeJson", false, false, req, session, ms -> {
-            return edit.saveNodeJson(ms, req);
+            return edit.cm_saveNodeJson(ms, req);
         });
     }
 
@@ -885,7 +885,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
         return callProc.run("getServerInfo", true, true, req, session, ms -> {
-            return system.getServerInfo(req, ms);
+            return system.cm_getServerInfo(req, ms);
         });
     }
 
@@ -893,21 +893,21 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
         return callProc.run("graphNodes", false, false, req, session, ms -> {
-            return graphNodes.graphNodes(ms, req);
+            return graphNodes.cm_graphNodes(ms, req);
         });
     }
 
     @RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String health() {
-        return system.getHealth();
+        return system.cm_getHealth();
     }
 
     @RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
     @ResponseBody
     public Object ping(@RequestBody PingRequest req, HttpSession session) {
         return callProc.run("ping", false, false, req, session, ms -> {
-            return system.ping();
+            return system.cm_ping();
         });
     }
 
@@ -915,7 +915,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
         return callProc.run("sendTestEmail", true, true, req, session, ms -> {
-            return system.sendTestEmail();
+            return system.cm_sendTestEmail();
         });
     }
 
@@ -923,7 +923,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
         return callProc.run("sendLogText", true, true, req, session, ms -> {
-            return system.sendLogText(req);
+            return system.cm_sendLogText(req);
         });
     }
 
@@ -931,7 +931,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object importJson(@RequestBody ImportJsonRequest req, HttpSession session) {
         return callProc.run("importJson", true, true, req, session, ms -> {
-            return edit.importJson(ms, req);
+            return edit.cm_importJson(ms, req);
         });
     }
 
@@ -939,7 +939,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object generateBookByAI(@RequestBody GenerateBookByAIRequest req, HttpSession session) {
         return callProc.run("generateBookByAI", true, true, req, session, ms -> {
-            return aiUtil.generateBookByAI(ms, req);
+            return aiUtil.cm_generateBookByAI(ms, req);
         });
     }
 
@@ -947,7 +947,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object sendFeedback(@RequestBody SendFeedbackRequest req, HttpSession session) {
         return callProc.run("sendFeedback", false, false, req, session, ms -> {
-            return user.sendFeedback(ms, req);
+            return user.cm_sendFeedback(ms, req);
         });
     }
 
@@ -955,21 +955,21 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
         return callProc.run("splitNode", true, true, req, session, ms -> {
-            return edit.splitNode(ms, req);
+            return edit.cm_splitNode(ms, req);
         });
     }
 
     @GetMapping(API_PATH + "/serverPush/{token}")
     public SseEmitter serverPush(@PathVariable(value = "token", required = true) String token, //
             HttpSession session) {
-        return system.serverPush(token);
+        return system.cm_serverPush(token);
     }
 
     @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_GIF_VALUE)
     @ResponseBody
     public byte[] captcha(HttpSession session) {
         return (byte[]) callProc.run("captcha", false, false, null, session, ms -> {
-            return CaptchaMaker.getCaptcha();
+            return CaptchaMaker.cm_getCaptcha();
         });
     }
 

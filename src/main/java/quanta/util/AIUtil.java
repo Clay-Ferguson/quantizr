@@ -205,7 +205,7 @@ public class AIUtil extends ServiceBase {
         return curBal.subtract(cost);
     }
 
-    public AskSubGraphResponse askSubGraph(MongoSession ms, AskSubGraphRequest req) {
+    public AskSubGraphResponse cm_askSubGraph(MongoSession ms, AskSubGraphRequest req) {
         AskSubGraphResponse res = new AskSubGraphResponse();
 
         // todo-2: in future use cases we'd want to allow includeComments setting
@@ -383,7 +383,7 @@ public class AIUtil extends ServiceBase {
                 || node.getTags().contains("#section") || node.getTags().contains("#subsection"));
     }
 
-    public GenerateBookByAIResponse generateBookByAI(MongoSession ms, GenerateBookByAIRequest req) {
+    public GenerateBookByAIResponse cm_generateBookByAI(MongoSession ms, GenerateBookByAIRequest req) {
         GenerateBookByAIResponse res = new GenerateBookByAIResponse();
 
         // node that will be the parent of the book

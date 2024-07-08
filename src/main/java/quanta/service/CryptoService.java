@@ -182,7 +182,7 @@ public class CryptoService extends ServiceBase {
         }
     }
 
-    public SignNodesResponse signNodes(MongoSession ms, SignNodesRequest req) {
+    public SignNodesResponse cm_signNodes(MongoSession ms, SignNodesRequest req) {
         // if the signPendingQueue contains the workload we assume it's the same workload, which is fine
         // because we aren't doing that security right here.
         if (sigPendingQueue.containsKey(req.getWorkloadId())) {
@@ -378,7 +378,7 @@ public class CryptoService extends ServiceBase {
         return totalTime < 30000;
     }
 
-    public Object signSubGraph(SignSubGraphRequest req, MongoSession ms) {
+    public Object cm_signSubGraph(SignSubGraphRequest req, MongoSession ms) {
         // run the signing in an async thread, so we can push messages back to browser from it without
         // any session mutexing getting in the way
         exec.run(() -> {
@@ -387,7 +387,7 @@ public class CryptoService extends ServiceBase {
         return new SignSubGraphResponse();
     }
 
-    public Object removeSignatures(MongoSession ms, RemoveSignaturesRequest req) {
+    public Object cm_removeSignatures(MongoSession ms, RemoveSignaturesRequest req) {
         SubNode node = read.getNode(ms, req.getNodeId());
         String sigProp = SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s();
 
@@ -455,7 +455,7 @@ public class CryptoService extends ServiceBase {
      * generates the hash of all subnodes, and will just stick thas hash into a property on the top
      * parent node (req.nodeId)
      */
-    public SubGraphHashResponse subGraphHash(MongoSession ms, SubGraphHashRequest req) {
+    public SubGraphHashResponse cm_subGraphHash(MongoSession ms, SubGraphHashRequest req) {
         SubGraphHashResponse res = new SubGraphHashResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
@@ -515,7 +515,7 @@ public class CryptoService extends ServiceBase {
         return res;
     }
 
-    public SavePublicKeyResponse savePublicKeys(SavePublicKeyRequest req) {
+    public SavePublicKeyResponse cm_savePublicKeys(SavePublicKeyRequest req) {
         SavePublicKeyResponse res = new SavePublicKeyResponse();
         String userName = ThreadLocals.getSC().getUserName();
         arun.run(as -> {

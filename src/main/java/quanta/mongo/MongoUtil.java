@@ -204,7 +204,7 @@ public class MongoUtil extends ServiceBase {
                     signupReq.setUserName(userName);
                     signupReq.setPassword(accountInfoList.get(1));
                     signupReq.setEmail(accountInfoList.get(2));
-                    user.signup(signupReq, true);
+                    user.cm_signup(signupReq, true);
                 } else {
                     log.debug("account exists: " + userName);
                 }

@@ -233,7 +233,7 @@ public class SystemService extends ServiceBase {
         return ("Redis PubSub Published: " + XString.prettyPrint(msg));
     }
 
-    public Object export(ExportRequest req, MongoSession ms) {
+    public Object cm_export(ExportRequest req, MongoSession ms) {
         ExportResponse res = new ExportResponse();
 
         arun.run(as -> {
@@ -285,7 +285,7 @@ public class SystemService extends ServiceBase {
         return res;
     }
 
-    public Object getServerInfo(GetServerInfoRequest req, MongoSession ms) {
+    public Object cm_getServerInfo(GetServerInfoRequest req, MongoSession ms) {
         GetServerInfoResponse res = new GetServerInfoResponse();
         res.setMessages(new LinkedList<>());
         if (req.getCommand().equalsIgnoreCase("getJson")) {
@@ -355,7 +355,7 @@ public class SystemService extends ServiceBase {
         return res;
     }
 
-    public String getHealth() {
+    public String cm_getHealth() {
         return "Health Check\n\n" + //
                 "Ver: " + prop.getAppVersion() + "\n" + //
                 "Server Time: " + System.currentTimeMillis() + "\n" + //
@@ -367,13 +367,13 @@ public class SystemService extends ServiceBase {
      * Used to keep session from timing out when browser is doing something long-running like playing an
      * audio file, and the user may not be interacting at all.
      */
-    public Object ping() {
+    public Object cm_ping() {
         PingResponse res = new PingResponse();
         res.setServerInfo("Server: t=" + System.currentTimeMillis() + " SwarmTaskId=" + prop.getSwarmTaskId());
         return res;
     }
 
-    public Object sendTestEmail() {
+    public Object cm_sendTestEmail() {
         SendTestEmailResponse res = new SendTestEmailResponse();
         ThreadLocals.requireAdmin();
         log.debug("SendEmailTest detected on server.");
@@ -389,7 +389,7 @@ public class SystemService extends ServiceBase {
         return res;
     }
 
-    public Object sendLogText(SendLogTextRequest req) {
+    public Object cm_sendLogText(SendLogTextRequest req) {
         ThreadLocals.requireAdmin();
         SendLogTextResponse res = new SendLogTextResponse();
         log.debug("DEBUG: " + req.getText());
@@ -398,7 +398,7 @@ public class SystemService extends ServiceBase {
         return res;
     }
 
-    public SseEmitter serverPush(String token) {
+    public SseEmitter cm_serverPush(String token) {
         if (StringUtils.isEmpty(token)) {
             throw new RuntimeException("No token for serverPush");
         }

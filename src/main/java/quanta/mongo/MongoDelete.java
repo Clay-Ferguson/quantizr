@@ -645,7 +645,7 @@ public class MongoDelete extends ServiceBase {
         opsw.remove(ms, q);
     }
 
-    public Object delete(DeleteNodesRequest req, MongoSession ms) {
+    public Object cm_delete(DeleteNodesRequest req, MongoSession ms) {
         if (req.isBulkDelete()) {
             return delete.bulkDeleteNodes(ms);
         } else {
@@ -656,7 +656,7 @@ public class MongoDelete extends ServiceBase {
     /*
      * Removes the property specified in the request from the node specified in the request
      */
-    public DeletePropertyResponse deleteProperties(MongoSession ms, DeletePropertyRequest req) {
+    public DeletePropertyResponse cm_deleteProperties(MongoSession ms, DeletePropertyRequest req) {
         DeletePropertyResponse res = new DeletePropertyResponse();
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
