@@ -19,7 +19,9 @@ cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.x
 cd ${PRJROOT}
 dockerDown
 dockerUp
-runInitReplica
+
+# only required to run once to initialize the replica set
+# runInitReplica
 
 # commenting this out, and doing it in compose file instead.
 # echo "Scaling Replicas"

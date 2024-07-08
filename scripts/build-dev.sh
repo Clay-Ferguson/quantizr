@@ -59,7 +59,9 @@ dockerUp
 
 serviceCheck ${docker_stack}_quanta-dev
 serviceCheck ${docker_stack}_mongo-dev
-runInitReplica
+
+# only required to run once to initialize the replica set
+# runInitReplica
 
 echo "Waiting 20s for server to initialize..."
 sleep 20s

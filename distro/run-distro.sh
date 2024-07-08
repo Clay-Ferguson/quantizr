@@ -48,6 +48,8 @@ dockerUp
 
 serviceCheck ${docker_stack}_quanta-distro
 serviceCheck ${docker_stack}_mongo-distro
-runInitReplica
+
+# only required to run once to initialize the replica set
+#runInitReplica
 
 printUrlsMessage
