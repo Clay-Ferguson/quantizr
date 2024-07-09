@@ -25,6 +25,9 @@ import quanta.util.ThreadLocals;
 /**
  * This is a level of indirection around MongoTemplate so we can do various cross-cutting concerns,
  * like logging, security, etc.
+ * 
+ * currently I'm adding onAfterLoad calls to this class, but I need to also be sure all
+ * BulkOperations are also ran thru that method, probably by being wrapped into this class.
  */
 @Component
 public class MongoTemplateWrapper extends ServiceBase {
@@ -62,11 +65,17 @@ public class MongoTemplateWrapper extends ServiceBase {
     }
 
     public List<SubNode> find(MongoSession ms, Query query) {
-        return executeOperation(ms, query, "find", () -> mt.find(query, SubNode.class));
+        List<SubNode> nodes = executeOperation(ms, query, "find", () -> mt.find(query, SubNode.class));
+        if (nodes != null)
+            nodes.forEach(n -> mongoUtil.validate(n));
+        return nodes;
     }
 
     public SubNode findOne(MongoSession ms, Query query) {
-        return executeOperation(ms, query, "findOne", () -> mt.findOne(query, SubNode.class));
+        SubNode node = executeOperation(ms, query, "findOne", () -> mt.findOne(query, SubNode.class));
+        if (node != null)
+            mongoUtil.validate(node);
+        return node;
     }
 
     public SubNode findById(MongoSession ms, Object id) {
@@ -74,14 +83,17 @@ public class MongoTemplateWrapper extends ServiceBase {
             return null;
 
         return executeOperation(ms, null, "findById", () -> {
-            SubNode obj = mt.findById(id, SubNode.class);
+            SubNode node = mt.findById(id, SubNode.class);
 
-            // Note: Since this method doesn't accept a query object, we can't have secured the query before
-            // calling this method like all other class methods do, so we check 'readAuth' here
-            if (obj != null && ms != null) {
-                auth.readAuth(ms, obj);
+            if (node != null) {
+                mongoUtil.validate(node);
+                // Note: Since this method doesn't accept a query object, we can't have secured the query before
+                // calling this method like all other class methods do, so we check 'readAuth' here
+                if (ms != null) {
+                    auth.readAuth(ms, node);
+                }
             }
-            return obj;
+            return node;
         });
     }
 
@@ -90,10 +102,18 @@ public class MongoTemplateWrapper extends ServiceBase {
     }
 
     public AggregationResults<SubNode> aggregate(Aggregation aggregation) {
-        return mt.aggregate(aggregation, SubNode.class, SubNode.class);
+        AggregationResults<SubNode> ret = mt.aggregate(aggregation, SubNode.class, SubNode.class);
+
+        // call onAfterLoad on all results
+        if (ret != null && ret.getMappedResults() != null) {
+            ret.getMappedResults().forEach(n -> mongoUtil.validate(n));
+        }
+
+        return ret;
     }
 
     public SubNode save(SubNode node) {
+        mongoUtil.validate(node);
         return mt.save(node);
     }
 
@@ -106,7 +126,11 @@ public class MongoTemplateWrapper extends ServiceBase {
     }
 
     public Stream<SubNode> stream(Query query) {
-        return mt.stream(query, SubNode.class);
+        Stream<SubNode> ret = mt.stream(query, SubNode.class);
+
+        // call onAfterLoad on all results
+        ret.forEach(n -> mongoUtil.validate(n));
+        return ret;
     }
 
     public SubNode findAndModify(Query query, UpdateDefinition update) {

@@ -234,6 +234,7 @@ public class MongoDelete extends ServiceBase {
                 bops.setVal(null);
             }
         });
+
         if (bops.hasVal()) {
             bops.getVal().execute();
         }

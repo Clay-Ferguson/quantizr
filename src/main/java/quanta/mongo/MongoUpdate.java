@@ -63,16 +63,12 @@ public class MongoUpdate extends ServiceBase {
 
         beforeSave(node);
 
-        // if not doing allowAuth, we need to be sure the thread has admin session
-        // because the MongoEventListener looks in threadlocals for auth
         if (!allowAuth) {
             arun.run(as -> {
                 opsw.save(node);
                 return null;
             });
         }
-        // otherwise leave same/current threadlocals as is and MongoEventListener will auth based
-        // on this
         else {
             opsw.save(node);
         }
@@ -169,7 +165,6 @@ public class MongoUpdate extends ServiceBase {
         return bops;
     }
 
-    // Originally from MongoEventListener onBeforeSave
     public void beforeSave(SubNode node) {
         ObjectId id = node.getId();
         boolean isNew = false;

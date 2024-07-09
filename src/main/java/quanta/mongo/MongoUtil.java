@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import quanta.rest.request.SignupRequest;
 import quanta.util.Const;
 import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
+import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
@@ -62,6 +64,36 @@ public class MongoUtil extends ServiceBase {
      * removed R and L because we have /r/usr/R and /r/usr/L for remote and local users.
      */
     static final String PATH_CHARS = "0123456789ABCDEFGHIJKMNOPQSTUVWXYZabcdefghijklmnoqstuvwxyz";
+
+    public void validate(SubNode node) {
+        if (ThreadLocals.hasDirtyNode(node.getId())) {
+            log.warn("DIRTY READ (onAfterLoad): " + node.getIdStr());
+        }
+
+        if (node.getOwner() == null) {
+            throw new RuntimeException("Node has no owner: " + node.getIdStr());
+            // if (auth.getAdminSession() != null) {
+            // node.setOwner(auth.getAdminSession().getUserNodeId());
+            // log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
+            // }
+        }
+
+        // Extra protection to be sure accounts and repo root can't have any sharing
+        if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
+            if (node.getAc() != null) {
+                throw new RuntimeException(
+                    "Node of type " + node.getType() + " cannot have any sharing: " + node.getIdStr());
+            }
+        }
+
+        // home nodes are always unpublished
+        if (Const.HOME_NODE_NAME.equalsIgnoreCase(node.getName())) {
+            node.set(NodeProp.UNPUBLISHED, true);
+        }
+
+        node.fixAttachments();
+        node.verifyParentPath = StringUtils.isEmpty(node.getPath());
+    }
 
     /*
      * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or
@@ -268,11 +300,6 @@ public class MongoUtil extends ServiceBase {
         // nodesProcessed.setVal(nodesProcessed.getVal() + 1);
         // if (nodesProcessed.getVal() % 1000 == 0) {
         // }
-        // // /*
-        // // NOTE: MongoEventListener#onBeforeSave runs in here, which is where some
-        // of
-        // // the workload is done that pertains ot this reSave process
-        // ///
         // save(session, node, true, false);
         // });
     }

@@ -79,12 +79,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return factory;
     }
 
-    // DO NOT REMOVE THIS. IT IS REQUIRED FOR THIS BEAN TO WORK.
-    @Bean
-    public MongoEventListener userCascadingMongoEventListener() {
-        return new MongoEventListener();
-    }
-
     @Bean
     CustomMongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
         return new CustomMongoTransactionManager(dbFactory);
