@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -166,6 +167,7 @@ public class UserManagerService extends ServiceBase {
      * Note that this function does 'succeed' even with ANON user given, and just considers that an
      * anonymouse user
      */
+    @Transactional
     public LoginResponse cm_login(HttpServletRequest httpReq, LoginRequest req) {
         LoginResponse res = new LoginResponse();
         SessionContext sc = ThreadLocals.getSC();
@@ -304,6 +306,7 @@ public class UserManagerService extends ServiceBase {
         update.save(ms, userNode);
     }
 
+    @Transactional
     public CloseAccountResponse cm_closeAccount(CloseAccountRequest req, HttpSession session) {
         CloseAccountResponse res = new CloseAccountResponse();
         log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
@@ -412,6 +415,7 @@ public class UserManagerService extends ServiceBase {
      * all other user accounts all information specific to that user that we currently know is held in
      * that node (i.e. preferences)
      */
+    @Transactional
     public SignupResponse cm_signup(SignupRequest req, boolean automated) {
         SignupResponse res = new SignupResponse();
         res.setCode(HttpServletResponse.SC_OK);
@@ -535,6 +539,7 @@ public class UserManagerService extends ServiceBase {
         return false;
     }
 
+    @Transactional
     public DeleteUserTransactionsResponse cm_deleteUserTransactions(MongoSession as, DeleteUserTransactionsRequest req) {
         ThreadLocals.requireAdmin();
         DeleteUserTransactionsResponse res = new DeleteUserTransactionsResponse();
@@ -542,6 +547,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    @Transactional
     public AddCreditResponse cm_addCredit(MongoSession as, String userId, BigDecimal amount) {
         ThreadLocals.requireAdmin();
         AddCreditResponse res = new AddCreditResponse();
@@ -636,6 +642,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    @Transactional
     public SaveUserProfileResponse cm_saveUserProfile(SaveUserProfileRequest req) {
         SaveUserProfileResponse res = new SaveUserProfileResponse();
         String userName = ThreadLocals.getSC().getUserName();
@@ -909,6 +916,7 @@ public class UserManagerService extends ServiceBase {
     /*
      * Runs when user is doing the 'change password' or 'reset password'
      */
+    @Transactional
     public ChangePasswordResponse cm_changePassword(MongoSession ms, ChangePasswordRequest req) {
         ChangePasswordResponse res = new ChangePasswordResponse();
         ms = ThreadLocals.ensure(ms);
@@ -1221,6 +1229,7 @@ public class UserManagerService extends ServiceBase {
         return quota - binTotal;
     }
 
+    @Transactional
     public Object cm_logout(HttpSession session) {
         redis.delete(ThreadLocals.getSC());
         ThreadLocals.getSC().forceAnonymous();

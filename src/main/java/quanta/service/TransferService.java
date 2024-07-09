@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Constant;
@@ -22,6 +23,7 @@ public class TransferService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(TransferService.class);
 
     // todo-2: need to be doing a bulk update in here.
+    @Transactional
     public TransferNodeResponse cm_transferNode(MongoSession ms, TransferNodeRequest req) {
         TransferNodeResponse res = new TransferNodeResponse();
         // make sure only admin will be allowed to specify some arbitrary "fromUser"

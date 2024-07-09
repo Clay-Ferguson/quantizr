@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
 import quanta.config.NodePath;
@@ -656,6 +657,7 @@ public class MongoDelete extends ServiceBase {
     /*
      * Removes the property specified in the request from the node specified in the request
      */
+    @Transactional
     public DeletePropertyResponse cm_deleteProperties(MongoSession ms, DeletePropertyRequest req) {
         DeletePropertyResponse res = new DeletePropertyResponse();
         String nodeId = req.getNodeId();

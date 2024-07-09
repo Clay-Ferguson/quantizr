@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -47,6 +48,7 @@ public class NodeMoveService extends ServiceBase {
      * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be the
      * first node under its parent.
      */
+    @Transactional
     public SetNodePositionResponse cm_setNodePosition(MongoSession ms, SetNodePositionRequest req) {
         SetNodePositionResponse res = new SetNodePositionResponse();
         NodeChanges nodeChanges = new NodeChanges();
@@ -200,6 +202,7 @@ public class NodeMoveService extends ServiceBase {
     /*
      * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
      */
+    @Transactional
     public MoveNodesResponse cm_moveNodes(MongoSession ms, MoveNodesRequest req) {
         MoveNodesResponse res = new MoveNodesResponse();
         ms = ThreadLocals.ensure(ms);

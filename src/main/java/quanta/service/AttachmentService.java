@@ -49,6 +49,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.transaction.annotation.Transactional;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -126,6 +127,7 @@ public class AttachmentService extends ServiceBase {
     /*
      * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
      */
+    @Transactional
     public ResponseBase cm_uploadMultipleFiles(MongoSession ms, String attName, String nodeId, MultipartFile[] files,
             boolean explodeZips) {
         if (nodeId == null) {
@@ -393,6 +395,7 @@ public class AttachmentService extends ServiceBase {
     /*
      * Removes the attachment from the node specified in the request.
      */
+    @Transactional
     public DeleteAttachmentResponse cm_deleteAttachment(MongoSession ms, DeleteAttachmentRequest req) {
         DeleteAttachmentResponse res = new DeleteAttachmentResponse();
         String nodeId = req.getNodeId();
@@ -1110,6 +1113,7 @@ public class AttachmentService extends ServiceBase {
         return totalBytes.getVal();
     }
 
+    @Transactional
     public PasteAttachmentsResponse cm_pasteAttachments(MongoSession ms, PasteAttachmentsRequest req) {
         PasteAttachmentsResponse res = new PasteAttachmentsResponse();
         SubNode sourceNode = read.getNode(ms, req.getSourceNodeId());

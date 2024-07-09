@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -182,6 +183,7 @@ public class CryptoService extends ServiceBase {
         }
     }
 
+    @Transactional
     public SignNodesResponse cm_signNodes(MongoSession ms, SignNodesRequest req) {
         // if the signPendingQueue contains the workload we assume it's the same workload, which is fine
         // because we aren't doing that security right here.
@@ -378,6 +380,7 @@ public class CryptoService extends ServiceBase {
         return totalTime < 30000;
     }
 
+    @Transactional
     public Object cm_signSubGraph(SignSubGraphRequest req, MongoSession ms) {
         // run the signing in an async thread, so we can push messages back to browser from it without
         // any session mutexing getting in the way
@@ -387,6 +390,7 @@ public class CryptoService extends ServiceBase {
         return new SignSubGraphResponse();
     }
 
+    @Transactional
     public Object cm_removeSignatures(MongoSession ms, RemoveSignaturesRequest req) {
         SubNode node = read.getNode(ms, req.getNodeId());
         String sigProp = SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s();

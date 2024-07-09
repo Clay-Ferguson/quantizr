@@ -65,6 +65,7 @@ import quanta.util.XString;
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
+    @Transactional
     public LikeNodeResponse cm_likeNode(MongoSession ms, LikeNodeRequest req) {
         LikeNodeResponse res = new LikeNodeResponse();
         exec.run(() -> {
@@ -98,6 +99,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    @Transactional
     public SaveNodeResponse cm_saveNode(MongoSession ms, SaveNodeRequest req) {
         SaveNodeResponse res = new SaveNodeResponse();
         NodeInfo nodeInfo = req.getNode();
@@ -285,6 +287,7 @@ public class NodeEditService extends ServiceBase {
      * representation of the JSON, with each key/value pair (and/or array content) in the JSON being a
      * node.
      */
+    @Transactional
     public ImportJsonResponse cm_importJson(MongoSession ms, ImportJsonRequest req) {
         ImportJsonResponse res = new ImportJsonResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
@@ -481,6 +484,7 @@ public class NodeEditService extends ServiceBase {
      *
      * req.splitType == 'inline' || 'children'
      */
+    @Transactional
     public SplitNodeResponse cm_splitNode(MongoSession ms, SplitNodeRequest req) {
         SplitNodeResponse res = new SplitNodeResponse();
         NodeChanges nodeChanges = new NodeChanges();
@@ -706,6 +710,7 @@ public class NodeEditService extends ServiceBase {
                 }
             }
         }
+        update.saveSession(ms);
         res.setMessage(String.valueOf(replacements) + " nodes were updated.");
         return res;
     }
@@ -732,6 +737,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
+    @Transactional
     public SaveNodeJsonResponse cm_saveNodeJson(MongoSession ms, SaveNodeJsonRequest req) {
         SaveNodeJsonResponse res = new SaveNodeJsonResponse();
         ThreadLocals.requireAdmin();

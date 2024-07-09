@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -67,6 +68,7 @@ public class AclService extends ServiceBase {
         return res;
     }
 
+    @Transactional
     public CopySharingResponse cm_copySharing(MongoSession ms, CopySharingRequest req) {
         CopySharingResponse res = new CopySharingResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
@@ -121,6 +123,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new privilege to a node
      */
+    @Transactional
     public AddPrivilegeResponse cm_addPrivilege(MongoSession ms, AddPrivilegeRequest req) {
         AddPrivilegeResponse res = new AddPrivilegeResponse();
         String nodeId = req.getNodeId();
@@ -141,6 +144,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new privilege to a node
      */
+    @Transactional
     public SetUnpublishedResponse cm_setUnpublished(MongoSession ms, SetUnpublishedRequest req) {
         SetUnpublishedResponse res = new SetUnpublishedResponse();
         String nodeId = req.getNodeId();
@@ -350,6 +354,7 @@ public class AclService extends ServiceBase {
     /*
      * Removes the privilege specified in the request from the node specified in the request
      */
+    @Transactional
     public RemovePrivilegeResponse cm_removePrivilege(MongoSession ms, RemovePrivilegeRequest req) {
         RemovePrivilegeResponse res = new RemovePrivilegeResponse();
         String nodeId = req.getNodeId();

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
@@ -95,6 +96,7 @@ public class FriendService extends ServiceBase {
         }
     }
 
+    @Transactional
     public DeleteFriendResponse cm_deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
         DeleteFriendResponse res = new DeleteFriendResponse();
         ms = ThreadLocals.ensure(ms);
@@ -204,6 +206,7 @@ public class FriendService extends ServiceBase {
      * Adds all the users in 'req.userName' (as a newline elimited list) as new friends of the current
      * user
      */
+    @Transactional
     public AddFriendResponse cm_addFriend(MongoSession ms, AddFriendRequest req) {
         AddFriendResponse res = new AddFriendResponse();
         String userDoingAction = ThreadLocals.getSC().getUserName();

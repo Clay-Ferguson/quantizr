@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import quanta.config.ServiceBase;
 import quanta.mongo.MongoSession;
@@ -20,6 +21,7 @@ import quanta.util.ThreadLocals;
 public class ImportService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
+    @Transactional
     public ResponseEntity<?> cm_streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
         if (nodeId == null) {
             throw ExUtil.wrapEx("target nodeId not provided");
