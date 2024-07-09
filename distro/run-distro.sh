@@ -50,6 +50,6 @@ serviceCheck ${docker_stack}_quanta-distro
 serviceCheck ${docker_stack}_mongo-distro
 
 # only required to run once to initialize the replica set
-#runInitReplica
+# runInitReplica
 
 printUrlsMessage

@@ -19,6 +19,8 @@ IMAGE_NAME="mongo:6.0.8"
 
 # Get the container ID based on the image name
 CONTAINER_ID=$(docker ps --format "{{.ID}} {{.Image}}" | grep "$IMAGE_NAME" | awk '{print $1}')
+# NOTE: THIS IS THE CORRECT WAY TO GET CONTAINER_ID (note the wildcard)
+# CONTAINER_ID=$(docker ps -q -f name=SomeNamePrefix*)
 
 # Check if a container was found
 if [ -z "$CONTAINER_ID" ]; then
