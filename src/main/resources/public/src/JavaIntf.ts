@@ -1389,7 +1389,6 @@ export const enum NodeType {
 }
 
 export const enum PrincipalName {
-    FOLLOW_BOT = "FollowBot",
     ANON = "anonymous",
     ADMIN = "admin",
     PUBLIC = "public",

@@ -163,12 +163,10 @@ public class FriendService extends ServiceBase {
         if (userNode == null)
             return;
 
-        // follower bot never blocks people, so we can avoid calling that if follower bot.
-        if (!userDoingFollow.equals(PrincipalName.FOLLOW_BOT.s())) {
-            // We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
-            // the DB enforcing this.
-            cm_deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
-        }
+        // We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
+        // the DB enforcing this.
+        cm_deleteFriend(ms, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
+
         log.trace("Creating friendNode for " + userToFollow);
         friendNode = createFriendNode(ms, followerFriendList, userToFollow, tags);
         if (friendNode != null) {
