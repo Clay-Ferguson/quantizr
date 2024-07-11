@@ -215,7 +215,9 @@ public class MongoDelete extends ServiceBase {
         // this hash set just makes sure we only submit each val set once! No replicated work.
         HashSet<ObjectId> parentIds = new HashSet<>();
 
-        opsw.stream(q).forEach(node -> {
+        opsw.forEach(q, node -> {
+            mongoUtil.validate(node); // todo-0: try to encapsulate this into some kind of wrapped stream
+
             // lazy create bops
             if (!bops.hasVal()) {
                 bops.setVal(opsw.bulkOps(BulkMode.UNORDERED));
@@ -293,7 +295,9 @@ public class MongoDelete extends ServiceBase {
             // starting a new pass, so zero deletes so far in this pass
             deletesInPass.setVal(0L);
             // scan the entire DB
-            opsw.stream(new Query()).forEach(node -> {
+            opsw.forEach(new Query(), node -> {
+                mongoUtil.validate(node); // todo-0: try to encapsulate this into some kind of wrapped stream
+
                 // if this node is root node, ignore
                 if (NodePath.ROOT_PATH.equals(node.getPath()))
                     return;
@@ -371,7 +375,9 @@ public class MongoDelete extends ServiceBase {
         // map every path to it's ObjectId
         HashMap<String, ObjectId> allNodes = new HashMap<>();
         // first all we do is build up the 'allNodes' hashMap.
-        opsw.stream(new Query()).forEach(node -> {
+        opsw.forEach(new Query(), node -> {
+            mongoUtil.validate(node); // todo-0: try to encapsulate this into some kind of wrapped stream
+            
             // print progress every 1000th node
             nodesProcessed.inc();
             if (nodesProcessed.getVal() % 1000 == 0) {

@@ -1,8 +1,8 @@
 package quanta.mongo;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,12 +125,11 @@ public class MongoTemplateWrapper extends ServiceBase {
         return mt.remove(object);
     }
 
-    public Stream<SubNode> stream(Query query) {
-        Stream<SubNode> ret = mt.stream(query, SubNode.class);
-
-        // call onAfterLoad on all results
-        ret.forEach(n -> mongoUtil.validate(n));
-        return ret;
+    public void forEach(Query query, Consumer<SubNode> consumer) {
+        mt.stream(query, SubNode.class).forEach(n -> {
+            mongoUtil.validate(n);
+            consumer.accept(n);
+        });
     }
 
     public SubNode findAndModify(Query query, UpdateDefinition update) {

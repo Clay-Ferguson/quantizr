@@ -318,7 +318,9 @@ public class CryptoService extends ServiceBase {
 
         BooleanVal failed = new BooleanVal();
 
-        opsw.stream(query).forEach(node -> {
+        opsw.forEach(query, node -> {
+            mongoUtil.validate(node); // todo-0: try to encapsulate this into some kind of wrapped stream
+
             // make sure session is still alive
             if (failed.getVal() || !sc.isLive())
                 return;
@@ -412,7 +414,9 @@ public class CryptoService extends ServiceBase {
         update.bulkOpDelProp(ms, bops.getVal(), node.getId(), sigProp);
         IntVal batchSize = new IntVal(1);
 
-        opsw.stream(query).forEach(n -> {
+        opsw.forEach(query, n -> {
+            mongoUtil.validate(node); // todo-0: try to encapsulate this into some kind of wrapped stream
+            
             // lazy create bops
             if (!bops.hasVal()) {
                 bops.setVal(opsw.bulkOps(BulkMode.UNORDERED));
