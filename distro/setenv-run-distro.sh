@@ -42,6 +42,9 @@ export PGADMIN_DATA=${DEPLOY_TARGET}/pgadmin
 export MONGO_HOST=mongo-host-distro
 export MONGO_PORT=27017
 
+export QAI_HOST=qai-host-distro
+export QAI_PORT=8187
+
 export DOCKER_DOWN_DELAY=15s
 export DOCKER_UP_DELAY=20s
 

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -12,17 +13,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeType;
-import quanta.model.client.anthropic.AnthChatResponse;
-import quanta.model.client.anthropic.AnthUsage;
-import quanta.model.client.openai.ChatGPTRequest;
-import quanta.model.client.openai.ChatMessage;
 import quanta.model.client.openai.SystemConfig;
+import quanta.model.qai.AIMessage;
+import quanta.model.qai.AIRequest;
+import quanta.model.qai.AIResponse;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
-/* Anthropic */
+/* Originally the Anthropic Service, but we will now begin to subsume all other services into this class as well 
+ * since the abstraction layer to handle different AI Cloud providers differently is now encapsulated in the microservice.
+ * 
+*/
 @Component
 public class AnthAiService extends ServiceBase {
     String ANTH_COMP_URL = "https://api.anthropic.com/v1/messages";
@@ -35,25 +39,24 @@ public class AnthAiService extends ServiceBase {
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(AnthAiService.class);
 
-    /**
-     * Queries Anthropic AI using the 'node.content' as the question to ask.
-     * 
-     * You can pass a node, or else 'text' to query about.
-     */
-    public AnthChatResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system,
-            String model) {
-
+    public AIResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system, String model, Val<BigDecimal> userCredit) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
+
+        // todo-0: need to pass this into the microservice so it can precalculate how much they can potentially cost in this
+        // transaction and ensure they have enough balance.
         BigDecimal balance = aiUtil.getBalance(ms, userNode);
 
         // this will hold all the prior chat history
-        List<ChatMessage> messages = new ArrayList<>();
-
+        List<AIMessage> messages = new ArrayList<>();
         if (system == null) {
             system = new SystemConfig();
+        }
+
+        if (StringUtils.isEmpty(system.getPrompt())) {
+            system.setPrompt("You are a helpful assistant.");
         }
 
         if (node != null) {
@@ -68,44 +71,44 @@ public class AnthAiService extends ServiceBase {
         }
 
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
-        messages.add(new ChatMessage("user", input));
         system.setModel(model);
+        aiUtil.ensureDefaults(system);
 
-        WebClient webClient = Util.webClientBuilder().baseUrl(ANTH_COMP_URL) //
+        String QAI_URL = "http://" + prop.getQuantaAIHost() + ":" + prop.getQuantaAIPort() + "/api/query";
+        WebClient webClient = Util.webClientBuilder().baseUrl(QAI_URL) //
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) //
-                .defaultHeader("x-api-key", prop.getAnthAiKey()) //
-                .defaultHeader("anthropic-version", API_VERSION) //
+                .defaultHeader("X-api-key", prop.getAnthAiKey()) //
                 .build();
 
-        aiUtil.ensureDefaults(system);
-        ChatGPTRequest request = new ChatGPTRequest(system.getModel(), messages, system.getTemperature(),
-                ms.getUserNodeId().toHexString(), maxTokens, system.getPrompt(), null);
+        AIRequest request = new AIRequest();
+        request.setSystemPrompt(system.getPrompt());
+        request.setPrompt(input);
+        request.setMessages(messages);
+        request.setModel(model);
+        request.setService("anthropic");
+        request.setTemperature(0.7f);
+        request.setMaxTokens(maxTokens);
 
-        request.setUser(null);
-        request.setTemperature(null);
+        log.debug("AI Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
 
-        log.debug("ANTH Req: USER: " + ms.getUserName() + " AI MODEL: " + system.getModel() + ": "
-                + XString.prettyPrint(request));
-
-        String response = Util.httpCall(webClient, request);
-        AnthChatResponse res = null;
+        AIResponse aiRes = null;
+        String res = Util.httpCall(webClient, request);
         try {
-            res = (AnthChatResponse) Util.mapper.readValue(response, AnthChatResponse.class);
+            aiRes = (AIResponse) Util.mapper.readValue(res, AIResponse.class);
         } catch (Exception e) {
-            log.error("Error parsing response: " + e.getMessage() + " response\n\n" + response);
-            throw new RuntimeException("Error parsing response: " + e.getMessage());
+            String msg = "Error parsing response: " + e.getMessage() + " response\n\n" + res;
+            log.error(msg);
+            throw new RuntimeException(msg);
         }
 
-        BigDecimal cost = new BigDecimal(calculateCost(res));
-        res.userCredit = aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE);
-        log.debug("ANTH Res: " + XString.prettyPrint(res));
-        return res;
+        BigDecimal cost = new BigDecimal(calculateCost(aiRes, model));
+        userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
+        log.debug("AI Res: " + XString.prettyPrint(aiRes));
+        return aiRes;
     }
 
     // https://www.anthropic.com/pricing#anthropic-api
-    private double calculateCost(AnthChatResponse res) {
-        AnthUsage usage = res.getUsage();
-        String model = res.getModel().toLowerCase();
+    private double calculateCost(AIResponse res, String model) {
         double outputPpm;
         double inputPpm;
 
@@ -116,29 +119,22 @@ public class AnthAiService extends ServiceBase {
                 // prices per magatoken
                 inputPpm = 15;
                 outputPpm = 75;
-                return (usage.getInputTokens() * inputPpm / 1000000) + //
-                        (usage.getOutputTokens() * outputPpm / 1000000);
+                return (res.getInputTokens() * inputPpm / 1000000) + //
+                        (res.getOutputTokens() * outputPpm / 1000000);
 
             case ANTH_SONNET_MODEL_COMPLETION_CHAT:
                 // prices per magatoken
                 inputPpm = 3;
                 outputPpm = 15;
-                return (usage.getInputTokens() * inputPpm / 1000000) + //
-                        (usage.getOutputTokens() * outputPpm / 1000000);
+                return (res.getInputTokens() * inputPpm / 1000000) + //
+                        (res.getOutputTokens() * outputPpm / 1000000);
 
             default:
-                throw new RuntimeException("Model not supported: " + res.getModel() + " is not supported.");
+                throw new RuntimeException("Model not supported: " + model + " is not supported.");
         }
     }
 
-    /**
-     * we walk up the tree, to build as much chat history as we have so we can create the full
-     * 
-     * conversation context, If any of the nodes contain a "system: ..." line of text that will be used
-     * as the system we return, so users will always be able to embed the system instructions into a
-     * question.
-     */
-    private void buildChatHistory(MongoSession ms, SubNode node, List<ChatMessage> messages, SystemConfig system) {
+    private void buildChatHistory(MongoSession ms, SubNode node, List<AIMessage> messages, SystemConfig system) {
         aiUtil.parseAIConfig(ms, node, system);
         SubNode parent = read.getParent(ms, node);
         int nonAnswerCounter = NodeType.AI_ANSWER.s().equals(parent.getType()) ? 0 : 1;
@@ -148,7 +144,7 @@ public class AnthAiService extends ServiceBase {
         while (parent != null) {
             if (NodeType.AI_ANSWER.s().equals(parent.getType())) {
                 nonAnswerCounter = 0;
-                messages.add(0, new ChatMessage("assistant", parent.getContent()));
+                messages.add(0, new AIMessage("ai", parent.getContent()));
             } else {
                 nonAnswerCounter++;
                 aiUtil.parseAIConfig(ms, parent, system);
@@ -158,15 +154,11 @@ public class AnthAiService extends ServiceBase {
                 if (nonAnswerCounter > 1) {
                     break;
                 }
-
-                // addAttachments(content, parent);
-                messages.add(0, new ChatMessage("user", parent.getContent()));
+                messages.add(0, new AIMessage("human", parent.getContent()));
             }
-
             // walk up the tree. get parent of parent.
             parent = read.getParent(ms, parent);
         }
-
         // if we still don't have a system prompt check all ancestor nodes
         aiUtil.getAIConfigFromAncestorNodes(ms, parent, system);
     }

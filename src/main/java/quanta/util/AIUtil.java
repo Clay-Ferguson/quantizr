@@ -16,8 +16,6 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.anthropic.AnthChatContent;
-import quanta.model.client.anthropic.AnthChatResponse;
 import quanta.model.client.geminiai.GeminiChatCandidate;
 import quanta.model.client.geminiai.GeminiChatContent;
 import quanta.model.client.geminiai.GeminiChatPart;
@@ -26,6 +24,7 @@ import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
+import quanta.model.qai.AIResponse;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
@@ -38,6 +37,7 @@ import quanta.rest.response.AskSubGraphResponse;
 import quanta.rest.response.CreateSubNodeResponse;
 import quanta.rest.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
+import quanta.util.val.Val;
 
 @Component
 public class AIUtil extends ServiceBase {
@@ -242,8 +242,9 @@ public class AIUtil extends ServiceBase {
         sb.append(req.getQuestion());
 
         ChatCompletionResponse answer = null;
-        AnthChatResponse anthAnswer = null;
         GeminiChatResponse geminiAnswer = null;
+        Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+        AIResponse aiResponse = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
         if (svc != null) {
             // #ai-model
@@ -255,12 +256,12 @@ public class AIUtil extends ServiceBase {
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                     break;
                 case ANTH:
-                    anthAnswer =
-                            anthai.getAnswer(ms, null, sb.toString(), system, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
+                    aiResponse = anthai.getAnswer(ms, null, sb.toString(), system,
+                            anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT, userCredit);
                     break;
                 case ANTH_SONNET:
-                    anthAnswer =
-                            anthai.getAnswer(ms, null, sb.toString(), system, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
+                    aiResponse = anthai.getAnswer(ms, null, sb.toString(), system,
+                            anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT, userCredit);
                     break;
                 case PPLX_ONLINE:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
@@ -280,9 +281,9 @@ public class AIUtil extends ServiceBase {
             res.setGptCredit(answer.userCredit);
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
         } //
-        else if (anthAnswer != null) {
-            res.setGptCredit(anthAnswer.userCredit);
-            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(anthAnswer, false));
+        else if (aiResponse != null) {
+            res.setGptCredit(userCredit.getVal());
+            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + aiResponse.getContent());
         } //
         else if (geminiAnswer != null) {
             res.setGptCredit(geminiAnswer.credit);
@@ -324,25 +325,6 @@ public class AIUtil extends ServiceBase {
         return sb.toString();
     }
 
-    public String formatAnswer(AnthChatResponse acr, boolean nullify) {
-        StringBuilder sb = new StringBuilder();
-        int counter = 0;
-        for (AnthChatContent cont : acr.getContent()) {
-            if (counter > 0) {
-                sb.append("\n\n");
-            }
-            sb.append(/* choice.getMessage().getRole() + ": " + */ cont.getText());
-
-            // Since we store the answer text in the content of the node and also store the answer object
-            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
-            if (nullify) {
-                cont.setText(null);
-            }
-            counter++;
-        }
-        return sb.toString();
-    }
-
     public String formatAnswer(GeminiChatResponse ccr, boolean nullify) {
         StringBuilder sb = new StringBuilder();
         int counter = 0;
@@ -369,13 +351,13 @@ public class AIUtil extends ServiceBase {
 
     public String formatExportAnswerSection(String content, String aiService) {
         return """
-<div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>
-    %s
-    <div style='text-align: right; margin: 6px;'>
-    %s
-    </div>
-</div>
-""".formatted(content, aiService);
+                <div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>
+                    %s
+                    <div style='text-align: right; margin: 6px;'>
+                    %s
+                    </div>
+                </div>
+                """.formatted(content, aiService);
     }
 
     public boolean hasBookTags(SubNode node) {
@@ -392,12 +374,13 @@ public class AIUtil extends ServiceBase {
 
         ChatCompletionResponse openAiAns = null;
         ChatCompletionResponse pplxAiAns = null;
-        AnthChatResponse anthAiAns = null;
         ChatCompletionResponse oobAiAns = null;
         HuggingFaceResponse huggingFaceAns = null;
         // OobaAiResponse oobaAiAnswer = null;
         GeminiChatResponse geminiAiAns = null;
 
+        Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+        AIResponse aiResponse = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
         if (svc != null) {
             // First scan up the tree to see if we have a svc on the tree and if so use it instead.
@@ -479,12 +462,14 @@ public class AIUtil extends ServiceBase {
                     res.setGptCredit(pplxAiAns.userCredit);
                     break;
                 case ANTH:
-                    anthAiAns = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
-                    res.setGptCredit(anthAiAns.userCredit);
+                    aiResponse = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
+                            userCredit);
+                    res.setGptCredit(userCredit.getVal());
                     break;
                 case ANTH_SONNET:
-                    anthAiAns = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
-                    res.setGptCredit(anthAiAns.userCredit);
+                    aiResponse = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT,
+                            userCredit);
+                    res.setGptCredit(userCredit.getVal());
                     break;
                 case PPLX_ONLINE:
                     pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
@@ -509,8 +494,12 @@ public class AIUtil extends ServiceBase {
             }
         }
 
-        String answer =
-                create.getAnswerText(null, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+        String answer = null;
+        if (aiResponse != null) {
+            answer = aiResponse.getContent();
+        } else {
+            answer = create.getAnswerText(null, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+        }
         log.debug("Generated book content: " + answer);
 
         String extractedJson = XString.extractFirstJsonCodeBlock(answer);

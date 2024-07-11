@@ -118,6 +118,7 @@ services:
             - redis-distro
             - mongo-distro
             - pgdb-distro
+            - qai-distro
         build: 
             context: ${PRJROOT}
             args:
@@ -205,6 +206,8 @@ services:
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "${MONGO_HOST}"
             mongodb.port: "${MONGO_PORT}" 
+            quantaAI.host: "${QAI_HOST}"
+            quantaAI.port: "${QAI_PORT}" 
             instanceId: "prod"
             profileName: "prod"
             server.port: "${PORT}" 
@@ -226,6 +229,40 @@ services:
 
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+
+    # Quanta AI Microservice (Encapsulates Python LangChain)
+    qai-distro:
+        image: qai-distro
+        build: 
+            context: .
+            dockerfile: dockerfile-qai
+        deploy:
+            # Don't want a restart policy for DEV!
+            # restart_policy:
+            #     condition: on-failure
+            #     # delay is time between restart attempts
+            #     delay: 10s
+            #     max_attempts: 4
+            #     window: 120s
+            replicas: 1
+        hostname: qai-host-distro
+        networks:
+            bridge:
+                aliases:
+                    - qai-host-distro
+        environment:
+            QAI_PORT: "${QAI_PORT}"
+            # todo-0: research what this is doing.
+            PYTHONUNBUFFERED: 1
+            
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        ports:
+            - '${QAI_PORT}:${QAI_PORT}'
+        volumes:
+            - ./QuantaAI:/app
 
 networks:
     bridge:

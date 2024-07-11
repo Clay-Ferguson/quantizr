@@ -51,6 +51,9 @@ export XMX=2g
 export MONGO_HOST=mongo-host-dev
 export MONGO_PORT=27016
 
+export QAI_HOST=qai-host-dev
+export QAI_PORT=8186
+
 # NOTE: This file gets *generated* by the build.
 export MONGOD_CONF=${PRJROOT}/mongod-dev.conf
 export MONGO_KEY=${PRJPARENT}/secrets/mongo-key-dev

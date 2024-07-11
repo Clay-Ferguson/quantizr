@@ -1,5 +1,6 @@
 package quanta.mongo;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +24,11 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.model.client.anthropic.AnthChatResponse;
 import quanta.model.client.geminiai.GeminiChatResponse;
 import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.SystemConfig;
+import quanta.model.qai.AIResponse;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
@@ -297,11 +298,11 @@ public class MongoCreate extends ServiceBase {
         String typeToCreate = req.getTypeName();
         ChatCompletionResponse openAiAns = null;
         ChatCompletionResponse pplxAiAns = null;
-        AnthChatResponse anthAiAns = null;
         ChatCompletionResponse oobAiAns = null;
         HuggingFaceResponse huggingFaceAns = null;
         // OobaAiResponse oobaAiAnswer = null;
         GeminiChatResponse geminiAiAns = null;
+        AIResponse aiResponse = null;
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
             AIServiceName svc = AIServiceName.fromString(req.getAiService());
@@ -312,6 +313,7 @@ public class MongoCreate extends ServiceBase {
                 if (system.getService() != null) {
                     svc = AIServiceName.fromString(system.getService());
                 }
+                Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
 
                 // #ai-model
                 switch (svc) {
@@ -326,15 +328,15 @@ public class MongoCreate extends ServiceBase {
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH:
-                        anthAiAns =
-                                anthai.getAnswer(ms, parentNode, null, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT);
-                        res.setGptCredit(anthAiAns.userCredit);
+                        aiResponse = anthai.getAnswer(ms, parentNode, null, null,
+                                anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT, userCredit);
+                        res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH_SONNET:
-                        anthAiAns =
-                                anthai.getAnswer(ms, parentNode, null, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT);
-                        res.setGptCredit(anthAiAns.userCredit);
+                        aiResponse = anthai.getAnswer(ms, parentNode, null, null,
+                                anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT, userCredit);
+                        res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_ONLINE:
@@ -391,13 +393,19 @@ public class MongoCreate extends ServiceBase {
             if (req.isPendingEdit()) {
                 newNode.setPath(mongoUtil.setPendingPathState(newNode.getPath(), true));
             }
-            String answer = getAnswerText(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+
+            String answer = null;
+            if (aiResponse != null) {
+                answer = aiResponse.getContent();
+            } else {
+                answer = getAnswerText(req, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+            }
             newNode.setContent(answer);
             newNode.touch();
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
         else {
-            String answer = getAnswerText(req, openAiAns, anthAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+            String answer = getAnswerText(req, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
             parentNode.setContent(answer);
             parentNode.touch();
             res.setAiContentOverwrite(true);
@@ -477,7 +485,6 @@ public class MongoCreate extends ServiceBase {
 
     public String getAnswerText(CreateSubNodeRequest req, //
             ChatCompletionResponse openAiAns, //
-            AnthChatResponse anthAiAns, //
             ChatCompletionResponse pplxAiAns, //
             ChatCompletionResponse oobAiAns, //
             HuggingFaceResponse huggingFaceAns, //
@@ -485,10 +492,6 @@ public class MongoCreate extends ServiceBase {
         // OpenAI
         if (openAiAns != null) {
             return aiUtil.formatAnswer(openAiAns, true);
-        }
-        // Anthropic
-        else if (anthAiAns != null) {
-            return aiUtil.formatAnswer(anthAiAns, true);
         }
         // Perplexity AI
         else if (pplxAiAns != null) {

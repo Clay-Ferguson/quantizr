@@ -125,26 +125,6 @@ export interface UserProfile {
     balance: number;
 }
 
-export interface AnthChatContent {
-    type: string;
-    text: string;
-}
-
-export interface AnthChatResponse {
-    id: string;
-    type: string;
-    role: string;
-    model: string;
-    content: AnthChatContent[];
-    usage: AnthUsage;
-    userCredit: number;
-}
-
-export interface AnthUsage {
-    input_tokens: number;
-    output_tokens: number;
-}
-
 export interface GeminiChatCandidate {
     content: GeminiChatContent;
     finishReason: string;

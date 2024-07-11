@@ -63,7 +63,7 @@ serviceCheck ${docker_stack}_mongo-dev
 # only required to run once to initialize the replica set
 # runInitReplica
 
-echo "Waiting 20s for server to initialize..."
-sleep 20s
+echo "Waiting 30s for server to initialize..."
+sleep 30s
 
 printUrlsMessage

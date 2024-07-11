@@ -1,0 +1,16 @@
+FROM python:3.12.3-slim
+LABEL maintainer="wclayf@gmail.com"
+ARG QAI_PORT
+WORKDIR /app
+
+# Copy the requirements file from the QuantaAI subfolder
+COPY QuantaAI/requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the contents of the QuantaAI subfolder into the container
+COPY QuantaAI .
+
+# Run the uvicorn server
+CMD uvicorn quanta-ai:app --host 0.0.0.0 --port ${QAI_PORT}
