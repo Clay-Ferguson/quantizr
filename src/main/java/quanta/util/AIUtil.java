@@ -16,11 +16,6 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.geminiai.GeminiChatCandidate;
-import quanta.model.client.geminiai.GeminiChatContent;
-import quanta.model.client.geminiai.GeminiChatPart;
-import quanta.model.client.geminiai.GeminiChatResponse;
-import quanta.model.client.huggingface.HuggingFaceResponse;
 import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
@@ -242,7 +237,6 @@ public class AIUtil extends ServiceBase {
         sb.append(req.getQuestion());
 
         ChatCompletionResponse answer = null;
-        GeminiChatResponse geminiAnswer = null;
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
@@ -271,8 +265,7 @@ public class AIUtil extends ServiceBase {
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
                     break;
                 case GEMINI:
-                    geminiAnswer = geminiai.getAnswer(ms, null, sb.toString(), system);
-                    break;
+                    throw new RuntimeException("Gemini is not currently unavailable.");
                 default:
                     throw new RuntimeException("Unknown AI service: " + req.getAiService());
             }
@@ -286,10 +279,7 @@ public class AIUtil extends ServiceBase {
             res.setGptCredit(userCredit.getVal());
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + aiResponse.getContent());
         } //
-        else if (geminiAnswer != null) {
-            res.setGptCredit(geminiAnswer.credit);
-            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(geminiAnswer, false));
-        } else {
+        else {
             throw new RuntimeException("No answer from AI service: " + req.getAiService());
         }
         return res;
@@ -326,30 +316,6 @@ public class AIUtil extends ServiceBase {
         return sb.toString();
     }
 
-    public String formatAnswer(GeminiChatResponse ccr, boolean nullify) {
-        StringBuilder sb = new StringBuilder();
-        int counter = 0;
-        for (GeminiChatCandidate choice : ccr.getCandidates()) {
-            if (counter > 0) {
-                sb.append("\n\n----\n\n");
-            }
-            GeminiChatContent content = choice.getContent();
-            if (content != null && content.getParts() != null && content.getParts().size() > 0) {
-                for (GeminiChatPart part : content.getParts()) {
-                    sb.append(part.getText() + "\n");
-                }
-            }
-
-            // Since we store the answer text in the content of the node and also store the answer object
-            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
-            if (nullify) {
-                choice.setContent(null);
-            }
-            counter++;
-        }
-        return sb.toString();
-    }
-
     public String formatExportAnswerSection(String content, String aiService) {
         return """
                 <div style='border-radius: 8px; border: 2px solid gray; padding: 8px; margin: 8px;'>
@@ -375,10 +341,6 @@ public class AIUtil extends ServiceBase {
 
         ChatCompletionResponse openAiAns = null;
         ChatCompletionResponse pplxAiAns = null;
-        ChatCompletionResponse oobAiAns = null;
-        HuggingFaceResponse huggingFaceAns = null;
-        // OobaAiResponse oobaAiAnswer = null;
-        GeminiChatResponse geminiAiAns = null;
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
@@ -482,16 +444,8 @@ public class AIUtil extends ServiceBase {
                     pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
                     res.setGptCredit(pplxAiAns.userCredit);
                     break;
-                // case HUGGING_FACE:
-                // huggingFaceAns = huggingFace.getAnswer(ms, parentNode, null);
-                // break;
-                // case OOBA:
-                // oobAiAns = oobaAi.getAnswer(ms, parentNode, null);
-                // break;
                 case GEMINI:
-                    geminiAiAns = geminiai.getAnswer(ms, null, prompt, system);
-                    res.setGptCredit(geminiAiAns.credit);
-                    break;
+                    throw new RuntimeException("Gemini is not currently unavailable.");
                 default:
                     break;
             }
@@ -501,7 +455,7 @@ public class AIUtil extends ServiceBase {
         if (aiResponse != null) {
             answer = aiResponse.getContent();
         } else {
-            answer = create.getAnswerText(null, openAiAns, pplxAiAns, oobAiAns, huggingFaceAns, geminiAiAns);
+            answer = create.getAnswerText(null, openAiAns, pplxAiAns);
         }
         log.debug("Generated book content: " + answer);
 

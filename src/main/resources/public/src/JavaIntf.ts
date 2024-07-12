@@ -125,60 +125,6 @@ export interface UserProfile {
     balance: number;
 }
 
-export interface GeminiChatCandidate {
-    content: GeminiChatContent;
-    finishReason: string;
-    index: number;
-}
-
-export interface GeminiChatContent {
-    role: string;
-    parts: GeminiChatPart[];
-}
-
-export interface GeminiChatPart {
-    text: string;
-}
-
-export interface GeminiChatRequest {
-    contents: GeminiChatContent[];
-}
-
-export interface GeminiChatResponse {
-    candidates: GeminiChatCandidate[];
-    credit: number;
-}
-
-export interface HuggingFaceConversation {
-    generated_responses: string[];
-    past_user_inputs: string[];
-}
-
-export interface HuggingFaceInputs {
-    text: string;
-    past_user_inputs: string[];
-    generated_responses: string[];
-}
-
-export interface HuggingFaceRequest {
-    inputs: HuggingFaceInputs;
-}
-
-export interface HuggingFaceResponse {
-    conversation: HuggingFaceConversation;
-    generated_text: string;
-}
-
-export interface OobAiMessage {
-    role: string;
-    content: string;
-}
-
-export interface OobAiRequest {
-    messages: OobAiMessage[];
-    mode: string;
-}
-
 export interface ChatCompletionResponse {
     id: string;
     object: string;
@@ -1241,8 +1187,6 @@ export const enum AIServiceName {
     ANTH_SONNET = "anthAi_sonnet",
     PPLX_ONLINE = "pplxAi_online",
     PPLX_LLAMA3 = "llama3",
-    HUGGING_FACE = "huggingFace",
-    OOBA = "oobAi",
     GEMINI = "geminiAi",
 }
 

@@ -16,7 +16,7 @@ public class CreateSubNodeRequest extends RequestBase {
 
     // If this is non-null it means we're asking a question on the parent, and the answer will come in
     // as a child. The string value determines the type of AI that will be asked to (OpenAI or
-    // Perplexity, Gemini, etc)
+    // Perplexity, etc)
     private String aiService;
 
     public String getAiService() {

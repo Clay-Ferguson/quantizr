@@ -39,9 +39,6 @@ import quanta.service.SystemService;
 import quanta.service.TransferService;
 import quanta.service.UserFeedService;
 import quanta.service.UserManagerService;
-import quanta.service.ai.GeminiAiService;
-import quanta.service.ai.HuggingFaceService;
-import quanta.service.ai.OobaAiService;
 import quanta.service.ai.OpenAiService;
 import quanta.service.ai.PplxAiService;
 import quanta.service.ai.AIService;
@@ -145,9 +142,6 @@ public class ServiceBase {
     public static OpenAiService oai;
     public static PplxAiService pplxai;
     public static AIService ai;
-    public static GeminiAiService geminiai;
-    public static HuggingFaceService huggingFace;
-    public static OobaAiService oobaAi;
     public static TransferService transfer;
     public static boolean initComplete = false;
     public static final Object initLock = new Object();
@@ -232,9 +226,6 @@ public class ServiceBase {
             oai = getBean(ctx, OpenAiService.class);
             pplxai = getBean(ctx, PplxAiService.class);
             ai = getBean(ctx, AIService.class);
-            geminiai = getBean(ctx, GeminiAiService.class);
-            huggingFace = getBean(ctx, HuggingFaceService.class);
-            oobaAi = getBean(ctx, OobaAiService.class);
             transfer = getBean(ctx, TransferService.class);
             gracefulShutdown = getBean(ctx, GracefulShutdown.class);
 

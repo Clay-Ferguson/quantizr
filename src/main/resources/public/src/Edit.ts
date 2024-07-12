@@ -1082,7 +1082,7 @@ export class Edit {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId,
-            aiService: getAs().userPrefs.aiService, // openAi, pplxAi, geminiAi, huggingFace, oobAi,
+            aiService: getAs().userPrefs.aiService, // openAi, pplxAi, geminiAi
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,

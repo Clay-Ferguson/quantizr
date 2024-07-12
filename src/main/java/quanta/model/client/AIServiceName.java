@@ -11,8 +11,6 @@ public enum AIServiceName {
     ANTH_SONNET("anthAi_sonnet", "Anthropic: Claude 3.5 Sonnet"), // Sonnet
     PPLX_ONLINE("pplxAi_online", "Perplexity: Recent News Aware"), //
     PPLX_LLAMA3("llama3", "Meta: Llama 3"), //
-    HUGGING_FACE("huggingFace", "Hugging Face"), //
-    OOBA("oobAi", "ooba"), //
     GEMINI("geminiAi", "Google: Gemini");
 
     @JsonValue

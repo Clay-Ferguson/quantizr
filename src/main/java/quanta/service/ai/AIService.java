@@ -69,6 +69,8 @@ public class AIService extends ServiceBase {
             buildChatHistory(ms, node, messages, system);
         }
 
+        // log.debug("AI Req: messages: " + XString.prettyPrint(messages));
+
         String input;
         if (node != null) {
             input = aiUtil.prepareAIQuestionText(node, system);
