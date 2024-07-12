@@ -48,6 +48,10 @@ def api_query(req: AIRequest,
               api_key: Optional[str] = Header(None, alias="X-api-key")
     ) -> AIResponse:
     try:
+        # for now we'll max out at 100k tokens allowed
+        if (req.maxTokens > 100000): 
+            req.maxTokens = 100000
+            
         llm = getChatModel(req, api_key)
         messages = buildMessages(req)
         
@@ -110,18 +114,18 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
                 api_key=SecretStr(api_key),
             )
     elif req.service == "openai":
-        # todo-0: what about max_tokens?
         llm = ChatOpenAI(
             model=req.model,
             temperature=req.temperature,
+            max_tokens_to_sample=req.maxTokens,
             api_key=api_key,
             verbose=True,
         )
     elif req.service == "perplexity":
-        # todo-0: what about max_tokens?
         llm = ChatPerplexity(
             model=req.model,
             temperature=req.temperature,
+            max_tokens_to_sample=req.maxTokens,
             pplx_api_key=api_key,
         )
     else:
