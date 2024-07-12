@@ -250,18 +250,19 @@ public class AIUtil extends ServiceBase {
             // #ai-model
             switch (svc) {
                 case OPENAI:
-                    answer = oai.getAnswer(ms, null, sb.toString(), system, false);
+                    aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.OPENAI_MODEL_COMPLETION, "openai",
+                            userCredit);
                     break;
                 case PPLX:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                     break;
                 case ANTH:
-                    aiResponse = anthai.getAnswer(ms, null, sb.toString(), system,
-                            anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT, userCredit);
+                    aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
+                            "anthropic", userCredit);
                     break;
                 case ANTH_SONNET:
-                    aiResponse = anthai.getAnswer(ms, null, sb.toString(), system,
-                            anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT, userCredit);
+                    aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.ANTH_SONNET_MODEL_COMPLETION_CHAT,
+                            "anthropic", userCredit);
                     break;
                 case PPLX_ONLINE:
                     answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
@@ -454,20 +455,22 @@ public class AIUtil extends ServiceBase {
             // #ai-model
             switch (svc) {
                 case OPENAI:
-                    openAiAns = oai.getAnswer(ms, null, prompt, null, true);
-                    res.setGptCredit(openAiAns.userCredit);
+                    // openAiAns = oai.getAnswer(ms, null, prompt, null, true);
+                    // res.setGptCredit(openAiAns.userCredit);
+                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.OPENAI_MODEL_COMPLETION, "openai", userCredit);
+                    res.setGptCredit(userCredit.getVal());
                     break;
                 case PPLX:
                     pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
                     res.setGptCredit(pplxAiAns.userCredit);
                     break;
                 case ANTH:
-                    aiResponse = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
+                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT, "anthropic",
                             userCredit);
                     res.setGptCredit(userCredit.getVal());
                     break;
                 case ANTH_SONNET:
-                    aiResponse = anthai.getAnswer(ms, null, prompt, null, anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT,
+                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.ANTH_SONNET_MODEL_COMPLETION_CHAT, "anthropic",
                             userCredit);
                     res.setGptCredit(userCredit.getVal());
                     break;
@@ -526,17 +529,21 @@ public class AIUtil extends ServiceBase {
     }
 
     // Assumes node is a question, and inserts the answer under it as a subnode
+    // todo-0: this method is an odball case. be sure to test it.
     public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
             CreateSubNodeResponse res) {
 
-        ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
-        res.setGptCredit(aiAnswer.userCredit);
+        // ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
+        // res.setGptCredit(aiAnswer.userCredit);
+        Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+        AIResponse aiResponse = ai.getAnswer(ms, node, null, null, ai.OPENAI_MODEL_COMPLETION, "openai", userCredit);
+        res.setGptCredit(userCredit.getVal());
 
         List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
         SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
                 null, true, true, res.getNodeChanges());
 
-        newNode.setContent(aiUtil.formatAnswer(aiAnswer, true));
+        newNode.setContent(aiResponse.getContent());
         // newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
 
         newNode.touch();

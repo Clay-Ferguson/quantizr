@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from pydantic.v1.types import SecretStr
 from pydantic import BaseModel
 from typing import List, Optional
@@ -46,6 +47,13 @@ def api_query(req: AIRequest,
                     timeout=120,  # timeout in seconds
                     api_key=SecretStr(api_key),
                 )
+        elif req.service == "openai":
+            llm = ChatOpenAI(
+                model=req.model,
+                temperature=req.temperature,
+                api_key=api_key,
+                verbose=True,
+            )
         else:
             raise ValueError(f"Unsupported service: {req.service}")
 

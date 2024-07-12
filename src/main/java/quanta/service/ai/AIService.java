@@ -23,29 +23,35 @@ import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
-/* Originally the Anthropic Service, but we will now begin to subsume all other services into this class as well 
- * since the abstraction layer to handle different AI Cloud providers differently is now encapsulated in the microservice.
+/*
+ * Originally the Anthropic Service, but we will now begin to subsume all other services into this
+ * class as well since the abstraction layer to handle different AI Cloud providers differently is
+ * now encapsulated in the microservice.
  * 
-*/
+ */
 @Component
-public class AnthAiService extends ServiceBase {
+public class AIService extends ServiceBase {
     String ANTH_COMP_URL = "https://api.anthropic.com/v1/messages";
     String API_VERSION = "2023-06-01";
 
     public final String ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229";
     public final String ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620";
+    public final String OPENAI_MODEL_COMPLETION = "gpt-4o";
+
     String COST_CODE = "ANT"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
-    private static Logger log = LoggerFactory.getLogger(AnthAiService.class);
+    private static Logger log = LoggerFactory.getLogger(AIService.class);
 
-    public AIResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system, String model, Val<BigDecimal> userCredit) {
+    public AIResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system, String model,
+            String service, Val<BigDecimal> userCredit) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
 
-        // todo-0: need to pass this into the microservice so it can precalculate how much they can potentially cost in this
+        // todo-0: need to pass this into the microservice so it can precalculate how much they can
+        // potentially cost in this
         // transaction and ensure they have enough balance.
         BigDecimal balance = aiUtil.getBalance(ms, userNode);
 
@@ -73,11 +79,11 @@ public class AnthAiService extends ServiceBase {
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
         system.setModel(model);
         aiUtil.ensureDefaults(system);
-
+        String apiKey = getApiKey(service);
         String QAI_URL = "http://" + prop.getQuantaAIHost() + ":" + prop.getQuantaAIPort() + "/api/query";
         WebClient webClient = Util.webClientBuilder().baseUrl(QAI_URL) //
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) //
-                .defaultHeader("X-api-key", prop.getAnthAiKey()) //
+                .defaultHeader("X-api-key", apiKey) //
                 .build();
 
         AIRequest request = new AIRequest();
@@ -85,7 +91,7 @@ public class AnthAiService extends ServiceBase {
         request.setPrompt(input);
         request.setMessages(messages);
         request.setModel(model);
-        request.setService("anthropic");
+        request.setService(service);
         request.setTemperature(0.7f);
         request.setMaxTokens(maxTokens);
 
@@ -107,14 +113,31 @@ public class AnthAiService extends ServiceBase {
         return aiRes;
     }
 
+    private String getApiKey(String service) {
+        switch (service) {
+            case "anthropic":
+                return prop.getAnthAiKey();
+            case "openai":
+                return prop.getOpenAiKey();
+            default:
+                throw new RuntimeException("Unknown service: " + service);
+        }
+    }
+
     // https://www.anthropic.com/pricing#anthropic-api
     private double calculateCost(AIResponse res, String model) {
-        double outputPpm;
-        double inputPpm;
+        double inputPpm = 0;
+        double outputPpm = 0;
 
         // We detect using startsWith, because the actual model used will be slightly different than the
         // one specified
         switch (model) {
+            case OPENAI_MODEL_COMPLETION:
+                // prices per magatoken
+                double inputPpk = 0.005;
+                double outputPpk = 0.015;
+                return (res.getInputTokens() * inputPpk / 1000) + (res.getOutputTokens() * outputPpk / 1000);
+
             case ANTH_OPUS_MODEL_COMPLETION_CHAT:
                 // prices per magatoken
                 inputPpm = 15;
@@ -124,8 +147,8 @@ public class AnthAiService extends ServiceBase {
 
             case ANTH_SONNET_MODEL_COMPLETION_CHAT:
                 // prices per magatoken
-                inputPpm = 3;
-                outputPpm = 15;
+                inputPpm = 3.0;
+                outputPpm = 15.0;
                 return (res.getInputTokens() * inputPpm / 1000000) + //
                         (res.getOutputTokens() * outputPpm / 1000000);
 

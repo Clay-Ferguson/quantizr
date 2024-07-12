@@ -318,8 +318,11 @@ public class MongoCreate extends ServiceBase {
                 // #ai-model
                 switch (svc) {
                     case OPENAI:
-                        openAiAns = oai.getAnswer(ms, parentNode, null, null, false);
-                        res.setGptCredit(openAiAns.userCredit);
+                        // openAiAns = oai.getAnswer(ms, parentNode, null, null, false);
+                        // res.setGptCredit(openAiAns.userCredit);
+                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.OPENAI_MODEL_COMPLETION, "openai",
+                                userCredit);
+                        res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX:
@@ -328,14 +331,14 @@ public class MongoCreate extends ServiceBase {
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH:
-                        aiResponse = anthai.getAnswer(ms, parentNode, null, null,
-                                anthai.ANTH_OPUS_MODEL_COMPLETION_CHAT, userCredit);
+                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
+                                "anthropic", userCredit);
                         res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH_SONNET:
-                        aiResponse = anthai.getAnswer(ms, parentNode, null, null,
-                                anthai.ANTH_SONNET_MODEL_COMPLETION_CHAT, userCredit);
+                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.ANTH_SONNET_MODEL_COMPLETION_CHAT,
+                                "anthropic", userCredit);
                         res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
