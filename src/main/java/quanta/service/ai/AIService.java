@@ -53,10 +53,6 @@ public class AIService extends ServiceBase {
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }
-
-        // todo-0: need to pass this into the microservice so it can precalculate how much they can
-        // potentially cost in this
-        // transaction and ensure they have enough balance.
         BigDecimal balance = aiUtil.getBalance(ms, userNode);
 
         // this will hold all the prior chat history
@@ -72,7 +68,6 @@ public class AIService extends ServiceBase {
         if (node != null) {
             buildChatHistory(ms, node, messages, system);
         }
-
         // log.debug("AI Req: messages: " + XString.prettyPrint(messages));
 
         String input;
@@ -100,9 +95,9 @@ public class AIService extends ServiceBase {
         request.setService(service);
         request.setTemperature(0.7f);
         request.setMaxTokens(maxTokens);
+        request.setCredit(balance.floatValue());
 
         log.debug("AI Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
-
         AIResponse aiRes = null;
         String res = Util.httpCall(webClient, request);
         try {
@@ -113,7 +108,11 @@ public class AIService extends ServiceBase {
             throw new RuntimeException(msg);
         }
 
-        BigDecimal cost = new BigDecimal(calculateCost(aiRes, model));
+        if (!StringUtils.isEmpty(aiRes.getError())) {
+            throw new RuntimeException(aiRes.getError());
+        }
+
+        BigDecimal cost = new BigDecimal(aiRes.getCost());
         userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;
@@ -129,63 +128,6 @@ public class AIService extends ServiceBase {
                 return prop.getPplxAiKey();
             default:
                 throw new RuntimeException("Unknown service: " + service);
-        }
-    }
-
-    // https://www.anthropic.com/pricing#anthropic-api
-    private double calculateCost(AIResponse res, String model) {
-        double inputPpm = 0;
-        double outputPpm = 0;
-
-        // We detect using startsWith, because the actual model used will be slightly different than the
-        // one specified
-        switch (model) {
-            case OPENAI_MODEL_COMPLETION:
-                // prices per magatoken
-                double inputPpk = 0.005;
-                double outputPpk = 0.015;
-                return (res.getInputTokens() * inputPpk / 1000) + (res.getOutputTokens() * outputPpk / 1000);
-
-            case ANTH_OPUS_MODEL_COMPLETION_CHAT:
-                // prices per magatoken
-                inputPpm = 15;
-                outputPpm = 75;
-                return (res.getInputTokens() * inputPpm / 1000000) + //
-                        (res.getOutputTokens() * outputPpm / 1000000);
-
-            case ANTH_SONNET_MODEL_COMPLETION_CHAT:
-                // prices per magatoken
-                inputPpm = 3.0;
-                outputPpm = 15.0;
-                return (res.getInputTokens() * inputPpm / 1000000) + //
-                        (res.getOutputTokens() * outputPpm / 1000000);
-
-            // 70B model
-            case PPLX_MODEL_COMPLETION_CHAT:
-                // prices per magatoken
-                inputPpm = 1.0;
-                outputPpm = 1.0;
-                return (res.getInputTokens() * inputPpm / 1000000) + //
-                        (res.getOutputTokens() * outputPpm / 1000000);
-
-            // 70B model
-            case PPLX_MODEL_COMPLETION_LLAMA3:
-                // prices per magatoken
-                inputPpm = 1.0;
-                outputPpm = 1.0;
-                return (res.getInputTokens() * inputPpm / 1000000) + //
-                        (res.getOutputTokens() * outputPpm / 1000000);
-
-            // 70B model
-            case PPLX_MODEL_COMPLETION_ONLINE:
-                inputPpm = 1.0;
-                outputPpm = 1.0;
-                double inputPricePerReq = 0.005;
-                return inputPricePerReq + (res.getInputTokens() * inputPpm / 1000000) + //
-                        (res.getOutputTokens() * outputPpm / 1000000);
-                        
-            default:
-                throw new RuntimeException("Model not supported: " + model + " is not supported.");
         }
     }
 

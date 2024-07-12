@@ -11,6 +11,13 @@ from pydantic import BaseModel
 from typing import List, Optional
 import traceback
 
+ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
+ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
+OPENAI_MODEL_COMPLETION = "gpt-4o"
+PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online" 
+PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
+PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
+
 app = FastAPI()
 
 class AIBaseMessage(BaseModel):
@@ -18,9 +25,9 @@ class AIBaseMessage(BaseModel):
     content: str
 
 class AIResponse(BaseModel):
-    inputTokens: int
-    outputTokens: int
-    content: str
+    content: Optional[str]
+    cost: Optional[float]
+    error: Optional[str]
 
 class AIRequest(BaseModel):
     systemPrompt: Optional[str]
@@ -30,6 +37,7 @@ class AIRequest(BaseModel):
     model: str
     temperature: float
     maxTokens: int
+    credit: float
 
 @app.get("/")
 def index() -> str:
@@ -42,19 +50,27 @@ def api_query(req: AIRequest,
     try:
         llm = getChatModel(req, api_key)
         messages = buildMessages(req)
-        response = llm.invoke(list(messages))
-
+        
         # Estimate input tokens
         input_text = "".join([msg.content for msg in req.messages])
         input_tokens = int((len(input_text)+3) / 3)
+                
+        # calculate predicted cost
+        cost: float = calculate_cost(input_tokens, req.maxTokens, req.model)
+        if (cost > req.credit):
+            return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account.")         
+
+        response = llm.invoke(list(messages))
 
         # Estimate output tokens
-        output_tokens = int((len(response.content)+3) / 3)
+        output_tokens = int((len(response.content)+3) / 3)        
+        cost = calculate_cost(input_tokens, output_tokens, req.model)
 
         # not make our return value and return it
-        return AIResponse(content=response.content, inputTokens=input_tokens, outputTokens=output_tokens)
+        ret = AIResponse(content=response.content, cost=cost, error=None)
+        return ret
     except Exception as e:
-        return AIResponse(content="```\n"+str(e)+"\n"+traceback.format_exc()+"```", inputTokens=0, outputTokens=0)
+        return AIResponse(content=None, cost=None, error=str(e)+"\n"+traceback.format_exc())
 
 def buildMessages(req):
     messages = []
@@ -111,3 +127,57 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     else:
         raise ValueError(f"Unsupported service: {req.service}")
     return llm
+
+# https://www.anthropic.com/pricing#anthropic-api
+def calculate_cost(input_tokens, output_tokens, model) -> float:
+    input_ppm = 0
+    output_ppm = 0
+
+    # We detect using startswith, because the actual model used will be slightly different than the
+    # one specified
+    if model == OPENAI_MODEL_COMPLETION:
+        # prices per kilotoken
+        input_ppk = 0.005
+        output_ppk = 0.015
+        return (input_tokens * input_ppk / 1000) + (output_tokens * output_ppk / 1000)
+
+    elif model == ANTH_OPUS_MODEL_COMPLETION_CHAT:
+        # prices per megatoken
+        input_ppm = 15
+        output_ppm = 75
+        return (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+
+    elif model == ANTH_SONNET_MODEL_COMPLETION_CHAT:
+        # prices per megatoken
+        input_ppm = 3.0
+        output_ppm = 15.0
+        return (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+
+    # 70B model
+    elif model == PPLX_MODEL_COMPLETION_CHAT:
+        # prices per megatoken
+        input_ppm = 1.0
+        output_ppm = 1.0
+        return (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+
+    # 70B model
+    elif model == PPLX_MODEL_COMPLETION_LLAMA3:
+        # prices per megatoken
+        input_ppm = 1.0
+        output_ppm = 1.0
+        return (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+
+    # 70B model
+    elif model == PPLX_MODEL_COMPLETION_ONLINE:
+        input_ppm = 1.0
+        output_ppm = 1.0
+        input_price_per_req = 0.005
+        return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+
+    else:
+        raise RuntimeError(f"Model not supported: {model} is not supported.")

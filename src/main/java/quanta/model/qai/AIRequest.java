@@ -10,7 +10,10 @@ public class AIRequest {
     private List<AIMessage> messages;
     private Float temperature;
     private Integer maxTokens;
-    
+
+    // how much user has left in their account
+    private Float credit;
+
     public Integer getMaxTokens() {
         return maxTokens;
     }
@@ -65,5 +68,13 @@ public class AIRequest {
 
     public List<AIMessage> getMessages() {
         return messages;
+    }
+
+    public Float getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Float credit) {
+        this.credit = credit;
     }
 }
