@@ -248,7 +248,8 @@ public class AIUtil extends ServiceBase {
                             userCredit);
                     break;
                 case PPLX:
-                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_CHAT);
+                    aiResponse = ai.getAnswer(ms, null, sb.toString(), null, ai.PPLX_MODEL_COMPLETION_CHAT,
+                            "perplexity", userCredit);
                     break;
                 case ANTH:
                     aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
@@ -259,10 +260,12 @@ public class AIUtil extends ServiceBase {
                             "anthropic", userCredit);
                     break;
                 case PPLX_ONLINE:
-                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
+                    aiResponse = ai.getAnswer(ms, null, sb.toString(), null, ai.PPLX_MODEL_COMPLETION_ONLINE,
+                            "perplexity", userCredit);
                     break;
                 case PPLX_LLAMA3:
-                    answer = pplxai.getAnswer(ms, null, sb.toString(), system, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
+                    aiResponse = ai.getAnswer(ms, null, sb.toString(), null, ai.PPLX_MODEL_COMPLETION_LLAMA3,
+                            "perplexity", userCredit);
                     break;
                 case GEMINI:
                     throw new RuntimeException("Gemini is not currently unavailable.");
@@ -340,7 +343,6 @@ public class AIUtil extends ServiceBase {
         auth.ownerAuth(ms, parentNode);
 
         ChatCompletionResponse openAiAns = null;
-        ChatCompletionResponse pplxAiAns = null;
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
@@ -417,14 +419,13 @@ public class AIUtil extends ServiceBase {
             // #ai-model
             switch (svc) {
                 case OPENAI:
-                    // openAiAns = oai.getAnswer(ms, null, prompt, null, true);
-                    // res.setGptCredit(openAiAns.userCredit);
                     aiResponse = ai.getAnswer(ms, null, prompt, null, ai.OPENAI_MODEL_COMPLETION, "openai", userCredit);
                     res.setGptCredit(userCredit.getVal());
                     break;
                 case PPLX:
-                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
-                    res.setGptCredit(pplxAiAns.userCredit);
+                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.PPLX_MODEL_COMPLETION_CHAT, "perplexity",
+                            userCredit);
+                    res.setGptCredit(userCredit.getVal());
                     break;
                 case ANTH:
                     aiResponse = ai.getAnswer(ms, null, prompt, null, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT, "anthropic",
@@ -437,12 +438,14 @@ public class AIUtil extends ServiceBase {
                     res.setGptCredit(userCredit.getVal());
                     break;
                 case PPLX_ONLINE:
-                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
-                    res.setGptCredit(pplxAiAns.userCredit);
+                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.PPLX_MODEL_COMPLETION_ONLINE, "perplexity",
+                            userCredit);
+                    res.setGptCredit(userCredit.getVal());
                     break;
                 case PPLX_LLAMA3:
-                    pplxAiAns = pplxai.getAnswer(ms, null, prompt, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
-                    res.setGptCredit(pplxAiAns.userCredit);
+                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.PPLX_MODEL_COMPLETION_LLAMA3, "perplexity",
+                            userCredit);
+                    res.setGptCredit(userCredit.getVal());
                     break;
                 case GEMINI:
                     throw new RuntimeException("Gemini is not currently unavailable.");
@@ -455,7 +458,7 @@ public class AIUtil extends ServiceBase {
         if (aiResponse != null) {
             answer = aiResponse.getContent();
         } else {
-            answer = create.getAnswerText(null, openAiAns, pplxAiAns);
+            answer = create.getAnswerText(null, openAiAns);
         }
         log.debug("Generated book content: " + answer);
 

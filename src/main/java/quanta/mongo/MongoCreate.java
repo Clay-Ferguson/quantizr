@@ -295,7 +295,6 @@ public class MongoCreate extends ServiceBase {
 
         String typeToCreate = req.getTypeName();
         ChatCompletionResponse openAiAns = null;
-        ChatCompletionResponse pplxAiAns = null;
         AIResponse aiResponse = null;
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
@@ -312,16 +311,15 @@ public class MongoCreate extends ServiceBase {
                 // #ai-model
                 switch (svc) {
                     case OPENAI:
-                        // openAiAns = oai.getAnswer(ms, parentNode, null, null, false);
-                        // res.setGptCredit(openAiAns.userCredit);
                         aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.OPENAI_MODEL_COMPLETION, "openai",
                                 userCredit);
                         res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX:
-                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_CHAT);
-                        res.setGptCredit(pplxAiAns.userCredit);
+                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.PPLX_MODEL_COMPLETION_CHAT, "perplexity",
+                                userCredit);
+                        res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case ANTH:
@@ -337,13 +335,15 @@ public class MongoCreate extends ServiceBase {
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_ONLINE:
-                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_ONLINE);
-                        res.setGptCredit(pplxAiAns.userCredit);
+                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.PPLX_MODEL_COMPLETION_ONLINE, "perplexity",
+                                userCredit);
+                        res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case PPLX_LLAMA3:
-                        pplxAiAns = pplxai.getAnswer(ms, parentNode, null, null, pplxai.PPLX_MODEL_COMPLETION_LLAMA3);
-                        res.setGptCredit(pplxAiAns.userCredit);
+                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.PPLX_MODEL_COMPLETION_LLAMA3, "perplexity",
+                                userCredit);
+                        res.setGptCredit(userCredit.getVal());
                         typeToCreate = NodeType.AI_ANSWER.s();
                         break;
                     case GEMINI:
@@ -384,14 +384,14 @@ public class MongoCreate extends ServiceBase {
             if (aiResponse != null) {
                 answer = aiResponse.getContent();
             } else {
-                answer = getAnswerText(req, openAiAns, pplxAiAns);
+                answer = getAnswerText(req, openAiAns);
             }
             newNode.setContent(answer);
             newNode.touch();
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
         else {
-            String answer = getAnswerText(req, openAiAns, pplxAiAns);
+            String answer = getAnswerText(req, openAiAns);
             parentNode.setContent(answer);
             parentNode.touch();
             res.setAiContentOverwrite(true);
@@ -470,15 +470,10 @@ public class MongoCreate extends ServiceBase {
     }
 
     public String getAnswerText(CreateSubNodeRequest req, //
-            ChatCompletionResponse openAiAns, //
-            ChatCompletionResponse pplxAiAns) {
+            ChatCompletionResponse openAiAns) {
         // OpenAI
         if (openAiAns != null) {
             return aiUtil.formatAnswer(openAiAns, true);
-        }
-        // Perplexity AI
-        else if (pplxAiAns != null) {
-            return aiUtil.formatAnswer(pplxAiAns, true);
         }
         else {
             return req != null && req.getContent() != null ? req.getContent() : "";

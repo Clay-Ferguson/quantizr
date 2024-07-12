@@ -38,6 +38,10 @@ public class AIService extends ServiceBase {
     public final String ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620";
     public final String OPENAI_MODEL_COMPLETION = "gpt-4o";
 
+    public final String PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online"; // 70B model
+    public final String PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct";
+    public final String PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"; // 70B model
+
     String COST_CODE = "ANT"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -121,6 +125,8 @@ public class AIService extends ServiceBase {
                 return prop.getAnthAiKey();
             case "openai":
                 return prop.getOpenAiKey();
+            case "perplexity":
+                return prop.getPplxAiKey();
             default:
                 throw new RuntimeException("Unknown service: " + service);
         }
@@ -154,6 +160,30 @@ public class AIService extends ServiceBase {
                 return (res.getInputTokens() * inputPpm / 1000000) + //
                         (res.getOutputTokens() * outputPpm / 1000000);
 
+            // 70B model
+            case PPLX_MODEL_COMPLETION_CHAT:
+                // prices per magatoken
+                inputPpm = 1.0;
+                outputPpm = 1.0;
+                return (res.getInputTokens() * inputPpm / 1000000) + //
+                        (res.getOutputTokens() * outputPpm / 1000000);
+
+            // 70B model
+            case PPLX_MODEL_COMPLETION_LLAMA3:
+                // prices per magatoken
+                inputPpm = 1.0;
+                outputPpm = 1.0;
+                return (res.getInputTokens() * inputPpm / 1000000) + //
+                        (res.getOutputTokens() * outputPpm / 1000000);
+
+            // 70B model
+            case PPLX_MODEL_COMPLETION_ONLINE:
+                inputPpm = 1.0;
+                outputPpm = 1.0;
+                double inputPricePerReq = 0.005;
+                return inputPricePerReq + (res.getInputTokens() * inputPpm / 1000000) + //
+                        (res.getOutputTokens() * outputPpm / 1000000);
+                        
             default:
                 throw new RuntimeException("Model not supported: " + model + " is not supported.");
         }
