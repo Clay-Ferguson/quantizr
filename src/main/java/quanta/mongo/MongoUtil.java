@@ -389,9 +389,7 @@ public class MongoUtil extends ServiceBase {
         q.addCriteria(Criteria.where(SubNode.TYPE).is(NodeType.ACCOUNT.s()));
         BulkOperations bops = opsw.bulkOps(BulkMode.UNORDERED);
 
-        opsw.forEach(q, node -> {
-            mongoUtil.validate(node); // todo-0: try to encapsulate this into some kind of wrapped stream
-            
+        opsw.forEach(q, node -> {            
             String userName = node.getStr(NodeProp.USER);
             if (!userName.startsWith("."))
                 return;
