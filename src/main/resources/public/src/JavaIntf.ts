@@ -125,81 +125,6 @@ export interface UserProfile {
     balance: number;
 }
 
-export interface ChatCompletionResponse {
-    id: string;
-    object: string;
-    created: number;
-    model: string;
-    choices: Choice[];
-    usage: Usage;
-    userCredit: number;
-}
-
-export interface ChatGPTModerationRequest {
-    input: string;
-}
-
-export interface ChatGPTModerationResponse {
-    id: string;
-    model: string;
-    results: ChatGPTTextModerationItem[];
-}
-
-export interface ChatGPTRequest {
-    user: string;
-    model: string;
-    messages: ChatMessage[];
-    temperature: number;
-    system: string;
-    max_tokens: number;
-    response_format: ChatGPTResponseFormat;
-}
-
-export interface ChatGPTResponseFormat {
-    type: string;
-}
-
-export interface ChatGPTTextModerationItem {
-    flagged: boolean;
-    categories: { [index: string]: boolean };
-    categoryScores: { [index: string]: number };
-}
-
-export interface ChatMessage {
-    role: string;
-    content: any;
-}
-
-export interface Choice {
-    message: ChatMessage;
-    finishProbability: number;
-    index: number;
-}
-
-export interface GptImageData {
-    revised_prompt: string;
-    url: string;
-}
-
-export interface ImageGenRequest {
-    model: string;
-    prompt: string;
-    size: string;
-    quality: string;
-    n: number;
-}
-
-export interface ImageResponse {
-    created: number;
-    data: GptImageData[];
-}
-
-export interface SpeechGenRequest {
-    model: string;
-    input: string;
-    voice: string;
-}
-
 export interface SystemConfig {
     prompt: string;
     template: string;
@@ -207,12 +132,6 @@ export interface SystemConfig {
     service: string;
     maxWords: number;
     temperature: number;
-}
-
-export interface Usage {
-    prompt_tokens: number;
-    completion_tokens: number;
-    text_generation: number;
 }
 
 export interface AIGenImageRequest extends RequestBase {

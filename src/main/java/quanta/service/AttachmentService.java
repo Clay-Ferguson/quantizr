@@ -40,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import com.mongodb.BasicDBObject;
@@ -49,7 +50,6 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.transaction.annotation.Transactional;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -669,16 +669,21 @@ public class AttachmentService extends ServiceBase {
     }
 
     public AIGenImageResponse cm_aiGenImage(MongoSession ms, AIGenImageRequest req) {
-        AIGenImageResponse res = new AIGenImageResponse();
-        String url = oai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef(), req.getSize());
-        readFromUrl(ms, url, null, req.getNodeId(), null, null, 0, true, req.getOpenAiPrompt());
-        return res;
+        throw new RuntimeEx("Image Generation is currently not available.");
+        // AIGenImageResponse res = new AIGenImageResponse();
+        // Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+        // String url = ai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef(), req.getSize(), "dall-e-3", "openai", userCredit);
+        // readFromUrl(ms, url, null, req.getNodeId(), null, null, 0, true, req.getOpenAiPrompt());
+        // return res;
     }
 
     public AIGenSpeechResponse cm_aiGenSpeech(MongoSession ms, AIGenSpeechRequest req) {
-        AIGenSpeechResponse res = new AIGenSpeechResponse();
-        oai.generateSpeech(ms, req.getOpenAiPrompt(), req.getVoice(), req.getNodeId());
-        return res;
+        // todo-0: I never used this much, since all AI has been moved into microservice we don't have it here
+        // until it's implemented in the microservice.
+        throw new RuntimeEx("Speech Generation is currently not available.");
+        // AIGenSpeechResponse res = new AIGenSpeechResponse();
+        // oai.generateSpeech(ms, req.getOpenAiPrompt(), req.getVoice(), req.getNodeId());
+        // return res;
     }
 
     /**

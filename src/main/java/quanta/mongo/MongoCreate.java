@@ -24,7 +24,6 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.model.client.openai.ChatCompletionResponse;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.qai.AIResponse;
 import quanta.mongo.model.AccessControl;
@@ -294,7 +293,6 @@ public class MongoCreate extends ServiceBase {
         }
 
         String typeToCreate = req.getTypeName();
-        ChatCompletionResponse openAiAns = null;
         AIResponse aiResponse = null;
 
         if (NodeType.NONE.s().equals(parentNode.getType())) {
@@ -309,6 +307,7 @@ public class MongoCreate extends ServiceBase {
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
 
                 // #ai-model
+                // todo-0: this switch can be simplified so most of the code is outside it.
                 switch (svc) {
                     case OPENAI:
                         aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.OPENAI_MODEL_COMPLETION, "openai",
@@ -380,19 +379,12 @@ public class MongoCreate extends ServiceBase {
                 newNode.setPath(mongoUtil.setPendingPathState(newNode.getPath(), true));
             }
 
-            String answer = null;
-            if (aiResponse != null) {
-                answer = aiResponse.getContent();
-            } else {
-                answer = getAnswerText(req, openAiAns);
-            }
-            newNode.setContent(answer);
+            newNode.setContent(aiResponse.getContent());
             newNode.touch();
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
         else {
-            String answer = getAnswerText(req, openAiAns);
-            parentNode.setContent(answer);
+            parentNode.setContent(aiResponse.getContent());
             parentNode.touch();
             res.setAiContentOverwrite(true);
             update.save(ms, parentNode);
@@ -417,7 +409,7 @@ public class MongoCreate extends ServiceBase {
             nodeBeingRepliedTo = parentNode;
         }
 
-        if (allowSharing && openAiAns == null) {
+        if (allowSharing) {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
@@ -466,17 +458,6 @@ public class MongoCreate extends ServiceBase {
             } else if (parentNode.getTags().contains("#section")) {
                 newNode.setTags("#subsection");
             }
-        }
-    }
-
-    public String getAnswerText(CreateSubNodeRequest req, //
-            ChatCompletionResponse openAiAns) {
-        // OpenAI
-        if (openAiAns != null) {
-            return aiUtil.formatAnswer(openAiAns, true);
-        }
-        else {
-            return req != null && req.getContent() != null ? req.getContent() : "";
         }
     }
 

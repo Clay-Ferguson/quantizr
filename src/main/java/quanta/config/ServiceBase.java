@@ -39,7 +39,6 @@ import quanta.service.SystemService;
 import quanta.service.TransferService;
 import quanta.service.UserFeedService;
 import quanta.service.UserManagerService;
-import quanta.service.ai.OpenAiService;
 import quanta.service.ai.AIService;
 import quanta.service.imports.ImportService;
 import quanta.service.node.NodeEditService;
@@ -138,7 +137,6 @@ public class ServiceBase {
     public static SimpleMongoClientDatabaseFactory mdbf;
     public static CryptoService crypto;
     public static SchemaOrgService schema;
-    public static OpenAiService oai;
     public static AIService ai;
     public static TransferService transfer;
     public static boolean initComplete = false;
@@ -221,7 +219,6 @@ public class ServiceBase {
             publisher = getBean(ctx, EventPublisher.class);
             crypto = getBean(ctx, CryptoService.class);
             schema = getBean(ctx, SchemaOrgService.class);
-            oai = getBean(ctx, OpenAiService.class);
             ai = getBean(ctx, AIService.class);
             transfer = getBean(ctx, TransferService.class);
             gracefulShutdown = getBean(ctx, GracefulShutdown.class);

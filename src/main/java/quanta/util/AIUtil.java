@@ -16,8 +16,6 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.AIServiceName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.openai.ChatCompletionResponse;
-import quanta.model.client.openai.Choice;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.qai.AIResponse;
 import quanta.mongo.MongoSession;
@@ -236,7 +234,6 @@ public class AIUtil extends ServiceBase {
         sb.append("Here is my question:\n");
         sb.append(req.getQuestion());
 
-        ChatCompletionResponse answer = null;
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
@@ -274,11 +271,7 @@ public class AIUtil extends ServiceBase {
             }
         }
 
-        if (answer != null) {
-            res.setGptCredit(answer.userCredit);
-            res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + formatAnswer(answer, false));
-        } //
-        else if (aiResponse != null) {
+        if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + aiResponse.getContent());
         } //
@@ -300,24 +293,24 @@ public class AIUtil extends ServiceBase {
         return input;
     }
 
-    public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
-        StringBuilder sb = new StringBuilder();
-        int counter = 0;
-        for (Choice choice : ccr.getChoices()) {
-            if (counter > 0) {
-                sb.append("\n\n");
-            }
-            sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getTextContent());
+    // public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
+    //     StringBuilder sb = new StringBuilder();
+    //     int counter = 0;
+    //     for (Choice choice : ccr.getChoices()) {
+    //         if (counter > 0) {
+    //             sb.append("\n\n");
+    //         }
+    //         sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getTextContent());
 
-            // Since we store the answer text in the content of the node and also store the answer object
-            // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
-            if (nullify) {
-                choice.getMessage().setContent(null);
-            }
-            counter++;
-        }
-        return sb.toString();
-    }
+    //         // Since we store the answer text in the content of the node and also store the answer object
+    //         // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
+    //         if (nullify) {
+    //             choice.getMessage().setContent(null);
+    //         }
+    //         counter++;
+    //     }
+    //     return sb.toString();
+    // }
 
     public String formatExportAnswerSection(String content, String aiService) {
         return """
@@ -341,8 +334,6 @@ public class AIUtil extends ServiceBase {
         // node that will be the parent of the book
         SubNode parentNode = read.getNode(ms, req.getNodeId());
         auth.ownerAuth(ms, parentNode);
-
-        ChatCompletionResponse openAiAns = null;
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
@@ -453,13 +444,7 @@ public class AIUtil extends ServiceBase {
                     break;
             }
         }
-
-        String answer = null;
-        if (aiResponse != null) {
-            answer = aiResponse.getContent();
-        } else {
-            answer = create.getAnswerText(null, openAiAns);
-        }
+        String answer = aiResponse.getContent();
         log.debug("Generated book content: " + answer);
 
         String extractedJson = XString.extractFirstJsonCodeBlock(answer);

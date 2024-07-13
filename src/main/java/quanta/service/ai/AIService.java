@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.SystemConfig;
+import quanta.model.qai.AIImageRequest;
+import quanta.model.qai.AIImageResponse;
 import quanta.model.qai.AIMessage;
 import quanta.model.qai.AIRequest;
 import quanta.model.qai.AIResponse;
@@ -116,6 +118,50 @@ public class AIService extends ServiceBase {
         userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;
+    }
+
+    // todo-0: need to handle highDef and size
+    public String generateImage(MongoSession ms, String prompt, boolean highDef, String size, String model,
+            String service, Val<BigDecimal> userCredit) {
+        SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
+        if (userNode == null) {
+            throw new RuntimeException("Unknown user.");
+        }
+        BigDecimal balance = aiUtil.getBalance(ms, userNode);
+
+        String apiKey = getApiKey(service);
+        String QAI_URL = "http://" + prop.getQuantaAIHost() + ":" + prop.getQuantaAIPort() + "/api/image";
+        WebClient webClient = Util.webClientBuilder().baseUrl(QAI_URL) //
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) //
+                .defaultHeader("X-api-key", apiKey) //
+                .build();
+
+        AIImageRequest request = new AIImageRequest();
+        request.setPrompt(prompt);
+        request.setModel(model);
+        request.setService(service);
+        request.setTemperature(0.7f);
+        request.setCredit(balance.floatValue());
+
+        log.debug("AI Image Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
+        AIImageResponse aiRes = null;
+        String res = Util.httpCall(webClient, request);
+        try {
+            aiRes = (AIImageResponse) Util.mapper.readValue(res, AIImageResponse.class);
+        } catch (Exception e) {
+            String msg = "Error parsing response: " + e.getMessage() + " response\n\n" + res;
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+
+        if (!StringUtils.isEmpty(aiRes.getError())) {
+            throw new RuntimeException(aiRes.getError());
+        }
+
+        BigDecimal cost = new BigDecimal(aiRes.getCost());
+        userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
+        log.debug("AI Image Res: " + XString.prettyPrint(aiRes));
+        return aiRes.getUrl();
     }
 
     private String getApiKey(String service) {
