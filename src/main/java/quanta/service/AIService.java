@@ -1,4 +1,4 @@
-package quanta.service.ai;
+package quanta.service;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -14,8 +14,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.SystemConfig;
-import quanta.model.qai.AIImageRequest;
-import quanta.model.qai.AIImageResponse;
 import quanta.model.qai.AIMessage;
 import quanta.model.qai.AIRequest;
 import quanta.model.qai.AIResponse;
@@ -33,17 +31,6 @@ import quanta.util.val.Val;
  */
 @Component
 public class AIService extends ServiceBase {
-    String ANTH_COMP_URL = "https://api.anthropic.com/v1/messages";
-    String API_VERSION = "2023-06-01";
-
-    public final String ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229";
-    public final String ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620";
-    public final String OPENAI_MODEL_COMPLETION = "gpt-4o";
-
-    public final String PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online"; // 70B model
-    public final String PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct";
-    public final String PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"; // 70B model
-
     String COST_CODE = "ANT"; // 3 chars allowed
 
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
@@ -118,50 +105,6 @@ public class AIService extends ServiceBase {
         userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;
-    }
-
-    // todo-0: need to handle highDef and size
-    public String generateImage(MongoSession ms, String prompt, boolean highDef, String size, String model,
-            String service, Val<BigDecimal> userCredit) {
-        SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
-        if (userNode == null) {
-            throw new RuntimeException("Unknown user.");
-        }
-        BigDecimal balance = aiUtil.getBalance(ms, userNode);
-
-        String apiKey = getApiKey(service);
-        String QAI_URL = "http://" + prop.getQuantaAIHost() + ":" + prop.getQuantaAIPort() + "/api/image";
-        WebClient webClient = Util.webClientBuilder().baseUrl(QAI_URL) //
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) //
-                .defaultHeader("X-api-key", apiKey) //
-                .build();
-
-        AIImageRequest request = new AIImageRequest();
-        request.setPrompt(prompt);
-        request.setModel(model);
-        request.setService(service);
-        request.setTemperature(0.7f);
-        request.setCredit(balance.floatValue());
-
-        log.debug("AI Image Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
-        AIImageResponse aiRes = null;
-        String res = Util.httpCall(webClient, request);
-        try {
-            aiRes = (AIImageResponse) Util.mapper.readValue(res, AIImageResponse.class);
-        } catch (Exception e) {
-            String msg = "Error parsing response: " + e.getMessage() + " response\n\n" + res;
-            log.error(msg);
-            throw new RuntimeException(msg);
-        }
-
-        if (!StringUtils.isEmpty(aiRes.getError())) {
-            throw new RuntimeException(aiRes.getError());
-        }
-
-        BigDecimal cost = new BigDecimal(aiRes.getCost());
-        userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
-        log.debug("AI Image Res: " + XString.prettyPrint(aiRes));
-        return aiRes.getUrl();
     }
 
     private String getApiKey(String service) {

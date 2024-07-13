@@ -134,19 +134,6 @@ export interface SystemConfig {
     temperature: number;
 }
 
-export interface AIGenImageRequest extends RequestBase {
-    nodeId: string;
-    openAiPrompt: string;
-    highDef: boolean;
-    size: string;
-}
-
-export interface AIGenSpeechRequest extends RequestBase {
-    nodeId: string;
-    openAiPrompt: string;
-    voice: string;
-}
-
 export interface AddCreditRequest extends RequestBase {
     amount: number;
     userId: string;
@@ -607,12 +594,6 @@ export interface UploadFromUrlRequest extends RequestBase {
 }
 
 export interface RequestBase {
-}
-
-export interface AIGenImageResponse extends ResponseBase {
-}
-
-export interface AIGenSpeechResponse extends ResponseBase {
 }
 
 export interface AddCreditResponse extends ResponseBase {
@@ -1102,10 +1083,10 @@ export const enum AIServiceName {
     NONE = "[null]",
     OPENAI = "openAi",
     PPLX = "pplxAi",
-    ANTH = "anthAi",
-    ANTH_SONNET = "anthAi_sonnet",
     PPLX_ONLINE = "pplxAi_online",
     PPLX_LLAMA3 = "llama3",
+    ANTH = "anthAi",
+    ANTH_SONNET = "anthAi_sonnet",
     GEMINI = "geminiAi",
 }
 

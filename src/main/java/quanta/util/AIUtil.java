@@ -213,7 +213,7 @@ public class AIUtil extends ServiceBase {
 
         for (SubNode n : nodes) {
             // if we have filter IDs and this node isn't in the filter, skip it
-            if (req.getNodeIds() != null && !req.getNodeIds().contains(n.getIdStr())) {
+            if (req.getNodeIds() != null && req.getNodeIds().size() > 0 && !req.getNodeIds().contains(n.getIdStr())) {
                 continue;
             }
 
@@ -231,45 +231,20 @@ public class AIUtil extends ServiceBase {
                 }
             }
         }
+        if (counter==0) {
+            throw new RuntimeException("No context for this query was able to be created.");
+        }
+
         sb.append("Here is my question:\n");
         sb.append(req.getQuestion());
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
         AIServiceName svc = AIServiceName.fromString(req.getAiService());
-        if (svc != null) {
-            // #ai-model
-            switch (svc) {
-                case OPENAI:
-                    aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.OPENAI_MODEL_COMPLETION, "openai",
-                            userCredit);
-                    break;
-                case PPLX:
-                    aiResponse = ai.getAnswer(ms, null, sb.toString(), null, ai.PPLX_MODEL_COMPLETION_CHAT,
-                            "perplexity", userCredit);
-                    break;
-                case ANTH:
-                    aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
-                            "anthropic", userCredit);
-                    break;
-                case ANTH_SONNET:
-                    aiResponse = ai.getAnswer(ms, null, sb.toString(), system, ai.ANTH_SONNET_MODEL_COMPLETION_CHAT,
-                            "anthropic", userCredit);
-                    break;
-                case PPLX_ONLINE:
-                    aiResponse = ai.getAnswer(ms, null, sb.toString(), null, ai.PPLX_MODEL_COMPLETION_ONLINE,
-                            "perplexity", userCredit);
-                    break;
-                case PPLX_LLAMA3:
-                    aiResponse = ai.getAnswer(ms, null, sb.toString(), null, ai.PPLX_MODEL_COMPLETION_LLAMA3,
-                            "perplexity", userCredit);
-                    break;
-                case GEMINI:
-                    throw new RuntimeException("Gemini is not currently unavailable.");
-                default:
-                    throw new RuntimeException("Unknown AI service: " + req.getAiService());
-            }
+        if (svc.getService() == "gemini") {
+            throw new RuntimeException("Gemini AI is temporarily unavailable.");
         }
+        aiResponse = ai.getAnswer(ms, null, sb.toString(), system, svc.getModel(), svc.getService(), userCredit);
 
         if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
@@ -294,22 +269,22 @@ public class AIUtil extends ServiceBase {
     }
 
     // public String formatAnswer(ChatCompletionResponse ccr, boolean nullify) {
-    //     StringBuilder sb = new StringBuilder();
-    //     int counter = 0;
-    //     for (Choice choice : ccr.getChoices()) {
-    //         if (counter > 0) {
-    //             sb.append("\n\n");
-    //         }
-    //         sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getTextContent());
+    // StringBuilder sb = new StringBuilder();
+    // int counter = 0;
+    // for (Choice choice : ccr.getChoices()) {
+    // if (counter > 0) {
+    // sb.append("\n\n");
+    // }
+    // sb.append(/* choice.getMessage().getRole() + ": " + */ choice.getMessage().getTextContent());
 
-    //         // Since we store the answer text in the content of the node and also store the answer object
-    //         // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
-    //         if (nullify) {
-    //             choice.getMessage().setContent(null);
-    //         }
-    //         counter++;
-    //     }
-    //     return sb.toString();
+    // // Since we store the answer text in the content of the node and also store the answer object
+    // // on the node we nullify the content here so it isn't duplicated in the MongoDb storage.
+    // if (nullify) {
+    // choice.getMessage().setContent(null);
+    // }
+    // counter++;
+    // }
+    // return sb.toString();
     // }
 
     public String formatExportAnswerSection(String content, String aiService) {
@@ -407,42 +382,11 @@ public class AIUtil extends ServiceBase {
                             ```
                             """;
 
-            // #ai-model
-            switch (svc) {
-                case OPENAI:
-                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.OPENAI_MODEL_COMPLETION, "openai", userCredit);
-                    res.setGptCredit(userCredit.getVal());
-                    break;
-                case PPLX:
-                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.PPLX_MODEL_COMPLETION_CHAT, "perplexity",
-                            userCredit);
-                    res.setGptCredit(userCredit.getVal());
-                    break;
-                case ANTH:
-                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT, "anthropic",
-                            userCredit);
-                    res.setGptCredit(userCredit.getVal());
-                    break;
-                case ANTH_SONNET:
-                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.ANTH_SONNET_MODEL_COMPLETION_CHAT, "anthropic",
-                            userCredit);
-                    res.setGptCredit(userCredit.getVal());
-                    break;
-                case PPLX_ONLINE:
-                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.PPLX_MODEL_COMPLETION_ONLINE, "perplexity",
-                            userCredit);
-                    res.setGptCredit(userCredit.getVal());
-                    break;
-                case PPLX_LLAMA3:
-                    aiResponse = ai.getAnswer(ms, null, prompt, null, ai.PPLX_MODEL_COMPLETION_LLAMA3, "perplexity",
-                            userCredit);
-                    res.setGptCredit(userCredit.getVal());
-                    break;
-                case GEMINI:
-                    throw new RuntimeException("Gemini is not currently unavailable.");
-                default:
-                    break;
+            if (svc.getService() == "gemini") {
+                throw new RuntimeException("Gemini AI is temporarily unavailable.");
             }
+            aiResponse = ai.getAnswer(ms, null, prompt, null, svc.getModel(), svc.getService(), userCredit);
+            res.setGptCredit(userCredit.getVal());
         }
         String answer = aiResponse.getContent();
         log.debug("Generated book content: " + answer);
@@ -471,27 +415,29 @@ public class AIUtil extends ServiceBase {
     }
 
     // Assumes node is a question, and inserts the answer under it as a subnode
-    // todo-0: this method is an odball case. be sure to test it.
-    public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
-            CreateSubNodeResponse res) {
+    // public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
+    //         CreateSubNodeResponse res) {
 
-        // ChatCompletionResponse aiAnswer = oai.getAnswer(ms, node, null, null, false);
-        // res.setGptCredit(aiAnswer.userCredit);
-        Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-        AIResponse aiResponse = ai.getAnswer(ms, node, null, null, ai.OPENAI_MODEL_COMPLETION, "openai", userCredit);
-        res.setGptCredit(userCredit.getVal());
+    //     Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+    //     AIResponse aiResponse = null;
+    //     AIServiceName svc = AIServiceName.fromString(req.getAiService());
+    //     if (svc.getService() == "gemini") {
+    //         throw new RuntimeException("Gemini AI is temporarily unavailable.");
+    //     }
+    //     SystemConfig system = new SystemConfig();
+    //     aiUtil.getAIConfigFromAncestorNodes(ms, node, system);
+    //     aiResponse = ai.getAnswer(ms, node, null, system, svc.getModel(), svc.getService(), userCredit);
 
-        List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
-        SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
-                null, true, true, res.getNodeChanges());
+    //     List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
+    //     SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
+    //             null, true, true, res.getNodeChanges());
 
-        newNode.setContent(aiResponse.getContent());
-        // newNode.set(NodeProp.OPENAI_RESPONSE, aiAnswer);
+    //     newNode.setContent(aiResponse.getContent());
 
-        newNode.touch();
-        newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-        acl.inheritSharingFromParent(ms, res, node, newNode);
-        update.save(ms, newNode);
-    }
+    //     newNode.touch();
+    //     newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+    //     acl.inheritSharingFromParent(ms, res, node, newNode);
+    //     update.save(ms, newNode);
+    // }
 }
 

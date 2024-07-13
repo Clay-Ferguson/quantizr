@@ -25,8 +25,6 @@ import jakarta.servlet.http.HttpSession;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.client.NodeType;
-import quanta.rest.request.AIGenImageRequest;
-import quanta.rest.request.AIGenSpeechRequest;
 import quanta.rest.request.AddCreditRequest;
 import quanta.rest.request.AddFriendRequest;
 import quanta.rest.request.AddPrivilegeRequest;
@@ -646,22 +644,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
         return callProc.run("deleteAttachment", true, true, req, session, ms -> {
             return attach.cm_deleteAttachment(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/aiGenImage", method = RequestMethod.POST)
-    @ResponseBody
-    public Object aiGenImage(@RequestBody AIGenImageRequest req, HttpSession session) {
-        return callProc.run("aiGenImage", true, true, req, session, ms -> {
-            return attach.cm_aiGenImage(ms, req);
-        });
-    }
-
-    @RequestMapping(value = API_PATH + "/aiGenSpeech", method = RequestMethod.POST)
-    @ResponseBody
-    public Object aiGenSpeech(@RequestBody AIGenSpeechRequest req, HttpSession session) {
-        return callProc.run("aiGenSpeech", true, true, req, session, ms -> {
-            return attach.cm_aiGenSpeech(ms, req);
         });
     }
 

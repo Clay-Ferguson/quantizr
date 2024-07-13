@@ -60,13 +60,9 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.rest.request.AIGenImageRequest;
-import quanta.rest.request.AIGenSpeechRequest;
 import quanta.rest.request.DeleteAttachmentRequest;
 import quanta.rest.request.PasteAttachmentsRequest;
 import quanta.rest.request.UploadFromUrlRequest;
-import quanta.rest.response.AIGenImageResponse;
-import quanta.rest.response.AIGenSpeechResponse;
 import quanta.rest.response.DeleteAttachmentResponse;
 import quanta.rest.response.PasteAttachmentsResponse;
 import quanta.rest.response.UploadFromUrlResponse;
@@ -666,24 +662,6 @@ public class AttachmentService extends ServiceBase {
             readFromUrl(ms, req.getSourceUrl(), null, req.getNodeId(), null, null, 0, req.isStoreLocally(), null);
         }
         return res;
-    }
-
-    public AIGenImageResponse cm_aiGenImage(MongoSession ms, AIGenImageRequest req) {
-        throw new RuntimeEx("Image Generation is currently not available.");
-        // AIGenImageResponse res = new AIGenImageResponse();
-        // Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-        // String url = ai.generateImage(ms, req.getOpenAiPrompt(), req.isHighDef(), req.getSize(), "dall-e-3", "openai", userCredit);
-        // readFromUrl(ms, url, null, req.getNodeId(), null, null, 0, true, req.getOpenAiPrompt());
-        // return res;
-    }
-
-    public AIGenSpeechResponse cm_aiGenSpeech(MongoSession ms, AIGenSpeechRequest req) {
-        // todo-0: I never used this much, since all AI has been moved into microservice we don't have it here
-        // until it's implemented in the microservice.
-        throw new RuntimeEx("Speech Generation is currently not available.");
-        // AIGenSpeechResponse res = new AIGenSpeechResponse();
-        // oai.generateSpeech(ms, req.getOpenAiPrompt(), req.getVoice(), req.getNodeId());
-        // return res;
     }
 
     /**

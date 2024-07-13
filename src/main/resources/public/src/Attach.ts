@@ -1,5 +1,3 @@
-import { UploadAIGenImgDlg } from "./dlg/UploadAIGenImgDlg";
-import { UploadAIGenSpeechDlg } from "./dlg/UploadAIGenSpeechDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
 import { Attachment, NodeInfo } from "./JavaIntf";
@@ -33,32 +31,6 @@ export class Attach {
         }
 
         new UploadFromUrlDlg(nodeId, onUploadFunc).open();
-    };
-
-    openUploadFromAiGenImageDlg = (nodeId: string, onUploadFunc: () => void) => {
-        if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode();
-            if (!node) {
-                S.util.showMessage("No node is selected.", "Warning");
-                return;
-            }
-            nodeId = node.id;
-        }
-
-        new UploadAIGenImgDlg(nodeId, onUploadFunc).open();
-    };
-
-    openUploadFromAiGenSpeechDlg = (nodeId: string, onUploadFunc: () => void) => {
-        if (!nodeId) {
-            const node = S.nodeUtil.getHighlightedNode();
-            if (!node) {
-                S.util.showMessage("No node is selected.", "Warning");
-                return;
-            }
-            nodeId = node.id;
-        }
-
-        new UploadAIGenSpeechDlg(nodeId, onUploadFunc).open();
     };
 
     getAttachmentUrl = (urlPart: string, node: NodeInfo, attName: string, downloadLink: boolean): string => {

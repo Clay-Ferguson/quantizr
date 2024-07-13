@@ -305,51 +305,13 @@ public class MongoCreate extends ServiceBase {
                     svc = AIServiceName.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+                aiResponse = ai.getAnswer(ms, parentNode, null, null, svc.getModel(), svc.getService(), userCredit);
 
-                // #ai-model
-                // todo-0: this switch can be simplified so most of the code is outside it.
-                switch (svc) {
-                    case OPENAI:
-                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.OPENAI_MODEL_COMPLETION, "openai",
-                                userCredit);
-                        res.setGptCredit(userCredit.getVal());
-                        typeToCreate = NodeType.AI_ANSWER.s();
-                        break;
-                    case PPLX:
-                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.PPLX_MODEL_COMPLETION_CHAT, "perplexity",
-                                userCredit);
-                        res.setGptCredit(userCredit.getVal());
-                        typeToCreate = NodeType.AI_ANSWER.s();
-                        break;
-                    case ANTH:
-                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.ANTH_OPUS_MODEL_COMPLETION_CHAT,
-                                "anthropic", userCredit);
-                        res.setGptCredit(userCredit.getVal());
-                        typeToCreate = NodeType.AI_ANSWER.s();
-                        break;
-                    case ANTH_SONNET:
-                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.ANTH_SONNET_MODEL_COMPLETION_CHAT,
-                                "anthropic", userCredit);
-                        res.setGptCredit(userCredit.getVal());
-                        typeToCreate = NodeType.AI_ANSWER.s();
-                        break;
-                    case PPLX_ONLINE:
-                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.PPLX_MODEL_COMPLETION_ONLINE, "perplexity",
-                                userCredit);
-                        res.setGptCredit(userCredit.getVal());
-                        typeToCreate = NodeType.AI_ANSWER.s();
-                        break;
-                    case PPLX_LLAMA3:
-                        aiResponse = ai.getAnswer(ms, parentNode, null, null, ai.PPLX_MODEL_COMPLETION_LLAMA3, "perplexity",
-                                userCredit);
-                        res.setGptCredit(userCredit.getVal());
-                        typeToCreate = NodeType.AI_ANSWER.s();
-                        break;
-                    case GEMINI:
-                        throw new RuntimeException("Gemini AI is temporarily unavailable.");
-                    default:
-                        break;
+                if (svc.getService() == "gemini") {
+                    throw new RuntimeException("Gemini AI is temporarily unavailable.");
                 }
+                res.setGptCredit(userCredit.getVal());
+                typeToCreate = NodeType.AI_ANSWER.s();
             }
         }
 
@@ -379,7 +341,9 @@ public class MongoCreate extends ServiceBase {
                 newNode.setPath(mongoUtil.setPendingPathState(newNode.getPath(), true));
             }
 
-            newNode.setContent(aiResponse.getContent());
+            if (aiResponse != null) {
+                newNode.setContent(aiResponse.getContent());
+            }
             newNode.touch();
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
@@ -409,7 +373,7 @@ public class MongoCreate extends ServiceBase {
             nodeBeingRepliedTo = parentNode;
         }
 
-        if (allowSharing) {
+        if (allowSharing && aiResponse == null) {
             // if a user to share to (a Direct Message) is provided, add it.
             if (req.getShareToUserId() != null) {
                 HashMap<String, AccessControl> ac = new HashMap<>();
@@ -439,8 +403,11 @@ public class MongoCreate extends ServiceBase {
         }
         update.save(ms, newNode);
 
+        // todo-0: this is apparently old code, that was left and a flow path that will never run, right? I'm just throwing an 
+        // exception here to see if it's ever hit.
         if (req.getAiService() != null && NodeType.AI_ANSWER.s().equals(parentNode.getType())) {
-            aiUtil.insertAnswerToQuestion(ms, newNode, req, res);
+            throw new RuntimeException("Unsupport AI method used");
+            // aiUtil.insertAnswerToQuestion(ms, newNode, req, res);
         }
 
         res.setNewNode(convert.toNodeInfo(false, ThreadLocals.getSC(), ms, newNode, false, //

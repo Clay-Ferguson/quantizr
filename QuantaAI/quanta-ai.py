@@ -38,11 +38,6 @@ class AIResponse(BaseModel):
     cost: Optional[float]
     error: Optional[str]
     
-class AIImageResponse(BaseModel):
-    url: Optional[str]
-    cost: Optional[float]
-    error: Optional[str]
-
 class AIRequest(BaseModel):
     systemPrompt: Optional[str]
     prompt: str
@@ -52,13 +47,6 @@ class AIRequest(BaseModel):
     temperature: float
     maxTokens: int
     credit: float
-
-class AIImageRequest(BaseModel):
-    prompt: str
-    service: str
-    model: str
-    credit: float
-    temperature: float
 
 @app.get("/")
 def index() -> str:
@@ -97,65 +85,6 @@ def api_query(req: AIRequest,
     except Exception as e:
         return AIResponse(content=None, cost=None, error=str(e)+"\n"+traceback.format_exc())
 
-# I'm putting this method on hold for now. I have spent the entier day 7/12/24 trying to get these trivial few lines of code
-# to work and at this point it's clear there's some kind of incompatibility between the packages, and reinstalling them all doesn't fix it
-# Since I don't personally care much about the image generation, I'm stoping work on this for now. To fix this I will need to run
-# outside of docker and step thru the code to see what's going on. It's saying 'image' is not found on 'client' and it's a well-known issue
-# on the openai forums and stack overflow, but supposedly it's fixed in the latest version of the package, and I'm USING the latest package.
-# People were speculating it even would keep showing this error until PYTHON itself is updated, but I'm in a recent version of python too,
-# so this is just one mystery after another.
-@app.post("/api/image")
-def api_image(req: AIImageRequest,
-              api_key: Optional[str] = Header(None, alias="X-api-key")
-    ) -> AIImageResponse:
-    raise ValueError("Image generation is not supported at this time.")
-    # try:
-    #     # # for now we'll max out at 100k tokens allowed
-    #     # if (req.maxTokens > 100000): 
-    #     #     req.maxTokens = 100000
-        
-    #     # # Estimate input tokens
-    #     # input_text = "".join([msg.content for msg in req.messages])
-    #     # input_tokens = int((len(input_text)+3) / 3)
-                
-    #     # # calculate predicted cost
-    #     # cost: float = calculate_cost(input_tokens, req.maxTokens, req.model)
-    #     # if (cost > req.credit):
-    #     #     return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account.")         
-
-    #     url = None
-    #     if LANGCHAIN_IMAGE_GEN:  
-    #         os.environ["OPENAI_API_KEY"] = api_key
-    #         llm = getImageModel(req, api_key)
-    #         prompt = PromptTemplate(
-    #             input_variables=["image_desc"],
-    #             template="Generate a detailed prompt to generate an image based on the following description: {image_desc}",
-    #         )
-    #         chain = LLMChain(llm=llm, prompt=prompt)
-    #         # url = DallEAPIWrapper(model_name="dall-e-3").run(chain.run(req.prompt))
-    #         url = DallEAPIWrapper().run(chain.run(req.prompt))
-    #     else:
-    #         os.environ["OPENAI_API_KEY"] = api_key
-    #         client = OpenAI()
-    #         response = client.images.generate(
-    #             model="dall-e-3",
-    #             prompt="a white siamese cat",
-    #             size="1024x1024",
-    #             quality="standard",
-    #             n=1,
-    #         )
-    #         url = response.data[0].url
-
-    #     # Estimate output tokens
-    #     # output_tokens = int((len(response.content)+3) / 3)        
-    #     # cost = calculate_cost(input_tokens, output_tokens, req.model)
-
-    #     # not make our return value and return it (todo-0: implement cost)
-    #     ret = AIImageResponse(url=url, cost=0.0, error=None)
-    #     return ret
-    # except Exception as e:
-    #     return AIImageResponse(url=None, cost=None, error=str(e)+"\n"+traceback.format_exc())
-
 def buildMessages(req):
     messages = []
     for msg in req.messages:
@@ -183,19 +112,6 @@ def buildMessages(req):
 
     return messages
 
-def getImageModel(req: AIRequest, api_key) -> BaseChatModel:
-    llm: BaseChatModel = None;
-    if req.service == "openai":
-        llm = OpenAI(
-            # model=req.model,
-            temperature=req.temperature,
-            # api_key=api_key,
-            # verbose=True,
-        )
-    else:
-        raise ValueError(f"Unsupported service: {req.service}")
-    return llm
-
 def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     llm: BaseChatModel = None;
     if req.service == "anthropic":
@@ -210,7 +126,8 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
         llm = ChatOpenAI(
             model=req.model,
             temperature=req.temperature,
-            max_tokens_to_sample=req.maxTokens,
+            max_tokens=req.maxTokens,
+            timeout=120,  # timeout in seconds
             api_key=api_key,
             verbose=True,
         )
@@ -219,6 +136,7 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
             model=req.model,
             temperature=req.temperature,
             max_tokens_to_sample=req.maxTokens,
+            request_timeout=120,  # timeout in seconds
             pplx_api_key=api_key,
         )
     else:
@@ -279,30 +197,3 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
     else:
         raise RuntimeError(f"Model not supported: {model} is not supported.")
 
-# IMAGE Code from deleted Java (We'll need this if we ever add back in image, vision, or tts)
-    # String OPENAI_MODEL_TTS = "tts-1";
-    # String OPENAI_MODEL_VISION = "gpt-4o";
-    # String OPENAI_MODEL_COMPLETION = "gpt-4o";
-    # String COST_CODE = "OAI"; // 3 chars allowed
-
-    # // https://openai.com/pricing
-    # private BigDecimal getImageCost(String size) {
-    #     switch (size) {
-    #         case "1024x1792":
-    #         case "1792x1024":
-    #             return new BigDecimal(0.12);
-    #         case "1024x1024":
-    #             return new BigDecimal(0.08);
-    #         default:
-    #             throw new RuntimeException("Unsupported image size: " + size);
-    #     }
-    # }
-
-    # private BigDecimal getSpeechCost(String model, int promptLength) {
-    #     switch (model) {
-    #         case "tts-1":
-    #             return new BigDecimal(0.000015 * promptLength);
-    #         default:
-    #             throw new RuntimeException("Unsupported speech model: " + model);
-    #     }
-    # }

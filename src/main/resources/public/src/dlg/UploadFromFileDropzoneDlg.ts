@@ -79,27 +79,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 ])
             ]),
             new Div(null, { className: "marginRight" }, [
-                new Div("AI Generated"),
-                new ButtonBar([
-                    new IconButton("fa-magic", "Image", {
-                        onClick: this.uploadFromAiGenImage,
-                        title: "Create an AI Generated Image"
-                    }),
-                    new IconButton("fa-magic", "Speech", {
-                        onClick: this.uploadFromAiGenSpeech,
-                        title: "Create an AI Generated Speech MP3"
-                    }),
-
-                    // LEAVING THIS FOR FUTURE
-                    // (Currently the clipboard upload button on the editor itself is all we need so this button
-                    // is not here since it just repliates that same functionality)
-                    // !S.util.clipboardReadable() ? null : new IconButton("fa-paperclip", "Clipboard", {
-                    //     onClick: this.uploadFromClipboard,
-                    //     title: "Upload from Clipboard"
-                    // }),
-                ])
-            ]),
-            new Div(null, { className: "marginRight" }, [
                 new Div("Live Recording"),
                 new ButtonBar([
                     !this.allowRecording ? null : new IconButton("fa-microphone", "Mic", {
@@ -155,24 +134,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     uploadFromUrl = () => {
         S.attachment.openUploadFromUrlDlg(this.nodeId, () => {
-            this.close();
-            if (this.afterUploadFunc) {
-                this.afterUploadFunc();
-            }
-        });
-    }
-
-    uploadFromAiGenImage = () => {
-        S.attachment.openUploadFromAiGenImageDlg(this.nodeId, () => {
-            this.close();
-            if (this.afterUploadFunc) {
-                this.afterUploadFunc();
-            }
-        });
-    }
-
-    uploadFromAiGenSpeech = () => {
-        S.attachment.openUploadFromAiGenSpeechDlg(this.nodeId, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
