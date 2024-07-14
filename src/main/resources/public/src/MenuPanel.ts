@@ -42,7 +42,7 @@ export class MenuPanel extends Div {
     }
 
     // leaving for reference how to open this.
-    static editFriends = () => { new FriendsDlg("Friends", null, true).open(); };
+    static editFriends = () => { new FriendsDlg("Following", null, true).open(); };
 
     static openBookmarksNode = () => {
         S.util.setUserPreferences(true);
@@ -210,7 +210,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("People", [
-                new MenuItem("Friends", MenuPanel.editFriends),
+                new MenuItem("Following", MenuPanel.editFriends),
                 new MenuItem("Followers", MenuPanel.showFollowers),
                 new MenuItem("Blocked", MenuPanel.showBlockedUsers),
                 new MenuItemSeparator(),
