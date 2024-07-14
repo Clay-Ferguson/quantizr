@@ -156,13 +156,18 @@ export class RightNavPanel extends Div {
             new FlexRowLayout([
                 avatarImg,
                 new Div(null, null, [
-                    new Div(null, { className: "marginBottom" }, [
+                    new Div(null, {
+                        className: "marginBottom clickable",
+                        onClick: () => {
+                            PubSub.pub(C.PUBSUB_closeNavPanel);
+                            new UserProfileDlg(null).open();
+                        }
+                    }, [
+                        new Icon({
+                            className: "fa fa-gear fa-lg microMarginRight",
+                        }),
                         !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
-                            className: "clickable marginRight",
-                            onClick: () => {
-                                PubSub.pub(C.PUBSUB_closeNavPanel);
-                                new UserProfileDlg(null).open();
-                            }
+                            className: "smallMarginRight",
                         }) : null,
                     ]),
                     loginSignupDiv,
