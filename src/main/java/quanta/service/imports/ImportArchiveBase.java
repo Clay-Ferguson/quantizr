@@ -117,6 +117,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 String nodeName = node.getName();
                 while (tries < 10) {
                     try {
+                        // todo-0: This kind of approach fails the second time around, with transaction enabled, in this scope.
+                        //         so we need to figure out how to do this properly. Probably doing a lookup instead of attempting a write
+                        //         is the better way. see #transaction-note-1 where @Transaction is commented out for now.
                         update.save(session, node);
                         break;
                     } catch (DuplicateKeyException ex) {

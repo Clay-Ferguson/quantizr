@@ -414,7 +414,7 @@ public class AIUtil extends ServiceBase {
         return res;
     }
 
-    // Assumes node is a question, and inserts the answer under it as a subnode
+    // Don't delete this yet, but it probably is no longer used.
     // public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
     //         CreateSubNodeResponse res) {
 
