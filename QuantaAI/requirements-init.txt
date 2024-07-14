@@ -2,7 +2,6 @@ langchain
 langchain_anthropic
 langchain_openai 
 langchain_community
-langchain_core
-openai 
+langchain_core 
 fastapi
 pydantic
