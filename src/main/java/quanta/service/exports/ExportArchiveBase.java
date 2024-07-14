@@ -83,9 +83,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         // allows us to generate headings sizes (#, ##, ###, etc) relative to the file.
         int baseSlashCount = 0;
 
-        // used only to detect name collisions so the record number will be used for decollision
-        HashSet<String> attachmentNames = new HashSet<>();
-
         StringBuilder content = new StringBuilder();
         StringBuilder toc = new StringBuilder();
         StringBuilder mtoc = new StringBuilder(); // master toc
@@ -709,7 +706,25 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return fileName;
     }
 
-    private void writeAttachmentFileForNode(MongoSession ms, String parentFolder, SubNode node, String fileName,
+    private String getAttachmentFileNameEx(Attachment att, SubNode node) {
+        String fileName = node.getIdStr() + "_" + att.getKey();
+        String attFileName = att.getFileName();
+
+        // try first to get the extension from the filename
+        String ext = FilenameUtils.getExtension(attFileName);
+        if (!StringUtils.isEmpty(ext)) {
+            fileName += "." + ext;
+        } 
+        // if no extension in the filename, try to get it from the mime type
+        else {
+            // NOTE: this method will retun with the "." in front of the extension
+            ext = MimeTypeUtils.getExtensionFromMimeType(att.getMime());
+            fileName += ext;
+        }
+        return fileName;
+    }
+
+    private void writeAttachmentFileForNode(MongoSession ms, String parentFolder, SubNode node, String path,
             Attachment att) {
         if (att.getMime() == null)
             return;
@@ -727,9 +742,12 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 attFileName += ext;
             }
         }
+        else if (req.getContentType().equals("json")) {
+            attFileName = att.getKey();
+        }
         // else we just need it to be the key
         else {
-            attFileName = att.getKey();
+            attFileName = getAttachmentFileNameEx(att, node);
         }
 
         InputStream is = null;
@@ -742,14 +760,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             String binFileName = null;
             if (mdFile != null) {
-                if (!mdFile.attachmentNames.add(attFileName)) {
-                    throw new RuntimeException("Attachment " + attFileName + " is used twice in the same node");
-                }
-
                 String attFolder = fileUtil.getParentPath(mdFile.fileName);
                 binFileName = attFolder + "/attachments/" + attFileName;
             } else {
-                String folder = req.getContentType().equals("fs") ? fileName : node.getIdStr();
+                String folder = req.getContentType().equals("fs") ? path : node.getIdStr();
                 binFileName = parentFolder + "/" + folder + "/" + attFileName;
             }
 
@@ -777,22 +791,21 @@ public abstract class ExportArchiveBase extends ServiceBase {
      */
     private void handleAttachment(SubNode node, boolean injectingTag, Val<String> htmlContent, Val<String> mdContent,
             String deeperPath, String parentFolder, boolean writeFile, Attachment att) {
-        String ext = null;
         String nodeId = node.getIdStr();
-        String attFileName = getAttachmentFileName(att, node);
 
-        ext = FilenameUtils.getExtension(attFileName);
+        String af = getAttachmentFileName(att, node);
+        String ext = FilenameUtils.getExtension(af);
         if (!StringUtils.isEmpty(ext)) {
             ext = "." + ext;
         } else {
             ext = MimeTypeUtils.getExtensionFromMimeType(att.getMime());
         }
-
-        String displayName = att.getFileName() != null ? att.getFileName() : attFileName;
+        String displayName = att.getFileName() != null ? att.getFileName() : af;
         String mimeType = att.getMime();
         String fullUrl = null;
 
         if (mdFile != null) {
+            String attFileName = getAttachmentFileNameEx(att, node);
             fullUrl = "attachments/" + attFileName;
         } else {
             fullUrl = parentFolder + "/" + nodeId + "/" + att.getKey() + ext;
