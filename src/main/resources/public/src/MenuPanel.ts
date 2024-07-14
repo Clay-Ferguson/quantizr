@@ -242,7 +242,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Move to Top", S.edit.moveNodeToTop, onMainTab && canMoveUp, null, true), //
                 new MenuItem("Move to Bottom", S.edit.moveNodeToBottom, onMainTab && canMoveDown, null, true), //
                 new MenuItemSeparator(), //
-                new MenuItem("Copy", S.edit.copySelNodes, onMainTab && !ast.nodesToMove, null, true), //
+                new MenuItem("Copy", S.edit.copySelNodes, onMainTab && !ast.nodesToMove && onMainTab && ast.selectedNodes.size > 0, null, true), //
                 new MenuItem("Undo Copy/Cut", S.edit.undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
 
                 // todo-2: disabled during mongo conversion
