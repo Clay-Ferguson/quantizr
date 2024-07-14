@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Semantic Web](#semantic-web)
     * [Semantic Web Basics](#semantic-web-basics)
@@ -37,35 +37,35 @@ However, with the Semantic Web we have Objects with Properties. So in the Semant
 }
 ```
 
-<img src='attachments/6418e2ffa4db9e5e43bb72b2-file-p' style='width:25%'/>
+<img src='attachments/6418e2ffa4db9e5e43bb72b2_p.png' style='width:25%'/>
 
 
 # Person Type Example
 
 Here's an example (below) of how to create a `Person object`, then edit it, and see how it displays. We can select `Menu -> Create -> Choose Type...` which will lead to the following selection list where we can select `Person` as the type of the thing we want to create.
 
-![choose-type.png](attachments/64193b62dfa8e71dac2b1018-choose-type.png)
+![choose-type.png](attachments/64193b62dfa8e71dac2b1018_p.png)
 
 
 # Editing a Person
 
 We're now editing the Person type we just created (above) and can `enter the properties` as shown in the image below:
 
-![edit-type.png](attachments/64193c39dfa8e71dac2b1040-edit-type.png)
+![edit-type.png](attachments/64193c39dfa8e71dac2b1040_p.png)
 
 
 # Object Display
 
 After clicking `Save` in the record editor dialog (above) the node will be saved, and will be displayed as shown below:
 
-<img src='attachments/64193c7fdfa8e71dac2b104e-rendering-type.png' style='width:100%'/>
+<img src='attachments/64193c7fdfa8e71dac2b104e_p.png' style='width:100%'/>
 
 
 # Adding more Properties
 
 As shown above, there are only a handful of properties that are assigned to the Person object by default in this experimental feature, but we can add more properties, by going back into the `Node Editor` at any time and clicking the `Plus Icon` to add more properties and pick from the full list of all `Schema.org` Person properties (or any other type of object's properties):
 
-<img src='attachments/64193cf4dfa8e71dac2b1066-add-property.png' style='width:100%'/>
+<img src='attachments/64193cf4dfa8e71dac2b1066_p.png' style='width:100%'/>
 
 
 # Technical Info
@@ -130,7 +130,7 @@ Arbitrary `Key/Value` pairs can also be added to any node including properties t
 
 Those properties could've been named anything, and they could've been assigned any values we want.
 
-![arbitrary-prop-create.png](attachments/6419e044dfa8e71dac2b33ba-arbitrary-prop-create.png)
+![arbitrary-prop-create.png](attachments/6419e044dfa8e71dac2b33ba_p.png)
 
 
 ## Default Property Display
@@ -139,7 +139,7 @@ Since those properties are not part of an object that has been configured to dis
 
 *Note: You'll need to select the `Menu -> Account -> Settings -> View Options -> Properties` checkbox to see these properties displayed.*
 
-![arbitrary-property-display.png](attachments/6419e457dfa8e71dac2b353f-arbitrary-property-display.png)
+![arbitrary-property-display.png](attachments/6419e457dfa8e71dac2b353f_p.png)
 
 
 ## Semantic Web References
@@ -166,4 +166,4 @@ Recommended reading: Search for "Project Gutenberg" in WordPress online informat
 
 
 ----
-**[Next: RDF Triples](/docs/user-guide/rdf-triples/index.md)**
+**[Next: RDF-Triples](/docs/user-guide/rdf-triples/index.md)**

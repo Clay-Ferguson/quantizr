@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
 
 * [How to Run](#how-to-run)
     * [How to Run the Quanta Server](#how-to-run-the-quanta-server)

@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Uploading
 
@@ -8,22 +8,22 @@ Below are the steps to upload an image or other file attachment to a node.
 
 The `Node Editor Dialog` (shown below) has an upload button that you can use to add any number of attachments to the node. We'll show an example of uploading an image here,.
 
-![edit-dlg2.png](attachments/6287c99196d3696042d5d5cb-edit-dlg2.png)
+![edit-dlg2.png](attachments/6287c99196d3696042d5d5cb_p.png)
 
 
 You'll now be in the `Attach File` dialog, where you can select files to upload. In the example below you can see one image was selected to be uploaded, by clicking in the dotted rectangle area and then selecting a file from the hard drive.
 
-![file-p](attachments/6287cb9696d3696042d5d5f8-file-p)
+![file-p](attachments/6287cb9696d3696042d5d5f8_p.png)
 
 
 After clicking "Upload" on the dialog above we'll see that the image is now on this node and we can choose a few options for how to display it, a checkbox to select it for delete, etc.
 
-![file-p](attachments/63f421f4fad1d222649c6548-file-p)
+![file-p](attachments/63f421f4fad1d222649c6548_p.png)
 
 
 After we save the node we uploaded to it will render displaying the image:
 
-![Screenshot from 2023-02-20 19-31-52.png](attachments/63f41f6cfad1d222649c64b8-Screenshot_from_2023-02-20_19-31-52.png)
+![Screenshot from 2023-02-20 19-31-52.png](attachments/63f41f6cfad1d222649c64b8_p.png)
 
 
 Each node can have any number of file attachments of any kind (i.e. images, video files, audio files, PDFs, etc) uploaded to it.
@@ -37,7 +37,7 @@ If the attachment is a media file (audio or video) there will be a "Play Audio" 
 As you saw in the screenshot above, are several kinds of sources from which you can upload:
 
 
-![buttons](attachments/5fa1926c6b842575d0e925ed-buttons)
+![buttons](attachments/5fa1926c6b842575d0e925ed_p.png)
 
 
 

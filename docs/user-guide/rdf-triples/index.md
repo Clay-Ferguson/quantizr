@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [RDF Triples](#rdf-triples)
     * [Node Linking](#node-linking)
@@ -18,15 +18,15 @@ The term `RDF Triple` is the technical name for a very simple concept, which in 
 
 The images below show the basic concept of an RDF Tripe. It's called a `triple` because you have a Subject, Predicate, and Object. However in Quanta you can think of these as a `Source Node`, verb, and `Object Node`.
 
-<img src='attachments/65bbdbeecf425c5fe6f2ddcf-file-img1' style='width:75%'/>
+<img src='attachments/65bbdbeecf425c5fe6f2ddcf_img1.png' style='width:75%'/>
 
 
-<img src='attachments/65bbdbeecf425c5fe6f2ddcf-file-p' style='width:75%'/>
+<img src='attachments/65bbdbeecf425c5fe6f2ddcf_p.png' style='width:75%'/>
 
 
 # How to Link two Nodes
 
-![file-p](attachments/65bbdd3bcf425c5fe6f2ddd4-file-p)
+![file-p](attachments/65bbdd3bcf425c5fe6f2ddd4_p.png)
 
 
 Under `Menu -> RDF Triple` menu item is where you will find the RDF Triple options. To link two nodes together, use the following four step process:
@@ -46,7 +46,7 @@ The `Create Triple` function mentioned above leads to the following dialog where
 
 The `Embed Content` option can be selected if you want to actually also **display** the linked node content right inline on the page just below the node that links to it. You can access `RDF Link` dialog from the Node Editor dialog as well to change the predicate configuration any time, or delete it.
 
-![file-p](attachments/65be7c46cf425c5fe6f2de07-file-p)
+![file-p](attachments/65be7c46cf425c5fe6f2de07_p.png)
 
 
 # Find Subjects

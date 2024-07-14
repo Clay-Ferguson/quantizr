@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Node Info
 
@@ -14,7 +14,7 @@ There will potentially be various other URLs associated with a node, such as a U
 
 Here's an example of that dialog, showing the URLs for a node:
 
-![file-p](attachments/5fa1926c6b842575d0e92616-file-p)
+![file-p](attachments/5fa1926c6b842575d0e92616_p.png)
 
 
 See also: The "Custom URLs" section of this User Guide.
@@ -33,4 +33,4 @@ You can click on any word displayed in this dialog to automatically run a search
 
 
 ----
-**[Next: RSS and Podcasts](/docs/user-guide/rss/index.md)**
+**[Next: RSS-and-Podcasts](/docs/user-guide/rss/index.md)**

@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [RSS and Podcasts](#rss-and-podcasts)
     * [Create an RSS Aggregator](#create-an-rss-aggregator)
@@ -20,21 +20,21 @@ Below are screenshots showing the steps to subscribe to some RSS feeds.
 
 First click the `Node Type` icon in the editor on a node where you want to host the RSS Subscription from, and then pick `RSS Feed` as the new node type.
 
-![set-node-type-to-rss.png](attachments/65722797fc3f094a7cc0ae1a-set-node-type-to-rss.png)
+![set-node-type-to-rss.png](attachments/65722797fc3f094a7cc0ae1a_p.png)
 
 
 ## Enter RSS URLs
 
 After changing a node to `RSS Feed` type it will automatically display a place for you to enter the URLs you want to subscribe to.
 
-![enter-feed-urls.png](attachments/657227f9fc3f094a7cc0ae3c-enter-feed-urls.png)
+![enter-feed-urls.png](attachments/657227f9fc3f094a7cc0ae3c_p.png)
 
 
 ## Request to View Feeds
 
 After saving the node you'll see a `View Feeds` button appearing on the node which you can click to retrieve all the latest RSS content.
 
-![view-feeds-node.png](attachments/65722839fc3f094a7cc0ae4c-view-feeds-node.png)
+![view-feeds-node.png](attachments/65722839fc3f094a7cc0ae4c_p.png)
 
 
 ## Have Fun Reading the News
@@ -43,7 +43,7 @@ After clicking `View Feed` the app will switch over to the `RSS Feed Tab` to dis
 
 You can update your list of URLs any time, and everything will just continue to work. There's no need to go thru the process again of creating a new node whenever you want to modify your subscriptions, because you can simply edit the list of URLs any time, using the Node Editor.
 
-<img src='attachments/6572288dfc3f094a7cc0ae67-rendered-feeds.png' style='width:100%'/>
+<img src='attachments/6572288dfc3f094a7cc0ae67_p.png' style='width:100%'/>
 
 
 # Comment on a Podcast
@@ -58,7 +58,7 @@ Here's a screenshot of the audio player, showing this "Post" button:
 
 
 
-![file-p](attachments/622512ed67a3a60f9a5d3210-file-p)
+![file-p](attachments/622512ed67a3a60f9a5d3210_p.png)
 
 
 

@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Sharing](#sharing)
     * [Node Ownership](#node-ownership)
@@ -28,39 +28,39 @@ However, Quanta doesn't necessarily require you to put usernames into the conten
 
 In the following we'll walk thru the process of how you'd start with this node below, which starts out un-shared, and make it public as well as share to a couple of other users, which will make it show up in their Social Media feed.
 
-![Screenshot from 2023-02-21 14-39-18.png](attachments/6287ccc996d3696042d5d61b-Screenshot_from_2023-02-21_14-39-18.png)
+![Screenshot from 2023-02-21 14-39-18.png](attachments/6287ccc996d3696042d5d61b_p.png)
 
 
 After clicking the `Share` button on the dialog above the following dialog pops up so we can configure the sharing. In this dialog we can add or remove people who are allowed to access this node, and control various aspects of how this node is shared.
 
-![file-p](attachments/6287cea096d3696042d5d640-file-p)
+![file-p](attachments/6287cea096d3696042d5d640_p.png)
 
 
 After clicking `Make Public` to share this node to the public, we're still on the same dialog and it shows up as follows:
 
-![Screenshot from 2023-02-21 14-40-46.png](attachments/63f52c51ca571559e120e477-Screenshot_from_2023-02-21_14-40-46.png)
+![Screenshot from 2023-02-21 14-40-46.png](attachments/63f52c51ca571559e120e477_p.png)
 
 
 In addition to making this node public, let's share it to a couple of people. After clicking `Add People` in the dialog above we will be presented with our Friends List Dialog, for picking people, as shown below:
 
-![Screenshot from 2023-02-21 14-43-08.png](attachments/63f52ce1ca571559e120e4bd-Screenshot_from_2023-02-21_14-43-08.png)
+![Screenshot from 2023-02-21 14-43-08.png](attachments/63f52ce1ca571559e120e4bd_p.png)
 
 
 After using the checkboxes in the above list of friends to pick Jetson and Adam, and clicking `Ok` (on the dialog above), we end up back at the Sharing Dialog and again it's showing the list of who it's shared to (see below).
 
-![Screenshot from 2023-02-21 14-43-48.png](attachments/63f52d0bca571559e120e4d7-Screenshot_from_2023-02-21_14-43-48.png)
+![Screenshot from 2023-02-21 14-43-48.png](attachments/63f52d0bca571559e120e4d7_p.png)
 
 
 After clicking `Done` to exit the Sharing Dialog, if we've shared to people whose usernames are not yet existing in the actual content text we'll be asked if we'd like to have those names "mentioned" in the text, by appending them to the end. We'll click `Yes` to have the mentions added.
 
-![Screenshot from 2023-02-21 14-44-35.png](attachments/63f52d37ca571559e120e4de-Screenshot_from_2023-02-21_14-44-35.png)
+![Screenshot from 2023-02-21 14-44-35.png](attachments/63f52d37ca571559e120e4de_p.png)
 
 
 After clicking `Yes` to add mentions we'll end up back in the Editor Dialog where we came from, and we can see both the sharing labels below the text editor and also we see the usernames put into the content for us.
 
 Since these are local usernames (local to the current instance we're on, quanta.wiki) we of course have the short names formatted like `@adam` rather than the longer names we'd see if they had been on some foreign server like `@adam@someserver.com`.
 
-![file-p](attachments/6287ceee96d3696042d5d643-file-p)
+![file-p](attachments/6287ceee96d3696042d5d643_p.png)
 
 
 The node is now shared with two people, and to the public, but we can still alter the sharing any time we want, by going back into the Sharing Dialog again. So for example if we decide we don't want the node public we can just delete the "Public" entry, and then only adam and jetson would be able to see the node.
@@ -73,7 +73,7 @@ For nodes that are "Unpublished" they're still visible to people you've shared t
 
 The 'Unpublished' option doesn't make the node private at all, because as long as you've got sharing set on this node the people shared with *can* still see it; but what the "Unpublished" option will do is to simply stop broadcasting the real-time changes you make going forward.
 
-![file-p](attachments/628cfcd0e585752ab4b72a51-file-p)
+![file-p](attachments/628cfcd0e585752ab4b72a51_p.png)
 
 
 # Sharing Indicators
@@ -102,4 +102,4 @@ Select `Menu -> Search -> Public Appendable` to display all the nodes you own th
 
 
 ----
-**[Next: Artificial Intelligence - LLMs](/docs/user-guide/ai/index.md)**
+**[Next: Artificial-Intelligence---LLMs](/docs/user-guide/ai/index.md)**

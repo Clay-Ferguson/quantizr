@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Timelines](#timelines)
     * [Terminology](#terminology)
@@ -36,27 +36,27 @@ Below shows our test node I created to demonstrate how we can find it again usin
 
 Since this node is the newest (when these screenshots were taken) the newest node should appear at the top of any timeline which would contain it, as we see below.
 
-<img src='attachments/6287d57896d3696042d5d75a-file-p' style='width:100%'/>
+<img src='attachments/6287d57896d3696042d5d75a_p.png' style='width:100%'/>
 
 
 Now we go all the way up to the root node of the book `War and Peace` and Click the `Clock Icon (to generate a Timeline)`
 
-<img src='attachments/6287d5f996d3696042d5d773-file-p' style='width:100%'/>
+<img src='attachments/6287d5f996d3696042d5d773_p.png' style='width:100%'/>
 
 
 As expected, the newest node is always at the top of the rev-chron list, so this has found the most recent content, and it's what we just added of course. You'll also notice the app switched over to the `Timeline Tab`, but we can always go back to the Folders tab any time.
 
-<img src='attachments/6287d6bb96d3696042d5d792-file-p' style='width:100%'/>
+<img src='attachments/6287d6bb96d3696042d5d792_p.png' style='width:100%'/>
 
 
 We could have also searched from anywhere else on the tree that's still above the node in question, in the hierarchy. So let's do that. We'll go directly to Book 7 and run a Timeline again on Book 7. Since our latest change was indeed somewhere down inside Book 7 as well, we can use Timeline again to find the node again.
 
-<img src='attachments/6287d73d96d3696042d5d79c-file-p' style='width:100%'/>
+<img src='attachments/6287d73d96d3696042d5d79c_p.png' style='width:100%'/>
 
 
 So here is our node again, in a different set of results, but still at the top since it's still the most recent thing under Book 7.
 
-<img src='attachments/6287d7c896d3696042d5d7a3-file-p' style='width:100%'/>
+<img src='attachments/6287d7c896d3696042d5d7a3_p.png' style='width:100%'/>
 
 
 # Practical Use Cases
@@ -91,4 +91,4 @@ Displays the timeline (by node modification time) just for the direct child node
 
 
 ----
-**[Next: Chat Rooms](/docs/user-guide/chat-rooms/index.md)**
+**[Next: Chat-Rooms](/docs/user-guide/chat-rooms/index.md)**

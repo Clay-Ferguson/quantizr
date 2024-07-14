@@ -1,7 +1,8 @@
-**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
 
 * [How to Build](#how-to-build)
     * [Front-End Notes](#front-end-notes)
+        * [About Yarn](#about-yarn)
     * [How to Build Quanta - Dev Mode](#how-to-build-quanta---dev-mode)
     * [Front-end Hot Deploy](#front-end-hot-deploy)
     * [Back-end Hot Deploy](#back-end-hot-deploy)
@@ -10,6 +11,20 @@
 # How to Build
 
 # Front-End Notes
+
+## About Yarn
+
+To manually install packages:
+
+In `src/main/resources/public` run `yarn install`
+
+Run `yarn outdated` to see which package versions are outdated and can be upgraded.
+
+To update a specific package to latest version:
+
+```
+yarn upgrade [package-name] --latest
+```
 
 * Deployment is build using `vite`
 
@@ -37,4 +52,4 @@ This script creates the distro folder in `[project]/distro` and updates the loca
 
 
 ----
-**[Next: How to Run](/docs/dev-guide/how-to-run.md)**
+**[Next: How-to-Run](/docs/dev-guide/how-to-run.md)**

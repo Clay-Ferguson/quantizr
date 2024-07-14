@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Playing Audio or Video
 
@@ -8,12 +8,12 @@ You can upload an audio or video file to a node, and the platform automatically 
 
 Screenshot of the Audio Player
 
-<img src='attachments/628acfde938318131bfcafa8-file-p' style='width:100%'/>
+<img src='attachments/628acfde938318131bfcafa8_p.png' style='width:100%'/>
 
 
 Here's an example of the video player:
 
-<img src='attachments/628ad070938318131bfcafb4-file-p' style='width:100%'/>
+<img src='attachments/628ad070938318131bfcafb4_p.png' style='width:100%'/>
 
 
 To see live examples of the Audio and Video players go here:
@@ -22,4 +22,4 @@ To see live examples of the Audio and Video players go here:
 
 
 ----
-**[Next: Recording Audio or Video](/docs/user-guide/recording-av/index.md)**
+**[Next: Recording-Audio-or-Video](/docs/user-guide/recording-av/index.md)**

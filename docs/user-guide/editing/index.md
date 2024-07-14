@@ -1,4 +1,12 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
+
+* [Content Editing](#content-editing)
+    * [Edit Mode](#edit-mode)
+    * [Edit Dialog](#edit-dialog)
+    * [Advanced Options](#advanced-options)
+    * [Tips and Tricks](#tips-and-tricks)
+        * [Including URLS](#including-urls)
+        * [Automatic Clipboard Attach](#automatic-clipboard-attach)
 
 # Content Editing
 
@@ -9,7 +17,7 @@ How to create and edit content.
 To start editing first enable "Edit Mode" via the menu.
 
 
-![myfile.png](attachments/5fa1926c6b842575d0e925d8-myfile.png)
+![myfile.png](attachments/5fa1926c6b842575d0e925d8_p.png)
 
 
 
@@ -25,7 +33,7 @@ Tip: Click `Folders -> My Account` to go to your root node.
 
 Here's a screenshot of the Editor Dialog, which is where all editing is done. You can edit one node at a time.
 
-![file-p](attachments/6287b47ea487d37f9989df92-file-p)
+![file-p](attachments/6287b47ea487d37f9989df92_p.png)
 
 
 The icon buttons across the top (of the above image) do the following (from left to right):
@@ -60,13 +68,37 @@ Buttons at bottom of the editor do the following (from left to right):
 
 The "Advanced" section contains more features/capabilities, like entering a node name, priority, word wrap, encryption, signature setting, etc.
 
-![file-p](attachments/6287b4e5a487d37f9989df9c-file-p)
+![file-p](attachments/6287b4e5a487d37f9989df9c_p.png)
 
 
 # Tips and Tricks
 
-* If you hold down the CTRL key when you click an insert button (the Plus '+' Icon) your clipboard text will be automatically inserted as your node content and immediately saved.
+## Including URLS
+
+When you put a url in any node the system will by default display it using a small image and snippet of text from the website if the website supports that kind of thing. For example if you put a youtube url in some content the GUI will display the image and title and description of that video at the bottom of the node.
+
+If you want to display the URL all by itself without that preview content just prefix the url with an asterisk followed by a space on a separate line like this:
+
+```md
+ * https://somesite.com
+```
+
+If you want to display just the preview image and text and not the URL itself use this:
+
+```md
+ - https://somesite.com
+```
+
+Or this, to show the preview image but neither a long description nor the URL.
+
+```md
+ -- https://somesite.com
+```
+
+## Automatic Clipboard Attach
+
+If you hold down the CTRL key when you click an insert button (the Plus '+' Icon) your clipboard text will be automatically inserted as your node content and immediately saved.
 
 
 ----
-**[Next: Tree Editing](/docs/user-guide/adv-editing/index.md)**
+**[Next: Tree-Editing](/docs/user-guide/adv-editing/index.md)**

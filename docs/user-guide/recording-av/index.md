@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Recording Audio or Video
 
@@ -8,9 +8,9 @@ You can record Audio or Video directly thru your browser, and automatically have
 
 The A/V recording option is available in the `File Attachment Dialog` accessible from the `Node Editor Dialog`, via the `Mic` (Audio) and `Web Cam` buttons. (see image)
 
-![file-p](attachments/5f8b75db9d8e1d1be249e48b-file-p)
+![file-p](attachments/5f8b75db9d8e1d1be249e48b_p.png)
 
 
 
 ----
-**[Next: Node Info](/docs/user-guide/node-info/index.md)**
+**[Next: Node-Info](/docs/user-guide/node-info/index.md)**

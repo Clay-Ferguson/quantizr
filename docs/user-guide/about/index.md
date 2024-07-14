@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # About Quanta
 
@@ -78,4 +78,4 @@ Importantly, these kinds of Deep Documents can also be powerful for their abilit
 
 
 ----
-**[Next: Application Layout](/docs/user-guide/app-layout/index.md)**
+**[Next: Application-Layout](/docs/user-guide/app-layout/index.md)**

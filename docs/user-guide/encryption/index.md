@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Encryption
 
@@ -56,4 +56,4 @@ This is a minor limitation, and will be made easier to use in a future release o
 
 
 ----
-**[Next: Interactive Graphs](/docs/user-guide/graphs/index.md)**
+**[Next: Interactive-Graphs](/docs/user-guide/graphs/index.md)**

@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Thread View
 
@@ -10,7 +10,7 @@ This is what the Thread View is designed for. You can switch to the Thread View 
 
 Here's what the menu looks like, after you click the `"..."` icon:
 
-![file-p](attachments/65f73a78cb4027493226dd11-file-p)
+![file-p](attachments/65f73a78cb4027493226dd11_p.png)
 
 
 Since each node has only one parent node, you can envision the process of walking up the tree node by node, always taking the parent and then the parent above that, etc, repeatedly. This process builds up the 'reply chain' above the node (if the node is part of a conversation), going back to the beginning of the conversation. Then the Thread View displays the entire conversation, from top to bottom.

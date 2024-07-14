@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
 
 * [Troubleshooting](#troubleshooting)
     * [Healthcheck Results](#healthcheck-results)
@@ -203,4 +203,4 @@ If after all these steps the issue remains unresolved, consider isolating the co
 
 
 ----
-**[Next: Demo Content](/docs/demo-content/index.md)**
+**[Next: Demo-Content](/docs/demo-content/index.md)**

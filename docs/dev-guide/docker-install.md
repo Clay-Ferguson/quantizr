@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
 
 * [Docker Install](#docker-install)
     * [How to Install Docker Compose](#how-to-install-docker-compose)
@@ -9,6 +9,8 @@
     * [Put Docker in Swarm Mode](#put-docker-in-swarm-mode)
 
 # Docker Install
+
+*Warning: As of 5/28/2024, when I started using Ubuntu 24.04, the docker install process has changed, and I have not yet updated the below info to represent the new required changes. The below process may have only slightly changed, however. One breaking change was that you'll need to be using 'docker compose' rather than 'docker-compose'*
 
 # How to Install Docker Compose
 
@@ -86,4 +88,4 @@ Error response from daemon: could not choose an IP address to advertise since th
 
 
 ----
-**[Next: How to Build](/docs/dev-guide/how-to-build.md)**
+**[Next: How-to-Build](/docs/dev-guide/how-to-build.md)**

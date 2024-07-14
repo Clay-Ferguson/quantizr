@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Tree Editing](#tree-editing)
     * [Search and Replace](#search-and-replace)
@@ -37,7 +37,7 @@ Under `Menu -> Edit -> Search and Replace` you'll find the same kind of "Search 
 
 
 
-![file-p](attachments/63eda70f32831373361c49fe-file-p)
+![file-p](attachments/63eda70f32831373361c49fe_p.png)
 
 
 # Copy - Cut - Paste - Delete
@@ -77,13 +77,13 @@ Use the up and down arrow icons on each node to move nodes up or down one positi
 # Drag and Drop
 
 When `Edit Mode` is enabled, you can generally drag any node to any other location on the tree, by using the mouse to click the dragable icon that looks like this vertical bar of dots: 
-![drag-icon](attachments/6226813b990f3a11b5c54d1d-drag-icon)
+![drag-icon](attachments/6226813b990f3a11b5c54d1d_img1.png)
 
 
 
 After you drag and drop a node you'll be prompted about what to do as your "Drop Action" with a dialog like the following:
 
-![file-p](attachments/6226813b990f3a11b5c54d1d-file-p)
+![file-p](attachments/6226813b990f3a11b5c54d1d_p.png)
 
 
 In the dialog above you can choose to Paste the node `Inside` (meaning as a child) the node you dragged it over or as another sibling under its same parent which is the `Inline` option.
@@ -109,7 +109,7 @@ You can also drag nodes to and from the History Panel (right-hand-side of page, 
 
 The split and join functions are located at `Menu -> Edit -> ...` and below you can see how to use these features.
 
-![file-p](attachments/64f64d24f8127d7dc133a38a-file-p)
+![file-p](attachments/64f64d24f8127d7dc133a38a_p.png)
 
 
 ## Split Node
@@ -118,7 +118,7 @@ When editing a node it's common to end up with multiple paragraphs of text on a 
 
 Here's the dialog you'll see pop up when you save some text that has double spaced content, which does this for you:
 
-![file-p](attachments/63edbb714975b001996fac99-file-p)
+![file-p](attachments/63edbb714975b001996fac99_p.png)
 
 
 Nodes can be automatically split apart, in two ways:
@@ -135,7 +135,7 @@ To split a node, first select the node (by clicking on it) and then choose `Menu
 
 In the dialog you specify what the delimiter to split on is, as well is whether you want to keep all the nodes at the same level of the tree (inline) or whether you want the nodes split up and appended as **children** of the node you're splitting.
 
-![file-p](attachments/64e57b8a0d3d9d7b99ea2f55-file-p)
+![file-p](attachments/64e57b8a0d3d9d7b99ea2f55_p.png)
 
 
 ## Join Nodes
@@ -168,7 +168,7 @@ How to add digital signatures to nodes.
 
 To add a digital signature to a node (signed using your browser's signature keys), click the "Sign" checkbox that's available in the 'advanced' section of the editor dialog.
 
-![file-p](attachments/6362b0a70aeca527dc83c3e4-file-p)
+![file-p](attachments/6362b0a70aeca527dc83c3e4_p.png)
 
 
 To sign all the nodes (that you own) under an entire branch of the tree, first select the node by clicking it, and then click `Menu -> Signature -> Sign`.
@@ -219,7 +219,7 @@ To initiate a transfer, select a node that you own (by clicking it in the Tree V
 
 This will open a dialog like the one below, where you'll enter the usernames of the two persons involved in the transfer.
 
-![file-p](attachments/635de23c68a8d0147326ad4e-file-p)
+![file-p](attachments/635de23c68a8d0147326ad4e_p.png)
 
 
 In the dialog above you can select `Include Subnodes` if you'd like to transfer *all* subnodes that you own under the subgraph to the other person. If there are also subnodes under that branch of the tree that you don't own, then of course none of those nodes will be transferred. Only nodes owned by the "From" user will get transferred.

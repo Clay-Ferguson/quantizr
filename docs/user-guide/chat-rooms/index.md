@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Chat Rooms
 
@@ -35,9 +35,9 @@ To find the URL for the `Chat Room` that you can share with other users, first s
 
 If you look at the URL itself you can also see all it's really doing is appending `view=timeline` to the URL, so that when users go to that node they're immediately presented with it's Timeline View.
 
-<img src='attachments/65c13322a14be04b61ad43d0-file-p' style='width:100%'/>
+<img src='attachments/65c13322a14be04b61ad43d0_p.png' style='width:100%'/>
 
 
 
 ----
-**[Next: Playing Audio or Video](/docs/user-guide/audio-video/index.md)**
+**[Next: Playing-Audio-or-Video](/docs/user-guide/audio-video/index.md)**

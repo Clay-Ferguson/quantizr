@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Bookmarks
 
@@ -8,9 +8,9 @@ At the bottom of the Bookmarks menu there's a "Manage..." menu item that takes y
 
 todo: This screenshot is obsolete now because the "Boomark" option has been moved to the node popup menu.
 
-<img src='attachments/629185986abed30d5b3c995b-file-p' style='width:100%'/>
+<img src='attachments/629185986abed30d5b3c995b_p.png' style='width:100%'/>
 
 
 
 ----
-**[Next: Account Profile and Settings](/docs/user-guide/account-settings/index.md)**
+**[Next: Account-Profile-and-Settings](/docs/user-guide/account-settings/index.md)**

@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 # Addendum
 
@@ -275,4 +275,4 @@ System Prompt:You are a mathematician and you will take all the numbers I give y
 
 
 ----
-**[Next: Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Next: Quanta-Developer-Guide](/docs/dev-guide/index.md)**

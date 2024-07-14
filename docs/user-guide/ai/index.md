@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Artificial Intelligence - LLMs](#artificial-intelligence---llms)
     * [AI Services Supported](#ai-services-supported)
@@ -13,9 +13,6 @@
     * [Questions about a Subgraph](#questions-about-a-subgraph)
     * [Configure AI](#configure-ai)
         * [System Prompt Examples](#system-prompt-examples)
-    * [Image Understanding](#image-understanding)
-    * [Image Generation](#image-generation)
-    * [Speech Generation](#speech-generation)
     * [AI Service Selection](#ai-service-selection)
         * [AI Cloud Services Supported](#ai-cloud-services-supported)
     * [Using AI for Writing](#using-ai-for-writing)
@@ -46,35 +43,35 @@ If you're doing image recognition, image generation, or speech generation, you c
 
 Including both **Sonnet** (best combination of performance and speed), and **Opus** (most intelligent and advanced model) Chat models.
 
-<img src='attachments/65f1f0fbe1bcaf0c420fca43-anthropic.png' style='width:20%'/>
+<img src='attachments/65f1f0fbe1bcaf0c420fca43_p.png' style='width:20%'/>
 
 
 ## OpenAI
 
 Including Chat Model, Text to Image (Image Generation), Image Understand, Text to Speech (Speech to MP3 Generation)
 
-<img src='attachments/65c5a9043e8c3b6aec82835c-file-p' style='width:20%'/>
+<img src='attachments/65c5a9043e8c3b6aec82835c_img1.png' style='width:20%'/>
 
 
 ## Perplexity
 
 Including models: Sonar, Sonar Online, Meta's Llama 3
 
-<img src='attachments/65c5a91a3e8c3b6aec82835d-file-p' style='width:20%'/>
+<img src='attachments/65c5a91a3e8c3b6aec82835d_img1.png' style='width:20%'/>
 
 
 ## Google Gemini
 
 Includes google's new chat model, for interactive chats.
 
-<img src='attachments/65c5a9543e8c3b6aec82835e-file-p' style='width:20%'/>
+<img src='attachments/65c5a9543e8c3b6aec82835e_p.png' style='width:20%'/>
 
 
 ## Meta Llama 3
 
 Meta's best Open Source AI LLM.
 
-<img src='attachments/6629d6a8788a362604b0e264-file-p' style='width:20%'/>
+<img src='attachments/6629d6a8788a362604b0e264_p.png' style='width:20%'/>
 
 
 Everything in Quanta is offered for free except for AI Capabilities. Since AI is provided by [OpenAI](https://openai.com) and their services cost money, Quanta lets you use your own credit, which you can add to you account, by going to `Menu -> Account -> Settings -> Add Credit` to use your Credit Card to add funds directly to your own account. Add as much credit as you want, but even one $1 buys quite a lot of AI generated content, so add as little or as much funds to your account as you want.
@@ -84,22 +81,19 @@ Everything in Quanta is offered for free except for AI Capabilities. Since AI is
 * Get answers to general questions about anything
 * Have conversations with the AI, that you can either keep private or share publicly
 * Ask questions about the content of any Quanta tree branch
-* Generate images via text prompt
-* Ask questions about images
-* Generate Speech from text, and save as MP3 attachment
 
 # AI Conversations
 
 The screenshot below shows how to ask a question to the AI, and get it's answer back. `Answers` are always inserted as a new node directly under the `question` node. This means AI conversations are actually a tree and not a top-to-bottom list.
 
-<img src='attachments/6591ebdbc9873822b24fa632-file-p' style='width:100%'/>
+<img src='attachments/6591ebdbc9873822b24fa632_img1.gif' style='width:100%'/>
 
 
 # A Node that Asks a Question to AI
 
 The screenshot below shows the easiest way to ask the AI a question. You just type your question and click the `Ask GPT` button. The answer to the node content will be inserted as a subnode directly under the node containing the question.
 
-![file-p](attachments/64f9194706a5b22fcf32ed0d-file-p)
+![file-p](attachments/64f9194706a5b22fcf32ed0d_p.png)
 
 
 # Asking Questions to the AI
@@ -142,7 +136,7 @@ In other words you can say things like the following examples and the AI will as
 
 NOTE: Experimenting with that adding game is the simplest way to make sure you understand how this, because you can just enter a few numbers into some nodes and not matter what question you ask you should always see it obeys it's system prompt and just replies with the total of all numbers it encountered, since that was it's explicit instructions
 
-![file-p](attachments/65b6b364e6d38a174f58684d-file-p)
+![file-p](attachments/65b6b364e6d38a174f58684d_p.png)
 
 
 So we would first click a node on the tree, and then choose `Menu -> AI -> Configure AI` to open the dialog above. After clicking "Save" in the dialog it will store these settings onto the selected node, so that all future questions asked below that section of the tree (anywhere under that branch of the tree) will `cause GPT to answer as a pirate`. Pirates are a fun role to let the GPT play, because they start sentences with `"Hey matey, how arrrr ye."` etc.
@@ -167,36 +161,11 @@ Here are some other examples to give you an idea of just how flexible and intell
 
 * Convert natural language into SQL queries.
 
-# Image Understanding
-
-To use GPT-4 Vision, simply upload an image onto the node, then paste a question into the node and click the AI Button (Robot Icon).
-
-Here's an example asking questions about an image of an air conditioner unit. When you ask a question in a node that has an image attached the AI automatically assumes you're asking a question about the image itself.
-
-<img src='attachments/654ab0d182df4f62995973fd-question-about-image.gif' style='width:100%'/>
-
-
-# Image Generation
-
-To generate images with DALL-E 3, click the upload button, then specify that you want an AI Generated image, and then type a description.
-
-<img src='attachments/654ab18182df4f629959741c-bird-house-hunting.gif' style='width:100%'/>
-
-
-# Speech Generation
-
-To convert a body of text to an MP3 file of a person narrating the text, you can do that using the "Attach" button, to attach the MP3.
-
-In the screen recording below we generate an MP3 file and attaching it to the node. The GIF is silent or else you would be able to hear the sentence being read when the created MP3 was played right.
-
-<img src='attachments/6591e76fc9873822b24fa51c-ai-text-to-speech.gif' style='width:100%'/>
-
-
 # AI Service Selection
 
-Quanta can connect to several different AI APIs on the back end, which is what performs the actual AI services. Any time you ask the AI a question it goes to your currently active Service. You can change what service you want to use any time using the selection in your Account Settings at `Menu -> Account -> Settings -> AI Service`, as shown in the following image:
+Quanta can connect to several different AI APIs on the back end, which is what performs the actual AI services. Any time you ask the AI a question it goes to your currently active Service. You can change what service you want to use any time using the selection in your Account Settings at `Menu -> AI -> AI Settings`, as shown in the following image:
 
-<img src='attachments/65bc2b7bcf425c5fe6f2dde2-file-p' style='width:100%'/>
+<img src='attachments/65bc2b7bcf425c5fe6f2dde2_p.png' style='width:100%'/>
 
 
 ## AI Cloud Services Supported
@@ -211,7 +180,7 @@ Here's the list of the available AI Services:
 |---------------------|-----------------------------------------------------------------------------------|
 | **Anthropic: Claud 3 - Opus** |  Anthropic's most intelligent model, which can handle complex analysis, longer tasks with multiple steps, and higher-order math and coding tasks. |
 | **Anthropic: Claud 3 - Sonnet** | Anthropic's best combination of performance and speed for efficient, high-throughput tasks. |
-| **OpenAI: ChatGPT**   | ChatGPT-4, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
+| **OpenAI: ChatGPT-4o**   | ChatGPT-4o, the default chatbot and is widely considered the most intelligent general-purpose AI on the market. |
 | **Google: Gemini** | Google's best high-end powerful general-purpose AI.                        |
 | **Meta: Llama 3** | Meta's best Open Source general-purpose AI.                        |
 | **Perplexity: Sonar** | Perplexity's best high-end powerful general-purpose AI.                    |
@@ -225,7 +194,7 @@ Here's the list of the available AI Services:
 
 You can use Quanta to write an entire book, on any topic, for any target audience! Here's the general approach for how the writing and creative process works:
 
-<img src='attachments/660b1bb8b2d57601ed09274d-' style='width:33%'/>
+<img src='attachments/660b1bb8b2d57601ed09274d_img1.png' style='width:33%'/>
 
 
 *Note: If you're wondering why in the world you'd be interested in "writing a book" when you're not an even author, scroll down to the last section below, where we discuss the power of what's really going on during the "writing" process and how you can use it even if you have no intentions of sharing your "writing".*
@@ -254,37 +223,37 @@ The next 17 screenshots below show you how to create books (i.e. auto-generate c
 
 First we create somewhere to hold our book, and in the image below, as you can see, we'll just put the book in a node we created called `My Books`. Once we click on `My Books` to make it the 'selected' node (as you can see by the blue bar on it's left), we can click the menu item called `Generate Book`.
 
-<img src='attachments/660b34abb2d57601ed092794-step1.png' style='width:100%'/>
+<img src='attachments/660b34abb2d57601ed092794_p.png' style='width:100%'/>
 
 
 Next we describe the book we're about to create, in as much detail as we want. You should mention in the description that you're indeed creating a book, what it's about, and who the target audience is. Then simply click the `Generate` button.
 
-<img src='attachments/660b34ddb2d57601ed092797-step2.png' style='width:100%'/>
+<img src='attachments/660b34ddb2d57601ed092797_p.png' style='width:100%'/>
 
 
 After the `Generate` button ran a process for a few seconds your book scaffolding (i.e. a book `outline` or `Table of Contents`) will have been created. As you can see in the image below we have the top level node representing the entire book, as well as the chapters. We can't see all the chapters without scrolling down of course), but they're there. Also we can expand any of the chapters and see even a further breakdown of each chapter into `sections', and those are there and already generated for us as well!
 
-<img src='attachments/660b350ab2d57601ed09279a-step3.png' style='width:100%'/>
+<img src='attachments/660b350ab2d57601ed09279a_p.png' style='width:100%'/>
 
 
 So we expand the `Choosing the Right Bicycle` chapter to take a look at the sections. Currently the system doesn't allow you to specify the number of 'sections' in each chapter, but you can set the number of chapters, as you saw above. However you can manually add more `sections` yourself, just by creating a node anywhere you want. Nothing is `fixed` about this tree of content. It's still all editable by you and nothing is permanent. Quanta is just automatically creating nodes of content for you using AI. You can always manually edit anything that got created, add images, move nodes around, etc.
 
-<img src='attachments/660b353db2d57601ed09279d-step4.png' style='width:100%'/>
+<img src='attachments/660b353db2d57601ed09279d_p.png' style='width:100%'/>
 
 
 Now we've turned "Edit Mode" back on in the screen shot below, and you can see the screen got a little more cluttered with buttons. We now still have `Types of Bicycles` as the selected node. So we click the `+` (Plus Button) that's right above the chapter text `Types of Bicycles` and that inserts a new node, so we can auto-generate that piece of content for the book, at that location in the book.
 
-<img src='attachments/660b3569b2d57601ed0927a3-step5.png' style='width:100%'/>
+<img src='attachments/660b3569b2d57601ed0927a3_p.png' style='width:100%'/>
 
 
 The system has noticed that we're inside a book, and setup things so that if we simply click `Ask AI` right now it will use the context location of what chapter and section we're in and auto-generate whatever content it thinks should go there. The tip in blue in the editor is telling us this too. So we just click `Ask AI` and wait a few seconds and some new AI-generated content will be inserted.
 
-<img src='attachments/660b3578b2d57601ed0927a6-step6.png' style='width:100%'/>
+<img src='attachments/660b3578b2d57601ed0927a6_p.png' style='width:100%'/>
 
 
 So now we can see the AI has auto-generated content for this location! We can edit this content by hand, if we don't like it. We can also update the specific prompting that generated this text too, and regenerate completely new content to overwrite this content if we want.
 
-<img src='attachments/660b358eb2d57601ed0927a9-step7.png' style='width:100%'/>
+<img src='attachments/660b358eb2d57601ed0927a9_p.png' style='width:100%'/>
 
 
 Above we generated book content based on the `Book Context` at that location (i.e. simply the Chapter Title, Section Title, etc).
@@ -297,7 +266,7 @@ The `${bookContext}` that you see here, causes the Chapter Titles and Section Ti
 
 So after typing that Template (the AI's instructions), we just click the `Ask AI` button, and it will generate the content into this node for us.
 
-<img src='attachments/660c56934cd11d33319a87a3-file-p' style='width:100%'/>
+<img src='attachments/660c56934cd11d33319a87a3_p.png' style='width:100%'/>
 
 
 We see the screenshot below after we just now generated using the `Ask AI` above.
@@ -306,7 +275,7 @@ Just to be clear, in the screen shot below we've turned on "Node Info" again and
 
 You can then go back into the node and edit the AI instructions again and regenerate if you want, or you could even directly edit what the AI had created as well.
 
-<img src='attachments/660b36ebb2d57601ed0927d3-step17.png' style='width:100%'/>
+<img src='attachments/660b36ebb2d57601ed0927d3_p.png' style='width:100%'/>
 
 
 Finally, let's go back and look at the larger scale instructions that are in effect during all of our editing of this book. We do this by going to the root level node (the "Book" node), and opening up the `AI Config` for that root node.
@@ -315,7 +284,7 @@ As you can see, the root node (Book Node) has a System Prompt that we never wrot
 
 These default instructions were carefully crafted to give the user a good book writing experience, but if you know what you're doing with AI "Prompt Engineering" and you know how "System Prompts" work (primarily using the OpenAI ChatGPT Cloud Service API), then you should be able to edit this content if you need to. Then again, it doesn't really take an engineer either, because you can see it's just giving the AI the larger overall purpose of what it's supposed to be doing so it's fairly obvious how to update that prompt if you think you can improve it, even if you're not an engineer or a rocket scientist.
 
-<img src='attachments/660b36fcb2d57601ed0927d6-step18.png' style='width:100%'/>
+<img src='attachments/660b36fcb2d57601ed0927d6_p.png' style='width:100%'/>
 
 
 ### Why use Book Writing Features
@@ -366,7 +335,7 @@ Let's show an example so that this makes sense. Let's say you're writing a docum
 
 You'd simply create an empty node at that location in your document and again choose `Menu -> AI -> Configure AI`, and then enter the following template:
 
-![file-p](attachments/65d6ef79d711a216791d9556-file-p)
+![file-p](attachments/65d6ef79d711a216791d9556_p.png)
 
 
 Note the checkbox `Overwrite Content with Answer`. This means that whenever you click the `AI Generate` button (the robot icon) at the bottom of the editor for this node, the current content of that node will be overwritten with the response from the selected `AI Service` using the output from the `Query Template`.
@@ -377,4 +346,4 @@ Once you've configured the AI settings to be what's shown above you can then cli
 
 
 ----
-**[Next: Customizing Content Display](/docs/user-guide/page-layout/index.md)**
+**[Next: Customizing-Content-Display](/docs/user-guide/page-layout/index.md)**

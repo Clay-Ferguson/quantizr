@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Text-to-Speech](#text-to-speech)
     * [Text-to-Speech Tab](#text-to-speech-tab)
@@ -17,7 +17,7 @@ As the TTS Engine reads content the current sentence of text being spoken will b
 
 You can choose your preferred Voice (American Accent, British, etc), and you can also select the speed of the speech, using the dropdown menus at the top.
 
-![file-p](attachments/63ae6cb49e10b95fe6502341-file-p)
+![file-p](attachments/63ae6cb49e10b95fe6502341_p.png)
 
 
 # TTS in the Node Editor Dialog
@@ -28,14 +28,14 @@ Whenever you're listening to TTS Text while in the Node Editor Dialog, the TTS T
 
 If you don't yet see the "Text-to-Speech" link then activate it by selecting `Menu -> Tools -> Text-to-Speech`
 
-![file-p](attachments/63eee29a4975b00199700f44-file-p)
+![file-p](attachments/63eee29a4975b00199700f44_p.png)
 
 
 # TTS from any Node
 
 If you have `Node Info` enabled, every node will have a TTS Icon displaying that you can click to have the node content narrated aloud to you.
 
-<img src='attachments/64e77bdd03bc775e03563948-file-p' style='width:100%'/>
+<img src='attachments/64e77bdd03bc775e03563948_p.png' style='width:100%'/>
 
 
 # TTS Text via Drag-and-Drop
@@ -46,9 +46,9 @@ The image at the top of this section shows the TTS Tab, where all the TTS button
 
 Another way to TTS text is to enable the input area by clicking the "Text Input" checkbox (see below) and then entering some text to read, and then clicking the "Speaker" icon.
 
-![file-p](attachments/64e77d7103bc775e035639b1-file-p)
+![file-p](attachments/64e77d7103bc775e035639b1_p.png)
 
 
 
 ----
-**[Next: Export and Import](/docs/user-guide/import-export/index.md)**
+**[Next: Export-and-Import](/docs/user-guide/import-export/index.md)**

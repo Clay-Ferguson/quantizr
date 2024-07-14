@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta Developer Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
 
 # PostgreSQL
 

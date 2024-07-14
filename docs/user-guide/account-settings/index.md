@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta User Guide](/docs/user-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-User-Guide](/docs/user-guide/index.md)**
 
 * [Account Profile and Settings](#account-profile-and-settings)
     * [User Profile](#user-profile)
@@ -19,14 +19,14 @@
 
 Edit your user profile using `Menu -> Account -> Profile`. This is how you setup your display name, bio text, avatar image, and heading image. Here's how it looks:
 
-![Screenshot from 2023-02-20 00-10-40.png](attachments/63f30ee855770e1b97de196e-Screenshot_from_2023-02-20_00-10-40.png)
+![Screenshot from 2023-02-20 00-10-40.png](attachments/63f30ee855770e1b97de196e_p.png)
 
 
 # Account Settings
 
 The Account Settings Tab can be accessed by `Menu -> Account -> Settings` as shown here:
 
-![file-p](attachments/6407e6c57d69fa44622efd4c-file-p)
+![file-p](attachments/6407e6c57d69fa44622efd4c_p.png)
 
 
 # Settings
@@ -63,7 +63,7 @@ If you want to delete your account and all content you've ever created you shoul
 
 Shows how much of your allotted space on the server you've consumed:
 
-![Screenshot from 2023-02-20 00-14-26.png](attachments/63f30fcc55770e1b97de19c2-Screenshot_from_2023-02-20_00-14-26.png)
+![Screenshot from 2023-02-20 00-14-26.png](attachments/63f30fcc55770e1b97de19c2_p.png)
 
 
 # Manage Keys
@@ -80,9 +80,9 @@ The `Publish Public Key` button let's you ensure the server has the current key 
 
 The `Import Key` lets you update the Selected Key type, from text content that you can paste in. This text content will be something you had previously gotten just by selecting the key JSON shown in the dialog. So there's no `Export Key` feature currently and you have to just cut-and-paste the JSON yourself. This process will be made easier in a future version of the app.
 
-![file-p](attachments/6572050efc3f094a7cc0a2eb-file-p)
+![file-p](attachments/6572050efc3f094a7cc0a2eb_p.png)
 
 
 
 ----
-**[Next: Semantic Web](/docs/user-guide/semantic-web/index.md)**
+**[Next: Semantic-Web](/docs/user-guide/semantic-web/index.md)**
