@@ -105,7 +105,7 @@ public class SystemService extends ServiceBase {
                 user.writeUserStats(as, statsMap);
                 return null;
             });
-            ret += runMongoDbCommand(MongoAppConfig.databaseName, new Document("compact", "nodes"));
+            ret += runMongoDbCommand(MongoAppConfig.databaseName, new Document("compact", "nodes").append("force", true));
             ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
         } finally {
             prop.setDaemonsEnabled(true);
@@ -122,8 +122,13 @@ public class SystemService extends ServiceBase {
     // metadata: <boolean> // Optional, added in MongoDB 5.0.4
     // })
     public String validateDb() {
+        // String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
+        // new Document("validate", "nodes").append("full", true).append("repair", true));
+
+        // todo-0: I get an error message with repair=true (commented out above), which I think is because we're now in a replica set mode.
         String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
-                new Document("validate", "nodes").append("full", true).append("repair", true));
+                new Document("validate", "nodes").append("full", true));
+
         ret += "\n\ndbStats: "
                 + runMongoDbCommand(MongoAppConfig.databaseName, new Document("dbStats", 1).append("scale", 1024));
         ret += "\n\nusersInfo: " + runMongoDbCommand("admin", new Document("usersInfo", 1));
@@ -204,7 +209,7 @@ public class SystemService extends ServiceBase {
     public String getFailedSigInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nFailed Signature Node IDs: \n");
-        for (String nodeId : crypto.failedSigNodes) {      
+        for (String nodeId : crypto.failedSigNodes) {
             sb.append("    " + nodeId + "\n");
         }
         sb.append("\n");
