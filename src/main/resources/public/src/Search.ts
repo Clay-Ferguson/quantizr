@@ -362,7 +362,6 @@ export class Search {
             fromMe: FeedTab.inst.props.feedFilterFromMe,
             toUser: FeedTab.inst.props.feedFilterToUser,
             toPublic: FeedTab.inst.props.feedFilterToPublic,
-            localOnly: FeedTab.inst.props.feedFilterLocalServer,
             name: FeedTab.inst.props.name,
             fromFriends: FeedTab.inst.props.feedFilterFriends,
             searchText,

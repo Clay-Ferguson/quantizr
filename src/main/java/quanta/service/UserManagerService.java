@@ -443,7 +443,7 @@ public class UserManagerService extends ServiceBase {
 
             // we disallow dupliate emails via this codepath, but by design we do allow them in the DB, and
             // even all the 'test accounts' will normally have the same email address.
-            SubNode ownerNode = read.getLocalUserNodeByProp(as, NodeProp.EMAIL.s(), email, false, false);
+            SubNode ownerNode = read.getUserNodeByProp(as, NodeProp.EMAIL.s(), email, false, false);
             if (ownerNode != null) {
                 res.setEmailError("Email already in use.");
                 res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
@@ -559,7 +559,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     public void addCreditByEmail(MongoSession as, String emailAdr, BigDecimal amount, Long timestamp) {
-        SubNode ownerNode = read.getLocalUserNodeByProp(as, NodeProp.EMAIL.s(), emailAdr, false, false);
+        SubNode ownerNode = read.getUserNodeByProp(as, NodeProp.EMAIL.s(), emailAdr, false, false);
         if (ownerNode != null) {
             String userName = ownerNode.getStr(NodeProp.USER);
             addCreditInternal(as, ownerNode.getIdStr(), amount, timestamp);

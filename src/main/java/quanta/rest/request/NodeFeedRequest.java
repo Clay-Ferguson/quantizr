@@ -11,7 +11,6 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean fromMe;
 	private Boolean fromFriends;
 	private Boolean toPublic;
-	private Boolean localOnly; // <-- todo-0: this is obsolete. delete.
 	private String searchText;
 	// users can add hashtags to each Friend Node, and those are passed in to filter to show
 	// only friends tagged with this tag
@@ -43,10 +42,6 @@ public class NodeFeedRequest extends RequestBase {
 
 	public Boolean getToPublic() {
 		return this.toPublic;
-	}
-
-	public Boolean getLocalOnly() {
-		return this.localOnly;
 	}
 
 	public String getSearchText() {
@@ -91,10 +86,6 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setToPublic(final Boolean toPublic) {
 		this.toPublic = toPublic;
-	}
-
-	public void setLocalOnly(final Boolean localOnly) {
-		this.localOnly = localOnly;
 	}
 
 	public void setSearchText(final String searchText) {

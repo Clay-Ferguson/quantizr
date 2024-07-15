@@ -978,8 +978,7 @@ public class MongoRead extends ServiceBase {
         return node;
     }
 
-    // todo-0: rename to getUserNodeByProp
-    public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean caseSensitive,
+    public SubNode getUserNodeByProp(MongoSession ms, String propName, String propVal, boolean caseSensitive,
             boolean allowAuth) {
         if (StringUtils.isEmpty(propVal))
             return null;

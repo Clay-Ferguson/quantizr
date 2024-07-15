@@ -12,7 +12,6 @@ export class FeedViewProps {
     feedFilterToUser: string = null;
     feedFilterToDisplayName: string = null;
     feedFilterToPublic = false;
-    feedFilterLocalServer = false;
     applyAdminBlocks: true;
     name: string = J.Constant.FEED_TOFROMME;
     friendsTagSearch: string = null;

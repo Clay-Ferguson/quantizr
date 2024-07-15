@@ -396,7 +396,6 @@ export interface NodeFeedRequest extends RequestBase {
     fromMe: boolean;
     fromFriends: boolean;
     toPublic: boolean;
-    localOnly: boolean;
     searchText: string;
     friendsTagSearch: string;
     loadFriendsTags: boolean;

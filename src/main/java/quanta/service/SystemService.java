@@ -125,7 +125,7 @@ public class SystemService extends ServiceBase {
         // String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
         // new Document("validate", "nodes").append("full", true).append("repair", true));
 
-        // todo-0: I get an error message with repair=true (commented out above), which I think is because we're now in a replica set mode.
+        // Note: we get an error message with repair=true (commented out above), which I think is because we're now in a replica set mode.
         String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
                 new Document("validate", "nodes").append("full", true));
 

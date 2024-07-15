@@ -55,18 +55,14 @@ public class MongoUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoUtil.class);
     private static HashSet<String> testAccountNames = new HashSet<>();
     private static final Random rand = new Random();
-    public static SubNode allUsersRootNode = null; // todo-0: rename to usersRootNode
+    public static SubNode usersNode = null;
     public static SubNode feedbackNode = null;
-    // public static SubNode usersNode = null;
 
     /*
      * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
      * need very performant way to translate from /r/p to /r path and vice verse
-     *
-     * todo-0: we can bring back R and L soon, becaus epath L is no longer going to be used.
-     * removed R and L because we have /r/usr/R and /r/usr/L for remote and local users.
      */
-    static final String PATH_CHARS = "0123456789ABCDEFGHIJKMNOPQSTUVWXYZabcdefghijklmnoqstuvwxyz";
+    static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
     public void validate(SubNode node) {
         if (ThreadLocals.hasDirtyNode(node.getId())) {
@@ -770,8 +766,8 @@ public class MongoUtil extends ServiceBase {
             throw new RuntimeEx("createUser should not be called for admin user.");
         }
         auth.requireAdmin(ms);
-        userNode = create.createNode(ms, allUsersRootNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
-        allUsersRootNode.setHasChildren(true);
+        userNode = create.createNode(ms, usersNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
+        usersNode.setHasChildren(true);
         ObjectId id = new ObjectId();
         userNode.setId(id);
         userNode.setOwner(id);
@@ -826,7 +822,7 @@ public class MongoUtil extends ServiceBase {
             // yet and it needs to for all subsequent operations.
             ms.setUserNodeId(adminNode.getId());
         }
-        allUsersRootNode =
+        usersNode =
                 snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, "Users", null, true, null, null);
   
         createPublicNodes(ms);

@@ -443,7 +443,6 @@ export class Nav {
             feedFilterFromMe: true,
             feedFilterToUser: null,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_NEW
@@ -482,7 +481,6 @@ export class Nav {
             feedFilterFromMe: true,
             feedFilterToUser: null,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_TOFROMME
@@ -499,7 +497,6 @@ export class Nav {
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_TOME
@@ -518,7 +515,6 @@ export class Nav {
             feedFilterToUser: user,
             feedFilterToDisplayName: displayName,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMMETOUSER
@@ -535,7 +531,6 @@ export class Nav {
             feedFilterFromMe: true,
             feedFilterToUser: null,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMME
@@ -553,7 +548,6 @@ export class Nav {
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: false,
             name: J.Constant.FEED_FROMFRIENDS
@@ -570,7 +564,6 @@ export class Nav {
             feedFilterFromMe: false,
             feedFilterToUser: null,
             feedFilterToPublic: true,
-            feedFilterLocalServer: false,
             results: null,
             applyAdminBlocks: true,
             name: J.Constant.FEED_PUB
