@@ -78,13 +78,6 @@ export function dispatch(type: string, func: StateModFunc, dispatchLater: boolea
         throw new Error("Called dispatch before first render. type: " + type);
     }
 
-    // this is a bit of tight coupling to audio player and we may decouple this better later.
-    // Keeping it simple for now.
-    if (S.quanta.audioPlaying) {
-        console.warn(`Ignoring dispatch ${type} while audio playing.`);
-        return;
-    }
-
     if (dispatchLater) {
         dispatchLaterList.push({ type, func });
     }
