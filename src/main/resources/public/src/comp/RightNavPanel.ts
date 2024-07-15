@@ -163,9 +163,9 @@ export class RightNavPanel extends Div {
                             new UserProfileDlg(null).open();
                         }
                     }, [
-                        new Icon({
+                        !ast.isAnonUser && !ast.mobileMode ? new Icon({
                             className: "fa fa-gear fa-lg microMarginRight",
-                        }),
+                        }) : null,
                         !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
                             className: "smallMarginRight",
                         }) : null,
