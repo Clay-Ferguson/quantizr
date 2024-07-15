@@ -93,7 +93,6 @@ public class UserFeedService extends ServiceBase {
         sc.setViewingFeed(true);
 
         NodeFeedResponse res = new NodeFeedResponse();
-        String pathToSearch = req.getLocalOnly() ? NodePath.LOCAL_USERS_PATH : NodePath.USERS_PATH;
         List<Criteria> ands = new LinkedList<>();
 
         int counter = 0;
@@ -131,7 +130,7 @@ public class UserFeedService extends ServiceBase {
 
         Query q = new Query();
         // initialize criteria using the Path to select the correct sub-graph of the tree
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(pathToSearch)); //
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.USERS_PATH)); //
         // DO NOT DELETE (keep as an example of how to do this)
         // if (no(req.getNodeId() )) {
         // criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);

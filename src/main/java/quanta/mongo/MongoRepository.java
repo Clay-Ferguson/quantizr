@@ -65,8 +65,8 @@ public class MongoRepository extends ServiceBase {
             ThreadLocals.setMongoSession(as);
             mongoUtil.createAdminUser(as);
             // DO NOT DELETE
+            // mongoUtil.upgradePaths(as);
             // mongoUtil.setParentNodes(as);
-            // mongoUtil.deleteNostrUsers(as);
             // mongoUtil.processAccounts(as);
             /* can shutdown during startup. */
             if (AppServer.isShuttingDown())

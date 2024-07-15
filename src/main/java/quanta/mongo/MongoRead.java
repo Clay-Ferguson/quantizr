@@ -214,8 +214,7 @@ public class MongoRead extends ServiceBase {
     public boolean knownPath(String path) {
         // if this is a path we KNOW exists, return false
         if (path == null || path.length() == 0 || !path.contains("/") || path.equals(NodePath.PENDING_PATH)
-                || path.equals(NodePath.ROOT_PATH) || path.equals(NodePath.USERS_PATH)
-                || path.equals(NodePath.LOCAL_USERS_PATH)) {
+                || path.equals(NodePath.ROOT_PATH) || path.equals(NodePath.USERS_PATH)) {
             return true;
         }
         return false;
@@ -265,11 +264,6 @@ public class MongoRead extends ServiceBase {
         }
         // no need to check USERS
         if (parPath.equals(NodePath.USERS_PATH) || parPath.equals(NodePath.USERS_PATH_S)) {
-            return;
-        }
-
-        // no need to check LOCAL USERS
-        if (parPath.equals(NodePath.LOCAL_USERS_PATH) || parPath.equals(NodePath.LOCAL_USERS_PATH + "/")) {
             return;
         }
         if (!pathExists(ms, parPath)) {
@@ -984,6 +978,7 @@ public class MongoRead extends ServiceBase {
         return node;
     }
 
+    // todo-0: rename to getUserNodeByProp
     public SubNode getLocalUserNodeByProp(MongoSession ms, String propName, String propVal, boolean caseSensitive,
             boolean allowAuth) {
         if (StringUtils.isEmpty(propVal))
@@ -992,10 +987,10 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit;
         if (caseSensitive) {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.USERS_PATH))
                     .and(SubNode.PROPS + "." + propName).is(propVal);
         } else {
-            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.USERS_PATH))
                     .and(SubNode.PROPS + "." + propName).regex("^" + Pattern.quote(propVal) + "$", "i");
         }
 
@@ -1020,7 +1015,7 @@ public class MongoRead extends ServiceBase {
         // Otherwise for ordinary users root is based off their username
         // case-insensitive lookup of username:
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH))
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.USERS_PATH))
                 .and(SubNode.PROPS + "." + NodeProp.USER).is(user).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
         if (allowAuth) {
@@ -1190,7 +1185,7 @@ public class MongoRead extends ServiceBase {
     public Iterable<SubNode> getAccountNodes(MongoSession ms, CriteriaDefinition textCriteria, Sort sort, Integer limit,
             int skip) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.USERS_PATH));
         crit = auth.addReadSecurity(ms, crit);
         q.addCriteria(crit);
 
@@ -1211,7 +1206,7 @@ public class MongoRead extends ServiceBase {
 
     public long getAccountNodeCount(MongoSession ms, CriteriaDefinition textCriteria) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.LOCAL_USERS_PATH));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(NodePath.USERS_PATH));
         q.addCriteria(crit);
 
         if (textCriteria != null) {

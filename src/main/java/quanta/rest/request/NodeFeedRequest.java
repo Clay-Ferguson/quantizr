@@ -11,7 +11,7 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean fromMe;
 	private Boolean fromFriends;
 	private Boolean toPublic;
-	private Boolean localOnly;
+	private Boolean localOnly; // <-- todo-0: this is obsolete. delete.
 	private String searchText;
 	// users can add hashtags to each Friend Node, and those are passed in to filter to show
 	// only friends tagged with this tag

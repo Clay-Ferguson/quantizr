@@ -23,7 +23,9 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -53,14 +55,15 @@ public class MongoUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoUtil.class);
     private static HashSet<String> testAccountNames = new HashSet<>();
     private static final Random rand = new Random();
-    public static SubNode allUsersRootNode = null;
+    public static SubNode allUsersRootNode = null; // todo-0: rename to usersRootNode
     public static SubNode feedbackNode = null;
-    public static SubNode usersNode = null;
+    // public static SubNode usersNode = null;
 
     /*
      * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
      * need very performant way to translate from /r/p to /r path and vice verse
      *
+     * todo-0: we can bring back R and L soon, becaus epath L is no longer going to be used.
      * removed R and L because we have /r/usr/R and /r/usr/L for remote and local users.
      */
     static final String PATH_CHARS = "0123456789ABCDEFGHIJKMNOPQSTUVWXYZabcdefghijklmnoqstuvwxyz";
@@ -381,26 +384,23 @@ public class MongoUtil extends ServiceBase {
         // log.debug("setParentNodes completed.");
     }
 
-    // DO NOT DELETE
-    // Leave as an example for future DB Conversions, which can update lots of nodes efficiently
-    public void deleteNostrUsers(MongoSession ms) {
+    // DO NOT DELETE (this method can be repurposed for other similar tasks)
+    @Transactional
+    public void upgradePaths(MongoSession ms) {
         IntVal batchSize = new IntVal();
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.TYPE).is(NodeType.ACCOUNT.s()));
+        q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph("/r/usr/L"))); //
         BulkOperations bops = opsw.bulkOps(BulkMode.UNORDERED);
 
         opsw.forEach(q, node -> {            
-            String userName = node.getStr(NodeProp.USER);
-            if (!userName.startsWith("."))
-                return;
-
-            log.debug("NOSTR DEL: " + node.getIdStr());
-
             Criteria crit = new Criteria("id").is(node.getId());
             Query query = new Query().addCriteria(crit);
-            bops.remove(query);
-            // Update update = new Update().set(SubNode.TYPE, NodeType.POSTS.s());
-            // bops.updateOne(query, update);
+            String path = node.getPath();
+            if (path.startsWith("/r/usr/L")) {
+                path = path.replace("/r/usr/L", "/r/usr");
+            }
+            Update update = new Update().set(SubNode.PATH, path);
+            bops.updateOne(query, update);
             batchSize.inc();
 
             if (batchSize.getVal() > Const.MAX_BULK_OPS) {
@@ -770,8 +770,8 @@ public class MongoUtil extends ServiceBase {
             throw new RuntimeEx("createUser should not be called for admin user.");
         }
         auth.requireAdmin(ms);
-        userNode = create.createNode(ms, usersNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
-        usersNode.setHasChildren(true);
+        userNode = create.createNode(ms, allUsersRootNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
+        allUsersRootNode.setHasChildren(true);
         ObjectId id = new ObjectId();
         userNode.setId(id);
         userNode.setOwner(id);
@@ -828,10 +828,7 @@ public class MongoUtil extends ServiceBase {
         }
         allUsersRootNode =
                 snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.USER, "Users", null, true, null, null);
-
-        usersNode =
-                snUtil.ensureNodeExists(ms, NodePath.USERS_PATH, NodePath.LOCAL, "Local Users", null, true, null, null);
-
+  
         createPublicNodes(ms);
 
         feedbackNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.FEEDBACK, "### User Feedback", null,
