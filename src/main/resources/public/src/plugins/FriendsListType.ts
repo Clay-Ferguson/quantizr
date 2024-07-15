@@ -12,7 +12,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class FriendsListType extends TypeBase {
     constructor() {
-        super(J.NodeType.FRIEND_LIST, "Friends", "fa-users", false);
+        super(J.NodeType.FRIEND_LIST, "Follows", "fa-users", false);
     }
 
     override getAllowRowHeader(): boolean {
@@ -25,13 +25,13 @@ export class FriendsListType extends TypeBase {
 
     override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
-            new Heading(4, "Friends"),
+            new Heading(4, "Follows"),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
-            new Button("Add New Friend", () => {
+            new Button("Follow Someone", () => {
                 new SearchUsersDlg().open();
             }, null, "btn-primary"),
-            new Button("Search Friends", () => {
-                const friendsDlg = new FriendsDlg("Friends", null, true);
+            new Button("Search Follows", () => {
+                const friendsDlg = new FriendsDlg("Follows", null, true);
                 friendsDlg.open();
             }, null, "btn-primary")
         ]);

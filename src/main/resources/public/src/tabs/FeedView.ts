@@ -236,7 +236,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     break;
 
                 case J.Constant.FEED_FROMFRIENDS:
-                    subHeading = "From Friends";
+                    subHeading = "From Follows";
                     break;
 
                 case J.Constant.FEED_LOCAL: 

@@ -105,7 +105,7 @@ export class FriendsDlg extends DialogBase {
         }
         else if (!state.friends || state.friends.length === 0) {
             if (!this.nodeId) {
-                message = "Once you add some friends you can pick from a list here.";
+                message = "Once you follow some people they will show up in this list.";
             }
             else {
                 message = "Only the Node Owner is associated with this node."
@@ -201,10 +201,10 @@ export class FriendsDlg extends DialogBase {
 
         new MessageDlg(
             "Use the download link below to get the text file.",
-            "Export Friends",
+            "Export Follows",
             null,
             new VerticalLayout([
-                new Anchor(downloadLink, "Download Friends List", { target: "_blank" }),
+                new Anchor(downloadLink, "Download Follows List", { target: "_blank" }),
             ]), false, 0, null
         ).open();
     }

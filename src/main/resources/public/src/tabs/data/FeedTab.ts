@@ -58,7 +58,7 @@ export class FeedTab implements TabIntf<FeedViewProps> {
             ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
             ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
             ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
-            ast.isAnonUser ? null : new AppNavLink("From Friends", S.nav.messagesFromFriends),
+            ast.isAnonUser ? null : new AppNavLink("From Follows", S.nav.messagesFromFriends),
         ]);
     };
 }
