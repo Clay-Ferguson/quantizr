@@ -106,7 +106,7 @@ export class RightNavPanel extends Div {
             });
         }
 
-        const textToSpeech = !ast.isAnonUser && !ast.mobileMode ? new Icon({
+        const textToSpeech = !ast.isAnonUser && !ast.mobileMode &&  S.speech.ttsSupported() ? new Icon({
             className: "fa fa-volume-up fa-lg marginRight clickable",
 
             // This mouseover stuff is compensating for the fact that when the onClick gets called

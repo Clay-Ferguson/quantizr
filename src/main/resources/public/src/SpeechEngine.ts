@@ -407,6 +407,10 @@ export class SpeechEngine {
         };
     }
 
+    ttsSupported = () => {
+        return this.tts && this.voices && this.voices.length > 0;
+    }
+
     filterVoices = () => {
         // console.log("TTS: " + this.voices?.length + " voices.");
 

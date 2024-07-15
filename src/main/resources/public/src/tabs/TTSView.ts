@@ -134,31 +134,37 @@ export class TTSView extends AppTab<any, TTSView> {
             }
         }
 
-        this.setChildren([
-            this.headingBar = new TabHeading([
-                new Div("Text-to-Speech", { className: "tabTitle" }),
-                new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
-                new Clearfix()
-            ], null),
-            new FlexRowLayout([
-                this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
-                S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
-                this.makeRateChooser(),
-                new Checkbox("Text Input", { className: "bigMarginLeft marginTop" }, {
-                    setValue: (checked: boolean) => dispatch("setTtsInput", s => {
-                        if (!checked) {
-                            TTSView.textAreaState.setValue("");
-                        }
-                        s.showTtsInputText = checked;
-                    }),
-                    getValue: (): boolean => getAs().showTtsInputText
-                })
-            ]),
-            getAs().showTtsInputText ? new TextArea("Enter Text to Speak", {
-                rows: 3
-            }, TTSView.textAreaState) : null,
-            paraComps?.length > 0 ? new Div(null, { className: "speechTxtArea" }, paraComps) : null
-        ]);
+        if (S.speech.ttsSupported()) {
+            this.setChildren([
+                this.headingBar = new TabHeading([
+                    new Div("Text-to-Speech", { className: "tabTitle" }),
+                    new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+                    new Clearfix()
+                ], null),
+                new FlexRowLayout([
+                    this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
+                    S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
+                    this.makeRateChooser(),
+                    new Checkbox("Text Input", { className: "bigMarginLeft marginTop" }, {
+                        setValue: (checked: boolean) => dispatch("setTtsInput", s => {
+                            if (!checked) {
+                                TTSView.textAreaState.setValue("");
+                            }
+                            s.showTtsInputText = checked;
+                        }),
+                        getValue: (): boolean => getAs().showTtsInputText
+                    })
+                ]),
+                getAs().showTtsInputText ? new TextArea("Enter Text to Speak", {
+                    rows: 3
+                }, TTSView.textAreaState) : null,
+                paraComps?.length > 0 ? new Div(null, { className: "speechTxtArea" }, paraComps) : null
+            ]);
+        } else {
+            this.setChildren([
+                new Div("Text-to-Speech is not supported in this browser.", { className: "tabTitle" })
+            ]);
+        }
         return true;
     }
 

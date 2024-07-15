@@ -215,14 +215,16 @@ export class NodeCompRowHeader extends Div {
                     // for now let's not have tts on mobile.
                 }
                 else {
-                    children.push(new Icon({
-                        className: "fa fa-volume-up fa-lg rowHeaderIcon",
-                        title: "Speech-to-Text (Read Aloud)",
-                        onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
-                        onMouseOut: () => { S.quanta.selectedForTts = null; },
-                        [C.DOM_ID_ATTR]: this.getContentDomId(),
-                        onClick: S.nav.ttsClick
-                    }));
+                    if (S.speech.ttsSupported()) {
+                        children.push(new Icon({
+                            className: "fa fa-volume-up fa-lg rowHeaderIcon",
+                            title: "Speech-to-Text (Read Aloud)",
+                            onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
+                            onMouseOut: () => { S.quanta.selectedForTts = null; },
+                            [C.DOM_ID_ATTR]: this.getContentDomId(),
+                            onClick: S.nav.ttsClick
+                        }));
+                    }
                 }
             }
         }

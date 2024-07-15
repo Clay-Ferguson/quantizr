@@ -1061,13 +1061,13 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.insertUserNames(this)
             }),
 
-            new Icon({
+            !ast.isAnonUser && !ast.mobileMode &&  S.speech.ttsSupported() ? new Icon({
                 className: "fa fa-lg fa-volume-up editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
                 onClick: () => this.utl.speakerClickInEditor(this),
                 title: "Text-to-Speech: Editor Text or Selection"
-            }),
+            }) : null,
             new Selection(null, null, [
                 { key: "h0", val: "" },
                 { key: "h1", val: "H1" },
