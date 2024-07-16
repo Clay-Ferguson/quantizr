@@ -262,10 +262,11 @@ public class NodeMoveService extends ServiceBase {
             if (sourceParentPath != null && !sourceParentPath.equals(node.getParentPath())) {
                 throw new RuntimeException("Nodes to move must be all from the same parent.");
             }
-            sourceParentPath = node.getParentPath();
+            sourceParentPath = node.getParentPath(); 
             // get the nodeParent if we don't have it already.
             if (nodeParent == null) {
-                nodeParent = read.getParent(ms, node);
+                // Very important, we can get the parent even without having ownership of it here.
+                nodeParent = read.getParent(ms, node, false);
             }
         }
 
