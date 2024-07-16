@@ -896,8 +896,11 @@ public class AttachmentService extends ServiceBase {
         });
     }
 
+    int verifyAttachmentsCounter = 0;
+
     @Scheduled(fixedDelay = VERIFY_FREQUENCY_MINS * 60 * 1000)
     public String verifyAllAttachments() {
+        log.debug("verifyAllAttachments()");  
         StringBuilder sb = new StringBuilder();
         IntVal nodesFound = new IntVal(0);
         List<String> nodesIdsMissingBins = new ArrayList<>();
@@ -925,7 +928,10 @@ public class AttachmentService extends ServiceBase {
             return null;
         });
 
-        sb.append("GridFS Attachment Verification\n");
+        // todo-0: we have this counter to troubleshoot a bug where two emails are being receieved,
+        // bizarrely 20min apart.
+        verifyAttachmentsCounter++;
+        sb.append("GridFS Attachment Verification (run=" + verifyAttachmentsCounter + ")\n");
         sb.append("  Binaries Found: " + nodesFound.getVal() + "\n");
         sb.append("  Nodes Missing Attachments: " + nodesIdsMissingBins.size() + "\n");
         nodesIdsMissingBins.forEach(id -> {
