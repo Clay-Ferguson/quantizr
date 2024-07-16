@@ -118,12 +118,20 @@ public class EmailService extends ServiceBase {
         }
     }
 
-        public boolean mailEnabled() {
+    public boolean mailEnabled() {
         return !StringUtils.isEmpty(prop.getMailPassword());
     }
 
     public static Object getLock() {
         return lock;
+    }
+
+    public void sendDevEmail(String subject, String content) {
+        synchronized (EmailService.getLock()) {
+            String devEmail = prop.getDevEmail();
+            String fromAddress = prop.getMailFrom();
+            email.sendMail(devEmail, fromAddress, content, "Quanta: " + prop.getHostAndPort() + ": " + subject);
+        }
     }
 
     public void sendMail(String sendToAddress, String fromAddress, String content, String subjectLine) {
@@ -190,7 +198,7 @@ public class EmailService extends ServiceBase {
         return cont.toString();
     }
 
-        /**
+    /**
      * Sends an email notification to the user associated with 'toUserNode' (a person's account root
      * node), telling them that 'fromUserName' has shared a node with them, and including a link to the
      * shared node in the email.
@@ -243,8 +251,8 @@ public class EmailService extends ServiceBase {
                 return outboxNode;
             }
             snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX, "Outbox", null, true, null, null);
-            outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH,
-                    NodePath.OUTBOX + "/" + NodePath.SYSTEM, "System Messages", null, true, null, null);
+            outboxNode = snUtil.ensureNodeExists(ms, NodePath.ROOT_PATH, NodePath.OUTBOX + "/" + NodePath.SYSTEM,
+                    "System Messages", null, true, null, null);
             return outboxNode;
         }
     }

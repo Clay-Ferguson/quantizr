@@ -40,6 +40,7 @@ import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -94,6 +95,9 @@ import quanta.util.val.LongVal;
 @Component
 public class AttachmentService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AttachmentService.class);
+
+    // number of minutes in a day
+    static final int VERIFY_FREQUENCY_MINS = 60 * 24;
 
     @Autowired
     public GridFsTemplate grid;
@@ -892,6 +896,7 @@ public class AttachmentService extends ServiceBase {
         });
     }
 
+    @Scheduled(fixedDelay = VERIFY_FREQUENCY_MINS * 60 * 1000)
     public String verifyAllAttachments() {
         StringBuilder sb = new StringBuilder();
         IntVal nodesFound = new IntVal(0);
@@ -926,6 +931,10 @@ public class AttachmentService extends ServiceBase {
         nodesIdsMissingBins.forEach(id -> {
             sb.append("    " + id + "\n");
         });
+
+        if (nodesIdsMissingBins.size() > 0) {
+            email.sendDevEmail("Missing Attachments", sb.toString());
+        }
         sb.append("\n\n");
         return sb.toString();
     }
