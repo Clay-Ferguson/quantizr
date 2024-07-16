@@ -337,7 +337,7 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
                 new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab, null, true),
-                new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab),
+                !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
 

@@ -21,8 +21,8 @@ export class SendFeedbackDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new Div("Send a message directly to the site operators and developers. Any feedback, both positive and negative, is welcome. Include you're email address if you're requesting information.", { className: "marginBottom" }),
-                new TextArea("Your Question or Comments", {
+                new Div("Send us any feedback, questions, or comments.", { className: "marginBottom" }),
+                new TextArea("Comments", {
                     rows: 7,
                 }, SendFeedbackDlg.promptState, null, false, 3, this.promptScrollPos),
                 new ButtonBar([
