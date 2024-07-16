@@ -52,7 +52,7 @@ public class ImportTarService extends ImportArchiveBase {
 
             while ((entry = zis.getNextTarEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    processFile(entry, zis, userNode.getOwner());
+                    processFile(ms, entry, zis, userNode.getOwner());
                 }
             }
         } catch (final Exception ex) {

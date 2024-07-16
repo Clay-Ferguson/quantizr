@@ -78,7 +78,7 @@ public class ImportZipService extends ImportArchiveBase {
 
             while ((entry = zis.getNextZipEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    processFile(entry, zis, userNode.getOwner());
+                    processFile(ms, entry, zis, userNode.getOwner());
                 }
             }
         } catch (Exception ex) {

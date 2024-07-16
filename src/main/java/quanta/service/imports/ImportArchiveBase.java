@@ -32,7 +32,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
     public SubNode importRootNode;
     public SubNode curNode;
 
-    public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
+    public void processFile(MongoSession ms, ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
         String name = entry.getName();
         int lastSlashIdx = name.lastIndexOf("/");
         String fileName = lastSlashIdx == -1 ? name : name.substring(lastSlashIdx + 1);
@@ -107,30 +107,21 @@ public abstract class ImportArchiveBase extends ServiceBase {
                         att.setBin(null);
                     });
                 }
-                /*
-                 * NOTE: It's important to save this node and NOT let the 'node' before this save, ever get set into
-                 * the dirty cache either, so we can't call any setters on it UNTIL it's saved here and we get the
-                 * DB to give us the new ID for it.
-                 */
-                // put this dupliate name tolerant save into a method we can call.
+                
                 int tries = 0;
                 String nodeName = node.getName();
-                while (tries < 10) {
-                    try {
-                        // todo-0: This kind of approach fails the second time around, with transaction enabled, in this scope.
-                        //         so we need to figure out how to do this properly. Probably doing a lookup instead of attempting a write
-                        //         is the better way. see #transaction-note-1 where @Transaction is commented out for now.
-                        update.save(session, node);
-                        break;
-                    } catch (DuplicateKeyException ex) {
-                        if (ex.getMessage().contains("unique-node-name")) {
-                            tries++;
-                            node.setName(nodeName + "-" + tries);
-                        } else {
-                            throw ex;
-                        }
-                    }
+                String baseNodeName = nodeName;
+                SubNode nodeFound = read.getNodeByName(ms, nodeName, false, null);
+                while (nodeFound != null && ++tries < 50) {
+                    nodeName = baseNodeName + "-" + tries;
+                    nodeFound = read.getNodeByName(ms, nodeName, false, null);
                 }
+                if (nodeFound != null) {
+                    throw new RuntimeException(
+                            "Failed to save node " + node.getIdStr() + ". Name already exists: " + nodeName);
+                }
+                node.setName(nodeName);
+                update.save(session, node);
             }
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);

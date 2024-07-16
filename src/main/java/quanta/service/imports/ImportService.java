@@ -21,7 +21,7 @@ import quanta.util.ThreadLocals;
 public class ImportService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
-    // @Transactional // todo-0: See '#transaction-note-1' for the reason we have @Transactional commented out
+    @Transactional
     public ResponseEntity<?> cm_streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
         if (nodeId == null) {
             throw ExUtil.wrapEx("target nodeId not provided");
