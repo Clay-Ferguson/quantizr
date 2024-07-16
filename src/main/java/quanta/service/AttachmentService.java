@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -79,6 +80,7 @@ import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.IntVal;
 import quanta.util.val.LongVal;
 
 /**
@@ -703,7 +705,7 @@ public class AttachmentService extends ServiceBase {
         ms = ThreadLocals.ensure(ms);
         LimitedInputStreamEx limitedIs = null;
         try {
-            URL url = new URI(sourceUrl).toURL(); 
+            URL url = new URI(sourceUrl).toURL();
             int timeout = 20;
             // if this is an image extension, handle it in a special way, mainly to extract the width, height
             // from it
@@ -890,6 +892,44 @@ public class AttachmentService extends ServiceBase {
         });
     }
 
+    public String verifyAllAttachments() {
+        StringBuilder sb = new StringBuilder();
+        IntVal nodesFound = new IntVal(0);
+        List<String> nodesIdsMissingBins = new ArrayList<>();
+
+        // iterate stream of all nodes
+        arun.run(as -> {
+            // get all nodes that have attachments
+            Criteria crit = Criteria.where(SubNode.ATTACHMENTS).exists(true);
+            Query query = new Query();
+            query.addCriteria(crit);
+
+            opsw.forEach(query, n -> {
+                n.getAttachments().forEach((String key, Attachment att) -> {
+                    if (att.getBin() != null) {
+                        com.mongodb.client.gridfs.model.GridFSFile gridFile =
+                                grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
+                        if (gridFile == null) {
+                            nodesIdsMissingBins.add(n.getIdStr());
+                        } else {
+                            nodesFound.inc();
+                        }
+                    }
+                });
+            });
+            return null;
+        });
+
+        sb.append("GridFS Attachment Verification\n");
+        sb.append("  Binaries Found: " + nodesFound.getVal() + "\n");
+        sb.append("  Nodes Missing Attachments: " + nodesIdsMissingBins.size() + "\n");
+        nodesIdsMissingBins.forEach(id -> {
+            sb.append("    " + id + "\n");
+        });
+        sb.append("\n\n");
+        return sb.toString();
+    }
+
     /**
      * This method makes a single pass over all grid items doing all the daily maintenance on each one
      * as necessary to maintain the system health and statistics.
@@ -961,7 +1001,7 @@ public class AttachmentService extends ServiceBase {
 
     /*
      * An alternative way to get the binary attachment from a node allowing more friendly url format
-     * (named nodes). 
+     * (named nodes).
      */
     public void cm_getAttachment(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
             String download, String gid, String attName, HttpServletRequest req, HttpServletResponse response) {
@@ -969,7 +1009,7 @@ public class AttachmentService extends ServiceBase {
             if (StringUtils.isEmpty(attName)) {
                 attName = Constant.ATTACHMENT_PRIMARY.s();
             }
-          
+
             // Node Names are identified using a colon in front of it, to make it detectable
             if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
                 id = ":" + userName + ":" + nameOnUserNode;
@@ -987,7 +1027,7 @@ public class AttachmentService extends ServiceBase {
                     if (node == null) {
                         throw new RuntimeException("Node not found.");
                     }
-                   
+
                     if (node.getAc() == null || node.getAc().size() == 0) {
                         user.authBearer();
                         crypto.authSig();

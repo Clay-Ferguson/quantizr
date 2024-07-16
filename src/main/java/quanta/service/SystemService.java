@@ -101,6 +101,8 @@ public class SystemService extends ServiceBase {
             final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
             attach.gridMaintenanceScan(statsMap);
 
+            ret += attach.verifyAllAttachments();
+
             arun.run(as -> {
                 user.writeUserStats(as, statsMap);
                 return null;
