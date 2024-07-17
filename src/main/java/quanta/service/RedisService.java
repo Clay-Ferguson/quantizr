@@ -70,10 +70,17 @@ public class RedisService extends ServiceBase {
     }
 
     // Note: This happens to be about the same as the session timeout, but doesn't need to be
+    int redisService_runCount = 0;
     @Scheduled(fixedDelay = 60 * DateUtil.MINUTE_MILLIS)
     public void maintenance() {
+        redisService_runCount++;
         if (!initComplete || !MongoRepository.fullInit)
             return;
+
+        // This first run will happen at startup and we don't want that.
+        if (redisService_runCount == 1) {
+            log.debug("redisService.run() first run, skipping.");
+        }
 
         List<SessionContext> list = redis.query("*");
         if (list.size() > 0) {

@@ -55,10 +55,18 @@ public class EmailService extends ServiceBase {
      *
      * Runs immediately at startup, and then every 10 seconds
      */
+    int emailService_runCount = 0;
     @Scheduled(fixedDelay = 30000)
     public void run() {
+        emailService_runCount++;
         if (!initComplete || run || !MongoRepository.fullInit)
             return;
+
+        // This first run will happen at startup and we don't want that.
+        if (emailService_runCount == 1) {
+            log.debug("emailService.run() first run, skipping.");
+        }
+
         try {
             run = true;
             if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {

@@ -896,11 +896,18 @@ public class AttachmentService extends ServiceBase {
         });
     }
 
-    int verifyAttachmentsCounter = 0;
+    int verifyAllAttachments_runCount = 0;
 
     @Scheduled(fixedDelay = VERIFY_FREQUENCY_MINS * 60 * 1000)
     public String verifyAllAttachments() {
-        log.debug("verifyAllAttachments()");  
+        verifyAllAttachments_runCount++;
+
+        // This first run will happen at startup and we don't want that.
+        if (verifyAllAttachments_runCount == 1) {
+            log.debug("verifyAllAttachments() first run, skipping.");
+            return "";
+        }
+        log.debug("verifyAllAttachments()");
         StringBuilder sb = new StringBuilder();
         IntVal nodesFound = new IntVal(0);
         List<String> nodesIdsMissingBins = new ArrayList<>();
@@ -928,10 +935,8 @@ public class AttachmentService extends ServiceBase {
             return null;
         });
 
-        // todo-0: we have this counter to troubleshoot a bug where two emails are being receieved,
-        // bizarrely 20min apart.
-        verifyAttachmentsCounter++;
-        sb.append("GridFS Attachment Verification (run=" + verifyAttachmentsCounter + ")\n");
+        verifyAllAttachments_runCount++;
+        sb.append("GridFS Attachment Verification (run=" + verifyAllAttachments_runCount + ")\n");
         sb.append("  Binaries Found: " + nodesFound.getVal() + "\n");
         sb.append("  Nodes Missing Attachments: " + nodesIdsMissingBins.size() + "\n");
         nodesIdsMissingBins.forEach(id -> {
