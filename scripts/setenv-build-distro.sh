@@ -14,6 +14,7 @@ export VITE_SCRIPT=vite-build
 export SASS_SCRIPT=sass-prod
 
 export DOCKER_IMAGE=quanta
+export QAI_IMAGE=qai
 export SCRIPTS=${PRJROOT}/scripts
 export DOCKER_NETWORK=bridge
 

@@ -189,18 +189,18 @@ services:
         #         max_attempts: 3
         #         window: 120s
         # healthcheck:
-        #     test: ["CMD", "curl", "-f", "http://quanta-host:${PORT}/health"]
+        #     test: ["CMD", "curl", "-f", "http://quanta-hos-dev:${PORT}/health"]
         #     interval: 10m
         #     timeout: 10s
         #     retries: 3
         #     start_period: 30s
         # ====================================================================
 
-        hostname: quanta-host
+        hostname: quanta-host-dev
         networks:
             bridge:
                 aliases:
-                    - quanta-host
+                    - quanta-host-dev
 
         # extra_hosts:
         #     - 'host.docker.internal:host-gateway'
@@ -295,10 +295,13 @@ services:
 
     # Quanta AI Microservice (Encapsulates Python LangChain)
     qai-dev:
-        image: qai-dev
+        image: ${QAI_IMAGE}
         build: 
-            context: .
-            dockerfile: dockerfile-qai
+            context: ${PRJROOT}
+            args:
+                QAI_HOST: "${QAI_HOST}"
+                QAI_PORT: "${QAI_PORT}"
+            dockerfile: ./dockerfile-qai
         deploy:
             # Don't want a restart policy for DEV!
             # restart_policy:
@@ -314,6 +317,7 @@ services:
                 aliases:
                     - qai-host-dev
         environment:
+            QAI_HOST: "${QAI_HOST}"
             QAI_PORT: "${QAI_PORT}"
             # todo-0: research what this is doing.
             PYTHONUNBUFFERED: 1

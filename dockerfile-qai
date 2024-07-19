@@ -1,5 +1,6 @@
 FROM python:3.12.3-slim
 LABEL maintainer="wclayf@gmail.com"
+ARG QAI_HOST
 ARG QAI_PORT
 WORKDIR /app
 
@@ -13,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY QuantaAI .
 
 # Run the uvicorn server
-CMD uvicorn quanta-ai:app --host 0.0.0.0 --port ${QAI_PORT}
+CMD uvicorn quanta-ai:app --host ${QAI_HOST} --port ${QAI_PORT}

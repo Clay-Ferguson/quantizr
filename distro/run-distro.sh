@@ -22,6 +22,10 @@ if [ -f "quanta-${QUANTA_VER}.tar" ]; then
     docker load -i quanta-${QUANTA_VER}.tar
 fi
 
+if [ -f "qai-${QUANTA_VER}.tar" ]; then
+    docker load -i qai-${QUANTA_VER}.tar
+fi
+
 # take ownership of this directory as current user
 sudo chown -R $USER .
 

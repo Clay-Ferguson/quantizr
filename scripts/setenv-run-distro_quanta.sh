@@ -9,6 +9,7 @@ source ./define-functions.sh
 # export DOCKER_IMAGE=subnode/quanta:2.20.12
 
 export DOCKER_IMAGE=quanta
+export QAI_IMAGE=qai
 export DEPLOY_TARGET=$PWD
 export DOCKER_NETWORK=bridge
 export DATA_FOLDER=/home/clay/q2-data

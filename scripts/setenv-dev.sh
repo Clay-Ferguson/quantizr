@@ -17,6 +17,7 @@ source ./define-functions-dev.sh
 export VITE_SCRIPT=vite-build
 export SASS_SCRIPT=sass-dev
 export DOCKER_IMAGE=quanta-dev
+export QAI_IMAGE=qai-dev
 
 # Must be the folder where the Quantizr project is located. The root of the source folders.
 export SCRIPTS=${PRJROOT}/scripts

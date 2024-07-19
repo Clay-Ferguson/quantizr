@@ -7,6 +7,7 @@ source ./define-functions.sh
 # export DOCKER_IMAGE=subnode/quanta:2.20.12
 
 export DOCKER_IMAGE=quanta
+export QAI_IMAGE=qai
 
 export DEPLOY_TARGET=$PWD
 

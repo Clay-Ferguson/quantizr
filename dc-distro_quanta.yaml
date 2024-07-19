@@ -275,10 +275,13 @@ services:
 
     # Quanta AI Microservice (Encapsulates Python LangChain)
     qai-distro:
-        image: qai-distro
+        image: ${QAI_IMAGE}
         build: 
-            context: .
-            dockerfile: dockerfile-qai
+            context: ${PRJROOT}
+            args:
+                QAI_HOST: "${QAI_HOST}"
+                QAI_PORT: "${QAI_PORT}"
+            dockerfile: ./dockerfile-qai
         deploy:
             # Don't want a restart policy for DEV!
             # restart_policy:
@@ -294,6 +297,7 @@ services:
                 aliases:
                     - qai-host-distro
         environment:
+            QAI_HOST: "${QAI_HOST}"
             QAI_PORT: "${QAI_PORT}"
             # todo-0: research what this is doing.
             PYTHONUNBUFFERED: 1

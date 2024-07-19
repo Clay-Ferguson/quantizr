@@ -84,6 +84,7 @@ echo "Docker build complete..."
 fi
 
 imageCheck ${DOCKER_IMAGE}
+imageCheck ${QAI_IMAGE}
 
 echo
 echo "==================== NOTE ======================================="
