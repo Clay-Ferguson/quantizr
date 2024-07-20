@@ -98,7 +98,7 @@ def buildMessages(req):
     # Add the current human question to the messages
     messages.append(HumanMessage(content=req.prompt))
 
-    # todo-0: we can do this cleaner, but we're doing the "If perplexity online model don't set system prompt" here
+    # todo-1: we can do this cleaner, but we're doing the "If perplexity online model don't set system prompt" here
     if "online" not in req.model:    
         if req.systemPrompt is None or req.systemPrompt == "":
             req.systemPrompt = "You are a helpful agent."

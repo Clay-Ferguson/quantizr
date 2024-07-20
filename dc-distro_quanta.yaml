@@ -299,7 +299,6 @@ services:
         environment:
             QAI_HOST: "${QAI_HOST}"
             QAI_PORT: "${QAI_PORT}"
-            # todo-0: research what this is doing.
             PYTHONUNBUFFERED: 1
             
         logging:
