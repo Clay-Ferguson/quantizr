@@ -302,8 +302,6 @@ export abstract class DialogBase extends Comp {
 
             clickDivElm.addEventListener("mousedown", (e) => {
                 if (!this.isTopmost()) return;
-                // e.preventDefault();
-                // e.stopPropagation();
 
                 // only accept left-button click
                 if (e.button !== 0) return;

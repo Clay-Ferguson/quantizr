@@ -131,7 +131,6 @@ export abstract class Comp {
             // Not sure if isConnected is needed here.
             ret = this.attribs.ref.current?.isConnected ? this.attribs.ref.current : null;
         }
-
         return ret;
     }
 
@@ -148,13 +147,14 @@ export abstract class Comp {
     }
 
     /* Schedules a function to get run whenever this element comes into existence, or will cause the
-     function to run immediately of the component is already mounted */
+     function to run immediately if the component is already mounted */
     onMount(func: (elm: HTMLElement) => void) {
         if (!func) return;
         // If we happen to already have the ref, we can run the 'func' immediately and be done or
         // else we add 'func' to the queue of functions to call when component does get mounted.
         const elm = this.getRef();
         if (elm) {
+            this.runQueuedFuncs(elm); // <-- new 7/20/24, just because this seems right, not to fix any problmes.
             func(elm);
             return;
         }
@@ -415,7 +415,8 @@ export abstract class Comp {
     }
 
     runQueuedFuncs = (elm: HTMLElement) => {
-        this.domAddFuncs?.forEach(func => func(elm));
+        if (!this.domAddFuncs) return;
+        this.domAddFuncs.forEach(func => func(elm));
         this.domAddFuncs = null;
     }
 

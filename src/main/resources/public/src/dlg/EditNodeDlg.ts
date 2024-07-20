@@ -565,7 +565,6 @@ export class EditNodeDlg extends DialogBase {
             nodeId: ast.editNode.id
         });
         ast.editNode.ac = res.aclEntries;
-
         S.edit.updateNode(ast.editNode);
     }
 
@@ -737,23 +736,15 @@ export class EditNodeDlg extends DialogBase {
 
     renderButtons(): Comp {
         const ast = getAs();
-        // let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         const type = S.plugin.getType(ast.editNode.type);
         if (type) {
             type.ensureDefaultProperties(ast.editNode);
         }
 
-        // let allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
-        // //regardless of value, if this property is present we consider the type locked
-        // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
-
         const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode)) : true;
         const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
-
-        // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);
-
         const numPropsShowing = this.utl.countPropsShowing(this);
         const advancedButtons: boolean = !!this.contentEditor;
         const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
