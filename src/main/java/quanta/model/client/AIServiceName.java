@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 // #ai-model
 // Encapsulates a specific AI service including a specific service and model
+// todo-0: rename this to AIServiceInfo
 public enum AIServiceName {
     NONE("[null]", null, null, null), //
     OPENAI("openAi", "openai", "gpt-4o", "OpenAI: ChatGPT-4o"), //
+    OPENAI_MINI("openAiMini", "openai", "gpt-4o-mini", "OpenAI: ChatGPT-4o Mini"), //
     PPLX("pplxAi", "perplexity", "llama-3-sonar-large-32k-chat", "Perplexity: Basic"), //
     PPLX_ONLINE("pplxAi_online",  "perplexity", "llama-3-sonar-large-32k-online", "Perplexity: Recent News Aware"), //
     PPLX_LLAMA3("llama3",  "perplexity", "llama-3-70b-instruct", "Meta: Llama 3"), //

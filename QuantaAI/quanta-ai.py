@@ -17,9 +17,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 import traceback
 
+# #ai-model
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
 ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
+OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online" 
 PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
 PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
@@ -144,6 +146,8 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     return llm
 
 # https://www.anthropic.com/pricing#anthropic-api
+# https://openai.com/api/pricing/
+# #ai-model
 def calculate_cost(input_tokens, output_tokens, model) -> float:
     input_ppm = 0
     output_ppm = 0
@@ -155,6 +159,12 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
         input_ppk = 0.005
         output_ppk = 0.015
         return (input_tokens * input_ppk / 1000) + (output_tokens * output_ppk / 1000)
+    
+    if model == OPENAI_MODEL_COMPLETION_MINI:
+        # prices per kilotoken
+        input_ppm = 0.15
+        output_ppm = 0.6
+        return (input_tokens * input_ppm / 1000000) + (output_tokens * output_ppm / 1000000)
 
     elif model == ANTH_OPUS_MODEL_COMPLETION_CHAT:
         # prices per megatoken

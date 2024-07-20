@@ -28,7 +28,12 @@ export class AIUtil {
             this.aiServices.push({
                 name: J.AIServiceName.OPENAI,
                 description: "OpenAI: ChatGPT-4o",
-                longDescription: "The default chatbot and is widely considered the most intelligent general-purpose AI on the market."
+                longDescription: "The most powerful version of OpenAI's intelligent general-purpose AI"
+            });
+            this.aiServices.push({
+                name: J.AIServiceName.OPENAI_MINI,
+                description: "OpenAI: ChatGPT-4o Mini",
+                longDescription: "The less expensive version of OpenAI's intelligent general-purpose AI"
             });
         }
 
@@ -36,7 +41,7 @@ export class AIUtil {
             this.aiServices.push({
                 name: J.AIServiceName.GEMINI,
                 description: "Google: Gemini",
-                longDescription: "Google's best general-purpose AI."
+                longDescription: "Google's best general-purpose AI"
             });
         }
 
@@ -45,7 +50,7 @@ export class AIUtil {
                 {
                     name: J.AIServiceName.PPLX_LLAMA3,
                     description: "Meta: Llama 3",
-                    longDescription: "Meta's Open Source Llama 3."
+                    longDescription: "Meta's Open Source Llama 3"
                 });
         }
 
@@ -54,12 +59,12 @@ export class AIUtil {
                 {
                     name: J.AIServiceName.ANTH,
                     description: "Anthropic: Claude 3 Opus",
-                    longDescription: "Anthropic's very powerful general-purpose AI."
+                    longDescription: "Anthropic's very powerful general-purpose AI"
                 },
                 {
                     name: J.AIServiceName.ANTH_SONNET,
                     description: "Anthropic: Claude 3.5 Sonnet",
-                    longDescription: "Anthropic's most powerful general-purpose AI."
+                    longDescription: "Anthropic's most powerful general-purpose AI"
                 });
         }
 
@@ -68,12 +73,12 @@ export class AIUtil {
                 {
                     name: J.AIServiceName.PPLX,
                     description: "Perplexity: Basic",
-                    longDescription: "Perplexity's best high-end powerful general-purpose AI."
+                    longDescription: "Perplexity's best high-end powerful general-purpose AI"
                 },
                 {
                     name: J.AIServiceName.PPLX_ONLINE,
                     description: "Perplexity: Recent News Aware",
-                    longDescription: "Perplexity's AI which has access to the latest news and content from from the web."
+                    longDescription: "Perplexity's AI which has access to the latest news and content from from the web"
                 });
         }
     }
