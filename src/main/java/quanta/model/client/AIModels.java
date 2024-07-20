@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 // #ai-model
 // Encapsulates a specific AI service including a specific service and model
-// todo-0: rename this to AIServiceInfo
-public enum AIServiceName {
+public enum AIModels {
     NONE("[null]", null, null, null), //
     OPENAI("openAi", "openai", "gpt-4o", "OpenAI: ChatGPT-4o"), //
     OPENAI_MINI("openAiMini", "openai", "gpt-4o-mini", "OpenAI: ChatGPT-4o Mini"), //
@@ -23,18 +22,18 @@ public enum AIServiceName {
     private final String service;
     private final String model;
 
-    private AIServiceName(String value, String service, String model, String description) {
+    private AIModels(String value, String service, String model, String description) {
         this.value = value;
         this.service = service;
         this.model = model;
         this.description = description;
     }
 
-    public static AIServiceName fromString(String name) {
+    public static AIModels fromString(String name) {
         if (name == null) {
             return null;
         }
-        for (AIServiceName e : values()) {
+        for (AIModels e : values()) {
             if (e.value.equalsIgnoreCase(name)) {
                 return e;
             }

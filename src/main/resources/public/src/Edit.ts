@@ -1074,7 +1074,7 @@ export class Edit {
 
     askAiQuestion = async (nodeId: string) => {
         const aiService = getAs().userPrefs.aiService;
-        if (!aiService || aiService === J.AIServiceName.NONE) {
+        if (!aiService || aiService === J.AIModels.NONE) {
             S.util.showMessage("You must select an AI Service. Go to `Menu -> Account -> Settings -> AI Service`", "Warning");
             return;
         }

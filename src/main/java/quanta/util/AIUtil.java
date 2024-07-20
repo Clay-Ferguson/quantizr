@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
 import quanta.model.PropertyInfo;
-import quanta.model.client.AIServiceName;
+import quanta.model.client.AIModels;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.SystemConfig;
@@ -240,7 +240,7 @@ public class AIUtil extends ServiceBase {
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
-        AIServiceName svc = AIServiceName.fromString(req.getAiService());
+        AIModels svc = AIModels.fromString(req.getAiService());
         if (svc.getService() == "gemini") {
             throw new RuntimeException("Gemini AI is temporarily unavailable.");
         }
@@ -312,13 +312,13 @@ public class AIUtil extends ServiceBase {
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
-        AIServiceName svc = AIServiceName.fromString(req.getAiService());
+        AIModels svc = AIModels.fromString(req.getAiService());
         if (svc != null) {
             // First scan up the tree to see if we have a svc on the tree and if so use it instead.
             SystemConfig system = new SystemConfig();
             aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
             if (system.getService() != null) {
-                svc = AIServiceName.fromString(system.getService());
+                svc = AIModels.fromString(system.getService());
             }
 
             String prompt = req.getPrompt();
@@ -420,7 +420,7 @@ public class AIUtil extends ServiceBase {
 
     //     Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
     //     AIResponse aiResponse = null;
-    //     AIServiceName svc = AIServiceName.fromString(req.getAiService());
+    //     AIModels svc = AIModels.fromString(req.getAiService());
     //     if (svc.getService() == "gemini") {
     //         throw new RuntimeException("Gemini AI is temporarily unavailable.");
     //     }
