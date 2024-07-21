@@ -49,7 +49,7 @@ class ProjectLoader:
                     )
 
                     if name in self.blocks:
-                        Utils.fail_app(
+                        FileUtils.fail_app(
                             f"Duplicate Block Name {name}. Block Names must be unique across all files.",
                             self.st,
                         )
@@ -60,7 +60,7 @@ class ProjectLoader:
                         self.blocks[n] = block
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_END):
                     if block is None:
-                        Utils.fail_app(
+                        FileUtils.fail_app(
                             f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""",
                             self.st,
                         )

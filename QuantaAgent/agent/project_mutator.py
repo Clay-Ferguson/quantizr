@@ -46,7 +46,7 @@ class ProjectMutator:
         """Performs all the project mutations which may be new files, updated files, or updated blocks in files."""
 
         if self.ran:
-            Utils.fail_app("ProjectMutator has already run.", self.st)
+            FileUtils.fail_app("ProjectMutator has already run.", self.st)
         self.ran = True
         self.process_project()
 
@@ -114,7 +114,7 @@ class ProjectMutator:
                 new_content.append(line)
             elif Utils.is_tag_and_name_line(line, TAG_FILE_BEGIN, rel_filename):
                 if len(new_content) > 0:
-                    Utils.fail_app(
+                    FileUtils.fail_app(
                         f"Error: {TAG_FILE_BEGIN} {rel_filename} exists multiple times in ai response. The LLM itself is failing.",
                         self.st,
                     )
