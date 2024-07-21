@@ -13,6 +13,7 @@ from agent.tags import (
 )
 from agent.utils import RefactorMode, Utils
 from agent.app_config import AppConfig
+from common.python.file_utils import FileUtils
 
 
 class ProjectMutator:
@@ -57,7 +58,7 @@ class ProjectMutator:
         content: List[str] = [""]
         try:
             # Read the entire file content
-            content[0] = Utils.read_file(filename)
+            content[0] = FileUtils.read_file(filename)
             modified: bool = False
 
             # Check if we have a diff for this file
@@ -88,7 +89,7 @@ class ProjectMutator:
                     if self.suffix
                     else filename
                 )
-                Utils.write_file(out_file, content[0])
+                FileUtils.write_file(out_file, content[0])
 
         except FileNotFoundError:
             print(f"The file {filename} does not exist.")

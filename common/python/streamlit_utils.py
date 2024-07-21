@@ -1,4 +1,4 @@
-"""Utilities Module"""
+"""Streamlit Utilities Module"""
 
 class StreamlitUtils:
     """Utilities Class"""

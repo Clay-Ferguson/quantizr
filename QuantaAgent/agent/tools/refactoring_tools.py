@@ -7,6 +7,7 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.tools import BaseTool
 from agent.models import TextBlock
 from agent.utils import Utils
+from common.python.file_utils import FileUtils
 
 
 class UpdateBlockInput(BaseModel):
@@ -112,9 +113,9 @@ class CreateFileTool(BaseTool):
             # st.error(f"Error: File already exists: {full_file_name}")
         else:
             # ensure that folder 'self.base_path' exists
-            Utils.ensure_folder_exists(full_file_name)
+            FileUtils.ensure_folder_exists(full_file_name)
             # write the content to a file only if the file currently does not exist
-            Utils.write_file(full_file_name, file_content)
+            FileUtils.write_file(full_file_name, file_content)
         return msg
 
 
@@ -144,6 +145,6 @@ class UpdateFileTool(BaseTool):
         if not file_name.startswith("/"):
             file_name = "/" + file_name
         full_file_name = self.base_path + file_name
-        Utils.write_file(full_file_name, file_content)
+        FileUtils.write_file(full_file_name, file_content)
 
         return msg

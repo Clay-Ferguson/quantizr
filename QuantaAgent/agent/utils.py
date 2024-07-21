@@ -64,24 +64,6 @@ class Utils:
         st.session_state.p_user_inputs = {}
 
     @staticmethod
-    def open_file(filename: str) -> TextIOWrapper:
-        """Reads a file and returns the content."""
-        return open(filename, "r", encoding="utf-8")
-
-    @staticmethod
-    def write_file(filename: str, content: str):
-        """Writes content to a file."""
-
-        with open(filename, "w", encoding="utf-8") as file:
-            file.write(content)
-
-    @staticmethod
-    def read_file(filename: str) -> str:
-        """Reads a file and returns the content."""
-        with Utils.open_file(filename) as file:
-            return file.read()
-
-    @staticmethod
     def should_include_file(ext_set: Set[str], file_name: str) -> bool:
         """Returns True if the file should be included in the scan."""
         # return file_name.endswith(tuple(AppConfig.ext_set)) # <--- AI suggested this. Didn't investigate further
@@ -148,13 +130,6 @@ class Utils:
         else:
             print(f"Error: {msg}")
             exit(1)
-
-    @staticmethod
-    def ensure_folder_exists(file_path: str):
-        """Ensures that the folder for the file exists."""
-        directory = os.path.dirname(file_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
 
     @staticmethod
     def sanitize_content(cfg: argparse.Namespace, content) -> str:
@@ -287,7 +262,6 @@ class Utils:
     ) -> BaseChatModel:
         """Creates a language model based on the AI service."""
         if ai_service == AIService.OPENAI.value:
-            print("Creating OpenAI service")
             llm = ChatOpenAI(
                 model=cfg.openai_model,
                 temperature=temperature,
@@ -295,7 +269,6 @@ class Utils:
                 verbose=True,
             )
         elif ai_service == AIService.ANTHROPIC.value:
-            print("Creating Anthropic service")
             llm = ChatAnthropic(
                 model_name=cfg.anth_model,
                 temperature=temperature,

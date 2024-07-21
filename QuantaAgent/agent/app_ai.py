@@ -16,6 +16,7 @@ from agent.tools.refactoring_tools import (
     CreateFileTool,
     UpdateFileTool
 )
+from common.python.file_utils import FileUtils
 
 
 class AppAI:
@@ -57,7 +58,7 @@ class AppAI:
 
             if os.path.isfile(answer_file):
                 print(f"Simulating AI Response by reading answer from {answer_file}")
-                ret = Utils.read_file(answer_file)
+                ret = FileUtils.read_file(answer_file)
             else:
                 ret = "Dry Run: No API call made."
         else:
@@ -132,6 +133,6 @@ Final Prompt:
 """
 
         filename = f"{self.cfg.data_folder}/{output_file_name}.txt"
-        Utils.write_file(filename, output)
+        FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
         return ret

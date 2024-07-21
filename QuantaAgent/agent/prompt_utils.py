@@ -11,6 +11,7 @@ from agent.tags import (
     template_info,
 )
 from agent.utils import Utils
+from common.python.file_utils import FileUtils
 
 
 class PromptUtils:
@@ -62,7 +63,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder
                     file_name: str = path[source_folder_len:]
-                    file_content = Utils.read_file(path)
+                    file_content = FileUtils.read_file(path)
                     content += PromptUtils.get_file_content_block(
                         file_name, file_content
                     )
@@ -82,7 +83,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
             tag: str = f"file({file_name})"
             if tag in prompt:
                 inserted = True
-                content: str = Utils.read_file(source_folder + file_name)
+                content: str = FileUtils.read_file(source_folder + file_name)
                 prompt = prompt.replace(
                     tag, PromptUtils.get_file_content_block(file_name, content)
                 )

@@ -5,6 +5,7 @@ from agent.models import TextBlock
 from agent.app_config import AppConfig
 from agent.utils import Utils
 from agent.tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
+from common.python.file_utils import FileUtils
 
 
 class ProjectLoader:
@@ -34,7 +35,7 @@ class ProjectLoader:
         self.file_names.append(relative_file_name)
 
         # Open the file using 'with' which ensures the file is closed after reading
-        with Utils.open_file(path) as file:
+        with FileUtils.open_file(path) as file:
             block: Optional[TextBlock] = None
             block_on: bool = True
 
