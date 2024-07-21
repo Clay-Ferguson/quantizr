@@ -14,9 +14,9 @@ from agent.tags import (
     TAG_BLOCK_END,
     MORE_INSTRUCTIONS,
 )
-from agent.utils import RefactorMode, Utils
+from agent.utils import RefactorMode
 from agent.prompt_utils import PromptUtils
-from common.python.file_utils import FileUtils
+from common.python.streamlit_utils import StreamlitUtils
 
 
 class QuantaAgent:
@@ -51,7 +51,7 @@ class QuantaAgent:
         alone without any prior context."""
         self.st = st
         if self.ran:
-            FileUtils.fail_app(
+            StreamlitUtils.fail_app(
                 "Agent has already run. Instantiate a new agent instance to run again.",
                 st,
             )
@@ -75,7 +75,7 @@ class QuantaAgent:
             self.st.session_state.p_source_provided = True
 
         if len(self.prompt) > int(self.cfg.max_prompt_length):
-            FileUtils.fail_app(
+            StreamlitUtils.fail_app(
                 f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.cfg.max_prompt_length} characters.",
                 st,
             )

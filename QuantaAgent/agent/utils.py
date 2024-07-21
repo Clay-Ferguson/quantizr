@@ -240,5 +240,5 @@ class Utils:
                 api_key=SecretStr(cfg.anth_api_key),
             )
         else:
-            FileUtils.fail_app(f"Invalid AI Service: {ai_service}")
+            StreamlitUtils.fail_app(f"Invalid AI Service: {ai_service}")
         return llm

@@ -6,6 +6,7 @@ from agent.app_config import AppConfig
 from agent.utils import Utils
 from agent.tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
 from common.python.file_utils import FileUtils
+from common.python.streamlit_utils import StreamlitUtils
 
 
 class ProjectLoader:
@@ -49,7 +50,7 @@ class ProjectLoader:
                     )
 
                     if name in self.blocks:
-                        FileUtils.fail_app(
+                        StreamlitUtils.fail_app(
                             f"Duplicate Block Name {name}. Block Names must be unique across all files.",
                             self.st,
                         )
@@ -60,7 +61,7 @@ class ProjectLoader:
                         self.blocks[n] = block
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_END):
                     if block is None:
-                        FileUtils.fail_app(
+                        StreamlitUtils.fail_app(
                             f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""",
                             self.st,
                         )
