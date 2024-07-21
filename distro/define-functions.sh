@@ -23,7 +23,7 @@ serviceCheck () {
 }
 
 imageCheck () {
-    if docker image ls | grep $1; then
+    if docker images --format '{{.Repository}}:{{.Tag}}' | grep "^$1:"; then
         echo "image $1 exists"
     else
         # if this fails can that mean you just didn't give docker enough time? So maybe it was in process of starting?

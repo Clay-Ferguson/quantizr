@@ -1,31 +1,24 @@
 import os
 from fastapi import FastAPI, Header
 from pydantic import BaseModel
-from openai import OpenAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatPerplexity
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
-from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
-from langchain_core.prompts import PromptTemplate
-from langchain_openai import OpenAI
 from pydantic.v1.types import SecretStr
 from pydantic import BaseModel
 from typing import List, Optional
 import traceback
 
+# #ai-model
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
 ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
+OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online" 
 PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
 PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
-
-# Langchain doesn't work. So we call OpenAI directly, for now.
-LANGCHAIN_IMAGE_GEN = False
 
 app = FastAPI()
 
@@ -98,7 +91,7 @@ def buildMessages(req):
     # Add the current human question to the messages
     messages.append(HumanMessage(content=req.prompt))
 
-    # todo-0: we can do this cleaner, but we're doing the "If perplexity online model don't set system prompt" here
+    # todo-1: we can do this cleaner, but we're doing the "If perplexity online model don't set system prompt" here
     if "online" not in req.model:    
         if req.systemPrompt is None or req.systemPrompt == "":
             req.systemPrompt = "You are a helpful agent."
@@ -144,6 +137,8 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     return llm
 
 # https://www.anthropic.com/pricing#anthropic-api
+# https://openai.com/api/pricing/
+# #ai-model
 def calculate_cost(input_tokens, output_tokens, model) -> float:
     input_ppm = 0
     output_ppm = 0
@@ -155,6 +150,12 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
         input_ppk = 0.005
         output_ppk = 0.015
         return (input_tokens * input_ppk / 1000) + (output_tokens * output_ppk / 1000)
+    
+    if model == OPENAI_MODEL_COMPLETION_MINI:
+        # prices per kilotoken
+        input_ppm = 0.15
+        output_ppm = 0.6
+        return (input_tokens * input_ppm / 1000000) + (output_tokens * output_ppm / 1000000)
 
     elif model == ANTH_OPUS_MODEL_COMPLETION_CHAT:
         # prices per megatoken
