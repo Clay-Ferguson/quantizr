@@ -1,17 +1,11 @@
 import os
 from fastapi import FastAPI, Header
 from pydantic import BaseModel
-from openai import OpenAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatPerplexity
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import LLMChain
-from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
-from langchain_core.prompts import PromptTemplate
-from langchain_openai import OpenAI
 from pydantic.v1.types import SecretStr
 from pydantic import BaseModel
 from typing import List, Optional
@@ -25,9 +19,6 @@ OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online" 
 PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
 PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
-
-# Langchain doesn't work. So we call OpenAI directly, for now.
-LANGCHAIN_IMAGE_GEN = False
 
 app = FastAPI()
 

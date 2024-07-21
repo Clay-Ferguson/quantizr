@@ -2,9 +2,9 @@
 
  This is the Quanta AI microservice, which will run inside the Quanta Docker stack to provide all AI services. We have this class specifically because it's far better to use Python for all AI functionality. A scondary reason is simply because we can eventually gain access to the entire world of capabilities available in Python, like generating charts and graphs, etc. because Python has a better ecosystem of these types of features than Java does.
 
- # Tips
+# Tips
  
- ## Adding Packages 
+## Adding Packages 
 
    cd QuantaAI
    conda create -n quanta_ai python=3.12.3
@@ -13,6 +13,7 @@
    pip freeze > requirements.txt
 
 ## Package Out of Date?
+
    pip list --outdated
    pip install -U <package>
    pip freeze > requirements.txt
