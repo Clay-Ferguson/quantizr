@@ -21,7 +21,7 @@ class AppConfig:
         # from command line arguments or environment variables as well.
         if config_file is None:
             config_file = "config/config.yaml"
-        secrets_file: str = "../../../secrets/secrets.yaml"
+        secrets_file: str = "../../secrets/secrets.yaml"
 
         if not os.path.isfile(config_file):
             print(f"WARNING: File not found: {config_file}")

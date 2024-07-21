@@ -1,9 +1,15 @@
 """Runs the Agent, as a Streamlit app."""
 
+import sys
+import os
 import streamlit as st
+
+ABS_FILE = os.path.abspath(__file__)
+PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
+sys.path.append(PRJ_DIR)
+
 from agent.app_config import AppConfig
 from agent.utils import RefactorMode, Utils, AIService
-
 
 def show_mode_picker(st):
     """Show the mode picker."""

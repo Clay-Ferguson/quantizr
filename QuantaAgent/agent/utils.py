@@ -3,6 +3,7 @@
 from io import TextIOWrapper
 import re
 import os
+import sys
 import argparse
 from enum import Enum
 from typing import List, Set, Optional
@@ -15,6 +16,8 @@ from langchain_anthropic import ChatAnthropic
 from pydantic.v1.types import SecretStr
 
 from agent.app_config import AppConfig
+
+from common.python.streamlit_utils import StreamlitUtils
 
 from agent.tags import (
     TAG_FILE_BEGIN,
@@ -227,7 +230,7 @@ class Utils:
             st.image("img/logo-100px-tr.jpg", width=100)
 
         Utils.set_default_session_vars(st, cfg)
-        Utils.keep_session_vars(st)
+        StreamlitUtils.keep_session_vars(st)
 
     @staticmethod
     def set_default_session_vars(st, cfg: argparse.Namespace):
@@ -249,17 +252,17 @@ class Utils:
         if "p_chatbot_messages" not in st.session_state:
             st.session_state.p_chatbot_messages = []
 
-    @staticmethod
-    def keep_session_vars(st):
-        """
-        Keeps the session state variables from being deleted by Streamlit.
+    # @staticmethod
+    # def keep_session_vars(st):
+    #     """
+    #     Keeps the session state variables from being deleted by Streamlit.
 
-        This is a workaround for the issue where Streamlit deletes session state variables when the page is refreshed.
-        https://discuss.streamlit.io/t/mutipages-and-st-session-state-has-no-key-username/45237
-        """
-        for prop in st.session_state:
-            if prop.startswith("p_"):
-                st.session_state[prop] = st.session_state[prop]
+    #     This is a workaround for the issue where Streamlit deletes session state variables when the page is refreshed.
+    #     https://discuss.streamlit.io/t/mutipages-and-st-session-state-has-no-key-username/45237
+    #     """
+    #     for prop in st.session_state:
+    #         if prop.startswith("p_"):
+    #             st.session_state[prop] = st.session_state[prop]
 
     @staticmethod
     def st_markdown(st, markdown_string):
