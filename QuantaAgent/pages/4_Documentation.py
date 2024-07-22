@@ -1,7 +1,7 @@
 import streamlit as st
 
 from agent.app_config import AppConfig
-from agent.utils import Utils
+from common.python.utils import Utils
 from common.python.file_utils import FileUtils
 from common.python.streamlit_utils import StreamlitUtils
 

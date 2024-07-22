@@ -1,4 +1,4 @@
-from agent.string_utils import StringUtils
+from common.python.string_utils import StringUtils
 
 
 class TestStringUtils:

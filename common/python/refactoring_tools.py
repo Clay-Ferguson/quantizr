@@ -2,12 +2,10 @@
 
 import os
 from typing import Dict, Optional, Type
-
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.tools import BaseTool
-from agent.models import TextBlock
-from agent.utils import Utils
-from common.python.file_utils import FileUtils
+from .models import TextBlock
+from .file_utils import FileUtils
 
 
 class UpdateBlockInput(BaseModel):

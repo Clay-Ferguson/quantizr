@@ -3,16 +3,16 @@
 import os
 import re
 from typing import List, Dict, Optional, Set
-from agent.models import TextBlock
-from agent.string_utils import StringUtils
-from agent.tags import (
+from .models import TextBlock
+from .string_utils import StringUtils
+from .tags import (
     TAG_BLOCK_BEGIN,
     TAG_BLOCK_END,
     TAG_FILE_BEGIN,
     TAG_FILE_END,
 )
-from agent.utils import RefactorMode, Utils
-from common.python.file_utils import FileUtils
+from .utils import RefactorMode, Utils
+from .file_utils import FileUtils
 
 class ProjectMutator:
     """Performs all project mutations that the AI has requested."""

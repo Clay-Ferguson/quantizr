@@ -1,10 +1,10 @@
 from typing import List, Dict, Optional, Set
 
 import os
-from agent.models import TextBlock
-from agent.utils import Utils
-from agent.tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
-from common.python.file_utils import FileUtils
+from .models import TextBlock
+from .utils import Utils
+from .tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
+from .file_utils import FileUtils
 
 
 class ProjectLoader:

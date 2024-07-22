@@ -5,10 +5,12 @@ import streamlit as st
 from streamlit_chat import message
 from langchain.schema import SystemMessage, HumanMessage, AIMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
-
-
+from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+from pydantic.v1.types import SecretStr
+from QuantaAgent.agent.app_config import AppConfig
+from common.python.utils import AIService
 from agent.app_config import AppConfig
-from agent.utils import Utils
 
 
 class AppChatbotGUI:
@@ -45,9 +47,7 @@ class AppChatbotGUI:
 
             st.session_state.p_chatbot_messages.append(HumanMessage(content=user_input))
             with st.spinner("Thinking..."):
-                llm: BaseChatModel = Utils.create_llm(
-                    st.session_state.p_ai_service, 0.7
-                )
+                llm: BaseChatModel = self.create_llm(st.session_state.p_ai_service, 0.7)
                 response = llm.invoke(list(st.session_state.p_chatbot_messages))
 
             st.session_state.p_chatbot_messages.append(
@@ -56,6 +56,31 @@ class AppChatbotGUI:
             st.session_state.p_chatbot_user_input = (
                 ""  # Clear the user input after processing
             )
+
+    def create_llm(
+        self,
+        ai_service: str,
+        temperature: float,
+    ) -> BaseChatModel:
+        """Creates a language model based on the AI service."""
+        if ai_service == AIService.OPENAI.value:
+            llm = ChatOpenAI(
+                model=self.cfg.openai_model,
+                temperature=temperature,
+                api_key=self.cfg.openai_api_key,
+                verbose=True,
+            )
+        elif ai_service == AIService.ANTHROPIC.value:
+            llm = ChatAnthropic(
+                model_name=self.cfg.anth_model,
+                temperature=temperature,
+                timeout=60,  # timeout in seconds
+                api_key=SecretStr(self.cfg.anth_api_key),
+            )
+        else:
+            raise Exception(f"Invalid AI Service: {ai_service}")
+        return llm
+
 
     def show_messages(self):
         """display message history"""

@@ -4,11 +4,10 @@ from typing import List
 import streamlit as st
 from streamlit_chat import message
 from langchain.schema import HumanMessage, AIMessage, BaseMessage
-
-from agent.app_agent import QuantaAgent
+from common.python.app_agent import QuantaAgent
 from agent.app_config import AppConfig
-from agent.prompt_utils import PromptUtils
-from agent.utils import Utils
+from common.python.prompt_utils import PromptUtils
+from common.python.utils import AIService, Utils
 
 
 class AppAgentGUI:
@@ -24,6 +23,17 @@ class AppAgentGUI:
             messages: List[BaseMessage] = []
             st.session_state.p_agent_messages = messages
 
+        model: str = ""
+        api_key = ""
+        if st.session_state.p_ai_service == AIService.OPENAI.value:
+            model=self.cfg.openai_model
+            api_key=self.cfg.openai_api_key
+        elif st.session_state.p_ai_service == AIService.ANTHROPIC.value:
+            model_name=self.cfg.anth_model  
+            api_key=self.cfg.anth_api_key
+        else:
+            raise Exception(f"Invalid AI Service: {st.session_state.p_ai_service}")
+
         # handle user input
         user_input = st.session_state.p_agent_user_input
         if user_input:
@@ -31,7 +41,6 @@ class AppAgentGUI:
                 agent = QuantaAgent()
                 agent.run(
                     st.session_state.p_ai_service,
-                    st,
                     st.session_state.p_mode,
                     "",
                     st.session_state.p_agent_messages,
@@ -40,9 +49,11 @@ class AppAgentGUI:
                     self.cfg.source_folder,
                     self.cfg.data_folder,
                     self.cfg.max_prompt_length,
-                    AppConfig.ext_set
+                    AppConfig.ext_set,
+                    model, 
+                    api_key
                 )
-
+                st.session_state.p_user_inputs[id(agent.human_message)] = user_input
                 st.session_state.p_agent_user_input = ""
 
     def show_messages(self):

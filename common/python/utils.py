@@ -5,16 +5,15 @@ import os
 import argparse
 from enum import Enum
 from typing import List, Set, Optional
-import streamlit as st
-from langchain.schema import BaseMessage, AIMessage
-from langchain.chat_models.base import BaseChatModel
-from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
-from pydantic.v1.types import SecretStr
-from agent.app_config import AppConfig
-from common.python.file_utils import FileUtils
-from common.python.streamlit_utils import StreamlitUtils
-from agent.tags import (
+from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
+import streamlit as st # <--- delete this
+from langchain.schema import AIMessage, BaseMessage, BaseMessage
+from langchain.chat_models.base import BaseChatModel
+from langchain.schema import BaseMessage, AIMessage
+from .streamlit_utils import StreamlitUtils
+from .tags import (
     TAG_FILE_BEGIN,
     TAG_FILE_END,
     TAG_BLOCK_BEGIN,
@@ -31,7 +30,7 @@ class RefactorMode(Enum):
     REFACTOR = "refactor"
     NONE = "none"
 
-cfg: argparse.Namespace = AppConfig.get_config(None)
+# cfg: argparse.Namespace = AppConfig.get_config(None)
 
 class Utils:
     """Utilities Class"""
@@ -211,27 +210,28 @@ class Utils:
             st.session_state.p_chatbot_messages = []
 
 
-    # Need to make cfg typesafe so we can get rid of all the `type: ignore` comments
     @staticmethod
     def create_llm(
         ai_service: str,
         temperature: float,
+        model: str,
+        api_key: str
     ) -> BaseChatModel:
         """Creates a language model based on the AI service."""
         if ai_service == AIService.OPENAI.value:
             llm = ChatOpenAI(
-                model=cfg.openai_model,
+                model=model,
                 temperature=temperature,
-                api_key=cfg.openai_api_key,
+                api_key=api_key,
                 verbose=True,
             )
         elif ai_service == AIService.ANTHROPIC.value:
             llm = ChatAnthropic(
-                model_name=cfg.anth_model,
+                model_name=model,
                 temperature=temperature,
                 timeout=60,  # timeout in seconds
-                api_key=SecretStr(cfg.anth_api_key),
+                api_key=SecretStr(api_key),
             )
         else:
-            StreamlitUtils.fail_app(f"Invalid AI Service: {ai_service}")
+            raise Exception(f"Invalid AI Service: {ai_service}")
         return llm

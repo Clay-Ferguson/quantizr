@@ -3,7 +3,7 @@
 import streamlit as st
 import argparse
 from agent.app_config import AppConfig
-from agent.utils import Utils
+from common.python.utils import Utils
 
 
 class Settings:

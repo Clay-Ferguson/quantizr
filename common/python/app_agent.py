@@ -3,32 +3,31 @@
 import os
 import time
 from typing import List, Set
-from agent.project_loader import ProjectLoader
-from agent.project_mutator import ProjectMutator
+from .project_loader import ProjectLoader
+from .project_mutator import ProjectMutator
 from langchain.schema import HumanMessage, AIMessage, BaseMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
-from agent.utils import RefactorMode, Utils
-from agent.tools.refactoring_tools import (
+from .utils import RefactorMode, Utils
+from .refactoring_tools import (
     UpdateBlockTool,
     CreateFileTool,
     UpdateFileTool
 )
-from common.python.file_utils import FileUtils
-from agent.tags import (
+from .file_utils import FileUtils
+from .tags import (
     TAG_BLOCK_BEGIN,
     TAG_BLOCK_END,
     MORE_INSTRUCTIONS,
 )
-from agent.utils import RefactorMode
-from agent.prompt_utils import PromptUtils
+from .utils import RefactorMode
+from .prompt_utils import PromptUtils
 
 
 class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
 
     def __init__(self):
-        self.st = None
         self.ts: str = str(int(time.time() * 1000))
         self.answer: str = ""
         self.mode = RefactorMode.NONE.value
@@ -41,11 +40,10 @@ class QuantaAgent:
         self.source_folder = ""
         self.data_folder = ""
         self.dry_run: bool = False
-
+    
     def run(
         self,
         ai_service: str,
-        st,
         mode: str,
         output_file_name: str,
         messages: List[BaseMessage],
@@ -54,12 +52,13 @@ class QuantaAgent:
         source_folder: str,
         data_folder: str,
         max_prompt_length: int,
-        ext_set: Set[str]
+        ext_set: Set[str],
+        model: str,
+        api_key: str
     ):
         """Runs the agent. We assume that if messages is not `None` then we are in the Streamlit GUI mode, and these messages
         represent the chatbot context. If messages is `None` then we are in the CLI mode, and we will use the `prompt` parameter
         alone without any prior context."""
-        self.st = st
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
@@ -95,7 +94,7 @@ class QuantaAgent:
             else:
                 self.answer = "Dry Run: No API call made."
         else:
-            llm: BaseChatModel = Utils.create_llm(ai_service, temperature)
+            llm: BaseChatModel = Utils.create_llm(ai_service, temperature, model, api_key)
 
             # Check the first 'message' to see if it's a SystemMessage and if not then insert one
             if len(messages) == 0 or not isinstance(messages[0], SystemMessage):
@@ -164,12 +163,8 @@ Final Prompt:
         filename = f"{self.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
-        
-        self.st.session_state.p_user_inputs[id(self.human_message)] = input_prompt
 
-        if (
-            self.mode == RefactorMode.REFACTOR.value
-        ):
+        if self.mode == RefactorMode.REFACTOR.value:
             ProjectMutator(
                 self.mode,
                 self.source_folder,
@@ -195,6 +190,7 @@ Final Prompt:
         self.system_prompt += MORE_INSTRUCTIONS
         self.add_file_handling_instructions()
         self.add_block_handling_instructions()
+
 
     def add_block_handling_instructions(self):
         """Adds instructions for updating blocks. If the prompt contains ${BlockName} tags, then we need to provide
@@ -235,6 +231,7 @@ Final Prompt:
             self.prompt, self.source_folder, self.prj_loader.folder_names, self.ext_set
         )
         return self.has_filename_inject or self.has_folder_inject
+
 
     def insert_blocks_into_prompt(self) -> bool:
         """

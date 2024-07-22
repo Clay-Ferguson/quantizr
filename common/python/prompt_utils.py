@@ -3,14 +3,14 @@
 import os
 from typing import List, Optional, Dict, Tuple, Set
 from langchain.prompts import PromptTemplate
-from agent.string_utils import StringUtils
-from agent.tags import (
+from .string_utils import StringUtils
+from .tags import (
     TAG_FILE_BEGIN,
     TAG_FILE_END,
     template_info,
 )
-from agent.utils import Utils
-from common.python.file_utils import FileUtils
+from .utils import Utils
+from .file_utils import FileUtils
 
 
 class PromptUtils:
