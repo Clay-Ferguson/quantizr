@@ -24,7 +24,6 @@ class ProjectMutator:
 
     def __init__(
         self,
-        st,
         mode: str,
         source_folder: str,
         ai_answer: str,
@@ -33,22 +32,17 @@ class ProjectMutator:
         blocks: Dict[str, TextBlock],
     ):
         """Initializes the ProjectMutator object."""
-        self.st = st
         self.mode: str = mode
         self.source_folder: str = source_folder
         self.source_folder_len: int = len(source_folder)
         self.ai_answer: str = ai_answer
         self.suffix: Optional[str] = suffix
         self.ts: str = ts
-        self.ran = False
         self.blocks = blocks
 
     def run(self):
         """Performs all the project mutations which may be new files, updated files, or updated blocks in files."""
 
-        if self.ran:
-            StreamlitUtils.fail_app("ProjectMutator has already run.", self.st)
-        self.ran = True
         self.process_project()
 
 
@@ -115,10 +109,8 @@ class ProjectMutator:
                 new_content.append(line)
             elif Utils.is_tag_and_name_line(line, TAG_FILE_BEGIN, rel_filename):
                 if len(new_content) > 0:
-                    StreamlitUtils.fail_app(
-                        f"Error: {TAG_FILE_BEGIN} {rel_filename} exists multiple times in ai response. The LLM itself is failing.",
-                        self.st,
-                    )
+                    raise Exception(
+                        f"Error: {TAG_FILE_BEGIN} {rel_filename} exists multiple times in ai response. The LLM itself is failing.",)
                 started = True
 
         if len(new_content) == 0:

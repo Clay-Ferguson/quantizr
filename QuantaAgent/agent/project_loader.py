@@ -6,7 +6,6 @@ from agent.app_config import AppConfig
 from agent.utils import Utils
 from agent.tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
 from common.python.file_utils import FileUtils
-from common.python.streamlit_utils import StreamlitUtils
 
 
 class ProjectLoader:
@@ -16,9 +15,8 @@ class ProjectLoader:
     file_names: List[str] = []
     folder_names: List[str] = []
 
-    def __init__(self, st, source_folder_len: int):
+    def __init__(self, source_folder_len: int):
         self.source_folder_len = source_folder_len
-        self.st = st
 
     def reset(self):
         self.blocks = {}
@@ -50,10 +48,7 @@ class ProjectLoader:
                     )
 
                     if name in self.blocks:
-                        StreamlitUtils.fail_app(
-                            f"Duplicate Block Name {name}. Block Names must be unique across all files.",
-                            self.st,
-                        )
+                        raise Exception(f"Duplicate Block Name {name}. Block Names must be unique across all files.")
                     else:
                         # n is a non-optional string
                         n = name if name is not None else ""
@@ -61,10 +56,8 @@ class ProjectLoader:
                         self.blocks[n] = block
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_END):
                     if block is None:
-                        StreamlitUtils.fail_app(
-                            f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""",
-                            self.st,
-                        )
+                        raise Exception(
+                            f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""")
                     block = None
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_OFF):
                     if block is not None:

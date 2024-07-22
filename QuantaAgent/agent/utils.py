@@ -59,7 +59,6 @@ class Utils:
         """Clear all agent session state."""
         messages: List[BaseMessage] = []
         st.session_state.p_agent_messages = messages
-        st.session_state.p_source_provided = False
         st.session_state.p_agent_user_input = ""
         st.session_state.p_user_inputs = {}
 
@@ -204,8 +203,6 @@ class Utils:
             st.session_state.p_mode = cfg.mode
         if "p_ai_service" not in st.session_state:
             st.session_state.p_ai_service = cfg.ai_service
-        if "p_source_provided" not in st.session_state:
-            st.session_state.p_source_provided = False
         if "p_agent_user_input" not in st.session_state:
             st.session_state.p_agent_user_input = ""
         if "p_chatbot_user_input" not in st.session_state:

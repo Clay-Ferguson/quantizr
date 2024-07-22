@@ -1,11 +1,9 @@
 """This is the main agent module that scans the source code and generates the AI prompt."""
 
 import time
-import argparse
 from typing import List
 from langchain.schema import BaseMessage
 from agent.app_ai import AppAI
-from agent.app_config import AppConfig
 from agent.project_loader import ProjectLoader
 from agent.project_mutator import ProjectMutator
 
@@ -16,7 +14,6 @@ from agent.tags import (
 )
 from agent.utils import RefactorMode
 from agent.prompt_utils import PromptUtils
-from common.python.streamlit_utils import StreamlitUtils
 
 
 class QuantaAgent:
@@ -27,7 +24,6 @@ class QuantaAgent:
         self.ts: str = str(int(time.time() * 1000))
         self.answer: str = ""
         self.mode = RefactorMode.NONE.value
-        self.ran: bool = False
         self.prompt: str = ""
         self.system_prompt: str = ""
         self.has_filename_inject = False
@@ -57,15 +53,8 @@ class QuantaAgent:
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
-        self.prj_loader = ProjectLoader(self.st, self.source_folder_len)
+        self.prj_loader = ProjectLoader(self.source_folder_len)
         self.max_prompt_length = max_prompt_length
-        
-        if self.ran:
-            StreamlitUtils.fail_app(
-                "Agent has already run. Instantiate a new agent instance to run again.",
-                st,
-            )
-        self.ran = True
         self.prompt = input_prompt
         self.mode = mode
 
@@ -81,14 +70,8 @@ class QuantaAgent:
             or self.insert_files_and_folders_into_prompt()
         )
 
-        if self.st is not None and prompt_injects:
-            self.st.session_state.p_source_provided = True
-
         if len(self.prompt) > int(self.max_prompt_length):
-            StreamlitUtils.fail_app(
-                f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.max_prompt_length} characters.",
-                st,
-            )
+           raise Exception(f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.max_prompt_length} characters.")
 
         self.build_system_prompt()
 
@@ -96,7 +79,6 @@ class QuantaAgent:
             self.mode,
             self.system_prompt,
             self.prj_loader.blocks,
-            self.st,
             self.source_folder,
             self.data_folder,
         )
@@ -111,12 +93,13 @@ class QuantaAgent:
             self.ts,
             temperature,
         )
+        
+        self.st.session_state.p_user_inputs[id(open_ai.human_message)] = input_prompt
 
         if (
             self.mode == RefactorMode.REFACTOR.value
         ):
             ProjectMutator(
-                self.st,
                 self.mode,
                 self.source_folder,
                 self.answer,

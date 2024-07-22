@@ -1,6 +1,5 @@
 """Makes a query to AI API and writes the response to a file."""
 
-import argparse
 import os
 from typing import Dict, List
 from langchain.schema import HumanMessage, AIMessage, BaseMessage, SystemMessage
@@ -8,7 +7,6 @@ from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
 
 
-from agent.app_config import AppConfig
 from agent.models import TextBlock
 from agent.utils import RefactorMode, Utils
 from agent.tools.refactoring_tools import (
@@ -18,7 +16,8 @@ from agent.tools.refactoring_tools import (
 )
 from common.python.file_utils import FileUtils
 
-
+# The content of this class has been refactored out of exisitence except for one method so we need to just move it into the class that uses it, because
+# it's only used in once place and it's not worth keeping it as a separate class
 class AppAI:
     """Makes calls to AI"""
 
@@ -29,16 +28,16 @@ class AppAI:
         mode: str,
         system_prompt: str,
         blocks: Dict[str, TextBlock] = {},
-        st=None,
         source_folder: str = "",
         data_folder: str = "",
     ):
         self.mode = mode
         self.system_prompt: str = system_prompt
         self.blocks = blocks
-        self.st = st
         self.source_folder = source_folder
         self.data_folder = data_folder
+        self.human_message = None
+        self.input_prompt = None
 
     def query(
         self,
@@ -73,12 +72,9 @@ class AppAI:
             else:
                 messages[0] = SystemMessage(content=self.system_prompt)
 
-            human_message = HumanMessage(content=query)
+            self.human_message = HumanMessage(content=query)
 
-            if self.st is not None:
-                self.st.session_state.p_user_inputs[id(human_message)] = input_prompt
-
-            messages.append(human_message)
+            messages.append(self.human_message)
 
             if self.mode != RefactorMode.NONE.value:
                 # https://python.langchain.com/v0.2/docs/tutorials/agents/

@@ -23,7 +23,6 @@ class AppAgentGUI:
         if "p_agent_messages" not in st.session_state:
             messages: List[BaseMessage] = []
             st.session_state.p_agent_messages = messages
-            st.session_state.p_source_provided = False
 
         # handle user input
         user_input = st.session_state.p_agent_user_input
@@ -43,13 +42,7 @@ class AppAgentGUI:
                     self.cfg.max_prompt_length
                 )
 
-                if not st.session_state.p_source_provided:
-                    st.error(
-                        "Warning: No files, folders, or blocks were provided to the AI. "
-                        + "See `Helpful Tips` section below to learn how to provide code context."
-                    )
-                else:
-                    st.session_state.p_agent_user_input = ""
+                st.session_state.p_agent_user_input = ""
 
     def show_messages(self):
         """display message history"""
