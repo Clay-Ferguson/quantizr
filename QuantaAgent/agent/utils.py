@@ -35,6 +35,7 @@ class RefactorMode(Enum):
     REFACTOR = "refactor"
     NONE = "none"
 
+cfg: argparse.Namespace = AppConfig.get_config(None)
 
 class Utils:
     """Utilities Class"""
@@ -220,7 +221,6 @@ class Utils:
     # Need to make cfg typesafe so we can get rid of all the `type: ignore` comments
     @staticmethod
     def create_llm(
-        cfg,
         ai_service: str,
         temperature: float,
     ) -> BaseChatModel:

@@ -37,7 +37,10 @@ class AppAgentGUI:
                     "",
                     st.session_state.p_agent_messages,
                     user_input,
-                    0.0,  # Use zero temp for code refactoring
+                    0.0,  # Use zero temp for code refactoring,
+                    self.cfg.source_folder,
+                    self.cfg.data_folder,
+                    self.cfg.max_prompt_length
                 )
 
                 if not st.session_state.p_source_provided:

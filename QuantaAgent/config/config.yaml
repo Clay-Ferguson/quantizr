@@ -12,7 +12,7 @@ anth_model: "claude-3-opus-20240229"
 
 ai_service: "openai"
 
-source_folder: "/home/clay/ferguson/Quantizr/QuantaAI"
+source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
 scan_extensions: ".java, .sql, .py, .html, .htm, .js, .ts, .css"
 data_folder: "data"
  

@@ -24,8 +24,6 @@ class QuantaAgent:
 
     def __init__(self):
         self.st = None
-        self.cfg: argparse.Namespace = AppConfig.get_config(None)
-        self.source_folder_len: int = len(self.cfg.source_folder)
         self.ts: str = str(int(time.time() * 1000))
         self.answer: str = ""
         self.mode = RefactorMode.NONE.value
@@ -34,7 +32,10 @@ class QuantaAgent:
         self.system_prompt: str = ""
         self.has_filename_inject = False
         self.has_folder_inject = False
-        self.prj_loader = ProjectLoader(self.st, self.source_folder_len)
+        self.prj_loader = None
+        self.max_prompt_length = 0
+        self.source_folder = ""
+        self.data_folder = ""
 
     def run(
         self,
@@ -45,11 +46,20 @@ class QuantaAgent:
         messages: List[BaseMessage],
         input_prompt: str,
         temperature: float,
+        source_folder: str,
+        data_folder: str,
+        max_prompt_length: int,
     ):
         """Runs the agent. We assume that if messages is not `None` then we are in the Streamlit GUI mode, and these messages
         represent the chatbot context. If messages is `None` then we are in the CLI mode, and we will use the `prompt` parameter
         alone without any prior context."""
         self.st = st
+        self.data_folder = data_folder
+        self.source_folder = source_folder
+        self.source_folder_len: int = len(source_folder)
+        self.prj_loader = ProjectLoader(self.st, self.source_folder_len)
+        self.max_prompt_length = max_prompt_length
+        
         if self.ran:
             StreamlitUtils.fail_app(
                 "Agent has already run. Instantiate a new agent instance to run again.",
@@ -64,7 +74,7 @@ class QuantaAgent:
             output_file_name = self.ts
 
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
-        self.prj_loader.scan_directory(self.cfg.source_folder)
+        self.prj_loader.scan_directory(self.source_folder)
 
         prompt_injects: bool = (
             self.insert_blocks_into_prompt()
@@ -74,20 +84,21 @@ class QuantaAgent:
         if self.st is not None and prompt_injects:
             self.st.session_state.p_source_provided = True
 
-        if len(self.prompt) > int(self.cfg.max_prompt_length):
+        if len(self.prompt) > int(self.max_prompt_length):
             StreamlitUtils.fail_app(
-                f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.cfg.max_prompt_length} characters.",
+                f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.max_prompt_length} characters.",
                 st,
             )
 
         self.build_system_prompt()
 
         open_ai = AppAI(
-            self.cfg,
             self.mode,
             self.system_prompt,
             self.prj_loader.blocks,
             self.st,
+            self.source_folder,
+            self.data_folder,
         )
 
         # Need to be sure the current `self.system_prompt`` is in these messages every time we send
@@ -107,7 +118,7 @@ class QuantaAgent:
             ProjectMutator(
                 self.st,
                 self.mode,
-                self.cfg.source_folder,
+                self.source_folder,
                 self.answer,
                 self.ts,
                 None,
@@ -163,10 +174,10 @@ class QuantaAgent:
         Returns true only if some files or folders were inserted.
         """
         self.prompt, self.has_filename_inject = PromptUtils.insert_files_into_prompt(
-            self.prompt, self.cfg.source_folder, self.prj_loader.file_names
+            self.prompt, self.source_folder, self.prj_loader.file_names
         )
         self.prompt, self.has_folder_inject = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.cfg.source_folder, self.prj_loader.folder_names
+            self.prompt, self.source_folder, self.prj_loader.folder_names
         )
         return self.has_filename_inject or self.has_folder_inject
 

@@ -26,17 +26,19 @@ class AppAI:
 
     def __init__(
         self,
-        cfg: argparse.Namespace,
         mode: str,
         system_prompt: str,
         blocks: Dict[str, TextBlock] = {},
         st=None,
+        source_folder: str = "",
+        data_folder: str = "",
     ):
-        self.cfg = cfg
         self.mode = mode
         self.system_prompt: str = system_prompt
         self.blocks = blocks
         self.st = st
+        self.source_folder = source_folder
+        self.data_folder = data_folder
 
     def query(
         self,
@@ -54,7 +56,7 @@ class AppAI:
         if self.dry_run:
             # If dry_run is True, we simulate the AI response by reading from a file
             # if we canfind that file or else we return a default response.
-            answer_file: str = f"{self.cfg.data_folder}/dry-run-answer.txt"
+            answer_file: str = f"{self.data_folder}/dry-run-answer.txt"
 
             if os.path.isfile(answer_file):
                 print(f"Simulating AI Response by reading answer from {answer_file}")
@@ -62,7 +64,7 @@ class AppAI:
             else:
                 ret = "Dry Run: No API call made."
         else:
-            llm: BaseChatModel = Utils.create_llm(self.cfg, ai_service, temperature)
+            llm: BaseChatModel = Utils.create_llm(ai_service, temperature)
 
             # Check the first 'message' to see if it's a SystemMessage and if not then insert one
             if len(messages) == 0 or not isinstance(messages[0], SystemMessage):
@@ -85,8 +87,8 @@ class AppAI:
                 if self.mode == RefactorMode.REFACTOR.value:
                     tools = [
                         UpdateBlockTool("Block Updater Tool", self.blocks),
-                        CreateFileTool("File Creator Tool", self.cfg.source_folder),
-                        UpdateFileTool("File Updater Tool", self.cfg.source_folder),
+                        CreateFileTool("File Creator Tool", self.source_folder),
+                        UpdateFileTool("File Updater Tool", self.source_folder),
                     ]
 
                 agent_executor = chat_agent_executor.create_tool_calling_executor(
@@ -132,7 +134,7 @@ Final Prompt:
 {query}
 """
 
-        filename = f"{self.cfg.data_folder}/{output_file_name}.txt"
+        filename = f"{self.data_folder}/{output_file_name}.txt"
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
         return ret

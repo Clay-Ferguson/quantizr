@@ -3,6 +3,7 @@ import streamlit as st
 from agent.app_config import AppConfig
 from agent.utils import Utils
 from common.python.file_utils import FileUtils
+from common.python.streamlit_utils import StreamlitUtils
 
 # Define the files lookup map
 files = {
@@ -35,7 +36,7 @@ class Documentation:
         # Display the content of the selected file in the right column
         with col2:
             content = FileUtils.read_file(selected_file)
-            FileUtils.st_markdown(st, content)
+            StreamlitUtils.st_markdown(st, content)
 
         # Sanity check
         # st.write(st.session_state)
