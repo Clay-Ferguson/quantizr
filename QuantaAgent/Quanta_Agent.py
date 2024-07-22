@@ -8,8 +8,8 @@ ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
-from QuantaAgent.app_utils import AppUtils
-from agent.app_config import AppConfig
+from app_utils import AppUtils
+from app_config import AppConfig
 from common.python.utils import RefactorMode, AIService
 
 def show_mode_picker(st):

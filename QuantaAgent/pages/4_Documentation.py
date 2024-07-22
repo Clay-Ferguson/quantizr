@@ -1,7 +1,7 @@
 import streamlit as st
 
-from QuantaAgent.app_utils import AppUtils
-from agent.app_config import AppConfig
+from app_utils import AppUtils
+from app_config import AppConfig
 from common.python.file_utils import FileUtils
 from common.python.streamlit_utils import StreamlitUtils
 

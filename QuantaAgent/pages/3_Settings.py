@@ -2,8 +2,8 @@
 
 import streamlit as st
 import argparse
-from QuantaAgent.app_utils import AppUtils
-from agent.app_config import AppConfig
+from app_utils import AppUtils
+from app_config import AppConfig
 
 
 class Settings:

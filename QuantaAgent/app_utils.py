@@ -1,5 +1,6 @@
 """Utilities Module"""
 
+print("app_utils.py")
 import argparse
 
 from common.python.streamlit_utils import StreamlitUtils

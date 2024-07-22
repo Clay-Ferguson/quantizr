@@ -8,9 +8,9 @@ from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 from langchain.chat_models.base import BaseChatModel
-from QuantaAgent.app_utils import AppUtils
+from app_utils import AppUtils
 from common.python.agent.app_agent import QuantaAgent
-from agent.app_config import AppConfig
+from app_config import AppConfig
 from common.python.agent.prompt_utils import PromptUtils
 from common.python.utils import AIService, Utils
 
