@@ -2,9 +2,9 @@ from typing import List, Dict, Optional, Set
 
 import os
 from .models import TextBlock
-from .utils import Utils
+from ..utils import Utils
 from .tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
-from .file_utils import FileUtils
+from ..file_utils import FileUtils
 
 
 class ProjectLoader:

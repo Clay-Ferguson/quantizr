@@ -1,7 +1,7 @@
 import streamlit as st
 
+from QuantaAgent.app_utils import AppUtils
 from agent.app_config import AppConfig
-from common.python.utils import Utils
 from common.python.file_utils import FileUtils
 from common.python.streamlit_utils import StreamlitUtils
 
@@ -21,7 +21,7 @@ class Documentation:
 
     def run(self):
         ### Main Documentation Page ###
-        Utils.setup_page(st, self.cfg, "Quanta: Documentation")
+        AppUtils.setup_page(st, self.cfg, "Quanta: Documentation")
 
         # Create a two-column layout
         col1, col2 = st.columns([1, 3])

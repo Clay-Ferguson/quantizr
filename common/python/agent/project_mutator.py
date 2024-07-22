@@ -4,15 +4,15 @@ import os
 import re
 from typing import List, Dict, Optional, Set
 from .models import TextBlock
-from .string_utils import StringUtils
+from ..string_utils import StringUtils
 from .tags import (
     TAG_BLOCK_BEGIN,
     TAG_BLOCK_END,
     TAG_FILE_BEGIN,
     TAG_FILE_END,
 )
-from .utils import RefactorMode, Utils
-from .file_utils import FileUtils
+from ..utils import RefactorMode, Utils
+from ..file_utils import FileUtils
 
 class ProjectMutator:
     """Performs all project mutations that the AI has requested."""

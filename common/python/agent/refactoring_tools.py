@@ -5,7 +5,7 @@ from typing import Dict, Optional, Type
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.tools import BaseTool
 from .models import TextBlock
-from .file_utils import FileUtils
+from ..file_utils import FileUtils
 
 
 class UpdateBlockInput(BaseModel):

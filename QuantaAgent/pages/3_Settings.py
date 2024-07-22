@@ -2,8 +2,8 @@
 
 import streamlit as st
 import argparse
+from QuantaAgent.app_utils import AppUtils
 from agent.app_config import AppConfig
-from common.python.utils import Utils
 
 
 class Settings:
@@ -26,7 +26,7 @@ class Settings:
 
     def run(self):
         """Run the settings page."""
-        Utils.setup_page(st, self.cfg, "Quanta: Agent Settings")
+        AppUtils.setup_page(st, self.cfg, "Quanta: Agent Settings")
 
         # ith st.expander("Show Configs"):
         cm = self.get_config_markdown(self.cfg)

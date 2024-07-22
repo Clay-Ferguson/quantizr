@@ -3,14 +3,14 @@
 import sys
 import os
 import streamlit as st
-from typing import List
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
+from QuantaAgent.app_utils import AppUtils
 from agent.app_config import AppConfig
-from common.python.utils import RefactorMode, Utils, AIService
+from common.python.utils import RefactorMode, AIService
 
 def show_mode_picker(st):
     """Show the mode picker."""
@@ -69,7 +69,7 @@ def show_ai_model_picker(st):
 if __name__ == "__main__":
     cfg = AppConfig.get_config(None)
 
-    Utils.setup_page(st, cfg, "Quanta: AI Tools")
+    AppUtils.setup_page(st, cfg, "Quanta: AI Tools")
     show_ai_model_picker(st)
     show_mode_picker(st)
 

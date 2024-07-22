@@ -9,9 +9,10 @@ from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from pydantic.v1.types import SecretStr
 from QuantaAgent.agent.app_config import AppConfig
+from QuantaAgent.app_utils import AppUtils
 from common.python.utils import AIService
 from agent.app_config import AppConfig
-from common.python.utils import AIService, Utils
+from common.python.utils import AIService
 
 
 class AppChatbotGUI:
@@ -107,7 +108,7 @@ class AppChatbotGUI:
 
     def run(self):
         """Main function for the Streamlit GUI."""
-        Utils.setup_page(st, self.cfg, "Quanta: AI Chatbot")
+        AppUtils.setup_page(st, self.cfg, "Quanta: AI Chatbot")
 
         self.show_messages()
         self.show_form()
