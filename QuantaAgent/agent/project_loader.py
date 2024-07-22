@@ -1,8 +1,7 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
 
 import os
 from agent.models import TextBlock
-from agent.app_config import AppConfig
 from agent.utils import Utils
 from agent.tags import TAG_BLOCK_BEGIN, TAG_BLOCK_END, TAG_BLOCK_OFF, TAG_BLOCK_ON
 from common.python.file_utils import FileUtils
@@ -15,8 +14,10 @@ class ProjectLoader:
     file_names: List[str] = []
     folder_names: List[str] = []
 
-    def __init__(self, source_folder_len: int):
+    def __init__(self, source_folder_len: int, ext_set: Set[str]):
         self.source_folder_len = source_folder_len
+        self.ext_set = ext_set
+        
 
     def reset(self):
         self.blocks = {}
@@ -86,7 +87,7 @@ class ProjectLoader:
             self.folder_names.append(short_dir)
 
             for filename in filenames:
-                if Utils.should_include_file(AppConfig.ext_set, filename):
+                if Utils.should_include_file(self.ext_set, filename):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # Call the visitor function for each file

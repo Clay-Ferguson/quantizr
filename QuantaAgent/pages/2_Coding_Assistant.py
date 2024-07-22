@@ -39,7 +39,8 @@ class AppAgentGUI:
                     0.0,  # Use zero temp for code refactoring,
                     self.cfg.source_folder,
                     self.cfg.data_folder,
-                    self.cfg.max_prompt_length
+                    self.cfg.max_prompt_length,
+                    AppConfig.ext_set
                 )
 
                 st.session_state.p_agent_user_input = ""

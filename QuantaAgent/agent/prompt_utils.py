@@ -1,9 +1,8 @@
 """Contains the prompt templates for the agent."""
 
 import os
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Set
 from langchain.prompts import PromptTemplate
-from agent.app_config import AppConfig
 from agent.string_utils import StringUtils
 from agent.tags import (
     TAG_FILE_BEGIN,
@@ -47,7 +46,7 @@ class PromptUtils:
 """
 
     @staticmethod
-    def build_folder_content(folder_path: str, source_folder_len: int) -> str:
+    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str]) -> str:
         """Builds the content of a folder. Which will contain all the filenames and their content."""
         print(f"Building content for folder: {folder_path}")
 
@@ -58,7 +57,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
                 # Check the file extension
-                if Utils.should_include_file(AppConfig.ext_set, filename):
+                if Utils.should_include_file(ext_set, filename):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder
@@ -91,7 +90,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
 
     @staticmethod
     def insert_folders_into_prompt(
-        prompt: str, source_folder: str, folder_names: List[str]
+        prompt: str, source_folder: str, folder_names: List[str], ext_set: Set[str]
     ) -> Tuple[str, bool]:
         """
         Substitute entire folder contents into the prompt. Prompts can contain ${FolderName} tags,
@@ -107,6 +106,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 content: str = PromptUtils.build_folder_content(
                     source_folder + folder_name,
                     source_folder_len,
+                    ext_set,
                 )
                 prompt = prompt.replace(tag, content)
         return prompt, inserted

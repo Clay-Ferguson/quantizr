@@ -2,7 +2,7 @@
 
 import os
 import re
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
 from agent.models import TextBlock
 from agent.string_utils import StringUtils
 from agent.tags import (
@@ -12,10 +12,7 @@ from agent.tags import (
     TAG_FILE_END,
 )
 from agent.utils import RefactorMode, Utils
-from agent.app_config import AppConfig
 from common.python.file_utils import FileUtils
-from common.python.streamlit_utils import StreamlitUtils
-
 
 class ProjectMutator:
     """Performs all project mutations that the AI has requested."""
@@ -30,6 +27,7 @@ class ProjectMutator:
         ts: str,
         suffix: Optional[str],
         blocks: Dict[str, TextBlock],
+        ext_set: Set[str]
     ):
         """Initializes the ProjectMutator object."""
         self.mode: str = mode
@@ -39,6 +37,7 @@ class ProjectMutator:
         self.suffix: Optional[str] = suffix
         self.ts: str = ts
         self.blocks = blocks
+        self.ext_set = ext_set
 
     def run(self):
         """Performs all the project mutations which may be new files, updated files, or updated blocks in files."""
@@ -162,7 +161,7 @@ class ProjectMutator:
         for dirpath, _, filenames in os.walk(self.source_folder):
             for filename in filenames:
                 # Check the file extension
-                if Utils.should_include_file(AppConfig.ext_set, filename):
+                if Utils.should_include_file(self.ext_set, filename):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # Call the visitor function for each file

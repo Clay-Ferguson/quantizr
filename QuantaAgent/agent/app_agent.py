@@ -2,15 +2,12 @@
 
 import os
 import time
-from typing import List
-from langchain.schema import BaseMessage
+from typing import List, Set
 from agent.project_loader import ProjectLoader
 from agent.project_mutator import ProjectMutator
-from langchain.schema import HumanMessage, AIMessage, BaseMessage, SystemMessage
+from langchain.schema import HumanMessage, AIMessage, BaseMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
-
-from agent.models import TextBlock
 from agent.utils import RefactorMode, Utils
 from agent.tools.refactoring_tools import (
     UpdateBlockTool,
@@ -18,7 +15,6 @@ from agent.tools.refactoring_tools import (
     UpdateFileTool
 )
 from common.python.file_utils import FileUtils
-
 from agent.tags import (
     TAG_BLOCK_BEGIN,
     TAG_BLOCK_END,
@@ -58,6 +54,7 @@ class QuantaAgent:
         source_folder: str,
         data_folder: str,
         max_prompt_length: int,
+        ext_set: Set[str]
     ):
         """Runs the agent. We assume that if messages is not `None` then we are in the Streamlit GUI mode, and these messages
         represent the chatbot context. If messages is `None` then we are in the CLI mode, and we will use the `prompt` parameter
@@ -66,10 +63,11 @@ class QuantaAgent:
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
-        self.prj_loader = ProjectLoader(self.source_folder_len)
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set)
         self.max_prompt_length = max_prompt_length
         self.prompt = input_prompt
         self.mode = mode
+        self.ext_set = ext_set
 
         # default filename to timestamp if empty
         if output_file_name == "":
@@ -107,7 +105,6 @@ class QuantaAgent:
                 messages[0] = SystemMessage(content=self.system_prompt)
 
             self.human_message = HumanMessage(content=self.prompt)
-
             messages.append(self.human_message)
 
             if self.mode != RefactorMode.NONE.value:
@@ -180,6 +177,7 @@ Final Prompt:
                 self.ts,
                 None,
                 self.prj_loader.blocks,
+                self.ext_set
             ).run()
 
     def build_system_prompt(self):
@@ -234,7 +232,7 @@ Final Prompt:
             self.prompt, self.source_folder, self.prj_loader.file_names
         )
         self.prompt, self.has_folder_inject = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.source_folder, self.prj_loader.folder_names
+            self.prompt, self.source_folder, self.prj_loader.folder_names, self.ext_set
         )
         return self.has_filename_inject or self.has_folder_inject
 
