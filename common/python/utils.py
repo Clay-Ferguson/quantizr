@@ -5,12 +5,7 @@ import os
 import argparse
 from enum import Enum
 from typing import List, Set, Optional
-from langchain_anthropic import ChatAnthropic
-from langchain_openai import ChatOpenAI
-from pydantic import SecretStr
-import streamlit as st # <--- delete this
-from langchain.schema import AIMessage, BaseMessage, BaseMessage
-from langchain.chat_models.base import BaseChatModel
+from langchain.schema import AIMessage, BaseMessage
 from langchain.schema import BaseMessage, AIMessage
 from .streamlit_utils import StreamlitUtils
 from .tags import (
@@ -19,7 +14,6 @@ from .tags import (
     TAG_BLOCK_BEGIN,
     TAG_BLOCK_END,
 )
-
 
 class AIService(Enum):
     OPENAI = "openai"
@@ -48,14 +42,6 @@ class Utils:
                         ret += f"Tool Call: {tool_call}\n"
 
         return ret
-
-    @staticmethod
-    def clear_agent_state():
-        """Clear all agent session state."""
-        messages: List[BaseMessage] = []
-        st.session_state.p_agent_messages = messages
-        st.session_state.p_agent_user_input = ""
-        st.session_state.p_user_inputs = {}
 
     @staticmethod
     def should_include_file(ext_set: Set[str], file_name: str) -> bool:
@@ -209,29 +195,3 @@ class Utils:
         if "p_chatbot_messages" not in st.session_state:
             st.session_state.p_chatbot_messages = []
 
-
-    @staticmethod
-    def create_llm(
-        ai_service: str,
-        temperature: float,
-        model: str,
-        api_key: str
-    ) -> BaseChatModel:
-        """Creates a language model based on the AI service."""
-        if ai_service == AIService.OPENAI.value:
-            llm = ChatOpenAI(
-                model=model,
-                temperature=temperature,
-                api_key=api_key,
-                verbose=True,
-            )
-        elif ai_service == AIService.ANTHROPIC.value:
-            llm = ChatAnthropic(
-                model_name=model,
-                temperature=temperature,
-                timeout=60,  # timeout in seconds
-                api_key=SecretStr(api_key),
-            )
-        else:
-            raise Exception(f"Invalid AI Service: {ai_service}")
-        return llm

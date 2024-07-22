@@ -3,6 +3,7 @@
 import sys
 import os
 import streamlit as st
+from typing import List
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
@@ -21,7 +22,7 @@ def show_mode_picker(st):
     }
 
     def mode_changed():
-        Utils.clear_agent_state()
+        clear_agent_state()
 
     st.radio(
         "Coding Assistant Mode:",
@@ -33,6 +34,13 @@ def show_mode_picker(st):
         }[x],
         on_change=mode_changed,
     )
+
+def clear_agent_state():
+    """Clear all agent session state."""
+    messages = []
+    st.session_state.p_agent_messages = messages
+    st.session_state.p_agent_user_input = ""
+    st.session_state.p_user_inputs = {}
 
 
 def show_ai_model_picker(st):

@@ -48,13 +48,11 @@ class QuantaAgent:
         output_file_name: str,
         messages: List[BaseMessage],
         input_prompt: str,
-        temperature: float,
         source_folder: str,
         data_folder: str,
         max_prompt_length: int,
         ext_set: Set[str],
-        model: str,
-        api_key: str
+        llm: BaseChatModel
     ):
         """Runs the agent. We assume that if messages is not `None` then we are in the Streamlit GUI mode, and these messages
         represent the chatbot context. If messages is `None` then we are in the CLI mode, and we will use the `prompt` parameter
@@ -94,8 +92,6 @@ class QuantaAgent:
             else:
                 self.answer = "Dry Run: No API call made."
         else:
-            llm: BaseChatModel = Utils.create_llm(ai_service, temperature, model, api_key)
-
             # Check the first 'message' to see if it's a SystemMessage and if not then insert one
             if len(messages) == 0 or not isinstance(messages[0], SystemMessage):
                 messages.insert(0, SystemMessage(content=self.system_prompt))

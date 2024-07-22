@@ -4,6 +4,10 @@ from typing import List
 import streamlit as st
 from streamlit_chat import message
 from langchain.schema import HumanMessage, AIMessage, BaseMessage
+from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
+from langchain.chat_models.base import BaseChatModel
 from common.python.app_agent import QuantaAgent
 from agent.app_config import AppConfig
 from common.python.prompt_utils import PromptUtils
@@ -23,14 +27,21 @@ class AppAgentGUI:
             messages: List[BaseMessage] = []
             st.session_state.p_agent_messages = messages
 
-        model: str = ""
-        api_key = ""
+        llm: BaseChatModel = None
         if st.session_state.p_ai_service == AIService.OPENAI.value:
-            model=self.cfg.openai_model
-            api_key=self.cfg.openai_api_key
+            llm = ChatOpenAI(
+                model=self.cfg.openai_model,
+                temperature=0.0, # Use zero temp for code refactoring,
+                api_key=self.cfg.openai_api_key,
+                verbose=True,
+            )
         elif st.session_state.p_ai_service == AIService.ANTHROPIC.value:
-            model_name=self.cfg.anth_model  
-            api_key=self.cfg.anth_api_key
+             llm = ChatAnthropic(
+                model_name=self.cfg.anth_model,
+                temperature=0.0, # Use zero temp for code refactoring,
+                timeout=60,  # timeout in seconds
+                api_key=SecretStr(self.cfg.anth_api_key),
+            )
         else:
             raise Exception(f"Invalid AI Service: {st.session_state.p_ai_service}")
 
@@ -45,13 +56,11 @@ class AppAgentGUI:
                     "",
                     st.session_state.p_agent_messages,
                     user_input,
-                    0.0,  # Use zero temp for code refactoring,
                     self.cfg.source_folder,
                     self.cfg.data_folder,
                     self.cfg.max_prompt_length,
                     AppConfig.ext_set,
-                    model, 
-                    api_key
+                    llm
                 )
                 st.session_state.p_user_inputs[id(agent.human_message)] = user_input
                 st.session_state.p_agent_user_input = ""
@@ -87,7 +96,14 @@ class AppAgentGUI:
             with col1:
                 st.form_submit_button("Ask AI", on_click=self.ask_ai)
             with col2:
-                st.form_submit_button("Clear", on_click=Utils.clear_agent_state)
+                st.form_submit_button("Clear", on_click=self.clear_agent_state)
+
+    def clear_agent_state(self):
+        """Clear all agent session state."""
+        messages = []
+        st.session_state.p_agent_messages = messages
+        st.session_state.p_agent_user_input = ""
+        st.session_state.p_user_inputs = {}
 
     def run(self):
         """Main function for the Streamlit GUI."""

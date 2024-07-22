@@ -11,6 +11,7 @@ from pydantic.v1.types import SecretStr
 from QuantaAgent.agent.app_config import AppConfig
 from common.python.utils import AIService
 from agent.app_config import AppConfig
+from common.python.utils import AIService, Utils
 
 
 class AppChatbotGUI:
