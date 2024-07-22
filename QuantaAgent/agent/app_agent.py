@@ -1,11 +1,23 @@
 """This is the main agent module that scans the source code and generates the AI prompt."""
 
+import os
 import time
 from typing import List
 from langchain.schema import BaseMessage
-from agent.app_ai import AppAI
 from agent.project_loader import ProjectLoader
 from agent.project_mutator import ProjectMutator
+from langchain.schema import HumanMessage, AIMessage, BaseMessage, SystemMessage
+from langchain.chat_models.base import BaseChatModel
+from langgraph.prebuilt import chat_agent_executor
+
+from agent.models import TextBlock
+from agent.utils import RefactorMode, Utils
+from agent.tools.refactoring_tools import (
+    UpdateBlockTool,
+    CreateFileTool,
+    UpdateFileTool
+)
+from common.python.file_utils import FileUtils
 
 from agent.tags import (
     TAG_BLOCK_BEGIN,
@@ -32,6 +44,7 @@ class QuantaAgent:
         self.max_prompt_length = 0
         self.source_folder = ""
         self.data_folder = ""
+        self.dry_run: bool = False
 
     def run(
         self,
@@ -65,36 +78,97 @@ class QuantaAgent:
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
 
-        prompt_injects: bool = (
-            self.insert_blocks_into_prompt()
-            or self.insert_files_and_folders_into_prompt()
-        )
+        self.insert_blocks_into_prompt()
+        self.insert_files_and_folders_into_prompt()
 
         if len(self.prompt) > int(self.max_prompt_length):
            raise Exception(f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.max_prompt_length} characters.")
 
         self.build_system_prompt()
 
-        open_ai = AppAI(
-            self.mode,
-            self.system_prompt,
-            self.prj_loader.blocks,
-            self.source_folder,
-            self.data_folder,
-        )
+        if self.dry_run:
+            # If dry_run is True, we simulate the AI response by reading from a file
+            # if we canfind that file or else we return a default response.
+            answer_file: str = f"{self.data_folder}/dry-run-answer.txt"
 
-        # Need to be sure the current `self.system_prompt`` is in these messages every time we send
-        self.answer = open_ai.query(
-            ai_service,
-            messages,
-            self.prompt,
-            input_prompt,
-            output_file_name,
-            self.ts,
-            temperature,
-        )
+            if os.path.isfile(answer_file):
+                print(f"Simulating AI Response by reading answer from {answer_file}")
+                self.answer = FileUtils.read_file(answer_file)
+            else:
+                self.answer = "Dry Run: No API call made."
+        else:
+            llm: BaseChatModel = Utils.create_llm(ai_service, temperature)
+
+            # Check the first 'message' to see if it's a SystemMessage and if not then insert one
+            if len(messages) == 0 or not isinstance(messages[0], SystemMessage):
+                messages.insert(0, SystemMessage(content=self.system_prompt))
+            # else we set the first message to the system prompt
+            else:
+                messages[0] = SystemMessage(content=self.system_prompt)
+
+            self.human_message = HumanMessage(content=self.prompt)
+
+            messages.append(self.human_message)
+
+            if self.mode != RefactorMode.NONE.value:
+                # https://python.langchain.com/v0.2/docs/tutorials/agents/
+                tools = []
+
+                if self.mode == RefactorMode.REFACTOR.value:
+                    tools = [
+                        UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
+                        CreateFileTool("File Creator Tool", self.source_folder),
+                        UpdateFileTool("File Updater Tool", self.source_folder),
+                    ]
+
+                agent_executor = chat_agent_executor.create_tool_calling_executor(
+                    llm, tools
+                )
+                initial_message_len = len(messages)
+                response = agent_executor.invoke({"messages": list(messages)})
+                # print(f"Response: {response}")
+                resp_messages = response["messages"]
+                new_messages = resp_messages[initial_message_len:]
+                self.answer = ""
+                ai_response: int = 0
+                for message in new_messages:
+                    if isinstance(message, AIMessage):
+                        ai_response += 1
+                        content = message.content
+                        if not content:
+                            content = Utils.get_tool_calls_str(message)
+                            # print(f"TOOL CALLS:\n{content}")
+                        self.answer += f"AI Response {ai_response}:\n{content}\n==============\n"  # type: ignore
+
+                # Agents may add multiple new messages, so we need to update the messages list
+                # This [:] syntax is a way to update the list in place
+                messages[:] = resp_messages
+
+            else:
+                response = llm.invoke(list(messages))
+                self.answer = response.content  # type: ignore
+                messages.append(AIMessage(content=response.content))
+
+        output = f"""AI Model Used: {ai_service}, Mode: {self.mode}, Timestamp: {self.ts}
+____________________________________________________________________________________
+Input Prompt: 
+{input_prompt}
+____________________________________________________________________________________
+LLM Output: 
+{self.answer}
+____________________________________________________________________________________
+System Prompt: 
+{self.system_prompt}
+____________________________________________________________________________________
+Final Prompt: 
+{self.prompt}
+"""
+
+        filename = f"{self.data_folder}/{output_file_name}.txt"
+        FileUtils.write_file(filename, output)
+        print(f"Wrote Log File: {filename}")
         
-        self.st.session_state.p_user_inputs[id(open_ai.human_message)] = input_prompt
+        self.st.session_state.p_user_inputs[id(self.human_message)] = input_prompt
 
         if (
             self.mode == RefactorMode.REFACTOR.value
