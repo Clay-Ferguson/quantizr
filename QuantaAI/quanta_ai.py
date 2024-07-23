@@ -1,15 +1,23 @@
 import os
+import sys
 from fastapi import FastAPI, Header
 from pydantic import BaseModel
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatPerplexity
 from pydantic.v1.types import SecretStr
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Set
 import traceback
+
+ABS_FILE = os.path.abspath(__file__)
+PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
+sys.path.append(PRJ_DIR)
+
+from common.python.agent.app_agent import QuantaAgent
+from common.python.utils import RefactorMode
 
 # #ai-model
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
@@ -40,6 +48,7 @@ class AIRequest(BaseModel):
     temperature: float
     maxTokens: int
     credit: float
+    codingAgent: bool
 
 @app.get("/")
 def index() -> str:
@@ -50,12 +59,14 @@ def api_query(req: AIRequest,
               api_key: Optional[str] = Header(None, alias="X-api-key")
     ) -> AIResponse:
     try:
+        # todo-0: for testing only
+        req.codingAgent = True
+        
         # for now we'll max out at 100k tokens allowed
         if (req.maxTokens > 100000): 
             req.maxTokens = 100000
             
         llm = getChatModel(req, api_key)
-        messages = buildMessages(req)
         
         # Estimate input tokens
         input_text = "".join([msg.content for msg in req.messages])
@@ -66,19 +77,41 @@ def api_query(req: AIRequest,
         if (cost > req.credit):
             return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account.")         
 
-        response = llm.invoke(list(messages))
+        answer: str = ""
+        response: BaseMessage = None
+        if req.codingAgent:
+            messages = buildContext(req)
+            ext_set: Set[str] = {"java", "py"} # todo-0: need to pass thru API
+            agent = QuantaAgent()
+            agent.run(
+                req.service,
+                RefactorMode.REFACTOR.value,
+                "",
+                messages,
+                req.prompt,
+                "/projects",
+                "/data",
+                2000, # do something better here
+                ext_set,
+                llm)
+        else:
+            messages = buildMessages(req)
+            # todo-0: isn't messages already 'list' why wrap in list() here?
+            response = llm.invoke(list(messages))
+            answer = response.content
 
         # Estimate output tokens
-        output_tokens = int((len(response.content)+3) / 3)        
+        output_tokens = int((len(answer)+3) / 3)        
         cost = calculate_cost(input_tokens, output_tokens, req.model)
 
         # not make our return value and return it
-        ret = AIResponse(content=response.content, cost=cost, error=None)
+        ret = AIResponse(content=answer, cost=cost, error=None)
         return ret
     except Exception as e:
         return AIResponse(content=None, cost=None, error=str(e)+"\n"+traceback.format_exc())
 
-def buildMessages(req):
+# Builds list of past messages
+def buildContext(req) -> List[BaseMessage]:
     messages = []
     for msg in req.messages:
         if msg.type == "human":
@@ -87,6 +120,10 @@ def buildMessages(req):
             messages.append(AIMessage(content=msg.content))
         else:
             raise ValueError(f"Unsupported message type: {msg.type}")
+    return messages
+
+def buildMessages(req):
+    messages =- buildContext(req)
         
     # Add the current human question to the messages
     messages.append(HumanMessage(content=req.prompt))
