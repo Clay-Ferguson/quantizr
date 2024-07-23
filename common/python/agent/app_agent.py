@@ -181,7 +181,7 @@ Final Prompt:
         """
 
         self.system_prompt = PromptUtils.get_template(
-            "prompt_templates/agent_system_prompt.txt"
+            "../common/python/agent/prompt_templates/agent_system_prompt.txt"
         )
         self.system_prompt += MORE_INSTRUCTIONS
         self.add_file_handling_instructions()
@@ -193,11 +193,11 @@ Final Prompt:
         instructions for how to provide the new block content."""
         if self.mode == RefactorMode.REFACTOR.value and len(self.prj_loader.blocks) > 0:
             self.system_prompt += PromptUtils.get_template(
-                "prompt_templates/block_access_instructions.txt"
+                "..common/python/agent/prompt_templates/block_access_instructions.txt"
             )
             
             self.system_prompt += PromptUtils.get_template(
-                "prompt_templates/block_update_instructions.txt"
+                "../common/python/agent/prompt_templates/block_update_instructions.txt"
             )
            
 
@@ -207,11 +207,11 @@ Final Prompt:
         """
         if self.mode == RefactorMode.REFACTOR.value:
             self.system_prompt += PromptUtils.get_template(
-                "prompt_templates/file_access_instructions.txt"
+                "../common/python/agent/prompt_templates/file_access_instructions.txt"
             )
             
             self.system_prompt += PromptUtils.get_template(
-                "prompt_templates/file_edit_instructions.txt"
+                "../common/python/agent/prompt_templates/file_edit_instructions.txt"
             )
            
 
