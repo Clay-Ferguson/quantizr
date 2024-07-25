@@ -3,6 +3,7 @@ package quanta.postgres;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
@@ -19,7 +20,8 @@ public class DatabaseService extends ServiceBase {
     private EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    @Transactional
+    @Transactional("transactionManager")
+    @Qualifier("transactionManager")
     public List<String> getAllTableNames() {
         return entityManager
                 .createNativeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'",

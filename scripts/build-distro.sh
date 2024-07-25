@@ -28,6 +28,8 @@ verifySuccess "Cleaned deploy target"
 
 mkdir -p ${DEPLOY_TARGET}/log
 mkdir -p ${DEPLOY_TARGET}/QuantaAI
+mkdir -p ${DEPLOY_TARGET}/common
+
 # Copy our primary logger file out to the live-loadable configured location
 # (note: without the 'logging.config' being set in the docker yaml this file would
 # load from /src/main/resouces which is the spring default location.)
@@ -41,8 +43,8 @@ cp ${PRJROOT}/dockerfile-qai                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint-distro.sh              ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 
-cp ${PRJROOT}/QuantaAI/*.py                     ${DEPLOY_TARGET}/QuantaAI
-cp ${PRJROOT}/QuantaAI/requirements.txt         ${DEPLOY_TARGET}/QuantaAI
+rsync -av --exclude='__pycache__' ${PRJROOT}/QuantaAI/  ${DEPLOY_TARGET}/QuantaAI/
+rsync -av --exclude='__pycache__' ${PRJROOT}/common/    ${DEPLOY_TARGET}/common/
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}

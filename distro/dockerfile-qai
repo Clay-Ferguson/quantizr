@@ -2,16 +2,15 @@ FROM python:3.12.3-slim
 LABEL maintainer="wclayf@gmail.com"
 ARG QAI_HOST
 ARG QAI_PORT
-WORKDIR /app
 
-# Copy the requirements file from the QuantaAI subfolder
-COPY QuantaAI/requirements.txt .
+WORKDIR /app/common
+COPY common .
+
+WORKDIR /app/QuantaAI
+COPY QuantaAI .
 
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the contents of the QuantaAI subfolder into the container
-COPY QuantaAI .
-
-# Run the uvicorn server
-CMD uvicorn quanta-ai:app --host ${QAI_HOST} --port ${QAI_PORT}
+# Run the uvicorn server (Note: The :app suffix after the script name is the variable name in the script which runs the FastAPI app)
+CMD uvicorn quanta_ai:app --host ${QAI_HOST} --port ${QAI_PORT}

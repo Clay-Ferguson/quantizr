@@ -12,15 +12,18 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import jakarta.persistence.EntityManagerFactory;
 import quanta.service.AppController;
 import quanta.service.AppFilter;
 import quanta.service.UtilFilter;
@@ -29,7 +32,6 @@ import quanta.service.UtilFilter;
  * Standard Spring WebMvcConfigurerAdapter-derived class.
  */
 @Configuration
-@EnableAsync
 public class AppConfiguration implements WebMvcConfigurer {
     private static Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
@@ -89,7 +91,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     @Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setPoolSize(10);
         threadPoolTaskScheduler.setThreadNamePrefix("ThreadPoolTaskScheduler");
         return threadPoolTaskScheduler;
     }
@@ -199,5 +201,11 @@ public class AppConfiguration implements WebMvcConfigurer {
         viewResolver.setTemplateEngine(templateEngine());
         viewResolver.setCharacterEncoding("UTF-8");
         return viewResolver;
+    }
+
+    @Bean(name = "transactionManager")
+    @Primary
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory);
     }
 }

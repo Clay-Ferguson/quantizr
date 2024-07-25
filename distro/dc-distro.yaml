@@ -264,8 +264,6 @@ services:
                 max-file: "3"
         ports:
             - '${QAI_PORT}:${QAI_PORT}'
-        volumes:
-            - ./QuantaAI:/app
 
 networks:
     bridge:

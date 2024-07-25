@@ -85,6 +85,7 @@ public class AIService extends ServiceBase {
         request.setTemperature(0.7f);
         request.setMaxTokens(maxTokens);
         request.setCredit(balance.floatValue());
+        request.setCodingAgent(false); // todo-0: make the gui control this
 
         log.debug("AI Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
         AIResponse aiRes = null;

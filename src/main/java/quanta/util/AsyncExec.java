@@ -8,7 +8,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
-/*
+/**
+ * IMPORTANT: We will slowly phase this out and replace it with AsyncLayer.java which is simpler.
+ * 
  * Wraps execution of a Runnable by the spring executor service. Warning: Don't try to refactor to
  * use
  *

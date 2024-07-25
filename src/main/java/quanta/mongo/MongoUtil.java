@@ -381,7 +381,7 @@ public class MongoUtil extends ServiceBase {
     }
 
     // DO NOT DELETE (this method can be repurposed for other similar tasks)
-    @Transactional
+    @Transactional("mongoTm")
     public void upgradePaths(MongoSession ms) {
         IntVal batchSize = new IntVal();
         Query q = new Query();

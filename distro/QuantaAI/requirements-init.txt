@@ -1,0 +1,7 @@
+langchain
+langchain_anthropic
+langchain_openai 
+langchain_community
+langchain_core 
+fastapi
+pydantic

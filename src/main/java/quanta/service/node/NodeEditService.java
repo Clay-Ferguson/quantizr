@@ -65,7 +65,7 @@ import quanta.util.XString;
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
-    @Transactional
+    @Transactional("mongoTm")
     public LikeNodeResponse cm_likeNode(MongoSession ms, LikeNodeRequest req) {
         LikeNodeResponse res = new LikeNodeResponse();
         exec.run(() -> {
@@ -99,7 +99,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public SaveNodeResponse cm_saveNode(MongoSession ms, SaveNodeRequest req) {
         SaveNodeResponse res = new SaveNodeResponse();
         NodeInfo nodeInfo = req.getNode();
@@ -287,7 +287,7 @@ public class NodeEditService extends ServiceBase {
      * representation of the JSON, with each key/value pair (and/or array content) in the JSON being a
      * node.
      */
-    @Transactional
+    @Transactional("mongoTm")
     public ImportJsonResponse cm_importJson(MongoSession ms, ImportJsonRequest req) {
         ImportJsonResponse res = new ImportJsonResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
@@ -484,7 +484,7 @@ public class NodeEditService extends ServiceBase {
      *
      * req.splitType == 'inline' || 'children'
      */
-    @Transactional
+    @Transactional("mongoTm")
     public SplitNodeResponse cm_splitNode(MongoSession ms, SplitNodeRequest req) {
         SplitNodeResponse res = new SplitNodeResponse();
         NodeChanges nodeChanges = new NodeChanges();
@@ -683,7 +683,7 @@ public class NodeEditService extends ServiceBase {
      * todo-2: we should be using a bulk update in here and using a streaming resultset instead of
      * holding it all in memory
      */
-    @Transactional
+    @Transactional("mongoTm")
     public SearchAndReplaceResponse cm_searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
         SearchAndReplaceResponse res = new SearchAndReplaceResponse();
         int replacements = 0;
@@ -737,7 +737,7 @@ public class NodeEditService extends ServiceBase {
         return res;
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public SaveNodeJsonResponse cm_saveNodeJson(MongoSession ms, SaveNodeJsonRequest req) {
         SaveNodeJsonResponse res = new SaveNodeJsonResponse();
         ThreadLocals.requireAdmin();

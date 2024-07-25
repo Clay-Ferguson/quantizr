@@ -68,7 +68,7 @@ public class AclService extends ServiceBase {
         return res;
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public CopySharingResponse cm_copySharing(MongoSession ms, CopySharingRequest req) {
         CopySharingResponse res = new CopySharingResponse();
         SubNode node = read.getNode(ms, req.getNodeId());
@@ -123,7 +123,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new privilege to a node
      */
-    @Transactional
+    @Transactional("mongoTm")
     public AddPrivilegeResponse cm_addPrivilege(MongoSession ms, AddPrivilegeRequest req) {
         AddPrivilegeResponse res = new AddPrivilegeResponse();
         String nodeId = req.getNodeId();
@@ -144,7 +144,7 @@ public class AclService extends ServiceBase {
     /*
      * Adds or updates a new privilege to a node
      */
-    @Transactional
+    @Transactional("mongoTm")
     public SetUnpublishedResponse cm_setUnpublished(MongoSession ms, SetUnpublishedRequest req) {
         SetUnpublishedResponse res = new SetUnpublishedResponse();
         String nodeId = req.getNodeId();
@@ -354,7 +354,7 @@ public class AclService extends ServiceBase {
     /*
      * Removes the privilege specified in the request from the node specified in the request
      */
-    @Transactional
+    @Transactional("mongoTm")
     public RemovePrivilegeResponse cm_removePrivilege(MongoSession ms, RemovePrivilegeRequest req) {
         RemovePrivilegeResponse res = new RemovePrivilegeResponse();
         String nodeId = req.getNodeId();

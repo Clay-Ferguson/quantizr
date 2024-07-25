@@ -59,9 +59,6 @@ def api_query(req: AIRequest,
               api_key: Optional[str] = Header(None, alias="X-api-key")
     ) -> AIResponse:
     try:
-        # todo-0: for testing only
-        req.codingAgent = True
-        
         # for now we'll max out at 100k tokens allowed
         if (req.maxTokens > 100000): 
             req.maxTokens = 100000
@@ -81,7 +78,7 @@ def api_query(req: AIRequest,
         response: BaseMessage = None
         if req.codingAgent:
             messages = buildContext(req)
-            ext_set: Set[str] = {"java", "py"} # todo-0: need to pass thru API
+            ext_set: Set[str] = {".java", ".py", ".sql", ".html", ".htm", ".js", ".ts", ".css"} # todo-0: need to pass thru API
             agent = QuantaAgent()
             agent.run(
                 req.service,
@@ -91,9 +88,10 @@ def api_query(req: AIRequest,
                 req.prompt,
                 "/projects",
                 "/data",
-                2000, # do something better here
+                100000, # todo-0: configure server wide
                 ext_set,
                 llm)
+            answer = messages[-1].content
         else:
             messages = buildMessages(req)
             # todo-0: isn't messages already 'list' why wrap in list() here?
@@ -123,7 +121,7 @@ def buildContext(req) -> List[BaseMessage]:
     return messages
 
 def buildMessages(req):
-    messages =- buildContext(req)
+    messages = buildContext(req)
         
     # Add the current human question to the messages
     messages.append(HumanMessage(content=req.prompt))

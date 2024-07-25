@@ -1,6 +1,7 @@
 package quanta.postgres.table;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,14 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-// block.xxxinject UserAccount.Imports
 
 @Entity
 @Table(name = "user_accnt")
 public class UserAccount {
-
-    // block.xxxinject UserAccount.Properties
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,8 +37,6 @@ public class UserAccount {
         this.mongoId = mongoId;
         this.userName = userName;
     }
-
-    // block.xxxinject UserAccount.Methods
 
     public Long getId() {
         return id;
@@ -67,10 +62,12 @@ public class UserAccount {
         this.userName = userName;
     }
 
+    @JsonIgnore
     public List<Tran> getTrans() {
         return trans;
     }
 
+    @JsonIgnore
     public void setTrans(List<Tran> trans) {
         this.trans = trans;
     }

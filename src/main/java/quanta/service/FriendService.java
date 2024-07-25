@@ -96,7 +96,7 @@ public class FriendService extends ServiceBase {
         }
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public DeleteFriendResponse cm_deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
         DeleteFriendResponse res = new DeleteFriendResponse();
         ms = ThreadLocals.ensure(ms);
@@ -204,7 +204,7 @@ public class FriendService extends ServiceBase {
      * Adds all the users in 'req.userName' (as a newline elimited list) as new friends of the current
      * user
      */
-    @Transactional
+    @Transactional("mongoTm")
     public AddFriendResponse cm_addFriend(MongoSession ms, AddFriendRequest req) {
         AddFriendResponse res = new AddFriendResponse();
         String userDoingAction = ThreadLocals.getSC().getUserName();

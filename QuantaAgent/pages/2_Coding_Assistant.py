@@ -83,7 +83,7 @@ class AppAgentGUI:
             elif isinstance(msg, AIMessage):
                 content: str = msg.content  # type: ignore
                 if content:
-                    content = Utils.sanitize_content(self.cfg, content)
+                    content = Utils.sanitize_content(content)
                     message(str(content), is_user=False, key=str(i) + "_ai")
 
     def show_form(self):

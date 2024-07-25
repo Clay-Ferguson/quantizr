@@ -54,7 +54,7 @@ public class StripeController extends ServiceBase implements ErrorController {
 
             // run the processing in an async thread, because we need to return immediately for Stripe.com to
             // see this endpoint as immediately responsive
-            exec.run(() -> {
+            asyncLayer.run(() -> {
                 switch (_event.getType()) {
                     case "checkout.session.completed":
                         EventDataObjectDeserializer dataObjectDeserializer = _event.getDataObjectDeserializer();
@@ -82,7 +82,8 @@ public class StripeController extends ServiceBase implements ErrorController {
                             String _customerEmail = customerEmail;
                             arun.run(as -> {
                                 BigDecimal dollarsAmount = new BigDecimal(amount).divide(new BigDecimal(100));
-                                user.addCreditByEmail(as, _customerEmail, dollarsAmount, checkoutSession.getCreated());
+                                // todo-0: I'm getting bad dates from 'getCreated()', so for now we set to null and that makes it use our own time
+                                user.addCreditByEmail(as, _customerEmail, dollarsAmount, null); // checkoutSession.getCreated());
                                 return null;
                             });
                         } else {

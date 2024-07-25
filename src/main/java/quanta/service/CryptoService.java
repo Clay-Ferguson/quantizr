@@ -183,7 +183,7 @@ public class CryptoService extends ServiceBase {
         }
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public SignNodesResponse cm_signNodes(MongoSession ms, SignNodesRequest req) {
         // if the signPendingQueue contains the workload we assume it's the same workload, which is fine
         // because we aren't doing that security right here.
@@ -380,7 +380,7 @@ public class CryptoService extends ServiceBase {
         return totalTime < 30000;
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public Object cm_signSubGraph(SignSubGraphRequest req, MongoSession ms) {
         // run the signing in an async thread, so we can push messages back to browser from it without
         // any session mutexing getting in the way
@@ -390,7 +390,7 @@ public class CryptoService extends ServiceBase {
         return new SignSubGraphResponse();
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public Object cm_removeSignatures(MongoSession ms, RemoveSignaturesRequest req) {
         SubNode node = read.getNode(ms, req.getNodeId());
         String sigProp = SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s();

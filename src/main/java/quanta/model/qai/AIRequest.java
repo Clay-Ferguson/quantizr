@@ -10,6 +10,7 @@ public class AIRequest {
     private List<AIMessage> messages;
     private Float temperature;
     private Integer maxTokens;
+    private Boolean codingAgent;
 
     // how much user has left in their account
     private Float credit;
@@ -76,5 +77,13 @@ public class AIRequest {
 
     public void setCredit(Float credit) {
         this.credit = credit;
+    }
+
+    public Boolean getCodingAgent() {
+        return codingAgent;
+    }
+
+    public void setCodingAgent(Boolean codingAgent) {
+        this.codingAgent = codingAgent;
     }
 }

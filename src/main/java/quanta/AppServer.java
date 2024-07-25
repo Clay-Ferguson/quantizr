@@ -8,6 +8,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
 
@@ -21,6 +22,7 @@ import quanta.util.ExUtil;
  * Standard SpringBoot entry point. Starts up entire application, which will run an instance of
  * Tomcat embedded and open the port specified in the properties file and start serving up requests.
  */
+@EnableTransactionManagement
 @SpringBootApplication
 @EnableScheduling
 @ServletComponentScan

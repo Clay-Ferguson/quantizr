@@ -658,7 +658,7 @@ public class MongoDelete extends ServiceBase {
     /*
      * Removes the property specified in the request from the node specified in the request
      */
-    @Transactional
+    @Transactional("mongoTm")
     public DeletePropertyResponse cm_deleteProperties(MongoSession ms, DeletePropertyRequest req) {
         DeletePropertyResponse res = new DeletePropertyResponse();
         String nodeId = req.getNodeId();

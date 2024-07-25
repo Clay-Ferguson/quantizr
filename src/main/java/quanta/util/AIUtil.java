@@ -3,31 +3,26 @@ package quanta.util;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
-import quanta.model.PropertyInfo;
 import quanta.model.client.AIModels;
 import quanta.model.client.NodeProp;
-import quanta.model.client.NodeType;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.qai.AIResponse;
 import quanta.mongo.MongoSession;
-import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
 import quanta.rest.request.AskSubGraphRequest;
-import quanta.rest.request.CreateSubNodeRequest;
 import quanta.rest.request.GenerateBookByAIRequest;
 import quanta.rest.response.AskSubGraphResponse;
-import quanta.rest.response.CreateSubNodeResponse;
 import quanta.rest.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
 import quanta.util.val.Val;
@@ -175,6 +170,7 @@ public class AIUtil extends ServiceBase {
     }
 
     // updates the user's credit, and returns new balance
+    @Transactional("transactionManager")
     public BigDecimal updateUserCredit(SubNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
         UserAccount user = userRepository.findByMongoId(userNode.getIdStr());
 
@@ -183,6 +179,7 @@ public class AIUtil extends ServiceBase {
             log.debug("User not found, creating...");
             String userName = userNode.getStr(NodeProp.USER);
             user = userRepository.save(new UserAccount(userNode.getIdStr(), userName));
+            userRepository.flush();
         }
 
         Tran debit = new Tran();

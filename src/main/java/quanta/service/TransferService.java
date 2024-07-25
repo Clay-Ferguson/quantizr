@@ -23,7 +23,7 @@ public class TransferService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(TransferService.class);
 
     // todo-2: need to be doing a bulk update in here.
-    @Transactional
+    @Transactional("mongoTm")
     public TransferNodeResponse cm_transferNode(MongoSession ms, TransferNodeRequest req) {
         TransferNodeResponse res = new TransferNodeResponse();
         // make sure only admin will be allowed to specify some arbitrary "fromUser"

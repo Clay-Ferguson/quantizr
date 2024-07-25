@@ -328,7 +328,9 @@ services:
         ports:
             - '${QAI_PORT}:${QAI_PORT}'
         volumes:
-            - ./QuantaAI:/app
+            - /home/clay/ferguson/Quantizr/QuantaAgent/test_project:/projects
+            - /home/clay/ferguson/Quantizr/QuantaAgent/data:/data
+
 
 networks:
     bridge:

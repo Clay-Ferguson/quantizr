@@ -54,6 +54,7 @@ import quanta.types.RssFeedType;
 import quanta.types.TypePluginMgr;
 import quanta.util.AIUtil;
 import quanta.util.AsyncExec;
+import quanta.util.AsyncLayer;
 import quanta.util.CallProcessor;
 import quanta.util.Convert;
 import quanta.util.EnglishDictionary;
@@ -100,6 +101,7 @@ public class ServiceBase {
     public static MongoUtil mongoUtil;
     public static SubNodeUtil snUtil;
     public static AIUtil aiUtil;
+    public static AsyncLayer asyncLayer;
     public static AclService acl;
     public static UserManagerService user;
     public static RedisService redis;
@@ -181,6 +183,7 @@ public class ServiceBase {
             mongoUtil = getBean(ctx, MongoUtil.class);
             snUtil = getBean(ctx, SubNodeUtil.class);
             aiUtil = getBean(ctx, AIUtil.class);
+            asyncLayer = getBean(ctx, AsyncLayer.class);
             acl = getBean(ctx, AclService.class);
             user = getBean(ctx, UserManagerService.class);
             redis = getBean(ctx, RedisService.class);

@@ -48,7 +48,7 @@ public class NodeMoveService extends ServiceBase {
      * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be the
      * first node under its parent.
      */
-    @Transactional
+    @Transactional("mongoTm")
     public SetNodePositionResponse cm_setNodePosition(MongoSession ms, SetNodePositionRequest req) {
         SetNodePositionResponse res = new SetNodePositionResponse();
         NodeChanges nodeChanges = new NodeChanges();
@@ -202,7 +202,7 @@ public class NodeMoveService extends ServiceBase {
     /*
      * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
      */
-    @Transactional
+    @Transactional("mongoTm")
     public MoveNodesResponse cm_moveNodes(MongoSession ms, MoveNodesRequest req) {
         MoveNodesResponse res = new MoveNodesResponse();
         ms = ThreadLocals.ensure(ms);

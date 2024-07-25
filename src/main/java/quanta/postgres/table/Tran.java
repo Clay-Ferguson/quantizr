@@ -3,6 +3,7 @@ package quanta.postgres.table;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import org.hibernate.annotations.Type;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.Column;
@@ -53,10 +54,12 @@ public class Tran {
         this.id = id;
     }
 
+    @JsonIgnore
     public UserAccount getUserAccount() {
         return userAccount;
     }
 
+    @JsonIgnore
     public void setUserAccount(UserAccount userAccount) {
         this.userAccount = userAccount;
     }
@@ -93,10 +96,12 @@ public class Tran {
         this.descCode = descCode;
     }
 
+    @JsonIgnore
     public JsonNode getDetail() {
         return detail;
     }
 
+    @JsonIgnore
     public void setDetail(JsonNode detail) {
         this.detail = detail;
     }

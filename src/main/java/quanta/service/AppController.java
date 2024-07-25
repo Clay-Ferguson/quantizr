@@ -160,8 +160,8 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "view", required = false) String view, //
             HttpSession session, //
             Model model) {
-        return render.cm_getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode, login, view,
-                model);
+        return render.cm_getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode, login,
+                view, model);
     }
 
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)

@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
@@ -167,7 +168,7 @@ public class UserManagerService extends ServiceBase {
      * Note that this function does 'succeed' even with ANON user given, and just considers that an
      * anonymouse user
      */
-    @Transactional
+    @Transactional("mongoTm")
     public LoginResponse cm_login(HttpServletRequest httpReq, LoginRequest req) {
         LoginResponse res = new LoginResponse();
         SessionContext sc = ThreadLocals.getSC();
@@ -306,7 +307,7 @@ public class UserManagerService extends ServiceBase {
         update.save(ms, userNode);
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public CloseAccountResponse cm_closeAccount(CloseAccountRequest req, HttpSession session) {
         CloseAccountResponse res = new CloseAccountResponse();
         log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
@@ -415,7 +416,7 @@ public class UserManagerService extends ServiceBase {
      * all other user accounts all information specific to that user that we currently know is held in
      * that node (i.e. preferences)
      */
-    @Transactional
+    @Transactional("mongoTm")
     public SignupResponse cm_signup(SignupRequest req, boolean automated) {
         SignupResponse res = new SignupResponse();
         res.setCode(HttpServletResponse.SC_OK);
@@ -521,11 +522,13 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
+    @Transactional("transactionManager")
+    @Qualifier("transactionManager")
     public boolean initialGrant(String userId, String userName) {
         UserAccount user = userRepository.findByMongoId(userId);
         if (user == null) {
             log.debug("UserAccount not found, creating...");
-            user = userRepository.save(new UserAccount(userId, userName));
+            user = userRepository.saveAndFlush(new UserAccount(userId, userName));
 
             Tran credit = new Tran();
             credit.setAmt(new BigDecimal(INITIAL_GRANT_AMOUNT));
@@ -533,31 +536,35 @@ public class UserManagerService extends ServiceBase {
             credit.setDescCode("NEW");
             credit.setTs(Timestamp.from(Instant.now()));
             credit.setUserAccount(user);
-            tranRepository.save(credit);
+            tranRepository.saveAndFlush(credit);
             return true;
         }
         return false;
     }
 
-    @Transactional
-    public DeleteUserTransactionsResponse cm_deleteUserTransactions(MongoSession as, DeleteUserTransactionsRequest req) {
+    @Transactional("transactionManager")
+    @Qualifier("transactionManager")
+    public DeleteUserTransactionsResponse cm_deleteUserTransactions(MongoSession as,
+            DeleteUserTransactionsRequest req) {
         ThreadLocals.requireAdmin();
         DeleteUserTransactionsResponse res = new DeleteUserTransactionsResponse();
         userRepository.deleteByMongoId(req.getUserId());
         return res;
     }
 
-    @Transactional
+    @Transactional("transactionManager") 
+    @Qualifier("transactionManager")
     public AddCreditResponse cm_addCredit(MongoSession as, String userId, BigDecimal amount) {
         ThreadLocals.requireAdmin();
         AddCreditResponse res = new AddCreditResponse();
         addCreditInternal(as, userId, amount, null);
-
         // calculate new balance and return it.
         res.setBalance(tranRepository.getBalByMongoId(userId));
         return res;
     }
 
+    @Transactional("transactionManager") 
+    @Qualifier("transactionManager")
     public void addCreditByEmail(MongoSession as, String emailAdr, BigDecimal amount, Long timestamp) {
         SubNode ownerNode = read.getUserNodeByProp(as, NodeProp.EMAIL.s(), emailAdr, false, false);
         if (ownerNode != null) {
@@ -580,13 +587,17 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
-    private void addCreditInternal(MongoSession as, String userId, BigDecimal amount, Long timestamp) {
+    @Transactional("transactionManager") 
+    @Qualifier("transactionManager")
+    public void addCreditInternal(MongoSession as, String userId, BigDecimal amount, Long timestamp) {
         UserAccount user = userRepository.findByMongoId(userId);
         if (user == null) {
             log.debug("User not found, creating...");
             SubNode userNode = read.getNode(as, userId, true, null);
             String userName = userNode.getStr(NodeProp.USER);
-            user = userRepository.save(new UserAccount(userId, userName));
+            user = new UserAccount(userId, userName);
+            user = userRepository.save(user);
+            userRepository.flush();
         }
 
         Tran credit = new Tran();
@@ -599,8 +610,7 @@ public class UserManagerService extends ServiceBase {
             credit.setTs(new Timestamp(timestamp));
         }
         credit.setUserAccount(user);
-        tranRepository.save(credit);
-        log.debug("TRAN: " + XString.prettyPrint(credit));
+        credit = tranRepository.save(credit);
     }
 
     public SaveUserPreferencesResponse cm_saveUserPreferences(SaveUserPreferencesRequest req) {
@@ -642,7 +652,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public SaveUserProfileResponse cm_saveUserProfile(SaveUserProfileRequest req) {
         SaveUserProfileResponse res = new SaveUserProfileResponse();
         String userName = ThreadLocals.getSC().getUserName();
@@ -916,7 +926,7 @@ public class UserManagerService extends ServiceBase {
     /*
      * Runs when user is doing the 'change password' or 'reset password'
      */
-    @Transactional
+    @Transactional("mongoTm")
     public ChangePasswordResponse cm_changePassword(MongoSession ms, ChangePasswordRequest req) {
         ChangePasswordResponse res = new ChangePasswordResponse();
         ms = ThreadLocals.ensure(ms);
@@ -1229,7 +1239,7 @@ public class UserManagerService extends ServiceBase {
         return quota - binTotal;
     }
 
-    @Transactional
+    @Transactional("mongoTm")
     public Object cm_logout(HttpSession session) {
         redis.delete(ThreadLocals.getSC());
         ThreadLocals.getSC().forceAnonymous();

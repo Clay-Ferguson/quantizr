@@ -49,7 +49,6 @@ export class SearchUsersDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         const desc = "User " + SearchUsersDlg.defaultSearchText;
