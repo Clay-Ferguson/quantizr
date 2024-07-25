@@ -225,8 +225,9 @@ public class NodeSearchService extends ServiceBase {
         Val<Iterable<SubNode>> accountNodes = new Val<>();
         // Run this as admin because ordinary users don't have access to account nodes.
         arun.run(as -> {
-            // todo-0: document in admin guide we can search by email using "email:email@address"
+            // todo-1: document in admin guide we can search by email using "email:name@address"
             if (req.getSearchText().startsWith("email:")) {
+                auth.requireAdmin(ms);
                 String email = req.getSearchText().substring(6);
                 accountNodes.setVal(read.getAccountNodes(as, Criteria.where("p." + NodeProp.EMAIL.s()).is(email), null, //
                         ConstantInt.ROWS_PER_PAGE.val(), //

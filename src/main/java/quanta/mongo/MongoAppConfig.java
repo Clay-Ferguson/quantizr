@@ -79,7 +79,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         return factory;
     }
 
-    // todo-0: after the massive transaction refactor, we should recheck that rollbacks can work in mongodb stuff.
     @Bean(name = "mongoTm")
     CustomMongoTransactionManager mongoTm(MongoDatabaseFactory dbFactory) {
         return new CustomMongoTransactionManager(dbFactory);

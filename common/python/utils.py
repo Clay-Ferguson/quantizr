@@ -96,6 +96,8 @@ class Utils:
         #     pattern += "$"
         return re.search(pattern, line) is not None
 
+    # NOTE: This method is only called from Streamlit code, because the Streamlist app uses the same messages array for GUI rendering
+    # that it used to send to the LangChain API, and so it potentially has content that needs to be cleaned up before rendering on screen.
     @staticmethod
     def sanitize_content(content) -> str:
         """Makes an AI response string presentable on screen."""
@@ -123,14 +125,7 @@ class Utils:
                         #     new_content.append(str(item))
 
         else:
-            for line in content.splitlines():
-                # todo-0: do we still need all these tag handling code here, because I think we changed it
-                #         to only use "tools" to update stuff. However, I'm now realizing if this stuff is sent
-                #         outbound and we're using only the SubNode hierarchy to build future context in the same conversation with
-                #         then that means the context is going to be loosign information. 
-                #         In other words when we inject folder() and block() stuff into the conversation we need to REINJECT
-                #         in the case of running from Quanta Web app, because the messages array is not being persisted.
-                
+            for line in content.splitlines(): 
                 # ENDS
                 if Utils.is_tag_line(line, TAG_FILE_END):
                     started_counter -= 1

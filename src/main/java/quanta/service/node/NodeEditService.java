@@ -711,6 +711,7 @@ public class NodeEditService extends ServiceBase {
             }
         }
         update.saveSession(ms);
+
         res.setMessage(String.valueOf(replacements) + " nodes were updated.");
         return res;
     }

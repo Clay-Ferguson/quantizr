@@ -79,10 +79,15 @@ public class StripeController extends ServiceBase implements ErrorController {
                                 log.error("Bad Stripe Request: No Amount");
                             }
 
+                            // todo-0: This is a critical piece of code and we should probably send an email to the admin, and save an actual FILE 
+                            // in some log folder that contains this payload JSON, and also the fact that the transaction committed successfully, so we need a 
+                            // big try/finally block inside the 'addCreditByEmail' that does all this, so we pass the payload object into that for logging too.
+                            // AND inside this processing we need to apply a "shutdown lock" that will hook into GracefulShutdown of the app just to also be sure
+                            // the app will wait for any of these to commplete before shutting down.
                             String _customerEmail = customerEmail;
                             arun.run(as -> {
                                 BigDecimal dollarsAmount = new BigDecimal(amount).divide(new BigDecimal(100));
-                                // todo-0: I'm getting bad dates from 'getCreated()', so for now we set to null and that makes it use our own time
+                                // todo-1: I'm getting bad dates from 'getCreated()', so for now we set to null and that makes it use our own time
                                 user.addCreditByEmail(as, _customerEmail, dollarsAmount, null); // checkoutSession.getCreated());
                                 return null;
                             });

@@ -117,7 +117,7 @@ class QuantaAgent:
                     llm, tools
                 )
                 initial_message_len = len(messages)
-                response = agent_executor.invoke({"messages": list(messages)})
+                response = agent_executor.invoke({"messages": messages})
                 # print(f"Response: {response}")
                 resp_messages = response["messages"]
                 new_messages = resp_messages[initial_message_len:]
@@ -139,7 +139,7 @@ class QuantaAgent:
                 messages[:] = resp_messages
 
             else:
-                response = llm.invoke(list(messages))
+                response = llm.invoke(messages)
                 self.answer = response.content  # type: ignore
                 messages.append(AIMessage(content=response.content))
 
