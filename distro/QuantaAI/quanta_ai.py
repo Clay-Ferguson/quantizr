@@ -58,7 +58,7 @@ def index() -> str:
 def api_query(req: AIRequest,
               api_key: Optional[str] = Header(None, alias="X-api-key")
     ) -> AIResponse:
-    try:
+    try:        
         # for now we'll max out at 100k tokens allowed
         if (req.maxTokens > 100000): 
             req.maxTokens = 100000
@@ -94,8 +94,7 @@ def api_query(req: AIRequest,
             answer = messages[-1].content
         else:
             messages = buildMessages(req)
-            # todo-0: isn't messages already 'list' why wrap in list() here?
-            response = llm.invoke(list(messages))
+            response = llm.invoke(messages)
             answer = response.content
 
         # Estimate output tokens
