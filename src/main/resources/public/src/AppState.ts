@@ -123,6 +123,7 @@ export class AppState {
         maxUploadFileSize: 0,
         mainPanelCols: 6,
         aiService: J.AIModels.OPENAI,
+        aiAgentFileExtensions: "txt,md,html,htm,java,js,css,ts,tsx,py,sh,sql,json,yaml,yml,xml,properties,ini,conf,config,env,log,mdx,jsx,tsx,graphql,mdx,md,markdown",
     };
 
     exportSettings: ExportSettings = {

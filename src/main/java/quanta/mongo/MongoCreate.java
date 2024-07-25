@@ -19,6 +19,7 @@ import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
+import quanta.model.UserPreferences;
 import quanta.model.client.AIModels;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -300,12 +301,14 @@ public class MongoCreate extends ServiceBase {
             if (svc != null) {
                 // First scan up the tree to see if we have a svc on the tree and if so use it instead.
                 SystemConfig system = new SystemConfig();
+                UserPreferences userPrefs = ThreadLocals.getSC().getUserPreferences();
+                system.setFileExtensions(userPrefs.getAiAgentFileExtensions());
                 aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
                 if (system.getService() != null) {
                     svc = AIModels.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-                aiResponse = ai.getAnswer(ms, parentNode, null, null, svc.getModel(), svc.getService(), userCredit);
+                aiResponse = ai.getAnswer(ms, req.isAgentic(), parentNode, null, system, svc.getModel(), svc.getService(), userCredit);
 
                 if (svc.getService() == "gemini") {
                     throw new RuntimeException("Gemini AI is temporarily unavailable.");

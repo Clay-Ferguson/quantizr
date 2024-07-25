@@ -49,6 +49,7 @@ class AIRequest(BaseModel):
     maxTokens: int
     credit: float
     codingAgent: bool
+    agentFileExtensions: Optional[str]
 
 @app.get("/")
 def index() -> str:
@@ -77,8 +78,10 @@ def api_query(req: AIRequest,
         answer: str = ""
         response: BaseMessage = None
         if req.codingAgent:
+             # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
+            ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
+
             messages = buildContext(req)
-            ext_set: Set[str] = {".java", ".py", ".sql", ".html", ".htm", ".js", ".ts", ".css"} # todo-0: need to pass thru API
             agent = QuantaAgent()
             agent.run(
                 req.service,
@@ -86,9 +89,10 @@ def api_query(req: AIRequest,
                 "",
                 messages,
                 req.prompt,
+                # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
                 "/data",
-                100000, # todo-0: configure server wide
+                1000000, # todo-0: configure server wide
                 ext_set,
                 llm)
             answer = messages[-1].content

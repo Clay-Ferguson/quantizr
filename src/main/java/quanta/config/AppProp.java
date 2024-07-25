@@ -197,6 +197,10 @@ public class AppProp {
         return "true".equals(env.getProperty("rssPreCacheEnabled"));
     }
 
+    public boolean getAiAgentEnabled() {
+        return "true".equals(env.getProperty("aiAgentEnabled"));
+    }
+
     public String getAdminDataFolder() {
         return getPathProperty("adminDataFolder");
     }

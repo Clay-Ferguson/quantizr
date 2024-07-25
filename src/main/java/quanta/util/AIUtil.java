@@ -241,7 +241,7 @@ public class AIUtil extends ServiceBase {
         if (svc.getService() == "gemini") {
             throw new RuntimeException("Gemini AI is temporarily unavailable.");
         }
-        aiResponse = ai.getAnswer(ms, null, sb.toString(), system, svc.getModel(), svc.getService(), userCredit);
+        aiResponse = ai.getAnswer(ms, false, null, sb.toString(), system, svc.getModel(), svc.getService(), userCredit);
 
         if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
@@ -382,7 +382,7 @@ public class AIUtil extends ServiceBase {
             if (svc.getService() == "gemini") {
                 throw new RuntimeException("Gemini AI is temporarily unavailable.");
             }
-            aiResponse = ai.getAnswer(ms, null, prompt, null, svc.getModel(), svc.getService(), userCredit);
+            aiResponse = ai.getAnswer(ms, false, null, prompt, null, svc.getModel(), svc.getService(), userCredit);
             res.setGptCredit(userCredit.getVal());
         }
         String answer = aiResponse.getContent();

@@ -8,12 +8,17 @@ import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
+import { TextField } from "../comp/core/TextField";
 import { TabIntf } from "../intf/TabIntf";
+import { Validator } from "../Validator";
 
 export class AISettingsView extends AppTab<any, AISettingsView> {
+    fileExtState: Validator = new Validator("");
+
     constructor(data: TabIntf<any, AISettingsView>) {
         super(data);
         data.inst = this;
+        this.fileExtState.setValue(getAs().userPrefs.aiAgentFileExtensions);
     }
 
     sectionTitle(title: string): Heading {
@@ -49,11 +54,27 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         S.quanta.config.paymentLink ?
                             new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
                     ])
-
                 ], horzClass) : null,
+
+                ast.isAdminUser && S.quanta.config.aiAgentEnabled ? //
+                    new Div("AI Agent Configuration", {
+                        className: "settingsSectionTitle alert alert-primary"
+                    }) : null,
+                ast.isAdminUser && S.quanta.config.aiAgentEnabled ? new Div(null, {
+                    className: "bigMarginRight"
+                }, [
+                    new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
+                    new Button("Save", this.save, {className: "marginTop"})
+                ]) : null,
             ])
         ]);
         return true;
+    }
+
+    save = async () => {
+        await S.util.saveUserPrefs(s => s.userPrefs.aiAgentFileExtensions = this.fileExtState.getValue());
+        // flash confirmation message
+        S.util.flashMessage("Saved settings", "Note");
     }
 
     settingsLink = (name: string, onClick: () => void, moreClasses: string = ""): Div => {

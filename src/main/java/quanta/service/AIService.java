@@ -36,7 +36,7 @@ public class AIService extends ServiceBase {
     DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
-    public AIResponse getAnswer(MongoSession ms, SubNode node, String question, SystemConfig system, String model,
+    public AIResponse getAnswer(MongoSession ms, boolean agentic, SubNode node, String question, SystemConfig system, String model,
             String service, Val<BigDecimal> userCredit) {
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
@@ -66,7 +66,7 @@ public class AIService extends ServiceBase {
             input = question;
         }
 
-        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 2000;
+        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 4000;
         system.setModel(model);
         aiUtil.ensureDefaults(system);
         String apiKey = getApiKey(service);
@@ -85,7 +85,12 @@ public class AIService extends ServiceBase {
         request.setTemperature(0.7f);
         request.setMaxTokens(maxTokens);
         request.setCredit(balance.floatValue());
-        request.setCodingAgent(false); // todo-0: make the gui control this
+        request.setCodingAgent(agentic);
+        request.setAgentFileExtensions(system.getFileExtensions());
+
+        if (!prop.getAiAgentEnabled()) {
+            throw new RuntimeException("AI Agent is disabled.");
+        }
 
         log.debug("AI Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
         AIResponse aiRes = null;

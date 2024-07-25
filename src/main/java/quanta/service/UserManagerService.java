@@ -639,6 +639,7 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, reqUserPrefs.isRssHeadlinesOnly());
             prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
             prefsNode.set(NodeProp.USER_PREF_AI_SERVICE, reqUserPrefs.getAiService());
+            prefsNode.set(NodeProp.USER_PREF_AI_FILE_EXTENSIONS, reqUserPrefs.getAiAgentFileExtensions());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
@@ -647,6 +648,7 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
             userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
             userPrefs.setAiService(reqUserPrefs.getAiService());
+            userPrefs.setAiAgentFileExtensions(reqUserPrefs.getAiAgentFileExtensions());
             return null;
         });
         return res;
@@ -918,6 +920,13 @@ public class UserManagerService extends ServiceBase {
                 aiService = AIModels.OPENAI.s();
             }
             userPrefs.setAiService(aiService);
+
+            String aiAgentFileExtensions = prefsNode.getStr(NodeProp.USER_PREF_AI_FILE_EXTENSIONS);
+            if (StringUtils.isEmpty(aiAgentFileExtensions)) {
+                aiAgentFileExtensions = "txt,md,html,java,js,ts,css,py,sh,xml,json";
+            }
+            userPrefs.setAiAgentFileExtensions(aiAgentFileExtensions);
+            
             return null;
         });
         return userPrefs;

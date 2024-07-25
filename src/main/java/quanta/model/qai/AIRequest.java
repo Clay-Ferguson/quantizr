@@ -11,6 +11,7 @@ public class AIRequest {
     private Float temperature;
     private Integer maxTokens;
     private Boolean codingAgent;
+    private String agentFileExtensions;
 
     // how much user has left in their account
     private Float credit;
@@ -85,5 +86,13 @@ public class AIRequest {
 
     public void setCodingAgent(Boolean codingAgent) {
         this.codingAgent = codingAgent;
+    }
+
+    public String getAgentFileExtensions() {
+        return agentFileExtensions;
+    }
+
+    public void setAgentFileExtensions(String agentFileExtensions) {
+        this.agentFileExtensions = agentFileExtensions;
     }
 }

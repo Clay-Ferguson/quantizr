@@ -38,6 +38,7 @@ export interface ClientConfig {
     search: string;
     login: string;
     paymentLink: string;
+    aiAgentEnabled: boolean;
 }
 
 export interface NodeLink {
@@ -132,6 +133,7 @@ export interface SystemConfig {
     service: string;
     maxWords: number;
     temperature: number;
+    fileExtensions: string;
 }
 
 export interface AddCreditRequest extends RequestBase {
@@ -188,6 +190,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     typeName: string;
     createAtTop: boolean;
     aiService: string;
+    agentic: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
     shareToUserId: string;
@@ -1040,6 +1043,7 @@ export interface UserPreferences {
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
     aiService: string;
+    aiAgentFileExtensions: string;
     maxUploadFileSize: number;
 }
 
@@ -1133,6 +1137,7 @@ export const enum NodeProp {
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
     USER_PREF_MAIN_PANEL_COLS = "sn:mainPanelCols",
     USER_PREF_AI_SERVICE = "sn:aiService",
+    USER_PREF_AI_FILE_EXTENSIONS = "sn:aiAgentFileExtensions",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",

@@ -18,6 +18,7 @@ public class UserPreferences {
     // valid Range = 4 thru 8, inclusive.
     private long mainPanelCols = 6;
     private String aiService;
+    private String aiAgentFileExtensions;
 
     @JsonProperty(required = false)
     private long maxUploadFileSize;
@@ -96,6 +97,14 @@ public class UserPreferences {
 
     public void setRssHeadlinesOnly(final boolean rssHeadlinesOnly) {
         this.rssHeadlinesOnly = rssHeadlinesOnly;
+    }
+
+    public String getAiAgentFileExtensions() {
+        return aiAgentFileExtensions;
+    }
+
+    public void setAiAgentFileExtensions(String aiAgentFileExtensions) {
+        this.aiAgentFileExtensions = aiAgentFileExtensions;
     }
 
     public UserPreferences() {}

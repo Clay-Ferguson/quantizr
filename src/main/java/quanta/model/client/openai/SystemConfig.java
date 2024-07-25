@@ -7,6 +7,7 @@ public class SystemConfig {
     private String service;
     private Integer maxWords;
     private Double temperature;
+    private String fileExtensions;
 
     public String getPrompt() {
         return prompt;
@@ -54,5 +55,13 @@ public class SystemConfig {
 
     public void setMaxWords(Integer maxWords) {
         this.maxWords = maxWords;
+    }
+
+    public String getFileExtensions() {
+        return fileExtensions;
+    }
+
+    public void setFileExtensions(String fileExtensions) {
+        this.fileExtensions = fileExtensions;
     }
 }

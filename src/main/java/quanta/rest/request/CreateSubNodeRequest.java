@@ -18,14 +18,7 @@ public class CreateSubNodeRequest extends RequestBase {
     // as a child. The string value determines the type of AI that will be asked to (OpenAI or
     // Perplexity, etc)
     private String aiService;
-
-    public String getAiService() {
-        return aiService;
-    }
-
-    public void setAiService(String aiService) {
-        this.aiService = aiService;
-    }
+    private boolean agentic;
 
     /* Adds TYPE_LOCK property which prevents user from being able to change the type on the node */
     private boolean typeLock;
@@ -119,6 +112,22 @@ public class CreateSubNodeRequest extends RequestBase {
 
     public void setPayloadType(@Nullable final String payloadType) {
         this.payloadType = payloadType;
+    }
+
+    public String getAiService() {
+        return aiService;
+    }
+
+    public void setAiService(String aiService) {
+        this.aiService = aiService;
+    }
+
+    public boolean isAgentic() {
+        return agentic;
+    }
+
+    public void setAgentic(boolean agentic) {
+        this.agentic = agentic;
     }
 
     public CreateSubNodeRequest() {}

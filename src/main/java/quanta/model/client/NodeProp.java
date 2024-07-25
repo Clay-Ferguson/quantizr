@@ -33,6 +33,7 @@ public enum NodeProp {
     USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly"), //
     USER_PREF_MAIN_PANEL_COLS("sn:mainPanelCols"), //
     USER_PREF_AI_SERVICE("sn:aiService"), //
+    USER_PREF_AI_FILE_EXTENSIONS("sn:aiAgentFileExtensions"), //
     SIGNUP_PENDING("sn:signupPending"), //
 
     EMAIL_CONTENT("sn:content"), //

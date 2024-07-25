@@ -241,6 +241,7 @@ export class Edit {
                     pendingEdit: false,
                     nodeId: parentId,
                     aiService: null,
+                    agentic: false,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     createAtTop,
@@ -279,6 +280,7 @@ export class Edit {
                     pendingEdit: true,
                     nodeId: parentId,
                     aiService: null,
+                    agentic: false,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     createAtTop,
@@ -1072,7 +1074,7 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
-    askAiQuestion = async (nodeId: string) => {
+    askAiQuestion = async (nodeId: string, agentic: boolean) => {
         const aiService = getAs().userPrefs.aiService;
         if (!aiService || aiService === J.AIModels.NONE) {
             S.util.showMessage("You must select an AI Service. Go to `Menu -> Account -> Settings -> AI Service`", "Warning");
@@ -1083,6 +1085,7 @@ export class Edit {
             pendingEdit: false,
             nodeId,
             aiService: getAs().userPrefs.aiService, // openAi, pplxAi, geminiAi
+            agentic,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1176,6 +1179,7 @@ export class Edit {
             pendingEdit: false,
             nodeId: parentId,
             aiService: null,
+            agentic: false,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1242,6 +1246,7 @@ export class Edit {
             pendingEdit: true,
             nodeId: null,
             aiService: null,
+            agentic: false,
             newNodeName: "",
             typeName: J.NodeType.BOOKMARK,
             createAtTop: true,
@@ -1287,6 +1292,7 @@ export class Edit {
             pendingEdit: true,
             nodeId,
             aiService: null,
+            agentic: false,
             newNodeName: "",
             typeName: typeName || J.NodeType.NONE,
             createAtTop: true,
@@ -1306,6 +1312,7 @@ export class Edit {
             pendingEdit,
             nodeId: node ? node.id : null,
             aiService: null,
+            agentic: false,
             newNodeName: "",
             typeName,
             createAtTop: true,
@@ -1334,6 +1341,7 @@ export class Edit {
             pendingEdit: false,
             nodeId: getAs().fullScreenConfig.nodeId,
             aiService: null,
+            agentic: false,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,

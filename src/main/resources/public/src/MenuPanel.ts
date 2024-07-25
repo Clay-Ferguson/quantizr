@@ -373,7 +373,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Configure AI", MenuPanel.configureAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(),
-                new MenuItem("AI Settings", S.nav.showAISettings)
+                new MenuItem("Settings", S.nav.showAISettings)
             ], null));
         }
 

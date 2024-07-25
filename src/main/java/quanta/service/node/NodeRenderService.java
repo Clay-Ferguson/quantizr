@@ -121,6 +121,7 @@ public class NodeRenderService extends ServiceBase {
             config.setUserMsg(user.processSignupCode(signupCode));
         }
 
+        // This is how we send arbitrary configuration information to the browser
         config.setConfig(prop.getConfig());
         config.setBrandingAppName(prop.getConfigText("brandingAppName"));
         config.setPaymentLink(prop.getStripePaymentLink());
@@ -132,6 +133,8 @@ public class NodeRenderService extends ServiceBase {
         config.setSearch(search);
         config.setLogin(login);
         config.setUrlView(view);
+        config.setAiAgentEnabled(prop.getAiAgentEnabled());
+
         attrs.put("g_config", config);
         model.addAllAttributes(attrs);
         return "index";

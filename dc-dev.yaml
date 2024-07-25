@@ -251,6 +251,7 @@ services:
             GEMINI_API_KEY: "${GEMINI_API_KEY}"
             mongoSecurity: "true"
             rssPreCacheEnabled: "false"
+            aiAgentEnabled: "true"
 
             # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
             # requireCrypto: "true"
@@ -328,9 +329,9 @@ services:
         ports:
             - '${QAI_PORT}:${QAI_PORT}'
         volumes:
+            # todo-1: make these two folders visible in Agent Config panel of app (but read-only)
             - /home/clay/ferguson/Quantizr/QuantaAgent/test_project:/projects
             - /home/clay/ferguson/Quantizr/QuantaAgent/data:/data
-
 
 networks:
     bridge:
