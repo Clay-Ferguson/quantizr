@@ -61,6 +61,8 @@ export class MenuPanel extends Div {
 
     static showBlockedUsers = () => { new BlockedUsersDlg("Blocked").open(); }
     static toggleEditMode = () => { S.edit.setEditMode(!getAs().userPrefs.editMode); }
+    static toggleAiWritingMode = () => { S.edit.setAiWritingMode(!getAs().userPrefs.aiWritingMode); }
+    static toggleAiAgentMode = () => { S.edit.setAiAgentMode(!getAs().userPrefs.aiAgentMode); }
     static toggleInfoMode = () => { S.edit.setShowMetaData(!getAs().userPrefs.showMetaData); }
     static userProfile = () => { new UserProfileDlg(null).open(); }
     static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
@@ -181,6 +183,10 @@ export class MenuPanel extends Div {
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
                 () => getAs().userPrefs.editMode, false, "ui-menu-options-editmode"),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
+            ast.isAnonUser ? null : new MenuItem("AI Writing Mode", MenuPanel.toggleAiWritingMode, allowEditMode && !fullScreenViewer, //
+                () => getAs().userPrefs.aiWritingMode, false, "ui-menu-options-editmode"),
+            ast.isAnonUser ? null : new MenuItem("AI Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
+                    () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),
         ], null, null, "ui-menu-options"));
 
         const bookmarkItems = [];

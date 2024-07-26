@@ -13,6 +13,7 @@ public class CreateSubNodeRequest extends RequestBase {
     private String newNodeName;
     private String typeName;
     private boolean createAtTop;
+    private boolean isAiWritingMode;
 
     // If this is non-null it means we're asking a question on the parent, and the answer will come in
     // as a child. The string value determines the type of AI that will be asked to (OpenAI or
@@ -130,5 +131,13 @@ public class CreateSubNodeRequest extends RequestBase {
         this.agentic = agentic;
     }
 
+    public boolean isAiWritingMode() {
+        return isAiWritingMode;
+    }
+
+    public void setAiWritingMode(boolean aiWritingMode) {
+        isAiWritingMode = aiWritingMode;
+    }
+    
     public CreateSubNodeRequest() {}
 }

@@ -22,6 +22,7 @@ public class InsertNodeRequest extends RequestBase {
 	private String newNodeName;
 	private String typeName;
 	private String initialValue;
+	private boolean aiWritingMode;
 
 	public boolean isPendingEdit() {
 		return this.pendingEdit;
@@ -77,6 +78,14 @@ public class InsertNodeRequest extends RequestBase {
 
 	public void setInitialValue(final String initialValue) {
 		this.initialValue = initialValue;
+	}
+
+	public boolean isAiWritingMode() {
+		return aiWritingMode;
+	}
+
+	public void setAiWritingMode(boolean aiWritingMode) {
+		this.aiWritingMode = aiWritingMode;
 	}
 
 	public InsertNodeRequest() {}

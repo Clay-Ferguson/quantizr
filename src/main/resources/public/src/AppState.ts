@@ -115,6 +115,8 @@ export class AppState {
 
     userPrefs: J.UserPreferences = {
         editMode: false,
+        aiWritingMode: false,
+        aiAgentMode: false,
         showMetaData: false,
         showProps: false,
         autoRefreshFeed: false, // #add-prop

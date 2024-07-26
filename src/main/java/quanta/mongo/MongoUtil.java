@@ -775,6 +775,8 @@ public class MongoUtil extends ServiceBase {
         userNode.set(NodeProp.EMAIL, email);
         userNode.set(NodeProp.PWD_HASH, getHashOfPassword(password));
         userNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
+        userNode.set(NodeProp.USER_PREF_AI_WRITING_MODE, false);
+        userNode.set(NodeProp.USER_PREF_AI_AGENT_MODE, false);
         userNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
         userNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
         userNode.set(NodeProp.BIN_TOTAL, 0);
@@ -815,6 +817,8 @@ public class MongoUtil extends ServiceBase {
                     snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(), true, null, null);
             adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
             adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
+            adminNode.set(NodeProp.USER_PREF_AI_WRITING_MODE, false);
+            adminNode.set(NodeProp.USER_PREF_AI_AGENT_MODE, false);
             adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
             adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
             update.save(ms, adminNode);

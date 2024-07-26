@@ -228,7 +228,8 @@ export class Edit {
                     targetOrdinal: insertAtLoc.ordinal + ordinalOffset,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
-                    initialValue: clipboardText
+                    initialValue: clipboardText,
+                    aiWritingMode: false
                 });
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 if (blob) {
@@ -250,6 +251,7 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     payloadType: null,
+                    aiWritingMode: getAs().userPrefs.aiWritingMode
                 });
 
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -271,7 +273,8 @@ export class Edit {
                     targetOrdinal: insertAtLoc.ordinal + ordinalOffset,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
-                    initialValue: ""
+                    initialValue: "",
+                    aiWritingMode: getAs().userPrefs.aiWritingMode
                 });
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 this.insertNodeResponse(res);
@@ -289,6 +292,7 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     payloadType: null,
+                    aiWritingMode: getAs().userPrefs.aiWritingMode
                 });
 
                 if (threadViewAiQuestion) {
@@ -612,6 +616,24 @@ export class Edit {
 
     setEditMode = async (val: boolean) => {
         this.setUserPreferenceVal(s => s.userPrefs.editMode = val);
+    }
+
+    setAiWritingMode = async (val: boolean) => {
+        this.setUserPreferenceVal(s => {
+            s.userPrefs.aiWritingMode = val;
+            if (val) {
+                s.userPrefs.aiAgentMode = false;
+            }
+        });
+    }
+
+    setAiAgentMode = async (val: boolean) => {
+        this.setUserPreferenceVal(s => {
+            s.userPrefs.aiAgentMode = val;
+            if (val) {
+                s.userPrefs.aiWritingMode = false;
+            }
+        });
     }
 
     toggleEditMode = async () => {
@@ -1093,7 +1115,8 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            payloadType: null
+            payloadType: null,
+            aiWritingMode: false
         });
 
         if (res.code == C.RESPONSE_CODE_OK) {
@@ -1187,7 +1210,8 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId: null,
-            payloadType: null
+            payloadType: null,
+            aiWritingMode: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
@@ -1255,6 +1279,7 @@ export class Edit {
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
+            aiWritingMode: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
@@ -1300,7 +1325,8 @@ export class Edit {
             typeLock: false,
             properties: null,
             shareToUserId,
-            payloadType: null
+            payloadType: null,
+            aiWritingMode: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
@@ -1321,6 +1347,7 @@ export class Edit {
             properties: null,
             payloadType: null,
             shareToUserId: null,
+            aiWritingMode: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
@@ -1349,7 +1376,8 @@ export class Edit {
             typeLock: true,
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
-            payloadType: null
+            payloadType: null,
+            aiWritingMode: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);

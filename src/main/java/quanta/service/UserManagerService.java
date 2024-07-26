@@ -497,6 +497,8 @@ public class UserManagerService extends ServiceBase {
 
     public void setDefaultUserPreferences(SubNode prefsNode) {
         prefsNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
+        prefsNode.set(NodeProp.USER_PREF_AI_WRITING_MODE, false);
+        prefsNode.set(NodeProp.USER_PREF_AI_AGENT_MODE, false);
         prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY, true);
     }
 
@@ -630,8 +632,16 @@ public class UserManagerService extends ServiceBase {
             if (!ThreadLocals.getSC().getUserName().equals(prefsNode.getStr(NodeProp.USER))) {
                 throw new RuntimeException("Not your node.");
             }
+
+            // AI Modes are mutually exclusive
+            if (reqUserPrefs.isAiWritingMode() && reqUserPrefs.isAiAgentMode()) {
+                throw new RuntimeException("AI Writing Mode and AI Agent Mode are mutually exclusive.");
+            }
+
             // Assign preferences as properties on this node,
             prefsNode.set(NodeProp.USER_PREF_EDIT_MODE, reqUserPrefs.isEditMode());
+            prefsNode.set(NodeProp.USER_PREF_AI_WRITING_MODE, reqUserPrefs.isAiWritingMode());
+            prefsNode.set(NodeProp.USER_PREF_AI_AGENT_MODE, reqUserPrefs.isAiAgentMode());
             prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA, reqUserPrefs.isShowMetaData());
             prefsNode.set(NodeProp.USER_PREF_SHOW_PROPS, reqUserPrefs.isShowProps());
             prefsNode.set(NodeProp.USER_PREF_AUTO_REFRESH_FEED, reqUserPrefs.isAutoRefreshFeed()); // #add-prop
@@ -642,6 +652,8 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_AI_FILE_EXTENSIONS, reqUserPrefs.getAiAgentFileExtensions());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
+            userPrefs.setAiWritingMode(reqUserPrefs.isAiWritingMode());
+            userPrefs.setAiAgentMode(reqUserPrefs.isAiAgentMode());
             userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
             userPrefs.setShowProps(reqUserPrefs.isShowProps());
             userPrefs.setShowReplies(reqUserPrefs.isShowReplies());
@@ -899,6 +911,8 @@ public class UserManagerService extends ServiceBase {
                 prefsNode = read.getAccountByUserName(as, userName, false);
             }
             userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
+            userPrefs.setAiWritingMode(prefsNode.getBool(NodeProp.USER_PREF_AI_WRITING_MODE));
+            userPrefs.setAiAgentMode(prefsNode.getBool(NodeProp.USER_PREF_AI_AGENT_MODE));
             userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
             userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
             userPrefs.setAutoRefreshFeed(prefsNode.getBool(NodeProp.USER_PREF_AUTO_REFRESH_FEED)); // #add-prop

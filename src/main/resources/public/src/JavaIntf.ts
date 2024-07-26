@@ -195,6 +195,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     properties: PropertyInfo[];
     shareToUserId: string;
     payloadType: string;
+    aiWritingMode: boolean;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {
@@ -353,6 +354,7 @@ export interface InsertNodeRequest extends RequestBase {
     newNodeName: string;
     typeName: string;
     initialValue: string;
+    aiWritingMode: boolean;
 }
 
 export interface JoinNodesRequest extends RequestBase {
@@ -1036,6 +1038,8 @@ export interface NodeInfo {
 
 export interface UserPreferences {
     editMode: boolean;
+    aiWritingMode: boolean;
+    aiAgentMode: boolean;
     showMetaData: boolean;
     showProps: boolean;
     autoRefreshFeed: boolean;
@@ -1129,6 +1133,8 @@ export const enum NodeProp {
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
     USER_PREF_PUBLIC_SIG_KEY = "sn:publicSigKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
+    USER_PREF_AI_WRITING_MODE = "sn:aiWritingMode",
+    USER_PREF_AI_AGENT_MODE = "sn:aiAgentMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
     USER_PREF_SHOW_PROPS = "sn:showProps",
     USER_PREF_AUTO_REFRESH_FEED = "sn:autoRefreshFeed",

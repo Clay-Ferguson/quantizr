@@ -715,7 +715,7 @@ export class EditNodeDlg extends DialogBase {
         }, true);
     }
 
-    askAI = async (agentic: boolean) => {
+    askAI = async () => {
         if (!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, getAs().editNode) && getAs().editNode.content) {
             const dlg = new ConfirmDlg("This node has the 'overwrite' AI options set. Are you sure you want to overwrite the current node content?", "Overwrite Node Content",
                 "btn-danger", "alert alert-danger");
@@ -731,6 +731,8 @@ export class EditNodeDlg extends DialogBase {
         if (savedOk) {
             this.close();
         }
+
+        const agentic = getAs().userPrefs.aiAgentMode;
         S.edit.askAiQuestion(getAs().editNode.id, agentic);
     }
 
@@ -798,16 +800,10 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
             ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask AI", {
-                onClick: () => this.askAI(false),
+                onClick: this.askAI,
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService
             }) : null,
 
-            // Currently the "Agent AI" is only available to Admin users, because it relies on having a configuration which points a docker
-            // volume share to a local file system directory, and this is not used on cloud deployments of Quanta
-            S.quanta.config.aiAgentEnabled && ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask Agent", {
-                onClick: () => this.askAI(true),
-                title: "Query AI Agent, using this Node as the Question.\n\n" + activeAiService
-            }) : null,
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary"),
         ]);

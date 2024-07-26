@@ -400,7 +400,11 @@ public class MongoCreate extends ServiceBase {
             parentPlugin.childCreated(ms, new Val<>(parentNode), new Val<>(newNode));
         }
         setDefaultTags(ms, parentNode, newNode);
-        if (aiUtil.hasBookTags(parentNode)) {
+        if (req.isAiWritingMode()) {
+            newNode.set(NodeProp.AI_OVERWRITE, true);
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
+        }
+        else if (aiUtil.hasBookTags(parentNode)) {
             newNode.set(NodeProp.AI_OVERWRITE, true);
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
         }
@@ -516,7 +520,11 @@ public class MongoCreate extends ServiceBase {
         }
 
         setDefaultTags(ms, parentNode, newNode);
-        if (aiUtil.hasBookTags(parentNode)) {
+        if (req.isAiWritingMode()) {
+            newNode.set(NodeProp.AI_OVERWRITE, true);
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
+        }
+        else if (aiUtil.hasBookTags(parentNode)) {
             newNode.set(NodeProp.AI_OVERWRITE, true);
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
         }
