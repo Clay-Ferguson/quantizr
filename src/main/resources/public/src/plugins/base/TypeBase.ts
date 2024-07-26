@@ -30,9 +30,9 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
-    getAutoExpandProps(): boolean {
-        // by default only expand props if this is a schema.org type.
-        return !!this.schemaOrg;
+    getAutoExpandProps(node: NodeInfo): boolean {
+        // by default only expand props if this is a schema.org type, or if there's a query template, so the user can see the template used to generate content
+        return !!this.schemaOrg || !!S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node)
     }
 
     getAllowUserSelect(): boolean {
@@ -43,9 +43,13 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
-    getEditLabelForProp(propName: string): string {
+    getEditLabelForProp(node: NodeInfo, propName: string): string {
         if (propName === J.NodeProp.AI_QUERY_TEMPLATE) {
-            return "AI Query Template";
+            let ret = "AI Query";
+            if (!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, node)) {
+                ret += " (Answer overwrites Content)";
+            }
+            return ret;
         }
         else if (propName === J.NodeProp.DATE) {
             return I.DomainType.Date;
@@ -360,9 +364,9 @@ export class TypeBase implements TypeIntf {
             // If this node has tags render them below the content (if we have edit mode or info turned on)
             if (node.tags && S.util.showMetaData(ast, node)) {
                 return new Div(null, attrs, [
+                    aiConfigDiv,
                     comp,
                     choices,
-                    aiConfigDiv,
                     S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
                     footerComp,
                     new Clearfix(),
@@ -370,7 +374,7 @@ export class TypeBase implements TypeIntf {
             }
             // otherwise just return the content component itself.
             else {
-                return new Div(null, attrs, [comp, aiConfigDiv, choices, footerComp, new Clearfix()]);
+                return new Div(null, attrs, [aiConfigDiv, comp, choices, footerComp, new Clearfix()]);
             }
         }
     }

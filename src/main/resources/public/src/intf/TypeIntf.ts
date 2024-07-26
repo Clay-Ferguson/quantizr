@@ -15,7 +15,7 @@ export interface TypeIntf {
     allowAction(action: NodeActionType, node: NodeInfo): boolean;
     allowDeleteProperty(prop: string): boolean;
     getAllowRowHeader(): boolean;
-    getAutoExpandProps(): boolean;
+    getAutoExpandProps(node: NodeInfo): boolean;
     allowPropertyEdit(typeName: string): boolean;
     domPreUpdateFunction(parent: Comp): void;
 
@@ -25,7 +25,7 @@ export interface TypeIntf {
     ensureDefaultProperties(node: NodeInfo): void;
     getAllowPropertyAdd(): boolean;
     getAllowContentEdit(): boolean;
-    getEditLabelForProp(propName: string): string;
+    getEditLabelForProp(node: NodeInfo, propName: string): string;
     getEditorRowsForProp(propName: string): number;
     getAllowUserSelect(): boolean;
     hasCustomProp(prop: string): boolean;

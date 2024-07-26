@@ -20,7 +20,7 @@ export class PropDisplayLayout extends Div {
 
                 const propConfig = type.getPropConfig(prop.name);
                 const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
-                const label = propConfig?.label || (type ? type.getEditLabelForProp(prop.name) : prop.name);
+                const label = propConfig?.label || (type ? type.getEditLabelForProp(this.node, prop.name) : prop.name);
                 const comment = type.getSchemaOrgPropComment(prop.name);
                 const w: number = propConfig?.width || 100;
                 const widthStr = "" + w + "%";

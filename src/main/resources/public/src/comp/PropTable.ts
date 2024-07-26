@@ -18,7 +18,7 @@ export class PropTable extends Comp {
         if (this.node.properties) {
             this.node.properties.forEach(prop => {
                 const propConfig = type.getPropConfig(prop.name);
-                const label = propConfig?.label || (type ? type.getEditLabelForProp(prop.name) : prop.name);
+                const label = propConfig?.label || (type ? type.getEditLabelForProp(this.node, prop.name) : prop.name);
                 const comment = type.getSchemaOrgPropComment(prop.name);
                 const propType = type.getType(prop.name);
                 const displayVal = S.util.formatProperty(prop.value, propType);

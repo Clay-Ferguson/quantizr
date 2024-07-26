@@ -16,7 +16,7 @@ export class RssType extends TypeBase {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
     }
 
-    override getEditLabelForProp(propName: string): string {
+    override getEditLabelForProp(_node: NodeInfo, propName: string): string {
         if (propName === J.NodeProp.RSS_FEED_SRC) {
             return "RSS Feed URLs (one per line)";
         }
@@ -44,7 +44,7 @@ export class RssType extends TypeBase {
         };
     }
 
-    override getAutoExpandProps(): boolean {
+    override getAutoExpandProps(_node: NodeInfo): boolean {
         return true;
     }
 

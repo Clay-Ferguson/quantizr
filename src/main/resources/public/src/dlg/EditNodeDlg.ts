@@ -275,7 +275,7 @@ export class EditNodeDlg extends DialogBase {
             editorOpts = type.getEditorOptions();
             customProps = type.getCustomProperties();
             type.ensureDefaultProperties(ast.editNode);
-            autoExpandProps = type.getAutoExpandProps();
+            autoExpandProps = type.getAutoExpandProps(ast.editNode);
         }
 
         const allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
@@ -872,7 +872,7 @@ export class EditNodeDlg extends DialogBase {
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const editItems: any[] = [];
-        const label = propConfig?.label || (type ? type.getEditLabelForProp(propEntry.name) : propEntry.name);
+        const label = propConfig?.label || (type ? type.getEditLabelForProp(ast.editNode, propEntry.name) : propEntry.name);
         const propType = type?.getType(propEntry.name);
 
         if (flexPropsEditPanel) {
