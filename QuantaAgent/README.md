@@ -1,8 +1,8 @@
 # About Quanta Agent 
 
-A tool to automate querying AIs (LLMs) about your codebase, which can also automatically refactor your actual project files, from high level human language instructions of what changes you'd like to make. You can ask the tool anything about your project, ask for any kind of refactoring you'd like to do in your project, or even ask the tool to create entirely new projects all on it's own.
+This is a standalone Streamlit app. To run it you only need this folder (QuantaAgent), as well as the `common` folder that's adjacent to it. 
 
-You have the option to use either the **Streamlit-based Web Interface/GUI, or a Command Line** version that reads the prompt from a simple text file.
+A tool to automate querying AIs (LLMs) about your codebase, which can also automatically refactor your actual project files, from high level human language instructions of what changes you'd like to make. You can ask the tool anything about your project, ask for any kind of refactoring you'd like to do in your project, or even ask the tool to create entirely new projects all on it's own.
 
 You're probably a developer if you're even reading this so be sure to check out the [Developer Notes](./docs/developer-notes.md)
 
