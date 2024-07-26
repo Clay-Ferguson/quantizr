@@ -185,7 +185,7 @@ export class MenuPanel extends Div {
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
             ast.isAnonUser ? null : new MenuItem("AI Writing Mode", MenuPanel.toggleAiWritingMode, allowEditMode && !fullScreenViewer, //
                 () => getAs().userPrefs.aiWritingMode, false, "ui-menu-options-editmode"),
-            ast.isAnonUser ? null : new MenuItem("AI Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
+            ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("AI Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
                     () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),
         ], null, null, "ui-menu-options"));
 
