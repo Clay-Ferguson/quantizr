@@ -804,7 +804,7 @@ export class EditNodeDlg extends DialogBase {
 
             // Currently the "Agent AI" is only available to Admin users, because it relies on having a configuration which points a docker
             // volume share to a local file system directory, and this is not used on cloud deployments of Quanta
-            ast.isAdminUser && S.quanta.config.aiAgentEnabled && ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask Agent", {
+            S.quanta.config.aiAgentEnabled && ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask Agent", {
                 onClick: () => this.askAI(true),
                 title: "Query AI Agent, using this Node as the Question.\n\n" + activeAiService
             }) : null,

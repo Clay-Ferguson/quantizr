@@ -58,11 +58,11 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                     ])
                 ], horzClass) : null,
 
-                ast.isAdminUser && S.quanta.config.aiAgentEnabled ? //
+                S.quanta.config.aiAgentEnabled ? //
                     new Div("AI Agent Configuration", {
                         className: "settingsSectionTitle alert alert-primary"
                     }) : null,
-                ast.isAdminUser && S.quanta.config.aiAgentEnabled ? new Div(null, {
+                S.quanta.config.aiAgentEnabled ? new Div(null, {
                     className: "bigMarginRight"
                 }, [
                     new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
