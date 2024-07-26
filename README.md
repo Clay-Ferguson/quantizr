@@ -9,7 +9,7 @@
 Quanta is a new kind of Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
 
 * Wikis & micro-blogging
-* [ChatGPT Question Answering](https://quanta.wiki/n/gpt-ai)
+* [AI Chat & Agents](https://quanta.wiki/n/gpt-ai)
 * Document collaboration and publishing
 * PDF Generation
 * Secure messaging with (E2E Encryption)
@@ -31,11 +31,11 @@ Learn more here: [User Guide and Technical Info](/docs/index.md)
 ## Technology Stack
 
 * Java Language (back end) 
-* Spring Boot 3 FAT Jar with embedded Tomcat (back end)
 * TypeScript, ReactJS, Vite (front end)
-* Bootstrap Styling
+* Spring Boot 3 FAT Jar with embedded Tomcat (back end)
 * MongoDB as primary data store
+* PostgreSQL for financial transaction storage
 * Redis for Session Data
-* ChatGPT (via OpenAI API)
+* Python Microservice using LangChain for AI functions
 * Deployment: Docker Compose (Swarm Mode)
 
