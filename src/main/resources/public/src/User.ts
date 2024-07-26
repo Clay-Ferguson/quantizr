@@ -104,7 +104,15 @@ export class User {
             S.util.showMessage("No payment link configured.");
             return;
         }
-        window.open(S.quanta.config.paymentLink, "_blank");
+
+        const dlg = new ConfirmDlg("### IMPORTANT \n\nOn the payments page, use the email address associated with your Quanta account.\n\n "+
+            "It may take a minute or two for the funds to become available, so refresh your brower to see your new funds, under `Menu -> AI -> Settings`. \n\n##### Proceed to Payments Page?",
+            "Payment Instructions", null, "[markdown]");
+
+        await dlg.open();
+        if (dlg.yes) {
+            window.open(S.quanta.config.paymentLink, "_blank");
+        }
     }
 
     logout = async () => {

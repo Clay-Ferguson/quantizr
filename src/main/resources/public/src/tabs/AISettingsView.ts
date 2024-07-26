@@ -11,6 +11,7 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import { TabIntf } from "../intf/TabIntf";
 import { Validator } from "../Validator";
+import { Span } from "../comp/core/Span";
 
 export class AISettingsView extends AppTab<any, AISettingsView> {
     fileExtState: Validator = new Validator("");
@@ -52,7 +53,8 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                     new Div(null, { className: settingsCol }, [
                         ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
                         S.quanta.config.paymentLink ?
-                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton") : null,
+                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton")
+                           : new Span("paymentLink not configured"),
                     ])
                 ], horzClass) : null,
 
@@ -64,7 +66,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                     className: "bigMarginRight"
                 }, [
                     new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
-                    new Button("Save", this.save, {className: "marginTop"})
+                    new Button("Save", this.save, { className: "marginTop" })
                 ]) : null,
             ])
         ]);
