@@ -182,11 +182,7 @@ export class MenuPanel extends Div {
         children.push(new Menu(C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
                 () => getAs().userPrefs.editMode, false, "ui-menu-options-editmode"),
-            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData),
-            ast.isAnonUser ? null : new MenuItem("AI Writing Mode", MenuPanel.toggleAiWritingMode, allowEditMode && !fullScreenViewer, //
-                () => getAs().userPrefs.aiWritingMode, false, "ui-menu-options-editmode"),
-            ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("AI Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),
+            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData)
         ], null, null, "ui-menu-options"));
 
         const bookmarkItems = [];
@@ -374,11 +370,15 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
-            children.push(new Menu("AI", [
+            children.push(new Menu("AI", [ 
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Configure AI", MenuPanel.configureAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(),
+                ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.toggleAiWritingMode, allowEditMode && !fullScreenViewer, //
+                    () => getAs().userPrefs.aiWritingMode, false, "ui-menu-options-editmode"),
+                ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
+                        () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),      
                 new MenuItem("Settings", S.nav.showAISettings)
             ], null));
         }

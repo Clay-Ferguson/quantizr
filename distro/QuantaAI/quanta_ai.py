@@ -73,7 +73,7 @@ def api_query(req: AIRequest,
         # calculate predicted cost
         cost: float = calculate_cost(input_tokens, req.maxTokens, req.model)
         if (cost > req.credit):
-            return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account.")         
+            return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account, using Menu -> AI -> Settings -> Add Credit")         
 
         answer: str = ""
         response: BaseMessage = None
@@ -82,6 +82,7 @@ def api_query(req: AIRequest,
             ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
 
             messages = buildContext(req)
+            # ext_set: Set[str] = {".java", ".py", ".sql", ".html", ".htm", ".js", ".ts", ".css"} # todo-0: need to pass thru API
             agent = QuantaAgent()
             agent.run(
                 req.service,
