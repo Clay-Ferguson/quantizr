@@ -251,7 +251,8 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     payloadType: null,
-                    aiWritingMode: getAs().userPrefs.aiWritingMode
+                    aiWritingMode: getAs().userPrefs.aiWritingMode,
+                    allowAiOverwrite: false
                 });
 
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -292,7 +293,8 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     payloadType: null,
-                    aiWritingMode: getAs().userPrefs.aiWritingMode
+                    aiWritingMode: getAs().userPrefs.aiWritingMode,
+                    allowAiOverwrite: false
                 });
 
                 if (threadViewAiQuestion) {
@@ -1116,7 +1118,11 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             payloadType: null,
-            aiWritingMode: false
+            aiWritingMode: false,
+
+            // this flag means if the node has an AI template on it, we use that as the prompt and then overwrite content with the anwer
+            // rather than the normal behavior of putting the AI answer in a subnode
+            allowAiOverwrite: true
         });
 
         if (res.code == C.RESPONSE_CODE_OK) {
@@ -1124,14 +1130,15 @@ export class Edit {
             // if we're asking a question from the thread view, we need to append the new node to the thread results
             const ast = getAs();
 
+            const contentOverwrite = !!S.props.getProp(J.NodeProp.AI_QUERY_TEMPLATE, res.newNode);
             // if user is asking a question and we're not on the thread tab, then jump to the thread
             // tab and display it from the hiearcharcy above the answer (thread is being displayed
             // for answer node)
-            if (!res.aiContentOverwrite && ast.activeTab !== C.TAB_THREAD) {
+            if (!contentOverwrite && ast.activeTab !== C.TAB_THREAD) {
                 S.srch.showThread(res.newNode.id);
                 jumpToNode = false;
             }
-            else if (!res.aiContentOverwrite && ast.threadViewQuestionId === nodeId && ast.activeTab == C.TAB_THREAD) {
+            else if (!contentOverwrite && ast.threadViewQuestionId === nodeId && ast.activeTab == C.TAB_THREAD) {
                 dispatch("AppendToThreadResults", s => {
                     const data = ThreadTab.inst;
                     if (!data) return;
@@ -1211,7 +1218,8 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             payloadType: null,
-            aiWritingMode: false
+            aiWritingMode: false,
+            allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
@@ -1279,7 +1287,8 @@ export class Edit {
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
-            aiWritingMode: false
+            aiWritingMode: false,
+            allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
@@ -1326,7 +1335,8 @@ export class Edit {
             properties: null,
             shareToUserId,
             payloadType: null,
-            aiWritingMode: false
+            aiWritingMode: false,
+            allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);
@@ -1347,7 +1357,8 @@ export class Edit {
             properties: null,
             payloadType: null,
             shareToUserId: null,
-            aiWritingMode: false
+            aiWritingMode: false,
+            allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
 
@@ -1377,7 +1388,8 @@ export class Edit {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
             payloadType: null,
-            aiWritingMode: false
+            aiWritingMode: false,
+            allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
         this.createSubNodeResponse(res, null);

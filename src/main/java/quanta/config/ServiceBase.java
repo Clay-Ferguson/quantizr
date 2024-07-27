@@ -237,7 +237,6 @@ public class ServiceBase {
     }
 
     static <T> T getBean(ApplicationContext ctx, Class<T> requiredType) throws BeansException {
-        // log.debug("getBean: " + requiredType.getSimpleName());
         T ret = ctx.getBean(requiredType);
         if (ret instanceof ServiceBase _ret) {
             ServiceBase.postConstructs.add(_ret::postConstruct);

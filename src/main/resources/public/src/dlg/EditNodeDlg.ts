@@ -26,7 +26,6 @@ import { PrincipalName, PropertyInfo } from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
@@ -281,14 +280,7 @@ export class EditNodeDlg extends DialogBase {
         const allowContentEdit: boolean = type ? type.getAllowContentEdit() : true;
         let propEditFieldContainer: Div = null;
 
-        const aiTemplate = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, ast.editNode);
-        let aiTipDiv = null;
-        if (aiTemplate?.indexOf("${bookContext}") != -1 && !!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, ast.editNode)) {
-            aiTipDiv = new Div("To generate content, click `Ask AI` and content will be created based on the Chapter, Section, etc. For more control over what 'Ask AI' generates, click 'Show Properties' below, and provide specific instructions to the AI.", { className: "alert alert-info" });
-        }
-
         const children = [
-            aiTipDiv,
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Div(null, null, [
                 new Div(null, {
@@ -716,15 +708,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     askAI = async () => {
-        if (!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, getAs().editNode) && getAs().editNode.content) {
-            const dlg = new ConfirmDlg("This node has the 'overwrite' AI options set. Are you sure you want to overwrite the current node content?", "Overwrite Node Content",
-                "btn-danger", "alert alert-danger");
-            await dlg.open();
-            if (!dlg.yes) {
-                return;
-            }
-        }
-
         // it's important to call saveNode before close, because close destroys some of our state,
         // what we need to complete the updating and page refresh.
         const savedOk: boolean = await this.utl.saveNode(this);

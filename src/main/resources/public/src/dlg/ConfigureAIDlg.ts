@@ -6,7 +6,6 @@ import { Validator } from "../Validator";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { FlexLayout } from "../comp/core/FlexLayout";
 import { Selection } from "../comp/core/Selection";
@@ -15,14 +14,10 @@ import { TextField } from "../comp/core/TextField";
 
 export class ConfigureAIDlg extends DialogBase {
     static promptState: Validator = new Validator();
-    static templateState: Validator = new Validator();
     static maxWordsState: Validator = new Validator();
     static temperatureState: Validator = new Validator();
     static aiServiceState: Validator = new Validator("[null]");
-    static overwriteState: Validator = new Validator(false);
-
     textScrollPos = new ScrollPos();
-    queryTemplateScrollPos = new ScrollPos();
 
     constructor(public node: NodeInfo) {
         super("Configure AI");
@@ -34,16 +29,11 @@ export class ConfigureAIDlg extends DialogBase {
             new Div(null, null, [
                 new FlexLayout([
                     new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom bigMarginRight", ConfigureAIDlg.aiServiceState),
-                    new Checkbox("Overwrite Content with Answer", null, ConfigureAIDlg.overwriteState)
                 ]),
                 new TextArea("System Prompt", {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
                 }, ConfigureAIDlg.promptState, null, false, 3, this.textScrollPos),
-                new TextArea("Query Template", {
-                    rows: 7,
-                    placeholder: "${content}"
-                }, ConfigureAIDlg.templateState, null, false, 3, this.queryTemplateScrollPos),
                 new FlexLayout([
                     new TextField({
                         label: "Max Response Words",
@@ -71,24 +61,14 @@ export class ConfigureAIDlg extends DialogBase {
         ConfigureAIDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
         ConfigureAIDlg.temperatureState.setValue(S.props.getPropStr(J.NodeProp.AI_TEMPERATURE, this.node));
         ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
-        ConfigureAIDlg.templateState.setValue(S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, this.node));
-        ConfigureAIDlg.overwriteState.setValue(!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, this.node));
     }
 
     save = async () => {
-        const template = ConfigureAIDlg.templateState.getValue();
-        if (template?.includes("${content}") && !!ConfigureAIDlg.overwriteState.getValue()) {
-            ConfigureAIDlg.templateState.setError("Template cannot contain ${content} when Overwrite is enabled.");
-            return;
-        }
-
         // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
         S.props.setPropVal(J.NodeProp.AI_PROMPT, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, ConfigureAIDlg.maxWordsState.getValue() || "[null]");
         S.props.setPropVal(J.NodeProp.AI_TEMPERATURE, this.node, ConfigureAIDlg.temperatureState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_QUERY_TEMPLATE, this.node, ConfigureAIDlg.templateState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_OVERWRITE, this.node, !!ConfigureAIDlg.overwriteState.getValue() || "[null]");
 
         await S.edit.saveNode(this.node, true);
         this.close();
@@ -96,11 +76,9 @@ export class ConfigureAIDlg extends DialogBase {
 
     reset = async () => {
         ConfigureAIDlg.promptState.setValue("");
-        ConfigureAIDlg.templateState.setValue("");
         ConfigureAIDlg.maxWordsState.setValue("");
         ConfigureAIDlg.temperatureState.setValue("");
         ConfigureAIDlg.aiServiceState.setValue("[null]");
-        ConfigureAIDlg.overwriteState.setValue(false);
     }
 
     override async preLoad(): Promise<void> {

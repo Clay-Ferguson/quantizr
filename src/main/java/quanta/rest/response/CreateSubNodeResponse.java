@@ -19,10 +19,6 @@ public class CreateSubNodeResponse extends ResponseBase {
 
 	private NodeChanges nodeChanges;
 
-	// This indicates the user is probably generating content as part of document authoring, and the
-	// client can use this as a hint not to switch to the thread view.
-	private boolean aiContentOverwrite;
-
 	public NodeInfo getNewNode() {
 		return this.newNode;
 	}
@@ -53,14 +49,6 @@ public class CreateSubNodeResponse extends ResponseBase {
 
 	public void setNodeChanges(NodeChanges nodeChanges) {
 		this.nodeChanges = nodeChanges;
-	}
-
-	public boolean isAiContentOverwrite() {
-		return aiContentOverwrite;
-	}
-
-	public void setAiContentOverwrite(boolean aiContentOverwrite) {
-		this.aiContentOverwrite = aiContentOverwrite;
 	}
 
 	public CreateSubNodeResponse() {}

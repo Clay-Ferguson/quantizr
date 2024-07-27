@@ -43,13 +43,9 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
-    getEditLabelForProp(node: NodeInfo, propName: string): string {
+    getEditLabelForProp(_node: NodeInfo, propName: string): string {
         if (propName === J.NodeProp.AI_QUERY_TEMPLATE) {
-            let ret = "AI Query";
-            if (!!S.props.getPropStr(J.NodeProp.AI_OVERWRITE, node)) {
-                ret += " (Answer overwrites Content)";
-            }
-            return ret;
+            return "AI Query (Answer overwrites Content)";
         }
         else if (propName === J.NodeProp.DATE) {
             return I.DomainType.Date;
@@ -349,16 +345,25 @@ export class TypeBase implements TypeIntf {
             const isRoot = node.id === ast.node?.id;
 
             let aiConfigDiv: Div = null;
-            if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER && S.props.hasAIConfigProps(node) && S.util.showMetaData(ast, node)) {
-                const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
-                aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
-                    new Div("AI Config", {
+            if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER && S.util.showMetaData(ast, node)) {
+                if (S.props.hasAIConfigProps(node)) {
+                    aiConfigDiv = new Div("AI Config", {
                         onClick: () => S.edit.configureAI(node),
                         className: "nodeTags aiTags microMarginBottom float-end",
                         title: "Configure AI Settings"
-                    }),
-                    template ? new Div(template, { className: "microMarginBottom" }) : null
-                ]);
+                    });
+                }
+                else {
+                    const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
+                    if (template) {
+                        aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
+                            new Div("AI Prompt", {
+                                className: "aiPrompt microMarginBottom float-end",
+                            }),
+                            template ? new Div(template, { className: "microMarginBottom" }) : null
+                        ]);
+                    }
+                }
             }
 
             // If this node has tags render them below the content (if we have edit mode or info turned on)

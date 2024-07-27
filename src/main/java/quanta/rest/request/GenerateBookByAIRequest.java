@@ -6,6 +6,7 @@ import quanta.rest.request.base.RequestBase;
 public class GenerateBookByAIRequest extends RequestBase {
 	private String nodeId;
 	private String prompt;
+	// todo-0: add also a field for numSections, and of course it will go into prompt as well
 	private Integer numChapters;
 	private String aiService;
 

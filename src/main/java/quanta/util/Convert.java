@@ -69,7 +69,7 @@ public class Convert extends ServiceBase {
              * site and the 'home' node is not yet signed we get this error with no explaination of why.
              */
 
-            crypto.failedSigNodes.add(node.getIdStr());
+            crypto.getFailedSigNodes().add(node.getIdStr());
             log.error("Bad Signature on Admin Node: " + node.getIdStr()); 
             /*
              * todo-2: we need a special global counter for when this happens, so the server info can show it.

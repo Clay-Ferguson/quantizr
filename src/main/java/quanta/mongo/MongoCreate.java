@@ -308,7 +308,8 @@ public class MongoCreate extends ServiceBase {
                     svc = AIModels.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-                aiResponse = ai.getAnswer(ms, req.isAgentic(), parentNode, null, system, svc.getModel(), svc.getService(), userCredit);
+                aiResponse = ai.getAnswer(ms, req.isAgentic(), parentNode, null, system, svc.getModel(),
+                        svc.getService(), userCredit);
 
                 if (svc.getService() == "gemini") {
                     throw new RuntimeException("Gemini AI is temporarily unavailable.");
@@ -327,9 +328,9 @@ public class MongoCreate extends ServiceBase {
         }
 
         // Get AI_OVERWRITE property from parent node
-        String aiOverwrite = parentNode.getStr(NodeProp.AI_OVERWRITE.s());
+        boolean aiOverwrite = parentNode.hasProp(NodeProp.AI_QUERY_TEMPLATE.s()) && req.isAllowAiOverwrite();
         SubNode newNode = null;
-        if (aiOverwrite == null) {
+        if (!aiOverwrite) {
             CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
             if (req.getProperties() == null) {
@@ -351,9 +352,10 @@ public class MongoCreate extends ServiceBase {
         }
         // if this AI question is set to overwrite the parent's content do that and then return, we're done.
         else {
-            parentNode.setContent(aiResponse.getContent());
+            if (aiResponse != null) {
+                parentNode.setContent(aiResponse.getContent());
+            }
             parentNode.touch();
-            res.setAiContentOverwrite(true);
             update.save(ms, parentNode);
             NodeInfo nodeInfo = convert.toNodeInfo(false, ThreadLocals.getSC(), ms, parentNode, false,
                     Convert.LOGICAL_ORDINAL_GENERATE, true, false, false, true, null);
@@ -401,16 +403,16 @@ public class MongoCreate extends ServiceBase {
         }
         setDefaultTags(ms, parentNode, newNode);
         if (req.isAiWritingMode()) {
-            newNode.set(NodeProp.AI_OVERWRITE, true);
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
-        }
-        else if (aiUtil.hasBookTags(parentNode)) {
-            newNode.set(NodeProp.AI_OVERWRITE, true);
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
+        } else if (aiUtil.hasBookTags(parentNode)) {
+            // todo-0: add special note to user (or maybe just in docs) that they should leave {bookContext} in their AI queries if they want
+            // the answer to consider the book context.
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext}");
         }
         update.save(ms, newNode);
 
-        // todo-2: this is apparently old code, that was left and a flow path that will never run, right? I'm just throwing an 
+        // todo-2: this is apparently old code, that was left and a flow path that will never run, right?
+        // I'm just throwing an
         // exception here to see if it's ever hit.
         if (req.getAiService() != null && NodeType.AI_ANSWER.s().equals(parentNode.getType())) {
             throw new RuntimeException("Unsupport AI method used");
@@ -521,12 +523,11 @@ public class MongoCreate extends ServiceBase {
 
         setDefaultTags(ms, parentNode, newNode);
         if (req.isAiWritingMode()) {
-            newNode.set(NodeProp.AI_OVERWRITE, true);
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
-        }
-        else if (aiUtil.hasBookTags(parentNode)) {
-            newNode.set(NodeProp.AI_OVERWRITE, true);
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "${bookContext}");
+        } else if (aiUtil.hasBookTags(parentNode)) {
+            // todo-0: add special note to user (or maybe just in docs) that they should leave {bookContext} in their AI queries if they want
+            // the answer to consider the book context.
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext}");
         }
 
         // we save right away here so we get the node ID

@@ -44,6 +44,15 @@
     cursor: pointer;
 }
 
+.aiPrompt {
+    display: inline-block;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-left: 4px;
+    margin-top: 8px;
+}
+
 .nodeTagInEditor {
     display: inline-block;
     background-color: darkolivegreen;

@@ -46,6 +46,9 @@ public class AIUtil extends ServiceBase {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
         }
 
+        // todo-0: this hierarchical aspect of getting query template from different nodes than the one whe
+        // user clicked "Ask AI" on needs to be reviewed
+        // to see if it still makes sense with current designs.
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
             queryTemplate = preProcessTemplate(ms, node, queryTemplate);
@@ -68,14 +71,15 @@ public class AIUtil extends ServiceBase {
 
         SubNode firstParent = null;
 
-        // we want ${bookContext} to turn into:
+        // we want {bookContext} to turn into:
         // Book Title: ${bookTitle}
         // Chapter Title: ${chapterTitle}
         // Section Title: ${sectionTitle}
         // Subsection Title: ${subsectionTitle}
         // by starting at this node's parent and walking up the tree to the root document.
-        if (template.contains("${bookContext}")) {
-            String bookContext = "\n";
+        if (template.contains("{bookContext}")) {
+            String bookContext = "\nTo provide the best answer, take into consideration `bookContext` below which lets you know what book, chapter, section, and subsection "+
+            " we're working on so you can make your answer specific to that as you deem appropriate:\n\n";
             SubNode parent = read.getParent(ms, node);
             while (parent != null) {
                 if (firstParent == null) {
@@ -101,7 +105,7 @@ public class AIUtil extends ServiceBase {
                 parent = read.getParent(ms, parent);
             }
 
-            template = template.replace("${bookContext}", "\n" + bookContext + "\n");
+            template = template.replace("{bookContext}", "\n<bookContext>\n" + bookContext + "\n</bookContext>\n");
 
             // DO NOT DELETE. KEEP THIS EXPERIMENTAL CODE FOR FUTURE REFERENCE.
             //
@@ -228,7 +232,7 @@ public class AIUtil extends ServiceBase {
                 }
             }
         }
-        if (counter==0) {
+        if (counter == 0) {
             throw new RuntimeException("No context for this query was able to be created.");
         }
 
@@ -254,12 +258,12 @@ public class AIUtil extends ServiceBase {
     }
 
     public String prepareAIQuestionText(SubNode node, SystemConfig system) {
-        String content = node.getContent();
-        content = XString.repeatingTrimFromFront(content, "#");
         String input;
         if (!StringUtils.isEmpty(system.getTemplate())) {
-            input = system.getTemplate().replace("${content}", content);
+            input = system.getTemplate();
         } else {
+            String content = node.getContent();
+            content = XString.repeatingTrimFromFront(content, "#");
             input = content;
         }
         return input;
@@ -413,28 +417,30 @@ public class AIUtil extends ServiceBase {
 
     // Don't delete this yet, but it probably is no longer used.
     // public void insertAnswerToQuestion(MongoSession ms, SubNode node, CreateSubNodeRequest req,
-    //         CreateSubNodeResponse res) {
+    // CreateSubNodeResponse res) {
 
-    //     Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-    //     AIResponse aiResponse = null;
-    //     AIModels svc = AIModels.fromString(req.getAiService());
-    //     if (svc.getService() == "gemini") {
-    //         throw new RuntimeException("Gemini AI is temporarily unavailable.");
-    //     }
-    //     SystemConfig system = new SystemConfig();
-    //     aiUtil.getAIConfigFromAncestorNodes(ms, node, system);
-    //     aiResponse = ai.getAnswer(ms, node, null, system, svc.getModel(), svc.getService(), userCredit);
+    // Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+    // AIResponse aiResponse = null;
+    // AIModels svc = AIModels.fromString(req.getAiService());
+    // if (svc.getService() == "gemini") {
+    // throw new RuntimeException("Gemini AI is temporarily unavailable.");
+    // }
+    // SystemConfig system = new SystemConfig();
+    // aiUtil.getAIConfigFromAncestorNodes(ms, node, system);
+    // aiResponse = ai.getAnswer(ms, node, null, system, svc.getModel(), svc.getService(), userCredit);
 
-    //     List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
-    //     SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L, CreateNodeLocation.FIRST, props,
-    //             null, true, true, res.getNodeChanges());
+    // List<PropertyInfo> props = Arrays.asList(new PropertyInfo(NodeProp.AI_SERVICE.s(),
+    // req.getAiService()));
+    // SubNode newNode = create.createNode(ms, node, null, NodeType.AI_ANSWER.s(), 0L,
+    // CreateNodeLocation.FIRST, props,
+    // null, true, true, res.getNodeChanges());
 
-    //     newNode.setContent(aiResponse.getContent());
+    // newNode.setContent(aiResponse.getContent());
 
-    //     newNode.touch();
-    //     newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
-    //     acl.inheritSharingFromParent(ms, res, node, newNode);
-    //     update.save(ms, newNode);
+    // newNode.touch();
+    // newNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
+    // acl.inheritSharingFromParent(ms, res, node, newNode);
+    // update.save(ms, newNode);
     // }
 }
 

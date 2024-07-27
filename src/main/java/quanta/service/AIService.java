@@ -76,6 +76,10 @@ public class AIService extends ServiceBase {
                 .defaultHeader("X-api-key", apiKey) //
                 .build();
 
+        if (system.getFileExtensions() == null) {
+            system.setFileExtensions("txt");
+        }
+
         AIRequest request = new AIRequest();
         request.setSystemPrompt(system.getPrompt());
         request.setPrompt(input);
@@ -88,9 +92,6 @@ public class AIService extends ServiceBase {
         request.setCodingAgent(agentic);
         request.setAgentFileExtensions(system.getFileExtensions());
 
-        if (!prop.getAiAgentEnabled()) {
-            throw new RuntimeException("AI Agent is disabled.");
-        }
 
         log.debug("AI Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
         AIResponse aiRes = null;

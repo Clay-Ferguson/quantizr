@@ -189,6 +189,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     newNodeName: string;
     typeName: string;
     createAtTop: boolean;
+    allowAiOverwrite: boolean;
     aiService: string;
     agentic: boolean;
     typeLock: boolean;
@@ -643,7 +644,6 @@ export interface CreateSubNodeResponse extends ResponseBase {
     encrypt: boolean;
     gptCredit: number;
     nodeChanges: NodeChanges;
-    aiContentOverwrite: boolean;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {
@@ -1186,7 +1186,6 @@ export const enum NodeProp {
     AI_PROMPT = "ai",
     AI_SERVICE = "aiService",
     AI_QUERY_TEMPLATE = "aiTemplate",
-    AI_OVERWRITE = "aiOverwrite",
     AI_MAX_WORDS = "aiMaxWords",
     AI_TEMPERATURE = "aiTemp",
     DURATION = "duration",

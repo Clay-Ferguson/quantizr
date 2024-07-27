@@ -182,10 +182,8 @@ export class Props {
     hasAIConfigProps = (node: NodeInfo): boolean => {
         return !!this.getPropStr(J.NodeProp.AI_PROMPT, node) || //
             !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
-            !!this.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node) || //
             !!this.getPropStr(J.NodeProp.AI_MAX_WORDS, node) || //
-            !!this.getPropStr(J.NodeProp.AI_TEMPERATURE, node) || //
-            !!this.getPropStr(J.NodeProp.AI_OVERWRITE, node);
+            !!this.getPropStr(J.NodeProp.AI_TEMPERATURE, node);
     }
 
     getPropStr = (propertyName: string, node: NodeInfo): string => {
@@ -259,7 +257,6 @@ export class Props {
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
-            J.NodeProp.AI_OVERWRITE, //
             J.NodeProp.AI_MAX_WORDS, //
             J.NodeProp.AI_TEMPERATURE //
         ]);
@@ -269,7 +266,6 @@ export class Props {
             // J.NodeProp.OPENAI_RESPONSE, //
             J.NodeProp.AI_PROMPT, //
             J.NodeProp.AI_SERVICE, //
-            J.NodeProp.AI_OVERWRITE, //
             J.NodeProp.AI_MAX_WORDS, //
             J.NodeProp.AI_TEMPERATURE, //
         ]);

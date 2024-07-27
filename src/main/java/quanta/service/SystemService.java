@@ -211,7 +211,7 @@ public class SystemService extends ServiceBase {
     public String getFailedSigInfo() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nFailed Signature Node IDs: \n");
-        for (String nodeId : crypto.failedSigNodes) {
+        for (String nodeId : crypto.getFailedSigNodes()) {
             sb.append("    " + nodeId + "\n");
         }
         sb.append("\n");

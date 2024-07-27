@@ -119,7 +119,6 @@ public enum NodeProp {
     AI_PROMPT("ai"), //
     AI_SERVICE("aiService"), //
     AI_QUERY_TEMPLATE("aiTemplate"), //
-    AI_OVERWRITE("aiOverwrite"), //
     AI_MAX_WORDS("aiMaxWords"), //
     AI_TEMPERATURE("aiTemp"), //
     DURATION("duration"), //
