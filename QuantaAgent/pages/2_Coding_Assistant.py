@@ -59,7 +59,6 @@ class AppAgentGUI:
                     user_input,
                     self.cfg.source_folder,
                     self.cfg.data_folder,
-                    self.cfg.max_prompt_length,
                     AppConfig.ext_set,
                     llm
                 )

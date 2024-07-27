@@ -21,7 +21,6 @@ class Settings:
 * Data Folder: {cfg.data_folder}
 * Extensiont to include: {cfg.scan_extensions}
 * Default Update Mode: {cfg.mode}
-* Max Prompt Length: {cfg.max_prompt_length}
 """
 
     def run(self):

@@ -47,8 +47,7 @@ public class AIUtil extends ServiceBase {
         }
 
         // todo-0: this hierarchical aspect of getting query template from different nodes than the one whe
-        // user clicked "Ask AI" on needs to be reviewed
-        // to see if it still makes sense with current designs.
+        // user clicked "Ask AI" on needs to be reviewed to see if it still makes sense with current designs.
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
             queryTemplate = preProcessTemplate(ms, node, queryTemplate);

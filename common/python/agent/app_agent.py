@@ -36,7 +36,6 @@ class QuantaAgent:
         self.has_filename_inject = False
         self.has_folder_inject = False
         self.prj_loader = None
-        self.max_prompt_length = 0
         self.source_folder = ""
         self.data_folder = ""
         self.dry_run: bool = False
@@ -50,7 +49,6 @@ class QuantaAgent:
         input_prompt: str,
         source_folder: str,
         data_folder: str,
-        max_prompt_length: int,
         ext_set: Set[str],
         llm: BaseChatModel
     ):
@@ -61,7 +59,6 @@ class QuantaAgent:
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
         self.prj_loader = ProjectLoader(self.source_folder_len, ext_set)
-        self.max_prompt_length = max_prompt_length
         self.prompt = input_prompt
         self.mode = mode
         self.ext_set = ext_set
@@ -75,10 +72,6 @@ class QuantaAgent:
 
         self.insert_blocks_into_prompt()
         self.insert_files_and_folders_into_prompt()
-
-        if len(self.prompt) > int(self.max_prompt_length):
-           raise Exception(f"Prompt length {len(self.prompt)} exceeds the maximum allowed length of {self.max_prompt_length} characters.")
-
         self.build_system_prompt()
 
         if self.dry_run:

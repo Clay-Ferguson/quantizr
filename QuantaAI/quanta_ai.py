@@ -71,9 +71,9 @@ def api_query(req: AIRequest,
         input_tokens = int((len(input_text)+3) / 3)
                 
         # calculate predicted cost
-        cost: float = calculate_cost(input_tokens, req.maxTokens, req.model)
-        if (cost > req.credit):
-            return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account, using Menu -> AI -> Settings -> Add Credit")         
+        maxCost: float = calculate_cost(input_tokens, req.maxTokens, req.model)
+        if (maxCost > req.credit):
+            return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account, using `Menu -> AI -> Settings -> Add Credit`")         
 
         answer: str = ""
         response: BaseMessage = None
@@ -82,7 +82,6 @@ def api_query(req: AIRequest,
             ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
 
             messages = buildContext(req)
-            # ext_set: Set[str] = {".java", ".py", ".sql", ".html", ".htm", ".js", ".ts", ".css"} # todo-0: need to pass thru API
             agent = QuantaAgent()
             agent.run(
                 req.service,
@@ -93,7 +92,6 @@ def api_query(req: AIRequest,
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
                 "/data",
-                1000000, # todo-0: configure server wide
                 ext_set,
                 llm)
             answer = messages[-1].content
@@ -104,10 +102,10 @@ def api_query(req: AIRequest,
 
         # Estimate output tokens
         output_tokens = int((len(answer)+3) / 3)        
-        cost = calculate_cost(input_tokens, output_tokens, req.model)
+        maxCost = calculate_cost(input_tokens, output_tokens, req.model)
 
         # not make our return value and return it
-        ret = AIResponse(content=answer, cost=cost, error=None)
+        ret = AIResponse(content=answer, cost=maxCost, error=None)
         return ret
     except Exception as e:
         return AIResponse(content=None, cost=None, error=str(e)+"\n"+traceback.format_exc())

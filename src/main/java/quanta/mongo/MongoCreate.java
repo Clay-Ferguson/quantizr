@@ -405,8 +405,7 @@ public class MongoCreate extends ServiceBase {
         if (req.isAiWritingMode()) {
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
         } else if (aiUtil.hasBookTags(parentNode)) {
-            // todo-0: add special note to user (or maybe just in docs) that they should leave {bookContext} in their AI queries if they want
-            // the answer to consider the book context.
+            // todo-1: This would be better as a checkbox that says something like "Include book context in AI prompt"
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext}");
         }
         update.save(ms, newNode);
@@ -525,8 +524,7 @@ public class MongoCreate extends ServiceBase {
         if (req.isAiWritingMode()) {
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
         } else if (aiUtil.hasBookTags(parentNode)) {
-            // todo-0: add special note to user (or maybe just in docs) that they should leave {bookContext} in their AI queries if they want
-            // the answer to consider the book context.
+            // todo-1: This would be better as a checkbox that says something like "Include book context in AI prompt"
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext}");
         }
 

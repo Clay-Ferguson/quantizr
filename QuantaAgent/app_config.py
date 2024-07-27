@@ -69,9 +69,6 @@ class AppConfig:
             required=True,
             help="Update mode for the files (files or blocks)",
         )
-        p.add_argument(
-            "--max_prompt_length", required=True, help="Max characters in prompt"
-        )
 
         options = p.parse_args()
 

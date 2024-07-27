@@ -18,5 +18,3 @@ data_folder: "data"
  
 mode: "none"
 
-# Units are in characters (bytes). This is just a safegard mainly to keep from accidentally spending too much money
-max_prompt_length: 100000

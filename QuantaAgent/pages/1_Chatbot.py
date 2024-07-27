@@ -39,12 +39,6 @@ class AppChatbotGUI:
         # handle user input
         user_input: str = st.session_state.p_chatbot_user_input
         if user_input:
-            if len(user_input) > int(self.cfg.max_prompt_length):
-                st.error(
-                    f"Input is too long. Max allowed is {self.cfg.max_prompt_length} characters."
-                )
-                return
-
             st.session_state.p_chatbot_messages.append(HumanMessage(content=user_input))
             with st.spinner("Thinking..."):
                 llm: BaseChatModel = self.create_llm(st.session_state.p_ai_service, 0.7)
