@@ -65,24 +65,27 @@ public class AIUtil extends ServiceBase {
         if (template == null) {
             return null;
         }
-        if (template.contains("{bookContext}")) {
-            template = insertBookContext(ms, node, template);
+
+        SubNode parent = read.getParent(ms, node);
+        if (aiUtil.hasBookTags(parent)) {
+            template = insertBookContext(ms, node) + template;
         } //
-        else if (template.contains("{context}")) {
-            template = insertGeneralContext(ms, node, template);
+        else {
+            template = insertGeneralContext(ms, node) + template;
         }
 
         log.debug("Prompt with Context: " + template);
         return template;
     }
 
-    private String insertBookContext(MongoSession ms, final SubNode node, String template) {
+    private String insertBookContext(MongoSession ms, final SubNode node) {
         String context = "";
         String instructions =
                 "\nTake into consideration the `bookContext` below which lets you know what book, chapter, section, and subsection "
                         + " we're working on. Don't mention anything about the context your reply, just use it for your own information about context.\n"; //
-                                        
+
         SubNode parent = read.getParent(ms, node);
+        boolean foundSystemPrompt = false;
         while (parent != null) {
             if (parent.getTags() != null) {
                 // get parent with any markdown headings stripped off
@@ -90,8 +93,6 @@ public class AIUtil extends ServiceBase {
 
                 if (parent.getTags().contains("#book")) {
                     context = "<book-title>\n" + content + "\n</book-title>\n" + context;
-                    // break. we're done if we reach the book node.
-                    break;
                 } else if (parent.getTags().contains("#chapter")) {
                     context = "<chapter>\n" + content + "\n</chapter>\n" + context;
                 } else if (parent.getTags().contains("#section")) {
@@ -102,33 +103,40 @@ public class AIUtil extends ServiceBase {
             }
             // if parent node has a system prompt we're done
             if (!StringUtils.isEmpty(parent.getStr(NodeProp.AI_PROMPT.s()))) {
+                foundSystemPrompt = true;
                 break;
             }
             parent = read.getParent(ms, parent);
         }
-        template =
-                template.replace("{bookContext}", "<instructions>\n"+instructions + "\n<bookContext>\n" + context + "\n</bookContext>\n</instructions>\n\n");
-        return template;
+        if (foundSystemPrompt) {
+            return "<instructions>\n" + instructions + "\n<bookContext>\n" + context
+                    + "\n</bookContext>\n</instructions>\n\n";
+        }
+        return "";
     }
 
-    private String insertGeneralContext(MongoSession ms, final SubNode node, String template) {
+    private String insertGeneralContext(MongoSession ms, final SubNode node) {
         String context = "";
         String instructions =
                 "\nTake into consideration the `context` below (which will contain 'sections' in top-down order from the document hierarchy)"
                         + " which lets you know what sections, subsections, etc. are being written about. "
                         + " Don't mention anything about the context your reply, just use it for your own information about context.\n";
         SubNode parent = read.getParent(ms, node);
+        boolean foundSystemPrompt = false;
         while (parent != null) {
             context = "<section>\n" + parent.getContent() + "\n</section>\n" + context;
 
             // if parent node has a system prompt we're done
             if (!StringUtils.isEmpty(parent.getStr(NodeProp.AI_PROMPT.s()))) {
+                foundSystemPrompt = true;
                 break;
             }
             parent = read.getParent(ms, parent);
         }
-        template = template.replace("{context}", "<instructions>\n"+instructions + "\n<context>\n" + context + "\n</context>\n</instructions>\n\n");
-        return template;
+        if (foundSystemPrompt) {
+            return "<instructions>\n" + instructions + "\n<context>\n" + context + "\n</context>\n</instructions>\n\n";
+        }
+        return "";
     }
 
     public void getAIConfigFromAncestorNodes(MongoSession ms, SubNode node, SystemConfig system) {
