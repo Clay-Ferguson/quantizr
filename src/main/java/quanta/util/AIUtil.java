@@ -27,7 +27,7 @@ import quanta.rest.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
 import quanta.util.val.Val;
 
-@Component 
+@Component
 public class AIUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIUtil.class);
 
@@ -46,11 +46,9 @@ public class AIUtil extends ServiceBase {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
         }
 
-        // todo-0: this hierarchical aspect of getting query template from different nodes than the one whe
-        // user clicked "Ask AI" on needs to be reviewed to see if it still makes sense with current designs.
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
-            queryTemplate = preProcessTemplate(ms, node, queryTemplate);
+            queryTemplate = injectTemplateContext(ms, node, queryTemplate);
             system.setTemplate(queryTemplate);
         }
 
@@ -63,87 +61,73 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public String preProcessTemplate(MongoSession ms, final SubNode node, String template) {
+    public String injectTemplateContext(MongoSession ms, final SubNode node, String template) {
         if (template == null) {
             return null;
         }
-
-        SubNode firstParent = null;
-
-        // we want {bookContext} to turn into:
-        // Book Title: ${bookTitle}
-        // Chapter Title: ${chapterTitle}
-        // Section Title: ${sectionTitle}
-        // Subsection Title: ${subsectionTitle}
-        // by starting at this node's parent and walking up the tree to the root document.
         if (template.contains("{bookContext}")) {
-            String bookContext = "\nTo provide the best answer, take into consideration `bookContext` below which lets you know what book, chapter, section, and subsection "+
-            " we're working on so you can make your answer specific to that as you deem appropriate:\n\n";
-            SubNode parent = read.getParent(ms, node);
-            while (parent != null) {
-                if (firstParent == null) {
-                    firstParent = parent;
-                }
-
-                if (parent.getTags() != null) {
-                    // get parent with any markdown headings stripped off
-                    String parentContent = XString.repeatingTrimFromFront(parent.getContent(), "#").trim();
-
-                    if (parent.getTags().contains("#book")) {
-                        bookContext = "Book Title: " + parentContent + "\n" + bookContext;
-                        // break. we're done if we reach the book node.
-                        break;
-                    } else if (parent.getTags().contains("#chapter")) {
-                        bookContext = "Chapter Title: " + parentContent + "\n" + bookContext;
-                    } else if (parent.getTags().contains("#section")) {
-                        bookContext = "Section Title: " + parentContent + "\n" + bookContext;
-                    } else if (parent.getTags().contains("#subsection")) {
-                        bookContext = "Subsection Title: " + parentContent + "\n" + bookContext;
-                    }
-                }
-                parent = read.getParent(ms, parent);
-            }
-
-            template = template.replace("{bookContext}", "\n<bookContext>\n" + bookContext + "\n</bookContext>\n");
-
-            // DO NOT DELETE. KEEP THIS EXPERIMENTAL CODE FOR FUTURE REFERENCE.
-            //
-            /*
-             * I had originally used the code below to try to have an "insert here" capability but at least
-             * ChatGPT (not necessarily other AI services) didn't handle this well, so we're no longer doing
-             * this.
-             * 
-             * LLM PROMPT:
-             * 
-             * You are an author helping me write a book. You will look at the Book Title, Chapter Title,
-             * Section Title and/or Subsection Titles provided, to understand which piece of the book you are
-             * writing, and you will generate a paragraph of content, as the proposed paragraph belonging in
-             * that section of the book.
-             * 
-             * If you are given `EXISTING PARAGRAPHS`, then you will generate your new paragraph of content so
-             * that it logically fits into where ${insertContentHere} appears inside the existing paragraphs, to
-             * create the content that would belong there (at the ${insertContentHere} location); otherwise, if
-             * there is no `EXISTING PARAGRAPHS` text provided, then assume you will be writing the first
-             * paragraph (rather than inserting a paragraph), based on the Chapter, Section, and/or Subsection.
-             * 
-             * <end of prompt>
-             */
-            // Iterable<SubNode> children = read.getChildren(ms, firstParent, Sort.by(Sort.Direction.ASC,
-            // SubNode.ORDINAL),
-            // null, 0, null, false);
-            // if (children != null) {
-            // StringBuilder sb = new StringBuilder();
-            // for (SubNode child : children) {
-            // if (child.getId().equals(node.getId())) {
-            // sb.append("${insertContentHere}\n\n");
-            // } else {
-            // sb.append(child.getContent() + "\n\n");
-            // }
-            // }
-            // template += "\n\nEXISTING PARAGRAPHS:\n" + sb.toString();
-            // }
+            template = insertBookContext(ms, node, template);
+        } //
+        else if (template.contains("{context}")) {
+            template = insertGeneralContext(ms, node, template);
         }
 
+        log.debug("Prompt with Context: " + template);
+        return template;
+    }
+
+    private String insertBookContext(MongoSession ms, final SubNode node, String template) {
+        String context = "";
+        String instructions =
+                "\nTake into consideration the `bookContext` below which lets you know what book, chapter, section, and subsection "
+                        + " we're working on. Don't mention anything about the context your reply, just use it for your own information about context.\n"; //
+                                        
+        SubNode parent = read.getParent(ms, node);
+        while (parent != null) {
+            if (parent.getTags() != null) {
+                // get parent with any markdown headings stripped off
+                String content = XString.repeatingTrimFromFront(parent.getContent(), "#").trim();
+
+                if (parent.getTags().contains("#book")) {
+                    context = "<book-title>\n" + content + "\n</book-title>\n" + context;
+                    // break. we're done if we reach the book node.
+                    break;
+                } else if (parent.getTags().contains("#chapter")) {
+                    context = "<chapter>\n" + content + "\n</chapter>\n" + context;
+                } else if (parent.getTags().contains("#section")) {
+                    context = "<section>\n" + content + "\n</section>\n" + context;
+                } else if (parent.getTags().contains("#subsection")) {
+                    context = "<subsection>\n" + content + "\n</subsection>\n" + context;
+                }
+            }
+            // if parent node has a system prompt we're done
+            if (!StringUtils.isEmpty(parent.getStr(NodeProp.AI_PROMPT.s()))) {
+                break;
+            }
+            parent = read.getParent(ms, parent);
+        }
+        template =
+                template.replace("{bookContext}", "<instructions>\n"+instructions + "\n<bookContext>\n" + context + "\n</bookContext>\n</instructions>\n\n");
+        return template;
+    }
+
+    private String insertGeneralContext(MongoSession ms, final SubNode node, String template) {
+        String context = "";
+        String instructions =
+                "\nTake into consideration the `context` below (which will contain 'sections' in top-down order from the document hierarchy)"
+                        + " which lets you know what sections, subsections, etc. are being written about. "
+                        + " Don't mention anything about the context your reply, just use it for your own information about context.\n";
+        SubNode parent = read.getParent(ms, node);
+        while (parent != null) {
+            context = "<section>\n" + parent.getContent() + "\n</section>\n" + context;
+
+            // if parent node has a system prompt we're done
+            if (!StringUtils.isEmpty(parent.getStr(NodeProp.AI_PROMPT.s()))) {
+                break;
+            }
+            parent = read.getParent(ms, parent);
+        }
+        template = template.replace("{context}", "<instructions>\n"+instructions + "\n<context>\n" + context + "\n</context>\n</instructions>\n\n");
         return template;
     }
 

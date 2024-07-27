@@ -403,10 +403,10 @@ public class MongoCreate extends ServiceBase {
         }
         setDefaultTags(ms, parentNode, newNode);
         if (req.isAiWritingMode()) {
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{context} ");
         } else if (aiUtil.hasBookTags(parentNode)) {
             // todo-1: This would be better as a checkbox that says something like "Include book context in AI prompt"
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext}");
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext} ");
         }
         update.save(ms, newNode);
 
@@ -522,7 +522,7 @@ public class MongoCreate extends ServiceBase {
 
         setDefaultTags(ms, parentNode, newNode);
         if (req.isAiWritingMode()) {
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{context}");
         } else if (aiUtil.hasBookTags(parentNode)) {
             // todo-1: This would be better as a checkbox that says something like "Include book context in AI prompt"
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "{bookContext}");
