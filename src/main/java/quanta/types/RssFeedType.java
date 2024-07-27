@@ -11,7 +11,7 @@ import quanta.mongo.model.SubNode;
 import quanta.util.XString;
 
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
-@Component
+@Component 
 public class RssFeedType extends TypeBase {
 
     @Override

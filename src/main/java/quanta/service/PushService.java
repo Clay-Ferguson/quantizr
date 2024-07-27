@@ -20,10 +20,9 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class PushService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(PushService.class);
-    static final int MAX_FEED_ITEMS = 25;
 
     /*
      * Notify all users being shared to on this node, or everyone if the node is public.

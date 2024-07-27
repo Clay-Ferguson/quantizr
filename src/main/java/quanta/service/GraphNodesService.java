@@ -17,10 +17,10 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class GraphNodesService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(GraphNodesService.class);
-    static int guid = 0;
+    private int guid = 0;
 
     public GraphResponse cm_graphNodes(MongoSession ms, GraphRequest req) {
         HashMap<String, GraphNode> mapByPath = new HashMap<>();

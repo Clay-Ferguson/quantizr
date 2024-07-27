@@ -31,10 +31,10 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class UserFeedService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserFeedService.class);
-    static final int MAX_FEED_ITEMS = 25;
+    private static final int MAX_FEED_ITEMS = 25;
 
     // DO NOT DELETE (part of example to keep below)
     // private static List<String> excludeTypes = Arrays.asList( //

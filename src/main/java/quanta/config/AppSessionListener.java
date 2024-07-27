@@ -13,7 +13,7 @@ import quanta.service.AppFilter;
 /**
  * For keeping track of sessions.
  */
-@Component
+@Component 
 public class AppSessionListener implements HttpSessionListener {
     private static Logger log = LoggerFactory.getLogger(AppSessionListener.class);
     private static final boolean debug = false;

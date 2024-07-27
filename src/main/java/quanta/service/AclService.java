@@ -53,7 +53,7 @@ import quanta.util.XString;
  * Service methods for (ACL): processing security, privileges, and Access Control List information
  * on nodes.
  */
-@Component
+@Component 
 public class AclService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AclService.class);
 

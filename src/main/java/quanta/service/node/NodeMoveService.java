@@ -37,7 +37,7 @@ import quanta.util.ThreadLocals;
  * move any existing nodes they have to any new location they want, subject to security constraints
  * of course.
  */
-@Component
+@Component 
 public class NodeMoveService extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(NodeMoveService.class);

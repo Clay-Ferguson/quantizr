@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
 
-@Component
+@Component 
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {
     private static Logger log = LoggerFactory.getLogger(ExportTarService.class);

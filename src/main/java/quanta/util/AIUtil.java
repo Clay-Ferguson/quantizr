@@ -27,7 +27,7 @@ import quanta.rest.response.GenerateBookByAIResponse;
 import quanta.service.UserManagerService;
 import quanta.util.val.Val;
 
-@Component
+@Component 
 public class AIUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIUtil.class);
 

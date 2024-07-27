@@ -47,7 +47,7 @@ import quanta.util.XString;
 /**
  * Service methods for System related functions. Admin functions.
  */
-@Component
+@Component 
 public class SystemService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(SystemService.class);
     private static final Random rand = new Random();
@@ -304,10 +304,10 @@ public class SystemService extends ServiceBase {
         switch (req.getCommand()) {
             case "getTestResults":
                 if ("run".equals(req.getParameter())) {
-                    testUtil.testResults = new StringBuilder();
+                    testUtil.setTestResults(new StringBuilder());
                     testUtil.runTests();
                 }
-                res.getMessages().add(new InfoMessage(testUtil.testResults.toString(), null));
+                res.getMessages().add(new InfoMessage(testUtil.getTestResults().toString(), null));
                 break;
             case "redisPubSubTest":
                 res.getMessages().add(new InfoMessage(system.redisPubSubTest(), null));

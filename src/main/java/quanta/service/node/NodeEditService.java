@@ -61,7 +61,7 @@ import quanta.util.XString;
  * the user is using the application and moving, copy+paste, or editing node content this is the
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
-@Component
+@Component 
 public class NodeEditService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeEditService.class);
 

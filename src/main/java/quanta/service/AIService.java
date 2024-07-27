@@ -29,11 +29,9 @@ import quanta.util.val.Val;
  * now encapsulated in the microservice.
  * 
  */
-@Component
+@Component 
 public class AIService extends ServiceBase {
-    String COST_CODE = "ANT"; // 3 chars allowed
-
-    DecimalFormat decimalFormatter = new DecimalFormat("0.##########");
+    private String COST_CODE = "ANT"; // 3 chars allowed
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
     public AIResponse getAnswer(MongoSession ms, boolean agentic, SubNode node, String question, SystemConfig system, String model,

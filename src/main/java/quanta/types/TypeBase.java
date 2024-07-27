@@ -10,7 +10,7 @@ import quanta.mongo.model.SubNode;
 import quanta.util.val.Val;
 
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
-@Component
+@Component 
 public abstract class TypeBase extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(TypeBase.class);

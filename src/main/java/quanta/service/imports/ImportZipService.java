@@ -23,7 +23,7 @@ import quanta.util.ThreadLocals;
  * have been actually exported from SubNode in order to import it, but merely have the proper
  * layout/content.
  */
-@Component
+@Component 
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
     private static Logger log = LoggerFactory.getLogger(ImportZipService.class);

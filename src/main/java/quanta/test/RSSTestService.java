@@ -11,11 +11,9 @@ import com.rometools.rome.io.XmlReader;
 import quanta.config.ServiceBase;
 import quanta.util.StreamUtil;
 
-@Component("RSSTestService")
+@Component("RSSTestService") 
 public class RSSTestService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(RSSTestService.class);
-
-    public static boolean debug = false;
 
     public void test() throws Exception {
         testUtil.log("RSSTest Running");

@@ -50,13 +50,13 @@ import quanta.util.val.Val;
 /**
  * Verious utilities related to MongoDB persistence
  */
-@Component
+@Component 
 public class MongoUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoUtil.class);
     private static HashSet<String> testAccountNames = new HashSet<>();
     private static final Random rand = new Random();
-    public static SubNode usersNode = null;
-    public static SubNode feedbackNode = null;
+    private static SubNode usersNode = null;
+    private static SubNode feedbackNode = null;
 
     /*
      * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we

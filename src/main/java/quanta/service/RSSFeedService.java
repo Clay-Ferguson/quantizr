@@ -74,7 +74,7 @@ import quanta.util.val.Val;
 import reactor.core.publisher.Mono;
 
 /* Proof of Concept RSS Publishing */
-@Component
+@Component 
 public class RSSFeedService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(RSSFeedService.class);
     private static boolean refreshingCache = false;
@@ -100,7 +100,7 @@ public class RSSFeedService extends ServiceBase {
             };
     private static final int FEED_ITEMS_PER_PAGE = 75;
     private static final int REFRESH_FREQUENCY_MINS = 480; // 8 hrs
-    static Object cacheLock = new Object();
+    private static Object cacheLock = new Object();
 
     /*
      * Runs immediately at startup, and then every few minutes, to refresh the feedCache.

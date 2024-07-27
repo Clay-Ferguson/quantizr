@@ -51,7 +51,7 @@ import quanta.util.val.Val;
  * to the client. But regardless of format this is the primary service for pulling content up for
  * rendering the pages on the client as the user browses around on the tree.
  */
-@Component
+@Component 
 public class NodeRenderService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 

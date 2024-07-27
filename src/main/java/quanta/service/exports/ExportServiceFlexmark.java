@@ -42,7 +42,7 @@ import quanta.util.XString;
 /**
  * https://github.com/vsch/flexmark-java
  */
-@Component
+@Component 
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
@@ -52,7 +52,7 @@ public class ExportServiceFlexmark extends ServiceBase {
     private StringBuilder markdown = new StringBuilder();
     private String format;
     private ExportRequest req;
-    int baseSlashCount = 0;
+    private int baseSlashCount = 0;
 
     /*
      * Exports the node specified in the req. If the node specified is "/", or the repository root, then

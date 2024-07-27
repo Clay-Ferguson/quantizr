@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
 
-@Component
+@Component 
 @Scope("prototype")
 public class ExportZipService extends ExportArchiveBase {
     private static Logger log = LoggerFactory.getLogger(ExportZipService.class);

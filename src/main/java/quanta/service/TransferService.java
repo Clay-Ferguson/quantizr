@@ -18,7 +18,7 @@ import quanta.rest.request.TransferNodeRequest;
 import quanta.rest.response.TransferNodeResponse;
 import quanta.util.val.IntVal;
 
-@Component
+@Component 
 public class TransferService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(TransferService.class);
 

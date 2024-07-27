@@ -25,7 +25,7 @@ import quanta.util.val.Val;
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
  */
-@Component
+@Component 
 @Scope("prototype")
 public class ExportJsonService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ExportJsonService.class);

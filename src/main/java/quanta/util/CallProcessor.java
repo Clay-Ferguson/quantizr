@@ -17,7 +17,7 @@ import quanta.rest.request.LogoutRequest;
 import quanta.rest.request.base.RequestBase;
 import quanta.rest.response.base.ResponseBase;
 
-@Component
+@Component 
 public class CallProcessor extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(CallProcessor.class);
     private static boolean logResponses = false;

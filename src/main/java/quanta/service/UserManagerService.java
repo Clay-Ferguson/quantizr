@@ -88,7 +88,7 @@ import quanta.util.val.Val;
  * Service methods for processing user management functions. Login, logout, signup, user
  * preferences, and settings persisted per-user
  */
-@Component
+@Component 
 public class UserManagerService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
@@ -96,7 +96,7 @@ public class UserManagerService extends ServiceBase {
     public static final float INITIAL_GRANT_AMOUNT = 0.01f;
 
     /* Private keys of each user by user name as key */
-    public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
+    // private static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
 
     public static final ConcurrentHashMap<String, SseEmitter> pushEmitters = new ConcurrentHashMap<>();
 

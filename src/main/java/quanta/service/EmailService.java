@@ -25,24 +25,21 @@ import quanta.util.LimitedInputStream;
 /**
  * Deamon for sending emails.
  */
-@Component
+@Component 
 public class EmailService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(EmailService.class);
     private int runCounter = 0;
-    public static final int INTERVAL_SECONDS = 10;
+    private static final int INTERVAL_SECONDS = 10;
     private int runCountdown = INTERVAL_SECONDS;
-    static boolean run = false;
+    private static boolean run = false;
 
     public static final Object lock = new Object();
-    public static final String MIME_HTML = "text/html";
-    public int TIMEOUT = 10000; // ten seconds
-    public int TIMESLICE = 250; // quarter second
-    public boolean debug = true;
     private JavaMailSenderImpl mailSender = null;
 
     private String mailBatchSize = "10";
     private static SubNode outboxNode = null;
     private static final Object outboxLock = new Object();
+    private int emailService_runCount = 0;
 
     /*
      * Note: Spring does correctly protect against concurrent runs. It will always wait until the last
@@ -55,7 +52,6 @@ public class EmailService extends ServiceBase {
      *
      * Runs immediately at startup, and then every 10 seconds
      */
-    int emailService_runCount = 0;
     @Scheduled(fixedDelay = 30000)
     public void run() {
         emailService_runCount++;

@@ -23,7 +23,7 @@ import quanta.util.Util;
  * WARNING: Don't put this in ServiceBase with other singletons, because this one needs to be
  * accessible immediately to be used by other beans before all are fully initialized.
  */
-@Component
+@Component 
 public class AppProp {
     private static Logger log = LoggerFactory.getLogger(AppProp.class);
 
@@ -36,7 +36,7 @@ public class AppProp {
     // if false this disables all backgrouind processing.
     private boolean daemonsEnabled = true;
     private String protocolHostAndPort = null;
-    HashMap<String, Object> configMap = null;
+    private HashMap<String, Object> configMap = null;
     private static final Object configLock = new Object();
 
     public HashMap<String, Object> getConfig() {

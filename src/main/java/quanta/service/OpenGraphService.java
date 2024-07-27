@@ -21,14 +21,14 @@ import quanta.rest.response.GetOpenGraphResponse;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class OpenGraphService extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(OpenGraphService.class);
 
-    Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)", Pattern.CASE_INSENSITIVE);
-    public final LRUMap<String, OpenGraph> ogCache = new LRUMap<>(1000);
-    public static final String BROWSER_USER_AGENT =
+    // private Pattern urlPattern = Pattern.compile("(https?:\\/\\/[^\\s]+)", Pattern.CASE_INSENSITIVE);
+    private final LRUMap<String, OpenGraph> ogCache = new LRUMap<>(1000);
+    private static final String BROWSER_USER_AGENT =
             "Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
 
     public GetOpenGraphResponse cm_getOpenGraph(GetOpenGraphRequest ogReq) {

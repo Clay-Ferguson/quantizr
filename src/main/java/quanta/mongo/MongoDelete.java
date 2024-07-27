@@ -40,7 +40,7 @@ import quanta.util.val.Val;
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
-@Component
+@Component 
 public class MongoDelete extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoDelete.class);
 

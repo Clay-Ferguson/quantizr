@@ -20,7 +20,7 @@ import quanta.config.SessionContext;
 import quanta.mongo.MongoRepository;
 import quanta.util.DateUtil;
 
-@Component
+@Component 
 public class RedisService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(RedisService.class);
 

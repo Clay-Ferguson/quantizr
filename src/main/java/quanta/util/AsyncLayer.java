@@ -11,7 +11,7 @@ import quanta.config.ServiceBase;
  * WARNING:
  * For @Async to work it needs to be in it's own component class, or the AOP proxying won't work.
  */
-@Component
+@Component 
 public class AsyncLayer extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AsyncLayer.class);
 

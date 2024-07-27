@@ -11,7 +11,7 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
-@Component
+@Component 
 public class FriendType extends TypeBase {
 
     @Override

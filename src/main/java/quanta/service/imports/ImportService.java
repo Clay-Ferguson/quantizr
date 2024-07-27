@@ -17,7 +17,7 @@ import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
-@Component
+@Component 
 public class ImportService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ImportService.class);
 

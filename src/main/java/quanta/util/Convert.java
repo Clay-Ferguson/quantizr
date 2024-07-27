@@ -33,7 +33,7 @@ import quanta.types.TypeBase;
 /**
  * Converting objects from one type to another, and formatting.
  */
-@Component
+@Component 
 public class Convert extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(Convert.class);
 

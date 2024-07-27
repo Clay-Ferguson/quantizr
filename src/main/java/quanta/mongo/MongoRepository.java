@@ -16,7 +16,7 @@ import quanta.util.Util;
 /**
  * Models the MongoDB repository connection.
  */
-@Component
+@Component 
 public class MongoRepository extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRepository.class);
 

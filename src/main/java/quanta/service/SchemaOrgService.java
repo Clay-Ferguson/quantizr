@@ -22,17 +22,17 @@ import quanta.util.StreamUtil;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class SchemaOrgService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(SchemaOrgService.class);
-    public static HashMap<String, Object> schema = null;
+    private static HashMap<String, Object> schema = null;
     /*
      * We'll keep properties and classes separate rather than doing any containment, because we can
      * always afford to do a brute force thru all properties whenever we need to find the properties in
      * a given class.
      */
-    public HashMap<String, SchemaOrgClass> classMap = new HashMap<>();
-    public static final ArrayList<SchemaOrgClass> classList = new ArrayList<>();
+    private HashMap<String, SchemaOrgClass> classMap = new HashMap<>();
+    private static final ArrayList<SchemaOrgClass> classList = new ArrayList<>();
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {

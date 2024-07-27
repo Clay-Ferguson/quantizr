@@ -12,7 +12,7 @@ import quanta.config.ServiceBase;
 import quanta.postgres.table.UserAccount;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class DatabaseService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(DatabaseService.class);
 

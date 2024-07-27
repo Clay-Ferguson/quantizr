@@ -55,27 +55,19 @@ import quanta.util.val.BooleanVal;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
 
-@Component
+@Component 
 public class CryptoService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(CryptoService.class);
-
-    public final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
     private final HashSet<String> failedSigNodes = new HashSet<>();
-
     private static final Random rand = new Random();
     private static boolean debugSigning = false;
-    int SIGN_BLOCK_SIZE = 100;
+    private int SIGN_BLOCK_SIZE = 100;
 
     public CryptoService() {
         log.debug("CryptoService created: failedSigNodes=" + failedSigNodes.hashCode());
     }
 
-    // todo-0: For some bizarre reason I discovered if we make failedSigNodes public, and access it directly thru other spring bean
-    // proxies (like 'crypto' variable in ServiceBase) rather than using this getter, then the failedSigNodes will be NULL!!
-    // I need to investigate this, because if I'm badly misunderstanding something, then I need to fix it. However my bet is that this is
-    // some kind of spring or even java compiler bug, because I even checked the hashcode of this service and it is correct
-    // and the object correctly initialized failedSigNodes, but still it's NULL when accessed directly from other beans. This must
-    // be some kind of spring proxying issue. Type a description into a good LLM and ask why this can happen.
     public HashSet<String> getFailedSigNodes() {
         return failedSigNodes;
     }

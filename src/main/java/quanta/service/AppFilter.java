@@ -34,7 +34,7 @@ import quanta.util.XString;
  * Filter for logging details of any request/response
  */
 // See AppConfiguration.java for Bean Registration
-@Component
+@Component 
 public class AppFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(AppFilter.class);
     private static String INDENT = "    ";

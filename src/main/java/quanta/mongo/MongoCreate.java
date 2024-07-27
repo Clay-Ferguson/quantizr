@@ -45,7 +45,7 @@ import quanta.util.val.Val;
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  */
-@Component
+@Component 
 public class MongoCreate extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(MongoCreate.class);

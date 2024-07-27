@@ -29,10 +29,10 @@ import quanta.util.ThreadLocals;
  * currently I'm adding onAfterLoad calls to this class, but I need to also be sure all
  * BulkOperations are also ran thru that method, probably by being wrapped into this class.
  */
-@Component
+@Component 
 public class MongoTemplateWrapper extends ServiceBase {
     // todo-2: make this able to be enabled by Admin panel button
-    public static boolean logging = false;
+    private static boolean logging = false;
     private static Logger log = LoggerFactory.getLogger(MongoTemplateWrapper.class);
 
     @Autowired

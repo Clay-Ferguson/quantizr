@@ -7,7 +7,7 @@ import quanta.config.ServiceBase;
 import quanta.postgres.table.Tran;
 import quanta.postgres.table.UserAccount;
 
-@Component
+@Component 
 public class PaymentService extends ServiceBase {
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PaymentService.class);

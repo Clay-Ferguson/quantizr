@@ -50,7 +50,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
     // we have this so we can set it to true and know that MongoDb failed and gracefully run in case
     // we need to run for debugging purposes.
-    public static boolean connectionFailed = false;
+    private static boolean connectionFailed = false;
 
     @Autowired
     private AppProp appProp;

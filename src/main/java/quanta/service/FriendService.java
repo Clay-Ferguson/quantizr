@@ -40,7 +40,7 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
-@Component
+@Component 
 public class FriendService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(FriendService.class);
 

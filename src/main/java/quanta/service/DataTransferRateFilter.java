@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class DataTransferRateFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(DataTransferRateFilter.class);
     public static double totalBytesSent = 0;

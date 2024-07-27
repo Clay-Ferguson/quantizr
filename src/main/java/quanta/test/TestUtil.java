@@ -12,10 +12,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
-@Component
+@Component 
 public class TestUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(TestUtil.class);
-    public StringBuilder testResults = new StringBuilder();
+    private StringBuilder testResults = new StringBuilder();
 
     @Autowired
     private Environment env;
@@ -58,5 +58,13 @@ public class TestUtil extends ServiceBase {
         log.debug("TestUtil: " + msg);
         testResults.append(msg);
         testResults.append("\n");
+    }
+
+    public StringBuilder getTestResults() {
+        return testResults;
+    }
+
+    public void setTestResults(StringBuilder testResults) {
+        this.testResults = testResults;
     }
 }

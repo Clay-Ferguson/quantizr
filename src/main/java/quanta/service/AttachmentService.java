@@ -92,15 +92,15 @@ import quanta.util.val.LongVal;
  * attachment. If the attachment is an 'image' type then it gets displayed right on the page.
  * Otherwise a download link is what gets displayed on the node.
  */
-@Component
+@Component 
 public class AttachmentService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
     // number of minutes in a day
-    static final int VERIFY_FREQUENCY_MINS = 60 * 24;
+    private static final int VERIFY_FREQUENCY_MINS = 60 * 24;
 
     @Autowired
-    public GridFsTemplate grid;
+    private GridFsTemplate grid;
 
     public UploadResponse cm_parseUploadFiles(MongoSession ms, MultipartFile[] uploadFiles) {
         UploadResponse resp = new UploadResponse();

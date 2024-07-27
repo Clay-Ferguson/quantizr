@@ -41,13 +41,12 @@ import quanta.util.val.Val;
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
-@Component
+@Component 
 public class MongoRead extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRead.class);
     private static final Object rootLock = new Object();
     private SubNode dbRoot;
-    public static Sort ordinalSort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
-    public static int MAX_TREE_GRAPH_SIZE = 100000;
+    private static int MAX_TREE_GRAPH_SIZE = 100000;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {

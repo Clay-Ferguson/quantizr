@@ -15,7 +15,7 @@ import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
-@Component
+@Component 
 @Scope("prototype")
 public class ImportTarService extends ImportArchiveBase {
     @SuppressWarnings("unused")

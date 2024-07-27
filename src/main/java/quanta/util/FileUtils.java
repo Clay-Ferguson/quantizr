@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 
-@Component
+@Component 
 public class FileUtils extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(FileUtils.class);
     /*

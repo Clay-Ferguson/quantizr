@@ -16,7 +16,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
-@Component
+@Component 
 public class EnglishDictionary extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
     private static final HashSet<String> stopWords = new HashSet<>();

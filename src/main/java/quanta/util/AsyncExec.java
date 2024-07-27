@@ -16,7 +16,7 @@ import quanta.config.ServiceBase;
  *
  * @Async annotation. That approach is dangerous and won't work in all scenarios
  */
-@Component
+@Component 
 public class AsyncExec extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AsyncExec.class);
 

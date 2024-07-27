@@ -11,7 +11,7 @@ import quanta.service.PushService;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component
+@Component 
 public class RedisSubscriber implements MessageListener {
     private static Logger log = LoggerFactory.getLogger(RedisSubscriber.class);
 

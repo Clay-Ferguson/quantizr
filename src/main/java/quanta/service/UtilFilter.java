@@ -21,10 +21,10 @@ import quanta.util.XString;
  * AppFilter
  */
 // See AppConfiguration.java for Bean Registration
-@Component
+@Component 
 public class UtilFilter extends GenericFilterBean {
     private static Logger log = LoggerFactory.getLogger(UtilFilter.class);
-    public static boolean debug = false;
+    private static boolean debug = false;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)

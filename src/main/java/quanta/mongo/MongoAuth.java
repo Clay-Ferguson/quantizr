@@ -36,7 +36,7 @@ import quanta.util.XString;
  * Service for checking authorization for access to nodes. Checks what users are accessing what
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
-@Component
+@Component 
 public class MongoAuth extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoAuth.class);
     private static final boolean verbose = false;

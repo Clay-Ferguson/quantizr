@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.ThreadLocals;
 
-@Component
+@Component 
 public class FinancialReport extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(FinancialReport.class);

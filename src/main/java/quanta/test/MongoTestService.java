@@ -20,11 +20,9 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
-@Component("MongoTestService")
+@Component("MongoTestService") 
 public class MongoTestService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoTestService.class);
-
-    public static boolean debug = false;
 
     public void test() throws Exception {
         testUtil.log("MongoTest Running");

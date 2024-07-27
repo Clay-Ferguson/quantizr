@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component 
 public class EventPublisher implements ApplicationEventPublisherAware {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(EventPublisher.class);

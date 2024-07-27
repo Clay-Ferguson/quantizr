@@ -27,7 +27,7 @@ import quanta.util.XString;
 /**
  * Performs update (as in CRUD) operations for MongoDB
  */
-@Component
+@Component 
 public class MongoUpdate extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 

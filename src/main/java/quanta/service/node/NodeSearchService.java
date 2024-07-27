@@ -50,10 +50,10 @@ import quanta.util.val.Val;
  * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my
  * searching but I'm not fully doing so yet I don't believe.
  */
-@Component
+@Component 
 public class NodeSearchService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-    static final String SENTENCE_DELIMS = ".!?";
+    
     /*
      * Warning: Do not add '#' or '@' to this list because we're using it to parse text for hashtags
      * and/or usernames so those characters are part of the text. Also since urls sometimes contain
@@ -61,7 +61,7 @@ public class NodeSearchService extends ServiceBase {
      * want / or ? or & characters in this delimiters list, and to support hyphenated terms we don't
      * want '-' character as a delimiter either
      */
-    static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
+    private static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
     public RenderDocumentResponse cm_renderDocument(MongoSession ms, RenderDocumentRequest req) {
         RenderDocumentResponse res = new RenderDocumentResponse();
