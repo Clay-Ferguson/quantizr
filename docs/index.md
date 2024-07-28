@@ -26,7 +26,7 @@ User Guide, Developer Guide, Demo Data. If you have any questions or comments fe
 
 ### [Quanta-User-Guide](/docs/user-guide/index.md)
 
-### [Quanta-Developer-Guide](/docs/dev-guide/index.md)
+### [Quanta-Technical-Docs](/docs/dev-guide/index.md)
 
 ### [Demo-Content](/docs/demo-content/index.md)
 

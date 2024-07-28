@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Technical-Docs](/docs/dev-guide/index.md)**
 
 * [Docker Install](#docker-install)
     * [How to Install Docker Compose](#how-to-install-docker-compose)

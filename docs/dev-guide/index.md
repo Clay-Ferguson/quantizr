@@ -1,8 +1,51 @@
 **[Quanta](/docs/index.md)**
 
-# Quanta Developer Guide
+* [Quanta Technical Docs](#quanta-technical-docs)
+    * [High Level Architecture](#high-level-architecture)
+        * [Docker Compose File Services](#docker-compose-file-services)
+            * [Quanta](#quanta)
+            * [QAI](#qai)
+            * [Redis](#redis)
+            * [MongoDB](#mongodb)
+            * [PostgreSQL](#postgresql)
+            * [PGAdmin](#pgadmin)
+    * [App Flow](#app-flow)
+    * [AI Notes](#ai-notes)
+        * [About AI Cloud Services HTTP Calls](#about-ai-cloud-services-http-calls)
 
-This section is for software developers who will be working on the Quanta code and/or deploying an instance of the platform.
+# Quanta Technical Docs
+
+This section is for software developers who will be working on the Quanta code and/or admins deploying an instance of the platform.
+
+# High Level Architecture
+
+## Docker Compose File Services
+
+We use docker compose yaml as the primary deployment artifact and deploy the app to a docker swarm (Docker needs to be running in swarm mode).  Below are the individual services in the docker compose files:
+
+### Quanta
+
+This is the web app itself.
+
+### QAI
+
+This service is the AI microservice. The Quanta app communicates to it via REST /HTTP interface. Internally this microservice uses Python and LangChain to provide AI services.
+
+### Redis
+
+Session data is stored in Redis instead of being managed by Quanta app itself, so that when necessary multiple swarm nodes of Quanta can be run for larger deployments.
+
+### MongoDB
+
+This runs the MongoDB instance, which is the main database for the app. There is only one `collection` in the DB which represents a `Tree Structure`. There is a `path` property in each Document (i.e. DB Record) which is how the tree structure is stored.
+
+### PostgreSQL
+
+Runs the PosgreSQL database instance. For any information that doesn't make sense to store on the main `Tree` structure of the app, we will put in the PostgreSQL database. Currently the only information stored in Postgre is the financial transactions related to the payments and usage of AI services. To allow users to consume as much AI usage from the AI Cloud providers (OpenAI, Anthropic, Perplexity, etc) as they want, in an unlimited way, we let users add credit into their own accounts, and then they're essentially spending their own money as they use the AI. The Quanta website doesn't charge extra for memberships or services.
+
+### PGAdmin
+
+This is a service that runs the PG Admin console where the PostgreSQL database can be managed from just for admin purposes.
 
 # App Flow
 

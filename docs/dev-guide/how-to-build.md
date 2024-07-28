@@ -1,4 +1,4 @@
-**[Quanta](/docs/index.md) / [Quanta-Developer-Guide](/docs/dev-guide/index.md)**
+**[Quanta](/docs/index.md) / [Quanta-Technical-Docs](/docs/dev-guide/index.md)**
 
 * [How to Build](#how-to-build)
     * [Front-End Notes](#front-end-notes)

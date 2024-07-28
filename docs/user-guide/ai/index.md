@@ -16,18 +16,24 @@
     * [AI Service Selection](#ai-service-selection)
         * [AI Cloud Services Supported](#ai-cloud-services-supported)
     * [Using AI for Writing](#using-ai-for-writing)
+        * [Generating Content with AI](#generating-content-with-ai)
+            * [Step 1 - Configure Document Root Node to have AI Settings](#step-1---configure-document-root-node-to-have-ai-settings)
+            * [Step 2 - Turn on AI Writing Mode](#step-2---turn-on-ai-writing-mode)
+            * [Summary](#summary)
         * [Writing an Entire Book with AI](#writing-an-entire-book-with-ai)
             * [Overview of the Writing Process](#overview-of-the-writing-process)
             * [Example - Write a Book on Bicycling](#example---write-a-book-on-bicycling)
                 * [Step by Step Screenshots](#step-by-step-screenshots)
             * [Why use Book Writing Features](#why-use-book-writing-features)
-        * [Help with Writing a Scientific Paper](#help-with-writing-a-scientific-paper)
-            * [Configure Document Root Node to have AI Settings](#configure-document-root-node-to-have-ai-settings)
-            * [Generating AI Content in your Documents](#generating-ai-content-in-your-documents)
+    * [AI Agent for Code Refactoring](#ai-agent-for-code-refactoring)
+        * [Configuring the Coding Agent](#configuring-the-coding-agent)
+        * [Quanta Agent Standalone App](#quanta-agent-standalone-app)
 
 # Artificial Intelligence - LLMs
 
-Converse with AI, write books or documents collaboratively with the AI, generate images, ask questions about images, generate speech MP3s from text.
+Converse with AI, write books or documents collaboratively with the AI. 
+
+In local deployments of Quanta (that you run yourself) Quanta provides an agent that's capable of directly refactoring your code projects, or answering questions about code.
 
 Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context".
 
@@ -81,6 +87,7 @@ Everything in Quanta is offered for free except for AI Capabilities. Since AI is
 * Get answers to general questions about anything
 * Have conversations with the AI, that you can either keep private or share publicly
 * Ask questions about the content of any Quanta tree branch
+* Request Code Refactoring via the `Quanta Agent`
 
 # AI Conversations
 
@@ -120,28 +127,10 @@ If you only want to ask an AI question about a limited subset of nodes you can u
 
 # Configure AI
 
-Use `Menu -> AI -> Configure AI` to configure a node (any node), so that all questions anywhere on the tree under that node will have the prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers. 
-
-*NOTE: Most of the discussion below describes how 'System Prompt' works for the OpenAI LLM, however when System Prompt is used with Anthropic Models (Sonnet and Opus), the System Prompt is simply added as a prefix to the actual prompt/question, because Anthropic doesn't support System Prompt per se.* 
-
-In other words you can say things like the following examples and the AI will assume this role during all question answering you do anywhere in the subgraph under this node. Once you set this `System Prompt` on the node it gets saved but it doesn't appear on the screen until you come back to the Configure GPT dialog to edit/view it again. 
-
-**Example System Prompts:**
-
-* You are a pirate, and will answer all questions like a pirate.
-
-* You are an expert physicist and research assistant helping me write a paper on a discovery in Quantum Mechanics
-
-* We are playing an adding game, and you will simply just sum up all the numbers you've ever seen and respond with the result.
-
-NOTE: Experimenting with that adding game is the simplest way to make sure you understand how this, because you can just enter a few numbers into some nodes and not matter what question you ask you should always see it obeys it's system prompt and just replies with the total of all numbers it encountered, since that was it's explicit instructions
+Use `Menu -> AI -> Configure AI` to configure a node (any node), so that all questions anywhere on the tree under that node will have the prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers.
 
 ![file-p](attachments/65b6b364e6d38a174f58684d_p.png)
 
-
-So we would first click a node on the tree, and then choose `Menu -> AI -> Configure AI` to open the dialog above. After clicking "Save" in the dialog it will store these settings onto the selected node, so that all future questions asked below that section of the tree (anywhere under that branch of the tree) will `cause GPT to answer as a pirate`. Pirates are a fun role to let the GPT play, because they start sentences with `"Hey matey, how arrrr ye."` etc.
-
-*Tip: When you use a prompt that start with "You will...", or "You are..." or some sentence starting with "you", or when you use the word "you" in any sentence at all in this prompt the AI knows you're talking to it. You speak to it (the AI) basically the same way you would speak to a person.
 
 ## System Prompt Examples
 
@@ -188,18 +177,65 @@ Here's the list of the available AI Services:
 
 # Using AI for Writing
 
+<img src='attachments/660b1b75b2d57601ed09274c_img1.png' style='width:20%'/>
+
+
+## Generating Content with AI
+
+Let's say you're writing a research paper, and you want to get AI assistance with your writing, or even let AI do all your writing for you.
+
+In this scenario you would first create the top level "root" of your document on the content tree. You would call it something like `"A Unification Theory: Schrodinger Black Holes"` or whatever. So all your sections, and paragraphs and content will go under that node as a large subgraph representing your document.
+
+There are only two simple steps to start creating documents using AI assisted writing (or completely AI-Generated) writing, as follows:
+
+### Step 1 - Configure Document Root Node to have AI Settings
+
+You would then select that document root node and click `Menu -> AI -> Configure AI` settings and enter into that dialog something like the following: 
+
+The above system prompt at the root of the document gives the AI the ability to apply that system prompt across the entire document as you start generating AI content underneath.
+
+<img src='attachments/64f7a2a206a5b22fcf329784_p.png' style='width:100%'/>
+
+
+### Step 2 - Turn on AI Writing Mode
+
+In the AI menu simply check the `Writing Mode` checkbox. This will make it so that as long as that check box is enabled every node you insert into your content will have a text field where you describe the content you want to create, and then when you click the `Ask AI` button at the bottom of the editor you get whatever written content you've requested.
+
+<img src='attachments/65d6ed44d711a216791d9551_p.png' style='width:50%'/>
+
+
+After doing step #1 and #2 above you are now ready to start writing content. Any nodes you create that are tree descendants (i.e. contained under) the root node of your document can be answered by the AI playing whatever role you defined for it to play, as your writing assistant. 
+
+So here's what we could to do perhaps create perhaps a node that describes what what Quantum Mechanics is.
+
+Now we can just create a node and ask the AI go generate some content for us as shown in the screenshot below:
+
+<img src='attachments/66a479b93035ce3a41d93a75_p.png' style='width:100%'/>
+
+
+That will result in the following being generated and displayed (image below). Notice that for us, as the owners of the node, we can see the prompt that generated the paragraphs of text (as long as `Menu -> Options -> Node Info` checkbox is set), but no other users will be able to see that prompt.
+
+<img src='attachments/66a479f43035ce3a41d93a78_p.png' style='width:100%'/>
+
+
+Of course now if we open the node again, we see the content that was generated, and if we want to edit that we can, but if we did another `Ask AI` on the node, rather than just a `Save` button click, then our edits would get replaced with another full response from the AI.
+
+<img src='attachments/66a47ac13035ce3a41d93a7b_p.png' style='width:100%'/>
+
+
+### Summary
+
+To summarize the above writing process. You can simply check the `Menu -> AI -> Writing Mode` checkbox, and that will put the app in a mode where it always displays an `AI Query` text field at the bottom of the editor where you can tell the AI what content you want it to generate, and it will generate that content for you when you click `Ask AI`.
+
+You can then edit the generated content yourself if you want or update your AI Query and regenerate another version of what you asked for. Just beware that when you click `Ask AI` it will overwrite your current node content with the generated content.
+
 ## Writing an Entire Book with AI
-
-----
-
-You can use Quanta to write an entire book, on any topic, for any target audience! Here's the general approach for how the writing and creative process works:
-
-<img src='attachments/660b1bb8b2d57601ed09274d_img1.png' style='width:33%'/>
-
 
 *Note: If you're wondering why in the world you'd be interested in "writing a book" when you're not an even author, scroll down to the last section below, where we discuss the power of what's really going on during the "writing" process and how you can use it even if you have no intentions of sharing your "writing".*
 
 ### Overview of the Writing Process
+
+You can use Quanta to write an entire book, on any topic, for any target audience! Here's the general approach for how the writing and creative process works:
 
 First you'll generate the outline for the book by describing what the book will be about, who the intended readers are, and how long (number of chapters) you want the book to be. Once you provide this very high level information, Quanta will scaffold out a sort of `Table of Contents` and then automatically generate the root level book node, all the chapter nodes, and all the section (chapter sub-parts) as well.
 
@@ -246,9 +282,9 @@ Now we've turned "Edit Mode" back on in the screen shot below, and you can see t
 <img src='attachments/660b3569b2d57601ed0927a3_p.png' style='width:100%'/>
 
 
-The system has noticed that we're inside a book, and setup things so that if we simply click `Ask AI` right now it will use the context location of what chapter and section we're in and auto-generate whatever content it thinks should go there. The tip in blue in the editor is telling us this too. So we just click `Ask AI` and wait a few seconds and some new AI-generated content will be inserted.
+Now before we start editing, we need to go to `Menu -> AI -> Writing Mode` and be sure that check box is checked. This puts the app in a mode where it allows you to enter a description of what content you want the AI to create for any node, and then it will populate the text content of the node with that when you click `Ask AI`.
 
-<img src='attachments/660b3578b2d57601ed0927a6_p.png' style='width:100%'/>
+![step6.png](attachments/660b3578b2d57601ed0927a6_p.png)
 
 
 So now we can see the AI has auto-generated content for this location! We can edit this content by hand, if we don't like it. We can also update the specific prompting that generated this text too, and regenerate completely new content to overwrite this content if we want.
@@ -260,13 +296,11 @@ Above we generated book content based on the `Book Context` at that location (i.
 
 Next let's look at how to generate some very specific content that not only relies on the chapter and section we're in, but is even more specific. In other words we're going to auto-generate content that we describe specifically to the AI, but let the AI actually do the writing for us.
 
-In the image below you can see where we've created a brand new node directly under the `Joy of Bicycling` chapter itself. Note that `AI Query Template` is where we describe to the AI what we want to be generated as the content for this specific node. As you can see we're asking for a bit of humor about riding with your cat.
+In the image below you can see where we've created a brand new node directly under the `Joy of Bicycling` chapter itself. Note that `AI Query` is where we describe to the AI what we want to be generated as the content for this specific node. As you can see, we're asking for a bit of humor about riding with your cat.
 
-The `${bookContext}` that you see here, causes the Chapter Titles and Section Titles to be embedded into the AI's instructions at that location, so the AI will find and use it, if found, to help it understand which part of the book you're working on.
+So with that AI Query entered we just click `Ask AI` button, and it will generate the content into this node for us.
 
-So after typing that Template (the AI's instructions), we just click the `Ask AI` button, and it will generate the content into this node for us.
-
-<img src='attachments/660c56934cd11d33319a87a3_p.png' style='width:100%'/>
+![file-p](attachments/660c56934cd11d33319a87a3_p.png)
 
 
 We see the screenshot below after we just now generated using the `Ask AI` above.
@@ -283,6 +317,8 @@ Finally, let's go back and look at the larger scale instructions that are in eff
 As you can see, the root node (Book Node) has a System Prompt that we never wrote, because it was put there automatically when we first created the Book Scaffolding. This top level (root level) System Prompt is ultimately in control of what happens during all of our `Ask AI` runs we did above, and you can edit these instructions if you want. 
 
 These default instructions were carefully crafted to give the user a good book writing experience, but if you know what you're doing with AI "Prompt Engineering" and you know how "System Prompts" work (primarily using the OpenAI ChatGPT Cloud Service API), then you should be able to edit this content if you need to. Then again, it doesn't really take an engineer either, because you can see it's just giving the AI the larger overall purpose of what it's supposed to be doing so it's fairly obvious how to update that prompt if you think you can improve it, even if you're not an engineer or a rocket scientist.
+
+*todo: This screenshot is out of date because things have slightly changed*
 
 <img src='attachments/660b36fcb2d57601ed0927d6_p.png' style='width:100%'/>
 
@@ -305,42 +341,35 @@ In summary, the reason the Book Writing feature of Quanta is important to author
 
 Remember, there's an "Export to PDF" feature in Quanta too, so if you do want to create something (a book, or document) that's easily shareable outside the Quanta server instance, you can always export it to PDF, and let that be your final product.
 
-## Help with Writing a Scientific Paper
+# AI Agent for Code Refactoring
 
-Let's say you're writing a research paper, and you want to get AI assistance with your writing.
+*Note: This section is only for developers and admins, and is not applicable to most users because the `Coding Agent` isn't available on the quanta.wiki website.*
 
-In this scenario you would first create the top level "root" of your document on the content tree. You would call it something like `"A Unification Theory: Schrodinger Black Holes"` or whatever. So all your sections, and paragraphs and content will go under that node as a large subgraph representing your document.
+The Coding Agent is only available for local deployments that you run yourself, and is not available on quanta.wiki website because it requires direct access to your code so it can read the code, analyze it, and make changes to it.
 
-### Configure Document Root Node to have AI Settings
+Note: The Coding Agent is also available as a Streamlit app that's checked into the `quantizr` monorepo on Github in the [QuantaAgent folder](https://github.com/Clay-Ferguson/quantizr/tree/master/QuantaAgent)
 
-You would then select that document root node and click `Menu -> AI -> Configure AI` settings and enter into that dialog something like the following: 
+## Configuring the Coding Agent
 
-**System Prompt:**
+The docker compose file named `dc-dev.yaml` shows an example of a setup that enables the Coding Agent in the QAI Microservice. The important parts of that yaml that activate the Coding Agent are that there's a volume named `/projects` and `/data` in the QAI service configuration, and there's a variable `aiAgentEnabled: "true"` that's defined in the Quanta service itself which tells the app to enable the agent.
 
-`"You are a theoretical physics researcher and scientist helping me write a research paper. You will take the text I provide, and rewrite it to make it better."`
+Once you've made these changes the AI menu will show an `Agent Mode` checkbox (in addition to the `Writing Mode` one), which will let you submit AI prompts to the Coding Agent using the `Ask AI` button on the Node Editor. Also once this is activated you'll see a text field in your AI Settings (`Menu -> AI -> Settings`) panel which lets you provide a comma delimited list of file extensions which you want to include in the `/projects` folder scans. These file extensions are now you narrow down what you want the coding agent to see. Normally you would put extensions of code files like py (Python), js (JavaScript), etc.
 
-The above system prompt at the root of the document gives the AI the ability to apply that system prompt across the entire document as you start generating AI content underneath.
+## Quanta Agent Standalone App
 
-### Generating AI Content in your Documents
+The original form of the Quanta Agent was a Streamlit app, that can run all by itself (outside of the Quanta app) as a pure Python app that you can run locally, and this app is still available, although it's now just sitting in a folder named `QuantaAgent` inside the quantizr monorepo.
 
-Now let's say your're editing in this document (i.e. creating/modifying nodes under your document rood node), and you want to generate a paragraph of text for the document using AI.
+To run this standalone Python app, you can just take the `QuantaAgent` and `common` folders out of the root of the monorepo and put them somewhere in some other folder (but as siblings, in same parent folder), and then you can just run the `Quanta_Agent.py` script and it should just work as a Streamlit app.
 
-The quickest way to get a piece of AI generated content is to create a node that contains your AI query prompt as its content and then click the AI button (Robot button at the bottom of the editor) to ask the question. This will insert the AI-generated answer to the question as a subnode under the question node.
+The `QuantaAgent` folder itself contains only files related to the `Streamlit` app, and all of the actual implementation of the AI Agent is contained in the `common` folder so that it can be used by both the Quanta AI Microservice (QAI) and the Streamlit app.
 
-However in this case you've created a node that will be sitting in your document that is an actual question with an answer under it, and that is different from what you would want to see in an actual document about some specific topic.
+Instructions for how to do the prompting in your Coding Agent prompts can be found in the following files, and are the same regardless if whether you're doing Coding Agent prompting from the Quanta app or the standalone Streamlit app.
 
-So if there is a place in your document where you would like to insert some content, that is AI generated, as if it was a piece of the document itself there is a way to do that as well. In this case, what you'd do is configure a node so that it has the description of the content (an AI prompt/question) you like to create as part of the actual node configuration itself.
+## Coding Agent Docs:
 
-Let's show an example so that this makes sense. Let's say you're writing a document on something related to Quantum Mechanics and you want to include an AI Generated paragraph or two on the actual definition of QM.
+* [README](https://github.com/Clay-Ferguson/quantizr/blob/master/QuantaAgent/README.md)
 
-You'd simply create an empty node at that location in your document and again choose `Menu -> AI -> Configure AI`, and then enter the following template:
-
-![file-p](attachments/65d6ef79d711a216791d9556_p.png)
-
-
-Note the checkbox `Overwrite Content with Answer`. This means that whenever you click the `AI Generate` button (the robot icon) at the bottom of the editor for this node, the current content of that node will be overwritten with the response from the selected `AI Service` using the output from the `Query Template`.
-
-Once you've configured the AI settings to be what's shown above you can then click the said robot icon and it will query the AI and then inject the definition of "Quantum Mechanics" into the content of that node. Using this technique you can create documents that seamlessly contain chunks of content that are AI-Generated mixed in with your own words.
+* [Docs Folder](https://github.com/Clay-Ferguson/quantizr/tree/master/QuantaAgent/docs)
 
 **[ChatGPT Example Q&A](/docs/user-guide/addendum/index.md)**
 

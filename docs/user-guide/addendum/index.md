@@ -275,4 +275,4 @@ System Prompt:You are a mathematician and you will take all the numbers I give y
 
 
 ----
-**[Next: Quanta-Developer-Guide](/docs/dev-guide/index.md)**
+**[Next: Quanta-Technical-Docs](/docs/dev-guide/index.md)**
