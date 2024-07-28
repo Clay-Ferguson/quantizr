@@ -49,6 +49,8 @@ public class AIUtil extends ServiceBase {
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
             queryTemplate = injectTemplateContext(ms, node, queryTemplate);
+
+            // When we set this, that means this will be the FINAL format for the question.
             system.setTemplate(queryTemplate);
         }
 
@@ -61,21 +63,30 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public String injectTemplateContext(MongoSession ms, final SubNode node, String template) {
-        if (template == null) {
+    public String injectTemplateContext(MongoSession ms, final SubNode node, String prompt) {
+        if (prompt == null) {
             return null;
         }
 
         SubNode parent = read.getParent(ms, node);
+        String context = null;
         if (aiUtil.hasBookTags(parent)) {
-            template = insertBookContext(ms, node) + template;
-        } //
-        else {
-            template = insertGeneralContext(ms, node) + template;
+            context = insertBookContext(ms, node);
+        } else {
+            context = insertGeneralContext(ms, node);
         }
 
-        log.debug("Prompt with Context: " + template);
-        return template;
+        // if we have some context then prepend it to the prompt
+        if (!StringUtils.isEmpty(context)) {
+            // todo-0: add to documentation that a single question mark can be used if context exists.
+            if (prompt.trim().equals("?")) {
+                prompt = "Write the content for this section of the document based on the context provided above.";
+            }
+            prompt = context + prompt;
+        }
+
+        log.debug("Prompt with Context: " + prompt);
+        return prompt;
     }
 
     private String insertBookContext(MongoSession ms, final SubNode node) {
@@ -250,6 +261,9 @@ public class AIUtil extends ServiceBase {
 
     public String prepareAIQuestionText(SubNode node, SystemConfig system) {
         String input;
+
+        // NOTE: if we have the template set this is known to be the full prompt, although it used to be
+        // used as a template for the prompt
         if (!StringUtils.isEmpty(system.getTemplate())) {
             input = system.getTemplate();
         } else {
