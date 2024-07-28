@@ -567,11 +567,11 @@ public class UserManagerService extends ServiceBase {
 
     @Transactional("transactionManager") 
     @Qualifier("transactionManager")
-    public void addCreditByEmail(MongoSession as, String emailAdr, BigDecimal amount, Long timestamp) {
+    public Tran addCreditByEmail(MongoSession as, String emailAdr, BigDecimal amount, Long timestamp) {
         SubNode ownerNode = read.getUserNodeByProp(as, NodeProp.EMAIL.s(), emailAdr, false, false);
         if (ownerNode != null) {
             String userName = ownerNode.getStr(NodeProp.USER);
-            addCreditInternal(as, ownerNode.getIdStr(), amount, timestamp);
+            Tran tran = addCreditInternal(as, ownerNode.getIdStr(), amount, timestamp);
 
             if (!StringUtils.isEmpty(prop.getMailHost())) {
                 String brandingAppName = prop.getConfigText("brandingAppName");
@@ -584,14 +584,15 @@ public class UserManagerService extends ServiceBase {
             BigDecimal credit = tranRepository.getBalByMongoId(ownerNode.getIdStr());
             UpdateAccountInfo pushInfo = new UpdateAccountInfo(ownerNode.getIdStr(), credit);
             push.pushInfo(ThreadLocals.getSC(), pushInfo);
+            return tran;
         } else {
-            log.debug("addCreditByEmail: user not found for email: " + emailAdr);
+            throw new RuntimeException("addCreditByEmail: user not found for email: " + emailAdr);
         }
     }
 
     @Transactional("transactionManager") 
     @Qualifier("transactionManager")
-    public void addCreditInternal(MongoSession as, String userId, BigDecimal amount, Long timestamp) {
+    public Tran addCreditInternal(MongoSession as, String userId, BigDecimal amount, Long timestamp) {
         UserAccount user = userRepository.findByMongoId(userId);
         if (user == null) {
             log.debug("User not found, creating...");
@@ -613,6 +614,7 @@ public class UserManagerService extends ServiceBase {
         }
         credit.setUserAccount(user);
         credit = tranRepository.save(credit);
+        return credit;
     }
 
     public SaveUserPreferencesResponse cm_saveUserPreferences(SaveUserPreferencesRequest req) {

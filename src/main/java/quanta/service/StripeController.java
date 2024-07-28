@@ -1,6 +1,7 @@
 package quanta.service;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,92 +18,122 @@ import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import quanta.config.ServiceBase;
+import quanta.postgres.table.Tran;
+import quanta.util.FileUtils;
+import quanta.util.Util;
 
 @Controller
 public class StripeController extends ServiceBase implements ErrorController {
     private static Logger log = LoggerFactory.getLogger(StripeController.class);
+    private static int entryCounter = 0;
 
     @PostMapping("/stripe/webhook")
     public ResponseEntity<String> handleStripeEvent(@RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {
-        log.debug("Stripe Event: " + payload);
-
-        String apiKey = prop.getStripeApiKey();
-        if (StringUtils.isEmpty(apiKey)) {
-            log.error("No Stripe API Key defined");
-            return ResponseEntity.badRequest().body("Bad Request: No Stripe API Key");
-        }
-
-        String endpointSecret = prop.getStripeEndpointKey();
-        if (StringUtils.isEmpty(endpointSecret)) {
-            log.error("No Stripe Endpoint Secret defined");
-            return ResponseEntity.badRequest().body("Bad Request: No Endpoint Secret");
-        }
-
-        Stripe.apiKey = apiKey;
         try {
-            Event event = null;
-            try {
-                event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
-            } catch (SignatureVerificationException e) {
-                return ResponseEntity.badRequest().body("Bad Request: Invalid Signature");
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body("Bad Request: Invalid Payload");
+            entryCounter++;
+            log.debug("Stripe Event: " + payload);
+
+            String apiKey = prop.getStripeApiKey();
+            if (StringUtils.isEmpty(apiKey)) {
+                log.error("No Stripe API Key defined");
+                return ResponseEntity.badRequest().body("Bad Request: No Stripe API Key");
             }
 
-            Event _event = event;
+            String endpointSecret = prop.getStripeEndpointKey();
+            if (StringUtils.isEmpty(endpointSecret)) {
+                log.error("No Stripe Endpoint Secret defined");
+                return ResponseEntity.badRequest().body("Bad Request: No Endpoint Secret");
+            }
 
-            // run the processing in an async thread, because we need to return immediately for Stripe.com to
-            // see this endpoint as immediately responsive
-            asyncLayer.run(() -> {
-                switch (_event.getType()) {
-                    case "checkout.session.completed":
-                        EventDataObjectDeserializer dataObjectDeserializer = _event.getDataObjectDeserializer();
-                        if (dataObjectDeserializer.getObject().isPresent()) {
-                            Session checkoutSession = (Session) dataObjectDeserializer.getObject().get();
-
-                            String customerEmail = checkoutSession.getCustomerEmail();
-                            if (customerEmail == null && checkoutSession.getCustomerDetails() != null) {
-                                customerEmail = checkoutSession.getCustomerDetails().getEmail();
-                            }
-                            if (customerEmail != null) {
-                                log.debug("Customer email: " + customerEmail);
-                            } else {
-                                log.debug("Customer email was not provided in the session.");
-                            }
-
-                            Long amount = checkoutSession.getAmountTotal();
-                            if (amount != null) {
-                                log.debug("amount: " + amount);
-                            }
-                            if (amount == null || amount == 0) {
-                                log.error("Bad Stripe Request: No Amount");
-                            }
-
-                            // todo-0: This is a critical piece of code and we should probably send an email to the admin, and save an actual FILE 
-                            // in some log folder that contains this payload JSON, and also the fact that the transaction committed successfully, so we need a 
-                            // big try/finally block inside the 'addCreditByEmail' that does all this, so we pass the payload object into that for logging too.
-                            // AND inside this processing we need to apply a "shutdown lock" that will hook into GracefulShutdown of the app just to also be sure
-                            // the app will wait for any of these to commplete before shutting down.
-                            String _customerEmail = customerEmail;
-                            arun.run(as -> {
-                                BigDecimal dollarsAmount = new BigDecimal(amount).divide(new BigDecimal(100));
-                                // todo-1: I'm getting bad dates from 'getCreated()', so for now we set to null and that makes it use our own time
-                                user.addCreditByEmail(as, _customerEmail, dollarsAmount, null); // checkoutSession.getCreated());
-                                return null;
-                            });
-                        } else {
-                            log.error("Bad Request: Invalid Payload");
-                        }
-                        break;
-                    default:
-                        break;
+            Stripe.apiKey = apiKey;
+            try {
+                Event event = null;
+                try {
+                    event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+                } catch (SignatureVerificationException e) {
+                    return ResponseEntity.badRequest().body("Bad Request: Invalid Signature");
+                } catch (Exception e) {
+                    return ResponseEntity.badRequest().body("Bad Request: Invalid Payload");
                 }
-            });
-        } catch (Exception e) {
-            log.error("Stripe Error", e);
+
+                Event _event = event;
+
+                // run the processing in an async thread, because we need to return immediately for Stripe.com to
+                // see this endpoint as immediately responsive
+                entryCounter++;
+                asyncLayer.run(() -> {
+                    try {
+                        switch (_event.getType()) {
+                            case "checkout.session.completed":
+                                EventDataObjectDeserializer dataObjectDeserializer = _event.getDataObjectDeserializer();
+                                if (dataObjectDeserializer.getObject().isPresent()) {
+                                    Session checkoutSession = (Session) dataObjectDeserializer.getObject().get();
+
+                                    String customerEmail = checkoutSession.getCustomerEmail();
+                                    if (customerEmail == null && checkoutSession.getCustomerDetails() != null) {
+                                        customerEmail = checkoutSession.getCustomerDetails().getEmail();
+                                    }
+                                    if (customerEmail != null) {
+                                        log.debug("Customer email: " + customerEmail);
+                                    } else {
+                                        log.debug("Customer email was not provided in the session.");
+                                    }
+
+                                    Long amount = checkoutSession.getAmountTotal();
+                                    if (amount != null) {
+                                        log.debug("amount: " + amount);
+                                    }
+                                    if (amount == null || amount == 0) {
+                                        log.error("Bad Stripe Request: No Amount");
+                                    }
+
+                                    String _customerEmail = customerEmail;
+                                    arun.run(as -> {
+                                        BigDecimal dollarsAmount = new BigDecimal(amount).divide(new BigDecimal(100));
+                                        // todo-1: I'm getting bad dates from 'getCreated()', so for now we set to a
+                                        // time we generated ourselves
+                                        Long now = Calendar.getInstance().getTime().getTime();
+                                        String logFile = "stripe-payment-" + now + ".json";
+                                        FileUtils.writeFile(logFile, payload, false);
+                                        email.sendDevEmail("Stripe Payment Recieved from " + _customerEmail,
+                                                "Amount: " + dollarsAmount + "\nLog File: " + logFile);
+                                        try {
+                                            Tran tran = user.addCreditByEmail(as, _customerEmail, dollarsAmount, now); // checkoutSession.getCreated());
+                                            FileUtils.writeFile(logFile,
+                                                    "\n\nSTATUS: Saved OK: \n\nTran Record ID=" + tran.getId(), true);
+                                        } catch (Exception e) {
+                                            log.error("Error adding credit to user", e);
+                                            FileUtils.writeFile(logFile,
+                                                    "\n\nSTATUS: DB Save Failed: \n\n" + e.getMessage(), true);
+                                        }
+                                        return null;
+                                    });
+                                } else {
+                                    log.error("Bad Request: Invalid Payload");
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    } finally {
+                        entryCounter--;
+                    }
+                });
+            } catch (Exception e) {
+                log.error("Stripe Error", e);
+            }
+            return ResponseEntity.ok().build();
+        } finally {
+            entryCounter--;
         }
-        return ResponseEntity.ok().build();
+    }
+
+    public static void waitForTransactions() {
+        while (entryCounter > 0) {
+            log.debug("Waiting for StripeController.entryCounter " + entryCounter);
+            Util.sleep(100);
+        }
     }
 }
 

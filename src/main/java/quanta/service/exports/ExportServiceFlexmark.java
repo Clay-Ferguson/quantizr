@@ -137,7 +137,7 @@ public class ExportServiceFlexmark extends ServiceBase {
             String body = renderer.render(document);
             String html = generateHtml(body);
             if ("html".equals(format)) {
-                FileUtils.writeEntireFile(fullFileName, html);
+                FileUtils.writeFile(fullFileName, html, false);
                 wroteFile = true;
             } //
             else if ("pdf".equals(format)) {

@@ -254,9 +254,9 @@ public class FileUtils extends ServiceBase {
         Files.setPosixFilePermissions(Paths.get(fileName), perms);
     }
 
-    public static void writeEntireFile(String fileName, String content) {
+    public static void writeFile(String fileName, String content, boolean append) {
         try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+            BufferedWriter out = new BufferedWriter(new FileWriter(fileName, append));
             try {
                 out.write(content);
                 out.flush();

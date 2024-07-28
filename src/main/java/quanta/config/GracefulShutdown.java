@@ -13,13 +13,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
+import quanta.service.StripeController;
 
 /**
  * Handles Tomcat shutdown
  *
  * NOTE: This is a spring bean instantiated with @Bean elsewhere.
  */
-@Component 
+@Component
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
     private static Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;
@@ -41,6 +42,8 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
         log.debug("GracefulShudown: ContextClosedEvent");
+
+        StripeController.waitForTransactions();
         this.connector.pause();
         Executor executor = this.connector.getProtocolHandler().getExecutor();
         if (executor instanceof ThreadPoolExecutor o) {
@@ -61,7 +64,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
                 log.debug("Unexpected executor: " + executor.getClass().getName());
             }
         }
-        
+
         log.debug("GracefulShudown: complete");
     }
 }
