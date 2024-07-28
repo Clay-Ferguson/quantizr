@@ -250,6 +250,7 @@ export interface GenerateBookByAIRequest extends RequestBase {
     nodeId: string;
     prompt: string;
     numChapters: number;
+    numSections: number;
     aiService: string;
 }
 

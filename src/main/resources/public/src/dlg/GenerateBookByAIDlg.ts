@@ -18,10 +18,12 @@ export class GenerateBookByAIDlg extends DialogBase {
     promptScrollPos = new ScrollPos();
 
     static numChapters: Validator = new Validator();
+    static numSections: Validator = new Validator();
 
     constructor(public node: NodeInfo) {
         super("Generate Book using AI");
         GenerateBookByAIDlg.numChapters.setValue("20");
+        GenerateBookByAIDlg.numSections.setValue("10");
 
         // #ai_prompt
         GenerateBookByAIDlg.promptState.setValue("I'm creating an online 'book' that is an introduction to Python programming geared towards allowing Java experts to learn Python.");
@@ -39,6 +41,13 @@ export class GenerateBookByAIDlg extends DialogBase {
                         label: "Number of Chapters",
                         val: GenerateBookByAIDlg.numChapters,
                         inputClass: "numChapters",
+                        outterClass: "bigMarginRight"
+
+                    }),
+                    new TextField({
+                        label: "Number of Sections per Chapter",
+                        val: GenerateBookByAIDlg.numSections,
+                        inputClass: "numSections",
                     })
                 ]),
                 new ButtonBar([
@@ -52,13 +61,20 @@ export class GenerateBookByAIDlg extends DialogBase {
     generate = async () => {
         const numChapters = parseInt(GenerateBookByAIDlg.numChapters.getValue());
         if (numChapters < 1 || numChapters > 100) {
-            alert("Too many chapters Max allowed is 100.");
+            alert("Too many chapters. Max allowed is 100.");
+            return;
+        }
+
+        const numSections = parseInt(GenerateBookByAIDlg.numSections.getValue());
+        if (numSections < 0 || numSections > 25) {
+            alert("Too many sections. Max allowed is 25.");
             return;
         }
 
         const res = await S.rpcUtil.rpc<J.GenerateBookByAIRequest, J.GenerateBookByAIResponse>("generateBookByAI", {
             nodeId: this.node.id,
             numChapters,
+            numSections,
             prompt: GenerateBookByAIDlg.promptState.getValue(),
             aiService: getAs().userPrefs.aiService
         });

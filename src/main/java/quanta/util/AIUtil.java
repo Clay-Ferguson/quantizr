@@ -324,6 +324,10 @@ public class AIUtil extends ServiceBase {
             }
             prompt += "I want to have " + req.getNumChapters() + " chapters in this book.\n";
 
+            if (req.getNumSections() != null && req.getNumSections() > 0) {
+                prompt += "Divide each chapter up into " + req.getNumSections() + " named sections.\n";
+            }
+
             // #ai_prompt
             prompt +=
                     """
