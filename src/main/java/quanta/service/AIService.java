@@ -110,7 +110,6 @@ public class AIService extends ServiceBase {
         }
 
         BigDecimal cost = new BigDecimal(aiRes.getCost());
-        // todo-0: this COST_CODE is a bug. needs to be correct value
         userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, svc.getCostCode()));
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;

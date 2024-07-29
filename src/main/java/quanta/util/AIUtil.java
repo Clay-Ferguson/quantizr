@@ -78,7 +78,6 @@ public class AIUtil extends ServiceBase {
 
         // if we have some context then prepend it to the prompt
         if (!StringUtils.isEmpty(context)) {
-            // todo-0: add to documentation that a single question mark can be used if context exists.
             if (prompt.trim().equals("?")) {
                 prompt = "Write the content for this section of the document based on the context provided above.";
             }
