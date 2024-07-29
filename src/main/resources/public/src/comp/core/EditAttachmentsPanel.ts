@@ -158,7 +158,6 @@ export class EditAttachmentsPanel extends Div {
             const fileName = fileNameFieldState.getValue();
 
             // if fileName tag not already in the content give the user help inserting it.
-            console.log("content check: " + content);
             if (content.indexOf(`{{${fileName}}}`) === -1) {
                 fileNameTagTip = new Div(`Insert {{${fileName}}} in text`, {
                     title: "Click to insert File Tag",

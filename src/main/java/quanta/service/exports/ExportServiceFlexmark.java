@@ -42,7 +42,7 @@ import quanta.util.XString;
 /**
  * https://github.com/vsch/flexmark-java
  */
-@Component 
+@Component
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
@@ -65,7 +65,7 @@ public class ExportServiceFlexmark extends ServiceBase {
         this.session = ms;
         this.format = format;
         this.req = req;
-    
+
         String nodeId = req.getNodeId();
         if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
             throw ExUtil.wrapEx("adminDataFolder does not exist");
@@ -178,7 +178,7 @@ public class ExportServiceFlexmark extends ServiceBase {
     }
 
     private void processNode(SubNode node) {
-        markdown.append("\n");
+        String nodeMarkdown = "\n";
         String content = node.getContent();
         TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
         if (plugin != null) {
@@ -195,9 +195,10 @@ public class ExportServiceFlexmark extends ServiceBase {
         }
 
         content = insertPropertySubstitutions(content, node);
-        markdown.append(content);
-        markdown.append("\n");
-        writeImages(node);
+        nodeMarkdown += content + "\n";
+        nodeMarkdown = writeImages(node, nodeMarkdown);
+
+        markdown.append(nodeMarkdown);
     }
 
     private String insertPropertySubstitutions(String content, SubNode node) {
@@ -213,10 +214,11 @@ public class ExportServiceFlexmark extends ServiceBase {
         return content;
     }
 
-    private void writeImages(SubNode node) {
+    private String writeImages(SubNode node, String content) {
         List<Attachment> atts = node.getOrderedAttachments();
         if (atts == null)
-            return;
+            return content;
+
         // process all attachments specifically to embed the image ones
         for (Attachment att : atts) {
             // Since GIFs are really only ever used for animated GIFs nowadays, and since PDF files cannot
@@ -234,7 +236,6 @@ public class ExportServiceFlexmark extends ServiceBase {
                 continue;
             String bin = att.getBin();
             String url = att.getUrl();
-
             if (bin == null && url == null) {
                 continue;
             }
@@ -263,14 +264,22 @@ public class ExportServiceFlexmark extends ServiceBase {
             }
             if (src == null)
                 continue;
-            /*
-             * I'm not wrapping this img in a div, so they don't get forced into a vertical display of images,
-             * but the PDF engine seems to be able to smartly insert images in an attractive way arranging small
-             * images side-by-side when they'll fit on the page so I'm just letting the PDF determine how to
-             * position images, since it seems ok
-             */
-            markdown.append("\n<img src='" + src + "' " + style + "/>\n");
+
+            String imgHtml = "\n<img src='" + src + "' " + style + "/>\n";
+
+            if (att.getPosition().equals("ft")) {
+                content = content.replace("{{" + att.getFileName() + "}}", imgHtml);
+            } else {
+                /*
+                 * I'm not wrapping this img in a div, so they don't get forced into a vertical display of images,
+                 * but the PDF engine seems to be able to smartly insert images in an attractive way arranging small
+                 * images side-by-side when they'll fit on the page so I'm just letting the PDF determine how to
+                 * position images, since it seems ok
+                 */
+                content += imgHtml;
+            }
         }
+        return content;
     }
 
     /**
