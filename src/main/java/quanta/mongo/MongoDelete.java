@@ -127,23 +127,12 @@ public class MongoDelete extends ServiceBase {
 
     /**
      * Currently cleaning up GridFS orphans is done in gridMaintenanceScan() only, so when we delete one
-     * ore more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans
+     * or more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans
      * will get cleaned up later on, but not synchronously or in this method.
      *
      * todo-2: However, we could also have the 'path' stored in the GridFS metadata so we can use a
      * 'regex' query to delete all the binaries (recursively under any node, using that path prefix as
      * the criteria) which is exacly like the one below for deleting the nodes themselves.
-     *
-     * UPDATE: In here we call "regexRecursiveChildrenOfPath" which does the most aggressive possible
-     * delete of the entire subgraph, but it would be more performant to use a non-recursive delete ONLY
-     * of the direct children under 'node' (using "regexDirectChildrenOfPath" instead) in this
-     * synchronous call and let the orphan delete do the rest of the cleanup later on asynchronously.
-     * However we do NOT do that, only because our orphan cleanup algo is already memory intensive and
-     * so we are decreasing the memory load of the orphan cleanup routing by doing the most aggressive
-     * tree delete possible here, synchronously, at he cost of a little performance.
-     *
-     * Said more simply: Replace 'regexRecursiveChildrenOfPath' with 'regexDirectChildrenOfPath' in this
-     * method if you want to increase performance of deletes at the cost of some additional memory.
      */
     public long delete(MongoSession ms, SubNode node, boolean childrenOnly) {
         auth.ownerAuth(ms, node);
@@ -340,7 +329,6 @@ public class MongoDelete extends ServiceBase {
                 break;
             }
         }
-        // todo-2: broadcast this back to server as a message push
         log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
     }
 

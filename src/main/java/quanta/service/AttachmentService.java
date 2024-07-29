@@ -490,7 +490,7 @@ public class AttachmentService extends ServiceBase {
             /*
              * we gracefully tolerate the case where no size is available but normally it will be there.
              * 
-             * todo-2: when we detect this and then stream back some data should be just go ahead and SET the
+             * todo-2: when we detect this and then stream back some data should we just go ahead and SET the
              * correct 'size' on the node at that point?
              */
             if (size > 0) {
@@ -635,6 +635,9 @@ public class AttachmentService extends ServiceBase {
                     .body(region);
         } catch (Exception e) {
             log.error(e.getMessage());
+        }
+        finally {
+            StreamUtil.close(inStream);
         }
         return ret;
     }

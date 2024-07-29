@@ -349,12 +349,6 @@ public class MongoUtil extends ServiceBase {
         // shortenPathParts(session);
     }
 
-    /*
-     * todo-2: need to make the system capable of doing this logic during a "Full Maintenance"
-     * operation, like right after a DB compaction etc. Also the current code just updates path ONLY if
-     * it's currently null rather than what maintenance would do which is additionally look up the
-     * parent to verify the path IS indeed the correct parent.
-     */
     public void setParentNodes(MongoSession ms) {
         // WARNING: use 'ops.stream' (findAll will be out of memory error on prod)
         // log.debug("Processing setParentNodes");
@@ -687,10 +681,7 @@ public class MongoUtil extends ServiceBase {
     // a HASH of the
     // content text, and enforce that's unique
     // and while i'm at it secondarily use it as a corruption check.
-    ///
-    // /* todo-2: haven't yet run my test case that verifies duplicate tree paths
-    // are indeed
-    // rejected */
+    //
     // DBObject dbo = textIndex.getIndexOptions();
     // dbo.put("unique", true);
     // dbo.put("dropDups", true);

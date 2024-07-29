@@ -513,8 +513,6 @@ public class AclService extends ServiceBase {
         }
         if (principalId != null) {
             arun.run(s -> {
-                // todo-2: if the actual user account has been deleted we can get here and end up with null user name
-                // I think. Look into it.
                 if (PrincipalName.PUBLIC.s().equals(principalId)) {
                     acInfo.setPrincipalName(PrincipalName.PUBLIC.s());
                     acInfo.setDisplayName(PrincipalName.PUBLIC.s());
