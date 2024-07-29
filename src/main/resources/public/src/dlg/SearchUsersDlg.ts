@@ -1,3 +1,4 @@
+import { getAs } from "../AppContext";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -30,6 +31,7 @@ export class SearchUsersDlg extends DialogBase {
 
         return [
             new Div(null, null, [
+                getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", {className: "borderBottom"}) : null,
                 this.searchTextField = new TextField({ label: "User", enter: this.search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
