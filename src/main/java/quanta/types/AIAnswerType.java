@@ -1,7 +1,7 @@
 package quanta.types;
 
 import org.springframework.stereotype.Component;
-import quanta.model.client.AIModels;
+import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
@@ -20,7 +20,7 @@ public class AIAnswerType extends TypeBase {
         if (exportType.equalsIgnoreCase("pdf")) {
             String aiService = node.getStr(NodeProp.AI_SERVICE.s());
             if (aiService != null) {
-                AIModels svc = AIModels.fromString(aiService);
+                AIModel svc = AIModel.fromString(aiService);
                 if (svc != null) {
                     return aiUtil.formatExportAnswerSection(content, "by AI: " + svc.getDescription());
                 }

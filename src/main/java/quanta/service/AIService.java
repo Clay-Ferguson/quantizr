@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.model.client.AIModel;
 import quanta.model.client.NodeType;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.qai.AIMessage;
@@ -29,13 +30,15 @@ import quanta.util.val.Val;
  * now encapsulated in the microservice.
  * 
  */
-@Component 
+@Component
 public class AIService extends ServiceBase {
-    private String COST_CODE = "ANT"; // 3 chars allowed
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
-    public AIResponse getAnswer(MongoSession ms, boolean agentic, SubNode node, String question, SystemConfig system, String model,
-            String service, Val<BigDecimal> userCredit) {
+    public AIResponse getAnswer(MongoSession ms, boolean agentic, SubNode node, String question, SystemConfig system,
+            AIModel svc, Val<BigDecimal> userCredit) {
+        if (svc == null) {
+            throw new RuntimeException("No AI service selected.");
+        }
         SubNode userNode = read.getAccountByUserName(ms, ms.getUserName(), false);
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
@@ -65,9 +68,9 @@ public class AIService extends ServiceBase {
         }
 
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 4000;
-        system.setModel(model);
+        system.setModel(svc.getModel());
         aiUtil.ensureDefaults(system);
-        String apiKey = getApiKey(service);
+        String apiKey = getApiKey(svc.getService());
         String QAI_URL = "http://" + prop.getQuantaAIHost() + ":" + prop.getQuantaAIPort() + "/api/query";
         WebClient webClient = Util.webClientBuilder().baseUrl(QAI_URL) //
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) //
@@ -82,16 +85,16 @@ public class AIService extends ServiceBase {
         request.setSystemPrompt(system.getPrompt());
         request.setPrompt(input);
         request.setMessages(messages);
-        request.setModel(model);
-        request.setService(service);
+        request.setModel(svc.getModel());
+        request.setService(svc.getService());
         request.setTemperature(0.7f);
         request.setMaxTokens(maxTokens);
         request.setCredit(balance.floatValue());
         request.setCodingAgent(agentic);
         request.setAgentFileExtensions(system.getFileExtensions());
 
-
-        log.debug("AI Req: USER: " + ms.getUserName() + " AI MODEL: " + model + ": " + XString.prettyPrint(request));
+        log.debug("AI Req: USER: " + ms.getUserName() + " AI Service: " + svc.getService() + ", Model=" + svc.getModel()
+                + ": " + XString.prettyPrint(request));
         AIResponse aiRes = null;
         String res = Util.httpCall(webClient, request);
         try {
@@ -107,7 +110,8 @@ public class AIService extends ServiceBase {
         }
 
         BigDecimal cost = new BigDecimal(aiRes.getCost());
-        userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, COST_CODE));
+        // todo-0: this COST_CODE is a bug. needs to be correct value
+        userCredit.setVal(aiUtil.updateUserCredit(userNode, balance, cost, svc.getCostCode()));
         log.debug("AI Res: " + XString.prettyPrint(aiRes));
         return aiRes;
     }

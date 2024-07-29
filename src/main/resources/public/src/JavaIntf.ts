@@ -1087,7 +1087,7 @@ export interface PrivilegeInfo {
     privilegeName: string;
 }
 
-export const enum AIModels {
+export const enum AIModel {
     NONE = "[null]",
     OPENAI = "openAi",
     OPENAI_MINI = "openAiMini",

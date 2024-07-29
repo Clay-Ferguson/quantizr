@@ -34,7 +34,7 @@ import quanta.exception.UnauthorizedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
-import quanta.model.client.AIModels;
+import quanta.model.client.AIModel;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
@@ -933,7 +933,7 @@ public class UserManagerService extends ServiceBase {
 
             String aiService = prefsNode.getStr(NodeProp.USER_PREF_AI_SERVICE);
             if (StringUtils.isEmpty(aiService)) {
-                aiService = AIModels.OPENAI.s();
+                aiService = AIModel.OPENAI.s();
             }
             userPrefs.setAiService(aiService);
 

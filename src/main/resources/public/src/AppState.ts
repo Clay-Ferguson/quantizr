@@ -124,7 +124,7 @@ export class AppState {
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
         mainPanelCols: 6,
-        aiService: J.AIModels.OPENAI,
+        aiService: J.AIModel.OPENAI,
         aiAgentFileExtensions: "txt,md,html,htm,java,js,css,ts,tsx,py,sh,sql,json,yaml,yml,xml,properties,ini,conf,config,env,log,mdx,jsx,tsx,graphql,mdx,md,markdown",
     };
 

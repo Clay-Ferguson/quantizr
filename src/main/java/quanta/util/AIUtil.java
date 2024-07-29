@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
-import quanta.model.client.AIModels;
+import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
 import quanta.model.client.openai.SystemConfig;
 import quanta.model.qai.AIResponse;
@@ -243,11 +243,11 @@ public class AIUtil extends ServiceBase {
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
-        AIModels svc = AIModels.fromString(req.getAiService());
+        AIModel svc = AIModel.fromString(req.getAiService());
         if (svc.getService() == "gemini") {
             throw new RuntimeException("Gemini AI is temporarily unavailable.");
         }
-        aiResponse = ai.getAnswer(ms, false, null, sb.toString(), system, svc.getModel(), svc.getService(), userCredit);
+        aiResponse = ai.getAnswer(ms, false, null, sb.toString(), system, svc, userCredit);
 
         if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
@@ -318,13 +318,13 @@ public class AIUtil extends ServiceBase {
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
-        AIModels svc = AIModels.fromString(req.getAiService());
+        AIModel svc = AIModel.fromString(req.getAiService());
         if (svc != null) {
             // First scan up the tree to see if we have a svc on the tree and if so use it instead.
             SystemConfig system = new SystemConfig();
             aiUtil.getAIConfigFromAncestorNodes(ms, parentNode, system);
             if (system.getService() != null) {
-                svc = AIModels.fromString(system.getService());
+                svc = AIModel.fromString(system.getService());
             }
 
             String prompt = req.getPrompt();
@@ -395,7 +395,7 @@ public class AIUtil extends ServiceBase {
             if (svc.getService() == "gemini") {
                 throw new RuntimeException("Gemini AI is temporarily unavailable.");
             }
-            aiResponse = ai.getAnswer(ms, false, null, prompt, null, svc.getModel(), svc.getService(), userCredit);
+            aiResponse = ai.getAnswer(ms, false, null, prompt, null, svc, userCredit);
             res.setGptCredit(userCredit.getVal());
         }
         String answer = aiResponse.getContent();

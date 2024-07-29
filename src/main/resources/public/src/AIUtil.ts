@@ -19,19 +19,19 @@ export class AIUtil {
     init = () => {
         this.aiServices = [];
         this.aiServices.push({
-            name: J.AIModels.NONE,
+            name: J.AIModel.NONE,
             description: "none (inherit)",
             longDescription: ""
         });
 
         if (S.quanta.config.useOpenAi) {
             this.aiServices.push({
-                name: J.AIModels.OPENAI,
+                name: J.AIModel.OPENAI,
                 description: "OpenAI: ChatGPT-4o",
                 longDescription: "The most powerful version of OpenAI's intelligent general-purpose AI"
             });
             this.aiServices.push({
-                name: J.AIModels.OPENAI_MINI,
+                name: J.AIModel.OPENAI_MINI,
                 description: "OpenAI: ChatGPT-4o Mini",
                 longDescription: "The less expensive version of OpenAI's intelligent general-purpose AI"
             });
@@ -39,7 +39,7 @@ export class AIUtil {
 
         if (S.quanta.config.useGeminiAi) {
             this.aiServices.push({
-                name: J.AIModels.GEMINI,
+                name: J.AIModel.GEMINI,
                 description: "Google: Gemini",
                 longDescription: "Google's best general-purpose AI"
             });
@@ -48,7 +48,7 @@ export class AIUtil {
         if (S.quanta.config.usePplxAi) {
             this.aiServices.push(//
                 {
-                    name: J.AIModels.PPLX_LLAMA3,
+                    name: J.AIModel.PPLX_LLAMA3,
                     description: "Meta: Llama 3",
                     longDescription: "Meta's Open Source Llama 3"
                 });
@@ -57,12 +57,12 @@ export class AIUtil {
         if (S.quanta.config.useAnthAi) {
             this.aiServices.push(//
                 {
-                    name: J.AIModels.ANTH,
+                    name: J.AIModel.ANTH,
                     description: "Anthropic: Claude 3 Opus",
                     longDescription: "Anthropic's very powerful general-purpose AI"
                 },
                 {
-                    name: J.AIModels.ANTH_SONNET,
+                    name: J.AIModel.ANTH_SONNET,
                     description: "Anthropic: Claude 3.5 Sonnet",
                     longDescription: "Anthropic's most powerful general-purpose AI"
                 });
@@ -71,12 +71,12 @@ export class AIUtil {
         if (S.quanta.config.usePplxAi) {
             this.aiServices.push(//
                 {
-                    name: J.AIModels.PPLX,
+                    name: J.AIModel.PPLX,
                     description: "Perplexity: Basic",
                     longDescription: "Perplexity's best high-end powerful general-purpose AI"
                 },
                 {
-                    name: J.AIModels.PPLX_ONLINE,
+                    name: J.AIModel.PPLX_ONLINE,
                     description: "Perplexity: Recent News Aware",
                     longDescription: "Perplexity's AI which has access to the latest news and content from from the web"
                 });
