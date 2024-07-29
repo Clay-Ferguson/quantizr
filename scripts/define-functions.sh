@@ -37,7 +37,7 @@ imageCheck () {
 dockerBuild () {
     echo "dockerBuild: app"
     # docker-compose -f ${dc_yaml} build --no-cache
-    docker-compose -f ${dc_yaml} build
+    docker-compose -f ${dc_yaml} build --parallel
     verifySuccess "Docker Compose: build app"
 }
 
