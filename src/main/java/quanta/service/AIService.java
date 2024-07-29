@@ -81,6 +81,14 @@ public class AIService extends ServiceBase {
             system.setFileExtensions("txt");
         }
 
+        if (!svc.isAllowSystemPrompt()) {
+            system.setPrompt(null);
+        } else {
+            if (StringUtils.isEmpty(system.getPrompt())) {
+                system.setPrompt("You are a helpful assistant.");
+            }
+        }
+
         AIRequest request = new AIRequest();
         request.setSystemPrompt(system.getPrompt());
         request.setPrompt(input);

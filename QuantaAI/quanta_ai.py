@@ -1,7 +1,7 @@
 import os
 import sys
 from fastapi import FastAPI, Header
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
@@ -39,8 +39,9 @@ class AIResponse(BaseModel):
     cost: Optional[float]
     error: Optional[str]
     
+# NOTE: Optional is not enough to make the field optional. You need to also default value to `Field(default=None)`
 class AIRequest(BaseModel):
-    systemPrompt: Optional[str]
+    systemPrompt: Optional[str] = Field(default=None)
     prompt: str
     messages: List[AIBaseMessage]
     service: str
@@ -128,11 +129,7 @@ def buildMessages(req):
     # Add the current human question to the messages
     messages.append(HumanMessage(content=req.prompt))
 
-    # todo-1: we can do this cleaner, but we're doing the "If perplexity online model don't set system prompt" here
-    if "online" not in req.model:    
-        if req.systemPrompt is None or req.systemPrompt == "":
-            req.systemPrompt = "You are a helpful agent."
-        
+    if req.systemPrompt != None and req.systemPrompt.strip() != "":        
         # Check the first 'message' to see if it's a SystemMessage and if not then insert one
         if len(messages) == 0 or not isinstance(messages[0], SystemMessage):
             messages.insert(0, SystemMessage(content=req.systemPrompt))
