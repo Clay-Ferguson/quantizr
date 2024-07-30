@@ -98,6 +98,7 @@ public class MongoRepository extends ServiceBase {
                     rssFeed.preCacheAdminFeeds(as);
                 });
             }
+            system.notifyAdminOfProblems();
         }
     }
 

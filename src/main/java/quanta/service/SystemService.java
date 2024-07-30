@@ -13,6 +13,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.mongodb.client.MongoDatabase;
@@ -40,6 +41,7 @@ import quanta.service.exports.ExportServiceFlexmark;
 import quanta.service.exports.ExportTarService;
 import quanta.service.exports.ExportZipService;
 import quanta.util.Const;
+import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -47,7 +49,7 @@ import quanta.util.XString;
 /**
  * Service methods for System related functions. Admin functions.
  */
-@Component 
+@Component
 public class SystemService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(SystemService.class);
     private static final Random rand = new Random();
@@ -107,7 +109,8 @@ public class SystemService extends ServiceBase {
                 user.writeUserStats(as, statsMap);
                 return null;
             });
-            ret += runMongoDbCommand(MongoAppConfig.databaseName, new Document("compact", "nodes").append("force", true));
+            ret += runMongoDbCommand(MongoAppConfig.databaseName,
+                    new Document("compact", "nodes").append("force", true));
             ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
         } finally {
             prop.setDaemonsEnabled(true);
@@ -127,7 +130,8 @@ public class SystemService extends ServiceBase {
         // String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
         // new Document("validate", "nodes").append("full", true).append("repair", true));
 
-        // Note: we get an error message with repair=true (commented out above), which I think is because we're now in a replica set mode.
+        // Note: we get an error message with repair=true (commented out above), which I think is because
+        // we're now in a replica set mode.
         String ret = "validate: " + runMongoDbCommand(MongoAppConfig.databaseName,
                 new Document("validate", "nodes").append("full", true));
 
@@ -166,6 +170,10 @@ public class SystemService extends ServiceBase {
         sb.append("AuditFilter Enabed: " + String.valueOf(AppFilter.audit) + "\n");
         sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
 
+        if (prop.isRequireCrypto()) {
+            sb.append(getFailedSigInfo());
+        }
+
         sb.append(getRedisReport());
         sb.append("HttpSessions: " + AppSessionListener.sessionCounter + "\n");
 
@@ -190,8 +198,6 @@ public class SystemService extends ServiceBase {
         sb.append("\nEnvironment Vars:\n");
         sb.append(getEnvironment());
 
-        sb.append(getFailedSigInfo());
-
         // Run command inside container
         // sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
         return sb.toString();
@@ -208,13 +214,34 @@ public class SystemService extends ServiceBase {
         return sb.toString();
     }
 
+    /* Every two hours, if there's a problem send email out to admin */
+    @Scheduled(fixedDelay = 2 * DateUtil.HOUR_MILLIS)
+    public void notifyAdminOfProblems() {
+        if (!prop.isRequireCrypto()) return;
+        crypto.sigCheckScan();
+
+        if (crypto.getFailedSigNodes().isEmpty() && crypto.getUnsignedPublicNodes().isEmpty())
+            return;
+
+        String msg = getFailedSigInfo();
+        email.sendDevEmail("Signature Node Problems", msg);
+    }
+
     public String getFailedSigInfo() {
         StringBuilder sb = new StringBuilder();
-        sb.append("\nFailed Signature Node IDs: \n");
-        for (String nodeId : crypto.getFailedSigNodes()) {
-            sb.append("    " + nodeId + "\n");
+
+        if (!crypto.getFailedSigNodes().isEmpty()) {
+            sb.append("\n ********** Failed Signature Node IDs ********** \n");
+            for (String nodeId : crypto.getFailedSigNodes()) {
+                sb.append("  " + nodeId + "\n");
+            }
         }
-        sb.append("\n");
+        if (!crypto.getUnsignedPublicNodes().isEmpty()) {
+            sb.append("\n ********** Unsigned Public Node IDs ********** \n");
+            for (String nodeId : crypto.getUnsignedPublicNodes()) {
+                sb.append("  " + nodeId + "\n");
+            }
+        }
         return sb.toString();
     }
 

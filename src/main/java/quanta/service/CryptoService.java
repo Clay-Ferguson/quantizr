@@ -55,11 +55,12 @@ import quanta.util.val.BooleanVal;
 import quanta.util.val.IntVal;
 import quanta.util.val.Val;
 
-@Component 
+@Component
 public class CryptoService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(CryptoService.class);
     private final ConcurrentHashMap<Integer, NodeSigPushInfo> sigPendingQueue = new ConcurrentHashMap<>();
     private final HashSet<String> failedSigNodes = new HashSet<>();
+    private final HashSet<String> unsignedPublicNodes = new HashSet<>();
     private static final Random rand = new Random();
     private static boolean debugSigning = false;
     private int SIGN_BLOCK_SIZE = 100;
@@ -72,12 +73,16 @@ public class CryptoService extends ServiceBase {
         return failedSigNodes;
     }
 
+    public HashSet<String> getUnsignedPublicNodes() {
+        return unsignedPublicNodes;
+    }
+
     public boolean nodeSigVerify(SubNode node, String sig) {
         return nodeSigVerify(node, sig, null);
     }
 
     /*
-     * For locations where we know we can reuse a mapping of IDs to nodew we have the option to pass in
+     * For locations where we know we can reuse a mapping of IDs to nodes we have the option to pass in
      * nodeMap to this method for a performance boost
      */
     public boolean nodeSigVerify(SubNode node, String sig, HashMap<String, SubNode> nodeMap) {
@@ -187,6 +192,30 @@ public class CryptoService extends ServiceBase {
             // todo-2: we need a special exception for this.
             throw new RuntimeException("Signature Failed", e);
         }
+    }
+
+    public void sigCheckScan() {
+        if (!prop.isRequireCrypto()) return;
+        
+        arun.run(as -> {
+            IntVal count = new IntVal(0);
+            Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(NodePath.PUBLIC_PATH));
+            Query query = new Query();
+            query.addCriteria(crit);
+
+            opsw.forEach(query, node -> {
+                count.inc();
+                if (node.hasProp(NodeProp.CRYPTO_SIG.s())) {
+                    if (!nodeSigVerify(node, node.getStr(NodeProp.CRYPTO_SIG))) {
+                        failedSigNodes.add(node.getIdStr());
+                    }
+                } else {
+                    unsignedPublicNodes.add(node.getIdStr());
+                }
+            });
+            log.debug("sigCheckScan complete. " + count.getVal() + " nodes checked.");
+            return null;
+        });
     }
 
     @Transactional("mongoTm")

@@ -70,6 +70,7 @@ public class Convert extends ServiceBase {
              */
 
             crypto.getFailedSigNodes().add(node.getIdStr());
+            
             log.error("Bad Signature on Admin Node: " + node.getIdStr()); 
             /*
              * todo-2: we need a special global counter for when this happens, so the server info can show it.
