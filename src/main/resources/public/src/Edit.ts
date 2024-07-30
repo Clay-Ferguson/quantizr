@@ -1618,11 +1618,6 @@ export class Edit {
                 }
             }
             else if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
-                // todo-1: Improvement here would be to try to go to the parent of the node, so we
-                // could pass the deletedPageNode indicator to the deleteNodes endpoint and let that
-                // signal to it to pass back to us the ID of the parent node or null if we don't
-                // have access to it, but for now if user deletes their page root node we take them
-                // to their account node.
                 S.nav.navToMyAccntRoot();
             }
             else if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {

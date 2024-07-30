@@ -91,7 +91,7 @@ public class StripeController extends ServiceBase implements ErrorController {
                                     String _customerEmail = customerEmail;
                                     arun.run(as -> {
                                         BigDecimal dollarsAmount = new BigDecimal(amount).divide(new BigDecimal(100));
-                                        // todo-1: I'm getting bad dates from 'getCreated()', so for now we set to a
+                                        // todo-2: I'm getting bad dates from 'getCreated()', so for now we set to a
                                         // time we generated ourselves
                                         Long now = Calendar.getInstance().getTime().getTime();
                                         String logFile = "stripe-payment-" + now + ".json";
