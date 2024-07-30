@@ -40,7 +40,7 @@ import quanta.util.val.Val;
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
-@Component 
+@Component
 public class MongoDelete extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
@@ -127,8 +127,8 @@ public class MongoDelete extends ServiceBase {
 
     /**
      * Currently cleaning up GridFS orphans is done in gridMaintenanceScan() only, so when we delete one
-     * or more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans
-     * will get cleaned up later on, but not synchronously or in this method.
+     * or more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans will
+     * get cleaned up later on, but not synchronously or in this method.
      *
      * todo-2: However, we could also have the 'path' stored in the GridFS metadata so we can use a
      * 'regex' query to delete all the binaries (recursively under any node, using that path prefix as
@@ -359,7 +359,7 @@ public class MongoDelete extends ServiceBase {
         // map every path to it's ObjectId
         HashMap<String, ObjectId> allNodes = new HashMap<>();
         // first all we do is build up the 'allNodes' hashMap.
-        opsw.forEach(new Query(), node -> {            
+        opsw.forEach(new Query(), node -> {
             // print progress every 1000th node
             nodesProcessed.inc();
             if (nodesProcessed.getVal() % 1000 == 0) {
@@ -635,12 +635,29 @@ public class MongoDelete extends ServiceBase {
         opsw.remove(ms, q);
     }
 
-    public Object cm_delete(DeleteNodesRequest req, MongoSession ms) {
-        if (req.isBulkDelete()) {
-            return delete.bulkDeleteNodes(ms);
-        } else {
-            return delete.deleteNodes(ms, req.getNodeIds());
+    public DeleteNodesResponse cm_delete(DeleteNodesRequest req, MongoSession ms) {
+        DeleteNodesResponse res = null;
+        String jumpTarget = null;
+
+        if (!StringUtils.isEmpty(req.getJumpToParentOf())) {
+            SubNode node = read.getNode(ms, req.getJumpToParentOf());
+            if (node == null) {
+                throw new RuntimeEx("Node node not found.");
+            }
+            SubNode parent = read.getParent(ms, node, false);
+
+            if (parent != null && auth.ownedBy(ThreadLocals.getSC(), parent)) {
+                jumpTarget = parent.getIdStr();
+            }
         }
+
+        if (req.isBulkDelete()) {
+            res = delete.bulkDeleteNodes(ms);
+        } else {
+            res = delete.deleteNodes(ms, req.getNodeIds());
+        }
+        res.setJumpTargetId(jumpTarget);
+        return res;
     }
 
     /*

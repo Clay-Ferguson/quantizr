@@ -148,14 +148,11 @@ export class Edit {
     /* nodeId is optional and represents what to highlight after the paste if anything */
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean) => {
         if (S.util.checkSuccess("Move nodes", res)) {
-
-            // todo-1: We DO need to do something to indicate to user that signatures got removed, but this way
-            // ended up being an annoyance when I'm doing a lot of editing back to back pasting every minute or two.
-            // if (res.signaturesRemoved) {
-            //     setTimeout(() => {
-            //         S.util.showMessage("Signatures on these nodes were removed, because signature is dependent upon path location.", "Signatures");
-            //     }, 1000);
-            // }
+            if (res.signaturesRemoved) {
+                setTimeout(() => {
+                    S.util.showMessage("Signatures on these nodes were removed, because signature is dependent upon path location.", "Signatures");
+                }, 500);
+            }
 
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
@@ -886,7 +883,8 @@ export class Edit {
             await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: ["~" + J.NodeType.INBOX],
                 childrenOnly: true,
-                bulkDelete: false
+                bulkDelete: false,
+                jumpToParentOf: null
             });
             S.nav.openContentNode(ast.userProfile.userNodeId, false);
         }
@@ -946,7 +944,8 @@ export class Edit {
             const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: null,
                 childrenOnly: false,
-                bulkDelete: true
+                bulkDelete: true,
+                jumpToParentOf: null
             });
             S.util.showMessage(res.message, "Message");
         }
@@ -1590,10 +1589,13 @@ export class Edit {
         if (nodesToDel.find(id => id === ast.node?.id)) {
             deletedPageNode = true;
         }
+        const jumpToParentOf = deletedPageNode ? ast.node?.id : null;
+
         const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
             nodeIds: nodesToDel,
             childrenOnly: false,
-            bulkDelete: false
+            bulkDelete: false,
+            jumpToParentOf
         });
 
         S.histUtil.removeNodesFromHistory(nodesToDel);
@@ -1605,7 +1607,11 @@ export class Edit {
             this.recursiveDelete(nodesToDel, ast.node);
 
             this.afterDeleteCleanup(nodesToDel);
-            if (ast.activeTab === C.TAB_DOCUMENT) {
+
+            if (res.jumpTargetId) {
+                S.view.jumpToId(res.jumpTargetId);
+            }            
+            else if (ast.activeTab === C.TAB_DOCUMENT) {
                 const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
                     S.srch.showDocument(data.props.node.id, false);

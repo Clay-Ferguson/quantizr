@@ -212,6 +212,7 @@ export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
     childrenOnly: boolean;
     bulkDelete: boolean;
+    jumpToParentOf: string;
 }
 
 export interface DeletePropertyRequest extends RequestBase {
@@ -654,6 +655,7 @@ export interface DeleteFriendResponse extends ResponseBase {
 }
 
 export interface DeleteNodesResponse extends ResponseBase {
+    jumpTargetId: string;
 }
 
 export interface DeletePropertyResponse extends ResponseBase {

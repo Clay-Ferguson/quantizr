@@ -9,6 +9,11 @@ public class DeleteNodesRequest extends RequestBase {
 	private boolean childrenOnly;
 	private boolean bulkDelete;
 
+	// This is used to jump to the parent of the node being deleted. We do this whenever we're deleting the node
+	// that's the root of what the user is now viewing. This is the nodeId of this root, whose parent we want to go to 
+	// after the deletion
+	private String jumpToParentOf;
+
 	public List<String> getNodeIds() {
 		return this.nodeIds;
 	}
@@ -31,6 +36,14 @@ public class DeleteNodesRequest extends RequestBase {
 	
 	public void setBulkDelete(final boolean bulkDelete) {
 		this.bulkDelete = bulkDelete;
+	}
+
+	public String getJumpToParentOf() {
+		return jumpToParentOf;
+	}
+
+	public void setJumpToParentOf(String jumpToParentOf) {
+		this.jumpToParentOf = jumpToParentOf;
 	}
 
 	public DeleteNodesRequest() {

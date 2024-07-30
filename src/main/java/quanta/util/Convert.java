@@ -37,8 +37,6 @@ import quanta.types.TypeBase;
 public class Convert extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(Convert.class);
 
-    // todo-0: rethink these. Is this a good design. I found a bug where -2 was making it all the way to the gui.
-    // indicates we don't need to worry about sending back a good logicalOrdinal
     public static int LOGICAL_ORDINAL_IGNORE = -1;
     // indicates we need generate the correct logicalOrdinal
     public static int LOGICAL_ORDINAL_GENERATE = -2;
@@ -64,7 +62,7 @@ public class Convert extends ServiceBase {
         if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
                 (sig == null || sigFail) && !sc.isAdmin()) {
             /*
-             * todo-1: This is designed to silently fail here and not show the nodes where a signature is
+             * Note: This is designed to silently fail here and not show the nodes where a signature is
              * failing and a possible database hack, however on a clean install when an anon user visits the
              * site and the 'home' node is not yet signed we get this error with no explaination of why.
              */
