@@ -78,9 +78,7 @@ export class EditNodeDlgUtil {
 
         /*
         Note: if this is an encrypted node we will be signing the cipher text (encrypted string),
-        because content has already  been encrypted just above.
-
-        todo-2: Note: We only sign if admin for now, by design */
+        because content has already  been encrypted just above. */
 
         if (dlg.getState<EditNodeDlgState>().signCheckboxVal) {
             if (S.crypto.avail) {

@@ -78,7 +78,6 @@ public class ExportJsonService extends ServiceBase {
                         _os.write(newLine);
                         numDocs.setVal(numDocs.getVal() + 1);
                     } catch (Exception e) {
-                        // todo-2
                         e.printStackTrace();
                     }
                 });

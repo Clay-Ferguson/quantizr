@@ -23,9 +23,6 @@ import quanta.util.val.Val;
 
 /**
  * Assorted general utility functions related to SubNodes.
- *
- * todo-2: there's a lot of code calling these static methods, but need to transition to singleton
- * scope bean and non-static methods.
  */
 @Component
 public class SubNodeUtil extends ServiceBase {

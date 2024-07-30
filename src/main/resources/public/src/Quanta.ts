@@ -207,8 +207,9 @@ export class Quanta {
             //     Log.log("The hash has changed: hash=" + location.hash);
             // }, false);
 
-            // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
-            // so until i make it able to detect if user is editing i'm removing this.
+            // todo-1: actually this is a nuisance unless user is actually EDITING a node right now
+            // so until i make it able to detect if user is editing i'm removing this. 
+            // UPDATE: this is easy with getAs().editNode right?
             // do not delete.
             // window.onbeforeunload = () => {
             //     return "Leave [appName] ?";

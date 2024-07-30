@@ -37,7 +37,7 @@ import quanta.types.TypeBase;
 public class Convert extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(Convert.class);
 
-    // todo-2: rethink these. Is this a good design. I found a bug where -2 was making it all the way to the gui.
+    // todo-0: rethink these. Is this a good design. I found a bug where -2 was making it all the way to the gui.
     // indicates we don't need to worry about sending back a good logicalOrdinal
     public static int LOGICAL_ORDINAL_IGNORE = -1;
     // indicates we need generate the correct logicalOrdinal
@@ -64,7 +64,7 @@ public class Convert extends ServiceBase {
         if (prop.isRequireCrypto() && node.getPath().startsWith(NodePath.PUBLIC_PATH + "/") && //
                 (sig == null || sigFail) && !sc.isAdmin()) {
             /*
-             * todo-2: This is designed to silently fail here and not show the nodes where a signature is
+             * todo-1: This is designed to silently fail here and not show the nodes where a signature is
              * failing and a possible database hack, however on a clean install when an anon user visits the
              * site and the 'home' node is not yet signed we get this error with no explaination of why.
              */
@@ -112,14 +112,6 @@ public class Convert extends ServiceBase {
         }
 
         /*
-         * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
-         * to client packaged in this response, so that tooltip on the browser can display it, and the
-         * browser will simply contain this same 'map' that maps userIds to profile text, for good
-         * performance.
-         * 
-         * log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" +
-         * sc.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
-         * 
          * If the node is not owned by the person doing the browsing we need to extract the key from ACL and
          * put in cipherKey, so send back so the user can decrypt the node.
          */

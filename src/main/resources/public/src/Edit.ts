@@ -149,7 +149,7 @@ export class Edit {
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean) => {
         if (S.util.checkSuccess("Move nodes", res)) {
 
-            // todo-2: We DO need to do something to indicate to user that signatures got removed, but this way
+            // todo-1: We DO need to do something to indicate to user that signatures got removed, but this way
             // ended up being an annoyance when I'm doing a lot of editing back to back pasting every minute or two.
             // if (res.signaturesRemoved) {
             //     setTimeout(() => {
@@ -1612,7 +1612,7 @@ export class Edit {
                 }
             }
             else if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
-                // todo-2: Improvement here would be to try to go to the parent of the node, so we
+                // todo-1: Improvement here would be to try to go to the parent of the node, so we
                 // could pass the deletedPageNode indicator to the deleteNodes endpoint and let that
                 // signal to it to pass back to us the ID of the parent node or null if we don't
                 // have access to it, but for now if user deletes their page root node we take them

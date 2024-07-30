@@ -649,7 +649,7 @@ public class RSSFeedService extends ServiceBase {
     // else if (m instanceof DCModuleImpl) {
     // } else { // log.debug("dcSource: " + dcSource); // String dcTitle = dm.getTitle(); // String
     // dcSource =
-    // // dm.getSource(); // String dcFormat = dm.getFormat(); // what feeds use this? (todo-2) //
+    // // dm.getSource(); // String dcFormat = dm.getFormat(); 
     // // DCModuleImpl dm = (DCModuleImpl) m;
     // log.debug("Unknown module type: " + m.getClass().getName());
     // }

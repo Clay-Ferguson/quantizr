@@ -594,7 +594,6 @@ export class DomUtil {
     }
 
     public escapeRegEx = (text: string): string => {
-        // todo-2: from StackOverflow (not yet fully vetted)
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     }
 

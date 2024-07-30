@@ -327,7 +327,7 @@ public class NodeRenderService extends ServiceBase {
         boolean endReached = false;
         if (req.isGoToLastPage()) {
             // todo-2: fix
-            throw new RuntimeEx("No ability to go to last page yet in new mongo api.");
+            throw new RuntimeEx("Last page access not implemented yet.");
         }
 
         List<SubNode> slidingWindow = null;

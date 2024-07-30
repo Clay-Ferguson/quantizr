@@ -65,7 +65,7 @@ export class Search {
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
             nodeId,
             // if 'loadOthers' is true we add more tree content at more levels up the tree rather than the pure history of replies
-            loadOthers: false // todo-2: disabling this for now, to make GPT threads cleaner looking
+            loadOthers: false // todo-2: disabling this for now, to make AI threads cleaner looking
         });
         S.nodeUtil.processInboundNodes(res.nodes);
 
