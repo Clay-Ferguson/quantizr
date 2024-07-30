@@ -68,7 +68,7 @@ public class Convert extends ServiceBase {
              * failing and a possible database hack, however on a clean install when an anon user visits the
              * site and the 'home' node is not yet signed we get this error with no explaination of why.
              */
-
+            // This will cause an email to be sent to admin as well as show up in the Server Info panel
             crypto.getFailedSigNodes().add(node.getIdStr());
             
             log.error("Bad Signature on Admin Node: " + node.getIdStr()); 
