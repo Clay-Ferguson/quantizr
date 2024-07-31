@@ -44,18 +44,6 @@ import quanta.util.val.Val;
 public class MongoDelete extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
-    public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly, boolean deleteAttachments) {
-        auth.ownerAuth(ms, node);
-        if (!childrenOnly && deleteAttachments) {
-            if (node.getAttachments() != null) {
-                node.getAttachments().forEach((String key, Attachment att) -> {
-                    attach.deleteBinary(ms, key, node, null, true);
-                });
-            }
-        }
-        delete(ms, node, childrenOnly);
-    }
-
     /*
      * When a user is creating a new node we leave FIELD_MODIFY_TIME null until their first save of it
      * and during the time it's null no other users can see the node. However the user can also abandon

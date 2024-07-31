@@ -108,9 +108,6 @@ public class NodeEditService extends ServiceBase {
         auth.ownerAuth(ms, node);
         read.forceCheckHasChildren(ms, node);
 
-        // remove orphaned attachments
-        attach.removeDeletedAttachments(ms, node, req.getNode().getAttachments());
-
         // set new attachments
         node.setAttachments(req.getNode().getAttachments());
 

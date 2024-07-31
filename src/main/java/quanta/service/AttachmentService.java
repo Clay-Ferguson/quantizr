@@ -795,11 +795,7 @@ public class AttachmentService extends ServiceBase {
         if (userNode == null) {
             userNode = read.getAccountByUserName(null, null, false);
         }
-        // if we're importing we should leave any binary alone
-        if (!importMode) {
-            // Delete any existing grid data stored under this node, before saving new attachment
-            deleteBinary(ms, attName, node, userNode, true);
-        }
+       
         String id = grid.store(stream, fileName, mimeType, metaData).toString();
         long streamCount = stream.getCount();
         // update the user quota which enforces their total storage limit
@@ -820,6 +816,7 @@ public class AttachmentService extends ServiceBase {
      * means we should only delete from the GRID DB, and not touch any of the properties on the node
      * itself
      */
+    // &&&
     public void deleteBinary(MongoSession ms, String attName, SubNode node, SubNode userNode, boolean gridOnly) {
         if (node == null)
             return;
@@ -1140,27 +1137,6 @@ public class AttachmentService extends ServiceBase {
                 });
             }
         }
-    }
-
-    // Removes all attachments from 'node' that are not on 'newAttrs'
-    public void removeDeletedAttachments(MongoSession ms, SubNode node, HashMap<String, Attachment> newAtts) {
-        if (node.getAttachments() == null)
-            return;
-        // we need toDelete as separate list to avoid "concurrent modification exception" by deleting
-        // from the attachments set during iterating it.
-        List<String> toDel = new LinkedList<>();
-        node.getAttachments().forEach((key, att) -> {
-            if (newAtts == null || !newAtts.containsKey(key)) {
-                toDel.add(key);
-            }
-        });
-        // run these actual deletes in a separate async thread
-        arun.run(as -> {
-            for (String key : toDel) {
-                attach.deleteBinary(ms, key, node, null, false);
-            }
-            return null;
-        });
     }
 
     public long getTotalAttachmentBytes(MongoSession ms, SubNode node) {
