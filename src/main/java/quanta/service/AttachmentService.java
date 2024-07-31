@@ -92,7 +92,7 @@ import quanta.util.val.LongVal;
  * attachment. If the attachment is an 'image' type then it gets displayed right on the page.
  * Otherwise a download link is what gets displayed on the node.
  */
-@Component 
+@Component
 public class AttachmentService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
@@ -635,8 +635,7 @@ public class AttachmentService extends ServiceBase {
                     .body(region);
         } catch (Exception e) {
             log.error(e.getMessage());
-        }
-        finally {
+        } finally {
             StreamUtil.close(inStream);
         }
         return ret;
@@ -963,53 +962,69 @@ public class AttachmentService extends ServiceBase {
      * Also keeps totals by each user account, in a hashmap to be written all out at the end to all the
      * nodes.
      */
-    public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
+    @Transactional("mongoTm")
+    public void gridMaintenanceScan() {
+        log.debug("gridMaintenanceScan()");
         arun.run(as -> {
             int delCount = 0;
+            HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
+            // query all grid items
             GridFSFindIterable files = grid.find(new Query());
-            // Scan all files in the grid
             if (files != null) {
+                boolean delete = true;
+
+                // Scan all files in the grid
                 for (GridFSFile file : files) {
+                    // by default we delete the grid item unless we reach discover it is being used
+                    delete = true;
                     Document meta = file.getMetadata();
+                    // if node has metadata
                     if (meta != null) {
                         // Get which nodeId owns this grid file
                         ObjectId id = (ObjectId) meta.get("nodeId");
                         if (id != null) {
                             SubNode node = read.getNode(as, id);
-                            // If the node doesn't exist then this grid file is an orphan and should go away
-                            if (node == null) {
-                                log.debug("Grid Orphan Delete: " + id.toHexString());
-                                // Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
 
-                                Query q = new Query(Criteria.where("_id").is(file.getId()));
-                                // Note: It's not a bug that we don't call this here:
-                                // usrMgr.addNodeBytesToUserNodeBytes(session, node, null, -1);
-                                // Because all the userstats are updated at the end of this scan.
-                                grid.delete(q);
-                                delCount++;
-                            }
-                            // else update the UserStats by adding the file length to the total for this user
-                            else {
+                            // did we find the node that owns this grid item
+                            if (node != null) {
+                                delete = false;
+
+                                // update the UserStats by adding the file length to the total for this user
                                 UserStats stats = statsMap.get(node.getOwner());
+
+                                // if our map doesn't have this user yet, then create a new UserStats object
                                 if (stats == null) {
                                     stats = new UserStats();
                                     stats.binUsage = file.getLength();
                                     statsMap.put(node.getOwner(), stats);
-                                } else {
+                                }
+                                // else update the binUsage on the UserStats object
+                                else {
                                     stats.binUsage = stats.binUsage.longValue() + file.getLength();
                                 }
                             }
                         }
                     }
+
+                    if (delete) {
+                        log.debug("Grid Orphan Del: " + file.getId());
+                        // Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
+                        Query q = new Query(Criteria.where("_id").is(file.getId()));
+                        grid.delete(q);
+                        delCount++;
+                    }
                 }
             }
 
+            /*
+             * All UserStats will now be updated in loop above for all users that do have some attachment space
+             * consumes. So now we scan all userAccountNodes, and set a zero amount for those that don't already
+             * exist in the map
+             */
             Iterable<SubNode> accntNodes = read.getAccountNodes(as, null, null, null, -1);
-            // scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
-            // amount).
             for (SubNode accntNode : accntNodes) {
-                log.debug("Processing Account Node: id=" + accntNode.getIdStr());
+                // log.debug("Processing Account Node: id=" + accntNode.getIdStr());
                 UserStats stats = statsMap.get(accntNode.getOwner());
                 if (stats == null) {
                     stats = new UserStats();
@@ -1018,6 +1033,7 @@ public class AttachmentService extends ServiceBase {
                 }
             }
             log.debug(String.valueOf(delCount) + " grid orphans deleted.");
+            user.writeUserStats(as, statsMap);
             return null;
         });
     }

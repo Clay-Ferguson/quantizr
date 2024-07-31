@@ -91,24 +91,25 @@ public class SystemService extends ServiceBase {
         return ret;
     }
 
+    int maintenanceRunCount = 0;
+
+    // every 4 hours run a grid maintenance scan
+    @Scheduled(fixedDelay = 3 * DateUtil.HOUR_MILLIS)
+    public void runScheduledMaintenance() {
+        if (++maintenanceRunCount == 1)
+            return; // skip first run, which triggers at startup
+        attach.gridMaintenanceScan();
+    }
+
     public String compactDb() {
         String ret = "";
         try {
             prop.setDaemonsEnabled(false);
             delete.deleteNodeOrphans();
-            // do not delete.
-            // usrMgr.cleanUserAccounts();
-            // Create map to hold all user account storage statistics which gets updated by the various
-            // processing in here and then written out in 'writeUserStats' below
-            final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
-            attach.gridMaintenanceScan(statsMap);
+            attach.gridMaintenanceScan();
 
             ret += attach.verifyAllAttachments();
 
-            arun.run(as -> {
-                user.writeUserStats(as, statsMap);
-                return null;
-            });
             ret += runMongoDbCommand(MongoAppConfig.databaseName,
                     new Document("compact", "nodes").append("force", true));
             ret += "\n\nRemember to Rebuild Indexes next. Or else the system can be slow.";
@@ -217,7 +218,8 @@ public class SystemService extends ServiceBase {
     /* Every two hours, if there's a problem send email out to admin */
     @Scheduled(fixedDelay = 2 * DateUtil.HOUR_MILLIS)
     public void notifyAdminOfProblems() {
-        if (!prop.isRequireCrypto()) return;
+        if (!prop.isRequireCrypto())
+            return;
         crypto.sigCheckScan();
 
         if (crypto.getFailedSigNodes().isEmpty() && crypto.getUnsignedPublicNodes().isEmpty())
