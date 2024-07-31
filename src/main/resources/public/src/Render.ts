@@ -624,7 +624,6 @@ export class Render {
                     img
                 ]),
                 new Div(null, { className: "friendRhs" }, [
-
                     // I'm removing this because we can click on the image and to these thru the Profile Dialog of the user.
                     // new ButtonBar([
                     //     // todo-2: need to make ALL calls be able to do a newSubNode here without so we don't need

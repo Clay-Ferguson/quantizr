@@ -60,7 +60,7 @@ public class ExportJsonService extends ServiceBase {
                 BufferedOutputStream _os = os;
 
                 iter.forEach(node -> {
-                    // todo-2: this is not yet handling multiple images, but this method isn't currently used.
+                    // todo-3: this is not yet handling multiple images, but this method isn't currently used.
                     Attachment att = node.getFirstAttachment();
                     String binFileName = att != null ? att.getFileName() : null;
                     if (binFileName != null) {

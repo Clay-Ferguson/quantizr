@@ -317,10 +317,6 @@ export class NodeUtil {
                         title
                     }
                 }
-                // todo-2: Else this is a foreign user, so is there a way to set a link here to a
-                // foreign account, or should we basically run the equivalent of a user search here,
-                // probably best done with a modifiction to the UserPreferences server call and
-                // dialog
                 else {
                     props = {
                         className: "sharingName",

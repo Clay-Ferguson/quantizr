@@ -16,13 +16,13 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.TransferNodeRequest;
 import quanta.rest.response.TransferNodeResponse;
+import quanta.util.ThreadLocals;
 import quanta.util.val.IntVal;
 
 @Component 
 public class TransferService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(TransferService.class);
 
-    // todo-2: need to be doing a bulk update in here.
     @Transactional("mongoTm")
     public TransferNodeResponse cm_transferNode(MongoSession ms, TransferNodeRequest req) {
         TransferNodeResponse res = new TransferNodeResponse();
@@ -57,10 +57,13 @@ public class TransferService extends ServiceBase {
         }
         transferNode(ms, req.getOperation(), node, fromUserNode, toUserNode, ops);
         if (req.isRecursive()) {
-            // todo-2: make this ONLY query for the nodes that ARE owned by the person doing the transfer,
-            // but leave as ALL node for the admin who might specify the 'from'?
             for (SubNode n : read.getSubGraph(ms, node, null, 0, false, true, null)) {
                 transferNode(ms, req.getOperation(), n, fromUserNode, toUserNode, ops);
+
+                // only cache up to 100 dirty nodes at time time before saving/flushing changes.
+                if (ThreadLocals.getDirtyNodeCount() > 100) {
+                    update.saveSession(ms);
+                }
             }
         }
         if (ops.getVal() > 0) {
@@ -81,7 +84,7 @@ public class TransferService extends ServiceBase {
             return;
         }
         // if we're transferring only from a specific user (will only be admin able to do this) then we
-        // simply return without doing anything if this node in't owned by the person we're transferring
+        // simply return without doing anything if this node isn't owned by the person we're transferring
         // from
         if (fromUserNode != null && !fromUserNode.getOwner().equals(node.getOwner())) {
             return;

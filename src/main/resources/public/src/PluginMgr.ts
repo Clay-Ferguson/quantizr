@@ -59,7 +59,6 @@ export class PluginMgr {
         return ret;
     }
 
-    // todo-2: make it so that some plugins can be flagged as 'admin only' and not show up on the menu to pick them.
     initPlugins = () => {
         console.log("initPlugins()");
 

@@ -246,14 +246,6 @@ export class MenuPanel extends Div {
                 new MenuItemSeparator(), //
                 new MenuItem("Copy", S.edit.copySelNodes, onMainTab && !ast.nodesToMove && onMainTab && ast.selectedNodes.size > 0, null, true), //
                 new MenuItem("Undo Copy/Cut", S.edit.undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
-
-                // todo-2: disabled during mongo conversion
-                // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
-                // new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-                //    () => { return state.isAdminUser && highlightNode != null }, //
-                //    () => { return state.isAdminUser }, //
-                //    true
-                // ), //
             ], null));
         }
 
@@ -420,26 +412,6 @@ export class MenuPanel extends Div {
                 children.push(new Menu("Guided Tours", tourItems, null));
             }
         }
-
-        // //need to make export safe for end users to use (regarding file sizes)
-        // if (state.isAdminUser) {
-        //     children.push(new Menu(localState, "Admin Tools", [
-        //         //todo-2: disabled during mongo conversion
-        //         //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
-        //         //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
-        //         //    () => { return state.isAdminUser && highlightNode != null }, //
-        //         //    () => { return state.isAdminUser }, //
-        //         //    true
-        //         //), //
-        //     ]));
-        // }
-
-        // WORK IN PROGRESS (do not delete)
-        // let fileSystemMenuItems = //
-        //     menuItem("Reindex", "fileSysReindexButton", "systemfolder.reindex();") + //
-        //     menuItem("Search", "fileSysSearchButton", "systemfolder.search();"); //
-        //     //menuItem("Browse", "fileSysBrowseButton", "systemfolder.browse();");
-        // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //

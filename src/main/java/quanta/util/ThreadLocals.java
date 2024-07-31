@@ -49,7 +49,7 @@ public class ThreadLocals {
     private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
 
     /*
-     * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
+     * This is to allow our ExportJsonService.resetNode importer to work. This is importing
      * nodes that should be all self contained as an acyclical-directed graph (i.e. tree) and there's no
      * risk of nodes without parents, but they MAY be out of order so that the children of some nodes
      * may appear in the JSON being imported BEFORE their parents (which would cause the parent check to

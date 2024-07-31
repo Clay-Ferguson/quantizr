@@ -2,7 +2,7 @@ import { State } from "./State";
 import { S } from "./Singletons";
 import { ValueIntf } from "./Interfaces";
 
-/* todo-2: Finish making this type safe, and don't use 'any' inside here */
+/* todo-1: Finish making this type safe, and don't use 'any' inside here */
 export class Validator implements ValueIntf {
     v: State = new State();
     e: State = new State();

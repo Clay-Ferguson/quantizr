@@ -71,7 +71,6 @@ public class Convert extends ServiceBase {
             
             log.error("Bad Signature on Admin Node: " + node.getIdStr()); 
             /*
-             * todo-2: we need a special global counter for when this happens, so the server info can show it.
              * if we're under the PUBLIC_PATH and a signature fails, don't even show the node if this is an
              * ordinary user, because this means an 'admin' node is failing it's signature, and is an indication
              * of a server DB being potentially hacked so we completely refuse to display this content to the

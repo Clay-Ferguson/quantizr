@@ -117,10 +117,6 @@ public class MongoDelete extends ServiceBase {
      * Currently cleaning up GridFS orphans is done in gridMaintenanceScan() only, so when we delete one
      * or more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans will
      * get cleaned up later on, but not synchronously or in this method.
-     *
-     * todo-2: However, we could also have the 'path' stored in the GridFS metadata so we can use a
-     * 'regex' query to delete all the binaries (recursively under any node, using that path prefix as
-     * the criteria) which is exacly like the one below for deleting the nodes themselves.
      */
     public long delete(MongoSession ms, SubNode node, boolean childrenOnly) {
         auth.ownerAuth(ms, node);
@@ -449,8 +445,6 @@ public class MongoDelete extends ServiceBase {
 
             // back out the number of bytes it was using
             if (!ms.isAdmin()) {
-                // todo-2: Also this is incorrect for now. If the user deletes a deep subgraph of nodes we don't
-                // grant them back the space, so this would rob users of some space. Need to fix that.
                 long totalBytes = attach.getTotalAttachmentBytes(ms, node);
                 user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
             }

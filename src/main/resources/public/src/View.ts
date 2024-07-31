@@ -391,7 +391,6 @@ export class View {
                     m.message += "Build Time: " + BUILDTIME + "\n";
                 }
 
-                /* For now just prefix description onto the text. This will be made 'prettier' later todo-2 */
                 if (dlgDescription) {
                     m.message = dlgDescription + "\n\n" + m.message;
                 }

@@ -677,7 +677,7 @@ public class NodeEditService extends ServiceBase {
     }
 
     /*
-     * todo-2: we should be using a bulk update in here and using a streaming resultset instead of
+     * todo-3: we should be using a bulk update in here and using a streaming resultset instead of
      * holding it all in memory
      */
     @Transactional("mongoTm")
