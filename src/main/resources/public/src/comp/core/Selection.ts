@@ -7,7 +7,7 @@ import { Select } from "./Select";
 export class Selection extends Comp {
 
     constructor(attribs: any, private label: string = null, public selectionOptions: any[] = null, public moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
-        super(attribs, (valueIntf?.getState ? valueIntf?.getState() : null) || new State());
+        super(attribs, (valueIntf?.getState ? valueIntf?.getState() : null) || new State<any>(null));
         // w-25 = width 25%
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
     }

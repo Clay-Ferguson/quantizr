@@ -7,7 +7,7 @@ interface LS { // Local State
 
 export class ErrorDiv extends Comp {
 
-    constructor(s: State) {
+    constructor(s: State<LS>) {
         super(null, s);
         this.attribs.className = "validationError";
     }

@@ -42,11 +42,12 @@ export interface FullScreenConfig {
     ordinal?: number;
 }
 
+// todo-0: can we add better typing here than 'any' ?
 export interface ValueIntf {
     getValue(): any;
     setValue(val: any): void;
     getValidationError?(): string;
-    getState?(): State;
+    getState?(): State<any>;
 }
 
 /* Function Prototype/Signatore, It is assumed that a return value of false, will abort the

@@ -52,7 +52,11 @@ export abstract class Comp {
     public preRenderRejected: boolean = false;
     public ordinal: number;
 
-    constructor(attribs?: any, private stateMgr?: State) {
+    // DO NOT DELETE (#monitor-lifecycle)
+    // static allCompIds: Set<string> = new Set<string>();
+
+    // todo-0: add typesafety and not 'any' on stateMgr here
+    constructor(attribs?: any, private stateMgr?: State<any>) {
         if (typeof attribs === "string") {
             throw new Error("string was passed for 'attribs' in " + this.constructor.name);
         }
@@ -100,10 +104,6 @@ export abstract class Comp {
     public static getNextId(): string {
         // using base 36 makes the id shorter
         return (++Comp.guid).toString(36);
-    }
-
-    public managesState = (): boolean => {
-        return !!this.stateMgr;
     }
 
     /* Not currently used, but let's keep this */
@@ -276,6 +276,7 @@ export abstract class Comp {
         return ret;
     }
 
+    // add type argument here (not 'any')
     checkState = (): boolean => {
         if (!this.stateMgr) {
             if (!this.rendered) {
@@ -283,7 +284,7 @@ export abstract class Comp {
                 // This is because the 'useState' can only be called inside the render method due to
                 // the "Rules of Hooks". The normal pattern is that a component will call mergeState
                 // in the constructor to initialize some state
-                this.stateMgr = new State();
+                this.stateMgr = new State<any>(null);
             }
             else {
                 console.error("non-state component " + this.getCompClass() + " attempted to use stateMgr, after renderd");
@@ -295,12 +296,12 @@ export abstract class Comp {
 
     mergeState<T>(moreState: T): void {
         if (!this.checkState()) return;
-        this.stateMgr.mergeState<T>(moreState);
+        this.stateMgr.mergeState(moreState);
     }
 
     setState = <T>(newState: T) => {
         if (!this.checkState()) return;
-        this.stateMgr.setState<T>(newState);
+        this.stateMgr.setState(newState);
     }
 
     getState<T>(): T {
@@ -342,6 +343,9 @@ export abstract class Comp {
                 return () => {
                     this.mounted = false;
                     if (this.domRemoveEvent) this.domRemoveEvent();
+                    
+                    // DO NOT DELETE (#monitor-lifecycle)
+                    // Comp.allCompIds.delete(this.getId());
                 };
             }, []);
 
@@ -398,6 +402,9 @@ export abstract class Comp {
     }
 
     private domAdd = (): void => {
+        // DO NOT DELETE (#monitor-lifecycle)
+        // Comp.allCompIds.add(this.getId());
+
         // console.log("domAddEvent: " + this.getCompClass());
         const elm = this.getRef();
         if (!elm) {

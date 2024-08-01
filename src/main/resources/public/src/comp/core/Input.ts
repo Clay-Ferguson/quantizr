@@ -7,8 +7,8 @@ interface LS { // Local State
 
 export class Input extends Comp {
 
-    constructor(attribs: any = null, s?: State) {
-        super(attribs, s || new State());
+    constructor(attribs: any = null, s?: State<LS>) {
+        super(attribs, s || new State<LS>(null));
 
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });

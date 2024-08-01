@@ -7,8 +7,8 @@ interface LS { // Local State
 }
 
 export class CheckboxInput extends Comp {
-    constructor(attribs: any = {}, s?: State, private valueIntf?: ValueIntf) {
-        super(attribs, s || new State());
+    constructor(attribs: any = {}, s?: State<LS>, private valueIntf?: ValueIntf) {
+        super(attribs, s || new State<LS>(null));
 
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ checked: evt.target.checked });

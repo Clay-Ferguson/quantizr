@@ -1,5 +1,4 @@
 import { ValueIntf } from "../../Interfaces";
-import { State } from "../../State";
 import { Value } from "../../Value";
 import { Comp } from "../base/Comp";
 import { CheckboxInput } from "./CheckboxInput";
@@ -10,7 +9,7 @@ export class Checkbox extends Comp {
 
     /* To turn this into a slider switch, just add 'form-switch' to layoutClass style */
     constructor(public label: string = null, attribs: any = null, private valueIntf: ValueIntf, private layoutClass: string = null) {
-        super(attribs, new State());
+        super(attribs);
 
         this.valueIntf = this.valueIntf || new Value<string>(this, "val");
         this.outterClassName = this.attribs.className || "";

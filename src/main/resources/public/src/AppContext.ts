@@ -4,7 +4,7 @@ import { S } from "./Singletons";
 
 /* Redux Replacement!!
 
-We are dropping Redux and using useReducer+useContext instead, because Redux is no longer needed,
+We are dropping Redux and using useReducer+createContext instead, because Redux is no longer needed,
 now that React can do that all the state management we need and do it better (i.e. simpler) than
 Redux.
 

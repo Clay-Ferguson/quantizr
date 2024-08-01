@@ -1,5 +1,4 @@
 import { ValueIntf } from "../../Interfaces";
-import { State } from "../../State";
 import { Value } from "../../Value";
 import { Comp } from "../base/Comp";
 import { CheckboxInput } from "./CheckboxInput";
@@ -9,7 +8,7 @@ export class RadioButton extends Comp {
 
     constructor(public label: string, public checked: boolean, public groupName: string, attribs: any, private valueIntf: ValueIntf,
         private layoutClass: string = null) {
-        super(attribs, new State());
+        super(attribs);
         valueIntf = this.valueIntf || new Value<string>(this, "val");
         this.setTag("span");
     }

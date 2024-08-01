@@ -1,25 +1,36 @@
 import { useState } from "react";
 
-export class State {
-    state: any = {};
-    onStateChange: (val: any) => void;
+/* 
+Encapsulates the state of a component and provides by maintaining the state internally and also
+allowing the ability to monitor state with the "onStateChange" callback. This is useful for
+components that need to maintain state but also need to be able to monitor that state for changes 
+*/
+export class State<T> {
+    state: T;
+    onStateChange: (val: T) => void;
 
     // this is 'overridable/assignable' so that we have a way to monitor values as they get assigned
     // or even translate a value to some other value during assignment
-    stateTranslator = (s: any): any => {
-        return s;
+    stateTranslator: (s: T) => T;
+
+    constructor(initState: T) {
+        this.state = initState || {} as T;
     }
 
-    mergeState<T>(moreState: T): void {
-        this.state = this.stateTranslator({ ...this.state, ...moreState });
-        this.setStateEx((state: any) => {
-            return this.state = this.stateTranslator({ ...state, ...moreState });
+    mergeState(moreState: T): void {
+        const newState = { ...this.state, ...moreState };
+        this.state = this.stateTranslator ? this.stateTranslator(newState) : newState;
+
+        this.setStateEx((state: T) => {
+            const newState = { ...state, ...moreState };
+            return this.state = this.stateTranslator ? this.stateTranslator(newState) : newState;
         });
     }
 
-    setState = <T>(newState: T): void => {
-        this.setStateEx((_state: any) => {
-            return this.state = this.stateTranslator({ ...newState });
+    setState = (newState: T): void => {
+        this.setStateEx((_state: T) => {
+            // We wrap newState with curly braces to be sure we get an actual new object here
+            return this.state = this.stateTranslator ? this.stateTranslator({ ...newState }) : { ...newState };
         });
     }
 
@@ -28,7 +39,7 @@ export class State {
       hook won't (and cannot) be even called ever until the react function itself is currently
       executing (per the "Rules of Hooks")
     */
-    private setStateEx(state: (s?: any) => void) {
+    private setStateEx(state: (s?: T) => T): void {
         this.state = state(this.state);
         if (this.onStateChange) {
             this.onStateChange(this.state);
@@ -40,7 +51,7 @@ export class State {
         this.state = state;
 
         if (this.onStateChange) {
-            this.setStateEx = (state: () => void) => {
+            this.setStateEx = (state: () => T) => {
                 setStateEx(state);
                 this.onStateChange(state());
             }
