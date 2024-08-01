@@ -10,7 +10,7 @@ interface LS { // Local State
 export class Button extends Comp {
     constructor(text: string, callback: (evt?: Event, id?: string) => void, attribs: any = null, moreClasses: string = "btn-secondary",
         private iconClass: string = null) {
-        super(attribs, null);
+        super(attribs);
         moreClasses = moreClasses || "btn-secondary";
         this.attribs.type = "button";
         this.attribs.onClick = callback;

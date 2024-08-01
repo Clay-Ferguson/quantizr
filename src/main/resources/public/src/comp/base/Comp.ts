@@ -55,7 +55,6 @@ export abstract class Comp {
     // DO NOT DELETE (#monitor-lifecycle)
     // static allCompIds: Set<string> = new Set<string>();
 
-    // todo-0: add typesafety and not 'any' on stateMgr here
     constructor(attribs?: any, private stateMgr?: State<any>) {
         if (typeof attribs === "string") {
             throw new Error("string was passed for 'attribs' in " + this.constructor.name);

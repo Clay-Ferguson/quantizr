@@ -10,8 +10,6 @@ export interface ValidatorError { // Local State
     error: string;
 }
 
-
-/* todo-1: Finish making this type safe, and don't use 'any' inside here */
 export class Validator implements ValueIntf {
     v: State<ValidatorValue> = new State<ValidatorValue>(null);
     e: State<ValidatorError> = new State<ValidatorError>(null);

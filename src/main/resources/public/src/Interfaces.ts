@@ -42,7 +42,6 @@ export interface FullScreenConfig {
     ordinal?: number;
 }
 
-// todo-0: can we add better typing here than 'any' ?
 export interface ValueIntf {
     getValue(): any;
     setValue(val: any): void;
