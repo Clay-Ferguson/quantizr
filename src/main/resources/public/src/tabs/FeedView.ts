@@ -193,7 +193,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             }
         }
 
-        this.setChildren([
+        this.children = [
             this.headingBar = new TabHeading([
                 this.renderHeading(),
                 new Div(null, { className: "float-end" }, [
@@ -203,7 +203,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 ])
             ], this.data),
             new Div(null, { className: "feedView" }, children)
-        ]);
+        ];
         return true;
     }
 

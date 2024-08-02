@@ -31,7 +31,7 @@ export class App extends Main {
         const ast = getAs();
 
         if (!ast.appInitComplete) {
-            this.setChildren([new Progress()]);
+            this.children = [new Progress()];
             return true;
         }
 
@@ -42,7 +42,7 @@ export class App extends Main {
             // all dialog divs simultaneously onscreen in background of top one.
             const dialog = ast.dialogStack[ast.dialogStack.length - 1];
             if (dialog && dialog.mode !== DialogMode.POPUP) {
-                this.setChildren([dialog]);
+                this.children = [dialog];
                 return true;
             }
         }
@@ -52,19 +52,19 @@ export class App extends Main {
         this.attribs.className = "container-fluid " + (ast.mobileMode ? "mainContainerMobile" : "mainContainer");
 
         if (fullScreenViewer) {
-            this.setChildren([
+            this.children = [
                 ast.fullScreenConfig.type !== FullScreenType.CALENDAR ? new FullScreenControlBar() : null,
                 new Clearfix(),
                 fullScreenViewer
-            ]);
+            ];
         }
         else {
             if (S.quanta.config.requireCrypto && !S.crypto.avail) {
-                this.setChildren([new Heading(4, S.quanta.config.brandingAppName + " requires a browser with crypto features.")]);
+                this.children = [new Heading(4, S.quanta.config.brandingAppName + " requires a browser with crypto features.")];
                 return true;
             }
 
-            this.setChildren([
+            this.children = [
                 new Div(null, {
                     className: "row mainAppRow",
                     id: "appMainContainer"
@@ -74,11 +74,11 @@ export class App extends Main {
                     new TabPanel(mobileTopBar),
                     ast.mobileMode || !ast.showRhs ? null : new RightNavPanel()
                 ])
-            ]);
+            ];
         }
 
         if (ast.dialogStack?.length > 0) {
-            this.addChildren(ast.dialogStack);
+            this.children = ast.dialogStack;
         }
         return true;
     }

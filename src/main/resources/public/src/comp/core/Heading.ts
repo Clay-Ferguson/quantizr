@@ -4,11 +4,11 @@ export class Heading extends Comp {
 
     constructor(public level: number, public content: string, attrs: any = {}) {
         super(attrs);
-        this.setTag("h" + this.level)
+        this.tag = "h" + this.level;
     }
 
     override preRender = (): boolean => {
-        this.setChildren([this.content]);
+        this.children = [this.content];
         return true;
     }
 }

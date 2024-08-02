@@ -40,7 +40,7 @@ export class NodeCompContent extends Div {
         const ast = getAs();
 
         if (!this.node) {
-            this.setChildren(null);
+            this.children = null;
             return false;
         }
 
@@ -112,7 +112,7 @@ export class NodeCompContent extends Div {
         }
 
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

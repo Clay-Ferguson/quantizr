@@ -11,6 +11,6 @@ export class EmojiPicker extends Comp {
             // console.log("emoji: & #x" + emojiData.unified + "; &#x" + emojiData.unified + "; ");
             this.selectionValueIntf.setValue(emojiData.emoji);
         };
-        this.setTag(Picker)
+        this.tag = Picker;
     }
 }

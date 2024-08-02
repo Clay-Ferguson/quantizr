@@ -29,7 +29,7 @@ export class NodeCompMainList extends Div {
             this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", false);
         }
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

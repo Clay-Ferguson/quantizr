@@ -13,7 +13,7 @@ export class ToggleIcon extends Comp {
             className: this.attribs.className,
             toggle: false
         });
-        this.setTag("i");
+        this.tag = "i";
     }
 
     toggleClass = () => {

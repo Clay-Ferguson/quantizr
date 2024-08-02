@@ -48,7 +48,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         const userNameDisp = S.util.getFriendlyPrincipalName(this.aclEntry);
         const isPublic = this.aclEntry.principalName === PrincipalName.PUBLIC;
 
-        this.setChildren([
+        this.children = [
             new Div(null, null, [
                 this.renderAclPrivileges(this.aclEntry),
                 new Div(null, { className: "friendListImgDivCont" }, [
@@ -80,7 +80,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                     })
                 ])
             ])
-        ]);
+        ];
         return true;
     }
 }

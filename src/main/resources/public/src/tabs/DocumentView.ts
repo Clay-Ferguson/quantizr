@@ -30,7 +30,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) {
-            this.setChildren([new Div("Nothing found.")]);
+            this.children = [new Div("Nothing found.")];
             return true;
         }
 
@@ -83,7 +83,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         this.addPaginationBar(rows);
 
         children.push(new Div(null, { className: ast.userPrefs.editMode ? "appTabPaneEditMode" : null }, rows));
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

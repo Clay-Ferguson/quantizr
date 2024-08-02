@@ -53,7 +53,7 @@ export class DocIndexPanel extends Div {
         if (ast.activeTab != C.TAB_DOCUMENT) {
             backToDocLink = new Div("Back to Doc", { className: "backToDocLink float-end", onClick: this.goToDocTab })
         }
-        this.setChildren([backToDocLink, backToDocLink ? new Clearfix() : null, html]);
+        this.children = [backToDocLink, backToDocLink ? new Clearfix() : null, html];
         return true;
     }
 

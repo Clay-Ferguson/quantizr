@@ -14,7 +14,7 @@ export class TextareaTag extends Comp {
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
-        this.setTag("textarea");
+        this.tag = "textarea";
     }
 
     splitLines = (str: string): string[] => {

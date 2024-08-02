@@ -78,7 +78,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
             rowCount++;
         });
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

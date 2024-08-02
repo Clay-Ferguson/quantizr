@@ -4,6 +4,6 @@ export class Italic extends Comp {
 
     constructor(attribs: any = null) {
         super(attribs);
-        this.setTag("i");
+        this.tag = "i";
     }
 }

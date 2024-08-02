@@ -33,7 +33,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) {
-            this.setChildren([new Div("Nothing found.")]);
+            this.children = [new Div("Nothing found.")];
             return true;
         }
 
@@ -111,7 +111,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
 
         this.addPaginationBar(children, true, true, false);
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

@@ -4,11 +4,11 @@ export class Para extends Comp {
 
     constructor(public content: string = null, attribs: any = null) {
         super(attribs);
-        this.setTag("p");
+        this.tag = "p";
     }
 
     override preRender = (): boolean => {
-        this.setChildren([this.content]);
+        this.children = [this.content];
         return true;
     }
 }

@@ -97,7 +97,7 @@ export class RSSView extends AppTab<any, RSSView> {
             comp = ast.rssNode ? new NodeCompMarkdown(ast.rssNode, null, this.data, null) : null;
         }
 
-        this.setChildren([
+        this.children = [
             this.headingBar = new TabHeading([
                 new IconButton("fa-arrow-left", "", {
                     onClick: () => S.view.jumpToId(ast.rssNode.id),
@@ -117,7 +117,7 @@ export class RSSView extends AppTab<any, RSSView> {
             feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "float-end") : null,
             comp,
             feedContent
-        ]);
+        ];
         return true;
     }
 

@@ -13,7 +13,7 @@ export class Input extends Comp {
         this.attribs.onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
             this.mergeState<LS>({ value: evt.target.value });
         };
-        this.setTag("input");
+        this.tag = "input";
     }
 
     override preRender = (): boolean => {

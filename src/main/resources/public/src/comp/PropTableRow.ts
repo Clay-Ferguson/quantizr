@@ -5,7 +5,7 @@ export class PropTableRow extends Comp {
 
     constructor(attribs: any = {}, children: PropTableCell[] = null) {
         super(attribs);
-        this.setChildren(children);
-        this.setTag("tr");
+        this.children = children;
+        this.tag = "tr";
     }
 }

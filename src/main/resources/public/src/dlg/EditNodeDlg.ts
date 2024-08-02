@@ -534,8 +534,8 @@ export class EditNodeDlg extends DialogBase {
         // });
         // -------------------------
 
-        propEditFieldContainer.setChildren([editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
-            propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons()]);
+        propEditFieldContainer.children = [editorSubPanel, mainPropsTable, sharingDiv, sharingDivClearFix, binarySection,
+            propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons()];
 
         return children;
     }
@@ -924,7 +924,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         editItems.push(valEditor as any as Comp);
-        tableRow.setChildren(editItems);
+        tableRow.children = editItems;
         tableRow.ordinal = ordinal;
         return tableRow;
     }

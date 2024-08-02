@@ -131,7 +131,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         // });
 
         children.push(this.input = new TextareaTag(att, this.valState, this.calcRows, this.minRows, this.scrollPos));
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 }

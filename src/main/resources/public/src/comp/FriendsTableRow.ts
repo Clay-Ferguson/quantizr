@@ -31,7 +31,7 @@ export class FriendsTableRow extends ListBoxRow {
             console.log("no avatarVer on friend: " + this.friend.userNodeId);
         }
 
-        this.setChildren([
+        this.children = [
             new FlexLayout([
                 this.selectableRows ? new Checkbox(null, { className: "personsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
@@ -82,7 +82,7 @@ export class FriendsTableRow extends ListBoxRow {
                         (this.friend.userName === ast.userName ? "likedByMeIcon" : "")
                 }) : null
             ], "flexAlignChildrenTop")
-        ]);
+        ];
         return true;
     }
 

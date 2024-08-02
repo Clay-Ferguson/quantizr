@@ -146,7 +146,7 @@ export class NodeCompTableRowLayout extends Div {
             S.edit.helpNewUserEdit();
         }
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 }

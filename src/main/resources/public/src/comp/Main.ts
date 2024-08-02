@@ -8,13 +8,13 @@ export class Main extends Comp {
 
     constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
         super(attribs);
-        this.setChildren(children);
+        this.children = children;
         this.mergeState<LS>({ content });
-        this.setTag("main");
+        this.tag = "main";
     }
 
     override preRender = (): boolean => {
-        this.setContent(this.getState<LS>().content);
+        this.content = this.getState<LS>().content;
         return true;
     }
 }

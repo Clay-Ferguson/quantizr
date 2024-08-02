@@ -11,6 +11,6 @@ export class AppNavLink extends Comp {
             PubSub.pub(C.PUBSUB_closeNavPanel);
             func();
         }
-        this.setContent(content);
+        this.content = content;
     }
 }

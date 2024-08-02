@@ -419,7 +419,7 @@ export class MenuPanel extends Div {
             new MenuItem("Contact Us", MenuPanel.sendFeedback), //
         ], null));
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

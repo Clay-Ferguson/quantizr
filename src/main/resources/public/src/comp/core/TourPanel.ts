@@ -64,7 +64,7 @@ export class TourPanel extends Div {
             children.push(new Div("*** NOTE: This tour requires you to be logged in, for the steps to work.", { className: "bigMarginLeft marginTop" }));
         }
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 }

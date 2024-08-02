@@ -23,7 +23,7 @@ export class AdminView extends AppTab<any, AdminView> {
         const horzClass = "marginTop marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
-        this.setChildren([
+        this.children = [
             this.headingBar = new TabHeading([
                 new Div("Admin Console", { className: "tabTitle" })
             ], null),
@@ -106,7 +106,7 @@ export class AdminView extends AppTab<any, AdminView> {
                     ])
                 ], horzClass),
             ])
-        ]);
+        ];
         return true;
     }
 

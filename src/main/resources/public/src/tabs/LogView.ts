@@ -31,10 +31,10 @@ export class LogView extends AppTab<any, LogView> implements LogViewIntf {
     }
 
     override preRender = (): boolean => {
-        this.setChildren([
+        this.children = [
             new Heading(3, "Log", { className: "logView" }),
             new Html("<pre>" + LogView.logs + "</pre>")
-        ]);
+        ];
         return true;
     }
 

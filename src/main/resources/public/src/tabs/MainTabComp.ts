@@ -50,7 +50,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         }
 
         // let header: Div = null;
-        this.setChildren([
+        this.children = [
             // We only show the primary (tree view) header if user is NOT logged in, so we can post
             // blogs and other content of that sort which don't need to say "Quanta" (branding name)
             // at top
@@ -105,7 +105,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 // })
             ], this.data)),
             contentDiv
-        ]);
+        ];
 
         // if (header) {
         //     S.domUtil.setDropHandler(header.attribs, (evt: DragEvent) => {

@@ -22,10 +22,10 @@ export class SchemaOrgPropsTable extends ListBox {
             });
 
             if (comps?.length > 0) {
-                this.setChildren(comps);
+                this.children = comps;
             }
             else {
-                this.setChildren([new Div("No properties.")]);
+                this.children = [new Div("No properties.")];
             }
         }
         return true;

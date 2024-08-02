@@ -39,13 +39,13 @@ export class MenuItem extends Div {
             innerClazz = "listGroupMenuItem " + this.moreClasses;
         }
 
-        this.setChildren([
+        this.children = [
             innerSpan,
             this.treeOp ? new Tag("i", {
                 className: "fa fa-caret-right fa-lg float-end " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
                 title: "Operates on the selected Tree Nodes(s)",
             }) : null
-        ]);
+        ];
 
         if (state.enabled) {
             this.attribs.disabled = "disabled";

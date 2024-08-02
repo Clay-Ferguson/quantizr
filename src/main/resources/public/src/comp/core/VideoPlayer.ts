@@ -4,7 +4,7 @@ export class VideoPlayer extends Comp {
 
     constructor(attrib: any) {
         super(attrib);
-        this.setTag("video");
+        this.tag = "video";
     }
 
     getVideoElement(): HTMLVideoElement {

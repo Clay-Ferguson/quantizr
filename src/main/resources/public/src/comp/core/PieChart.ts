@@ -9,7 +9,7 @@ export class PieChart extends Div {
     }
 
     override preRender = (): boolean => {
-        this.setChildren([new Svg(null, { className: this.className })]);
+        this.children = [new Svg(null, { className: this.className })];
         return true;
     }
 

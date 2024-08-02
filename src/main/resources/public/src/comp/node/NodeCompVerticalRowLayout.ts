@@ -133,7 +133,7 @@ export class NodeCompVerticalRowLayout extends Div {
             S.edit.helpNewUserEdit();
         }
 
-        this.setChildren(comps);
+        this.children = comps;
         return true;
     }
 }

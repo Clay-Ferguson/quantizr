@@ -14,7 +14,7 @@ export class Checkbox extends Comp {
         this.valueIntf = this.valueIntf || new Value<string>(this, "val");
         this.outterClassName = this.attribs.className || "";
         this.layoutClass = this.layoutClass || "form-check-inline";
-        this.setTag("span")
+        this.tag = "span";
     }
 
     override preRender = (): boolean => {
@@ -24,7 +24,7 @@ export class Checkbox extends Comp {
         // all other things being identical! The custom-switch shows a little slider switch button
         // instead of a box with a check.
         this.attribs.className = "form-check " + this.layoutClass + " " + this.outterClassName + " clickable";
-        this.setChildren([
+        this.children = [
             cbInput = new CheckboxInput({
                 type: "checkbox",
                 className: "form-check-input clickable"
@@ -36,7 +36,7 @@ export class Checkbox extends Comp {
                 htmlFor: cbInput.getId(),
                 title: this.attribs.title
             })
-        ]);
+        ];
         return true;
     }
 }

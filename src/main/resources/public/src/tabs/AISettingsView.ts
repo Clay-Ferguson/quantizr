@@ -35,7 +35,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
         const aiModelInfo = aiService && aiService.longDescription ? aiService.description + " -- " + aiService.longDescription : null;
         const aiOptions = S.aiUtil.getAiOptions();
 
-        this.setChildren([
+        this.children = [
             this.headingBar = new TabHeading([
                 new Div("AI Settings", { className: "tabTitle" })
             ], null),
@@ -69,7 +69,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                     new Button("Save", this.save, { className: "marginTop" })
                 ]) : null,
             ])
-        ]);
+        ];
         return true;
     }
 

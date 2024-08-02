@@ -178,7 +178,7 @@ export abstract class DialogBase extends Comp {
             contentAreaClass = ast.mobileMode ? "appModalContentAreaEmbedMobile" : "appModalContentAreaEmbed";
         }
 
-        this.setChildren([
+        this.children = [
             // It's tricky but 'closeByOutsideClick' means this is a "menu", so, no title.
             this.title && !this.closeByOutsideClick ? (this.titleDiv = new Div(null, {
                 className: (this.mode === DialogMode.POPUP ? "appModalTitlePopup " : "appModalTitleNormal ") +
@@ -192,7 +192,7 @@ export abstract class DialogBase extends Comp {
             new Div(null, {
                 className: contentAreaClass
             }, this.renderDlg())
-        ]);
+        ];
 
 
         if (this.mode === DialogMode.FULLSCREEN) {
@@ -222,8 +222,8 @@ export abstract class DialogBase extends Comp {
                     }
                 }
 
-                const children = this.getChildren();
-                this.setChildren([
+                const children = this.children
+                this.children = [
                     this.dlgFrame = new Div(null, {
                         id: this.getId(),
                         className: clazzName,
@@ -233,7 +233,7 @@ export abstract class DialogBase extends Comp {
                             width: this.dlgWidth
                         }
                     }, children)
-                ]);
+                ];
 
                 if (!ast.mobileMode && this.dlgFrame && this.titleDiv) {
                     this.makeDraggable(this.dlgFrame, this.titleDiv);

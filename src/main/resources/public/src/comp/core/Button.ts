@@ -17,7 +17,7 @@ export class Button extends Comp {
         this.attribs.className = (this.attribs.className || "") + " btn clickable " + //
             moreClasses + (getAs().mobileMode ? " mobileButton" : "");
         this.mergeState<LS>({ text, enabled: true });
-        this.setTag("button");
+        this.tag = "button";
     }
 
     setEnabled = (enabled: boolean) => {
@@ -38,12 +38,12 @@ export class Button extends Comp {
             this.attribs.disabled = "disabled";
         }
 
-        this.setChildren([
+        this.children = [
             // We use Tag("i") here instead of Icon(), because Icon renders larger in size for mobile mode and that
             // would conflict with this button already itself sizing larger for mobile
             this.iconClass ? new Tag("i", {
                 className: "fa " + this.iconClass + (text ? " buttonIconWithText" : " buttonIconNoText")
-            }) : null, text]);
+            }) : null, text];
 
         return true;
     }

@@ -9,7 +9,7 @@ export class ButtonBar extends Comp {
      solution is to add a "new Clearfix()" after the ButtonBar (below the ButtonBar) */
     constructor(buttons: Comp[] = null, private wrapperClass: string = null, private extraClass: string = null) {
         super(null);
-        this.setChildren(buttons);
+        this.children = buttons;
     }
 
     override preRender = (): boolean => {
@@ -19,8 +19,8 @@ export class ButtonBar extends Comp {
         };
 
         if (this.wrapperClass) {
-            const children = this.getChildren();
-            this.setChildren([new Div(null, props, children)]);
+            const children = this.children;
+            this.children = [new Div(null, props, children)];
             this.attribs.className = this.wrapperClass;
         }
         else {

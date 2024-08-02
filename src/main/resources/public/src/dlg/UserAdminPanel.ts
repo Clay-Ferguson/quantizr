@@ -16,7 +16,7 @@ export class UserAdminPanel extends Div {
 
     override preRender = (): boolean => {
         const userProfile = this.dlg.getState<UserProfileDlgState>().userProfile;
-        this.setChildren([
+        this.children = [
             new Div("User Admin", { className: "userAdminHeading" }),
             userProfile?.balance ? new Div("Balance: " + userProfile.balance) : null,
             new ButtonBar([
@@ -51,7 +51,7 @@ export class UserAdminPanel extends Div {
                     this.dlg.mergeState<UserProfileDlgState>({ userProfile });
                 })
             ])
-        ]);
+        ];
         return true;
     }
 }

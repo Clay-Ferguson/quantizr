@@ -44,7 +44,7 @@ export class PropDisplayLayout extends Div {
         }
         const innerDiv = new Div(null, { className: "flexPropsDisplayPanel" }, children)
         innerDiv.ordinalSortChildren();
-        this.setChildren([innerDiv]);
+        this.children = [innerDiv];
         return true;
     }
 }

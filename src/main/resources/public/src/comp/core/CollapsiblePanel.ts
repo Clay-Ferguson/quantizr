@@ -20,11 +20,11 @@ export class CollapsiblePanel extends Comp {
         private extraDivStyleCollapsed: string = "",
         elementName: string = "div") {
         super(attribs);
-        this.setChildren(children);
+        this.children = children;
         this.collapsedButtonText = collapsedButtonText || "More ";
         this.expandedButtonText = expandedButtonText || "Less ";
         this.mergeState<LS>({ expanded });
-        this.setTag(elementName);
+        this.tag = elementName;
     }
 
     setExpanded(expanded: boolean) {
@@ -40,8 +40,8 @@ export class CollapsiblePanel extends Comp {
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
             this.attribs.className = this.extraDivStyleExpanded;
-            const children = this.getChildren();
-            this.setChildren([
+            const children = this.children;
+            this.children = [
                 // This div and it's children holds the actual collapsible content.
                 new Div(null, {
                     className: collapseClass
@@ -55,12 +55,12 @@ export class CollapsiblePanel extends Comp {
                     }),
                     ...children
                 ])
-            ]);
+            ];
         }
         else {
             this.attribs.className = this.extraDivStyleCollapsed;
-            const children = this.getChildren();
-            this.setChildren([
+            const children = this.children;
+            this.children = [
                 // This span is the expande/collapse button itself
                 new Span(this.collapsedButtonText === "n/a" ? null : (this.collapsedButtonText + "   "), {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " iconUp" : " iconDown"),
@@ -74,7 +74,7 @@ export class CollapsiblePanel extends Comp {
                     className: collapseClass
                 },
                     children)
-            ]);
+            ];
         }
         return true;
     }

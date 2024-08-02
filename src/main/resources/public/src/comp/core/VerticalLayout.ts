@@ -12,7 +12,7 @@ export class VerticalLayout extends Div {
                 return child ? new Div(null, null, [child]) : null;
             }).filter(c => !!c);
 
-            this.setChildren(children);
+            this.children = children;
         }
     }
 }

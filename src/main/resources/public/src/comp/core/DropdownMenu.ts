@@ -6,12 +6,12 @@ export class DropdownMenu extends Comp {
     constructor(private items: Comp[], moreClasses: string = "") {
         super(null);
         this.attribs.className = "dropdown " + moreClasses;
-        this.setTag("span")
+        this.tag = "span";
     }
 
     override preRender = (): boolean => {
         const id = "ddMenu-" + this.getId();
-        this.setChildren([
+        this.children = [
             new Icon({
                 className: "fa fa-ellipsis-h fa-lg clickable",
                 id,
@@ -22,7 +22,7 @@ export class DropdownMenu extends Comp {
                 className: "dropdown-menu",
                 "aria-labelledby": id,
             }, this.items)
-        ]);
+        ];
         return true;
     }
 }

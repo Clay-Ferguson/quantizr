@@ -174,16 +174,16 @@ export class NodeCompBinary extends Div {
     override preRender = (): boolean => {
         const node = this.getState<LS>().node;
         if (!node) {
-            this.setChildren(null);
+            this.children = null;
             return;
         }
 
         /* If this is an image render the image directly onto the page as a visible image */
         if (S.props.hasImage(node, this.attName)) {
-            this.setChildren([this.makeImageComp(node)]);
+            this.children = [this.makeImageComp(node)];
         }
         else if (S.props.hasVideo(node, this.attName)) {
-            this.setChildren([
+            this.children = [
                 new FlexRowLayout([
                     new IconButton("fa-play", "Video", {
                         onClick: () => {
@@ -194,10 +194,10 @@ export class NodeCompBinary extends Div {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
-            ]);
+            ];
         }
         else if (S.props.hasAudio(node, this.attName)) {
-            this.setChildren([
+            this.children = [
                 new FlexRowLayout([
                     new IconButton("fa-play", "Audio", {
                         onClick: () => {
@@ -208,7 +208,7 @@ export class NodeCompBinary extends Div {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
-            ]);
+            ];
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
@@ -229,20 +229,22 @@ export class NodeCompBinary extends Div {
             }
 
             const titleSuffix = `File Size:${fileSize}\n\nType:${fileType}`;
-            this.setChildren([new Div(null, {
-                className: "binary-link"
-            }, [
-                new Icon({
-                    className: "fa fa-file fa-lg smallMarginRight"
-                }),
-                new Span(null, null, [
-                    new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {
-                        className: "downloadLink marginRight",
-                        title: "Click to download attachment\n\n" + titleSuffix
+            this.children = [
+                new Div(null, {
+                    className: "binary-link"
+                }, [
+                    new Icon({
+                        className: "fa fa-file fa-lg smallMarginRight"
                     }),
-                    viewFileLink
+                    new Span(null, null, [
+                        new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {
+                            className: "downloadLink marginRight",
+                            title: "Click to download attachment\n\n" + titleSuffix
+                        }),
+                        viewFileLink
+                    ])
                 ])
-            ])]);
+            ];
         }
         return true;
     }

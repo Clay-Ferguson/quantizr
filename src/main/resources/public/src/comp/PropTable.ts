@@ -43,9 +43,9 @@ export class PropTable extends Comp {
         children.sort((a, b) => a.ordinal - b.ordinal);
 
         this.attribs.className = "scrollingPropsTable";
-        this.setChildren([
+        this.children = [
             new Table({ className: "customScrollBar smallMarginRight" }, children)
-        ]);
+        ];
         return true;
     }
 }

@@ -13,7 +13,7 @@ export class Menu extends Comp {
         const expanded = getAs().expandedMenus.has(this.name);
         const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");
 
-        this.setChildren([
+        this.children = [
             new Div(null, {
                 className: clazz + (ast.mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses,
                 id: "heading" + this.getId(),
@@ -34,7 +34,7 @@ export class Menu extends Comp {
                     id: "items-" + this.getId(),
                     className: "menuPanelItems"
                 }, this.menuItems)]) : null
-        ]);
+        ];
         return true;
     }
 }

@@ -113,7 +113,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
             ])
         ]) : null;
 
-        this.setChildren([
+        this.children = [
             label,
             new Div(null, {
                 className: "input-group textField"
@@ -122,7 +122,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
                 passwordEye
             ]),
             new ErrorDiv(this.cfg.val.e)
-        ]);
+        ];
 
         if (this.cfg.enter) {
             this.input.attribs.onKeyPress = (e: KeyboardEvent) => {

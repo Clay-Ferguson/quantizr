@@ -8,13 +8,13 @@ export class Svg extends Comp {
 
     constructor(content: string = "", attribs: any = null, children: Comp[] = null) {
         super(attribs);
-        this.setChildren(children);
+        this.children = children;
         this.mergeState<LS>({ content });
-        this.setTag("svg");
+        this.tag = "svg";
     }
 
     override preRender = (): boolean => {
-        this.setContent(this.getState<LS>().content);
+        this.content = this.getState<LS>().content;
         return true;
     }
 }

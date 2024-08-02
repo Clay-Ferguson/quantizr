@@ -4,6 +4,6 @@ export class Img extends Comp {
 
     constructor(attribs: any = null) {
         super(attribs);
-        this.setTag("img");
+        this.tag = "img";
     }
 }

@@ -4,8 +4,8 @@ export class PropTableCell extends Comp {
 
     constructor(content: string = null, attribs: any = {}, children: Comp[] = null) {
         super(attribs);
-        this.setChildren(children);
-        this.setTag("td");
-        this.setContent(content);
+        this.children = children;
+        this.tag = "td";
+        this.content = content;
     }
 }

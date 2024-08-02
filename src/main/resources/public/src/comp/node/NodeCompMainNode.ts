@@ -27,12 +27,12 @@ export class NodeCompMainNode extends Div {
         const node = ast.node;
 
         if (ast.cutCopyOp === "cut" && ast.nodesToMove && ast.nodesToMove.find(id => id === node.id)) {
-            this.setChildren([new Div("You've cut this node. Navigate to another folder to paste it.", { className: "pageNodeCutMessage" })]);
+            this.children = [new Div("You've cut this node. Navigate to another folder to paste it.", { className: "pageNodeCutMessage" })];
             return true;
         }
 
         if (!node) {
-            this.setChildren(null);
+            this.children = null;
             return false;
         }
 
@@ -84,7 +84,7 @@ export class NodeCompMainNode extends Div {
 
         const buttonBar = new NodeCompButtonBar(node, false, 0, false, null, null, this.tabData);
 
-        this.setChildren([
+        this.children = [
             S.render.renderLinkLabel(node.id),
             header,
             buttonBar,
@@ -92,7 +92,7 @@ export class NodeCompMainNode extends Div {
             jumpButton,
             new NodeCompContent(node, this.tabData, false, true, this.tabData.id, null, true, null),
             S.render.renderLinks(node, this.tabData)
-        ]);
+        ];
 
         return true;
     }

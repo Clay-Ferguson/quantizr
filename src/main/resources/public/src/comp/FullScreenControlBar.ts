@@ -22,7 +22,7 @@ export class FullScreenControlBar extends Div {
     }
 
     override preRender = (): boolean => {
-        this.setChildren(this.getComps());
+        this.children = this.getComps();
         return true;
     }
 

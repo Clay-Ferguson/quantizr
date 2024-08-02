@@ -79,7 +79,7 @@ export class DateTimeField extends Span {
     }
 
     override preRender = (): boolean => {
-        this.setChildren([
+        this.children = [
             new DateField(this.dateState),
             this.showTime ? new TimeField(this.timeState, "marginLeft") : null,
             this.durationState ? new TextField({
@@ -128,7 +128,7 @@ export class DateTimeField extends Span {
                     title: "Make this a #due date"
                 }) : null,
             ])
-        ]);
+        ];
         return true;
     }
 }

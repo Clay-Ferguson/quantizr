@@ -40,14 +40,14 @@ export class TabPanel extends Div {
             this.attribs.className += " compHidden";
         }
 
-        this.setChildren([
+        this.children = [
             this.customTopComp,
             new Div(null, {
                 className: "row tabContent",
                 role: "main",
                 id: "tabPanelContentId"
             }, this.buildTabs())
-        ]);
+        ];
         return true;
     }
 

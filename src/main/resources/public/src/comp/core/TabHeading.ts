@@ -16,7 +16,7 @@ export class TabHeading extends Div {
             children.push(!getAs().mobileMode && data?.props?.breadcrumbs ? new BreadcrumbsPanel(data?.props?.breadcrumbs) : null);
         }
 
-        this.setChildren(children);
+        this.children = children;
         this.attribs.className = getAs().mobileMode ? "headingBarMobile" : "headingBar";
     }
 }

@@ -4,13 +4,13 @@ export class Tag extends Comp {
 
     constructor(public tagName: string, attribs: any = null, children: Comp[] = null, private textChild: string = null) {
         super(attribs);
-        this.setChildren(children);
-        this.setTag(tagName);
+        this.children = children;
+        this.tag = tagName;
     }
 
     override preRender = (): boolean => {
         if (this.textChild) {
-            this.setChildren([this.textChild]);
+            this.children = [this.textChild];
         }
         return true;
     }

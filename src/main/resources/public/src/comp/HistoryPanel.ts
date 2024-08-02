@@ -22,7 +22,7 @@ export class HistoryPanel extends Div {
         const ast = getAs();
 
         if (ast.nodeHistory.length === 0) {
-            this.setChildren(null);
+            this.children = null;
             return;
         }
         const children = [];
@@ -78,7 +78,7 @@ export class HistoryPanel extends Div {
                 S.domUtil.makeDropTarget(parentDropTarg.attribs, h.id);
             }
         });
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

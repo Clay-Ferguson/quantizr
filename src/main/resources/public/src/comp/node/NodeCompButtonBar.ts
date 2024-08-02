@@ -29,7 +29,7 @@ export class NodeCompButtonBar extends Div {
     override preRender = (): boolean => {
         const ast = getAs();
         if (!this.node) {
-            this.setChildren(null);
+            this.children = null;
             return false;
         }
 
@@ -374,7 +374,7 @@ export class NodeCompButtonBar extends Div {
         }
 
         if (dragIcon || selCheckbox || sharedIcon || buttonBar) {
-            this.setChildren([dragIcon, selCheckbox, sharedIcon, buttonBar]);
+            this.children = [dragIcon, selCheckbox, sharedIcon, buttonBar];
             return true;
         }
         return false;

@@ -15,7 +15,7 @@ export class TabPanelButtons extends Div {
     }
 
     override preRender = (): boolean => {
-        this.setChildren([
+        this.children = [
             new Div(null, {
                 className: "tabButtonsContainer"
             }, [
@@ -24,7 +24,7 @@ export class TabPanelButtons extends Div {
                     id: "navTabs"
                 }, this.buildTabButtons())]
             )
-        ]);
+        ];
         return true;
     }
 

@@ -17,7 +17,7 @@ export class CheckboxInput extends Comp {
         if (this.valueIntf) {
             this.mergeState<LS>({ checked: !!valueIntf.getValue() });
         }
-        this.setTag("input");
+        this.tag = "input";
     }
 
     override preRender = (): boolean => {

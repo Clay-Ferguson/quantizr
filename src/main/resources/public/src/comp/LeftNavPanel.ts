@@ -76,7 +76,7 @@ export class LeftNavPanel extends Div {
         }
 
         let scrollDiv = null;
-        this.setChildren([
+        this.children = [
             scrollDiv = new Div(null, { className: "leftNavPanel customScrollbar" }, [
                 new Div(null, { id: "appLHSHeaderPanelId", className: "lhsHeaderPanel" }, [
                     new Img({
@@ -112,7 +112,7 @@ export class LeftNavPanel extends Div {
                 showDocIndex ? new DocIndexPanel() : null,
                 showDocIndex ? null : new MenuPanel()
             ])
-        ]);
+        ];
 
         scrollDiv.getScrollPos = (): number => {
             return LeftNavPanel.scrollPos;

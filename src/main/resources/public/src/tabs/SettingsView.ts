@@ -29,7 +29,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
         const horzClass = "marginTop marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
-        this.setChildren([
+        this.children = [
             this.headingBar = new TabHeading([
                 new Div("Settings", { className: "tabTitle" })
             ], null),
@@ -110,7 +110,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     ])
                 ], horzClass)
             ])
-        ]);
+        ];
         return true;
     }
 

@@ -135,7 +135,7 @@ export class TTSView extends AppTab<any, TTSView> {
         }
 
         if (S.speech.ttsSupported()) {
-            this.setChildren([
+            this.children = [
                 this.headingBar = new TabHeading([
                     new Div("Text-to-Speech", { className: "tabTitle" }),
                     new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
@@ -159,11 +159,11 @@ export class TTSView extends AppTab<any, TTSView> {
                     rows: 3
                 }, TTSView.textAreaState) : null,
                 paraComps?.length > 0 ? new Div(null, { className: "speechTxtArea" }, paraComps) : null
-            ]);
+            ];
         } else {
-            this.setChildren([
+            this.children = [
                 new Div("Text-to-Speech is not supported in this browser.", { className: "tabTitle" })
-            ]);
+            ];
         }
         return true;
     }

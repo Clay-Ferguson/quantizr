@@ -24,7 +24,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) {
-            this.setChildren([new Div("Nothing found.")]);
+            this.children = [new Div("Nothing found.")];
             return true;
         }
 
@@ -98,7 +98,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             }, "btn-secondary ui-new-node-plus marginTop", "fa-plus"));
         }
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

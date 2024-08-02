@@ -23,7 +23,7 @@ export class DateField extends Div implements I.ValueIntf {
     }
 
     override preRender = (): boolean => {
-        this.setChildren([
+        this.children = [
             new Div(null, {
                 className: "dateField"
             }, [
@@ -32,7 +32,7 @@ export class DateField extends Div implements I.ValueIntf {
                     type: "date"
                 }, this.valState.v)
             ])
-        ]);
+        ];
         return true;
     }
 }

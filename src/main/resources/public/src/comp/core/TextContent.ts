@@ -10,7 +10,7 @@ export class TextContent extends Comp {
         super(null);
         this.attribs.className = classes || "alert alert-secondary";
         this.setText(text);
-        this.setTag(this.preformatted ? "pre" : "div");
+        this.tag = this.preformatted ? "pre" : "div";
     }
 
     setText = (text: string) => {
@@ -27,7 +27,7 @@ export class TextContent extends Comp {
         }
         else {
             // console.log("Building (TextContent) react element: " + this.attribs.id);
-            this.setChildren([state.text]);
+            this.children = [state.text];
         }
         return true;
     }

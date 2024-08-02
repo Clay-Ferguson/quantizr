@@ -25,10 +25,10 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
         const res = this.data ? this.data.props.res : null;
 
         if (!res) {
-            this.setChildren([
+            this.children = [
                 new Heading(6, "Generating statistics...", { className: "marginTop" }),
                 new Spinner()
-            ]);
+            ];
             return true;
         }
 
@@ -70,7 +70,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
 
         const hasTop100s = tagPanel?.hasChildren() || wordPanel?.hasChildren();
 
-        this.setChildren([
+        this.children = [
             this.headingBar = new TabHeading([
                 new Div("Node Stats", { className: "tabTitle" })
             ], null),
@@ -78,7 +78,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
             hasTop100s ? new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }) : null,
             tagPanel.hasChildren() ? tagPanel : null,
             wordPanel.hasChildren() ? wordPanel : null
-        ]);
+        ];
         return true;
     }
 

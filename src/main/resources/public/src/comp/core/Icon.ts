@@ -6,11 +6,11 @@ export class Icon extends Comp {
     constructor(attribs: any = null, private label: string = null) {
         super(attribs);
         this.attribs.className += getAs().mobileMode ? " mobileIcon" : "";
-        this.setTag("i")
+        this.tag = "i";
     }
 
     override preRender = (): boolean => {
-        this.setChildren([this.label]);
+        this.children = [this.label];
         return true;
     }
 }

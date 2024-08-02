@@ -17,10 +17,10 @@ export class Select extends Comp {
             this.mergeState({ value: evt.target.value });
         };
 
-        this.setChildren(this.selectionOptions.map((row: any) => {
+        this.children = this.selectionOptions.map((row: any) => {
             return new SelectionOption(row.key, row.val);
-        }));
-        this.setTag("select");
+        });
+        this.tag = "select";
     }
 
     override preRender = (): boolean => {

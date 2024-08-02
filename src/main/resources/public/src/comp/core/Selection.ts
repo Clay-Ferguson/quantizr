@@ -28,7 +28,7 @@ export class Selection extends Comp {
         }
 
         children.push(select);
-        this.setChildren(children);
+        this.children = children;
         this.attribs.className = this.outterClasses || "";
         return true;
     }

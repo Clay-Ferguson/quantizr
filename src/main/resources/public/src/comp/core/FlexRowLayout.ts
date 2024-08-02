@@ -9,6 +9,6 @@ export class FlexRowLayout extends Comp {
     constructor(public comps: Comp[] = null, moreClasses: string = "", attribs: any = {}) {
         super(attribs);
         this.attribs.className = "flexRowLayout " + moreClasses;
-        this.setChildren(comps);
+        this.children = comps;
     }
 }

@@ -9,11 +9,11 @@ export class Markdown extends Comp {
     constructor(public content: string = "", public attr: any = null) {
         super(attr);
         this.mergeState<LS>({ content });
-        this.setTag(ReactMarkdownComp);
+        this.tag = ReactMarkdownComp;
     }
 
     override preRender = (): boolean => {
-        this.setChildren([this.getState<LS>().content]);
+        this.children = [this.getState<LS>().content];
         return true;
     }
 }

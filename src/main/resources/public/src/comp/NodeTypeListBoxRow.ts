@@ -13,12 +13,12 @@ export class NodeTypeListBoxRow extends ListBoxRow {
     override preRender = (): boolean => {
         const iconClass = this.type.getIconClass();
 
-        this.setChildren([
+        this.children = [
             new FlexLayout([
                 iconClass ? new Icon({ className: iconClass + " typeListIcon" }) : null,
                 new Span(this.type.getName())
             ], this.isSelected ? "selectedListItem" : "unselectedListItem")
-        ]);
+        ];
         return true;
     }
 }

@@ -23,10 +23,10 @@ export class FriendsTable extends ListBox {
             });
 
             if (friendsComps?.length > 0) {
-                this.setChildren(friendsComps);
+                this.children = friendsComps;
             }
             else {
-                this.setChildren([new Div("No matching users.")]);
+                this.children = [new Div("No matching users.")];
             }
         }
         return true;

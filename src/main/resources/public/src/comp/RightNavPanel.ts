@@ -194,18 +194,18 @@ export class RightNavPanel extends Div {
         ]);
 
         if (ast.mobileMode) {
-            this.setChildren([
+            this.children = [
                 creditDiv,
                 rightNavDiv
-            ]);
+            ];
         }
         else {
-            this.setChildren([
+            this.children = [
                 scrollDiv = new Div(null, { className: ast.showRhs ? "rightNavPanel customScrollbar" : "rightNavPanelPopup" }, [
                     creditDiv,
                     rightNavDiv
                 ])
-            ]);
+            ];
 
             scrollDiv.getScrollPos = (): number => {
                 return RightNavPanel.scrollPos;

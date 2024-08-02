@@ -487,7 +487,7 @@ export class NodeCompRowHeader extends Div {
             children.push(new Clearfix());
         }
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

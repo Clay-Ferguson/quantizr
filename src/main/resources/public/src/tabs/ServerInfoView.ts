@@ -18,7 +18,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
     override preRender = (): boolean => {
         const ast = getAs();
 
-        this.setChildren([
+        this.children = [
             new Div(null, { className: "marginTop" }, [
 
                 ast.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
@@ -29,7 +29,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
 
                 ast.serverInfoText.startsWith("<") ? new Html(ast.serverInfoText) : new Pre(ast.serverInfoText, { className: "serverInfoText" })
             ])
-        ]);
+        ];
         return true;
     }
 }

@@ -18,7 +18,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
         if (this.prop.comment) {
             attr.title = this.prop.comment;
         }
-        this.setChildren([
+        this.children = [
             new Div(null, attr, [
                 new Checkbox(null, { className: "propsListItemCheckBox" }, {
                     setValue: (checked: boolean) => {
@@ -36,7 +36,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
                 new Div(this.prop.label, { className: "propNameInList" }),
                 new Div(this.makeRangesListString(), { className: "propRangesInList float-end" })
             ])
-        ]);
+        ];
         return true;
     }
 

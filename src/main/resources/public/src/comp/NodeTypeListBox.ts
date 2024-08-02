@@ -36,7 +36,7 @@ export class NodeTypeListBox extends ListBox {
             }
         });
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

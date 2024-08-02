@@ -36,7 +36,7 @@ export class FullScreenImgViewer extends Main {
             children.push(new NodeCompBinary(node, attName, false, true, true, null));
         }
 
-        this.setChildren(children);
+        this.children = children;
         return true;
     }
 

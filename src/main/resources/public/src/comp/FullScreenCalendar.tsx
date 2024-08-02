@@ -30,7 +30,7 @@ export class FullScreenCalendar extends Main {
 
         this.attribs.className = "marginAll";
 
-        this.setChildren([
+        this.children = [
             createElement(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
                 headerToolbar: {
@@ -80,7 +80,7 @@ export class FullScreenCalendar extends Main {
                     }
                 }
             })
-        ]);
+        ];
 
         return this.reactNode("div");
     }

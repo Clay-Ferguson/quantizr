@@ -4,7 +4,7 @@ export class RadioButtonGroup extends Comp {
     constructor(initialButtons: Comp[] = null, moreClasses: string = "") {
         super(null);
         this.attribs.className = moreClasses;
-        this.setChildren(initialButtons);
+        this.children = initialButtons;
 
         initialButtons.forEach(row => {
             if (row?.attribs?.checked === "checked") {

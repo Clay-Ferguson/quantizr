@@ -38,13 +38,13 @@ export class IconButton extends Comp {
         // this gets activated when the user clicks an infinite scrolling button, so it turns into a spinner
         // while loading more records
         if (state.waiting) {
-            this.setTag("span");
-            this.setChildren([new Spinner()]);
+            this.tag = "span";
+            this.children = [new Spinner()];
             return true;
         }
 
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
-        this.setChildren([
+        this.children = [
             this.imageUrl ? new Img({
                 key: "img_" + this.getId(),
                 src: this.imageUrl
@@ -57,8 +57,8 @@ export class IconButton extends Comp {
                 key: "t_" + this.getId(),
                 className: "iconButtonFont"
             }) : null
-        ]);
-        this.setTag("button");
+        ];
+        this.tag = "button";
         return true;
     }
 }

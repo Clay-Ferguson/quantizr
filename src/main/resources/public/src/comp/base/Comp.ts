@@ -17,8 +17,8 @@ export abstract class Comp {
     public rendered: boolean = false;
 
     // tag can be a string *or* a react functional component
-    private tag: any;
-    public firstContent: string = null;
+    public tag: any;
+    public content: string = null;
 
     private static guid: number = 0;
 
@@ -37,7 +37,7 @@ export abstract class Comp {
      * required to be tolerated and ignored WARNING: TypeScript is NOT enforcing that children be
      * private here.
      */
-    private children: any[];
+    public children: any[];
 
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
@@ -94,14 +94,6 @@ export abstract class Comp {
         this.attribs.key = this.attribs.key || this.attribs.id;
     }
 
-    setTag = (tag: any): void => {
-        this.tag = tag;
-    }
-
-    setContent = (cont: string): void => {
-        this.firstContent = cont;
-    }
-
     /* Not currently used, but let's keep this */
     public getRefAsync = (_warn: boolean = true): Promise<HTMLElement> => {
         return new Promise<HTMLElement>((resolve, _reject) => {
@@ -136,10 +128,6 @@ export abstract class Comp {
 
     getCompClass = (): string => {
         return this.constructor.name + "_" + this.getId();
-    }
-
-    static nextGuid(): number {
-        return ++Comp.guid;
     }
 
     /* Schedules a function to get run whenever this element comes into existence, or will cause the
@@ -188,22 +176,14 @@ export abstract class Comp {
 
     /* Returns true if there are any non-null children */
     hasChildren(): boolean {
-        return !!this.firstContent || this.children?.some(child => !!child);
-    }
-
-    setChildren(comps: any[]) {
-        this.children = comps;
-    }
-
-    getChildren(): any[] {
-        return this.children;
+        return !!this.content || this.children?.some(child => !!child);
     }
 
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {
-        if (!this.firstContent && (!children || children.length === 0)) return null;
+        if (!this.content && (!children || children.length === 0)) return null;
 
-        let arr = this.firstContent ? [this.firstContent] : [];
+        let arr = this.content ? [this.content] : [];
         if (children) {
             arr = children.reduce((acc: any[], child: any) => {
                 if (child instanceof Comp) {
@@ -268,7 +248,6 @@ export abstract class Comp {
                 S.util.logErr(e, "Failed in Comp.tagRender" + this.getCompClass() + " attribs=" + S.util.prettyPrint(this.attribs));
             }
         }
-
         return ret;
     }
 
@@ -359,8 +338,7 @@ export abstract class Comp {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
-            // we allow preRender to not return a value and that's the same as true
-            if (this.preRender() === false) {
+            if (this.preRender && this.preRender() === false) {
                 this.preRenderRejected = true;
                 return null;
             }
@@ -426,9 +404,7 @@ export abstract class Comp {
     /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this
     method should be just to set the children. To indicate to NOT render the component at all return
     false from this method */
-    preRender(): boolean {
-        return true;
-    }
+    preRender: () => boolean
 
     // This is the function you override/define to implement the actual render method, which is
     // simple and decoupled from state management aspects that are wrapped in 'render' which is what

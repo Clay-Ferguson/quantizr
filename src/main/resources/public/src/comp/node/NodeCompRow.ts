@@ -177,7 +177,7 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node);
         }
 
-        this.setChildren([
+        this.children = [
             this.isTableCell ? null : insertInlineButton,
             S.render.renderLinkLabel(this.node.id),
             header,
@@ -187,7 +187,7 @@ export class NodeCompRow extends Div {
             new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, null),
             this.internalComp,
             S.render.renderLinks(this.node, this.tabData)
-        ]);
+        ];
         return true;
     }
 }

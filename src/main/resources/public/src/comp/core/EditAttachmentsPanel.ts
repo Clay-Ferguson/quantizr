@@ -27,7 +27,7 @@ export class EditAttachmentsPanel extends Div {
     override preRender = (): boolean => {
         const ast = getAs();
         if (!this.node.attachments && !ast.cutAttachments) return null;
-        this.setChildren([]);
+        this.children = [];
         let isFirst = true;
         const atts = this.dlg.getState<EditNodeDlgState>().selectedAttachments;
 

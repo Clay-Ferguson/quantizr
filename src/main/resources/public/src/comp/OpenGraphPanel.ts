@@ -156,19 +156,19 @@ export class OpenGraphPanel extends Div {
         if (state.loading || !state.og) {
             // be sure to return true to let this render or else we won't get the observer callback,
             // because the observer callback is only called when the element is rendered.
-            this.setChildren(null);
+            this.children = null;
             return true;
         }
 
         if (state.og.mime?.startsWith("image/")) {
-            this.setChildren([new Img({ src: this.ui.url, className: "insImgInRow" })]);
+            this.children = [new Img({ src: this.ui.url, className: "insImgInRow" })];
             return true;
         }
 
         /* If neither a description nor image exists, this will not be interesting enough so don't
         render */
         if (!state.og.description && !state.og.image && !state.og.title) {
-            this.setChildren(null);
+            this.children = null;
             return false;
         }
 
@@ -227,7 +227,7 @@ export class OpenGraphPanel extends Div {
         }
 
         this.attribs.className = this.wrapperClass;
-        this.setChildren([
+        this.children = [
             // bookmarkIcon,
             this.showTitle ? (state.og.url ? new Anchor(this.ui.url, state.og.title, {
                 target: "_blank",
@@ -236,7 +236,7 @@ export class OpenGraphPanel extends Div {
                 className: "openGraphTitle"
             })) : null,
             imgAndDesc
-        ]);
+        ];
         return true;
     }
 }

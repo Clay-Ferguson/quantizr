@@ -10,13 +10,13 @@ export class RadioButton extends Comp {
         private layoutClass: string = null) {
         super(attribs);
         valueIntf = this.valueIntf || new Value<string>(this, "val");
-        this.setTag("span");
+        this.tag = "span";
     }
 
     override preRender = (): boolean => {
         let cbInput = null;
         this.attribs.className = "form-check " + (this.layoutClass || "");
-        this.setChildren([
+        this.children = [
             cbInput = new CheckboxInput({
                 name: this.groupName,
                 type: "radio",
@@ -28,7 +28,7 @@ export class RadioButton extends Comp {
                 htmlFor: cbInput.getId(),
                 className: "form-check-label radioLabel"
             })
-        ]);
+        ];
         return true;
     }
 }
