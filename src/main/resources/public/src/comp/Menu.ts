@@ -5,7 +5,7 @@ import { Div } from "./core/Div";
 
 export class Menu extends Comp {
     constructor(public name: string, public menuItems: Comp[], private func: () => void = null, private floatRightComp: Comp = null, private moreClasses: string = "", private subMenu: boolean = false) {
-        super({ id: "menu_" + S.util.hashOfString(name), className: "menuCard" });
+        super({ key: name, className: "menuCard" });
     }
 
     override preRender = (): boolean => {
