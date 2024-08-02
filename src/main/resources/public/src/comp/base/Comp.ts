@@ -88,7 +88,9 @@ export abstract class Comp {
             }
         }
 
-        this.attribs.id = this.attribs.id || Comp.getNextId();
+        // Note: I used to pass a 36 into the toString method to get a 36-based number, but I decided since this code
+        // needs to be as fast as possible, I would just use the default base 10 number and not worry about the extra memory consumed
+        this.attribs.id = this.attribs.id || (++Comp.guid).toString();
         this.attribs.key = this.attribs.key || this.attribs.id;
     }
 
@@ -98,11 +100,6 @@ export abstract class Comp {
 
     setContent = (cont: string): void => {
         this.firstContent = cont;
-    }
-
-    public static getNextId(): string {
-        // using base 36 makes the id shorter
-        return (++Comp.guid).toString(36);
     }
 
     /* Not currently used, but let's keep this */
