@@ -181,7 +181,10 @@ export abstract class Comp {
 
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {
-        if (!this.content && (!children || children.length === 0)) return null;
+        if (!this.content && (!children || children.length === 0)) {
+            if (this.debug) console.log("createChildren: no children for " + this.getCompClass());
+            return null;
+        }
 
         let arr = this.content ? [this.content] : [];
         if (children) {
@@ -233,6 +236,9 @@ export abstract class Comp {
         else {
             try {
                 const children = this.createChildren(this.children);
+
+                if (this.debug)
+                    console.log("reactNode: " + this.getCompClass() + " childCount=" + children?.length);
 
                 if (children?.length == 1) {
                     ret = createElement(type, this.attribs, children[0]);
@@ -318,7 +324,7 @@ export abstract class Comp {
                 return () => {
                     this.mounted = false;
                     if (this.domRemoveEvent) this.domRemoveEvent();
-                    
+
                     // DO NOT DELETE (#monitor-lifecycle)
                     // Comp.allCompIds.delete(this.getId());
                 };
@@ -340,6 +346,8 @@ export abstract class Comp {
 
             if (this.preRender && this.preRender() === false) {
                 this.preRenderRejected = true;
+                if (this.debug)
+                    console.log("preRender Rejected: " + this.getCompClass());
                 return null;
             }
             const ret = this.compRender();

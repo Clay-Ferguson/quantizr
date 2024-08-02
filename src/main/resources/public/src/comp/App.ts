@@ -78,7 +78,7 @@ export class App extends Main {
         }
 
         if (ast.dialogStack?.length > 0) {
-            this.children = ast.dialogStack;
+            this.addChildren(ast.dialogStack);
         }
         return true;
     }
