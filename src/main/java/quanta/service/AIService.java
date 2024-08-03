@@ -1,7 +1,6 @@
 package quanta.service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -123,6 +122,7 @@ public class AIService extends ServiceBase {
         return aiRes;
     }
 
+    // todo-0: put these properties right inside the AIModel and get rid of this method
     private String getApiKey(String service) {
         switch (service) {
             case "anthropic":
@@ -131,6 +131,8 @@ public class AIService extends ServiceBase {
                 return prop.getOpenAiKey();
             case "perplexity":
                 return prop.getPplxAiKey();
+            case "gemini":
+                return prop.getGeminiAiKey();
             default:
                 throw new RuntimeException("Unknown service: " + service);
         }

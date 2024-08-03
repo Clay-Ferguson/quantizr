@@ -16,7 +16,6 @@ class Settings:
         """Get the config markdown."""
         return f"""
 ### Configuration
-* Model: {cfg.openai_model}
 * Source Folder: {cfg.source_folder}
 * Data Folder: {cfg.data_folder}
 * Extensiont to include: {cfg.scan_extensions}

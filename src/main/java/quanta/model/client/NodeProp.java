@@ -127,12 +127,6 @@ public enum NodeProp {
     OPEN_GRAPH("sn:og"), //
     TRUNCATED("trunc"), //
 
-    // not needed yet (or ever), commenting for now.
-    // OPENAI_RESPONSE("sn:oaiRes"), //
-    // ANTHAI_RESPONSE("sn:anthaiRes"), //
-    // PPLXAI_RESPONSE("sn:pplxaiRes"), //
-    // GEMINIAI_RESPONSE("sn:geminiaiRes"), //
-
     // used to let nodes specify the files and paths for markdown export
     FILE_NAME("file"), //
     FOLDER_NAME("folder");

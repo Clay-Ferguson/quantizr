@@ -1,6 +1,7 @@
 """ Streamlit GUI for the Quanta Chatbot """
 
 from typing import List
+from langchain_google_genai import ChatGoogleGenerativeAI
 import streamlit as st
 from streamlit_chat import message
 from langchain.schema import HumanMessage, AIMessage, BaseMessage
@@ -43,6 +44,13 @@ class AppAgentGUI:
                 timeout=60,  # timeout in seconds
                 api_key=SecretStr(self.cfg.anth_api_key),
             )
+        elif st.session_state.p_ai_service == AIService.GEMINI.value:
+            llm = ChatGoogleGenerativeAI(
+                model=self.cfg.gemini_model,
+                temperature=0.0,
+                request_timeout=60,
+                google_api_key=self.cfg.gemini_api_key,
+        )
         else:
             raise Exception(f"Invalid AI Service: {st.session_state.p_ai_service}")
 

@@ -48,8 +48,12 @@ class AppConfig:
         )
         p.add_argument("--openai_api_key", required=True, help="API key for OpenAI")
         p.add_argument("--anth_api_key", required=True, help="API key for Anthropic")
+        p.add_argument("--gemini_api_key", required=True, help="API key for Gemini")
+        
         p.add_argument("--openai_model", required=True, help="OpenAI model name")
         p.add_argument("--anth_model", required=True, help="Anthropic model name")
+        p.add_argument("--gemini_model", required=True, help="Anthropic model name")
+
         p.add_argument("--ai_service", required=True, help="AI Service")
         p.add_argument(
             "--scan_extensions",

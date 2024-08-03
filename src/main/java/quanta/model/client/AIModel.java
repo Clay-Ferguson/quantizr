@@ -13,7 +13,7 @@ public enum AIModel {
     PPLX_LLAMA3("llama3",  "perplexity", "llama-3-70b-instruct", "Meta: Llama 3", "PPL", true), //
     ANTH("anthAi",  "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true), // Opus (most powerful)
     ANTH_SONNET("anthAi_sonnet",  "anthropic", "claude-3-5-sonnet-20240620", "Anthropic: Claude 3.5 Sonnet", "ACS", true), // Sonnet
-    GEMINI("geminiAi",  "gemini", "", "Google: Gemini", "GEM", true);
+    GEMINI("geminiAi",  "gemini", "gemini-pro", "Google: Gemini", "GEM", true);
 
     @JsonValue
     private final String value;

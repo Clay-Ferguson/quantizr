@@ -15,6 +15,7 @@ from .agent.tags import (
 class AIService(Enum):
     OPENAI = "openai"
     ANTHROPIC = "anth"
+    GEMINI = "gemini"
 
 
 class RefactorMode(Enum):

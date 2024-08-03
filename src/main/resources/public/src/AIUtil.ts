@@ -24,6 +24,7 @@ export class AIUtil {
             longDescription: ""
         });
 
+        // todo-0: we should be defining these only in AIModel.java
         if (S.quanta.config.useOpenAi) {
             this.aiServices.push({
                 name: J.AIModel.OPENAI,

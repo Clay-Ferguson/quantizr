@@ -46,7 +46,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
             nodeId: this.nodeId,
             question: this.questionState.getValue(),
             nodeIds: S.nodeUtil.getSelNodeIdsArray(),
-            aiService: getAs().userPrefs.aiService, // openAi, pplxAi, geminiAi
+            aiService: getAs().userPrefs.aiService, 
         });
 
         this.close();

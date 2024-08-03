@@ -44,6 +44,12 @@ Current installed modules can be gathered into `requirements.txt` using this:
 
     pip freeze > requirements.txt
 
+    -- or -- 
+    This more portable version which will work better in docker because there's no paths coded into it.
+
+    pip list --format=freeze | grep -v "file:" > requirements.txt
+
+
 To install the current requirements that are published with this project run this:
 
     pip install -r requirements.txt

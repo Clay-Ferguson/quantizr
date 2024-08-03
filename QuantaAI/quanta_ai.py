@@ -6,7 +6,7 @@ from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
-from langchain_community.chat_models import ChatPerplexity
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic.v1.types import SecretStr
 from pydantic import BaseModel
 from typing import List, Optional, Set
@@ -27,6 +27,7 @@ OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online" 
 PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
 PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
+GEMINI_MODEL_COMPLETION_CHAT = "gemini-pro"
 
 app = FastAPI()
 
@@ -166,6 +167,14 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
             request_timeout=120,  # timeout in seconds
             pplx_api_key=api_key,
         )
+    elif req.service == "gemini":
+        llm = ChatGoogleGenerativeAI(
+            model=req.model,
+            temperature=req.temperature,
+            max_tokens_to_sample=req.maxTokens,
+            request_timeout=120,  # timeout in seconds
+            google_api_key=api_key,
+        )
     else:
         raise ValueError(f"Unsupported service: {req.service}")
     return llm
@@ -223,6 +232,14 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
 
     # 70B model
     elif model == PPLX_MODEL_COMPLETION_ONLINE:
+        input_ppm = 1.0
+        output_ppm = 1.0
+        input_price_per_req = 0.005
+        return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+
+    # todo-0: This is actually incorrect pricing for Gemini. Need to look it up
+    elif model == GEMINI_MODEL_COMPLETION_CHAT:
         input_ppm = 1.0
         output_ppm = 1.0
         input_price_per_req = 0.005

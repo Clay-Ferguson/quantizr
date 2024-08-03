@@ -50,6 +50,7 @@ def show_ai_model_picker(st):
     mode_mapping = {
         AIService.OPENAI.value: "OpenAI",
         AIService.ANTHROPIC.value: "Anthropic",
+        AIService.GEMINI.value: "Gemini",
     }
 
     st.radio(
@@ -59,6 +60,7 @@ def show_ai_model_picker(st):
         format_func=lambda x: {
             AIService.OPENAI.value: "OpenAI",
             AIService.ANTHROPIC.value: "Anthropic",
+            AIService.GEMINI.value: "Gemini",
         }[x],
         # on_change=mode_changed,
     )
