@@ -2,9 +2,19 @@
 FROM python:3.12.3-slim AS builder
 WORKDIR /app/QuantaAI
 
-# Copy and install requirements first to leverage caching
-COPY QuantaAI/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -U \
+    uvicorn \
+    fastapi \
+    langchain \
+    langchain-anthropic \
+    langchain_google_genai \
+    langchain-openai \
+    langchain-community \
+    langchain-core \
+    langchain-text-splitters \
+    langgraph \
+    pydantic \
+    pydantic_core 
 
 # Final stage
 FROM python:3.12.3-slim
