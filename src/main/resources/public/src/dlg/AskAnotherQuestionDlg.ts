@@ -9,7 +9,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
-import { GptAnswerDlg } from "./GptAnswerDlg";
+import { AIAnswerDlg } from "./AIAnswerDlg";
 
 export class AskAboutSubgraphDlg extends DialogBase {
     questionState: Validator = new Validator("", [
@@ -52,7 +52,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
         this.close();
 
         if (res.code == C.RESPONSE_CODE_OK) {
-            new GptAnswerDlg(res.answer).open();
+            new AIAnswerDlg(res.answer).open();
         }
     }
 }

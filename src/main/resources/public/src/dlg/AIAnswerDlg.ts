@@ -5,7 +5,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Markdown } from "../comp/core/Markdown";
 
-export class GptAnswerDlg extends DialogBase {
+export class AIAnswerDlg extends DialogBase {
 
     constructor(public answer: string) {
         super("Chat GPT Answer", "appModalContMediumWidth");
