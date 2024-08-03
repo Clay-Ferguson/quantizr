@@ -62,7 +62,7 @@ public class MongoUtil extends ServiceBase {
      * removed lower-case 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we
      * need very performant way to translate from /r/p to /r path and vice verse
      */
-    static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
+    static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOQSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
     public void validate(SubNode node) {
         if (ThreadLocals.hasDirtyNode(node.getId())) {
@@ -152,12 +152,6 @@ public class MongoUtil extends ServiceBase {
          * regardless of any existing ones
          */
         if (!path.endsWith("/") && pathIsAvailable(path)) {
-            // we must proactively delete any orphaned nodes that might be existing and would be 'ressurected'
-            // which would be BAD!
-            long orphans = delete.simpleDeleteUnderPath(null, path);
-            if (orphans > 0) {
-                log.debug("New Path Found: " + path + " deleted " + orphans + " orphans");
-            }
             return path;
         }
         int tries = 0;
@@ -197,7 +191,7 @@ public class MongoUtil extends ServiceBase {
     public boolean pathIsAvailable(String path) {
         Criteria crit = new Criteria();
         /*
-         * Or criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
+         * Our criteria here says if the exact 'path' exists or any node starting with "${path}/" exists even
          * as an orphan (which can definitely happen) then this path it not available. So even orphaned
          * nodes can keep us from being able to consider a path 'available for use'
          */
