@@ -307,9 +307,6 @@ public class MongoCreate extends ServiceBase {
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
                 aiResponse = ai.getAnswer(ms, req.isAgentic(), parentNode, null, system, svc, userCredit);
 
-                if (svc.getService() == "gemini") {
-                    throw new RuntimeException("Gemini AI is temporarily unavailable.");
-                }
                 res.setGptCredit(userCredit.getVal());
                 typeToCreate = NodeType.AI_ANSWER.s();
             }
