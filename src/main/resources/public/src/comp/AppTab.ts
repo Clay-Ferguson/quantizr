@@ -61,12 +61,10 @@ export class AppTab<PT = any, TT = any> extends Div {
             this.setScrollTop(elm.offsetTop);
         }
         else {
+            // We use headingBarHeight adustment only for desktop app because the mobile version doesn't have the sticky header.
             // headingBar is not fixed height so we get it's hight in realtime here.
-            const headingBarHeight = this.headingBar?.getRef()?.offsetHeight || 0;
-
-            // we scroll up the additional 12 pixels just to make a slight gap between top row
-            // border and heading border, because it's slightly better looking that way.
-            let top = elm.offsetTop - headingBarHeight - 12;
+            const headingBarHeight = getAs().mobileMode ? 0 : this.headingBar?.getRef()?.offsetHeight || 0;
+            let top = elm.offsetTop - headingBarHeight;
             if (top < 0) top = 0;
 
             // If we were gonna scroll somewhere near the top of the page go ahead and scroll to the
