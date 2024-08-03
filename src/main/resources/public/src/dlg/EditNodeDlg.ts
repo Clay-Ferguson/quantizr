@@ -77,8 +77,6 @@ export class EditNodeDlg extends DialogBase {
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
         super("[none]", "appModalCont " + C.TAB_MAIN, null, mode);
         const ast = getAs();
-        this.attribs.id = "EditNodeDlg_" + ast.editNode.id;
-        this.attribs.key = this.attribs.key || this.attribs.id;
 
         let signCheckboxVal = false;
         let encryptCheckboxVal = false;
@@ -101,7 +99,7 @@ export class EditNodeDlg extends DialogBase {
             encryptCheckboxVal
         });
 
-        this.allowEditAllProps = getAs().isAdminUser;
+        this.allowEditAllProps = ast.isAdminUser;
         this.utl.initStates(this);
         this.initialProps = S.util.arrayClone(ast.editNode.properties);
 

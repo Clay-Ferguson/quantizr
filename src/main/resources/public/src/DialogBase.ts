@@ -40,7 +40,7 @@ export abstract class DialogBase extends Comp {
     "embedded-dlg"
     */
     constructor(public title: string, private overrideClass: string = null, private closeByOutsideClick: string = null, public mode: DialogMode = null, public forceMode: boolean = false) {
-        super(null);
+        super({ id: "dlg_" + getAs().dialogStack.length });
         const ast = getAs();
         this.title = this.title || "Message";
 
