@@ -122,7 +122,6 @@ public class AIService extends ServiceBase {
         return aiRes;
     }
 
-    // todo-0: put these properties right inside the AIModel and get rid of this method
     private String getApiKey(String service) {
         switch (service) {
             case "anthropic":

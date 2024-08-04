@@ -20,7 +20,6 @@ from common.python.agent.app_agent import QuantaAgent
 from common.python.utils import RefactorMode
 
 # #ai-model
-# todo-0: these model names also exist in AIModel.java, and config.yaml, and we need to only have them in one place somehow
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
 ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
@@ -239,7 +238,6 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
         return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
                (output_tokens * output_ppm / 1000000)
 
-    # todo-0: This is actually incorrect pricing for Gemini. Need to look it up
     elif model == GEMINI_MODEL_COMPLETION_CHAT:
         input_ppm = 1.0
         output_ppm = 1.0
