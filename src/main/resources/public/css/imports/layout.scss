@@ -44,7 +44,7 @@
 
 .headingDropDown {
     display: inline-block;
-    width: 4rem;   
+    width: 4rem;
     margin-left: $smallGap;
 }
 
@@ -263,6 +263,11 @@
     display: inline-block;
 }
 
+.centeredText {
+    text-align: center;
+    width: 100%;
+}
+
 // centers the child that's inside this div (both vertically and horizontall centering)
 .centerChild {
     display: flex;
@@ -343,7 +348,7 @@
 
 // I don't know where the ul and ol margins are getting zet to zero, but somewhere they are and this fixes it.
 ul {
-    margin-bottom: 1rem !important; 
+    margin-bottom: 1rem !important;
 }
 
 ol {

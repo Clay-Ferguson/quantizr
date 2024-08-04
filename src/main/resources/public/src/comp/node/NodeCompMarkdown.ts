@@ -18,6 +18,9 @@ export class NodeCompMarkdown extends Comp {
     static urlRegex = /(https?:\/\/[^\s]+)/g;
     static COLLAPSE_TITLE_START = "-**";
     static COLLAPSE_TITLE_END = "**-";
+    static CENTERING_START = "->";
+    static CENTERING_END = "<-";
+
 
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
     // but is ok named as 'cont'
@@ -131,22 +134,34 @@ export class NodeCompMarkdown extends Comp {
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 
-        if (state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
-            state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
-            const sections = this.buildWithCollapsibles(state);
-            if (sections) {
-                return sections;
-            }
+        // Process with special markdown if there is any.
+        const sections = this.processSpecialMarkdown(state);
+        if (sections) {
+            return sections;
         }
 
         return createElement(ReactMarkdownComp as any, this.attribs, state.content);
     }
 
     /* When any markdown content contains something like "-**My Section Title**-" that will be
-        rendered as a collapsible section where everhthing below the section title, up to a double
+        rendered as a collapsible section where everything below the section title, up to a double
         blank line, will be hidden until the user clicks the section title to expand it. 
     */
-    buildWithCollapsibles = (state: LS) => {
+    processSpecialMarkdown = (state: LS) => {
+        let hasCollapse = false;
+        if (state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
+            state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
+            hasCollapse = true;
+        }
+
+        let hasCentering = false;
+        if (state.content.indexOf(NodeCompMarkdown.CENTERING_START) != -1 && //
+            state.content.indexOf(NodeCompMarkdown.CENTERING_END) != -1) {
+            hasCentering = true;
+        }
+
+        if (!hasCollapse && !hasCentering) return null;
+
         state.content = state.content || "";
         state.content = state.content.replaceAll("\r", "");
         const lines = state.content.split("\n");
@@ -155,9 +170,32 @@ export class NodeCompMarkdown extends Comp {
         const children: ReactNode[] = [];
         let curBuf = "";
         let collapseTitle: string = null;
+        let inGatedSection = false;
 
         lines?.forEach((line, i) => {
-            if (line.startsWith(NodeCompMarkdown.COLLAPSE_TITLE_START) && //
+            if (line.startsWith("```") && !inGatedSection) {
+                inGatedSection = true;
+            }
+            else if (line.startsWith("```") && inGatedSection) {
+                inGatedSection = false;
+            }
+
+            if (line == "-") {
+                if (curBuf) {
+                    this.attribs.key = "ncmkd_" + this.node.id + "_" + i;
+                    children.push(createElement(ReactMarkdownComp as any, this.attribs, curBuf));
+                    curBuf = "";
+                }
+                children.push(createElement("br"));
+                return;
+            }
+            else if (!inGatedSection && line.startsWith(NodeCompMarkdown.CENTERING_START) && //
+                line.endsWith(NodeCompMarkdown.CENTERING_END)) {
+                let centeredText = line.substring(2, line.length - 2).trim();
+                children.push(createElement(ReactMarkdownComp as any, { className: "centeredText" }, centeredText));
+                return;
+            }
+            else if (!inGatedSection && line.startsWith(NodeCompMarkdown.COLLAPSE_TITLE_START) && //
                 line.endsWith(NodeCompMarkdown.COLLAPSE_TITLE_END)) {
                 // if we ran into another collapsible before the last one ended, end it now. It
                 // should've ended with two blank lines but that's ok, we can end it anyway.
@@ -176,9 +214,8 @@ export class NodeCompMarkdown extends Comp {
                 blankLines = 0;
                 return;
             }
-            else {
-                curBuf += line + "\n";
-            }
+
+            curBuf += line + "\n";
 
             if (line.trim().length == 0) {
                 blankLines++;
