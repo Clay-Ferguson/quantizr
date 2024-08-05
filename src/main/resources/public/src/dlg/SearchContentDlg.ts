@@ -9,9 +9,11 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
+import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { IconButton } from "../comp/core/IconButton";
+import { Markdown } from "../comp/core/Markdown";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
@@ -72,7 +74,17 @@ export class SearchContentDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new Div(null, null, [
-                    this.searchTextField = new TextField({ enter: () => this.search(false), val: this.searchTextState })
+                    // new Markdown("* Use quotes to search for exact phrases. Example: \"hello world\"\n* `and` and `or` can be used between quoted phrases."),
+                    this.searchTextField = new TextField({
+                        label: "Enter Search Text",
+                        enter: () => this.search(false),
+                        val: this.searchTextState
+                    }),
+                    new CollapsiblePanel("Show Tips", "Hide Tips", null, [
+                        new Markdown("* Use quotes to search for exact phrases. Example: \"hello world\"\n* `and` and `or` can be used between quoted phrases.")
+                    ], true, (exp: boolean) => {
+                        dispatch("ExpandAttachment", s => s.searchTipsExpanded = exp);
+                    }, getAs().searchTipsExpanded, null, "marginTop", "marginTop")
                 ]),
                 this.createSearchFieldIconButtons(),
                 new Clearfix(),
@@ -96,7 +108,7 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): boolean => this.getState<LS>().blockedWords
                     }, "marginTop") : null,
-                    new Checkbox("Substring", null, {
+                    new Checkbox("Regex", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState<LS>({ fuzzy: checked });
@@ -183,7 +195,8 @@ export class SearchContentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", () => this.search(false), null, "btn-primary"),
                     new Button("Graph", this.graph),
-                    ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
+                    // todo-2: this is currently not implemented on the server.
+                    // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])

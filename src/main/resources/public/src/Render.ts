@@ -541,7 +541,7 @@ export class Render {
             src,
             // For Transfer in Progress need a RED border here.
             className: "avatarImage",
-            title: "User: @" + node.owner + "\n\nShow Profile",
+            title: "User: " + node.owner + "\n\nShow Profile",
             [C.USER_ID_ATTR]: node.ownerId,
             onClick: S.nav.clickToOpenUserProfile
         });

@@ -1,19 +1,17 @@
+import { createElement, ReactNode } from "react";
 import { Comp } from "../base/Comp";
 import ReactMarkdownComp from "./ReactMarkdownComp";
 
-interface LS { // Local State
-    content?: string;
-}
-
 export class Markdown extends Comp {
-    constructor(public content: string = "", public attr: any = null) {
+    constructor(private cont: string = "", public attr: any = null) {
         super(attr);
-        this.mergeState<LS>({ content });
-        this.tag = ReactMarkdownComp;
+        this.tag = "div"; //<-- not used
     }
 
-    override preRender = (): boolean => {
-        this.children = [this.getState<LS>().content];
-        return true;
+    override compRender = (): ReactNode => {
+        // ReactMarkdown can't have this 'ref' and would throw a warning if we did
+        delete this.attribs.ref;
+
+        return createElement(ReactMarkdownComp as any, this.attribs, this.cont);
     }
 }

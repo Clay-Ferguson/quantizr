@@ -198,6 +198,9 @@ export abstract class Comp {
                         S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
                     }
                 } else if (child) {
+                    if (child === this.content) {
+                        console.error("child is same as content, skipping: " + child);
+                    }
                     acc.push(child);
                 }
                 return acc;

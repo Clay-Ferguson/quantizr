@@ -1,18 +1,13 @@
 import { Comp } from "../base/Comp";
 
-interface LS { // Local State
-    content?: string;
-}
-
 export class SpanHtml extends Comp {
-    constructor(public content: string = "", attribs: any = null) {
+    constructor(public cont: string = "", attribs: any = null) {
         super(attribs);
-        this.mergeState<LS>({ content });
         this.tag = "span";
     }
 
     override preRender = (): boolean => {
-        this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.content);
+        this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.cont);
         return true;
     }
 }

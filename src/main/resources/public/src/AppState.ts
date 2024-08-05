@@ -54,6 +54,7 @@ export class AppState {
 
     otherAccountNodesExpanded: boolean = false;
     linksToAttachmentsExpanded: boolean = false;
+    searchTipsExpanded: boolean = false;
     aiPromptsExpanded: boolean = false;
     fullScreenControlsExpanded: boolean = false;
 
