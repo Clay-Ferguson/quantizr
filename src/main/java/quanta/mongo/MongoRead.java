@@ -1,5 +1,6 @@
 package quanta.mongo;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ import quanta.util.val.Val;
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
-@Component 
+@Component
 public class MongoRead extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRead.class);
     private static final Object rootLock = new Object();
@@ -619,7 +620,7 @@ public class MongoRead extends ServiceBase {
         if (node.getOrdinal() == null) {
             node.setOrdinal(0L);
         }
-        
+
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexChildren(node.getParentPath()));
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
@@ -703,38 +704,39 @@ public class MongoRead extends ServiceBase {
         ands.add(crit);
 
         if (!StringUtils.isEmpty(text)) {
+            if (StringUtils.isEmpty(prop)) {
+                prop = SubNode.CONTENT;
+            }
+
             if (fuzzy) {
-                if (StringUtils.isEmpty(prop)) {
-                    prop = SubNode.CONTENT;
-                }
-                if (caseSensitive) {
-                    ands.add(Criteria.where(prop).regex(text));
-                } else {
-                    // i==insensitive (case)
-                    ands.add(Criteria.where(prop).regex(text, "i"));
-                }
+                ands.add(Criteria.where(prop).regex(text, caseSensitive ? "" : "i"));
             } else {
-                // examples:
-                // .matchingAny("search term1", "search term2")
-                // .matching("search term") // matches any that contain "search" OR "term"
-                // .matchingPhrase("search term")
-                textCriteria = TextCriteria.forDefaultLanguage();
-                // If searching for a pure tag name or a username (no spaces in search string), be smart enough to
-                // enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up
-                // finding also just instances of mytag (not a tag) which is incorrect.
-                if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
-                    text = "\"" + text + "\"";
+                List<String> quotedStrings = XString.extractQuotedStrings(text, "or");
+                if (!quotedStrings.isEmpty()) {
+                    List<Criteria> orCriteria = new ArrayList<>();
+                    for (String quotedString : quotedStrings) {
+                        orCriteria.add(Criteria.where(prop).regex(quotedString, caseSensitive ? "" : "i"));
+                    }
+                    ands.add(new Criteria().orOperator(orCriteria.toArray(new Criteria[0])));
+                } else {
+                    /*
+                     * Check if use has entered "and" between quoted strings, because this is a valid syntax but we send
+                     * it to mongo without the "ands", because they're not needed, they are assumed.
+                     */
+                    quotedStrings = XString.extractQuotedStrings(text, "and");
+                    if (!quotedStrings.isEmpty()) {
+                        text = "";
+                        for (String quotedString : quotedStrings) {
+                            if (text.length() > 0) {
+                                text += " ";
+                            }
+                            text += "\"" + quotedString + "\"";
+                        }
+                    }
+                    textCriteria = TextCriteria.forDefaultLanguage();
+                    textCriteria.matching(text);
+                    textCriteria.caseSensitive(caseSensitive);
                 }
-                /*
-                 * this reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
-                 * bug. (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an
-                 * OR search on strings containing special characters, without the special characters basically
-                 * being ignored.
-                 */
-                //
-                // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
-                textCriteria.matching(text);
-                textCriteria.caseSensitive(caseSensitive);
             }
         }
 

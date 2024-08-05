@@ -314,14 +314,7 @@ public class UserFeedService extends ServiceBase {
             if (textCriteria == null) {
                 textCriteria = TextCriteria.forDefaultLanguage();
             }
-            String text = req.getSearchText();
-            // If searching for a tag name or a username, be smart enough to enclose it in quotes for user,
-            // because if we don't then searches for "#mytag" WILL end up finding also just instances of mytag
-            // (not a tag) which is incorrect.
-            if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
-                text = "\"" + text + "\"";
-            }
-            textCriteria.matching(text);
+            textCriteria.matching(req.getSearchText());
         }
 
         if (textCriteria != null) {

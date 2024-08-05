@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -457,5 +458,27 @@ public class XString {
             // If no JSON code block is found, return null or an empty string
             return null;
         }
+    }
+
+     // Divider is always either "and" or "or".
+    public static List<String> extractQuotedStrings(String text, String divider) {
+        List<String> quotedStrings = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\"([^\"]*)\"\\s*(?i:" + divider + ")\\s*\"([^\"]*)\"");
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            quotedStrings.add(matcher.group(1));
+            quotedStrings.add(matcher.group(2));
+        }
+        return quotedStrings;
+    }
+
+    public static List<String> extractQuotedStrings(String text) {
+        List<String> quotedStrings = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            quotedStrings.add(matcher.group(1));
+        }
+        return quotedStrings;
     }
 }

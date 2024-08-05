@@ -50,10 +50,10 @@ import quanta.util.val.Val;
  * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my
  * searching but I'm not fully doing so yet I don't believe.
  */
-@Component 
+@Component
 public class NodeSearchService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-    
+
     /*
      * Warning: Do not add '#' or '@' to this list because we're using it to parse text for hashtags
      * and/or usernames so those characters are part of the text. Also since urls sometimes contain
@@ -165,8 +165,12 @@ public class NodeSearchService extends ServiceBase {
                 }
 
                 if (req.isDeleteMatches()) {
-                    delete.deleteMatches(ms, searchRoot, req.getSearchProp(), searchText, req.isFuzzy(),
-                            req.isCaseSensitive(), req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority());
+                    /*
+                     * I'm removing this until we have a way to make it share the SAME query building code as we have
+                     * inside the searchSubGraph method, or else we can just iterate over the subGraph return list
+                     * itself and delete one by one.
+                     */
+                    throw new RuntimeException("Delete Matches not currently implemented.");
                 } else {
                     for (SubNode node : read.searchSubGraph(ms, searchRoot, req.getSearchProp(), searchText,
                             req.getSortField(), req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(),
