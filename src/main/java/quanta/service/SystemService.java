@@ -441,7 +441,9 @@ public class SystemService extends ServiceBase {
 
         SessionContext sc = redis.get(token);
         if (sc == null) {
-            throw new RuntimeException("bad token for push emitter: " + token);
+            // todo-2: We were getting this a LOT in the log file, just from outdated sessions (i think) so let's ignore it for now.
+            // throw new RuntimeException("bad token for push emitter: " + token); // todo-0: make this silent in the logs
+            return null;
         }
 
         SseEmitter emitter = user.getPushEmitter(token);
