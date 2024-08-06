@@ -88,7 +88,7 @@ import quanta.util.val.Val;
  * Service methods for processing user management functions. Login, logout, signup, user
  * preferences, and settings persisted per-user
  */
-@Component 
+@Component
 public class UserManagerService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
@@ -96,7 +96,8 @@ public class UserManagerService extends ServiceBase {
     public static final float INITIAL_GRANT_AMOUNT = 0.01f;
 
     /* Private keys of each user by user name as key */
-    // private static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
+    // private static final ConcurrentHashMap<String, String> privateKeysByUserName = new
+    // ConcurrentHashMap<>();
 
     public static final ConcurrentHashMap<String, SseEmitter> pushEmitters = new ConcurrentHashMap<>();
 
@@ -143,6 +144,11 @@ public class UserManagerService extends ServiceBase {
         if (sc == null) {
             throw new RuntimeException("Unable to get SessionContext to check token.");
         }
+
+        if (StringUtils.isEmpty(sc.getUserName())) {
+            throw new RuntimeException("No user name in session context.");
+        }
+
         String bearer = ThreadLocals.getReqBearerToken();
         // otherwise require secure header
         if (bearer == null || !validToken(bearer, sc.getUserName())) {
@@ -243,8 +249,8 @@ public class UserManagerService extends ServiceBase {
         // the swarm replicas via redis
         if (sc.getUserToken() == null) {
             sc.setUserToken(Util.genStrongToken());
-            // log.debug("userName: " + userName + " NEW userToken: " + sc.getUserToken() + " sessionId="
-            // + ThreadLocals.getHttpSession().getId());
+            log.debug("userName: " + userName + " NEW userToken: " + sc.getUserToken() + " sessionId="
+                    + ThreadLocals.getHttpSession().getId());
         }
         sc.setUserName(userName);
         sc.setUserNodeId(userNodeId.toHexString());
@@ -554,7 +560,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    @Transactional("transactionManager") 
+    @Transactional("transactionManager")
     @Qualifier("transactionManager")
     public AddCreditResponse cm_addCredit(MongoSession as, String userId, BigDecimal amount) {
         ThreadLocals.requireAdmin();
@@ -565,7 +571,7 @@ public class UserManagerService extends ServiceBase {
         return res;
     }
 
-    @Transactional("transactionManager") 
+    @Transactional("transactionManager")
     @Qualifier("transactionManager")
     public Tran addCreditByEmail(MongoSession as, String emailAdr, BigDecimal amount, Long timestamp) {
         SubNode ownerNode = read.getUserNodeByProp(as, NodeProp.EMAIL.s(), emailAdr, false, false);
@@ -590,7 +596,7 @@ public class UserManagerService extends ServiceBase {
         }
     }
 
-    @Transactional("transactionManager") 
+    @Transactional("transactionManager")
     @Qualifier("transactionManager")
     public Tran addCreditInternal(MongoSession as, String userId, BigDecimal amount, Long timestamp) {
         UserAccount user = userRepository.findByMongoId(userId);
@@ -942,7 +948,7 @@ public class UserManagerService extends ServiceBase {
                 aiAgentFileExtensions = "txt,md,html,java,js,ts,css,py,sh,xml,json";
             }
             userPrefs.setAiAgentFileExtensions(aiAgentFileExtensions);
-            
+
             return null;
         });
         return userPrefs;

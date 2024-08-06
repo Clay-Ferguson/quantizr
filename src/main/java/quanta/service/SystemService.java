@@ -106,8 +106,7 @@ public class SystemService extends ServiceBase {
         try {
             prop.setDaemonsEnabled(false);
             delete.deleteNodeOrphans();
-            attach.gridMaintenanceScan();
-
+            ret += attach.gridMaintenanceScan();
             ret += attach.verifyAllAttachments();
 
             ret += runMongoDbCommand(MongoAppConfig.databaseName,
@@ -184,7 +183,7 @@ public class SystemService extends ServiceBase {
         sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
 
         sb.append("Node Count: " + read.getNodeCount() + "\n");
-        sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
+        sb.append("Binary Grid Item Count: " + attach.getGridItemCount() + "\n");
         sb.append(user.getUserAccountsReport(null));
 
         RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();

@@ -17,9 +17,10 @@ import quanta.rest.request.LogoutRequest;
 import quanta.rest.request.base.RequestBase;
 import quanta.rest.response.base.ResponseBase;
 
-@Component 
+@Component
 public class CallProcessor extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(CallProcessor.class);
+    private static boolean logRequests = true;
     private static boolean logResponses = false;
 
     /*
@@ -49,7 +50,9 @@ public class CallProcessor extends ServiceBase {
             crypto.authSig();
         }
 
-        logRequest(command, req, httpSession);
+        if (logRequests) {
+            logRequest(command, req, httpSession);
+        }
         /*
          * Instantiating this, runs its constructor and ensures our threadlocal at least has response object
          * on it, but most (not all) implementations of methods end up instantiating their own which
@@ -93,7 +96,7 @@ public class CallProcessor extends ServiceBase {
             } else {
                 log.debug("ERROR: " + ExceptionUtils.getStackTrace(e));
             }
-        } 
+        }
 
         if (ret instanceof ResponseBase _ret) {
             String callId = ThreadLocals.getServletRequest().getHeader("callId");
@@ -132,11 +135,12 @@ public class CallProcessor extends ServiceBase {
         }
 
         if (logResponses) {
-            log.debug("ORB: " + XString.prettyPrint(orb));
+            log.debug("RES=" + XString.prettyPrint(orb));
         }
     }
 
     private static void logRequest(String url, Object req, HttpSession httpSession) {
-        log.trace("REQ=" + url + " " + (req == null ? "none" : XString.prettyPrint(req)));
+        log.debug("REQ=" + url + " sessionId=" + httpSession.getId() + " "
+                + (req == null ? "none" : XString.prettyPrint(req)));
     }
 }

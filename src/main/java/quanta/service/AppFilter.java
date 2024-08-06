@@ -208,7 +208,8 @@ public class AppFilter extends GenericFilterBean {
             token = httpReq.getParameter(Const.BEARER_TOKEN);
         }
 
-        // and finally get token from session of still null
+        // and finally get token from session if still null
+        // NOTE: Do we need this? It seems like we should always get the token from the header or URL
         if (StringUtils.isEmpty(token)) {
             token = (String) session.getAttribute(Const.BEARER_TOKEN);
         }

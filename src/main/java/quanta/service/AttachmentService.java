@@ -96,6 +96,12 @@ import quanta.util.val.LongVal;
 public class AttachmentService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
+    /*
+     * todo-1: for troubleshooting purposes let's keep all gridfs items for a while, and so they'll show
+     * up continually as orphans but that's fine
+     */
+    private static final boolean ALLOW_DELETES = false;
+
     // number of minutes in a day
     private static final int VERIFY_FREQUENCY_MINS = 60 * 24;
 
@@ -403,9 +409,11 @@ public class AttachmentService extends ServiceBase {
         String nodeId = req.getNodeId();
         SubNode node = read.getNode(ms, nodeId);
         auth.ownerAuth(node);
+
         final List<String> attKeys = XString.tokenize(req.getAttName(), ",", true);
         if (attKeys != null) {
             for (String attKey : attKeys) {
+                log.debug("User " + ms.getUserName() + " deleting attachment: " + attKey + " from nodeId: " + nodeId);
                 deleteBinary(ms, attKey, node, null, false);
             }
         }
@@ -795,7 +803,7 @@ public class AttachmentService extends ServiceBase {
         if (userNode == null) {
             userNode = read.getAccountByUserName(null, null, false);
         }
-       
+
         String id = grid.store(stream, fileName, mimeType, metaData).toString();
         long streamCount = stream.getCount();
         // update the user quota which enforces their total storage limit
@@ -816,7 +824,6 @@ public class AttachmentService extends ServiceBase {
      * means we should only delete from the GRID DB, and not touch any of the properties on the node
      * itself
      */
-    // &&&
     public void deleteBinary(MongoSession ms, String attName, SubNode node, SubNode userNode, boolean gridOnly) {
         if (node == null)
             return;
@@ -834,9 +841,14 @@ public class AttachmentService extends ServiceBase {
             long totalBytes = attach.getTotalAttachmentBytes(ms, node);
             user.addBytesToUserNodeBytes(ms, -totalBytes, userNode);
         }
-        Criteria crit = Criteria.where("_id").is(att.getBin());
-        crit = auth.addWriteSecurity(ms, crit);
-        grid.delete(new Query(crit));
+        log.debug("  deleteBinary gridId=" + att.getBin() + " leaving for orphan cleanup");
+
+        // DO NOT DELETE THE GRID ITEM, we leave it for orphan cleanup. This will make the app faster, but
+        // it's fine because orphan cleanup will eventually clean it up.
+        // BUT....LEAVE THIS CODE HERE
+        // Criteria crit = Criteria.where("_id").is(att.getBin());
+        // crit = auth.addWriteSecurity(ms, crit);
+        // grid.delete(new Query(crit));
     }
 
     public InputStream getStream(MongoSession ms, String attName, SubNode node, boolean allowAuth) {
@@ -856,9 +868,7 @@ public class AttachmentService extends ServiceBase {
         Attachment att = node.getAttachment(attName, false, false);
         if (att == null || att.getBin() == null)
             return null;
-        /* why not an import here? */
-        com.mongodb.client.gridfs.model.GridFSFile gridFile =
-                grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
+        GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
 
         if (gridFile == null) {
             log.debug("gridfs ID not found");
@@ -921,9 +931,9 @@ public class AttachmentService extends ServiceBase {
             opsw.forEach(query, n -> {
                 n.getAttachments().forEach((String key, Attachment att) -> {
                     if (att.getBin() != null) {
-                        com.mongodb.client.gridfs.model.GridFSFile gridFile =
-                                grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
+                        GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
                         if (gridFile == null) {
+                            log.debug("NodeId=" + n.getIdStr() + " Has Missing Binary: " + att.getBin());
                             nodesIdsMissingBins.add(n.getIdStr());
                         } else {
                             nodesFound.inc();
@@ -936,7 +946,7 @@ public class AttachmentService extends ServiceBase {
 
         verifyAllAttachments_runCount++;
         sb.append("GridFS Attachment Verification (run=" + verifyAllAttachments_runCount + ")\n");
-        sb.append("  Binaries Found: " + nodesFound.getVal() + "\n");
+        sb.append("  Binaries In Use: " + nodesFound.getVal() + "\n");
         sb.append("  Nodes Missing Attachments: " + nodesIdsMissingBins.size() + "\n");
         nodesIdsMissingBins.forEach(id -> {
             sb.append("    " + id + "\n");
@@ -960,9 +970,10 @@ public class AttachmentService extends ServiceBase {
      * nodes.
      */
     @Transactional("mongoTm")
-    public void gridMaintenanceScan() {
+    public String gridMaintenanceScan() {
         log.debug("gridMaintenanceScan()");
-        arun.run(as -> {
+        return arun.run(as -> {
+            StringBuilder sb = new StringBuilder();
             int delCount = 0;
             HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
@@ -976,39 +987,64 @@ public class AttachmentService extends ServiceBase {
                     // by default we delete the grid item unless we reach discover it is being used
                     delete = true;
                     Document meta = file.getMetadata();
+                    String binId = file.getObjectId().toHexString();;
+                    String nodeIdStr = null;
                     // if node has metadata
                     if (meta != null) {
                         // Get which nodeId owns this grid file
-                        ObjectId id = (ObjectId) meta.get("nodeId");
-                        if (id != null) {
-                            SubNode node = read.getNode(as, id);
+                        ObjectId nodeId = (ObjectId) meta.get("nodeId");
+                        if (nodeId != null) {
+                            nodeIdStr = nodeId.toHexString();
+                            SubNode node = read.getNode(as, nodeIdStr, false);
 
                             // did we find the node that owns this grid item
                             if (node != null) {
-                                delete = false;
+                                // scan all attachments on the node to look for the actual attachment
+                                // that uses this grid item
+                                if (node.getAttachments() != null) {
+                                    // scan all attachments to see if we have one pointing to binId
+                                    for (String key : node.getAttachments().keySet()) {
+                                        Attachment att = node.getAttachments().get(key);
 
-                                // update the UserStats by adding the file length to the total for this user
-                                UserStats stats = statsMap.get(node.getOwner());
-
-                                // if our map doesn't have this user yet, then create a new UserStats object
-                                if (stats == null) {
-                                    stats = new UserStats();
-                                    stats.binUsage = file.getLength();
-                                    statsMap.put(node.getOwner(), stats);
+                                        // if this attachment is in use, then don't delete the grid item
+                                        if (att.getBin() != null && att.getBin().equals(binId)) {
+                                            // log.debug("Grid Item Found: " + binId
+                                            // + " on node: " + node.getIdStr() + " with att.key: " + key);
+                                            delete = false;
+                                            break;
+                                        }
+                                    }
                                 }
-                                // else update the binUsage on the UserStats object
-                                else {
-                                    stats.binUsage = stats.binUsage.longValue() + file.getLength();
+
+                                if (!delete) {
+                                    // update the UserStats by adding the file length to the total for this user
+                                    UserStats stats = statsMap.get(node.getOwner());
+
+                                    // if our map doesn't have this user yet, then create a new UserStats object
+                                    if (stats == null) {
+                                        stats = new UserStats();
+                                        stats.binUsage = file.getLength();
+                                        statsMap.put(node.getOwner(), stats);
+                                    }
+                                    // else update the binUsage on the UserStats object
+                                    else {
+                                        stats.binUsage = stats.binUsage.longValue() + file.getLength();
+                                    }
                                 }
                             }
                         }
                     }
 
                     if (delete) {
-                        log.debug("Grid Orphan Del: " + file.getId());
-                        // Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
-                        Query q = new Query(Criteria.where("_id").is(file.getId()));
-                        grid.delete(q);
+                        String msg = "Grid Orphan: binId=" + binId + " nodeId=" + nodeIdStr;
+
+                        sb.append(msg + "\n");
+                        log.debug(msg);
+
+                        if (ALLOW_DELETES) {
+                            Query q = new Query(Criteria.where("_id").is(binId));
+                            grid.delete(q);
+                        }
                         delCount++;
                     }
                 }
@@ -1016,7 +1052,7 @@ public class AttachmentService extends ServiceBase {
 
             /*
              * All UserStats will now be updated in loop above for all users that do have some attachment space
-             * consumes. So now we scan all userAccountNodes, and set a zero amount for those that don't already
+             * consumed. So now we scan all userAccountNodes, and set a zero amount for those that don't already
              * exist in the map
              */
             Iterable<SubNode> accntNodes = read.getAccountNodes(as, null, null, null, -1);
@@ -1029,9 +1065,11 @@ public class AttachmentService extends ServiceBase {
                     statsMap.put(accntNode.getOwner(), stats);
                 }
             }
-            log.debug(String.valueOf(delCount) + " grid orphans deleted.");
+            sb.append(String.valueOf(delCount) + " grid orphans found.\n\n");
+            String ret = sb.toString();
+            log.debug(ret);
             user.writeUserStats(as, statsMap);
-            return null;
+            return ret;
         });
     }
 
@@ -1105,6 +1143,10 @@ public class AttachmentService extends ServiceBase {
      */
     public void cm_getBinary(String binId, String nodeId, String token, String download, HttpSession session,
             HttpServletResponse response) {
+
+        log.debug("getBinary: session.id=" + session.getId() + " binId=" + binId + " nodeId=" + nodeId + " token="
+                + token + " download=" + download);
+
         if (token == null) {
             // Check if this is an 'avatar' request and if so bypass security
             if ("avatar".equals(binId)) {
