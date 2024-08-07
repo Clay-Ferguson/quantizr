@@ -34,7 +34,7 @@ export class NodeCompMarkdown extends Comp {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
-        this.attribs.className = "mkCont";
+        this.attribs.className = ast.mobileMode ? "mkContMobile" : "mkCont";
 
         if (extraContainerClass) {
             this.attribs.className += " " + extraContainerClass;
