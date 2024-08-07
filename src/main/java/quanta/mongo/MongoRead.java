@@ -787,6 +787,12 @@ public class MongoRead extends ServiceBase {
                 }
                 sort = Sort.by((sortDir != null && sortDir.equalsIgnoreCase("DESC")) ? Sort.Direction.DESC
                         : Sort.Direction.ASC, sortField);
+
+                // if we're sorting by priority, we want to sort by priority first, and then by date. We include date so that when
+                // many have the same priority their sort order is still deterministic and unique
+                if (sortField.equals(NodeProp.PRIORITY_FULL.s())) {
+                    sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
+                }
             }
         }
 
