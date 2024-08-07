@@ -137,6 +137,7 @@ public class CryptoService extends ServiceBase {
         return false;
     }
 
+    /* Builds the string that will be the raw data that's cryptographically signed */
     public String getNodeSigData(SubNode node) {
         String path = node.getPath();
         if (path.startsWith(NodePath.PENDING_PATH + "/")) {
@@ -327,10 +328,12 @@ public class CryptoService extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexSubGraph(parent.getPath()))//
                 .and(SubNode.OWNER).is(ms.getUserNodeId());
 
+        // if we're only signing unsigned nodes, then we add this criteria
         if (req.isSignUnsigned()) {
             crit.and(SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s()).exists(false);
         }
 
+        // Query DB for all nodes we're going to sign
         Query query = new Query();
         crit = auth.addReadSecurity(ms, crit);
         query.addCriteria(crit);

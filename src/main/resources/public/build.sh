@@ -20,6 +20,8 @@ fi
 
 if [ ! -d "node_modules" ]; then
     echo "node_modules directory not found, running 'yarn install'..."
+    echo "Working Dir=$(pwd)"
+    read -p "Press ENTER to continue..."
     yarn install
 else
     echo "node_modules found."
