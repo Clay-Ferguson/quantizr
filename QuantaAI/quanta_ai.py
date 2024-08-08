@@ -182,6 +182,7 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
 
 # https://www.anthropic.com/pricing#anthropic-api
 # https://openai.com/api/pricing/
+# https://ai.google.dev/pricing
 # #ai-model
 def calculate_cost(input_tokens, output_tokens, model) -> float:
     input_ppm = 0
@@ -240,15 +241,31 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
                (output_tokens * output_ppm / 1000000)
 
     elif model == GEMINI_MODEL_COMPLETION_CHAT:
-        input_ppm = 1.0
-        output_ppm = 1.0
+        if (input_tokens <= 128000):
+            input_ppm = 3.5
+        else:
+            input_ppm = 7.0
+            
+        if (output_tokens <= 128000):
+            output_ppm = 10.5
+        else:
+            output_ppm = 21.0
+            
         input_price_per_req = 0.005
         return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
                (output_tokens * output_ppm / 1000000)
                
     elif model == GEMINI_FLASH_MODEL_COMPLETION_CHAT:
-        input_ppm = 1.0
-        output_ppm = 1.0
+        if (input_tokens <= 128000):
+            input_ppm = 0.075
+        else:
+            input_ppm = 0.15
+            
+        if (output_tokens <= 128000):
+            output_ppm = 0.3
+        else:
+            output_ppm = 0.6
+            
         input_price_per_req = 0.005
         return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
                (output_tokens * output_ppm / 1000000)
