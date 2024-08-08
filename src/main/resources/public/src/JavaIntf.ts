@@ -1099,6 +1099,7 @@ export const enum AIModel {
     ANTH = "anthAi",
     ANTH_SONNET = "anthAi_sonnet",
     GEMINI = "geminiAi",
+    GEMINI_FLASH = "geminiFlashAi",
 }
 
 export const enum Constant {

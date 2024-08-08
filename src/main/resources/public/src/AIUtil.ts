@@ -40,8 +40,13 @@ export class AIUtil {
         if (S.quanta.config.useGeminiAi) {
             this.aiServices.push({
                 name: J.AIModel.GEMINI,
-                description: "Google: Gemini",
+                description: "Google: Gemini 1.5 Pro",
                 longDescription: "Google's best general-purpose AI"
+            });
+            this.aiServices.push({
+                name: J.AIModel.GEMINI_FLASH,
+                description: "Google: Gemini 1.5 Flash",
+                longDescription: "Google's best cost effective general-purpose AI"
             });
         }
 

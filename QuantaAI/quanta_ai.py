@@ -28,6 +28,7 @@ PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online"
 PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
 PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
 GEMINI_MODEL_COMPLETION_CHAT = "gemini-1.5-pro"
+GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 
 app = FastAPI()
 
@@ -239,6 +240,13 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
                (output_tokens * output_ppm / 1000000)
 
     elif model == GEMINI_MODEL_COMPLETION_CHAT:
+        input_ppm = 1.0
+        output_ppm = 1.0
+        input_price_per_req = 0.005
+        return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
+               (output_tokens * output_ppm / 1000000)
+               
+    elif model == GEMINI_FLASH_MODEL_COMPLETION_CHAT:
         input_ppm = 1.0
         output_ppm = 1.0
         input_price_per_req = 0.005
