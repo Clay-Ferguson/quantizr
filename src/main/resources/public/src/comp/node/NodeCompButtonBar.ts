@@ -120,7 +120,7 @@ export class NodeCompButtonBar extends Div {
             const isMine = S.props.isMine(this.node);
 
             if (!(exp && !isMine)) {
-                openButton = new IconButton("fa-folder-open", "Open", {
+                openButton = new IconButton("fa-folder-open", null, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.openNodeById,
                     title: "Explore content of this node"
@@ -128,12 +128,12 @@ export class NodeCompButtonBar extends Div {
             }
 
             // for now, let's go back to only showing expand/collapse button for our own nodes
-            if (isMine) {
+            if (isMine && ast.userPrefs.editMode) {
                 expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav.toggleNodeInlineChildren,
                     title: expandChildren ? "Collapse Children" : "Expand Children"
-                }, "btn-primary") : null;
+                }) : null;
             }
         }
 
@@ -363,12 +363,11 @@ export class NodeCompButtonBar extends Div {
             floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
         }
 
-        let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan
-        ];
+        let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan];
 
         btnArray = btnArray.concat(this.extraButtons);
 
-        let buttonBar = null;
+        let buttonBar: ButtonBar = null;
         if (btnArray.some(c => !!c)) {
             buttonBar = new ButtonBar(btnArray);
         }

@@ -11,14 +11,12 @@ import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo, PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { FlexLayout } from "../core/FlexLayout";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompRow extends Div {
-
-    /* we have this flag so we can turn off buttons to troubleshoot performance. */
-    static showButtonBar: boolean = true;
 
     constructor(public node: NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, //
         public index: number, public count: number, public rowCount: number, public level: number,
@@ -81,7 +79,7 @@ export class NodeCompRow extends Div {
         }
 
         let buttonBar = null;
-        if (this.allowHeaders && NodeCompRow.showButtonBar) {
+        if (this.allowHeaders) {
             buttonBar = new NodeCompButtonBar(this.node, this.isTableCell, this.level, this.allowNodeMove, this.isTableCell ? [insertInlineButton] : null, null, this.tabData);
         }
 
@@ -177,17 +175,45 @@ export class NodeCompRow extends Div {
             S.render.setNodeDropHandler(this.attribs, this.node);
         }
 
-        this.children = [
-            this.isTableCell ? null : insertInlineButton,
-            S.render.renderLinkLabel(this.node.id),
-            header,
-            buttonBar,
-            buttonBar ? new Clearfix() : null,
-            jumpButton,
-            new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, null),
-            this.internalComp,
-            S.render.renderLinks(this.node, this.tabData)
-        ];
+        // if we're on the tree view and have a simple layout where all we copuld need is an expand/collapse button and markdown
+        // then we display the expand button and markdonw in a size by side layout
+        if (this.node.hasChildren && this.tabData.id === C.TAB_MAIN && !ast.userPrefs.editMode && !ast.userPrefs.showMetaData) {
+            const exp = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
+            const isMine = S.props.isMine(this.node);
+            let openButton = null;
+            if (!(exp && !isMine)) {
+                openButton = new IconButton("fa-folder-open", null, {
+                    [C.NODE_ID_ATTR]: this.node.id,
+                    onClick: S.nav.openNodeById,
+                    title: "Explore content of this node"
+                }, "btn-primary marginLeft");
+            }
+
+            this.children = [
+                this.isTableCell ? null : insertInlineButton,
+                S.render.renderLinkLabel(this.node.id),
+                header,
+                new FlexLayout([
+                    openButton, 
+                    new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, "inlineBlock")
+                ], "flexAlignChildrenTop"),
+                this.internalComp,
+                S.render.renderLinks(this.node, this.tabData)
+            ];
+        }
+        else {
+            this.children = [
+                this.isTableCell ? null : insertInlineButton,
+                S.render.renderLinkLabel(this.node.id),
+                header,
+                buttonBar,
+                buttonBar ? new Clearfix() : null,
+                jumpButton,
+                new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, null),
+                this.internalComp,
+                S.render.renderLinks(this.node, this.tabData)
+            ];
+        }
         return true;
     }
 }
