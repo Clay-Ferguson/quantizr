@@ -954,6 +954,12 @@ export class Edit {
     // clears selections before deleting so only the id passed or the id on the event can be
     // deleted. This is because non-tree views don't have the checkbox for even multiselecting
     deleteOneNode = async (evt: Event = null, id: string = null) => {
+        // if fullscreen (Graph or Calendar) is active, we must delete immediately rather than the normal flow of showing a confirmation on the node first.
+        if (S.util.fullscreenViewerActive()) {
+            S.edit.immediateDeleteSelNodes([id]);
+            return;
+        }
+
         await promiseDispatch("ClearSelectNode", s => {
             s.selectedNodes.clear();
         });
@@ -1589,7 +1595,7 @@ export class Edit {
         if (nodesToDel.find(id => id === ast.node?.id)) {
             deletedPageNode = true;
         }
-        const jumpToParentOf = deletedPageNode ? ast.node?.id : null;
+        const jumpToParentOf = deletedPageNode && !S.util.fullscreenViewerActive() ? ast.node?.id : null;
 
         const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
             nodeIds: nodesToDel,
@@ -1605,12 +1611,14 @@ export class Edit {
         if (ast.node && S.util.checkSuccess("Delete node", res)) {
             S.util.notifyNodeDeleted();
             this.recursiveDelete(nodesToDel, ast.node);
-
             this.afterDeleteCleanup(nodesToDel);
 
-            if (res.jumpTargetId) {
+            if (S.util.fullscreenViewerActive()) {
+                getAs().node.children = ast.node.children;
+            }
+            else if (res.jumpTargetId) {
                 S.view.jumpToId(res.jumpTargetId);
-            }            
+            }
             else if (ast.activeTab === C.TAB_DOCUMENT) {
                 const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
