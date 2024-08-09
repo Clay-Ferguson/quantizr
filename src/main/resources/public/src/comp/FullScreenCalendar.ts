@@ -52,7 +52,10 @@ export class FullScreenCalendar extends Main {
                 weekends: state.calendarShowWeekends,
                 initialEvents: state.calendarData,
                 dateClick: this.dateClick,
-                eventContent: renderEventContent,
+                eventContent: (eventContent: any) => createElement("div", null,
+                    createElement("b", null, eventContent.timeText + " -> "),
+                    createElement("i", null, eventContent.event.title)
+                ),
                 eventClick: this.handleEventClick,
 
                 customButtons: {
@@ -81,7 +84,6 @@ export class FullScreenCalendar extends Main {
                 }
             })
         ];
-
         return this.reactNode("div");
     }
 
@@ -103,13 +105,4 @@ export class FullScreenCalendar extends Main {
         // #DEBUG-SCROLLING
         S.view.docElm.scrollTop = 0;
     }
-}
-
-function renderEventContent(eventContent: any) {
-    return (
-        <>
-            <b>{eventContent.timeText} - </b>
-            <i>{eventContent.event.title}</i>
-        </>
-    );
 }
