@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import quanta.config.ServiceBase;
 
 @RunWith(JUnit4.class) // This tells JUnit to run the test using JUnit4 runner
 public class UnitTest {

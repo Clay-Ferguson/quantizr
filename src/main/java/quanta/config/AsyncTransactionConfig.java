@@ -17,7 +17,7 @@ public class AsyncTransactionConfig implements AsyncConfigurer {
         executor.setCorePoolSize(7);
         executor.setMaxPoolSize(42);
         executor.setQueueCapacity(11);
-        executor.setThreadNamePrefix("MyExecutor-");
+        executor.setThreadNamePrefix("async-");
         executor.initialize();
         return executor;
     }
