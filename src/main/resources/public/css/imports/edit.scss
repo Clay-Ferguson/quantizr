@@ -1,0 +1,385 @@
+.deleteQuestion {
+    display: inline-block;
+}
+
+.textTypeContent {
+    margin: 12px 0px 12px 12px;
+    padding: 8px;
+    border: 1px solid $nodeBorderBottomColor;
+    background-color: #17202A;
+}
+
+code {
+    font-size: unset;
+}
+
+.preWordWrap {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
+.mkCont table, th, td {
+    border: 1px solid $nodeBorderBottomColor;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 4px;
+}
+
+th {
+    padding: 6px;
+    background-color: $secondary;
+}
+
+.mkCont td {
+    padding: $tinyGap;
+}
+
+.fileNameField {
+    width: 18em;
+    min-width: 3em;
+}
+
+.displayNameTextField {
+    max-width: 40rem;
+}
+
+.textareaMin4 {
+    font-family: inherit;
+    min-height: 4rem;
+}
+
+.fontInherit {
+    font-family: inherit;
+}
+
+.mkDownCodespan {
+    color: var(--bs-green);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.preTextarea {
+    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
+    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
+    font-family: inherit;
+    background-color: #1b2631 !important;
+    border-radius: 0px !important;
+    border: 1px solid gray;
+}
+
+.preTextField {
+    //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
+    //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
+    padding: 5px 5px 5px 10px;
+    font-family: inherit;
+    border-radius: 0px !important;
+    border: 1px solid gray;
+}
+
+.textField {
+    font-family: "monospace";
+}
+
+/* We use a tiny gap for password text fields so that the 'Show Password" button can be very close below */
+.passwordTextField {
+    margin-bottom: $tinyGap;
+}
+
+.typeSearchField {
+    margin-bottom: $smallGap;
+}
+
+.mkCont {
+    padding: .3rem 1rem 1rem 1rem;
+}
+
+.mkCont h1 {
+    font-size: 2rem;
+}
+
+.mkCont h2 {
+    font-size: 1.9rem;
+}
+
+.mkCont h3 {
+    font-size: 1.8rem;
+}
+
+.mkCont h4 {
+    font-size: 1.7rem;
+}
+
+.mkCont h5 {
+    font-size: 1.6rem;
+}
+
+.mkCont h6 {
+    font-size: 1.5rem;
+}
+
+// without this any multi-paragraph text that our markdown renders always has too much spacing at the bottom. We already specify the
+// amount of spacing we want in the mkCont style itself so we stop this from messing that up with this 'last-child' style
+.mkCont p:last-child {
+    margin-bottom: 0;
+}
+
+// Note: Don't try border-radius here, becasue that's ugly with horizontal scrollbar (corner sticks out over round edge)
+.mkCont kbd,
+.mkCont pre,
+.mkCont samp {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.txtFieldLabelShort {
+    margin-right: .25rem;
+}
+
+.txtFieldLabel {
+    margin-right: .25rem;
+    margin-top: 1rem;
+}
+
+.formGrpBorder {
+    border: 1px solid $gray-600;
+}
+
+.editPropsCont {
+    background-color: #17202A;
+    border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+}
+
+.advancedCont {
+    background-color: #17202A;
+    border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+    padding: $smallGap;
+    border-radius: $border-radius;
+}
+
+.editPropsTable {
+    padding-left: $smallGap;
+    // we can't let this table go full width, because the "+" button for adding properties is a float-end
+    // and needs to slide down to the right of the props table. If this is 100% width, then the "+" button
+    // will take up vertical space and push the whole table down.
+    width: 90%;
+}
+
+.splitNodeRadioButtonGroup {
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.propsPanelExpanded {}
+
+.propsPanelCollapsed {}
+
+.scrollingPropsTable {
+    width: 100%;
+    overflow-x: auto;
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.attachmentButtonBar {
+    border-bottom: 1px solid gray;
+    padding-bottom: $tinyGap;
+    margin-bottom: $tinyGap;
+}
+
+.delAttCheckbox {
+    margin-right: 0 !important;
+}
+
+.attachmentLinkGroup {
+    margin-left: 20px;
+}
+
+.selectOption {
+    font-size: 120%;
+}
+
+.formSelect {
+    border: 1px solid gray !important;
+    padding: 5px 5px 5px 10px;
+}
+
+.compactFormSelect {
+    border: 1px solid gray !important;
+    padding: 0 0 0 5px;
+}
+
+.validationError {
+    color: #E74C3C;
+    margin-bottom: 0;
+}
+
+.validationErrorBorder {
+    border: 2px solid #E74C3C;
+}
+
+.editorTagsSection {
+    margin-top: $tinyGap;
+}
+
+.tagsFlexContainer {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.propsList {}
+
+.propsListItemCheckBox {
+    vertical-align: middle;
+    margin-left: $microGap;
+    margin-right: 0 !important;
+}
+
+.propertyTable {}
+
+.propTableRow {
+    width: 100%;
+}
+
+.propTableNameCol {
+    width: 25%;
+    background-color: darkolivegreen;
+}
+
+.propTableValCol {
+    width: 70%;
+}
+
+.binaryEditorSection {
+    margin-top: $tinyGap;
+    padding: $smallGap;
+    background-color: #17202A;
+    border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+}
+
+.binaryEditorItem {
+    padding-bottom: $microGap;
+}
+
+.binaryEditorItem {
+    &:not(:last-child) {
+        border-bottom: 1px solid $gray-700;
+        margin-bottom: $tinyGap;
+    }
+}
+
+.dateField {
+    font-family: "monospace";
+}
+
+.timeField {
+    font-family: "monospace";
+}
+
+.tagsPrompt {
+    width: 4em;
+    margin-right: $smallGap;
+    text-align: right;
+}
+
+.linksPrompt {
+    width: 4em;
+    margin-right: $tinyGap;
+    text-align: right;
+}
+
+.fieldDisplayCell {
+    border-left: 4px solid $nodeBorderBottomColor;
+    border-bottom: 1px dotted $nodeBorderBottomColor;
+}
+
+.contentEditor {
+    width: 100%;
+}
+
+.editTypesPanelHeader {
+    margin: $tinyGap 0 0 $smallGap;
+}
+
+.selectLabel {
+    margin-right: 6px;
+}
+
+.widthDropDown {
+    display: inline-block;
+    margin-right: $smallGap;
+    margin-left: $smallGap;
+    width: 6rem;
+}
+
+.positionDropDown {
+    display: inline-block;
+    margin-right: $smallGap;
+    width: 7rem;
+}
+
+.flexPropsEditPanel {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flexPropsDisplayPanel {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.linksPanelInEditor {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.durationTypeInput {
+    max-width: 5rem;
+    margin-left: $smallGap;
+}
+
+.maxResponseWords {
+    max-width: 10rem;
+}
+
+.numChapters {
+    max-width: 7rem;
+}
+
+.numSections {
+    max-width: 7rem;
+}
+
+.aiTemperature {
+    max-width: 5rem;
+}
+
+.layoutSelection {
+    max-width: 14rem;
+    width: 5rem;
+    margin-right: 1rem;
+}
+
+.sharingDisplayName {
+    display: inline-block;
+    padding: $smallGap;
+    cursor: pointer;
+}
+
+.propNameInList {
+    display: inline-block;
+    margin: $tinyGap;
+}
+
+.propRangesInList {
+    display: inline-block;
+    margin: $tinyGap;
+}

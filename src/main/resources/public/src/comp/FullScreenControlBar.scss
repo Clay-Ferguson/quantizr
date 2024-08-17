@@ -1,0 +1,16 @@
+.fullScreenToolbar {
+    z-index: 2147483501;
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 4px;
+    border: 1px solid gray;
+    border-radius: 6px;
+    background-color: darken($secondary, 10%);
+}
+
+.selectPowerFactorDropDown {
+    display: inline-block;
+    width: 10rem;   
+    margin-right: $bigGap;
+}

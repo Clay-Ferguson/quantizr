@@ -1,0 +1,110 @@
+body {
+    background-color: rgb(21, 32, 43);
+    color: white;
+    margin: 25px 50px 50px 50px;
+}
+
+.tocLink {
+    text-decoration: none;
+    display: list-item;
+}
+
+.topLevelToc {
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.toc {
+    margin-bottom: 18px;
+    margin-left: 25px;
+}
+
+.floatContainer {
+    position: relative;
+    width: 100%;
+    height: 0;
+}
+
+.floatRight {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
+.markdown {
+    margin: 20px;
+}
+
+.attachment {
+    margin-left: 20px;
+}
+
+.markdown kbd,
+.markdown pre,
+.markdown samp {
+    width: 100%;
+    border: 2px dotted green;
+    padding: 8px;
+    background-color: black;
+    color: green;
+    font-size: 115%;
+}
+
+a:link,
+a:visited {
+    color: lightGray;
+}
+
+a:hover,
+a:active {
+    color: cyan;
+}
+
+html {
+    font-family: "Roboto", "Verdana", "Aria";
+}
+
+pre {
+    width: 100%;
+}
+
+/************************************************************** 
+Media Queries below are per Bootstap 4 standard */
+
+/* Small devices (tiny, 320px and up) */
+
+/* Small devices (portrait phones?, 576px and up) */
+@media (min-width: 576px) {
+    .container {
+        max-width: 500px;
+    }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .container {
+        max-width: 700px;
+    }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .container {
+        max-width: 800px;
+    }
+}
+
+/* Extra large devices (large desktops, 1200px and up) */
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 800px;
+    }
+}
+
+@media (min-width: 1500px) {
+    .container {
+        max-width: 800px;
+    }
+}

@@ -1,0 +1,466 @@
+.pageNodeCutMessage {
+    border: 2px dotted green !important;
+    padding: $smallGap;
+    margin: $smallGap;
+}
+
+.accountCredit {
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    background-color: darkcyan;
+    color: white;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.accountCreditLow {
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    background-color:orange;
+    color: black;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.nodeTags {
+    display: inline-block;
+    background-color: darkolivegreen;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-left: 4px;
+    margin-top: 8px;
+}
+
+.aiTags {
+    background-color: darkcyan;
+    color: white;
+    cursor: pointer;
+}
+
+.aiPrompt {
+    display: inline-block;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-left: 4px;
+    margin-top: 8px;
+}
+
+.nodeTagInEditor {
+    display: inline-block;
+    background-color: darkolivegreen;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 0 6px 0 6px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.typeName {
+    border: 2px solid gray;
+    padding: 0px 4px 0px 4px;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.treeFriendImage {
+    max-width: 70px;
+    cursor: pointer;
+    border: 2px solid $nodeBorderBottomColor;
+    margin: 0 10px 10px 10px;
+}
+
+.commentMarkdownClass {
+    border: 2px solid darkkhaki;
+    margin: 8px;
+    background-color: #17202A;
+}
+
+.downloadLink {
+    margin-right: 24px;
+    white-space: nowrap;
+}
+
+.nodeCompButtonBar {
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.nodeCompBinary {
+    padding-right: $smallGap;
+    padding-bottom: $smallGap;
+}
+
+.nodeCompBinaryNoRtMargin {
+    padding-bottom: $smallGap;
+}
+
+.imgInRow {
+    cursor: pointer;
+    vertical-align: top;
+    border-radius: $border-radius;
+
+    border: 1px solid $gray-700;
+    // we size this to 100% becasue the DIV it's inside is the one that actually has the specified sizing
+    width: 100%;
+}
+
+.insImgInRow {
+    border-radius: $border-radius;
+    border: 1px solid $gray-700;
+    margin: $smallGap $smallGap $smallGap 0;
+    display: block;
+    width: 100%;
+}
+
+.attachmentLinksPanel {
+    border: 1px solid $nodeBorderBottomColor;
+    padding-left: $smallGap;
+    padding-right: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.created-by {
+    padding: 3px 6px 3px 6px;
+    margin-right: 10px;
+    margin-left: $microGap;
+    border: 1px solid gray;
+    display: inline-block;
+    border-radius: $border-radius;
+}
+
+.createdByMe {
+    @extend .created-by;
+    background: $createdByMeBackgroundColor;
+    color: $createdByMeTextColor;
+}
+
+.createdByMe:first-child {
+    margin-left: 0;
+}
+
+
+.transferPending {
+    @extend .created-by;
+    background: darkkhaki;
+    color: black;
+}
+
+.transferPending:first-child {
+    margin-left: 0;
+}
+
+.createdByOther {
+    @extend .created-by;
+    background: $createdByAnotherBackgroundColor;
+    color: $createdByAnotherTextColor;
+}
+
+.createdByOther:first-child {
+    margin-left: 0;
+}
+
+.rowHeaderIcon {
+    margin-right: 16px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.row-header {
+    margin-left: $smallGap;
+    min-height: 2rem; // warning: don't make this less than 2rem!
+    margin-bottom: $tinyGap;
+}
+
+.rowHeaderEditFirst {
+    margin-left: $smallGap;
+    // min-height: 2rem; 
+    padding: 4px;
+    margin-top: 4px;
+}
+
+.rowHeaderEdit {
+    margin-left: $smallGap;
+    // min-height: 2rem; 
+    border-top: 1px solid gray;
+    padding: 4px;
+    margin-top: 4px;
+}
+
+.rowFooter {
+    font-size: small;
+    cursor: pointer;
+}
+
+.nodeName {
+    padding: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.nodeTableRow {
+    position: relative;
+    padding-top: $tinyGap;
+}
+
+.nodeTableRowEdit {
+    position: relative;
+}
+
+.row-border {
+    /* If no border is defined here then borders only show up during edit or metadata display modes */
+    border-bottom: 1px dotted $nodeBorderBottomColor;
+}
+
+.rowBorderInlineChildren {
+    /* If no border is defined here then borders only show up during edit or metadata display modes */
+    // border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
+.rowBorderEdit {
+    border-bottom: 1px solid $nodeBorderBottomColor;
+    padding-top: 4px;
+}
+
+/*
+With "Display: table", the only way to get the internal 'nodeGridItem' cell content to render with the SAME
+height as the actual cell (i.e. fill up the entire cell) is to use "height: 100%" on the table, and the table-row, 
+and the table-cell (all three)
+
+update: oops, that 100% is causing vertical scrollbar to ALWAYS show up because something's off by a few pixels, so
+i'm backing out for now
+*/
+.nodeGridTable {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 8px;
+}
+
+.nodeGridItem {
+    height: 100%;
+    width: 100%;
+    padding-right: $smallGap;
+    padding-top: $smallGap
+}
+
+.nodeGridRow {
+    display: table-row;
+}
+
+.nodeGridCell {
+    border: 1px solid $nodeBorderBottomColor;
+    display: table-cell;
+    overflow: hidden;
+    vertical-align: top;
+}
+
+.nodeTableRow .top-right-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.activeRow {
+    border-left: $highlightBorderSize solid $primary;
+}
+
+.activeRow:hover {
+    // This lightens the row the mouse is over, but I currently find it just annoying, so I'm removing it.
+    // see other places with a lighten function on a ":hover"
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+.inactiveRow {
+    border-left: $highlightBorderSize solid transparent;
+}
+
+.inactiveRow:hover {
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+.activeRowMain {
+    border-left: $highlightBorderSize solid $primary;
+    border-bottom: $highlightBorderSize solid $primary;
+    padding-top: 4px;
+    margin-bottom: 4px;
+}
+
+.activeRowMain:hover {
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+.inactiveRowMain {
+    border-left: $highlightBorderSize solid transparent;
+    border-bottom: $highlightBorderSize solid $nodeBorderBottomColor;
+    padding-top: 4px;
+    margin-bottom: 4px;
+}
+
+.inactiveRowMain:hover {
+    // background-color: lighten($body-bg, $lightenRowFactor);
+}
+
+@keyframes fadeInRowBkg {
+    from {
+        background-color: $gray-700;
+    }
+
+    to {
+        background-color: transparent;
+    }
+}
+
+.fadeInRowBkgClz {
+    animation-name: fadeInRowBkg;
+    animation-duration: 3.5s;
+}
+
+.rowFooterIcon {
+    margin-top: .5rem;
+    margin-right: 6px;
+    margin-bottom: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.priorityTag {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 5px;
+    margin-left: $smallGap;
+    border-radius: 100px;
+    border: 1px solid white;
+}
+
+.priorityTag1 {
+    @extend .priorityTag;
+    background-color: red;
+    color: black;
+}
+
+.priorityTag2 {
+    @extend .priorityTag;
+    background-color: orange;
+    color: black;
+}
+
+.priorityTag3 {
+    @extend .priorityTag;
+    background-color: yellow;
+    color: black;
+}       
+
+.priorityTag4 {
+    @extend .priorityTag;
+    background-color: green;
+    color: white;
+}
+
+.priorityTag5 {
+    @extend .priorityTag;
+    background-color: blue;
+    color: yellow;
+}
+
+.dateTimeDisplay {
+    padding: 0px 8px 0px 8px;
+    display: inline-block;
+    margin-bottom: $tinyGap;
+    border-radius: 4px;
+}
+
+.dateTimeToday {
+    background-color: yellow;
+    color: black;
+}
+
+.dateTimeFuture {
+    background-color: darkgoldenrod;
+    color: black;
+}
+
+.dateTimePast {
+    background-color: black;
+    color: green;
+    border: 1px solid green;
+}
+
+.dateTimePastDue {
+    background-color: red;
+    color: white;
+    border: 2px solid white;
+}
+
+.nodeNameDisp {
+    margin-right: $smallGap;
+    padding: 4px;
+    border: 1px solid gray;
+    background-color: $primary;
+    border-radius: $border-radius;
+}
+
+.nodeFolderNameDisp {
+    margin-right: $smallGap;
+    padding: 4px;
+    border: 1px solid gray;
+    background-color: darkgoldenrod;
+    border-radius: $border-radius;
+}
+
+.nodeFileNameDisp {
+    margin-right: $smallGap;
+    padding: 4px;
+    border: 1px solid gray;
+    background-color: darkgoldenrod;
+    border-radius: $border-radius;
+}
+
+.sharingIcon {
+    color: cyan;
+}
+
+.sharingName {
+    border: 1px solid gray;
+    margin-left: 3px;
+    display: inline-block;
+    padding: 0px 3px 0px 3px;
+}
+
+.sharingName:first-child {
+    margin-left: 0;
+}
+
+.sharingNamePublic {
+    border: 3px solid cyan;
+    margin-left: 3px;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 0px 3px 0px 3px;
+}
+
+.sharingName:first-child {
+    margin-left: 0;
+}
+
+.aiAnswer {
+    border: 2px solid cyan;
+    border-radius: $border-radius;
+    padding: 8px 8px 0 8px;
+    margin-left: $tinyGap;
+    margin-bottom: 6px;
+}
+
+.aiAnswerFooter {
+    color: cyan;
+    font-weight: bold;
+}

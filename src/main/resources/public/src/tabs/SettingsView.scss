@@ -1,0 +1,37 @@
+.settingsCol {
+    width: 50%;
+}
+
+.mobileSettingsCol {
+    width: 100%;
+}
+
+.settingsPanel {
+    margin-left: $smallGap;
+    width: 100%;
+}
+
+.settingsSection {
+    width: 100%;
+}
+
+.settingsLink {
+    cursor: pointer;
+    font-size: 120%;
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsButton {
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsSectionTitle {
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    text-align: center;
+    margin-right: $bigGap;
+}

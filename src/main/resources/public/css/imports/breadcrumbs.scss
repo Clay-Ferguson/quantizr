@@ -1,0 +1,22 @@
+.breadcrumbPanel {
+    padding-top: 4px;
+}
+
+.breadcrumbItem {
+    cursor: pointer;
+    border: 2px solid gray;
+    padding: 0px 6px 0px 6px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.breadcrumbItem:hover {
+    border: 2px solid var(--bs-green);
+}
+
+.breadcrumbElipsis {
+    margin-right: 6px;
+    font-weight: bold;
+}

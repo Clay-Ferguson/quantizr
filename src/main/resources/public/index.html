@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta property="instanceId" th:attr="content=${instanceId}" />
+    <meta name="description" th:attr="content=${brandingMetaContent}" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="theme-color" content="#000000" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" th:attr="content=${brandingAppName}" />
+
+    <meta property="og:type" th:if="${not #strings.isEmpty(ogDescription)}" content="website" />
+    <meta property="og:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
+    <meta property="og:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}" />
+    <meta property="og:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
+    <meta property="og:url" th:if="${not #strings.isEmpty(ogUrl)}" th:attr="content=${ogUrl}" />
+
+    <meta name="twitter:card" th:if="${not #strings.isEmpty(ogDescription)}" content="summary" />
+    <meta name="twitter:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
+    <meta name="twitter:description" th:if="${not #strings.isEmpty(ogDescription)}"
+        th:attr="content=${ogDescription}" />
+    <meta name="twitter:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="stylesheet" type="text/css" href="/katex/katex.min.css">
+
+    <title th:text="${brandingAppName}"></title>
+
+    <script nomodule>
+        alert("This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
+    </script>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      window.g_config = /*[[${g_config}]]*/ null;
+      // console.log("g_config: " + JSON.stringify(window.g_config, null, 4));
+      /*]]>*/
+  </script>
+  </head>
+
+  <body style="background-color: 'black'; width: 100%; height: 100%;">
+    <noscript>
+      This app requires JavaScript.
+      </noscript>
+
+      <div id="app">
+          <div style="height: 100vh; width: 20%; margin: auto">
+              <div style="margin-left: auto; margin-right: auto;" class="progressSpinner">
+                  <div class="spinner-border text-success"></div>
+              </div>
+          </div>
+      </div>
+
+  <div id="overlayDiv" class="overlay"></div>
+  <div id="mouse-circle"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

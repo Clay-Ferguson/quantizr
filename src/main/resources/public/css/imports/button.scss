@@ -1,0 +1,166 @@
+/* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
+
+.askDeleteQuestion {
+    padding: 5px !important;
+    cursor: pointer;
+    margin-right: $tinyGap;
+    position: relative;
+    top: 7px;
+}
+
+.adminButton {
+    font-weight: bold;
+    color: var(--bs-green);
+    border-bottom: 2px solid var(--bs-green);
+    cursor: pointer;
+}
+
+.tourLinkDiv {
+    margin-bottom: $smallGap;
+}
+
+.tourLink {
+    font-weight: bold;
+    color: var(--bs-green);
+    border-bottom: 2px solid var(--bs-green);
+    cursor: pointer;
+}
+
+.hrefLink {
+    font-weight: bold;
+    color: var(--bs-green);
+    cursor: pointer;
+}
+
+.menuButton {
+    padding: 12px 16px 12px 16px;
+}
+
+.mobileButton {
+    padding: 12px 16px 12px 16px;
+}
+
+.mobileIconButton {
+    padding: 12px 16px 12px 16px;
+}
+
+.mobileIcon {
+    padding: 8px;
+    width: 2.5rem;
+}
+
+.appNavTab {
+    white-space: nowrap;
+    min-width: 10rem;
+    padding: .3rem .3rem .3rem .6rem !important;
+}
+
+.appNavTabAttention {
+    color: yellow !important;
+    background-color: blue !important;
+}
+
+.feedDirtyIcon {
+    color: yellow;
+}
+
+.btn {
+    border-radius: 0 !important;
+    border: 1px solid slategrey;
+    cursor: pointer !important;
+}
+
+.btn[disabled] {
+    font-style: italic;
+}
+
+.btn:hover {
+    border: 1px solid slategrey;
+}
+
+.btn:active {
+    border: 1px solid slategrey;
+}
+
+.btn:focus {
+    border: 1px solid slategrey;
+}
+
+.errorBackButton {
+    margin-top: 1.5rem;
+    font-weight: 700;
+}
+
+.appEnterButton {
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+}
+
+.iconButtonFont {
+    font-family: $fontFamily !important;
+    white-space: nowrap;
+    padding-left: 6px;
+}
+
+.pasteButton {
+    border: 2px dotted var(--bs-green) !important;
+    border-radius: 6px;
+    padding: 5px !important;
+    cursor: pointer;
+    margin-left: $tinyGap;
+}
+
+.feedDirtyButton {
+    color: yellow;
+}
+
+.scrollTopButtonUpperRight {
+    position: fixed;
+    top: 3px;
+    right: 23px;
+}
+
+.scrollTopButtonLowerRight {
+    position: fixed;
+    bottom: 3px;
+    right: 23px;
+}
+
+.buttonBarIcon {
+    margin-right: 14px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.iconLabel {
+    vertical-align: middle;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.jumpButton {
+    margin-right: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.buttonIconWithText {
+    margin-right: 6px;
+}
+
+.buttonIconNoText {
+    margin-right: 0;
+}
+
+// we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
+// wrapped to a new line (position) that where the row isn't full and has space to stretch. 
+.btnGroup {
+    display: inline;
+}
+
+.backToDocLink {
+    color: $green;
+    cursor: pointer;
+    margin-bottom: $tinyGap;
+}

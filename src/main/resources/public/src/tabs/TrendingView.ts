@@ -1,0 +1,94 @@
+import { getAs } from "../AppContext";
+import { Constants as C } from "../Constants";
+import { S } from "../Singletons";
+import { TrendingRSInfo } from "../TrendingRSInfo";
+import { AppTab } from "../comp/AppTab";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
+import { Span } from "../comp/core/Span";
+import { Spinner } from "../comp/core/Spinner";
+import { TabHeading } from "../comp/core/TabHeading";
+import { TextContent } from "../comp/core/TextContent";
+import { SearchContentDlg } from "../dlg/SearchContentDlg";
+import { TabIntf } from "../intf/TabIntf";
+
+export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
+    static inst: TrendingView = null;
+
+    constructor(data: TabIntf<TrendingRSInfo, TrendingView>) {
+        super(data);
+        data.inst = TrendingView.inst = this;
+    }
+
+    override preRender = (): boolean => {
+        const ast = getAs();
+        const res = this.data ? this.data.props.res : null;
+
+        if (!res) {
+            this.children = [
+                new Heading(6, "Generating statistics...", { className: "marginTop" }),
+                new Spinner()
+            ];
+            return true;
+        }
+
+        const tagPanel = new Div(null, { className: "trendingWordStatsArea" });
+
+        // todo-2: add back in when votes are implemented
+        // if (this.res.topVotes?.length > 0) {
+        //     tagPanel.addChild(new Heading(6, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
+        //     this.res.topVotes.forEach(word => {
+        //         tagPanel.addChild(new Span(word, {
+        //             className: ast.mobileMode ? "statsWordMobile" : "statsWord",
+        //             [C.WORD_ATTR]: "\"" + word + "\""
+        //         }));
+        //     });
+        // }
+
+        if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
+            tagPanel.addChild(new Heading(6, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
+            res.topTags.forEach(word => {
+                tagPanel.addChild(new Span(word, {
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
+                    [C.WORD_ATTR]: word,
+                    onClick: TrendingView.searchWord
+                }));
+            });
+        }
+
+        const wordPanel = new Div(null, { className: "trendingWordStatsArea" });
+        if ((!this.data.props.filter || this.data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
+            wordPanel.addChild(new Heading(6, "Words", { className: "trendingSectionTitle alert alert-primary" }));
+            res.topWords.forEach(word => {
+                wordPanel.addChild(new Span(word, {
+                    className: ast.mobileMode ? "statsWordMobile" : "statsWord",
+                    [C.WORD_ATTR]: word,
+                    onClick: TrendingView.searchWord
+                }));
+            });
+        }
+
+        const hasTop100s = tagPanel?.hasChildren() || wordPanel?.hasChildren();
+
+        this.children = [
+            this.headingBar = new TabHeading([
+                new Div("Node Stats", { className: "tabTitle" })
+            ], null),
+            res.stats ? new TextContent(res.stats, "marginTop", true) : null,
+            hasTop100s ? new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }) : null,
+            tagPanel.hasChildren() ? tagPanel : null,
+            wordPanel.hasChildren() ? wordPanel : null
+        ];
+        return true;
+    }
+
+    static searchWord = (evt: Event, word: string) => {
+        if (!word) {
+            word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
+        }
+        if (!word) return;
+
+        SearchContentDlg.defaultSearchText = word;
+        new SearchContentDlg().open();
+    }
+}

@@ -1,0 +1,107 @@
+.userAdminPanel {
+    margin: $smallGap 0 $smallGap 0;
+    padding: $smallGap;
+    border: 2px solid gray;
+    border-radius: $border-radius;
+}
+
+.userAdminHeading {
+    margin-bottom: $smallGap;
+    font-size: 115%;
+}
+
+.userProfileDlgAvatar {
+    background-color: $modal-content-bg;
+    max-width: 120px;
+    min-width: 120px;
+    border: 1px solid gray;
+    cursor: pointer;
+    border-radius: $border-radius;
+}
+
+.userProfileDlgAvatarNone {
+    background-color: $modal-content-bg;
+    cursor: pointer;
+    border: 2px dotted gray;
+    width: 120px;
+    height: 120px;
+    padding: 12px;
+    border-radius: $border-radius;
+}
+
+.userProfileDlgHeader {
+    background-color: $modal-content-bg;
+    cursor: pointer;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border: 1px solid gray;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+}
+
+.userProfileDlgHeaderNone {
+    background-color: $modal-content-bg;
+    cursor: pointer;
+    margin-bottom: $smallGap;
+    width: 100%;
+    height: 50px;
+    border: 2px dotted gray;
+    border-radius: $border-radius;
+    padding: 12px;
+}
+
+.avatarAndNamePanel {
+    border-collapse: collapse;
+    margin-bottom: $smallGap;
+}
+
+.bioPanel {
+    margin: $smallGap 30px 20px 30px;
+}
+
+.userDisplayName {
+    padding-left: $smallGap;
+    width: 40rem;
+}
+
+.profileImageRHS {
+    cursor: pointer;
+    background-color: $modal-content-bg;
+    max-width: 80px;
+    position: relative;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    margin-right: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.userBio {
+    margin: 15px 10px 10px 10px;
+}
+
+.profileInfoButton {
+    display: inline-block;
+    margin-top: $smallGap;
+    font-weight: bold;
+    margin-left: 15px;
+    padding: 8px 16px 8px 16px;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.followingText {
+    @extend .profileInfoButton;
+    background-color: green;
+}
+
+.blockingText {
+    @extend .profileInfoButton;
+    background-color: orangered;
+}
+
+.followCount {
+    @extend .profileInfoButton;
+}
+

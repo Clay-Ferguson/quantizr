@@ -1,0 +1,337 @@
+# Docker Compose (for Development) 
+version: '3.7'
+services:
+    redis-dev:
+        image: redis:7.2
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        hostname: redis-host-dev
+        networks:
+            bridge:
+                aliases:
+                    - redis-host-dev
+
+        # No need to limit resources for now
+        # deploy:
+        #     resources:
+        #         limits:
+        #             cpus: '0.50'
+        #             memory: 128M
+        #         reservations:
+        #             cpus: '0.25'
+        #             memory: 64M
+        ports:
+            - "${REDIS_PORT}:${REDIS_PORT}"
+        
+        # Saves to disk every 20 seconds (if 1 or more writes done)
+        # command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+        # mem arg: --maxmemory 50M
+
+        command: redis-server --maxmemory-policy allkeys-lru --port ${REDIS_PORT} --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+        environment:
+            REDIS_HOST: "${REDIS_HOST}"
+            REDIS_PORT: "${REDIS_PORT}"
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+            
+        # We need to embed the AppVersion into the Redis Records before it makes sense
+        # to cache them across restarts.
+        # volumes: 
+        #     - ${QUANTA_BASE}/redis:/data
+
+    mongo-dev: 
+        # Warning: supposedly starting at Mongo 6.0 this would be the way to do healthcheck
+        #   test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+        #      --or--
+        #   test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+
+        image: mongo:6.0.8
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        hostname: mongo-host-dev
+        networks:
+            bridge:
+                aliases:
+                    - mongo-host-dev
+       
+        volumes:
+            - '${MONGO_DATA}:/data/db'
+            - '${MONGOD_CONF}:/etc/mongod.conf'
+            - '${MONGO_BACKUP}:/backup'
+            - '${MONGO_KEY}:/data/mongo-key:ro'
+            - '${INIT_REPLICA}:/init/init-replica.sh:ro'
+
+        # command: mongod --config /etc/mongod.conf
+        command: ["--config", "/etc/mongod.conf"]
+
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
+
+        # NOTE: I'm keeping this disabled just because it might interfere with the init-replica.sh script
+        #       and I haven't had time to be sure that it never will.
+        # healthcheck:
+        #     test: ["CMD", "mongosh", 
+        #         "-u", "root", 
+        #         "-p", "${mongoPassword}", 
+        #         "--port", "${MONGO_PORT}",
+        #         "--host", "${MONGO_HOST}",
+        #         "--quiet", "--eval", "rs.status()"]
+        #     interval: 10s
+        #     timeout: 5s
+        #     retries: 30
+
+    pgdb-dev:
+        image: postgres
+        deploy:
+            # Don't want a restart policy for DEV!
+            # restart_policy:
+            #     condition: on-failure
+            #     # delay is time between restart attempts
+            #     delay: 10s
+            #     max_attempts: 4
+            #     window: 120s
+            replicas: 1
+        hostname: pgdb-host-dev
+        networks:
+            bridge:
+                aliases:
+                    - pgdb-host-dev
+        environment:
+            - POSTGRES_USER=quanta-pg
+            - POSTGRES_PASSWORD=${pgPassword}
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        # expose to host machine for management.
+        ports:
+            - '${POSTGRES_PORT}:5432'
+        volumes: 
+            - '${POSTGRES_DATA}:/var/lib/postgresql/data'
+
+    pgadmin4:
+        image: dpage/pgadmin4:latest
+        depends_on:
+            - pgdb-dev
+        environment:
+            PGADMIN_DEFAULT_EMAIL: ${pgAdminEmail}
+            PGADMIN_DEFAULT_PASSWORD: ${pgAdminPassword}
+        ports:
+            - '${PGADMIN_PORT}:80'
+        networks:
+            - bridge
+        volumes:
+            - '${PGADMIN_DATA}:/var/lib/pgadmin'
+
+    quanta-dev:
+        image: ${DOCKER_IMAGE}
+        depends_on:
+            - redis-dev
+            - mongo-dev
+            - pgdb-dev
+            - qai-dev
+        build: 
+            context: ${PRJROOT}
+            args:
+                PORT: "${PORT}"
+                PORT_DEBUG: "${PORT_DEBUG}"
+                XMS: "${XMS}"
+                XMX: "${XMX}"
+            dockerfile: ./dockerfile-dev
+
+        # This is important for DEV environment because we have a script
+        # we run to deploy new Java Classes, and it works by scaling down
+        # to zero replicas, doing a build, and then scaling back up, so
+        # we don't want docker swarm on it's own restarting it during all that.
+        # restart: "no"
+
+        # =================================================================
+        # DEPLOY REPLICAS
+        # Enable either one of the two deploy sections below
+        # =================================================================
+        # deploy for normal development with single replia
+        # NOTE: If you don't need Zero Downtime deploy you can just set multiple replias here
+        deploy:
+            restart_policy:
+                condition: on-failure
+                # delay is time between restart attempts
+                delay: 10s
+                max_attempts: 4
+                window: 120s
+            replicas: 1
+        # =================================================================
+        # This config does a Zero-Downtime Redeploy!!
+        # deploy:
+        #     replicas: 2
+        #     update_config:
+        #         parallelism: 1
+        #         order: start-first
+        #         failure_action: rollback
+        #         delay: 10s
+        #     rollback_config:
+        #         parallelism: 0
+        #         order: stop-first
+        #     restart_policy:
+        #         condition: any
+        #         delay: 5s
+        #         max_attempts: 3
+        #         window: 120s
+        # healthcheck:
+        #     test: ["CMD", "curl", "-f", "http://quanta-hos-dev:${PORT}/health"]
+        #     interval: 10m
+        #     timeout: 10s
+        #     retries: 3
+        #     start_period: 30s
+        # ====================================================================
+
+        hostname: quanta-host-dev
+        networks:
+            bridge:
+                aliases:
+                    - quanta-host-dev
+
+        # extra_hosts:
+        #     - 'host.docker.internal:host-gateway'
+
+        volumes:
+            - '${QUANTA_BASE}/tmp:/tmp'
+            - '${QUANTA_BASE}/log:/log'
+            - '${QUANTA_BASE}/config:/config'
+            - '${PRJROOT}/target/classes:/loader-path'
+            
+        ports:
+            - '${HOST_PORT}:${PORT}'
+            - '${PORT_DEBUG}:${PORT_DEBUG}'
+
+        environment:
+            # Docker warm vars
+            X_NODE_ID: "{{.Node.ID}}"
+            X_NODE_HOSTNAME: '{{.Node.Hostname}}'
+            X_SERVICE_ID: '{{.Service.ID}}'
+            X_SERVICE_NAME: '{{.Service.Name}}'
+            X_TASK_SLOT: "{{.Task.Slot}}"
+            X_TASK_ID: '{{.Task.ID}}'
+            X_TASK_NAME: '{{.Task.Name}}'
+
+            QUANTA_VER: "${QUANTA_VER}"
+            logging.config: /log/logback.xml
+            XMS: "${XMS}"
+            XMX: "${XMX}"
+
+            REDIS_HOST: "${REDIS_HOST}"
+            REDIS_PORT: "${REDIS_PORT}"
+            REDIS_PASSWORD: "${REDIS_PASSWORD}"
+
+            SPRING_DATASOURCE_URL: "jdbc:postgresql://pgdb-dev:5432/quanta-pg"
+            SPRING_DATASOURCE_USERNAME: "quanta-pg"
+            SPRING_DATASOURCE_PASSWORD: ${pgPassword}
+
+            # Instead of setting this flag, it may be easier to just click 
+            # "Run JUnit Tests" in the Admin Console of the app
+            runJUnit: "false"
+            
+            adminPassword: "${adminPassword}"
+            mongoPassword: "${mongoPassword}"
+            devEmail: "${devEmail}"            
+            OPENAI_API_KEY: "${OPENAI_API_KEY}"
+            PPLX_API_KEY: "${PPLX_API_KEY}"
+            ANTH_API_KEY: "${ANTH_API_KEY}"
+            GEMINI_API_KEY: "${GEMINI_API_KEY}"
+            mongoSecurity: "true"
+            rssPreCacheEnabled: "false"
+            aiAgentEnabled: "true"
+
+            # WARNING: Most browsers (other than Firefox) will not support crypto unless you're on HTTPS
+            # requireCrypto: "true"
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            # Using '|' there instead would preserve the newlines after read in
+            # The '-' after either of those removes any trailing newline
+            testUserAccounts: >-
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail},
+                eric:${testPassword}:${devEmail}
+    
+            testPassword: "${testPassword}"
+            throttleTime: "0"
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "${MONGO_HOST}"
+            mongodb.port: "${MONGO_PORT}" 
+            quantaAI.host: "${QAI_HOST}"
+            quantaAI.port: "${QAI_PORT}" 
+            instanceId: "dev"
+            profileName: "dev"
+            server.port: "${PORT}" 
+            httpProtocol: "http" 
+            metaHost: "${quanta_domain}" 
+            allowFileSystemSearch: "false"
+
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/tmp" 
+
+            mail.port: ""
+            mail.user: "postmaster@quantizr.com" 
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "noreply@quanta.wiki"
+
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:${PORT_DEBUG},server=y,suspend=n"
+
+    # Quanta AI Microservice (Encapsulates Python LangChain)
+    qai-dev:
+        image: ${QAI_IMAGE}
+        build: 
+            context: ${PRJROOT}
+            args:
+                QAI_HOST: "${QAI_HOST}"
+                QAI_PORT: "${QAI_PORT}"
+            dockerfile: ./dockerfile-qai
+        deploy:
+            # Don't want a restart policy for DEV!
+            # restart_policy:
+            #     condition: on-failure
+            #     # delay is time between restart attempts
+            #     delay: 10s
+            #     max_attempts: 4
+            #     window: 120s
+            replicas: 1
+        hostname: qai-host-dev
+        networks:
+            bridge:
+                aliases:
+                    - qai-host-dev
+        environment:
+            QAI_HOST: "${QAI_HOST}"
+            QAI_PORT: "${QAI_PORT}"
+            PYTHONUNBUFFERED: 1
+            
+        logging:
+            options:
+                max-size: 10m
+                max-file: "3"
+        ports:
+            - '${QAI_PORT}:${QAI_PORT}'
+        volumes:
+            # todo-2: make these two folders visible in Agent Config panel of app (but read-only)
+            - /home/clay/ferguson/Quantizr/QuantaAgent/test_project:/projects
+            - /home/clay/ferguson/Quantizr/QuantaAgent/data:/data
+
+networks:
+    bridge:

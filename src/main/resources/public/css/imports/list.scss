@@ -1,0 +1,93 @@
+.docIdxLnk {
+    cursor: pointer;
+    white-space: nowrap;
+    padding-left: 5px;
+    border: 2px solid transparent;
+}
+
+.docIdxLnkHighlight {
+    cursor: pointer;
+    white-space: nowrap;
+    padding-left: 5px;
+    border: 2px solid purple;
+}
+
+.docNodeHighlight {
+    border: 2px solid purple;
+    border-radius: $border-radius;
+    padding: $smallGap;
+}
+
+.docIndxLnk:hover {
+    background-color: $primary;
+}
+
+.docIndexPanel {
+    overflow-x: scroll;
+    width: 100%;
+    padding-top: $tinyGap;
+    margin-top: $tinyGap;
+    border-top: 2px solid gray;
+}
+
+.listBoxRow {
+    cursor: pointer;
+    //we need zero margin and padding here so that the border area around the list item
+    //when clicked on by the user (in a selectable list), looks good. That is the border should
+    //maximally surround the list row and any padding margins contained in that list row. 
+    margin: 0;
+    padding: 0;
+    background-color: #17202A;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid gray;
+    }
+}
+
+.selectedListItem {
+    cursor: pointer;
+    background-color: $secondary;
+    width: 100%;
+    border: 2px solid green;
+    padding: 8px;
+}
+
+.unselectedListItem {
+    cursor: pointer;
+    width: 100%;
+    border: 2px solid transparent;
+    padding: 8px;
+}
+
+.personsList {
+    background-color: #17202A;
+}
+
+.privsTable {
+    background-color: #17202A;
+}
+
+.personsListItemCheckBox {
+    vertical-align: top;
+    margin: $smallGap;
+}
+
+.selectAllPersonsCheckBox {
+    vertical-align: top;
+}
+
+.personsListItem {
+    cursor: pointer;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid gray;
+    }
+}
+
+.propListItem {
+    cursor: pointer;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid gray;
+    }
+}

@@ -1,0 +1,48 @@
+.feedClearButton {
+    display: inline-block;
+}
+
+.feedSearchField {
+    width: 20rem;
+}
+
+.feedView {
+    margin-bottom: $smallGap;
+}
+
+.feedFilterRadioButtons {
+    display: inline-block;
+    margin-bottom: $smallGap;
+    margin-right: $smallGap;
+}
+
+.feedNode {
+    position: relative;
+    cursor: pointer;
+}
+
+.inactiveFeedRow {
+    border-left: 2px solid $nodeBorderBottomColor;
+}
+
+.userFeedItem {
+    padding-top: 10px;
+    border-top: 1px solid $nodeBorderBottomColor;
+    padding-bottom: $tinyGap;
+}
+
+.userFeedItemHighlight {
+    border: 2px solid olivedrab;
+    padding: 10px;
+    border-radius: $border-radius;
+}
+
+.userFeedParent {
+    border: 2px solid $nodeBorderBottomColor;
+}
+
+.protocolPickerOnView {
+    width: 9rem;
+    padding-right: $smallGap;
+    display: inline-block;
+}

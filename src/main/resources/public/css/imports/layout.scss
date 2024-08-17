@@ -1,0 +1,360 @@
+.collapsibleMarkdown {
+    margin-left: $mediumGap;
+    margin-bottom: $smallGap;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.collapsibleMarkdownExpanded {
+    margin-left: $mediumGap;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.expandedCollapsible {
+    border: 2px solid $border-color;
+    border-radius: $border-radius;
+    margin-bottom: $smallGap;
+    margin-left: $bigGap;
+}
+
+.aiConfigSection {
+    border: 2px solid $border-color;
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
+    margin-left: $smallGap;
+}
+
+.aiImageGenSize {
+    width: 15rem;
+    padding-left: $bigGap;
+    display: inline-block;
+}
+
+.aiSpeechGenVoice {
+    width: 10rem;
+}
+
+.timelineChronoOrder {
+    width: 10rem;
+    display: inline-block;
+}
+
+.headingDropDown {
+    display: inline-block;
+    width: 4rem;
+    margin-left: $smallGap;
+}
+
+.clipboardIcon {
+    margin: 0 6px 0 0;
+}
+
+.appColumn {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.appColumnTourActive {
+    height: 100%;
+    margin: 0;
+    padding: 0 0 $tourPanelHeight 0;
+    overflow: hidden;
+}
+
+.guidedTourHeading {
+    margin-right: $smallGap;
+    margin-top: $smallGap;
+    font-size: 150%;
+    font-weight: bold;
+    padding: $tinyGap;
+    color: yellow;
+}
+
+.guidedTourInstructions {
+    font-weight: bold;
+}
+
+.tourPanel {
+    border: 2px solid yellow;
+    background-color: $modal-content-bg;
+    z-index: 16000010;
+    padding: $tinyGap;
+
+    // We have to set a fixed height here so that the scrollbars and main
+    // app column heights can adjust a bottom padding and not clip content
+    height: $tourPanelHeight;
+    max-height: $tourPanelHeight;
+}
+
+.tourHighlight {
+    position: relative;
+}
+
+/* bottom line */
+.tourHighlight::after {
+    content: '';
+    position: absolute;
+    background-color: yellow;
+    width: 100%;
+    height: 8px;
+    bottom: -8px;
+    left: 0;
+    animation: blink 1s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+    50% {
+        background-color: transparent;
+    }
+}
+
+.marginLeftIfNotFirst {
+    margin-left: $smallGap;
+}
+
+.marginLeftIfNotFirst:first-child {
+    margin-left: 0;
+}
+
+.marginLeft {
+    margin-left: $smallGap;
+}
+
+.marginRight {
+    margin-right: $smallGap;
+}
+
+.mediumMarginRight {
+    margin-right: $mediumGap;
+}
+
+.microMarginTop {
+    margin-top: $microGap;
+}
+
+.microMarginBottom {
+    margin-bottom: $microGap;
+}
+
+.microMarginRight {
+    margin-right: $microGap;
+}
+
+.marginTop {
+    margin-top: $smallGap;
+}
+
+.mediumPaddingTop {
+    padding-top: $mediumGap;
+}
+
+.smallMarginTop {
+    margin-top: $tinyGap;
+}
+
+.smallMarginBottom {
+    margin-bottom: $tinyGap;
+}
+
+.smallMarginRight {
+    margin-right: $smallGap;
+}
+
+.bigMarginBottom {
+    margin-bottom: $bigGap;
+}
+
+.bigMarginRight {
+    margin-right: $bigGap;
+}
+
+.bigPaddingRight {
+    padding-right: $bigGap;
+}
+
+.bigMarginTop {
+    margin-top: $bigGap;
+}
+
+.bigMarginLeft {
+    margin-left: $bigGap;
+}
+
+.bigMargin {
+    margin: $bigGap;
+}
+
+.microMarginTop {
+    margin-top: $microGap;
+}
+
+.marginBottom {
+    margin-bottom: $smallGap;
+}
+
+.marginBottomIfNotLast {
+    &:not(:last-child) {
+        margin-bottom: $smallGap;
+    }
+}
+
+.marginAll {
+    margin: $smallGap;
+}
+
+.microMarginAll {
+    margin: $microGap;
+}
+
+.tinyMarginAll {
+    margin: $tinyGap;
+}
+
+.tinyMarginTop {
+    margin-top: $tinyGap;
+}
+
+.tinyMarginBottom {
+    margin-bottom: $tinyGap;
+}
+
+.flexAlignChildrenTop {
+    align-items: flex-start;
+}
+
+.alignBottom {
+    vertical-align: bottom;
+}
+
+// see if flexRowLayout can be used here (CSS class and or TS class)
+.horizontalLayout {
+    // flex will layout things all on the same horizontal row
+    display: flex;
+}
+
+.vertLayoutRow {
+    margin-bottom: $smallGap;
+}
+
+.noMargin {
+    margin: 0;
+}
+
+.noPaddingRight {
+    padding-right: 0px !important;
+}
+
+.verticalSpace {
+    height: 16px;
+    min-height: 16px;
+}
+
+.alignBottom {
+    vertical-align: bottom !important;
+}
+
+.inlineBlock {
+    display: inline-block;
+}
+
+.fullWidth {
+    width: 100%;
+}
+
+.centeredText {
+    text-align: center;
+    width: 100%;
+}
+
+// centers the child that's inside this div (both vertically and horizontall centering)
+.centerChild {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.flexRowLayout {
+    display: flex;
+    flex-wrap: wrap;
+
+    // WARNING: without this items can stretch vertically and this warps images 
+    align-items: flex-start;
+}
+
+// Note: This is to be used inside a flexRowLayout. 'auto' margins on something directly inside
+// a display=flex container has a very special meaning, which is to consume (use up) all available space
+// on the left or right of something. So this auto margin left has the effect of pushing
+// the element as far to the right as it can go.
+.flexFloatRight {
+    margin-left: auto;
+}
+
+.flexRowAlignBottom {
+    align-items: end;
+}
+
+.horizontalLayoutComp {
+    display: table;
+    border-spacing: 10px;
+    margin-top: $smallGap;
+    margin-bottom: $smallGap;
+}
+
+.horizontalLayoutCompCompact {
+    display: table;
+    border-spacing: 10px;
+}
+
+.horizontalLayoutCompBorderCollapse {
+    @extend .horizontalLayoutComp;
+    border-collapse: collapse;
+}
+
+.displayTableNoSpacing {
+    display: table;
+}
+
+.displayRow {
+    display: table-row;
+}
+
+.displayCell {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.invisible {
+    display: none;
+    visibility: hidden !important;
+}
+
+// for some reason, 'visibility: hidden' isn't working, but 'opacity' does work. I'll just leave both, it works.
+.compHidden {
+    opacity: 0;
+}
+
+.visible {
+    display: inline-block;
+    visibility: visible !important;
+}
+
+.clearBoth {
+    clear: both;
+}
+
+// I don't know where the ul and ol margins are getting zet to zero, but somewhere they are and this fixes it.
+ul {
+    margin-bottom: 1rem !important;
+}
+
+ol {
+    margin-bottom: 1rem !important;
+}

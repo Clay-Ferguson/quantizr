@@ -1,0 +1,121 @@
+@import "variables.scss";
+
+$profileImgSize: 200px;
+$highlightActiveMenuItems: false;
+
+$border-radius-small: 3px;
+$border-radius: 6px;
+$border-radius-large: 10px;
+$dlg-border-radius: 8px;
+
+$input-bg: $gray-700;
+$input-color: white;
+$input-color-placeholder: #999;
+
+$mobileHeaderBarHeight: 3.5rem;
+$baseBgColor: black; // rgb(32, 34, 36);
+$body-bg: black; // darken($baseBgColor, 7%);
+$body-color: white;
+$font-size-base: 1rem !default;
+$disabled-body-color: gray; //darken($body-color, 90%);
+$custom-control-indicator-size: 1.75rem; // This gives us awesome large checkboxes and radio buttons!!
+$form-select-indicator-color: lightGray;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+$fa-font-path: "../fonts/fa";
+@import "../node_modules/font-awesome/scss/font-awesome";
+
+@import "bootswatch.scss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+$fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
+
+// This does work (border around focused edit fields) but we don't need it.
+/*
+.form-control:focus {
+    border-color: green;
+}
+*/
+
+* {
+    outline: none;
+}
+
+$menuItemHoverBackgroundColor: $primary;
+$nodeBorderBottomColor: $gray-700;
+$dlgBorderColor: var(--bs-green);
+$dlgBorderWidth: 2px;
+$createdByMeBackgroundColor: green;
+$createdByMeTextColor: white;
+$createdByAnotherBackgroundColor: $gray-700;
+$createdByAnotherTextColor: white;
+$listBackgroundColor: lightGray;
+$smallGap: 12px;
+$mediumGap: 18px;
+$bigGap: 24px;
+$tinyGap: 8px;
+$microGap: 4px;
+$smallerFont: 80%;
+$lightenRowFactor: 5;
+$fatBorderSize: 8px;
+$mediumBorderSize: 6px;
+$highlightBorderSize: 8px;
+$smallBorderSize: 3px;
+$mobileHeaderHeight: 3.5rem;
+$tourPanelHeight: 6rem;
+
+@font-face {
+    font-family: "QuantaCustomFont";
+    /* src: url('../fonts/Roboto-Light.ttf') format('truetype'); */
+    src: url('../fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@import './imports/breadcrumbs.scss';
+@import './imports/button.scss';
+@import './imports/checkbox.scss';
+@import './imports/click-effect.scss';
+@import './imports/dialog.scss';
+@import './imports/dropzone.scss';
+@import './imports/edit.scss';
+@import './imports/feed.scss';
+@import './imports/friends.scss';
+@import './imports/history.scss';
+@import './imports/icon.scss';
+@import './imports/image.scss';
+@import './imports/layout.scss';
+@import './imports/list.scss';
+@import './imports/media-queries.scss';
+@import './imports/menu.scss';
+@import './imports/nav.scss';
+@import './imports/nodeItem.scss';
+@import './imports/openGraph.scss';
+@import './imports/player.scss';
+@import './imports/profile.scss';
+@import './imports/rss.scss';
+@import './imports/scrollbar.scss';
+@import './imports/stats.scss';
+@import './imports/tabs.scss';
+@import './imports/tags.scss';
+@import './imports/text.scss';
+@import './imports/thread.scss';
+@import './imports/tts.scss';
+@import '../src/comp/App.scss';
+@import '../src/comp/FullScreenControlBar.scss';
+@import '../src/comp/FullScreenGraphViewer.scss';
+@import '../src/comp/FullScreenImgViewer.scss';
+@import '../src/comp/LeftNavPanel.scss';
+@import '../src/comp/PropDisplayLayout.scss';
+@import '../src/dlg/ManageStorageDlg.scss';
+@import '../src/dlg/MediaRecorderDlg.scss';
+@import '../src/dlg/PasteOrLinkDlg.scss';
+@import '../src/dlg/SearchContentDlg.scss';
+@import '../src/dlg/SelectTagsDlg.scss';
+@import '../src/plugins/CalcType.scss';
+@import '../src/tabs/SettingsView.scss';
+@import '../src/comp/core/HelpPanel.scss';
+@import '../src/comp/node/NodeCompBinary.scss';
+
