@@ -170,8 +170,7 @@ public class AclService extends ServiceBase {
         return res;
     }
 
-    public boolean setCipherKey(SubNode node, String principalNodeId, String cipherKey,
-            SetCipherKeyResponse res) {
+    public boolean setCipherKey(SubNode node, String principalNodeId, String cipherKey, SetCipherKeyResponse res) {
         boolean ret = false;
         HashMap<String, AccessControl> acl = node.getAc();
         AccessControl ac = acl.get(principalNodeId);
@@ -190,8 +189,8 @@ public class AclService extends ServiceBase {
      *
      * If BulkOperations is non-null we use it instead of a non-bulk operation.
      */
-    public boolean addPrivilege(BulkOperations bops, SubNode node, String principal,
-            SubNode principalNode, List<String> privileges, AddPrivilegeResponse res) {
+    public boolean addPrivilege(BulkOperations bops, SubNode node, String principal, SubNode principalNode,
+            List<String> privileges, AddPrivilegeResponse res) {
         if ((principal == null && principalNode == null) || node == null)
             return false;
         if (principal != null) {
@@ -416,10 +415,6 @@ public class AclService extends ServiceBase {
                 && node.getAc().get(PrincipalName.PUBLIC.s()).getPrvs().contains(PrivilegeType.WRITE.s());
     }
 
-    public void makePublicAppendable(SubNode node) {
-        setKeylessPriv(node, PrincipalName.PUBLIC.s(), Const.RDWR);
-    }
-
     // The effeciency of using this function is it won't set the node to dirty of nothing changed.
     public void setKeylessPriv(SubNode node, String key, String prvs) {
         // if no privileges exist at all just add the one we need to add
@@ -511,16 +506,16 @@ public class AclService extends ServiceBase {
             acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.WRITE.s()));
         }
         if (principalId != null) {
-            svc_arun.run(() -> {
-                if (PrincipalName.PUBLIC.s().equals(principalId)) {
-                    acInfo.setPrincipalName(PrincipalName.PUBLIC.s());
-                    acInfo.setDisplayName(PrincipalName.PUBLIC.s());
-                } else {
+            if (PrincipalName.PUBLIC.s().equals(principalId)) {
+                acInfo.setPrincipalName(PrincipalName.PUBLIC.s());
+                acInfo.setDisplayName(PrincipalName.PUBLIC.s());
+            } else {
+                svc_arun.run(() -> {
                     acInfo.setPrincipalName(svc_auth.getAccountPropById(principalId, NodeProp.USER.s()));
                     acInfo.setDisplayName(svc_auth.getAccountPropById(principalId, NodeProp.DISPLAY_NAME.s()));
-                }
-                return null;
-            });
+                    return null;
+                });
+            }
         }
         return acInfo;
     }

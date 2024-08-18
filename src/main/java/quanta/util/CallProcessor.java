@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
-import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.perf.PerfEvent;
 import quanta.rest.request.base.RequestBase;
@@ -24,7 +23,11 @@ public class CallProcessor extends ServiceBase {
 
     /*
      * Wraps the processing of any command by using whatever info is on the session and/or the request
-     * to perform the login if the user is not logged in, and then call the function to be processed
+     * to perform the login if the user is not logged in, and then call the function to be processed.
+     * 
+     * @authBearer: if true, then the request must have a valid `Bearer` token in the header, or a valid
+     * `token` in the requests url, or in the session (see AppFilter.getToken() for details), or else we
+     * fail with a security error.
      */
     public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession,
             Supplier<Object> runner) {

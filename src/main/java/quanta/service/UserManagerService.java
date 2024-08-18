@@ -132,9 +132,13 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeException("No user name in session context.");
         }
 
+        // NOTE: This token (if in header, request url, or session variable) will have been set in the
+        // ThreadLocals inside AppFilter if available, but not checked against userName until here, in
+        // this method.
         String bearer = TL.getReqBearerToken();
+
         // otherwise require secure header
-        if (bearer == null || !validToken(bearer, sc.getUserName())) {
+        if (!validToken(bearer, sc.getUserName())) {
             throw new UnauthorizedException();
         }
     }
@@ -575,7 +579,7 @@ public class UserManagerService extends ServiceBase {
         UserAccount user = svc_userRepo.findByMongoId(userId);
         if (user == null) {
             log.debug("User not found, creating...");
-            SubNode userNode = svc_mongoRead.getNode(userId, true, null); 
+            SubNode userNode = svc_mongoRead.getNode(userId, true, null);
             String userName = userNode.getStr(NodeProp.USER);
             user = new UserAccount(userId, userName);
             user = svc_userRepo.save(user);

@@ -108,13 +108,6 @@ public class SubNodeUtil extends ServiceBase {
         return true;
     }
 
-    public void setNodePublicAppendable(SubNode node) {
-        svc_arun.run(() -> {
-            svc_acl.makePublicAppendable(node);
-            return null;
-        });
-    }
-
     public String getFriendlyNodeUrl(SubNode node) {
         // if node doesn't thave a name, make ID-based url
         if (StringUtils.isEmpty(node.getName())) {

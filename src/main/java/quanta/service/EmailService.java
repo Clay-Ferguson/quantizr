@@ -80,13 +80,11 @@ public class EmailService extends ServiceBase {
                 }
                 if (--runCountdown <= 0) {
                     runCountdown = INTERVAL_SECONDS;
-                    svc_arun.run(() -> {
-                        LinkedList<SubNode> mailNodes = svc_mongoUtil.asList(getMailNodes());
-                        if (mailNodes.size() > 0) {
-                            sendAllMail(mailNodes);
-                        }
-                        return null;
-                    });
+
+                    LinkedList<SubNode> mailNodes = svc_mongoUtil.asList(getMailNodes());
+                    if (mailNodes.size() > 0) {
+                        sendAllMail(mailNodes);
+                    }
                 }
             } catch (Exception e) {
                 log.error("notification deamo cycle fail", e);

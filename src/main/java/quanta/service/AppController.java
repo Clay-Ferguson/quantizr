@@ -162,8 +162,8 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "view", required = false) String view, //
             HttpSession session, //
             Model model) {
-        return svc_render.cm_getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode, login,
-                view, model);
+        return svc_render.cm_getIndexPage(nameOnAdminNode, nameOnUserNode, userName, id, search, name, signupCode,
+                login, view, model);
     }
 
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
@@ -518,7 +518,7 @@ public class AppController extends ServiceBase implements ErrorController {
             return svc_user.cm_resetPassword(req);
         });
     }
-
+    
     @RequestMapping({FILE_PATH + "/id/{id}", FILE_PATH + "/{nameOnAdminNode}",
             FILE_PATH + "/{userName}/{nameOnUserNode}"})
     public void attachment(
@@ -529,14 +529,18 @@ public class AppController extends ServiceBase implements ErrorController {
             @PathVariable(value = "userName", required = false) String userName,
             @PathVariable(value = "id", required = false) String id,
             @RequestParam(value = "download", required = false) String download,
-            // gid is used ONLY for cache bustring so it can be the
+            // gid is used ONLY for cache busting so it can be the
             // gridId, we don't know or care which it is.
             @RequestParam(value = "gid", required = false) String gid,
             // attachment name for retrieving from a multiple attachment node, and if omitted
             // defaults to "p" (primary)
             @RequestParam(value = "att", required = false) String attName, HttpSession session, HttpServletRequest req,
             HttpServletResponse response) {
-        svc_attach.cm_getAttachment(nameOnAdminNode, nameOnUserNode, userName, id, download, gid, attName, req, response);
+        svc_callProc.run("getAttachment", false, false, null, session, () -> {
+            svc_attach.cm_getAttachment(nameOnAdminNode, nameOnUserNode, userName, id, download, gid, attName, req,
+                    response);
+            return null;
+        });
     }
 
     @RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
@@ -548,10 +552,12 @@ public class AppController extends ServiceBase implements ErrorController {
              * content, and as the PDF is being generated calls are made to this endpoint for each image, or
              * other file so we use the token to auth the request
              */
-            @RequestParam(value = "token", required = false) String token,
             @RequestParam(value = "download", required = false) String download, HttpSession session,
             HttpServletResponse response) {
-        svc_attach.cm_getBinary(binId, nodeId, token, download, session, response);
+        svc_callProc.run("getBinary", false, false, null, session, () -> {
+            svc_attach.cm_getBinary(binId, nodeId, download, session, response);
+            return null;
+        });
     }
 
     /*
@@ -564,12 +570,8 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = FILE_PATH + "/export/{fileName:.+}", method = RequestMethod.GET)
     public void getFile(@PathVariable("fileName") String fileName,
             @RequestParam(name = "disp", required = false) String disposition,
-            @RequestParam(name = "token", required = true) String token, HttpSession session,
+            HttpSession session,
             HttpServletResponse response) {
-        SessionContext sc = ServiceBase.svc_redis.get(token);
-        if (sc == null) {
-            throw new RuntimeException("bad token in /f/export/ access: " + token);
-        }
         svc_callProc.run("file", false, false, null, session, () -> {
             svc_attach.cm_getFile(fileName, disposition, response);
             return null;
@@ -581,12 +583,8 @@ public class AppController extends ServiceBase implements ErrorController {
      */
     @RequestMapping(value = FILE_PATH + "/export-friends", method = RequestMethod.GET)
     public void exportFriends(@RequestParam(name = "disp", required = false) String disposition,
-            @RequestParam(name = "token", required = true) String token, HttpSession session,
+            HttpSession session,
             HttpServletResponse response) {
-        SessionContext sc = ServiceBase.svc_redis.get(token);
-        if (sc == null) {
-            throw new RuntimeException("bad token in /f/export-friends/ access: " + token);
-        }
         svc_callProc.run("exportFriends", false, false, null, session, () -> {
             svc_user.cm_exportPeople(response, disposition, NodeType.FRIEND_LIST.s());
             return null;
@@ -598,13 +596,8 @@ public class AppController extends ServiceBase implements ErrorController {
      */
     @RequestMapping(value = FILE_PATH + "/export-blocks", method = RequestMethod.GET)
     public void exportBlocks(@RequestParam(name = "disp", required = false) String disposition,
-            @RequestParam(name = "token", required = true) String token, HttpSession session,
+            HttpSession session,
             HttpServletResponse response) {
-        SessionContext sc = ServiceBase.svc_redis.get(token);
-        if (sc == null) {
-            throw new RuntimeException("bad token in /f/export-blocks/ access: " + token);
-        }
-
         svc_callProc.run("exportBlocks", false, false, null, session, () -> {
             svc_user.cm_exportPeople(response, disposition, NodeType.BLOCKED_USERS.s());
             return null;

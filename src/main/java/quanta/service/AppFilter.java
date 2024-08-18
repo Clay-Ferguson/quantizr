@@ -203,9 +203,8 @@ public class AppFilter extends GenericFilterBean {
     }
 
     private String getToken(HttpServletRequest httpReq, HttpSession session) {
-        String token;
         // first try to get the token from the HTTP header
-        token = httpReq.getHeader("Bearer");
+        String token = httpReq.getHeader("Bearer");
 
         // second, allow token to be specified in URL as well
         if (StringUtils.isEmpty(token)) {

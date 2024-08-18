@@ -87,33 +87,31 @@ public class NodeRenderService extends ServiceBase {
         boolean _hasUrlId = hasUrlId;
         boolean _isHomeNodeRequest = isHomeNodeRequest;
         ClientConfig config = new ClientConfig();
-        svc_arun.run(() -> {
-            SubNode node = null;
-            try {
-                Val<SubNode> accntNode = new Val<>();
-                node = svc_mongoRead.getNode(_id, true, accntNode);
-                if (node == null) {
-                    if (_isHomeNodeRequest && accntNode.hasVal()) {
-                        config.setDisplayUserProfileId(accntNode.getVal().getIdStr());
-                    }
-                }
-            } catch (Exception e) {
-                config.setUserMsg("Unable to access node: " + _id);
-                ExUtil.warn(log, "Unable to access node: " + _id, e);
-            }
 
-            if (node != null) {
-                if (_hasUrlId) {
-                    config.setInitialNodeId(_id);
+        SubNode node = null;
+        try {
+            Val<SubNode> accntNode = new Val<>();
+            node = svc_mongoRead.getNode(_id, true, accntNode);
+            if (node == null) {
+                if (_isHomeNodeRequest && accntNode.hasVal()) {
+                    config.setDisplayUserProfileId(accntNode.getVal().getIdStr());
                 }
-                if (AclService.isPublic(node)) {
-                    svc_render.populateSocialCardProps(node, model);
-                }
-            } else {
-                config.setUserMsg("Unable to open node: " + _id);
             }
-            return null;
-        });
+        } catch (Exception e) {
+            config.setUserMsg("Unable to access node: " + _id);
+            ExUtil.warn(log, "Unable to access node: " + _id, e);
+        }
+
+        if (node != null) {
+            if (_hasUrlId) {
+                config.setInitialNodeId(_id);
+            }
+            if (AclService.isPublic(node)) {
+                svc_render.populateSocialCardProps(node, model);
+            }
+        } else {
+            config.setUserMsg("Unable to open node: " + _id);
+        }
 
         if (signupCode != null) {
             config.setUserMsg(svc_user.processSignupCode(signupCode));

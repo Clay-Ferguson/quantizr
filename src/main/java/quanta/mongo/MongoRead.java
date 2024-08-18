@@ -401,11 +401,10 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).is(path);
         if (allowAuth) {
-            Criteria _crit = crit;
-            crit = svc_arun.run(() -> svc_auth.addReadSecurity(_crit));
+            crit = svc_auth.addReadSecurity(crit);
         }
         q.addCriteria(crit);
-        return allowAuth ? svc_ops.findOne(q) : svc_ops.adminFindOne(q);
+        return svc_ops.findOne(q);
     }
 
     public boolean pathExists(String path) {

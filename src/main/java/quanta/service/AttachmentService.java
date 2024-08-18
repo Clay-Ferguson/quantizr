@@ -59,6 +59,7 @@ import quanta.model.UserStats;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.DeleteAttachmentRequest;
@@ -921,26 +922,23 @@ public class AttachmentService extends ServiceBase {
             List<String> nodesIdsMissingBins = new ArrayList<>();
 
             // iterate stream of all nodes
-            svc_arun.run(() -> {
-                // get all nodes that have attachments
-                Criteria crit = Criteria.where(SubNode.ATTACHMENTS).exists(true);
-                Query query = new Query();
-                query.addCriteria(crit);
+            // get all nodes that have attachments
+            Criteria crit = Criteria.where(SubNode.ATTACHMENTS).exists(true);
+            Query query = new Query();
+            query.addCriteria(crit);
 
-                svc_ops.forEach(query, n -> {
-                    n.getAttachments().forEach((String key, Attachment att) -> {
-                        if (att.getBin() != null) {
-                            GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
-                            if (gridFile == null) {
-                                log.debug("NodeId=" + n.getIdStr() + " Has Missing Binary: " + att.getBin());
-                                nodesIdsMissingBins.add(n.getIdStr());
-                            } else {
-                                nodesFound.inc();
-                            }
+            svc_ops.forEach(query, n -> {
+                n.getAttachments().forEach((String key, Attachment att) -> {
+                    if (att.getBin() != null) {
+                        GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(att.getBin())));
+                        if (gridFile == null) {
+                            log.debug("NodeId=" + n.getIdStr() + " Has Missing Binary: " + att.getBin());
+                            nodesIdsMissingBins.add(n.getIdStr());
+                        } else {
+                            nodesFound.inc();
                         }
-                    });
+                    }
                 });
-                return null;
             });
 
             verifyAllAttachments_runCount++;
@@ -1078,105 +1076,67 @@ public class AttachmentService extends ServiceBase {
      */
     public void cm_getAttachment(String nameOnAdminNode, String nameOnUserNode, String userName, String id,
             String download, String gid, String attName, HttpServletRequest req, HttpServletResponse response) {
-        try {
-            if (StringUtils.isEmpty(attName)) {
-                attName = Constant.ATTACHMENT_PRIMARY.s();
-            }
 
-            // Node Names are identified using a colon in front of it, to make it detectable
-            if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
-                id = ":" + userName + ":" + nameOnUserNode;
-            } //
-            else if (!StringUtils.isEmpty(nameOnAdminNode)) {
-                id = ":" + nameOnAdminNode;
-            }
-            if (id != null) {
-                String _id = id;
-                String _attName = attName;
-                svc_arun.run(() -> {
-                    // we don't check ownership of node at this time, but merely check sanity of
-                    // whether this ID is even existing or not.
-                    SubNode node = svc_mongoRead.getNode(_id);
-                    if (node == null) {
-                        throw new RuntimeException("Node not found.");
-                    }
-
-                    if (node.getAc() == null || node.getAc().size() == 0) {
-                        svc_user.authBearer();
-                        svc_crypto.authSig();
-                    }
-                    String _gid = gid;
-                    // if no cachebuster gid was on url then redirect to a url that does have the gid
-                    if (_gid == null) {
-                        Attachment att = node.getAttachment(_attName, false, false);
-                        _gid = null;
-                        if (_gid == null) {
-                            _gid = att != null ? att.getBin() : null;
-                        }
-                        if (_gid != null) {
-                            try {
-                                response.sendRedirect(Util.getFullURL(req, "gid=" + _gid));
-                            } catch (Exception e) {
-                                throw new RuntimeException("fail.");
-                            }
-                        }
-                    }
-                    if (_gid == null) {
-                        throw new RuntimeException("No attachment data for node.");
-                    }
-
-                    svc_attach.getBinary(_attName, node, null, null, download != null, response);
-                    return null;
-                });
-            }
-        } catch (Exception e) {
-            // need to add some kind of message to exception to indicate to user something
-            // with the arguments went wrong.
-            ExUtil.error(log, "exception in call processor", e);
+        if (StringUtils.isEmpty(attName)) {
+            attName = Constant.ATTACHMENT_PRIMARY.s();
         }
+
+        // Node Names are identified using a colon in front of it, to make it detectable
+        if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
+            id = ":" + userName + ":" + nameOnUserNode;
+        } //
+        else if (!StringUtils.isEmpty(nameOnAdminNode)) {
+            id = ":" + nameOnAdminNode;
+        }
+
+        if (id == null) {
+            throw new RuntimeException("No ID specified.");
+        }
+
+        // we don't check ownership of node at this time, but merely check sanity of
+        // whether this ID is even existing or not.
+        SubNode node = svc_mongoRead.getNode(id);
+        if (node == null) {
+            throw new RuntimeException("Node not found.");
+        }
+
+        svc_attach.getBinary(attName, node, null, null, download != null, response);
     }
 
     /*
      * binId param not uses currently but the client will send either the gridId of the node depending
      * on which type of attachment it sees on the node
      */
-    public void cm_getBinary(String binId, String nodeId, String token, String download, HttpSession session,
+    public void cm_getBinary(String binId, String nodeId, String download, HttpSession session,
             HttpServletResponse response) {
 
-        log.debug("getBinary: session.id=" + session.getId() + " binId=" + binId + " nodeId=" + nodeId + " token="
-                + token + " download=" + download);
+        log.debug("getBinary: session.id=" + session.getId() + " binId=" + binId + " nodeId=" + nodeId + " download="
+                + download);
 
-        if (token == null) {
-            // Check if this is an 'avatar' request and if so bypass security
+        SubNode node = svc_mongoRead.getNode(nodeId);
+        if (node == null) {
+            throw new RuntimeException("Node not found.");
+        }
+
+        if (node.isType(NodeType.ACCOUNT)) {
+            String attName = null;
             if ("avatar".equals(binId)) {
-                svc_arun.run(() -> {
-                    svc_attach.getBinary(Constant.ATTACHMENT_PRIMARY.s(), null, nodeId, binId, download != null,
-                            response);
-                    return null;
-                });
+                attName = Constant.ATTACHMENT_PRIMARY.s();
             } //
-            else if ("profileHeader".equals(binId)) { // Check if this is an 'profileHeader Image' request
-                // and if so bypass security
-                svc_arun.run(() -> {
-                    svc_attach.getBinary(Constant.ATTACHMENT_HEADER.s(), null, nodeId, binId, download != null,
-                            response);
-                    return null;
-                });
+            else if ("profileHeader".equals(binId)) {
+                attName = Constant.ATTACHMENT_HEADER.s();
             }
-            // Else if not an avatar request then do a secure acccess
-            else {
-                svc_callProc.run("bin", false, false, null, session, () -> {
-                    svc_attach.getBinary(null, null, nodeId, binId, download != null, response);
-                    return null;
-                });
-            }
-        } else {
-            if (svc_user.validToken(token, null)) {
-                svc_arun.run(() -> {
-                    svc_attach.getBinary(null, null, nodeId, binId, download != null, response);
-                    return null;
-                });
-            }
+
+            final String _attName = attName;
+            // Access as Admin because all account node attachments are always public.
+            svc_arun.run(() -> {
+                svc_attach.getBinary(_attName, null, nodeId, binId, download != null, response);
+                return null;
+            });
+        }
+        // Else if not an account node
+        else {
+            svc_attach.getBinary(null, null, nodeId, binId, download != null, response);
         }
     }
 
