@@ -3,8 +3,10 @@ import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
+import { Attachment, NodeInfo } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
 import { Comp } from "./comp/base/Comp";
 import { AppNavLink } from "./comp/core/AppNavLink";
 import { Button } from "./comp/core/Button";
@@ -12,12 +14,11 @@ import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
-import { Heading } from "./comp/core/Heading";
 import { IconButton } from "./comp/core/IconButton";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
-import { Tag } from "./comp/core/Tag";
 import { NodeCompBinary } from "./comp/node/NodeCompBinary";
+import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { MessageDlg } from "./dlg/MessageDlg";
@@ -26,9 +27,7 @@ import { TabIntf } from "./intf/TabIntf";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
-import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
-import { Attachment, NodeInfo } from "./JavaIntf";
-import { NodeCompContent } from "./comp/node/NodeCompContent";
+import { Tag } from "./comp/core/Tag";
 
 export class Render {
     private debug: boolean = false;
@@ -196,7 +195,7 @@ export class Render {
         const pathPart = S.nodeUtil.getPathPartForNamedNode(node);
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
 
-        children.push(new Heading(6, "By ID"), //
+        children.push(this.titleDiv("By ID"), //
             new Div(byIdUrl, {
                 className: "linkDisplay",
                 title: "Copy to clipboard",
@@ -204,7 +203,7 @@ export class Render {
             }));
 
         const markdownByIdUrl = "[Link](?id=" + node.id + ")";
-        children.push(new Heading(6, "By ID (Markdown)"), //
+        children.push(this.titleDiv("By ID (Markdown)"), //
             new Div(markdownByIdUrl, {
                 className: "linkDisplay",
                 title: "Copy to clipboard",
@@ -213,7 +212,7 @@ export class Render {
 
         if (node.name) {
             const byNameUrl = window.location.origin + pathPart;
-            children.push(new Heading(6, "By Name"), //
+            children.push(this.titleDiv("By Name"), //
                 new Div(byNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
@@ -221,7 +220,7 @@ export class Render {
                 }));
 
             const docViewByNameUrl = window.location.origin + pathPart + "?view=doc";
-            children.push(new Heading(6, "Doc View (By Name)"), //
+            children.push(this.titleDiv("Doc View (By Name)"), //
                 new Div(docViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
@@ -229,7 +228,7 @@ export class Render {
                 }));
 
             const timelineViewByNameUrl = window.location.origin + pathPart + "?view=timeline";
-            children.push(new Heading(6, "Timeline View (By Name)"), //
+            children.push(this.titleDiv("Timeline View (By Name)"), //
                 new Div(timelineViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
@@ -237,7 +236,7 @@ export class Render {
                 }));
 
             const markdownByNameUrl = "[Link](" + pathPart + ")";
-            children.push(new Heading(6, "By Name (Markdown)"), //
+            children.push(this.titleDiv("By Name (Markdown)"), //
                 new Div(markdownByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
@@ -245,7 +244,7 @@ export class Render {
                 }));
         }
 
-        children.push(new Heading(6, "Thread View"), //
+        children.push(this.titleDiv("Thread View"), //
             new Div(byIdUrlThreadView, {
                 className: "linkDisplay",
                 title: "Copy to clipboard",
@@ -254,7 +253,7 @@ export class Render {
 
         // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
         // const rssFeed = window.location.origin + "/rss?id=" + node.id;
-        // children.push(new Heading(5, "Node RSS Feed"), //
+        // children.push(this.titleDiv("Node RSS Feed"), //
         //     new Div(rssFeed, {
         //         className: "linkDisplay",
         //         title: "Copy to clipboard",
@@ -264,18 +263,17 @@ export class Render {
         const attComps: Comp[] = [];
         if (node.attachments) {
             const atts: Attachment[] = S.props.getOrderedAtts(node);
-            attComps.push(new Heading(3, "Attachments"));
             for (const att of atts) {
                 attComps.push(new Tag("hr"));
                 const bin = att ? att.b : null;
                 if (bin) {
                     attComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
-                    attComps.push(new Heading(4, att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
+                    attComps.push(this.titleDiv(att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
                     const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
 
                     const attByIdUrl = window.location.origin + "/f/id/" + node.id;
                     linkGroup.addChildren([
-                        new Heading(6, "View By Id"), //
+                        this.titleDiv("View By Id"), //
                         new Div(attByIdUrl, {
                             className: "linkDisplay",
                             title: "Copy to clipboard",
@@ -285,7 +283,7 @@ export class Render {
 
                     const downloadAttByIdUrl = attByIdUrl + "?download=y";
                     linkGroup.addChildren([
-                        new Heading(6, "Download By Id"), //
+                        this.titleDiv("Download By Id"), //
                         new Div(downloadAttByIdUrl, {
                             className: "linkDisplay",
                             title: "Copy to clipboard",
@@ -296,7 +294,7 @@ export class Render {
                     if (node.name) {
                         const attByNameUrl = window.location.origin + pathPart;
                         linkGroup.addChildren([
-                            new Heading(6, "View By Name"), //
+                            this.titleDiv("View By Name"), //
                             new Div(attByNameUrl, {
                                 className: "linkDisplay",
                                 title: "Copy to clipboard",
@@ -306,7 +304,7 @@ export class Render {
 
                         const downloadAttByNameUrl = attByNameUrl + "?download=y";
                         linkGroup.addChildren([
-                            new Heading(6, "Download By Name"), //
+                            this.titleDiv("Download By Name"), //
                             new Div(downloadAttByNameUrl, {
                                 className: "linkDisplay",
                                 title: "Copy to clipboard",
@@ -320,7 +318,7 @@ export class Render {
             }
 
             if (attComps.length > 0) {
-                children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attComps, false, (exp: boolean) => {
+                children.push(new CollapsiblePanel("Show Attachment URLs", "Hide Attachment URLs", null, attComps, true, (exp: boolean) => {
                     dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
                 }, getAs().linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
             }
@@ -328,6 +326,10 @@ export class Render {
 
         dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
         dlgHolder.dlg.open();
+    }
+
+    titleDiv = (title: string): Div => {
+        return new Div(title, {className: "largerFont"});
     }
 
     allowAction = (type: TypeIntf, action: NodeActionType, node: NodeInfo): boolean => {

@@ -11,7 +11,7 @@ export class CollapsiblePanel extends Comp {
     constructor(private collapsedButtonText: string,
         private expandedButtonText: string,
         attribs: any = {},
-        children: Comp[] = null,
+        private compChildren: Comp[] = null,
         private textLink: boolean = false,
         private stateCallback: (exp: boolean) => void = null,
         expanded: boolean = false,
@@ -20,7 +20,6 @@ export class CollapsiblePanel extends Comp {
         private extraDivStyleCollapsed: string = "",
         elementName: string = "div") {
         super(attribs);
-        this.children = children;
         this.collapsedButtonText = collapsedButtonText || "More ";
         this.expandedButtonText = expandedButtonText || "Less ";
         this.mergeState<LS>({ expanded });
@@ -40,7 +39,6 @@ export class CollapsiblePanel extends Comp {
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
             this.attribs.className = this.extraDivStyleExpanded;
-            const children = this.children;
             this.children = [
                 // This div and it's children holds the actual collapsible content.
                 new Div(null, {
@@ -53,13 +51,12 @@ export class CollapsiblePanel extends Comp {
                         "data-bs-toggle": collapseClass,
                         onClick: this.onToggle
                     }),
-                    ...children
+                    ...this.compChildren
                 ])
             ];
         }
         else {
             this.attribs.className = this.extraDivStyleCollapsed;
-            const children = this.children;
             this.children = [
                 // This span is the expande/collapse button itself
                 new Span(this.collapsedButtonText === "n/a" ? null : (this.collapsedButtonText + "   "), {
@@ -73,7 +70,7 @@ export class CollapsiblePanel extends Comp {
                 new Div(null, {
                     className: collapseClass
                 },
-                    children)
+                this.compChildren)
             ];
         }
         return true;

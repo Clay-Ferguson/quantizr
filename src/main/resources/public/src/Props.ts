@@ -130,6 +130,8 @@ export class Props {
         return ret;
     }
 
+    // todo-0: Find a way to make this cache the results somehow. To accomplish it cleanly we need some way to
+    // have a listener on the 'node.attachments' which is new to me, if JS can even do it.
     getOrderedAtts = (node: NodeInfo): Attachment[] => {
         const list: Attachment[] = [];
 
