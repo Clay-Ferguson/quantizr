@@ -580,13 +580,13 @@ public class CryptoService extends ServiceBase {
     }
 
     public void authSig() {
+        if (!svc_prop.isRequireCrypto()) {
+            return;
+        }
+
         SessionContext sc = TL.getSC();
         if (sc == null) {
             throw new RuntimeException("Unable to get SessionContext to check token.");
-        }
-
-        if (!svc_prop.isRequireCrypto() || PrincipalName.ANON.s().equals(sc.getUserName())) {
-            return;
         }
 
         String sig = TL.getReqSig();
