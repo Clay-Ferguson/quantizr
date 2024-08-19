@@ -111,7 +111,7 @@ public class TL {
      * admin authority to return true here
      */
     public static boolean hasAdminPrivileges() {
-        return getSC().isAdmin() || getHasAdminAuthority();
+        return (getSC() != null && getSC().isAdmin()) || getHasAdminAuthority();
     }
 
     public static SessionContext getSC() {
