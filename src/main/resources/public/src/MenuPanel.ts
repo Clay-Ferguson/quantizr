@@ -90,10 +90,8 @@ export class MenuPanel extends Div {
     static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
     static showFollowers = () => { S.srch.showFollowers(0, null); };
-    static timelineByCreated = () => S.srch.timeline(null, "ctm", null, "by Create Time", 0, true);
-    static timelineByModified = () => S.srch.timeline(null, "mtm", null, "by Modify Time", 0, true);
-    static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", null, "by Create Time (top level)", 0, false);
-    static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", null, "by Modify Time (top level)", 0, false);
+    static timelineByCreated = () => S.srch.timelineAfterUserInput("ctm");
+    static timelineByModified = () => S.srch.timelineAfterUserInput("mtm");
     static showCalendar = () => S.render.showCalendar(null);
     static calendarFutureDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
@@ -113,6 +111,13 @@ export class MenuPanel extends Div {
             S.edit.importJson(node.id, null);
         }
     };
+
+    static openDocumentView = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            S.nav.openDocumentView(null, node.id);
+        }
+    }
 
     static importToC = () => {
         const node = S.nodeUtil.getHighlightedNode();
@@ -197,6 +202,40 @@ export class MenuPanel extends Div {
                 () => getAs().userPrefs.editMode, false, "ui-menu-options-editmode"),
             new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData)
         ], null, null, "ui-menu-options"));
+
+        if (!ast.isAnonUser) {
+            children.push(new Menu("View", [
+                new MenuItem("Timeline: By Modified", MenuPanel.timelineByModified, onMainTab && !!hltNode, null, true),
+                new MenuItem("Timeline: By Created", MenuPanel.timelineByCreated, onMainTab && !!hltNode, null, true),
+                new MenuItemSeparator(), //
+                new MenuItem("Thread History", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
+                new MenuItem("Document View", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),
+                new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
+            ], null));
+        
+            children.push(new Menu("Search", [
+                new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
+                new MenuItem("By Node Name", MenuPanel.searchByName), //
+                new MenuItem("By Node ID", MenuPanel.searchById), //
+
+                // moved into editor dialog
+                // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
+                //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
+
+                new MenuItemSeparator(), //
+
+                new MenuItem("Shared Nodes", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
+                new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
+                new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
+                new MenuItemSeparator(), //
+
+                new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode), //
+                new MenuItem("Search and Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
+
+                // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
+                //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
+            ], null));
+        }
 
         const bookmarkItems = [];
         if (!ast.isAnonUser) {
@@ -300,41 +339,6 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser) {
-            children.push(new Menu("Search", [
-                new MenuItem("Search and Replace", MenuPanel.searchAndReplace, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
-                new MenuItem("By Node Name", MenuPanel.searchByName), //
-                new MenuItem("By Node ID", MenuPanel.searchById), //
-
-                // moved into editor dialog
-                // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
-                //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
-
-                new MenuItemSeparator(), //
-
-                new MenuItem("Shared Nodes", MenuPanel.showAllShares, !ast.isAnonUser && !!hltNode),
-                new MenuItem("Public Read-only", MenuPanel.showPublicReadonlyShares, !ast.isAnonUser && !!hltNode),
-                new MenuItem("Public Appendable", MenuPanel.showPublicWritableShares, !ast.isAnonUser && !!hltNode),
-                new MenuItemSeparator(), //
-
-                new MenuItem("Priority Listing", MenuPanel.listSubgraphByPriority, !ast.isAnonUser && !!hltNode)
-
-                // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
-                //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
-            ], null));
-        }
-
-        if (!ast.isAnonUser) {
-            children.push(new Menu("Timeline", [
-                new MenuItem("Created", MenuPanel.timelineByCreated, onMainTab && !!hltNode, null, true),
-                new MenuItem("Modified", MenuPanel.timelineByModified, onMainTab && !!hltNode, null, true),
-                new MenuItemSeparator(), //
-                new MenuItem("Created (non-Recursive)", MenuPanel.timelineByCreatedNonRecursive, onMainTab && !!hltNode, null, true), //
-                new MenuItem("Modified (non-Recursive)", MenuPanel.timelineByModifiedNonRecursive, onMainTab && !!hltNode, null, true) //
-            ], null));
-        }
-
-        if (!ast.isAnonUser) {
             children.push(new Menu("Calendar", [
                 new MenuItem("Display", MenuPanel.showCalendar, onMainTab && !!hltNode, null, true),
                 new MenuItemSeparator(), //
@@ -349,8 +353,6 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
                 new MenuItem("Set Headings", S.edit.setHeadings, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Thread History", MenuPanel.threadHistory, onMainTab && !!hltNode, null, true),
-                new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab, null, true),
                 !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
@@ -382,7 +384,7 @@ export class MenuPanel extends Div {
         }
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
-            children.push(new Menu("AI", [ 
+            children.push(new Menu("AI", [
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Configure AI", MenuPanel.configureAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
@@ -390,7 +392,7 @@ export class MenuPanel extends Div {
                 ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.toggleAiWritingMode, allowEditMode && !fullScreenViewer, //
                     () => getAs().userPrefs.aiWritingMode, false, "ui-menu-options-editmode"),
                 ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
-                        () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),      
+                    () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),
                 new MenuItem("Settings", S.nav.showAISettings)
             ], null));
         }

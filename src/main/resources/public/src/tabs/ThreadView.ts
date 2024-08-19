@@ -12,6 +12,9 @@ import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
 import * as J from "../JavaIntf";
+import { MessageDlg } from "../dlg/MessageDlg";
+import { VerticalLayout } from "../comp/core/VerticalLayout";
+import { Anchor } from "../comp/core/Anchor";
 
 export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
 
@@ -27,6 +30,13 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             this.children = [new Div("Nothing found.")];
             return true;
         }
+
+        const floatEndDiv = new Div(null, { className: "float-end tinyMarginBottom" }, [
+            !this.data.props.endReached ? new Button("More History...", this.moreHistory,
+                { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
+            new Button("Save as PDF", this.saveAsPDF,
+                { className: "float-end tinyMarginBottom" }),
+        ]);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get
@@ -56,9 +66,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                     title: "Go back..."
                 }, "marginRight"),
                 new Div(this.data.name, { className: "tabTitle" }),
-                !this.data.props.endReached ? new Button("More History...", () => { this.moreHistory() },
-                    { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
-
+                floatEndDiv,
                 new Clearfix()
             ], null),
             this.data.props.description ? new Div(this.data.props.description) : null
@@ -104,6 +112,42 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
 
     moreHistory = () => {
         S.srch.showThread(getAs().threadViewFromNodeId);
+    }
+
+    saveAsPDF = async () => {
+        const res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
+            nodeId: getAs().threadViewFromNodeId,
+            exportExt: "pdf",
+            fileName: "thread-view",
+            includeToc: false,
+            includeMetaComments: false,
+            includeJypyter: true, // todo-0: Jypyter is obsolete right? Also that's a misspelling.Search for jupyter in the code.
+            contentType: "md", // unused for PDF export right?
+            includeIDs: false,
+            dividerLine: false, // this would be nice to have in PDFs right?
+            updateHeadings: false,
+            threadAsPDF: true
+        });
+        this.exportResponse(res);
+    }
+
+    exportResponse = (res: J.ExportResponse) => {
+        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
+        eventually the plan is to have the export return the actual md5 of the export for use here
+        */
+        // disp=inline (is the other)
+        const downloadLink = S.util.getHostAndPort() + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+
+        if (S.util.checkSuccess("Export", res)) {
+            new MessageDlg(
+                "Export successful.<p>Use the download link below now, to get the file.",
+                "Export",
+                null,
+                new VerticalLayout([
+                    new Anchor(downloadLink, "Download", { target: "_blank" }),
+                ]), false, 0, null
+            ).open();
+        }
     }
 
     /* overridable (don't use arrow function) */

@@ -52,28 +52,6 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         this.children = [
             !ast.node ? null : (this.headingBar = new TabHeading([
                 new Div(null, { className: "float-end" }, [
-                    new Icon({
-                        className: "fa fa-search fa-lg buttonBarIcon",
-                        title: "Search Subnodes",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.runSearch
-                    }),
-
-                    new Icon({
-                        className: "fa fa-clock-o fa-lg buttonBarIcon",
-                        title: "View Timeline (by Mod Time)",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.runTimeline
-                    }),
-
-                    // save screen space for mobile
-                    !ast.mobileMode ? new Icon({
-                        className: "fa fa-book fa-lg buttonBarIcon",
-                        title: "Show Document View\n\n(All content on a single page)",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.openDocumentView
-                    }) : null,
-
                     // save screen space for mobile
                     !ast.mobileMode ? new Icon({
                         className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",

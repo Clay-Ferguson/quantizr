@@ -6,6 +6,7 @@ import { Div } from "./comp/core/Div";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
 import { FollowersRSInfo } from "./FollowersRSInfo";
@@ -256,6 +257,20 @@ export class Search {
             s.menuIndexToggle = S.util.willRenderDocIndex(s) ? "index" : "menu";
             S.tabUtil.selectTabStateOnly(DocumentTab.inst.id);
         });
+    }
+
+    timelineAfterUserInput = async (prop: string) => {
+        let description = prop === "ctm" ? "by Create Time" : "by Modify Time";
+        let recursive = false;
+        const dlg = new ConfirmDlg("Include all subnodes recursively?", "Timeline Options");
+        await dlg.open();
+        if (dlg.yes) {
+            recursive = true;
+        }
+        if (!recursive) {
+            description += " (non-recursive)";
+        }
+        this.timeline(null, prop, null, description, 0, recursive);
     }
 
     /* prop = mtm (modification time) | ctm (create time) */

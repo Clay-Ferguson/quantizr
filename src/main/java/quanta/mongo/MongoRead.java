@@ -1135,6 +1135,32 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
+    // Starts at 'leafId' node and goes up the tree to build a linear chain of nodes parent by parent
+    // until get get to root of what this user can access or else the first "noexport" node.
+    public TreeNode getThreadGraphTree(String leafId) {
+        SubNode curNode = getNode(leafId);
+        TreeNode curTreeNode = new TreeNode(curNode);
+
+        while (true) {
+            try {
+                SubNode parentNode = getParent(curNode);
+                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH) || parentNode.getStr(NodeProp.NO_EXPORT)!=null) {
+                    break;
+                }
+
+                TreeNode parentTreeNode = new TreeNode(parentNode);
+                curTreeNode.parent = parentTreeNode;
+                parentTreeNode.children = new LinkedList<>();
+                parentTreeNode.children.add(curTreeNode);
+                curTreeNode = parentTreeNode;
+                curNode = parentNode;
+            } catch (Exception e) {
+                break;
+            }
+        }
+        return curTreeNode;
+    }
+
     // If optional idMap is passed in non-null it gets loaded with a map from nodeId to TreeNode
     public TreeNode getSubGraphTree(String rootId, Criteria criteria, HashMap<String, TreeNode> idMap) {
         SubNode rootNode = getNode(new ObjectId(rootId));

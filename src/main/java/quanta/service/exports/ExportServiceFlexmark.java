@@ -80,7 +80,9 @@ public class ExportServiceFlexmark extends ServiceBase {
             throw ExUtil.wrapEx("adminDataFolder does not exist.");
         }
 
-        TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, null, null);
+        TreeNode rootNode = req.isThreadAsPDF() ? svc_mongoRead.getThreadGraphTree(nodeId) : //
+                svc_mongoRead.getSubGraphTree(nodeId, null, null);
+
         SubNode exportNode = rootNode.node;
         String fileName = svc_snUtil.getExportFileName(req.getFileName(), exportNode);
         shortFileName = fileName + "." + format;
@@ -112,7 +114,8 @@ public class ExportServiceFlexmark extends ServiceBase {
                     TocExtension.create(), //
                     AnchorLinkExtension.create(), //
                     AutolinkExtension.create()));
-            // We start the TOC at level 2 because level 1 is the title of the document itself, and the root node.
+            // We start the TOC at level 2 because level 1 is the title of the document itself, and the root
+            // node.
             options.set(TocExtension.LEVELS, TocOptions.getLevels(2, 3, 4, 5, 6));
             // This numbering works in the TOC but I haven't figured out how to number the
             // actual headings in the body of the document itself.
@@ -126,7 +129,7 @@ public class ExportServiceFlexmark extends ServiceBase {
              * checkbox in the export, or theoretically we could also insert this [TOC] somewhere else in the
              * text.
              */
-            
+
             recurseNode(rootNode, 0);
             Node document = parser.parse(markdown.toString());
             String body = renderer.render(document);
@@ -160,7 +163,7 @@ public class ExportServiceFlexmark extends ServiceBase {
             return;
         processNode(tn.node);
 
-        if (level==0 && "pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
+        if (level == 0 && "pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
             markdown.append("[TOC]");
         }
 

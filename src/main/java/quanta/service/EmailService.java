@@ -87,7 +87,7 @@ public class EmailService extends ServiceBase {
                     }
                 }
             } catch (Exception e) {
-                log.error("notification deamo cycle fail", e);
+                log.error("notification daemon cycle fail", e);
             } finally {
                 run = false;
             }

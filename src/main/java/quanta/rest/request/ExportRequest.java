@@ -15,6 +15,7 @@ public class ExportRequest extends RequestBase {
 	private boolean includeIDs;
 	private boolean dividerLine;
 	private boolean updateHeadings;
+	private boolean threadAsPDF;
 
 	public ExportRequest() {}
 
@@ -96,5 +97,13 @@ public class ExportRequest extends RequestBase {
 
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+
+	public boolean isThreadAsPDF() {
+		return threadAsPDF;
+	}
+
+	public void setThreadAsPDF(boolean threadAsPDF) {
+		this.threadAsPDF = threadAsPDF;
 	}
 }

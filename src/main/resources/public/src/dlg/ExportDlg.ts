@@ -132,20 +132,19 @@ export class ExportDlg extends DialogBase {
             contentType: ast.exportSettings.contentType,
             includeIDs: ast.exportSettings.includeIDs,
             dividerLine: ast.exportSettings.dividerLine,
-            updateHeadings: ast.exportSettings.updateHeadings
+            updateHeadings: ast.exportSettings.updateHeadings,
+            threadAsPDF: false
         });
         this.exportResponse(res);
         this.close();
     }
 
     exportResponse = (res: J.ExportResponse) => {
-        const hostAndPort: string = S.util.getHostAndPort();
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
         eventually the plan is to have the export return the actual md5 of the export for use here
         */
-
         // disp=inline (is the other)
-        const downloadLink = hostAndPort + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+        const downloadLink = S.util.getHostAndPort() + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(

@@ -2,8 +2,6 @@ import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
-import { Icon } from "../comp/core/Icon";
-import { Constants as C } from "../Constants";
 import { DocumentRSInfo } from "../DocumentRSInfo";
 import { TabIntf } from "../intf/TabIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -86,18 +84,6 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
                 getValue: (): boolean => {
                     return getAs().userPrefs.showReplies;
                 }
-            }),
-            new Icon({
-                className: "fa fa-search fa-lg buttonBarIcon",
-                title: "Search Subnodes",
-                [C.NODE_ID_ATTR]: this.data.props.node.id,
-                onClick: S.nav.runSearch
-            }),
-            new Icon({
-                className: "fa fa-clock-o fa-lg buttonBarIcon",
-                title: "View Timeline (by Mod Time)",
-                [C.NODE_ID_ATTR]: this.data.props.node.id,
-                onClick: S.nav.runTimeline
             })
         ]);
     }

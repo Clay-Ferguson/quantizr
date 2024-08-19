@@ -222,34 +222,6 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        // ---------------------------
-        // DO NOT DELETE
-        // These buttons were moved to the main tree header bar, BUT if we ever decide to bring these back
-        // for ALL nodes, rather than just the page root node, we can just re-enable this code.
-        // if (isPageRootNode && this.node.hasChildren) {
-        //     docIcon = !ast.isAnonUser ? new Icon({
-        //         className: "fa fa-book fa-lg buttonBarIcon",
-        //         title: "Show Document View",
-        //         [C.NODE_ID_ATTR]: this.node.id,
-        //         onClick: S.nav.openDocumentView
-        //     }) : null;
-
-        //     searchIcon = new Icon({
-        //         className: "fa fa-search fa-lg buttonBarIcon",
-        //         title: "Search Subnodes",
-        //         ni[C.NODE_ID_ATTR]d: this.node.id,
-        //         onClick: S.nav.runSearch
-        //     });
-
-        //     timelineIcon = !ast.isAnonUser ? new Icon({
-        //         className: "fa fa-clock-o fa-lg buttonBarIcon",
-        //         title: "View Timeline (by Mod Time)",
-        //         [C.NODE_ID_ATTR]: this.node.id,
-        //         onClick: S.nav.runTimeline
-        //     }) : null;
-        // }
-        // ---------------------------
-
         let floatEndSpan = null;
         let spanArray: Comp[] = [
             addDelete ? new Icon({
