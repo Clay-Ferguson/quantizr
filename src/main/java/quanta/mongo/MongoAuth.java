@@ -38,7 +38,7 @@ import quanta.util.XString;
 @Component
 public class MongoAuth extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoAuth.class);
-    private static final boolean verbose = true;
+    private static final boolean verbose = false;
     private static final Object adminSessionLck = new Object();
     private static SessionContext adminSC;
     private static final ConcurrentHashMap<String, SubNode> userNodesById = new ConcurrentHashMap<>();
@@ -169,12 +169,6 @@ public class MongoAuth extends ServiceBase {
      * to include any or all of the ands as well as the security criteria.
      */
     public Criteria addSecurity(boolean write, Criteria crit, List<Criteria> ands) {
-        if (TL.getSC() == null) {
-            String msg = "ThreadLocals doesn't have SessionContext.";
-            log.error(msg);
-            throw new RuntimeException(msg);
-        }
-
         // admin can bypass all security
         if (TL.hasAdminPrivileges()) {
             if (ands != null && ands.size() > 0) {
@@ -182,6 +176,13 @@ public class MongoAuth extends ServiceBase {
             } else {
                 return crit;
             }
+        }
+
+        // If we didn't have admin privileges above, then we must have a session context
+        if (TL.getSC() == null) {
+            String msg = "ThreadLocals doesn't have SessionContext.";
+            log.error(msg);
+            throw new RuntimeException(msg);
         }
     
         SubNode myAcntNode = null;
