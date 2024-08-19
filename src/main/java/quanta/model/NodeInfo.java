@@ -38,15 +38,6 @@ public class NodeInfo {
     private Long ordinal;
     private String type;
     private List<PropertyInfo> properties;
-
-    /*
-     * todo-0: we have to call S.props.getOrderedAtts(node); on the client since we're sending back a
-     * map here. We should do that sorting on the server and send back a list of attachments in the
-     * order they should be displayed to the client. Don't forget the "move up" and "move down" buttons
-     * in the client, need to be altered to work with a list of attachments instead of a map.
-     * 
-     * todo-0: eventually the SERVER side also needs to be converted to use a list and not a map??? 
-     */
     private HashMap<String, Attachment> attachments;
     private List<NodeLink> links;
     /*

@@ -121,7 +121,6 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             fileName: "thread-view",
             includeToc: false,
             includeMetaComments: false,
-            includeJypyter: true, // todo-0: Jypyter is obsolete right? Also that's a misspelling.Search for jupyter in the code.
             contentType: "md", // unused for PDF export right?
             includeIDs: false,
             dividerLine: false, // this would be nice to have in PDFs right?

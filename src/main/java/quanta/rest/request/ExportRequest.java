@@ -11,7 +11,6 @@ public class ExportRequest extends RequestBase {
 	private boolean includeToc;
 	private boolean includeMetaComments;
 	private String contentType;
-	private boolean includeJypyter;
 	private boolean includeIDs;
 	private boolean dividerLine;
 	private boolean updateHeadings;
@@ -43,10 +42,6 @@ public class ExportRequest extends RequestBase {
 		this.includeMetaComments = includeMetaComments;
 	}
 
-	public boolean isIncludeJypyter() {
-		return this.includeJypyter;
-	}
-
 	public boolean isIncludeIDs() {
 		return this.includeIDs;
 	}
@@ -73,10 +68,6 @@ public class ExportRequest extends RequestBase {
 
 	public void setIncludeToc(final boolean includeToc) {
 		this.includeToc = includeToc;
-	}
-
-	public void setIncludeJypyter(final boolean includeJypyter) {
-		this.includeJypyter = includeJypyter;
 	}
 
 	public void setIncludeIDs(final boolean includeIDs) {

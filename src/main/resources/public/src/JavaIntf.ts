@@ -231,7 +231,6 @@ export interface ExportRequest extends RequestBase {
     includeToc: boolean;
     includeMetaComments: boolean;
     contentType: string;
-    includeJypyter: boolean;
     includeIDs: boolean;
     dividerLine: boolean;
     updateHeadings: boolean;

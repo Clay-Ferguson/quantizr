@@ -128,7 +128,6 @@ export class ExportDlg extends DialogBase {
             fileName: this.fileNameState.getValue(),
             includeToc: ast.exportSettings.includeToc,
             includeMetaComments: ast.exportSettings.includeMetaComments,
-            includeJypyter: ast.exportSettings.includeJypyter,
             contentType: ast.exportSettings.contentType,
             includeIDs: ast.exportSettings.includeIDs,
             dividerLine: ast.exportSettings.dividerLine,

@@ -12,7 +12,6 @@ export interface ExportSettings {
     exportType: string;
     includeToc?: boolean;
     includeMetaComments?: boolean;
-    includeJypyter?: boolean;
     contentType?: string; // html, md, json
     includeIDs?: boolean;
     dividerLine?: boolean;
@@ -133,7 +132,6 @@ export class AppState {
         exportType: "zip",
         includeToc: true,
         includeMetaComments: true,
-        includeJypyter: true,
         contentType: "md", // html, md, json
         includeIDs: true,
         dividerLine: true,
