@@ -49,31 +49,37 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             ]);
         }
 
-        this.children = [
-            !ast.node ? null : (this.headingBar = new TabHeading([
+        const isRootNode = ast.node.path === "/r";
+        const parentVisible = S.nav.parentVisibleToUser();
+
+        if (ast.node && ((!ast.mobileMode && !isRootNode) || parentVisible))
+            this.headingBar = new TabHeading([
                 new Div(null, { className: "float-end" }, [
                     // save screen space for mobile
-                    !ast.mobileMode ? new Icon({
+                    !ast.mobileMode && !isRootNode ? new Icon({
                         className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
                         title: "Previous Sibling Node",
                         onClick: S.nav.navToPrev
                     }) : null,
 
-                    !ast.mobileMode ? new Icon({
+                    !ast.mobileMode && !isRootNode ? new Icon({
                         className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
                         title: "Next Sibling Node",
                         [C.NODE_ID_ATTR]: ast.node.id,
                         onClick: S.nav.navToNext
                     }) : null,
 
-                    S.nav.parentVisibleToUser() ?
+                    parentVisible ?
                         new IconButton("fa-folder", "Up", {
                             [C.NODE_ID_ATTR]: ast.node.id,
                             onClick: S.nav.navUpLevelClick,
                             title: "Go to Parent Node"
                         }, "btn-primary") : null
                 ]),
-            ], this.data)),
+            ], this.data);
+
+        this.children = [
+            this.headingBar,
             contentDiv
         ];
         return true;
