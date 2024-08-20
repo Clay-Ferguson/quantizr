@@ -183,7 +183,7 @@ public class UserFeedService extends ServiceBase {
          * a single rev-chron.
          */
         else {
-            SubNode toUserNode = svc_user.getAccountByUserName(req.getToUser(), false);
+            SubNode toUserNode = svc_user.getAccountByUserNameAP(req.getToUser());
             if (myAcntNode == null) {
                 myAcntNode = svc_mongoRead.getNode(sc.getUserNodeId());
             }

@@ -478,7 +478,7 @@ public class CryptoService extends ServiceBase {
         String json = sc.getPubSigKeyJson();
 
         if (json == null) {
-            SubNode userNode = svc_user.getAccountByUserName(sc.getUserName(), false);
+            SubNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
             if (userNode == null) {
                 throw new RuntimeException("Unknown user: " + sc.getUserName());
             }
@@ -511,8 +511,8 @@ public class CryptoService extends ServiceBase {
             if (req.isRecursive()) {
                 StringBuilder sb = new StringBuilder();
 
-                for (SubNode n : svc_mongoRead.getSubGraph(node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false,
-                        false, null)) {
+                for (SubNode n : svc_mongoRead.getSubGraphAP(node, Sort.by(Sort.Direction.ASC, SubNode.PATH), 0, false,
+                        null)) {
                     nodeCount++;
                     sb.append(n.getPath());
                     sb.append("-");
@@ -561,7 +561,7 @@ public class CryptoService extends ServiceBase {
         SavePublicKeyResponse res = new SavePublicKeyResponse();
         String userName = TL.getSC().getUserName();
         svc_arun.run(() -> {
-            SubNode userNode = svc_user.getAccountByUserName(userName, false);
+            SubNode userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode != null) {
                 if (!StringUtils.isEmpty(req.getAsymEncKey())) {
                     userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());

@@ -144,11 +144,10 @@ public class AttachmentService extends ServiceBase {
         try {
             /*
              * NEW LOGIC: If the node itself currently has an attachment, leave it alone and just upload
-             * UNDERNEATH this current node. Pass allowAuth=false here because below we check the ownerAuth
-             * which will be even more strict.
+             * UNDERNEATH this current node.
              */
             boolean allowEmailParse = false;
-            SubNode node = svc_mongoRead.getNode(nodeId, false, null);
+            SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null) {
                 throw ExUtil.wrapEx("Node not found.");
             }
@@ -164,7 +163,7 @@ public class AttachmentService extends ServiceBase {
              * Also we only do this check if not admin. Admin can upload unlimited amounts.
              */
             if (!TL.getSC().isAdmin() && files.length > 1) {
-                SubNode userNode = svc_user.getAccountByUserName(null, false);
+                SubNode userNode = svc_user.getSessionUserAccount();
                 // get how many bytes of storage the user currently holds
                 Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
                 if (binTotal == null) {
@@ -444,7 +443,7 @@ public class AttachmentService extends ServiceBase {
         BufferedOutputStream outStream = null;
         try {
             if (node == null) {
-                node = svc_mongoRead.getNode(nodeId, false, null);
+                node = svc_mongoRead.getNodeAP(nodeId);
             } else {
                 nodeId = node.getIdStr();
             }
@@ -468,16 +467,7 @@ public class AttachmentService extends ServiceBase {
                     throw ExUtil.wrapEx("attachment info not found.");
                 }
             }
-            // Everyone's account node can publish it's attachment and is assumed to be an
-            // avatar.
-            boolean allowAuth = true;
-            if (svc_auth.isAnAccountNode(node)) {
-                allowAuth = false;
-            }
 
-            if (allowAuth) {
-                svc_auth.readAuth(node);
-            }
             String mimeTypeProp = att.getMime();
             if (mimeTypeProp == null) {
                 throw ExUtil.wrapEx("unable to find mimeType property");
@@ -487,7 +477,8 @@ public class AttachmentService extends ServiceBase {
                 fileName = "filename";
             }
 
-            InputStream is = getStream(attName, node, allowAuth);
+            // We always allow access to account nodes becasue they only contain avatars and header images.
+            InputStream is = svc_auth.isAnAccountNode(node) ? getStreamAP(attName, node) : getStream(attName, node);
             if (is == null) {
                 throw new RuntimeException("Image not found.");
             }
@@ -571,7 +562,7 @@ public class AttachmentService extends ServiceBase {
             throw new RuntimeEx("unauthorized");
         }
         try {
-            SubNode node = svc_mongoRead.getNode(nodeId, false, null);
+            SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null) {
                 throw new RuntimeEx("node not found: " + nodeId);
             }
@@ -611,7 +602,7 @@ public class AttachmentService extends ServiceBase {
         ResponseEntity<ResourceRegion> ret = null;
 
         try {
-            SubNode node = svc_mongoRead.getNode(nodeId, false, null);
+            SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null) {
                 throw ExUtil.wrapEx("node not found.");
             }
@@ -628,7 +619,7 @@ public class AttachmentService extends ServiceBase {
             if (fileName == null) {
                 fileName = "filename";
             }
-            InputStream is = getStream(attName, node, false);
+            InputStream is = getStream(attName, node);
             long size = att.getSize();
             if (size == 0) {
                 throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
@@ -799,7 +790,7 @@ public class AttachmentService extends ServiceBase {
         DBObject metaData = new BasicDBObject();
         metaData.put("nodeId", node.getId());
         if (userNode == null) {
-            userNode = svc_user.getAccountByUserName(null, false);
+            userNode = svc_user.getSessionUserAccount();
         }
 
         String id = grid.store(stream, fileName, mimeType, metaData).toString();
@@ -849,10 +840,12 @@ public class AttachmentService extends ServiceBase {
         // grid.delete(new Query(crit));
     }
 
-    public InputStream getStream(String attName, SubNode node, boolean allowAuth) {
-        if (allowAuth) {
-            svc_auth.readAuth(node);
-        }
+    public InputStream getStreamAP(String attName, SubNode node) {
+        return svc_arun.run(() -> getStream(attName, node));
+    }
+
+    public InputStream getStream(String attName, SubNode node) {
+        svc_auth.readAuth(node);
         Attachment att = node.getAttachment(attName, false, false);
         if (att == null)
             return null;
@@ -993,7 +986,7 @@ public class AttachmentService extends ServiceBase {
                         ObjectId nodeId = (ObjectId) meta.get("nodeId");
                         if (nodeId != null) {
                             nodeIdStr = nodeId.toHexString();
-                            SubNode node = svc_mongoRead.getNode(nodeIdStr, false);
+                            SubNode node = svc_mongoRead.getNode(nodeIdStr);
 
                             // did we find the node that owns this grid item
                             if (node != null) {
@@ -1113,11 +1106,12 @@ public class AttachmentService extends ServiceBase {
         log.debug("getBinary: session.id=" + session.getId() + " binId=" + binId + " nodeId=" + nodeId + " download="
                 + download);
 
-        SubNode node = svc_mongoRead.getNode(nodeId);
+        SubNode node = svc_mongoRead.getNodeAP(nodeId);
         if (node == null) {
             throw new RuntimeException("Node not found.");
         }
 
+        // if node is account node we can get ANY attachments from it.
         if (node.isType(NodeType.ACCOUNT)) {
             String attName = null;
             if ("avatar".equals(binId)) {
@@ -1134,7 +1128,7 @@ public class AttachmentService extends ServiceBase {
                 return null;
             });
         }
-        // Else if not an account node
+        // Else if not an account node, do a normal thread-based secure access.
         else {
             svc_attach.getBinary(null, null, nodeId, binId, download != null, response);
         }

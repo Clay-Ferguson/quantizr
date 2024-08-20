@@ -108,10 +108,10 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 int tries = 0;
                 String nodeName = node.getName();
                 String baseNodeName = nodeName;
-                SubNode nodeFound = svc_mongoRead.getNodeByName(nodeName, false, null);
+                SubNode nodeFound = svc_mongoRead.getNodeByNameAP(nodeName, null);
                 while (nodeFound != null && ++tries < 50) {
                     nodeName = baseNodeName + "-" + tries;
-                    nodeFound = svc_mongoRead.getNodeByName(nodeName, false, null);
+                    nodeFound = svc_mongoRead.getNodeByNameAP(nodeName, null);
                 }
                 if (nodeFound != null) {
                     throw new RuntimeException(

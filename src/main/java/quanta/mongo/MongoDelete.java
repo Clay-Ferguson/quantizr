@@ -122,7 +122,7 @@ public class MongoDelete extends ServiceBase {
      * Note: This method doesn't remove orphans of the node.
      */
     public DeleteResult delete(SubNode node) {
-        SubNode parent = svc_mongoRead.getParent(node, false);
+        SubNode parent = svc_mongoRead.getParentAP(node);
         if (parent != null) {
             parent.setHasChildren(null);
         }
@@ -324,7 +324,7 @@ public class MongoDelete extends ServiceBase {
      */
     public DeleteNodesResponse deleteNodes(List<String> nodeIds) {
         DeleteNodesResponse res = new DeleteNodesResponse();
-        SubNode userNode = svc_user.getAccountByUserName(null, false);
+        SubNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }
@@ -334,16 +334,14 @@ public class MongoDelete extends ServiceBase {
         int batchSize = 0;
 
         for (String nodeId : nodeIds) {
-            // lookup the node we're going to delete, we call with allowAuth, becasuse it would be redundant
-            // since the next thing we do is an 'ownerAuth', which is even more restrictive
-            SubNode node = svc_mongoRead.getNode(nodeId, false, null);
+            SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null)
                 continue;
             svc_auth.ownerAuth(node);
             svc_mongoRead.hasChildrenConsistencyCheck(node);
 
             // get the parent of the node and add it's id to parentIds
-            SubNode parent = svc_mongoRead.getParent(node, false);
+            SubNode parent = svc_mongoRead.getParentAP(node);
 
             // back out the number of bytes it was using
             if (!TL.hasAdminPrivileges()) {
@@ -420,7 +418,7 @@ public class MongoDelete extends ServiceBase {
      */
     public DeleteNodesResponse bulkDeleteNodes() {
         DeleteNodesResponse res = new DeleteNodesResponse();
-        SubNode userNode = svc_user.getAccountByUserName(null, false);
+        SubNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }
@@ -453,7 +451,7 @@ public class MongoDelete extends ServiceBase {
             if (node == null) {
                 throw new RuntimeEx("Node node not found.");
             }
-            SubNode parent = svc_mongoRead.getParent(node, false);
+            SubNode parent = svc_mongoRead.getParentAP(node);
 
             if (parent != null && svc_auth.ownedBy(TL.getSC(), parent)) {
                 jumpTarget = parent.getIdStr();

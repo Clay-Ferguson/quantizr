@@ -53,7 +53,7 @@ public class MongoRead extends ServiceBase {
     public SubNode getDbRoot() {
         synchronized (rootLock) {
             if (dbRoot == null) {
-                dbRoot = findNodeByPath(NodePath.ROOT_PATH, false);
+                dbRoot = findNodeByPathAP(NodePath.ROOT_PATH);
             }
             return dbRoot;
         }
@@ -115,7 +115,7 @@ public class MongoRead extends ServiceBase {
      */
     public boolean noChildren(String path) {
         if (SubNode.USE_HAS_CHILDREN) {
-            SubNode node = getNode(path, false, null);
+            SubNode node = getNodeAP(path);
             // using booleanValue for clarity
             if (node != null && node.getHasChildren() != null && !node.getHasChildren().booleanValue()) {
                 return true;
@@ -148,11 +148,6 @@ public class MongoRead extends ServiceBase {
         return svc_ops.count(q);
     }
 
-    /*
-     * we only update the hasChildren if allowAuth is false, because allowAuth would be a
-     * person-specific exact query, unlike what the hasChildren represents which is a global
-     * "any children visible to any user" thing.
-     */
     public boolean hasChildren(SubNode node) {
         // if the node knows it's children status (non-null value) return that.
         if (SubNode.USE_HAS_CHILDREN && node.getHasChildren() != null) {
@@ -268,7 +263,11 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getNodeByName(String name) {
-        return getNodeByName(name, true, null);
+        return getNodeByName(name, null);
+    }
+
+    public SubNode getNodeByNameAP(String name, Val<SubNode> accntNode) {
+        return svc_arun.run(() -> getNodeByName(name, accntNode));
     }
 
     /*
@@ -278,7 +277,7 @@ public class MongoRead extends ServiceBase {
      *
      * 2) "userName:nodeName" (a named node some user has created)
      */
-    public SubNode getNodeByName(String name, boolean allowAuth, Val<SubNode> accntNode) {
+    public SubNode getNodeByName(String name, Val<SubNode> accntNode) {
         Query q = new Query();
         if (name == null)
             return null;
@@ -297,7 +296,7 @@ public class MongoRead extends ServiceBase {
             String userName = name.substring(0, colonIdx);
             // pass a null session here to cause adminSession to be used which is required to get a user node,
             // but it always safe to get this node this way here.
-            userNode = svc_user.getAccountByUserName(userName, false);
+            userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {
                 log.debug("Unable to find node by: " + name);
                 return null;
@@ -311,19 +310,22 @@ public class MongoRead extends ServiceBase {
         }
 
         Criteria crit = Criteria.where(SubNode.NAME).is(name).and(SubNode.OWNER).is(nodeOwnerId);
-        if (allowAuth) {
-            crit = svc_auth.addReadSecurity(crit);
-        }
+        crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.findOne(q);
     }
 
     public SubNode getNode(String identifier) {
-        return getNode(identifier, true, null);
+        return getNode(identifier, null);
     }
 
-    public SubNode getNode(String identifier, boolean allowAuth) {
-        return getNode(identifier, allowAuth, null);
+    public SubNode getNodeAP(String identifier) {
+        return svc_arun.run(() -> getNode(identifier, null));
+    }
+
+    // AP == Admin Priviledged
+    public SubNode getNodeAP(String identifier, Val<SubNode> accntNode) {
+        return svc_arun.run(() -> getNode(identifier, accntNode));
     }
 
     /**
@@ -338,7 +340,7 @@ public class MongoRead extends ServiceBase {
      * 6) access node by type '~typeName' (admin account) or '~userName~typeName' (user account)
      * </pre>
      */
-    public SubNode getNode(String identifier, boolean allowAuth, Val<SubNode> accntNode) {
+    public SubNode getNode(String identifier, Val<SubNode> accntNode) {
         if (identifier == null)
             return null;
         if (identifier.equals("/")) {
@@ -364,11 +366,11 @@ public class MongoRead extends ServiceBase {
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
-            ret = getNodeByName(identifier.substring(1), allowAuth, accntNode);
+            ret = getNodeByName(identifier.substring(1), accntNode);
         }
         // else if search starts with a slash then it's a path
         else if (identifier.startsWith("/")) {
-            ret = findNodeByPath(identifier, allowAuth);
+            ret = findNodeByPath(identifier);
         }
         // else the identifier is a node id
         else {
@@ -383,26 +385,15 @@ public class MongoRead extends ServiceBase {
         return svc_ops.findById(objId);
     }
 
-    public SubNode getNode(ObjectId objId, boolean allowAuth, int retries) {
-        Supplier<SubNode> run = () -> {
-            SubNode ret = svc_ops.findById(objId);
-            int retriesLeft = retries;
-            while (ret == null && retriesLeft-- > 0) {
-                Util.sleep(3000);
-                ret = svc_ops.findById(objId);
-            }
-            return ret;
-        };
-        return allowAuth ? run.get() : svc_arun.run(run);
+    public SubNode findNodeByPathAP(String path) {
+        return svc_arun.run(() -> findNodeByPath(path));
     }
 
-    public SubNode findNodeByPath(String path, boolean allowAuth) {
+    public SubNode findNodeByPath(String path) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).is(path);
-        if (allowAuth) {
-            crit = svc_auth.addReadSecurity(crit);
-        }
+        crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.findOne(q);
     }
@@ -421,27 +412,31 @@ public class MongoRead extends ServiceBase {
         return svc_ops.exists(q);
     }
 
-    public SubNode getOwner(SubNode node, boolean allowAuth) {
+    public SubNode getOwnerAP(SubNode node) {
+        return svc_arun.run(() -> getOwner(node));
+    }
+
+    public SubNode getOwner(SubNode node) {
         if (node == null)
             return null;
-        return allowAuth ? svc_ops.findById(node.getOwner()) : svc_arun.run(() -> svc_ops.findById(node.getOwner()));
+        return svc_ops.findById(node.getOwner());
+    }
+
+    public SubNode getParentAP(SubNode node) {
+        return svc_arun.run(() -> getParent(node));
     }
 
     public SubNode getParent(SubNode node) {
-        return getParent(node, true);
-    }
-
-    public SubNode getParent(SubNode node, boolean allowAuth) {
         if (node == null)
             return null;
 
-        return getParentByPath(node.getPath(), allowAuth);
+        return getParentByPath(node.getPath());
     }
 
     /*
      * WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/)
      */
-    public SubNode getParentByPath(String path, boolean allowAuth) {
+    public SubNode getParentByPath(String path) {
         if ("/".equals(path)) {
             return null;
         }
@@ -451,7 +446,7 @@ public class MongoRead extends ServiceBase {
 
         // If node is in pending area take the pending part out of the path to get the real parent
         parentPath = parentPath.replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
-        return getNode(parentPath, allowAuth, null);
+        return getNode(parentPath);
     }
 
     public List<String> getChildrenIds(SubNode node, boolean ordered, Integer limit) {
@@ -492,7 +487,7 @@ public class MongoRead extends ServiceBase {
      * There is no actual NODE that is root node.
      */
     public Iterable<SubNode> getChildren(String path, Sort sort, Integer limit, int skip, TextCriteria textCriteria,
-            Criteria moreCriteria, boolean preCheck, boolean allowAuth) {
+            Criteria moreCriteria, boolean preCheck) {
         if (preCheck && noChildren(path)) {
             return Collections.<SubNode>emptyList();
         }
@@ -521,27 +516,30 @@ public class MongoRead extends ServiceBase {
         if (sort != null) {
             q.with(sort);
         }
-        if (allowAuth) {
-            crit = svc_auth.addReadSecurity(crit);
-        }
+        crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.find(q);
     }
 
-    public Iterable<SubNode> getChildren(SubNode node, Sort sort, Integer limit, int skip, boolean allowAuth) {
-        return getChildren(node, sort, limit, skip, null, allowAuth);
+    public Iterable<SubNode> getChildrenAP(SubNode node, Sort sort, Integer limit, int skip) {
+        return svc_arun.run(() -> getChildren(node, sort, limit, skip, null));
+    }
+
+    public Iterable<SubNode> getChildren(SubNode node, Sort sort, Integer limit, int skip) {
+        return getChildren(node, sort, limit, skip, null);
+    }
+
+    public Iterable<SubNode> getChildrenAP(SubNode node, Sort sort, Integer limit, int skip, Criteria moreCriteria) {
+        return svc_arun.run(() -> getChildren(node, sort, limit, skip, moreCriteria));
     }
 
     /*
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node
      */
-    public Iterable<SubNode> getChildren(SubNode node, Sort sort, Integer limit, int skip, Criteria moreCriteria,
-            boolean allowAuth) {
-        if (allowAuth) {
-            svc_auth.readAuth(node);
-        }
-        return getChildren(node.getPath(), sort, limit, skip, null, moreCriteria, false, allowAuth);
+    public Iterable<SubNode> getChildren(SubNode node, Sort sort, Integer limit, int skip, Criteria moreCriteria) {
+        svc_auth.readAuth(node);
+        return getChildren(node.getPath(), sort, limit, skip, null, moreCriteria, false);
     }
 
     /*
@@ -632,18 +630,20 @@ public class MongoRead extends ServiceBase {
         return svc_ops.findOne(q);
     }
 
+    public Iterable<SubNode> getSubGraphAP(SubNode node, Sort sort, int limit, boolean publicOnly,
+            Criteria moreCriteria) {
+        return svc_arun.run(() -> getSubGraph(node, sort, limit, publicOnly, moreCriteria));
+    }
+
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
-    public Iterable<SubNode> getSubGraph(SubNode node, Sort sort, int limit, boolean publicOnly, boolean allowAuth,
+    public Iterable<SubNode> getSubGraph(SubNode node, Sort sort, int limit, boolean publicOnly,
             Criteria moreCriteria) {
         if (noChildren(node)) {
             return Collections.<SubNode>emptyList();
         }
 
-        if (allowAuth) {
-            svc_auth.readAuth(node);
-        }
         Query q = new Query();
         /*
          * This regex finds all that START WITH path, have some characters after path, before the end of the
@@ -656,7 +656,7 @@ public class MongoRead extends ServiceBase {
         }
 
         // Note if publicOnly we don't need any more security conditions. Anyone can see 'public stuff'
-        if (allowAuth && !publicOnly) {
+        if (!publicOnly) {
             crit = svc_auth.addReadSecurity(crit);
         }
         q.addCriteria(crit);
@@ -964,7 +964,7 @@ public class MongoRead extends ServiceBase {
             if (userName == null) {
                 userName = TL.getSC().getUserName();
             }
-            userNode = svc_user.getAccountByUserName(userName, false);
+            userNode = svc_user.getAccountByUserNameAP(userName);
         }
         if (userNode == null) {
             log.warn("userNode not found for user name: " + userName);
@@ -986,7 +986,11 @@ public class MongoRead extends ServiceBase {
         return node;
     }
 
-    public SubNode getUserNodeByProp(String propName, String propVal, boolean caseSensitive, boolean allowAuth) {
+    public SubNode getUserNodeByPropAP(String propName, String propVal, boolean caseSensitive) {
+        return svc_arun.run(() -> getUserNodeByProp(propName, propVal, caseSensitive));
+    }
+
+    public SubNode getUserNodeByProp(String propName, String propVal, boolean caseSensitive) {
         if (StringUtils.isEmpty(propVal))
             return null;
         // Otherwise for ordinary users root is based off their username
@@ -1000,9 +1004,7 @@ public class MongoRead extends ServiceBase {
                     .and(SubNode.PROPS + "." + propName).regex("^" + Pattern.quote(propVal) + "$", "i");
         }
 
-        if (allowAuth) {
-            crit = svc_auth.addReadSecurity(crit);
-        }
+        crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.findOne(q);
     }
@@ -1014,7 +1016,7 @@ public class MongoRead extends ServiceBase {
      */
     public SubNode findNodeByUserAndType(SubNode node, SubNode userNode, String userName, String type) {
         if (userNode == null) {
-            userNode = svc_user.getAccountByUserName(userName, false);
+            userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {
                 return null;
             }
@@ -1144,7 +1146,8 @@ public class MongoRead extends ServiceBase {
         while (true) {
             try {
                 SubNode parentNode = getParent(curNode);
-                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH) || parentNode.getStr(NodeProp.NO_EXPORT)!=null) {
+                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH)
+                        || parentNode.getStr(NodeProp.NO_EXPORT) != null) {
                     break;
                 }
 
@@ -1177,7 +1180,7 @@ public class MongoRead extends ServiceBase {
         nodeMap.put(rootNode.getPath(), rootTreeNode);
 
         // first scan to build up the nodes list and nodeMap
-        for (SubNode n : getSubGraph(rootNode, null, 0, false, true, criteria)) {
+        for (SubNode n : getSubGraph(rootNode, null, 0, false, criteria)) {
             nodeMap.put(n.getPath(), new TreeNode(n));
             if (nodeMap.size() > MAX_TREE_GRAPH_SIZE) {
                 throw new RuntimeException(

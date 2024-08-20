@@ -155,7 +155,7 @@ public class SystemService extends ServiceBase {
     }
 
     public String getJson(String nodeId) {
-        SubNode node = svc_mongoRead.getNode(nodeId, true, null);
+        SubNode node = svc_mongoRead.getNode(nodeId);
         if (node != null) {
             String ret = XString.prettyPrint(node);
             return ret;

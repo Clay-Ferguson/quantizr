@@ -788,9 +788,9 @@ public class RSSFeedService extends ServiceBase {
         if (AclService.isPublic(node)) {
             Criteria crit = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
 
-            // pass allowAuth=false, becasue we already included PUBLIC and everyone can see public.
+            // pass no auth here, becasue we already included PUBLIC and everyone can see public.
             Iterable<SubNode> iter =
-                    svc_mongoRead.getChildren(node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit, false);
+                    svc_mongoRead.getChildrenAP(node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, crit);
 
             if (iter != null) {
                 for (SubNode n : iter) {

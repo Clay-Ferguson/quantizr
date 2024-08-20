@@ -206,7 +206,7 @@ public class NodeEditService extends ServiceBase {
             plugin.beforeSaveNode(node);
         }
         String sessionUserName = TL.getSC().getUserName();
-        SubNode parent = svc_mongoRead.getParent(node, false);
+        SubNode parent = svc_mongoRead.getParentAP(node);
         if (parent != null) {
             parent.setHasChildren(true);
         }
@@ -369,7 +369,7 @@ public class NodeEditService extends ServiceBase {
      * passed in.
      */
     public UpdateHeadingsResponse cm_updateHeadings(String nodeId) {
-        SubNode node = svc_mongoRead.getNode(nodeId, true, null);
+        SubNode node = svc_mongoRead.getNode(nodeId);
         svc_auth.ownerAuth(node);
         String content = node.getContent();
         if (content != null) {
@@ -377,7 +377,7 @@ public class NodeEditService extends ServiceBase {
             int baseLevel = XString.getHeadingLevel(content);
             int baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
-            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, true, null)) {
+            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, null)) {
                 int slashCount = StringUtils.countMatches(n.getPath(), "/");
                 int level = baseLevel + (slashCount - baseSlashCount);
                 if (level > 6)
@@ -489,7 +489,7 @@ public class NodeEditService extends ServiceBase {
 
         if (req.isRecursive()) {
             Criteria crit = Criteria.where(SubNode.CONTENT).regex(req.getSearch());
-            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, true, crit)) {
+            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, crit)) {
                 if (replaceText(n, req.getSearch(), req.getReplace())) {
                     replacements++;
                     cachedChanges++;
@@ -521,7 +521,7 @@ public class NodeEditService extends ServiceBase {
     public GetNodeJsonResponse cm_getNodeJson(GetNodeJsonRequest req) {
         GetNodeJsonResponse res = new GetNodeJsonResponse();
         TL.requireAdmin();
-        SubNode node = svc_mongoRead.getNode(req.getNodeId(), false, null);
+        SubNode node = svc_mongoRead.getNodeAP(req.getNodeId());
         if (node != null) {
             res.setJson(XString.prettyPrint(node));
         }
@@ -535,7 +535,10 @@ public class NodeEditService extends ServiceBase {
 
         try {
             SubNode n = Util.simpleMapper.readValue(req.getJson(), SubNode.class);
-            svc_mongoUpdate.save(n, false);
+            svc_arun.run(() -> {
+                svc_mongoUpdate.save(n);
+                return null;
+            });
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

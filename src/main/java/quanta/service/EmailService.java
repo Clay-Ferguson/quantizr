@@ -243,7 +243,7 @@ public class EmailService extends ServiceBase {
     public Iterable<SubNode> getMailNodes() {
         SubNode outboxNode = getSystemOutbox();
         int mailBatchSizeInt = Integer.parseInt(mailBatchSize);
-        return svc_mongoRead.getChildren(outboxNode, null, mailBatchSizeInt, 0, false);
+        return svc_mongoRead.getChildrenAP(outboxNode, null, mailBatchSizeInt, 0);
     }
 
     public SubNode getSystemOutbox() {

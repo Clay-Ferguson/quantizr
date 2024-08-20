@@ -39,7 +39,7 @@ public class MongoTestService extends ServiceBase {
     public void authTest() {
         svc_auth.asUser(PrincipalName.ADMIN.s());
 
-        SubNode adminNode = svc_user.getAccountByUserName(PrincipalName.ADMIN.s(), false);
+        SubNode adminNode = svc_user.getAccountByUserNameAP(PrincipalName.ADMIN.s());
         assertNotNull("Checking adminNode existed", adminNode);
 
         // root for all testing. Note: '?' indicates to find any available path (generates a new path)
@@ -110,7 +110,7 @@ public class MongoTestService extends ServiceBase {
 
         // adam successfully inserts node in his root
         SubNode adamsNode = null;
-        SubNode adamsRootNode = svc_user.getAccountByUserName("adam", false);
+        SubNode adamsRootNode = svc_user.getAccountByUserNameAP("adam");
         assertTrue(adamsRootNode != null);
 
         adamsNode = svc_mongoCreate.createNode(adamsRootNode.getPath() + "/?");

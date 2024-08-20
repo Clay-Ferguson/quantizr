@@ -91,7 +91,7 @@ public class NodeRenderService extends ServiceBase {
         SubNode node = null;
         try {
             Val<SubNode> accntNode = new Val<>();
-            node = svc_mongoRead.getNode(_id, true, accntNode);
+            node = svc_mongoRead.getNode(_id, accntNode);
             if (node == null) {
                 if (_isHomeNodeRequest && accntNode.hasVal()) {
                     config.setDisplayUserProfileId(accntNode.getVal().getIdStr());
@@ -203,8 +203,6 @@ public class NodeRenderService extends ServiceBase {
          * end when the query returns, and the page root node will of course be the parent of scanToNode
          */
         SubNode scanToNode = null;
-        // we pass allowAuth=true because right here we DO care that the hasChildren is considering only
-        // based on what WE can access.
         if (req.isForceRenderParent()) {
             req.setUpLevel(true);
         }
@@ -315,7 +313,7 @@ public class NodeRenderService extends ServiceBase {
         // if (!showReplies) {
         // moreCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT.s());
         // }
-        Iterable<SubNode> nodeIter = svc_mongoRead.getChildren(node, sort, queryLimit, offset, moreCriteria, true);
+        Iterable<SubNode> nodeIter = svc_mongoRead.getChildren(node, sort, queryLimit, offset, moreCriteria);
         Iterator<SubNode> iterator = nodeIter.iterator();
         int idx = offset;
         // this should only get set to true if we run out of records, because we reached

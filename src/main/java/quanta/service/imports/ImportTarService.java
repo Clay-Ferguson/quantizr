@@ -39,7 +39,7 @@ public class ImportTarService extends ImportArchiveBase {
             throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
         }
         used = true;
-        SubNode userNode = svc_user.getAccountByUserName(TL.getSC().getUserName(), false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         if (userNode == null) {
             throw new RuntimeEx("UserNode not found: " + TL.getSC().getUserName());
         }

@@ -18,12 +18,18 @@ import quanta.util.TL;
 public class AdminRun extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AdminRun.class);
 
-    // Runs as 'ms' user
+    // Runs with full authority, but as the same user as on the current session.
     public <T> T run(Supplier<T> runner) {
+        boolean saveHasAdminAuthority = TL.getHasAdminAuthority();
+
+        // if this thread is already with Admin Authority we're done and can just call the runner.
+        if (saveHasAdminAuthority) {
+            return runner.get();
+        }
+
         // Otherwise we're running as admin.
         HashMap<ObjectId, SubNode> savedDirtyNodes = TL.getDirtyNodes();
         TL.setDirtyNodes(null);
-        Boolean saveHasAdminAuthority = TL.getHasAdminAuthority();
         TL.setHasAdminAuthority(true);
 
         // otherwise we need to run on the context of admin, and then restore the savedMs afterwards.

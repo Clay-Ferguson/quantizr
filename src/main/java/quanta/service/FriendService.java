@@ -45,7 +45,7 @@ public class FriendService extends ServiceBase {
 
     public SubNode createFriendNode(SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
-        SubNode userNode = svc_user.getAccountByUserName(userToFollow, false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(userToFollow);
         if (userNode != null) {
             List<PropertyInfo> properties = new LinkedList<>();
             properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
@@ -85,7 +85,7 @@ public class FriendService extends ServiceBase {
             if (userNodeId == null) {
                 Val<SubNode> userNode = new Val<SubNode>();
 
-                userNode.setVal(svc_user.getAccountByUserName(friendUserName, false));
+                userNode.setVal(svc_user.getAccountByUserNameAP(friendUserName));
 
                 if (userNode.getVal() != null) {
                     userNodeId = userNode.getVal().getIdStr();
@@ -125,7 +125,7 @@ public class FriendService extends ServiceBase {
         }
         // If we don't know the account id of the person doing the follow, then look it up.
         if (accntIdDoingFollow == null) {
-            SubNode followerAcctNode = svc_arun.run(() -> svc_user.getAccountByUserName(userDoingFollow, false));
+            SubNode followerAcctNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userDoingFollow));
             if (followerAcctNode == null) {
                 throw new RuntimeException("Unable to find user: " + userDoingFollow);
             }
@@ -157,7 +157,7 @@ public class FriendService extends ServiceBase {
 
         // the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
         // must use arun.
-        SubNode userNode = svc_arun.run(() -> svc_user.getAccountByUserName(userToFollow, false));
+        SubNode userNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userToFollow));
         if (userNode == null)
             return;
 
@@ -183,7 +183,7 @@ public class FriendService extends ServiceBase {
             fi.setUserName(userName);
             fi.setTags(friendNode.getTags());
             String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-            SubNode friendAccountNode = svc_mongoRead.getNode(userNodeId, false, null);
+            SubNode friendAccountNode = svc_mongoRead.getNodeAP(userNodeId);
             if (friendAccountNode != null) {
                 fi.setDisplayName(svc_user.getFriendlyNameFromNode(friendAccountNode));
                 Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
@@ -289,7 +289,7 @@ public class FriendService extends ServiceBase {
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
                         Iterable<SubNode> iter = svc_mongoRead.getChildren(node,
-                                Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0, true);
+                                Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 20, 0);
                         HashSet<String> childIds = new HashSet<>();
                         List<NodeInfo> children = new LinkedList<>();
                         for (SubNode child : iter) {
@@ -392,7 +392,7 @@ public class FriendService extends ServiceBase {
     public Query getPeopleByUserName_query(SubNode userNode, String userName) {
         Query q = new Query();
         if (userNode == null) {
-            userNode = svc_user.getAccountByUserName(userName, false);
+            userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {
                 return null;
             }
@@ -485,7 +485,7 @@ public class FriendService extends ServiceBase {
      */
     public SubNode findFriendNode(ObjectId ownerId, SubNode userNode, String userName) {
         if (userNode == null) {
-            userNode = svc_user.getAccountByUserName(userName, false);
+            userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {
                 return null;
             }

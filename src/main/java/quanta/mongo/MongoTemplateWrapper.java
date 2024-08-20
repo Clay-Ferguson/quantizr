@@ -100,11 +100,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
             if (node != null) {
                 svc_mongoUtil.validate(node);
-                // Note: Since this method doesn't accept a query object, we can't have secured the query before
-                // calling this method like all other class methods do, so we check 'readAuth' here
-                if (TL.getSC() != null) {
-                    svc_auth.readAuth(node);
-                }
+                svc_auth.readAuth(node);
             }
             return node;
         });

@@ -33,7 +33,7 @@ public class FriendType extends TypeBase {
          * be null, and is normal
          */
         if (accountId != null) {
-            SubNode accountNode = svc_mongoRead.getNode(accountId, false, null);
+            SubNode accountNode = svc_mongoRead.getNodeAP(accountId);
 
             /*
              * to load up a friend node for the browser to display, we have to populate these "Client Props", on

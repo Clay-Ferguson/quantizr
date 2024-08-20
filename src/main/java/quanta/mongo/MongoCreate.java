@@ -193,8 +193,8 @@ public class MongoCreate extends ServiceBase {
         int batchSize = 0;
 
         boolean madeNodeChanges = false;
-        for (SubNode child : svc_mongoRead.getChildren(node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0,
-                crit, false)) {
+        for (SubNode child : svc_mongoRead.getChildrenAP(node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0,
+                crit)) {
             // lazy create bulkOps
             if (bops == null) {
                 bops = svc_ops.bulkOps(BulkMode.UNORDERED);

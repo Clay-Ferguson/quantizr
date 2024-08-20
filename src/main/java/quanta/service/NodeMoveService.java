@@ -163,7 +163,7 @@ public class NodeMoveService extends ServiceBase {
         for (SubNode n : nodes) {
             if (targetNode == null) {
                 if (req.isJoinToParent()) {
-                    targetNode = svc_mongoRead.getParent(n, true);
+                    targetNode = svc_mongoRead.getParent(n);
                     if (targetNode == null) {
                         throw new RuntimeException("Failed to find parent of node: " + n.getIdStr());
                     }
@@ -265,7 +265,7 @@ public class NodeMoveService extends ServiceBase {
             // get the nodeParent if we don't have it already.
             if (nodeParent == null) {
                 // Very important, we can get the parent even without having ownership of it here.
-                nodeParent = svc_mongoRead.getParent(node, false);
+                nodeParent = svc_mongoRead.getParentAP(node);
             }
         }
 
@@ -343,7 +343,7 @@ public class NodeMoveService extends ServiceBase {
         BulkOperations bops = null;
         int batchSize = 0;
 
-        for (SubNode node : svc_mongoRead.getSubGraph(graphRoot, null, 0, false, false, null)) {
+        for (SubNode node : svc_mongoRead.getSubGraphAP(graphRoot, null, 0, false, null)) {
             if (!node.getPath().startsWith(originalPath)) {
                 throw new RuntimeEx(
                         "Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);

@@ -181,7 +181,7 @@ public class UserManagerService extends ServiceBase {
             }
 
             svc_arun.run(() -> {
-                SubNode userNode = svc_user.getAccountByUserName(req.getUserName(), false);
+                SubNode userNode = svc_user.getAccountByUserNameAP(req.getUserName());
                 if (userNode == null) {
                     throw new RuntimeException("User not found: " + req.getUserName());
                 }
@@ -194,7 +194,7 @@ public class UserManagerService extends ServiceBase {
         else {
             // lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
             svc_arun.run(() -> {
-                SubNode userNode = svc_user.getAccountByUserName(req.getUserName(), false);
+                SubNode userNode = svc_user.getAccountByUserNameAP(req.getUserName());
                 if (userNode == null) {
                     throw new RuntimeException("User not found: " + req.getUserName());
                 }
@@ -267,7 +267,7 @@ public class UserManagerService extends ServiceBase {
     public void processLogin(LoginResponse res, SubNode userNode, String userName, String asymEncKey, String sigKey) {
         SessionContext sc = TL.getSC();
         if (userNode == null) {
-            userNode = svc_user.getAccountByUserName(userName, false);
+            userNode = svc_user.getAccountByUserNameAP(userName);
         }
         if (userNode == null) {
             throw new RuntimeEx("User not found: " + userName);
@@ -304,7 +304,7 @@ public class UserManagerService extends ServiceBase {
         log.debug("Closing Account: " + TL.getSC().getUserName());
         svc_arun.run(() -> {
             String userName = TL.getSC().getUserName();
-            SubNode ownerNode = svc_user.getAccountByUserName(userName, false);
+            SubNode ownerNode = svc_user.getAccountByUserNameAP(userName);
             if (ownerNode != null) {
                 svc_mongoDelete.delete(ownerNode, false);
             }
@@ -335,7 +335,7 @@ public class UserManagerService extends ServiceBase {
      */
     public void addBytesToUserNodeBytes(long binSize, SubNode userNode) {
         if (userNode == null) {
-            userNode = svc_user.getAccountByUserName(null, false);
+            userNode = svc_user.getSessionUserAccount();
         }
         // get the current binTotal on the user account (max they are allowed to upload)
         Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
@@ -435,7 +435,7 @@ public class UserManagerService extends ServiceBase {
 
             // we disallow dupliate emails via this codepath, but by design we do allow them in the DB, and
             // even all the 'test accounts' will normally have the same email address.
-            SubNode ownerNode = svc_mongoRead.getUserNodeByProp(NodeProp.EMAIL.s(), email, false, false);
+            SubNode ownerNode = svc_mongoRead.getUserNodeByPropAP(NodeProp.EMAIL.s(), email, false);
             if (ownerNode != null) {
                 res.setEmailError("Email already in use.");
                 res.setCode(HttpServletResponse.SC_EXPECTATION_FAILED);
@@ -466,7 +466,7 @@ public class UserManagerService extends ServiceBase {
      * signupCode has been used to validate their email address.
      */
     public void initiateSignup(String userName, String password, String emailAdr) {
-        SubNode ownerNode = getAccountByUserName(userName, false);
+        SubNode ownerNode = getAccountByUserNameAP(userName);
         if (ownerNode != null) {
             throw new RuntimeEx("User already exists.");
         }
@@ -497,7 +497,7 @@ public class UserManagerService extends ServiceBase {
         GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
         String userName = TL.getSC().getUserName();
         svc_arun.run(() -> {
-            SubNode userNode = getAccountByUserName(userName, false);
+            SubNode userNode = getAccountByUserNameAP(userName);
             if (userNode == null) {
                 res.error("unknown user: " + userName);
             }
@@ -553,7 +553,7 @@ public class UserManagerService extends ServiceBase {
 
     public Tran addCreditByEmail(String emailAdr, BigDecimal amount, Long timestamp) {
         PgTranMgr.ensureTran();
-        SubNode ownerNode = svc_mongoRead.getUserNodeByProp(NodeProp.EMAIL.s(), emailAdr, false, false);
+        SubNode ownerNode = svc_mongoRead.getUserNodeByPropAP(NodeProp.EMAIL.s(), emailAdr, false);
         if (ownerNode != null) {
             String userName = ownerNode.getStr(NodeProp.USER);
             Tran tran = addCreditInternal(ownerNode.getIdStr(), amount, timestamp);
@@ -579,7 +579,7 @@ public class UserManagerService extends ServiceBase {
         UserAccount user = svc_userRepo.findByMongoId(userId);
         if (user == null) {
             log.debug("User not found, creating...");
-            SubNode userNode = svc_mongoRead.getNode(userId, true, null);
+            SubNode userNode = svc_mongoRead.getNode(userId);
             String userName = userNode.getStr(NodeProp.USER);
             user = new UserAccount(userId, userName);
             user = svc_userRepo.save(user);
@@ -659,7 +659,7 @@ public class UserManagerService extends ServiceBase {
         String userName = TL.getSC().getUserName();
         svc_arun.run(() -> {
             boolean failed = false;
-            SubNode userNode = svc_user.getAccountByUserName(userName, false);
+            SubNode userNode = svc_user.getAccountByUserNameAP(userName);
             // DO NOT DELETE: This is temporaryly disabled (no ability to edit userName)
             // If userName is changing, validate it first.
             // if (!req.getUserName().equals(userName)) {
@@ -742,7 +742,7 @@ public class UserManagerService extends ServiceBase {
             if (friendNodes != null) {
                 for (SubNode friendNode : friendNodes) {
                     String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-                    SubNode friendAccountNode = svc_mongoRead.getNode(userNodeId, false, null);
+                    SubNode friendAccountNode = svc_mongoRead.getNodeAP(userNodeId);
                     if (friendAccountNode != null) {
                         String userName = friendNode.getStr(NodeProp.USER);
                         sb.append(userName);
@@ -795,9 +795,9 @@ public class UserManagerService extends ServiceBase {
             SubNode userNode = null;
             if (_userNode == null) {
                 if (userId == null) {
-                    userNode = svc_user.getAccountByUserName(sessionUserName, false);
+                    userNode = svc_user.getAccountByUserNameAP(sessionUserName);
                 } else {
-                    userNode = svc_mongoRead.getNode(userId, false, null);
+                    userNode = svc_mongoRead.getNodeAP(userId);
                 }
             } else {
                 userNode = _userNode;
@@ -896,7 +896,7 @@ public class UserManagerService extends ServiceBase {
         svc_arun.run(() -> {
             SubNode prefsNode = _prefsNode;
             if (prefsNode == null) {
-                prefsNode = svc_user.getAccountByUserName(userName, false);
+                prefsNode = svc_user.getAccountByUserNameAP(userName);
             }
             userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
             userPrefs.setAiWritingMode(prefsNode.getBool(NodeProp.USER_PREF_AI_WRITING_MODE));
@@ -970,7 +970,7 @@ public class UserManagerService extends ServiceBase {
                 return null;
             });
         } else {
-            userNode.setVal(svc_user.getAccountByUserName(TL.getSC().getUserName(), true));
+            userNode.setVal(svc_user.getAccountByUserNameAP(TL.getSC().getUserName()));
             if (userNode.getVal() == null) {
                 throw ExUtil.wrapEx("changePassword cannot find user.");
             }
@@ -1003,7 +1003,7 @@ public class UserManagerService extends ServiceBase {
                 res.error("User name is illegal.");
                 return null;
             }
-            SubNode ownerNode = svc_user.getAccountByUserName(user, false);
+            SubNode ownerNode = svc_user.getAccountByUserNameAP(user);
             if (ownerNode == null) {
                 res.error("User does not exist.");
                 return null;
@@ -1070,7 +1070,7 @@ public class UserManagerService extends ServiceBase {
                     if (accntId.equals(ownerIdStr) || idSet.contains(accntId)
                             || PrincipalName.PUBLIC.s().equals(accntId))
                         continue;
-                    SubNode accntNode = svc_mongoRead.getNode(accntId, false, null);
+                    SubNode accntNode = svc_mongoRead.getNodeAP(accntId);
                     if (accntNode != null) {
                         FriendInfo fi = buildPersonInfoFromAccntNode(accntNode);
                         if (fi != null) {
@@ -1152,7 +1152,7 @@ public class UserManagerService extends ServiceBase {
     public List<SubNode> getSpecialNodesList(Val<SubNode> parentNodeVal, String underType, String userName,
             boolean sort, Criteria moreCriteria) {
         List<SubNode> nodeList = new LinkedList<>();
-        SubNode userNode = svc_user.getAccountByUserName(userName, false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(userName);
         if (userNode == null)
             return null;
         SubNode parentNode = svc_mongoRead.findSubNodeByType(userNode, underType);
@@ -1162,7 +1162,7 @@ public class UserManagerService extends ServiceBase {
             parentNodeVal.setVal(parentNode);
         }
         for (SubNode node : svc_mongoRead.getChildren(parentNode,
-                sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, null, 0, moreCriteria, true)) {
+                sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, null, 0, moreCriteria)) {
             nodeList.add(node);
         }
         return nodeList;
@@ -1204,7 +1204,7 @@ public class UserManagerService extends ServiceBase {
 
     public void updateLastActiveTime(SessionContext sc) {
         svc_arun.run(() -> {
-            SubNode userNode = svc_user.getAccountByUserName(sc.getUserName(), false);
+            SubNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
             if (userNode != null) {
                 userNode.set(NodeProp.LAST_ACTIVE_TIME, sc.getLastActiveTime());
                 svc_mongoUpdate.save(userNode);
@@ -1220,7 +1220,7 @@ public class UserManagerService extends ServiceBase {
         if (TL.hasAdminPrivileges()) {
             return Integer.MAX_VALUE;
         }
-        SubNode userNode = svc_user.getAccountByUserName(TL.getSC().getUserName(), false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         long ret = userNode.getInt(NodeProp.BIN_QUOTA);
         if (ret == 0) {
             return Const.DEFAULT_USER_QUOTA;
@@ -1235,7 +1235,7 @@ public class UserManagerService extends ServiceBase {
         if (TL.hasAdminPrivileges()) {
             return Integer.MAX_VALUE;
         }
-        SubNode userNode = svc_user.getAccountByUserName(TL.getSC().getUserName(), false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         if (userNode == null)
             return 0;
 
@@ -1270,8 +1270,16 @@ public class UserManagerService extends ServiceBase {
         });
     }
 
-    public SubNode getAccountByUserName(String user, boolean allowAuth) {
-        if (user == null) {
+    public SubNode getSessionUserAccount() {
+        return getAccountByUserName(TL.getSC().getUserName());
+    }
+
+    public SubNode getAccountByUserNameAP(String user) {
+        return svc_arun.run(() -> getAccountByUserName(user));
+    }
+
+    public SubNode getAccountByUserName(String user) {
+        if (StringUtils.isEmpty(user)) {
             user = TL.getSC().getUserName();
         }
         user = user.trim();
@@ -1287,9 +1295,7 @@ public class UserManagerService extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(NodePath.USERS_PATH))
                 .and(SubNode.PROPS + "." + NodeProp.USER).is(user).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
-        if (allowAuth) {
-            crit = svc_auth.addReadSecurity(crit);
-        }
+        crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.findOne(q);
     }
@@ -1346,7 +1352,7 @@ public class UserManagerService extends ServiceBase {
                     continue;
                 }
                 String userName = accountInfoList.get(0);
-                SubNode ownerNode = svc_user.getAccountByUserName(userName, false);
+                SubNode ownerNode = svc_user.getAccountByUserNameAP(userName);
                 if (ownerNode == null) {
                     log.debug("userName not found: " + userName + ". Account will be created.");
                     SignupRequest signupReq = new SignupRequest();
@@ -1379,7 +1385,7 @@ public class UserManagerService extends ServiceBase {
      */
     public void createAdminUser() {
         String adminUser = svc_prop.getMongoAdminUserName();
-        SubNode adminNode = svc_user.getAccountByUserName(adminUser, false);
+        SubNode adminNode = svc_user.getAccountByUserNameAP(adminUser);
         if (adminNode == null) {
             adminNode =
                     svc_snUtil.ensureNodeExists("/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(), true, null, null);
@@ -1397,7 +1403,7 @@ public class UserManagerService extends ServiceBase {
 
     public SubNode createUser(String newUserName, String email, String password, boolean automated,
             Val<SubNode> postsNodeVal) {
-        SubNode userNode = svc_user.getAccountByUserName(newUserName, false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(newUserName);
         if (userNode != null) {
             throw new RuntimeException("User already existed: " + newUserName);
         }

@@ -96,7 +96,7 @@ public class Convert extends ServiceBase {
         String nameProp = null;
         String displayName = null;
         String owner = PrincipalName.ADMIN.s();
-        SubNode ownerAccnt = svc_mongoRead.getOwner(node, false);
+        SubNode ownerAccnt = svc_mongoRead.getOwnerAP(node);
 
         if (ownerAccnt != null) {
             nameProp = ownerAccnt.getStr(NodeProp.USER);
@@ -209,7 +209,7 @@ public class Convert extends ServiceBase {
 
         if (hasInlineChildren) {
             Iterable<SubNode> nodeIter = svc_mongoRead.getChildren(node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL),
-                    ConstantInt.MAX_EXPANDED_CHILDREN.val(), 0, true);
+                    ConstantInt.MAX_EXPANDED_CHILDREN.val(), 0);
             Iterator<SubNode> iterator = nodeIter.iterator();
             long inlineOrdinal = 0;
 

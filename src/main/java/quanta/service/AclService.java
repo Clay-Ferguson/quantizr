@@ -81,7 +81,7 @@ public class AclService extends ServiceBase {
         Boolean unpublished = node.getBool(NodeProp.UNPUBLISHED);
         int batchSize = 0;
 
-        for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, true, null)) {
+        for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, null)) {
             if (batchMode) {
                 // lazy instantiate
                 if (bops == null) {
@@ -211,7 +211,7 @@ public class AclService extends ServiceBase {
             // if no principal node passed in, then look it up
             if (principalNode == null) {
                 String _principal = principal;
-                principalNode = svc_user.getAccountByUserName(_principal, false);
+                principalNode = svc_user.getAccountByUserNameAP(_principal);
                 if (principalNode == null) {
                     if (res != null) {
                         res.error("Unknown user name: " + principal);

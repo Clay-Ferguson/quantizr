@@ -100,7 +100,7 @@ public class NodeSearchService extends ServiceBase {
         int counter = 0;
 
         if ("node.id".equals(req.getSearchProp())) {
-            SubNode node = svc_mongoRead.getNode(searchText, true, null);
+            SubNode node = svc_mongoRead.getNode(searchText);
             if (node != null) {
                 NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
                         false, false, false, null);
@@ -119,7 +119,7 @@ public class NodeSearchService extends ServiceBase {
                     searchText = ":" + TL.getSC().getUserName() + ":" + searchText;
                 }
             }
-            SubNode node = svc_mongoRead.getNode(searchText, true, null);
+            SubNode node = svc_mongoRead.getNode(searchText);
             if (node != null) {
                 NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
                         false, false, false, null);
@@ -358,7 +358,7 @@ public class NodeSearchService extends ServiceBase {
 
         searchRoot = svc_mongoRead.getNode(req.getNodeId());
         Sort sort = null;
-        iter = svc_mongoRead.getSubGraph(searchRoot, sort, 0, false, true, null);
+        iter = svc_mongoRead.getSubGraph(searchRoot, sort, 0, false, null);
         HashSet<String> uniqueUsersSharedTo = new HashSet<>();
         HashSet<ObjectId> uniqueVoters = countVotes ? new HashSet<>() : null;
 

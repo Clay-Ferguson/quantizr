@@ -127,7 +127,7 @@ public class MongoAuth extends ServiceBase {
             String userName = parent.getStr(NodeProp.USER);
             // if we have a userProp, find the account node for the user
             if (userName != null) {
-                SubNode accountNode = svc_user.getAccountByUserName(userName, false);
+                SubNode accountNode = svc_user.getAccountByUserNameAP(userName);
                 if (accountNode != null) {
                     child.putAc(accountNode.getIdStr(), new AccessControl(null, Const.RDWR));
                 }
@@ -184,7 +184,7 @@ public class MongoAuth extends ServiceBase {
             log.error(msg);
             throw new RuntimeException(msg);
         }
-    
+
         SubNode myAcntNode = null;
 
         // if anonymous check for public nodes
@@ -289,8 +289,8 @@ public class MongoAuth extends ServiceBase {
         try {
             auth(node, PrivilegeType.READ);
         } catch (RuntimeException e) {
-            log.debug(
-                    "session: " + TL.getSC().getUserName() + " tried to read nodeId " + node.getIdStr() + " and was refused.");
+            log.debug("session: " + TL.getSC().getUserName() + " tried to read nodeId " + node.getIdStr()
+                    + " and was refused.");
             throw e;
         }
     }
@@ -344,12 +344,17 @@ public class MongoAuth extends ServiceBase {
                 log.trace("auth granted. you're admin.");
             return;
         }
+        if (TL.getSC() == null) {
+            throw new RuntimeEx("session context is null");
+        }
+
         if (verbose)
             log.debug("auth path " + node.getPath() + " for " + TL.getSC().getUserName());
 
         if (node.getOwner() == null) {
             throw new RuntimeEx("node had no owner: " + node.getIdStr());
         }
+
         if (TL.getSC().getUserNodeObjId() != null) {
             // if this session user is the owner of this node, then they have full power
             if (TL.getSC().getUserNodeObjId().equals(node.getOwner())) {
@@ -364,14 +369,15 @@ public class MongoAuth extends ServiceBase {
                             + node.getTransferFrom().toHexString());
                 return;
             }
-        } 
+        }
 
         if (priv == null || priv.size() == 0) {
             throw new RuntimeEx("privileges not specified.");
         }
 
-        String sessionUserNodeId = TL.getSC().getUserNodeObjId() != null ? TL.getSC().getUserNodeObjId().toHexString() : null;
-        if (nodeAuth(node, sessionUserNodeId, priv)) { 
+        String sessionUserNodeId =
+                TL.getSC().getUserNodeObjId() != null ? TL.getSC().getUserNodeObjId().toHexString() : null;
+        if (nodeAuth(node, sessionUserNodeId, priv)) {
             if (verbose)
                 log.trace("nodeAuth success");
             return;
@@ -447,7 +453,7 @@ public class MongoAuth extends ServiceBase {
         }
         // else we need the user name
         else {
-            SubNode principalNode = svc_mongoRead.getNode(principalId, false, null);
+            SubNode principalNode = svc_mongoRead.getNodeAP(principalId);
             if (principalNode == null) {
                 return null;
             }
@@ -563,7 +569,7 @@ public class MongoAuth extends ServiceBase {
     }
 
     public void asUser(String userName) {
-        SubNode userNode = svc_user.getAccountByUserName(userName, false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(userName);
         if (userNode == null) {
             throw new RuntimeException("UserNode not found for userName " + userName);
         }

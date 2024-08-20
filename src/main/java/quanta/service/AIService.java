@@ -38,7 +38,7 @@ public class AIService extends ServiceBase {
         if (svc == null) {
             throw new RuntimeException("No AI service selected.");
         }
-        SubNode userNode = svc_user.getAccountByUserName(TL.getSC().getUserName(), false);
+        SubNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }

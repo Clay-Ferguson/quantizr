@@ -36,7 +36,7 @@ public class GraphNodesService extends ServiceBase {
             Iterable<SubNode> results = null;
             // Run subgraph query to get all nodes if no search text provided
             if (StringUtils.isEmpty(req.getSearchText())) {
-                results = svc_mongoRead.getSubGraph(node, null, 0, false, true, null);
+                results = svc_mongoRead.getSubGraph(node, null, 0, false, null);
             }
             // If search text provided run subgraph search.
             else {

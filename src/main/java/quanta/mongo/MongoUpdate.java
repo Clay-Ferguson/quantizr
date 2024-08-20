@@ -38,18 +38,14 @@ public class MongoUpdate extends ServiceBase {
     public void saveIfDirty(SubNode node) {
         if (node == null || !TL.hasDirtyNode(node.getId()))
             return;
-        save(node, true);
-    }
-
-    public void save(SubNode node) {
-        save(node, true);
+        save(node);
     }
 
     public void updateParentHasChildren(SubNode node) {
         if (node == null)
             return;
         svc_arun.run(() -> {
-            SubNode parent = svc_mongoRead.findNodeByPath(node.getParentPath(), false);
+            SubNode parent = svc_mongoRead.findNodeByPathAP(node.getParentPath());
             if (parent != null) {
                 parent.setHasChildren(true);
             }
@@ -57,19 +53,20 @@ public class MongoUpdate extends ServiceBase {
         });
     }
 
-    public void save(SubNode node, boolean allowAuth) {
+    public void save(SubNode node) {
+        // if the thread doesn't have admin privs, and the current user is not the owner of this node throw
+        // an exception
+        if (!TL.hasAdminPrivileges()
+                && (node.getOwner() == null || !node.getOwner().equals(TL.getSC().getUserNodeObjId()))) {
+            throw new ForbiddenException();
+        }
         /*
          * calling this may result in an update of this node's children property, and we want to call it
          * here rather than later so if this modified the node it doesn't trigger an additional write.
          */
         svc_mongoRead.hasChildren(node);
-
         beforeSave(node);
-        if (allowAuth) {
-            svc_ops.save(node);
-        } else {
-            svc_arun.run(() -> svc_ops.save(node));
-        }
+        svc_ops.save(node);
         TL.clean(node);
     }
 
@@ -114,8 +111,17 @@ public class MongoUpdate extends ServiceBase {
                             nodes.add(node);
                         }
 
-                        for (SubNode node : nodes) {
-                            save(node, !asAdmin);
+                        if (asAdmin) {
+                            svc_arun.run(() -> {
+                                for (SubNode node : nodes) {
+                                    save(node);
+                                }
+                                return null;
+                            });
+                        } else {
+                            for (SubNode node : nodes) {
+                                save(node);
+                            }
                         }
                     }
                     log.debug("sync block for ms - exiting");
@@ -125,6 +131,7 @@ public class MongoUpdate extends ServiceBase {
                 }
             }
         }
+
     }
 
     public void resetChildrenState() {
@@ -340,7 +347,7 @@ public class MongoUpdate extends ServiceBase {
                 bops.setVal(svc_ops.bulkOps(BulkMode.UNORDERED));
             }
 
-            SubNode parent = svc_mongoRead.getParent(node, false);
+            SubNode parent = svc_mongoRead.getParentAP(node);
             if (parent != null && parentIds.add(parent.getId())) {
                 // we have a known 'bops' in this one and don't lazy create so we don't care
                 // about the return value of this call

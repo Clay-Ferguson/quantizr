@@ -595,7 +595,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         InputStream is = null;
         try {
-            is = svc_attach.getStream(att.getKey(), node, false);
+            is = svc_attach.getStream(att.getKey(), node);
             if (is == null)
                 return;
             BufferedInputStream bis = new BufferedInputStream(is);

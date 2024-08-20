@@ -33,15 +33,15 @@ public class TransferService extends ServiceBase {
         String nodeId = req.getNodeId();
         // get and auth node being transfered
         log.debug("Transfer node: " + nodeId + " operation=" + req.getOperation());
-        // we do allowAuth below, not here
-        SubNode node = svc_mongoRead.getNode(nodeId, false, null);
+        // we check auth below, not here
+        SubNode node = svc_mongoRead.getNodeAP(nodeId);
         if (node == null) {
             throw new RuntimeEx("Node not found: " + nodeId);
         }
         // get user node of person being transfered to
         SubNode toUserNode = null;
         if (req.getOperation().equals(TransferOp.TRANSFER.s())) {
-            toUserNode = svc_user.getAccountByUserName(req.getToUser(), false);
+            toUserNode = svc_user.getAccountByUserNameAP(req.getToUser());
             if (toUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getToUser());
             }
@@ -49,14 +49,14 @@ public class TransferService extends ServiceBase {
         // get account node of person doing the transfer
         SubNode fromUserNode = null;
         if (!StringUtils.isEmpty(req.getFromUser())) {
-            fromUserNode = svc_user.getAccountByUserName(req.getFromUser(), false);
+            fromUserNode = svc_user.getAccountByUserNameAP(req.getFromUser());
             if (fromUserNode == null) {
                 throw new RuntimeEx("User not found: " + req.getFromUser());
             }
         }
         transferNode(req.getOperation(), node, fromUserNode, toUserNode, ops);
         if (req.isRecursive()) {
-            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, true, null)) {
+            for (SubNode n : svc_mongoRead.getSubGraph(node, null, 0, false, null)) {
                 transferNode(req.getOperation(), n, fromUserNode, toUserNode, ops);
 
                 // only cache up to 100 dirty nodes at time time before saving/flushing changes.
