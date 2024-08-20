@@ -50,11 +50,13 @@ export class EditAttachmentsPanel extends Div {
             ], "attachmentButtonBar"));
         }
 
-        S.props.getOrderedAtts(this.node).forEach(att => {
-            if (S.nodeUtil.isCutAttachment(att, ast.editNode.id)) return;
-            this.addChild(this.makeAttPanel(att, isFirst));
-            isFirst = false;
-        });
+        if (this.node.attachments) {
+            S.props.getOrderedAtts(this.node).forEach(att => {
+                if (S.nodeUtil.isCutAttachment(att, ast.editNode.id)) return;
+                this.addChild(this.makeAttPanel(att, isFirst));
+                isFirst = false;
+            });
+        }
         return true;
     }
 
@@ -129,8 +131,8 @@ export class EditAttachmentsPanel extends Div {
         });
 
         const list: Attachment[] = S.props.getOrderedAtts(ast.editNode);
-        const firstAttachment = list[0].o === att.o;
-        const lastAttachment = list[list.length - 1].o === att.o;
+        const firstAttachment = list != null && list[0].o === att.o;
+        const lastAttachment = list != null && list[list.length - 1].o === att.o;
 
         const topBinRow = new FlexRowLayout([
             attCheckbox,
@@ -200,6 +202,7 @@ export class EditAttachmentsPanel extends Div {
 
     moveAttDown = (att: Attachment, node: NodeInfo) => {
         const list: Attachment[] = S.props.getOrderedAtts(node);
+        if (!list) return;
         let idx: number = 0;
         let setNext: number = -1;
         for (const a of list) {
@@ -224,6 +227,7 @@ export class EditAttachmentsPanel extends Div {
 
     moveAttUp = (att: Attachment, node: NodeInfo) => {
         const list: Attachment[] = S.props.getOrderedAtts(node);
+        if (!list) return;
         let idx: number = 0;
         let lastA = null;
         for (const a of list) {

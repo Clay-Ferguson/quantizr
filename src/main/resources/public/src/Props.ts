@@ -131,6 +131,7 @@ export class Props {
     }
 
     getOrderedAtts = (node: NodeInfo): Attachment[] => {
+        if (!node.attachments) return null;
         const list: Attachment[] = [];
 
         // put all attachments in 'list', random order

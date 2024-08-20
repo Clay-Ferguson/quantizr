@@ -128,12 +128,12 @@ export class EditNodeDlgUtil {
 
     saveAttFileNamesToNode = (editNode: NodeInfo, dlg: EditNodeDlg) => {
         const list: Attachment[] = S.props.getOrderedAtts(editNode);
-        for (const att of list) {
+        list?.forEach(att => {
             const propState = dlg.attFileNames.get((att as any).key);
             if (propState) {
                 att.f = propState.getValue();
             }
-        }
+        });
     }
 
     addProperty = async (dlg: EditNodeDlg): Promise<void> => {

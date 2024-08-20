@@ -56,7 +56,7 @@ export class NodeCompContent extends Div {
         const showImages = (ast.docImages || this.tabData.id !== C.TAB_DOCUMENT) && S.props.hasBinary(this.node) && !isAccountNode;
         if (showImages) {
             const attachments = S.props.getOrderedAtts(this.node);
-            attachments.forEach(att => {
+            attachments?.forEach(att => {
                 if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
 
                 // don't process here, we process below
@@ -95,7 +95,7 @@ export class NodeCompContent extends Div {
         if (showImages) {
             const attComps: Comp[] = [];
             const attachments = S.props.getOrderedAtts(this.node);
-            attachments.forEach(att => {
+            attachments?.forEach(att => {
                 if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
 
                 // having 'att.key' is a client-side only hack, and only generated during the
