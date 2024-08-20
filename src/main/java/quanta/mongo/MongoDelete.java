@@ -17,6 +17,7 @@ import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.DeleteNodesRequest;
@@ -319,10 +320,60 @@ public class MongoDelete extends ServiceBase {
         log.debug("TOTAL ORPHANS DELETED=" + totalDeleted.getVal());
     }
 
+    public DeleteNodesResponse preDeleteCheck(List<String> nodeIds) {
+        SessionContext sc = TL.getSC();
+        int mineCount = 0;
+        int otherCount = 0; // count nodes that are not mine
+        boolean subgraphsExist = false;
+
+        if (sc == null) {
+            throw new RuntimeEx("User not found.");
+        }
+
+        for (String nodeId : nodeIds) {
+            SubNode node = svc_mongoRead.getNode(nodeId);
+
+            // check if node is mine
+            if (svc_auth.ownedBy(sc, node)) {
+                mineCount++;
+            } else {
+                throw new RuntimeEx("You can't delete a node that you don't own.");
+            }
+
+            Iterable<SubNode> results = svc_arun.run(() -> svc_mongoRead.getSubGraph(node, null, 0, false, null));
+            for (SubNode n : results) {
+                subgraphsExist = true;
+                // check if node is mine
+                if (svc_auth.ownedBy(sc, n)) {
+                    mineCount++;
+                } else {
+                    otherCount++;
+                }
+            }
+        }
+
+        if (subgraphsExist || otherCount > 0) {
+            DeleteNodesResponse res = new DeleteNodesResponse();
+            String warning = "You are about to delete " + String.valueOf(mineCount + otherCount) + " nodes. ";
+            if (otherCount > 0)
+                warning += String.valueOf(otherCount) + " of them are owned by other users.";
+            res.setWarning(warning);
+            return res;
+        }
+        return null;
+    }
+
     /*
      * Deletes the set of nodes specified in the request
      */
-    public DeleteNodesResponse deleteNodes(List<String> nodeIds) {
+    public DeleteNodesResponse deleteNodes(boolean force, List<String> nodeIds) {
+        if (!force) {
+            DeleteNodesResponse res = preDeleteCheck(nodeIds);
+            if (res != null) {
+                return res;
+            }
+        }
+
         DeleteNodesResponse res = new DeleteNodesResponse();
         SubNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
@@ -413,10 +464,15 @@ public class MongoDelete extends ServiceBase {
         return bops;
     }
 
-    /*
-     * Deletes the set of nodes specified in the request
-     */
     public DeleteNodesResponse bulkDeleteNodes() {
+        /*
+         * todo-0: disabling until we have a way to do this without the possibility of deleting subnodes
+         * owned by other users AND so I may do away this method completely because of that. We can instead
+         * allow a query that shows these nodes to users as a search result.
+         */
+        if (true)
+            throw new RuntimeException("Sorry, this feature is temporarily disabled.");
+
         DeleteNodesResponse res = new DeleteNodesResponse();
         SubNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
@@ -461,7 +517,7 @@ public class MongoDelete extends ServiceBase {
         if (req.isBulkDelete()) {
             res = svc_mongoDelete.bulkDeleteNodes();
         } else {
-            res = svc_mongoDelete.deleteNodes(req.getNodeIds());
+            res = svc_mongoDelete.deleteNodes(req.isForce(), req.getNodeIds());
         }
         res.setJumpTargetId(jumpTarget);
         return res;

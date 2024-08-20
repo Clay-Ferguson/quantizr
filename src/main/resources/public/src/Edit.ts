@@ -882,7 +882,8 @@ export class Edit {
                 nodeIds: ["~" + J.NodeType.INBOX],
                 childrenOnly: true,
                 bulkDelete: false,
-                jumpToParentOf: null
+                jumpToParentOf: null,
+                force: true
             });
             S.nav.openContentNode(ast.userProfile.userNodeId, false);
         }
@@ -943,7 +944,8 @@ export class Edit {
                 nodeIds: null,
                 childrenOnly: false,
                 bulkDelete: true,
-                jumpToParentOf: null
+                jumpToParentOf: null,
+                force: true
             });
             S.util.showMessage(res.message, "Message");
         }
@@ -1595,12 +1597,32 @@ export class Edit {
         }
         const jumpToParentOf = deletedPageNode && !S.util.fullscreenViewerActive() ? ast.node?.id : null;
 
-        const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+        let res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
             nodeIds: nodesToDel,
             childrenOnly: false,
             bulkDelete: false,
-            jumpToParentOf
+            jumpToParentOf,
+            force: false
         });
+
+        // if we have a warning from that delete attempt, show it to the user and let them decide wehter to proceed
+        // which is done by a second call with force=true
+        if (res.warning) {
+            const dlg = new ConfirmDlg(res.warning, "Confirm Delete");
+            await dlg.open();
+            if (dlg.yes) {
+                res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                    nodeIds: nodesToDel,
+                    childrenOnly: false,
+                    bulkDelete: false,
+                    jumpToParentOf,
+                    force: true
+                });
+            }
+            else {
+                return;
+            }
+        }
 
         S.histUtil.removeNodesFromHistory(nodesToDel);
         this.removeNodesFromCalendarData(nodesToDel);

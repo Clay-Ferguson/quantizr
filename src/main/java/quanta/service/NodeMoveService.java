@@ -194,7 +194,11 @@ public class NodeMoveService extends ServiceBase {
         }
         targetNode.touch();
         svc_mongoUpdate.saveSession();
-        svc_mongoDelete.deleteNodes(delIds);
+
+        // todo-0: this is really slightly dangerous. We need to probably run with force=false first, and throw back warnings to the user
+        // and roll this transaction back of there are warnings that the user will be destroying subnode content by doing this join function.
+        // Better yet, really if there are subnodes at all we should just fail to join and throw exception.
+        svc_mongoDelete.deleteNodes(true, delIds);
         return res;
     }
 
