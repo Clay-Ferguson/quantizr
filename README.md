@@ -4,12 +4,10 @@
 
 [Live Instance: https://quanta.wiki](https://quanta.wiki)
 
-## A new Kind of CMS with ChatGPT and Social Media features
-
 Quanta is a new kind of Content Management platform, with powerful [features](https://quanta.wiki/n/features) including:
 
-* Wikis & micro-blogging
 * [AI Chat & Agents](https://quanta.wiki/n/gpt-ai)
+* Wikis & micro-blogging
 * Document collaboration and publishing
 * PDF Generation
 * Secure messaging with (E2E Encryption)
@@ -18,7 +16,7 @@ Quanta is a new kind of Content Management platform, with powerful [features](ht
 * Podcatcher (RSS Reader)
 * Many other features related to managing hierarchical content
 
-## Hierarchical Content
+---
 
 Create hierarchically organized content that's always editable like a wiki and shared online. Quanta is a new kind of platform with a new kind of architecture.
 
