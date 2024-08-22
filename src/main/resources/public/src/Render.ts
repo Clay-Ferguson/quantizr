@@ -192,6 +192,8 @@ export class Render {
 
         const byIdUrl = window.location.origin + "?id=" + node.id;
         const byIdUrlThreadView = byIdUrl + "&view=thread";
+        const byIdUrlDocView = byIdUrl + "&view=doc";
+        const byIdUrlTimelineView = byIdUrl + "&view=timeline";
         const pathPart = S.nodeUtil.getPathPartForNamedNode(node);
         children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
 
@@ -219,6 +221,14 @@ export class Render {
                     onClick: () => S.util.copyToClipboard(byNameUrl)
                 }));
 
+            const threadViewByNameUrl = window.location.origin + pathPart + "?view=thread";
+            children.push(this.titleDiv("Thread View (By Name)"), //
+                new Div(threadViewByNameUrl, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(threadViewByNameUrl)
+                }));
+
             const docViewByNameUrl = window.location.origin + pathPart + "?view=doc";
             children.push(this.titleDiv("Doc View (By Name)"), //
                 new Div(docViewByNameUrl, {
@@ -244,11 +254,25 @@ export class Render {
                 }));
         }
 
-        children.push(this.titleDiv("Thread View"), //
+        children.push(this.titleDiv("Thread View by ID"), //
             new Div(byIdUrlThreadView, {
                 className: "linkDisplay",
                 title: "Copy to clipboard",
                 onClick: () => S.util.copyToClipboard(byIdUrlThreadView)
+            }));
+
+        children.push(this.titleDiv("Doc View by ID"), //
+            new Div(byIdUrlDocView, {
+                className: "linkDisplay",
+                title: "Copy to clipboard",
+                onClick: () => S.util.copyToClipboard(byIdUrlDocView)
+            }));
+
+        children.push(this.titleDiv("Timeline View by ID"), //
+            new Div(byIdUrlTimelineView, {
+                className: "linkDisplay",
+                title: "Copy to clipboard",
+                onClick: () => S.util.copyToClipboard(byIdUrlTimelineView)
             }));
 
         // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
@@ -329,7 +353,7 @@ export class Render {
     }
 
     titleDiv = (title: string): Div => {
-        return new Div(title, {className: "largerFont"});
+        return new Div(title, { className: "largerFont" });
     }
 
     allowAction = (type: TypeIntf, action: NodeActionType, node: NodeInfo): boolean => {

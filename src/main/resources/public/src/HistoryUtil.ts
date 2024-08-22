@@ -40,6 +40,17 @@ export class HistoryUtil {
         this.historySaverInterval = setInterval(this.historySaverFunc, 5000);
     }
 
+    updateHistoryById = (nodeId: string, view: string) => {
+        let url = window.location.origin + "?id=" + nodeId;
+        if (view) {
+            url += "&view=" + view;
+        }
+        const newHistObj = {
+            nodeId
+        };
+        history.pushState(newHistObj, "Open View", url);
+    }
+
     updateHistory = (node: NodeInfo) => {
         if (!node) {
             node = getAs().node;

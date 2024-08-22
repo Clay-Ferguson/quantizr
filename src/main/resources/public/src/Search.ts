@@ -73,6 +73,8 @@ export class Search {
         const node = res.nodes?.length > 0 ? res.nodes[res.nodes.length - 1] : null;
 
         if (res.nodes?.length > 0) {
+            S.histUtil.updateHistoryById(nodeId, "thread");
+
             dispatch("RenderThreadResults", s => {
                 s.highlightSearchNodeId = node.id;
 
@@ -230,6 +232,9 @@ export class Search {
         });
         S.nodeUtil.processInboundNodes(res.searchResults);
 
+        // todo-0: do this same thing for 'thread' and 'timeline' views.
+        S.histUtil.updateHistoryById(rootId, "doc");
+
         if (!res.searchResults || res.searchResults.length === 0) {
             dispatch("RenderDocumentResults", s => {
                 DocumentTab.inst.openGraphComps = [];
@@ -318,6 +323,8 @@ export class Search {
             S.util.showMessage("Nothing found", "Timeline");
             return;
         }
+
+        S.histUtil.updateHistoryById(nodeId, "timeline");
 
         dispatch("RenderTimelineResults", () => {
             S.domUtil.focusId(C.TAB_TIMELINE);
