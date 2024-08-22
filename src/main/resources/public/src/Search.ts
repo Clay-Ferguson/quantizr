@@ -231,8 +231,6 @@ export class Search {
             includeComments: getAs().userPrefs.showReplies
         });
         S.nodeUtil.processInboundNodes(res.searchResults);
-
-        // todo-0: do this same thing for 'thread' and 'timeline' views.
         S.histUtil.updateHistoryById(rootId, "doc");
 
         if (!res.searchResults || res.searchResults.length === 0) {

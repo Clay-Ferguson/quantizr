@@ -1,6 +1,5 @@
 import { dispatch, getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
-import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -10,74 +9,85 @@ import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
 import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
-import { VerticalLayout } from "../comp/core/VerticalLayout";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
-import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
-import { MessageDlg } from "./MessageDlg";
 
 export class ExportDlg extends DialogBase {
 
     fileNameState: Validator = new Validator();
+    res: J.ExportResponse = null;
 
-    constructor(private node: NodeInfo) {
+    constructor(defaultName: string, private nodeId: string, public exportingThread: boolean) {
         super("Export Node");
-        this.fileNameState.setValue(node.name);
+        this.fileNameState.setValue(defaultName);
     }
 
     renderDlg(): Comp[] {
         const ast = getAs();
-        const exportType = ast.exportSettings.exportType;
 
         const hasOptions = ast.exportSettings.contentType === "html" || ast.exportSettings.contentType === "md" || //
             ast.exportSettings.contentType === "pdf" || //
             (ast.exportSettings.contentType !== "md" && ast.exportSettings.contentType !== "fs");
 
-        return [
-            new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
-            new Heading(5, "File Type", { className: "bigMarginTop" }),
-            new RadioButtonGroup([
+        let children: Comp[] = [];
+
+        if (!this.exportingThread) {
+            children.push(new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }));
+            children.push(new Heading(5, "File Type", { className: "bigMarginTop" }));
+            children.push(new RadioButtonGroup([
                 this.makeFileTypeRadioBtn("ZIP", "zip"),
                 this.makeFileTypeRadioBtn("TAR", "tar"),
                 this.makeFileTypeRadioBtn("TAR.GZ", "tar.gz"),
                 this.makeFileTypeRadioBtn("PDF", "pdf")
-            ], "radioButtonsBar marginTop"),
+            ], "radioButtonsBar marginTop"));
 
-            exportType === "zip" || exportType === "tar" || exportType === "tar.gz" ? this.contentTypeOptions() : null,
+            if (ast.exportSettings.exportType === "zip" || ast.exportSettings.exportType === "tar" || ast.exportSettings.exportType === "tar.gz") children.push(this.contentTypeOptions());
+        }
 
-            hasOptions ? new Heading(5, "Options", { className: "bigMarginTop" }) : null,
+        if (hasOptions) children.push(new Heading(5, "Options", { className: "bigMarginTop" }));
 
-            ast.exportSettings.contentType === "html" ? new Checkbox("IDs", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
-                getValue: (): boolean => getAs().exportSettings.includeIDs
-            }) : null,
-            ast.exportSettings.contentType === "html" ? new Checkbox("Divider Line", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
-                getValue: (): boolean => getAs().exportSettings.dividerLine
-            }) : null,
+        if (this.exportingThread || ast.exportSettings.contentType === "html") children.push(new Checkbox("IDs", null, {
+            setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
+            getValue: (): boolean => getAs().exportSettings.includeIDs
+        }));
+
+        // todo-0: implement for pdf
+        if (this.exportingThread || ast.exportSettings.contentType === "html" || ast.exportSettings.exportType == "pdf") children.push(new Checkbox("Divider Line", null, {
+            setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
+            getValue: (): boolean => getAs().exportSettings.dividerLine
+        }));
+
+        if (!this.exportingThread) {
             // don't show headings option for 'md' becasue it's forced to true
-            ast.exportSettings.contentType !== "md" && ast.exportSettings.contentType !== "fs" ? new Checkbox("Set Headings", null, {
+            if (ast.exportSettings.contentType !== "md" && ast.exportSettings.contentType !== "fs") children.push(new Checkbox("Set Headings", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.updateHeadings = checked; }),
                 getValue: (): boolean => getAs().exportSettings.updateHeadings
-            }) : null,
+            }));
 
-            exportType === "pdf" || ast.exportSettings.contentType == "md" || ast.exportSettings.contentType == "html" ? new Checkbox("Table of Contents", null, {
+            if (ast.exportSettings.exportType === "pdf" || ast.exportSettings.contentType == "md" || ast.exportSettings.contentType == "html") children.push(new Checkbox("Table of Contents", null, {
                 setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeToc = checked),
                 getValue: (): boolean => getAs().exportSettings.includeToc
-            }) : null,
+            }));
+        }
 
-            ast.exportSettings.contentType == "md" ? new Checkbox("Include Metadata", null, {
-                setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeMetaComments = checked),
-                getValue: (): boolean => getAs().exportSettings.includeMetaComments
-            }) : null,
+        if (!this.exportingThread && ast.exportSettings.contentType == "md" && ast.exportSettings.exportType !== "pdf") children.push(new Checkbox("Metadata", null, {
+            setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeMetaComments = checked),
+            getValue: (): boolean => getAs().exportSettings.includeMetaComments
+        }));
 
-            new ButtonBar([
-                new Button("Export", this.exportNodes, null, "btn-primary"),
-                new Button("Close", this.close, null, "btn-secondary float-end")
-            ], "marginTop")
-        ];
+        if (this.exportingThread || ast.exportSettings.exportType === "pdf") children.push(new Checkbox("Owner Names", null, {
+            setValue: (checked: boolean) => dispatch("exportSetting", s => s.exportSettings.includeOwners = checked),
+            getValue: (): boolean => getAs().exportSettings.includeOwners
+        }));
+
+        children.push(new ButtonBar([
+            new Button("Export", this.exportNodes, null, "btn-primary"),
+            new Button("Close", this.close, null, "btn-secondary float-end")
+        ], "marginTop"));
+
+        return children;
     }
 
     contentTypeOptions = (): Div => {
@@ -122,40 +132,39 @@ export class ExportDlg extends DialogBase {
 
     exportNodes = async () => {
         const ast = getAs();
-        const res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
-            nodeId: this.node.id,
-            exportExt: ast.exportSettings.exportType,
-            fileName: this.fileNameState.getValue(),
-            includeToc: ast.exportSettings.includeToc,
-            includeMetaComments: ast.exportSettings.includeMetaComments,
-            contentType: ast.exportSettings.contentType,
-            includeIDs: ast.exportSettings.includeIDs,
-            dividerLine: ast.exportSettings.dividerLine,
-            updateHeadings: ast.exportSettings.updateHeadings,
-            threadAsPDF: false
-        });
-        this.exportResponse(res);
-        this.close();
-    }
-
-    exportResponse = (res: J.ExportResponse) => {
-        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
-        eventually the plan is to have the export return the actual md5 of the export for use here
-        */
-        // disp=inline (is the other)
-        const downloadLink = S.util.getHostAndPort() + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
-
-        if (S.util.checkSuccess("Export", res)) {
-            new MessageDlg(
-                "Export successful.<p>Use the download link below now, to get the file.",
-                "Export",
-                null,
-                new VerticalLayout([
-                    new Anchor(downloadLink, "Download", { target: "_blank" }),
-                ]), false, 0, null
-            ).open();
-
-            S.view.scrollToNode();
+        if (this.exportingThread) {
+            this.res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
+                nodeId: getAs().threadViewFromNodeId,
+                exportExt: "pdf",
+                fileName: "thread-view",
+                includeToc: false,
+                includeMetaComments: false,
+                contentType: "md", // unused for PDF export right?
+                includeIDs: ast.exportSettings.includeIDs,
+                dividerLine: ast.exportSettings.dividerLine,
+                updateHeadings: false,
+                threadAsPDF: true,
+                includeOwners: ast.exportSettings.includeOwners
+            });
         }
+        else {
+            this.res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
+                nodeId: this.nodeId,
+                exportExt: ast.exportSettings.exportType,
+                fileName: this.fileNameState.getValue(),
+                includeToc: ast.exportSettings.includeToc,
+                includeMetaComments: ast.exportSettings.includeMetaComments,
+                contentType: ast.exportSettings.contentType,
+                includeIDs: ast.exportSettings.includeIDs,
+                dividerLine: ast.exportSettings.dividerLine,
+                updateHeadings: ast.exportSettings.updateHeadings,
+                threadAsPDF: false,
+                includeOwners: ast.exportSettings.includeOwners
+            });
+
+            // todo-0: for consistency we should move this method outside of this dialog
+            // this.exportResponse(this.res);
+        }
+        this.close();
     }
 }

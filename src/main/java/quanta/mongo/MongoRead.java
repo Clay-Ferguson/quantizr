@@ -1146,7 +1146,7 @@ public class MongoRead extends ServiceBase {
         while (true) {
             try {
                 SubNode parentNode = getParent(curNode);
-                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH)
+                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH) || parentNode.getType().equals(NodeType.ACCOUNT.s())
                         || parentNode.getStr(NodeProp.NO_EXPORT) != null) {
                     break;
                 }

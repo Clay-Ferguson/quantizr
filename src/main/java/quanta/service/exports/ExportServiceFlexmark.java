@@ -181,7 +181,20 @@ public class ExportServiceFlexmark extends ServiceBase {
     }
 
     private void processNode(SubNode node) {
-        String nodeMarkdown = "\n";
+        String nodeMarkdown = req.isDividerLine() ? "\n----\n" : "\n";
+
+        String id = req.isIncludeIDs() ? (" (id:" + node.getIdStr() + ")") : "";
+        if (req.isIncludeOwners()) {
+            SubNode accntNode = svc_mongoRead.getNode(node.getOwner());
+            if (accntNode != null) {
+                nodeMarkdown += "Owner: " + accntNode.getStr(NodeProp.USER) + id + "\n";
+            }
+        } else {
+            if (req.isIncludeIDs())
+                nodeMarkdown += id + "\n";
+        }
+        nodeMarkdown += "\n";
+
         String content = node.getContent();
         TypeBase plugin = svc_typeMgr.getPluginByType(node.getType());
         if (plugin != null) {

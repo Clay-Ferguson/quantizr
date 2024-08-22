@@ -236,6 +236,7 @@ export interface ExportRequest extends RequestBase {
     dividerLine: boolean;
     updateHeadings: boolean;
     threadAsPDF: boolean;
+    includeOwners: boolean;
 }
 
 export interface FileSearchRequest extends RequestBase {

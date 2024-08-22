@@ -15,6 +15,7 @@ import * as J from "../JavaIntf";
 import { MessageDlg } from "../dlg/MessageDlg";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
 import { Anchor } from "../comp/core/Anchor";
+import { ExportDlg } from "../dlg/ExportDlg";
 
 export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
 
@@ -115,19 +116,9 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     }
 
     saveAsPDF = async () => {
-        const res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {
-            nodeId: getAs().threadViewFromNodeId,
-            exportExt: "pdf",
-            fileName: "thread-view",
-            includeToc: false,
-            includeMetaComments: false,
-            contentType: "md", // unused for PDF export right?
-            includeIDs: false,
-            dividerLine: false, // this would be nice to have in PDFs right?
-            updateHeadings: false,
-            threadAsPDF: true
-        });
-        this.exportResponse(res);
+        const dlg =new ExportDlg("thread-view", getAs().threadViewFromNodeId, true);
+        await dlg.open();
+        this.exportResponse(dlg.res);
     }
 
     exportResponse = (res: J.ExportResponse) => {

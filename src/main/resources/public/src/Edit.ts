@@ -1,6 +1,8 @@
 import { dispatch, getAs, promiseDispatch, StateModFunc } from "./AppContext";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
+import { Anchor } from "./comp/core/Anchor";
+import { VerticalLayout } from "./comp/core/VerticalLayout";
 import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
@@ -12,6 +14,7 @@ import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { EditTagsDlg } from "./dlg/EditTagsDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
 import { GenerateBookByAIDlg } from "./dlg/GenerateBookByAIDlg";
+import { MessageDlg } from "./dlg/MessageDlg";
 import { SetNodeUsingJsonDlg } from "./dlg/SetNodeUsingJsonDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
@@ -101,10 +104,33 @@ export class Edit {
         dlg.open();
     }
 
-    openExportDlg = (): any => {
+    openExportDlg = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
-            new ExportDlg(node).open();
+            const dlg = new ExportDlg(node.name, node.id, false);
+            await dlg.open();
+            this.exportResponse(dlg.res);
+        }
+    }
+
+    exportResponse = (res: J.ExportResponse) => {
+        /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
+        eventually the plan is to have the export return the actual md5 of the export for use here
+        */
+        // disp=inline (is the other)
+        const downloadLink = S.util.getHostAndPort() + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+
+        if (S.util.checkSuccess("Export", res)) {
+            new MessageDlg(
+                "Export successful.<p>Use the download link below now, to get the file.",
+                "Export",
+                null,
+                new VerticalLayout([
+                    new Anchor(downloadLink, "Download", { target: "_blank" }),
+                ]), false, 0, null
+            ).open();
+
+            S.view.scrollToNode();
         }
     }
 

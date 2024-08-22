@@ -15,6 +15,7 @@ public class ExportRequest extends RequestBase {
 	private boolean dividerLine;
 	private boolean updateHeadings;
 	private boolean threadAsPDF;
+	private boolean includeOwners;
 
 	public ExportRequest() {}
 
@@ -96,5 +97,13 @@ public class ExportRequest extends RequestBase {
 
 	public void setThreadAsPDF(boolean threadAsPDF) {
 		this.threadAsPDF = threadAsPDF;
+	}
+
+	public boolean isIncludeOwners() {
+		return includeOwners;
+	}
+
+	public void setIncludeOwners(boolean includeOwners) {
+		this.includeOwners = includeOwners;
 	}
 }

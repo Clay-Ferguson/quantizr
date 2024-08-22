@@ -16,6 +16,7 @@ export interface ExportSettings {
     includeIDs?: boolean;
     dividerLine?: boolean;
     updateHeadings?: boolean;
+    includeOwners?: boolean;
 }
 
 export class AppState {
@@ -130,12 +131,13 @@ export class AppState {
 
     exportSettings: ExportSettings = {
         exportType: "zip",
-        includeToc: true,
-        includeMetaComments: true,
+        includeToc: false,
+        includeMetaComments: false,
         contentType: "md", // html, md, json
-        includeIDs: true,
-        dividerLine: true,
-        updateHeadings: true
+        includeIDs: false,
+        dividerLine: false,
+        updateHeadings: false,
+        includeOwners: false
     };
 
     userProfile: J.UserProfile = null;
