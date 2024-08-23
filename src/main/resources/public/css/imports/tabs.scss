@@ -88,3 +88,11 @@
     vertical-align: middle;
     color: var(--bs-green);
 }
+
+.activeTab {
+    border-bottom: $highlightBorderSize solid $primary;
+}
+
+.inactiveTab {
+    border-bottom: $highlightBorderSize solid darkGray;
+}

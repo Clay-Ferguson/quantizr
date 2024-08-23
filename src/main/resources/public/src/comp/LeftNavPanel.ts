@@ -8,10 +8,9 @@ import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { TabPanelButtons } from "./TabPanelButtons";
+import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
 import { IconButton } from "./core/IconButton";
-import { RadioButton } from "./core/RadioButton";
-import { RadioButtonGroup } from "./core/RadioButtonGroup";
 
 export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
@@ -48,28 +47,16 @@ export class LeftNavPanel extends Div {
             ? (ast.myNewMessageCount + " new posts") : "";
         let showDocIndex = S.util.willRenderDocIndex();
 
-        const docIndexToggle = showDocIndex ? new RadioButtonGroup([
-            new Span(null, null, [
-                new RadioButton("Doc Index", false, "docIndexToggle", null, {
-                    setValue: (_checked: boolean) => {
-                        dispatch("ToggleMenuIndex", s => {
-                            s.menuIndexToggle = "index";
-                        });
-                    },
-                    getValue: (): boolean => getAs().menuIndexToggle == "index"
-                }, "form-check-inline marginRight")
-            ]),
-            new Span(null, null, [
-                new RadioButton("Menu", false, "docIndexToggle", null, {
-                    setValue: (_checked: boolean) => {
-                        dispatch("ToggleMenuIndex", s => {
-                            s.menuIndexToggle = "menu";
-                        });
-                    },
-                    getValue: (): boolean => getAs().menuIndexToggle == "menu"
-                }, "form-check-inline marginRight")
-            ])
-        ], "marginTop testRadioButtonGroup") : null;
+        const docIndexToggle = showDocIndex ? new FlexRowLayout([
+            new Span("Doc Index", {
+                className: "bigMarginRight clickable" + (ast.menuIndexToggle == "index" ? " activeTab" : " inactiveTab"),
+                onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "index")
+            }),
+            new Span("Menu", {
+                className: "marginRight clickable" + (ast.menuIndexToggle == "menu" ? " activeTab" : " inactiveTab"),
+                onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "menu")
+            })
+        ], "marginTop") : null;
 
         if (showDocIndex) {
             showDocIndex = ast.menuIndexToggle == "index";
