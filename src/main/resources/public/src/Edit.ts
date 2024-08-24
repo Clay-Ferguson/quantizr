@@ -1055,8 +1055,10 @@ export class Edit {
         });
     }
 
-    setUsingJson = (nodeId: string) => {
-        new SetNodeUsingJsonDlg(nodeId).open();
+    setUsingJson = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node)
+            new SetNodeUsingJsonDlg(node.id).open();
     }
 
     undoCutSelNodes = () => {
@@ -1300,8 +1302,11 @@ export class Edit {
         }
     }
 
-    addBookmark = (node: NodeInfo) => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, null);
+    addBookmark = () => {
+        const node = S.nodeUtil.getHighlightedNode();
+        if (node) {
+            this.createNode(node, J.NodeType.BOOKMARK, true, null);
+        }
     }
 
     addLinkBookmark = async (content: any, audioUrl: string) => {

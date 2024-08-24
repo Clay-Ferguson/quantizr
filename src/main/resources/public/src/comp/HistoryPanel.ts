@@ -18,6 +18,10 @@ export class HistoryPanel extends Div {
         });
     }
 
+    static historyLockChanged = (checked: boolean) => {
+        dispatch("historyLockChanged", s => s.nodeHistoryLocked = checked)
+    }
+
     override preRender = (): boolean => {
         const ast = getAs();
 
@@ -33,11 +37,7 @@ export class HistoryPanel extends Div {
                 onClick: S.histUtil.clearHistory
             }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
-                setValue: (checked: boolean) => {
-                    dispatch("historyLockChanged", s => {
-                        s.nodeHistoryLocked = checked;
-                    })
-                },
+                setValue: HistoryPanel.historyLockChanged,
                 getValue: (): boolean => ast.nodeHistoryLocked
             }, "form-switch formCheckInlineNoMargin")
         ]));
@@ -45,13 +45,14 @@ export class HistoryPanel extends Div {
         ast.nodeHistory.forEach(h => {
             if (!h.content) return;
             let parentDropTarg: Comp;
-            let parentIcon: Icon;
+            let histIcon: Icon;
 
             const type = S.plugin.getType(h.type);
             if (type) {
                 const iconClass = type.getIconClass();
                 if (iconClass) {
-                    parentIcon = new Icon({
+                    histIcon = new Icon({
+                        id: h.id + "_histIcon",
                         className: iconClass + " histTypeIcon",
                         title: "Node Type: " + type.getName()
                     });
@@ -70,8 +71,8 @@ export class HistoryPanel extends Div {
                 className: "nodeHistoryItem",
                 ...dragProps
             }, [
-                parentIcon,
-                new SpanHtml(h.content)
+                histIcon,
+                new SpanHtml(h.content, { id: h.id + "_histCont" })
             ]));
 
             if (!ast.mobileMode) {

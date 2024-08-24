@@ -53,7 +53,6 @@ export class ExportDlg extends DialogBase {
             getValue: (): boolean => getAs().exportSettings.includeIDs
         }));
 
-        // todo-0: implement for pdf
         if (this.exportingThread || ast.exportSettings.contentType === "html" || ast.exportSettings.exportType == "pdf") children.push(new Checkbox("Divider Line", null, {
             setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.dividerLine = checked; }),
             getValue: (): boolean => getAs().exportSettings.dividerLine
@@ -161,9 +160,6 @@ export class ExportDlg extends DialogBase {
                 threadAsPDF: false,
                 includeOwners: ast.exportSettings.includeOwners
             });
-
-            // todo-0: for consistency we should move this method outside of this dialog
-            // this.exportResponse(this.res);
         }
         this.close();
     }

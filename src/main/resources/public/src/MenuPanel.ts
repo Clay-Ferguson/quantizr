@@ -49,13 +49,6 @@ export class MenuPanel extends Div {
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST, false);
     };
 
-    static addBookmark = () => {
-        const node = S.nodeUtil.getHighlightedNode();
-        if (node) {
-            S.edit.addBookmark(node);
-        }
-    }
-
     static continueEditing = () => {
         const ast = getAs();
         if (ast.editNode) {
@@ -104,6 +97,8 @@ export class MenuPanel extends Div {
     static export = () => S.edit.openExportDlg();
     static viewNodeGraph = () => S.render.showGraph(null, "");
     static sendFeedback = () => { new SendFeedbackDlg(null).open(); }
+    static isEditMode = () => getAs().userPrefs.editMode;
+    static isInfoMode = () => getAs().userPrefs.showMetaData;
 
     static importJson = () => {
         const node = S.nodeUtil.getHighlightedNode();
@@ -199,8 +194,8 @@ export class MenuPanel extends Div {
 
         children.push(new Menu(C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
-                () => getAs().userPrefs.editMode, false, "ui-menu-options-editmode"),
-            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, () => getAs().userPrefs.showMetaData)
+                MenuPanel.isEditMode, false, "ui-menu-options-editmode"),
+            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, MenuPanel.isInfoMode)
         ], null, null, "ui-menu-options"));
 
         if (!ast.isAnonUser) {
@@ -255,7 +250,7 @@ export class MenuPanel extends Div {
             if (bookmarkItems.length > 0) {
                 bookmarkItems.push(new MenuItemSeparator());
             }
-            bookmarkItems.push(new MenuItem("Add Bookmark", MenuPanel.addBookmark, !ast.isAnonUser && !!hltNode, null, true));
+            bookmarkItems.push(new MenuItem("Add Bookmark", S.edit.addBookmark, !ast.isAnonUser && !!hltNode, null, true));
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !ast.isAnonUser));
 
             if (hasBookmarks) {
@@ -275,7 +270,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Edit", [
-                ast.isAdminUser ? new MenuItem("Direct Edit JSON", () => S.edit.setUsingJson(hltNode.id), onMainTab, null, true) : null,
+                ast.isAdminUser ? new MenuItem("Direct Edit JSON", S.edit.setUsingJson, onMainTab, null, true) : null,
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
 
@@ -326,7 +321,7 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             if (typesAdded) createMenuItems.push(new MenuItemSeparator());
             createMenuItems.push(new MenuItem("Choose Type...", async () => {
-                await promiseDispatch("chooseType", s => { s.showSchemaOrgProps = true; });
+                await promiseDispatch("chooseType", s => s.showSchemaOrgProps = true);
                 const dlg = new PickNodeTypeDlg(null);
                 await dlg.open();
                 if (dlg.chosenType) {
