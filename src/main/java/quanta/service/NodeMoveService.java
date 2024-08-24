@@ -28,6 +28,7 @@ import quanta.rest.response.SetNodePositionResponse;
 import quanta.rest.response.base.NodeChanges;
 import quanta.util.Const;
 import quanta.util.TL;
+import quanta.util.val.LongVal;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -195,9 +196,12 @@ public class NodeMoveService extends ServiceBase {
         targetNode.touch();
         svc_mongoUpdate.saveSession();
 
-        // todo-1: this is really slightly dangerous. We need to probably run with force=false first, and throw back warnings to the user
-        // and roll this transaction back of there are warnings that the user will be destroying subnode content by doing this join function.
-        // Better yet, really if there are subnodes at all we should just fail to join and throw exception.
+        /*
+         * todo-1: this is really slightly dangerous. We need to probably run with force=false first, and
+         * throw back warnings to the user and roll this transaction back of there are warnings that the
+         * user will be destroying subnode content by doing this join function. Better yet, really if there
+         * are subnodes at all we should just fail to join and throw exception.
+         */
         svc_mongoDelete.deleteNodes(true, delIds);
         return res;
     }
@@ -218,8 +222,8 @@ public class NodeMoveService extends ServiceBase {
      * we are inserting, and the inserted nodes will be pasted in directly below that ordinal (i.e. new
      * siblings posted in below it)
      */
-    private void moveNodesInternal(String location, String targetId, List<String> nodeIds,
-            boolean copyPaste, MoveNodesResponse res) {
+    private void moveNodesInternal(String location, String targetId, List<String> nodeIds, boolean copyPaste,
+            MoveNodesResponse res) {
         if (nodeIds == null || nodeIds.size() == 0) {
             throw new RuntimeException("No nodes specified to move.");
         }
@@ -231,20 +235,22 @@ public class NodeMoveService extends ServiceBase {
                 location.equalsIgnoreCase("inside") ? targetNode : svc_mongoRead.getParent(targetNode);
         svc_auth.ownerAuth(parentToPasteInto);
         String parentPath = parentToPasteInto.getPath();
-        Long curTargetOrdinal = null;
+        LongVal curTargetOrdinal = new LongVal();
 
         if (location != null) {
             switch (location.toLowerCase()) {
                 case "inside":
-                    curTargetOrdinal = svc_mongoRead.getMaxChildOrdinal(targetNode) + 1;
+                    curTargetOrdinal.setVal(svc_mongoRead.getMaxChildOrdinal(targetNode) + 1);
                     break;
                 case "inline":
-                    curTargetOrdinal = targetNode.getOrdinal() + 1;
-                    svc_mongoCreate.insertOrdinal(parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
+                    curTargetOrdinal.setVal(targetNode.getOrdinal() + 1);
+                    svc_mongoCreate.insertOrdinal(parentToPasteInto, curTargetOrdinal.getVal(), nodeIds.size(),
+                            nodeChanges);
                     break;
                 case "inline-above":
-                    curTargetOrdinal = targetNode.getOrdinal();
-                    svc_mongoCreate.insertOrdinal(parentToPasteInto, curTargetOrdinal, nodeIds.size(), nodeChanges);
+                    curTargetOrdinal.setVal(targetNode.getOrdinal());
+                    svc_mongoCreate.insertOrdinal(parentToPasteInto, curTargetOrdinal.getVal(), nodeIds.size(),
+                            nodeChanges);
                     break;
                 default:
                     break;
@@ -276,11 +282,10 @@ public class NodeMoveService extends ServiceBase {
         // make sure nodes to move are in ordinal order.
         nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 
-        // process all nodes being moved.
-        for (SubNode node : nodesToMove) {
-            Long _targetOrdinal = curTargetOrdinal;
-            SubNode _nodeParent = nodeParent;
-            svc_arun.run(() -> {
+        SubNode _nodeParent = nodeParent;
+        svc_arun.run(() -> {
+            // process all nodes being moved.
+            for (SubNode node : nodesToMove) {
                 // if a parent node is attempting to be pasted into one of it's children that's an impossible move
                 // so we reject the attempt.
                 if (parentToPasteInto.getPath().startsWith(node.getPath() + "/")) {
@@ -312,8 +317,8 @@ public class NodeMoveService extends ServiceBase {
                 }
 
                 // do processing for when ordinal has changed.
-                if (!node.getOrdinal().equals(_targetOrdinal)) {
-                    node.setOrdinal(_targetOrdinal);
+                if (!node.getOrdinal().equals(curTargetOrdinal.getVal())) {
+                    node.setOrdinal(curTargetOrdinal.getVal());
                     // we know this tareget node has chilren now.
                     parentToPasteInto.setHasChildren(true);
                 }
@@ -331,18 +336,18 @@ public class NodeMoveService extends ServiceBase {
                         TL.setParentCheckEnabled(true);
                     }
                 }
-                return null;
-            });
-            curTargetOrdinal++;
-        }
+                curTargetOrdinal.inc();
+            }
+            return null;
+        });
     }
 
     /*
      * WARNING: This does NOT affect the path of 'graphRoot' itself, but only changes the location of
      * all the children under it
      */
-    public void changePathOfSubGraph(SubNode graphRoot, String oldPathPrefix, String newPathPrefix,
-            boolean copyPaste, MoveNodesResponse res) {
+    public void changePathOfSubGraph(SubNode graphRoot, String oldPathPrefix, String newPathPrefix, boolean copyPaste,
+            MoveNodesResponse res) {
         String originalPath = graphRoot.getPath();
         BulkOperations bops = null;
         int batchSize = 0;
