@@ -1292,8 +1292,8 @@ public class UserManagerService extends ServiceBase {
         // Otherwise for ordinary users root is based off their username
         // case-insensitive lookup of username:
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(NodePath.USERS_PATH))
-                .and(SubNode.PROPS + "." + NodeProp.USER).is(user).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
+        Criteria crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + NodeProp.USER)
+                .is(user).and(SubNode.TYPE).is(NodeType.ACCOUNT.s());
 
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
@@ -1302,7 +1302,7 @@ public class UserManagerService extends ServiceBase {
 
     public Iterable<SubNode> getAccountNodes(CriteriaDefinition textCriteria, Sort sort, Integer limit, int skip) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(NodePath.USERS_PATH));
+        Criteria crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
 
@@ -1323,7 +1323,7 @@ public class UserManagerService extends ServiceBase {
 
     public long getAccountNodeCount(CriteriaDefinition textCriteria) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(NodePath.USERS_PATH));
+        Criteria crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH);
         q.addCriteria(crit);
 
         if (textCriteria != null) {

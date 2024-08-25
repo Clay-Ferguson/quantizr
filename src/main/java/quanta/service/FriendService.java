@@ -39,7 +39,7 @@ import quanta.util.TL;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
-@Component 
+@Component
 public class FriendService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(FriendService.class);
 
@@ -69,7 +69,7 @@ public class FriendService extends ServiceBase {
     public UpdateFriendNodeResponse cm_updateFriendNode(UpdateFriendNodeRequest req) {
         UpdateFriendNodeResponse res = new UpdateFriendNodeResponse();
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
-       svc_auth.ownerAuth(node);
+        svc_auth.ownerAuth(node);
         if (!NodeType.FRIEND.s().equals(node.getType())) {
             throw new RuntimeException("Not a Friend node.");
         }
@@ -114,8 +114,8 @@ public class FriendService extends ServiceBase {
      * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
      * if the user wasn't already a friend
      */
-    public String addFriend(String userDoingFollow, ObjectId accntIdDoingFollow,
-            String userBeingFollowed, String tags) {
+    public String addFriend(String userDoingFollow, ObjectId accntIdDoingFollow, String userBeingFollowed,
+            String tags) {
         String _userToFollow = userBeingFollowed;
         _userToFollow = XString.stripIfStartsWith(_userToFollow, "@");
         // duplicate variable because of lambdas below
@@ -136,10 +136,10 @@ public class FriendService extends ServiceBase {
     }
 
     /* The code pattern here is very similar to 'blockUser' */
-    private void addFriendInternal(String userDoingFollow, ObjectId accntIdDoingFollow,
-            String userToFollow, String tags) {
-        SubNode followerFriendList =
-                svc_mongoRead.getUserNodeByType(userDoingFollow, null, "### Friends", NodeType.FRIEND_LIST.s(), null, true);
+    private void addFriendInternal(String userDoingFollow, ObjectId accntIdDoingFollow, String userToFollow,
+            String tags) {
+        SubNode followerFriendList = svc_mongoRead.getUserNodeByType(userDoingFollow, null, "### Friends",
+                NodeType.FRIEND_LIST.s(), null, true);
         if (followerFriendList == null) {
             log.debug("Can't access Friend list for: " + userDoingFollow);
             return;
@@ -228,8 +228,8 @@ public class FriendService extends ServiceBase {
         SubNode node = svc_mongoRead.getNode(nodeId);
         if (node == null)
             return res;
-        NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, Convert.LOGICAL_ORDINAL_IGNORE,
-                false, false, false, true, null);
+        NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
+                false, false, true, null);
         nodes.add(info);
         if (nodes.size() > 1) {
             res.setNodes(nodes);
@@ -284,8 +284,8 @@ public class FriendService extends ServiceBase {
                 // point to further places 'logically above' (in this conversation thread)
                 boolean topNode = node.isType(NodeType.POSTS) || node.isType(NodeType.ACCOUNT);
                 if (!topNode) {
-                    info = svc_convert.toNodeInfo( false, TL.getSC(), node, false,
-                            Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, null);
+                    info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, Convert.LOGICAL_ORDINAL_IGNORE, false,
+                            false, false, true, null);
                     // we only collect children at this level if it's not an account top level post
                     if (loadOthers) {
                         Iterable<SubNode> iter = svc_mongoRead.getChildren(node,
@@ -295,7 +295,7 @@ public class FriendService extends ServiceBase {
                         for (SubNode child : iter) {
                             if (!child.getId().equals(lastNodeId)) {
                                 childIds.add(child.getIdStr());
-                                children.add(svc_convert.toNodeInfo( false, TL.getSC(), child, false,
+                                children.add(svc_convert.toNodeInfo(false, TL.getSC(), child, false,
                                         Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, null));
                             }
                         }
@@ -366,8 +366,8 @@ public class FriendService extends ServiceBase {
             int counter = 0;
 
             for (SubNode node : iterable) {
-                NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                        false, true, false, null);
+                NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, true,
+                        false, null);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -397,9 +397,9 @@ public class FriendService extends ServiceBase {
                 return null;
             }
         }
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(NodePath.USERS_PATH))
-                .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr()).and(SubNode.TYPE)
-                .is(NodeType.FRIEND.s());
+        Criteria crit =
+                svc_mongoUtil.subGraphCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s())
+                        .is(userNode.getIdStr()).and(SubNode.TYPE).is(NodeType.FRIEND.s());
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return q;
@@ -430,8 +430,8 @@ public class FriendService extends ServiceBase {
             int counter = 0;
 
             for (SubNode node : iterable) {
-                NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                        false, false, false, null);
+                NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, false,
+                        false, null);
                 if (info != null) {
                     searchResults.add(info);
                 }
@@ -468,8 +468,8 @@ public class FriendService extends ServiceBase {
             return null;
         // query all the direct children under the friendsListNode, that are FRIEND type although they
         // should all be FRIEND types.
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(friendsListNode.getPath()))
-                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
+        Criteria crit =
+                svc_mongoUtil.childrenCriteria(friendsListNode.getPath()).and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);

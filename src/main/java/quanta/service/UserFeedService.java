@@ -30,7 +30,7 @@ import quanta.util.ExUtil;
 import quanta.util.TL;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class UserFeedService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(UserFeedService.class);
     private static final int MAX_FEED_ITEMS = 25;
@@ -46,7 +46,7 @@ public class UserFeedService extends ServiceBase {
             return res;
         String pathToSearch = NodePath.USERS_PATH;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(pathToSearch)); //
+        Criteria crit = svc_mongoUtil.subGraphCriteria(pathToSearch); //
         /*
          * limit to just markdown types and comments, because we need to avoid everything else since we are
          * searching from the root of all user accounts.
@@ -127,7 +127,7 @@ public class UserFeedService extends ServiceBase {
 
         Query q = new Query();
         // initialize criteria using the Path to select the correct sub-graph of the tree
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(NodePath.USERS_PATH)); //
+        Criteria crit = svc_mongoUtil.subGraphCriteria(NodePath.USERS_PATH); //
         // DO NOT DELETE (keep as an example of how to do this)
         // if (no(req.getNodeId() )) {
         // criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
@@ -335,7 +335,8 @@ public class UserFeedService extends ServiceBase {
 
         for (SubNode node : iter) {
             try {
-                NodeInfo info = svc_convert.toNodeInfo( false, sc, node, false, counter + 1, false, false, false, true, null);
+                NodeInfo info =
+                        svc_convert.toNodeInfo(false, sc, node, false, counter + 1, false, false, false, true, null);
                 if (info != null) {
                     searchResults.add(info);
                     if (searchResults.size() >= MAX_FEED_ITEMS) {

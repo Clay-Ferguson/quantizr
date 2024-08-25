@@ -143,9 +143,9 @@ public class MongoUtil extends ServiceBase {
          */
         crit = crit.orOperator( //
                 Criteria.where(SubNode.PATH).is(path), //
-                Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(path)));
+                svc_mongoUtil.subGraphCriteria(path));
         Query q = new Query(crit);
-        Boolean ret = svc_arun.run(()-> {
+        Boolean ret = svc_arun.run(() -> {
             return !svc_ops.exists(q) ? Boolean.TRUE : Boolean.FALSE;
         });
         return ret;
@@ -240,7 +240,7 @@ public class MongoUtil extends ServiceBase {
         MongoTranMgr.ensureTran();
         IntVal batchSize = new IntVal();
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph("/r/usr/L"))); //
+        q.addCriteria(svc_mongoUtil.subGraphCriteria("/r/usr/L")); //
         BulkOperations bops = svc_ops.bulkOps(BulkMode.UNORDERED);
 
         svc_ops.forEach(q, node -> {
@@ -534,6 +534,14 @@ public class MongoUtil extends ServiceBase {
     public String regexChildren(String path) {
         path = XString.stripIfEndsWith(path, "/");
         return "^" + Pattern.quote(path) + "\\/[^\\/]+$";
+    }
+
+    public Criteria subGraphCriteria(String path) {
+        return Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(path));
+    }
+
+    public Criteria childrenCriteria(String path) {
+        return Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(path));
     }
 
     /*

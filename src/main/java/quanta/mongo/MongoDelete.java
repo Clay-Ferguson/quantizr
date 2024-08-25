@@ -56,7 +56,7 @@ public class MongoDelete extends ServiceBase {
      */
     public long deleteUnderPath(String path) {
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(path)));
+        q.addCriteria(svc_mongoUtil.subGraphCriteria(path));
         SubNode parent = svc_mongoRead.getNodeAP(path);
         if (parent != null) {
             parent.setHasChildren(false);
@@ -67,7 +67,7 @@ public class MongoDelete extends ServiceBase {
 
     public long simpleDeleteUnderPath(String path) {
         Query q = new Query();
-        q.addCriteria(Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(path)));
+        q.addCriteria(svc_mongoUtil.subGraphCriteria(path));
         DeleteResult res = svc_ops.remove(q);
         return res.getDeletedCount();
     }
@@ -95,7 +95,7 @@ public class MongoDelete extends ServiceBase {
          * single operation!
          */
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(node.getPath());
         crit = svc_auth.addWriteSecurity(crit);
         q.addCriteria(crit);
         DeleteResult res = svc_ops.remove(q);
@@ -446,7 +446,7 @@ public class MongoDelete extends ServiceBase {
         }
         Query q = new Query();
         log.debug("DEL SUBGRAPH: " + node.getPath());
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(node.getPath());
         q.addCriteria(crit);
         svc_ops.remove(q);
     }

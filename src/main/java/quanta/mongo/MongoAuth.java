@@ -505,7 +505,7 @@ public class MongoAuth extends ServiceBase {
         }
         List<Criteria> ands = new LinkedList<Criteria>();
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(pathToSearch));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(pathToSearch);
         if (sharedToAny != null && sharedToAny.size() > 0) {
             List<Criteria> orCriteria = new LinkedList<>();
 
@@ -557,7 +557,7 @@ public class MongoAuth extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(pathToSearch));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(pathToSearch);
 
         ands.add(Criteria.where(SubNode.AC).ne(null));
         if (ownerIdMatch != null) {

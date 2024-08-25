@@ -200,7 +200,7 @@ public class CryptoService extends ServiceBase {
 
         svc_arun.run(() -> {
             IntVal count = new IntVal(0);
-            Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(NodePath.PUBLIC_PATH));
+            Criteria crit = svc_mongoUtil.subGraphCriteria(NodePath.PUBLIC_PATH);
             Query query = new Query();
             query.addCriteria(crit);
 
@@ -325,7 +325,7 @@ public class CryptoService extends ServiceBase {
         }
 
         // query all nodes under the path that are owned by 'ms'
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(parent.getPath()))//
+        Criteria crit = svc_mongoUtil.subGraphCriteria(parent.getPath())//
                 .and(SubNode.OWNER).is(TL.getSC().getUserNodeObjId());
 
         // if we're only signing unsigned nodes, then we add this criteria
@@ -439,7 +439,7 @@ public class CryptoService extends ServiceBase {
         svc_auth.ownerAuth(node);
 
         // query for the subgraph under 'node' for all nodes that have the sigProp and are owned by us
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()))//
+        Criteria crit = svc_mongoUtil.subGraphCriteria(node.getPath())//
                 .and(sigProp).exists(true) //
                 .and(SubNode.OWNER).is(TL.getSC().getUserNodeObjId());
 

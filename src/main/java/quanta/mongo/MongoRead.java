@@ -130,7 +130,7 @@ public class MongoRead extends ServiceBase {
         if (noChildren(path))
             return 0;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(path));
+        Criteria crit = svc_mongoUtil.childrenCriteria(path);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.count(q);
@@ -142,7 +142,7 @@ public class MongoRead extends ServiceBase {
         if (noChildren(path))
             return 0;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(path));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(path);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.count(q);
@@ -169,7 +169,7 @@ public class MongoRead extends ServiceBase {
         // counter-productive.
         // if (noChildren(ms, path)) return false;
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(path));
+        Criteria crit = svc_mongoUtil.childrenCriteria(path);
         q.addCriteria(crit);
         return svc_ops.exists(q);
     }
@@ -466,8 +466,7 @@ public class MongoRead extends ServiceBase {
         //
         // example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
         // ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
-        Criteria crit =
-                Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node == null ? "" : node.getPath()));
+        Criteria crit = svc_mongoUtil.childrenCriteria(node == null ? "" : node.getPath());
         if (ordered) {
             q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         }
@@ -506,7 +505,7 @@ public class MongoRead extends ServiceBase {
         //
         // example: To find all DIRECT children (non-recursive) under path /aa/bb regex is
         // ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(path));
+        Criteria crit = svc_mongoUtil.childrenCriteria(path);
         if (textCriteria != null) {
             q.addCriteria(textCriteria);
         }
@@ -554,7 +553,7 @@ public class MongoRead extends ServiceBase {
             return 0L;
         svc_auth.readAuth(node);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getPath()));
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getPath());
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
         q.limit(1);
@@ -570,7 +569,7 @@ public class MongoRead extends ServiceBase {
             return 0L;
         svc_auth.readAuth(node);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getPath()));
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getPath());
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
         q.limit(1);
@@ -594,7 +593,7 @@ public class MongoRead extends ServiceBase {
             node.setOrdinal(0L);
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getParentPath()));
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getParentPath());
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -619,7 +618,7 @@ public class MongoRead extends ServiceBase {
         }
 
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getParentPath()));
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getParentPath());
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -650,7 +649,7 @@ public class MongoRead extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(node.getPath());
         if (publicOnly) {
             crit = crit.and(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
         }
@@ -693,14 +692,8 @@ public class MongoRead extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria crit = null;
-
-        // todo-0: both patterns like the below need to be put in a method
-        if (recursive) {
-            crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
-        } else {
-            crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getPath()));
-        }
+        Criteria crit = recursive ? svc_mongoUtil.subGraphCriteria(node.getPath())
+                : svc_mongoUtil.childrenCriteria(node.getPath());
 
         ands.add(crit);
 
@@ -929,7 +922,7 @@ public class MongoRead extends ServiceBase {
         }
         svc_auth.readAuth(node);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(node.getPath());
         // this mod time condition is simply to be sure the user has 'saved' the node and not pick up new
         // node currently being crafted
         crit = crit.and(SubNode.MODIFY_TIME).ne(null);
@@ -949,7 +942,7 @@ public class MongoRead extends ServiceBase {
         }
         svc_auth.readAuth(node);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
+        Criteria crit = svc_mongoUtil.subGraphCriteria(node.getPath());
         crit = crit.and(SubNode.NAME).ne(null);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
@@ -999,11 +992,10 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit;
         if (caseSensitive) {
-            crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(NodePath.USERS_PATH))
-                    .and(SubNode.PROPS + "." + propName).is(propVal);
+            crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + propName).is(propVal);
         } else {
-            crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(NodePath.USERS_PATH))
-                    .and(SubNode.PROPS + "." + propName).regex("^" + Pattern.quote(propVal) + "$", "i");
+            crit = svc_mongoUtil.childrenCriteria(NodePath.USERS_PATH).and(SubNode.PROPS + "." + propName)
+                    .regex("^" + Pattern.quote(propVal) + "$", "i");
         }
 
         crit = svc_auth.addReadSecurity(crit);
@@ -1025,7 +1017,7 @@ public class MongoRead extends ServiceBase {
         }
         // Otherwise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getPath()))//
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getPath())//
                 .and(SubNode.TYPE).is(type)//
                 .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
         crit = svc_auth.addReadSecurity(crit);
@@ -1043,8 +1035,7 @@ public class MongoRead extends ServiceBase {
         }
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getPath()))//
-                .and(SubNode.TYPE).is(type);
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getPath()).and(SubNode.TYPE).is(type);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
         return svc_ops.findOne(q);
@@ -1075,9 +1066,10 @@ public class MongoRead extends ServiceBase {
 
     public Query typedNodesUnderPath_query(SubNode node, String type, boolean recursive, Sort sort, Integer limit) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(
-                recursive ? svc_mongoUtil.regexSubGraph(node.getPath()) : svc_mongoUtil.regexChildren(node.getPath()))
-                .and(SubNode.TYPE).is(type);
+        Criteria crit = recursive ? svc_mongoUtil.subGraphCriteria(node.getPath())
+                : svc_mongoUtil.childrenCriteria(node.getPath());
+        crit = crit.and(SubNode.TYPE).is(type);
+
         if (sort != null) {
             q.with(sort);
         }
@@ -1098,7 +1090,7 @@ public class MongoRead extends ServiceBase {
             return null;
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getPath())) //
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getPath()) //
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
@@ -1116,7 +1108,7 @@ public class MongoRead extends ServiceBase {
             return Collections.<SubNode>emptyList();
         }
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(path)) //
+        Criteria crit = svc_mongoUtil.childrenCriteria(path) //
                 .and(SubNode.PROPS + "." + propName).is(propVal);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
@@ -1148,7 +1140,8 @@ public class MongoRead extends ServiceBase {
         while (true) {
             try {
                 SubNode parentNode = getParent(curNode);
-                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH) || parentNode.getType().equals(NodeType.ACCOUNT.s())
+                if (parentNode == null || parentNode.getPath().equals(NodePath.ROOT_PATH)
+                        || parentNode.getType().equals(NodeType.ACCOUNT.s())
                         || parentNode.getStr(NodeProp.NO_EXPORT) != null) {
                     break;
                 }
@@ -1254,9 +1247,7 @@ public class MongoRead extends ServiceBase {
     // it does. If no nodes are lower in ordinal that makes it the top one, and thus 0th ordinal, etc.
     public long generateLogicalOrdinal(SubNode node) {
         Query q = new Query();
-        Criteria crit = Criteria //
-                .where(SubNode.PATH).regex(svc_mongoUtil.regexChildren(node.getParentPath())).and(SubNode.ORDINAL)
-                .lt(node.getOrdinal());
+        Criteria crit = svc_mongoUtil.childrenCriteria(node.getParentPath()).and(SubNode.ORDINAL).lt(node.getOrdinal());
         q.addCriteria(crit);
         return svc_ops.count(q);
     }

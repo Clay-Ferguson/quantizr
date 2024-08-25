@@ -24,7 +24,7 @@ import quanta.util.val.Val;
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
  */
-@Component 
+@Component
 @Scope("prototype")
 public class ExportJsonService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ExportJsonService.class);
@@ -48,7 +48,7 @@ public class ExportJsonService extends ServiceBase {
             Val<Integer> numBins = new Val<>(0);
             byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
             Query q = new Query();
-            Criteria crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(pathPrefix));
+            Criteria crit = svc_mongoUtil.subGraphCriteria(pathPrefix);
             crit = svc_auth.addReadSecurity(crit);
 
             q.addCriteria(crit);
