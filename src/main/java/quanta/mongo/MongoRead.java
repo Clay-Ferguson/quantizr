@@ -694,6 +694,8 @@ public class MongoRead extends ServiceBase {
          * children.
          */
         Criteria crit = null;
+
+        // todo-0: both patterns like the below need to be put in a method
         if (recursive) {
             crit = Criteria.where(SubNode.PATH).regex(svc_mongoUtil.regexSubGraph(node.getPath()));
         } else {

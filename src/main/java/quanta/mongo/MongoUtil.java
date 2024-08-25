@@ -86,51 +86,6 @@ public class MongoUtil extends ServiceBase {
     }
 
     /*
-     * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or
-     * else this WILL result in DATA LOSS!
-     *
-     * Note: rootNode will not be included in 'nodes'.
-     *
-     * Most places we do a call like this: Iterable<SubNode> results = read.getSubGraph(ms, node, null,
-     * 0); We will be better off to filterOutOrphans from the returned list before processing it.
-     *
-     */
-    public LinkedList<SubNode> filterOutOrphans(SubNode rootNode, Iterable<SubNode> nodes) {
-        LinkedList<SubNode> ret = new LinkedList<>();
-        HashSet<String> paths = new HashSet<>();
-        // this just helps us avoide redundant delete attempts
-        HashSet<String> pathsRemoved = new HashSet<>();
-        paths.add(rootNode.getPath());
-
-        // Add all the paths
-        for (SubNode node : nodes) {
-            paths.add(node.getPath());
-        }
-
-        // now identify all nodes that don't have a parent in the list
-        for (SubNode node : nodes) {
-            String parentPath = node.getParentPath();
-            // if parentPath not in paths this is an orphan
-            if (!paths.contains(parentPath)) {
-                // if we haven't alread seen this parent path and deleted under it.
-                if (!pathsRemoved.contains(parentPath)) {
-                    pathsRemoved.add(parentPath);
-                    // Since we know this parent doesn't exist we can delete all nodes that fall under it
-                    // which would remove ALL siblings that are also orphans. Using this kind of pattern:
-                    // ${parantPath}/* (that is, we append a slash and then find anything starting with that)
-                    svc_mongoDelete.deleteUnderPath(parentPath);
-                }
-            }
-            // otherwise add to our output results. // NOTE: we can also go ahead and DELETE these orphans as
-            // found (from the DB)
-            else {
-                ret.add(node);
-            }
-        }
-        return ret;
-    }
-
-    /*
      * Takes a path like "/a/b/" OR "/a/b" and finds any random longer path that's not currently used.
      * Note that since we don't require to end with "/" this function can be extending an existing leaf
      * name, or if the path does end with "/", then it has the effect of finding a new leaf from

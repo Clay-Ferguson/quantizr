@@ -20,15 +20,15 @@ public class AdminRun extends ServiceBase {
 
     // Runs with full authority, but as the same user as on the current session.
     public <T> T run(Supplier<T> runner) {
-        boolean saveHasAdminAuthority = TL.getHasAdminAuthority();
+        boolean hasAdminAuth = TL.getHasAdminAuthority();
 
         // if this thread is already with Admin Authority we're done and can just call the runner.
-        if (saveHasAdminAuthority) {
+        if (hasAdminAuth) {
             return runner.get();
         }
 
-        // Otherwise we're running as admin.
-        HashMap<ObjectId, SubNode> savedDirtyNodes = TL.getDirtyNodes();
+        // Otherwise we'll be running as admin.
+        HashMap<ObjectId, SubNode> dirtyNodes = TL.getDirtyNodes();
         TL.setDirtyNodes(null);
         TL.setHasAdminAuthority(true);
 
@@ -41,8 +41,8 @@ public class AdminRun extends ServiceBase {
             log.error("error", ex);
             throw ex;
         } finally {
-            TL.setDirtyNodes(savedDirtyNodes);
-            TL.setHasAdminAuthority(saveHasAdminAuthority);
+            TL.setDirtyNodes(dirtyNodes);
+            TL.setHasAdminAuthority(hasAdminAuth);
         }
         return ret;
     }

@@ -25,7 +25,7 @@ import quanta.util.StreamUtil;
 import quanta.util.Util;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class ImportService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ImportService.class);
 
@@ -38,7 +38,7 @@ public class ImportService extends ServiceBase {
         if (node == null) {
             throw ExUtil.wrapEx("Node not found.");
         }
-       svc_auth.ownerAuth(node);
+        svc_auth.ownerAuth(node);
 
         // This is critical to be correct so we run the actual query based determination of 'hasChildren'
         boolean hasChildren = svc_mongoRead.directChildrenExist(node.getPath());
@@ -47,9 +47,11 @@ public class ImportService extends ServiceBase {
                     + node.getPath());
         }
 
-        // It's important to be sure there are absolutely no orphans at any level under this branch of the
-        // tree, so even though the check above told us there are no direct children we still need to run
-        // this recursive delete.
+        /*
+         * It's important to be sure there are absolutely no orphans at any level under this branch of the
+         * tree, so even though the check above told us there are no direct children we still need to run
+         * this recursive delete.
+         */
         svc_mongoDelete.deleteUnderPath(node.getPath());
         if (uploadFiles.length != 1) {
             throw ExUtil.wrapEx("Multiple file import not allowed");
@@ -134,7 +136,7 @@ public class ImportService extends ServiceBase {
         return res;
     }
 
-        /* returns the new book node */
+    /* returns the new book node */
     public SubNode traverseToC(Map<String, Object> map, SubNode parentNode, String bookMasterPrompt) {
         String bookTitle = (String) map.get("title");
         if (bookTitle == null) {
@@ -200,8 +202,8 @@ public class ImportService extends ServiceBase {
                     long subSectionIdx = 0;
                     for (Object subsection : subsections) {
                         if (subsection instanceof String) {
-                            addJsonNode(sectionNode, (String) "#### " + subsection, subSectionIdx * 1000,
-                                    "#subsection", null);
+                            addJsonNode(sectionNode, (String) "#### " + subsection, subSectionIdx * 1000, "#subsection",
+                                    null);
                         } else {
                             log.debug("toc subsection not a string");
                         }
@@ -247,8 +249,7 @@ public class ImportService extends ServiceBase {
         return newNode;
     }
 
-    private void traverseList(List<?> list, SubNode parentNode, Long ordinal, int level,
-            boolean listInList) {
+    private void traverseList(List<?> list, SubNode parentNode, Long ordinal, int level, boolean listInList) {
         if (list == null)
             return;
 
@@ -275,10 +276,8 @@ public class ImportService extends ServiceBase {
         }
     }
 
-    private SubNode addJsonNode(SubNode parentNode, String content, Long ordinal, String tag,
-            String aiSystemPrompt) {
-        SubNode newNode =
-                svc_mongoCreate.createNode(parentNode, null, ordinal, CreateNodeLocation.LAST, false, null);
+    private SubNode addJsonNode(SubNode parentNode, String content, Long ordinal, String tag, String aiSystemPrompt) {
+        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, ordinal, CreateNodeLocation.LAST, false, null);
         newNode.setContent(content);
         newNode.setAc(parentNode.getAc());
         newNode.touch();
