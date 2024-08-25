@@ -25,7 +25,7 @@ ai_service: "openai"
 
 source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
 scan_extensions: ".java, .sql, .py, .html, .htm, .js, .ts, .css"
-data_folder: "data"
+data_folder: "/home/clay/ai-agent-temp"
  
 mode: "none"
 

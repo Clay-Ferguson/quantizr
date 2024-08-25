@@ -10,7 +10,7 @@ sys.path.append(PRJ_DIR)
 
 from app_utils import AppUtils
 from app_config import AppConfig
-from common.python.utils import RefactorMode, AIService
+from common.python.utils import RefactorMode, AIService, Utils
 
 def show_mode_picker(st):
     """Show the mode picker."""
@@ -70,6 +70,8 @@ def show_ai_model_picker(st):
 
 if __name__ == "__main__":
     cfg = AppConfig.get_config(None)
+    
+    Utils.init_logging(cfg.data_folder + "/quanta_agent.log")
 
     AppUtils.setup_page(st, cfg, "Quanta: AI Tools")
     show_ai_model_picker(st)

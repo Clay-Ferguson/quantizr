@@ -331,7 +331,7 @@ services:
         volumes:
             # todo-2: make these two folders visible in Agent Config panel of app (but read-only)
             - /home/clay/ferguson/Quantizr/QuantaAgent/test_project:/projects
-            - /home/clay/ferguson/Quantizr/QuantaAgent/data:/data
+            - /home/clay/ai-agent-temp:/data
 
 networks:
     bridge:

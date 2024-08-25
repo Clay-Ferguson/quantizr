@@ -2,6 +2,7 @@
 
 import re
 import os
+import logging
 from enum import Enum
 from typing import List, Set, Optional
 from langchain.schema import AIMessage, BaseMessage, AIMessage
@@ -24,6 +25,20 @@ class RefactorMode(Enum):
 
 class Utils:
     """Utilities Class"""
+
+    @staticmethod
+    def init_logging(file_name: str):
+        """Initializes the logging."""
+        logging.basicConfig(
+            filename=file_name,  # Log file name
+            level=logging.DEBUG,     # Log level
+            format="%(asctime)s - %(levelname)s - %(message)s"
+        )
+
+    @staticmethod
+    def debug(message: str):
+        """Logs a debug message."""
+        logging.debug(message)
 
     @staticmethod
     def get_tool_calls_str(message: BaseMessage) -> str:
