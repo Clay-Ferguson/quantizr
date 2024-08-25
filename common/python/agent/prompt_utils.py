@@ -78,6 +78,9 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         Substitute entire file contents into the prompt. Prompts can contain ${FileName} tags,
         which will be replaced with the content of the file with the name 'FileName'
         """
+        if "file(" not in prompt:
+            return prompt, False
+        
         inserted: bool = False 
         # Use regular expression to find all instances of file(filename) pattern in the prompt. 
         # The 'matches' collecion will contain all the file names
@@ -103,6 +106,9 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         Substitute entire folder contents into the prompt. Prompts can contain ${FolderName} tags,
         which will be replaced with the content of the files inside the folder
         """
+        if "folder(" not in prompt:
+            return prompt, False
+        
         source_folder_len: int = len(source_folder)
     
         inserted: bool = False 

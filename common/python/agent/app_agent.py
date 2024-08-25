@@ -231,6 +231,10 @@ Final Prompt:
 
         Returns true only if someblocks were inserted.
         """
+        # As performance boost, if self.prompt does not contain "block(" then return False
+        if "block(" not in self.prompt:
+            return False
+        
         ret = False
         for key, value in self.prj_loader.blocks.items():
             k = f"block({key})"
@@ -245,4 +249,9 @@ Final Prompt:
 {TAG_BLOCK_END}
 """,
             )
+            
+            # If no more 'block(' tags are in prompt, then we can break out of the loop
+            if "block(" not in self.prompt:
+                break
+            
         return ret
