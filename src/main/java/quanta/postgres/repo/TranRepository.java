@@ -28,34 +28,39 @@ public interface TranRepository extends JpaRepository<Tran, Long> {
         @Query("SELECT p FROM Tran p JOIN FETCH p.userAccount")
         List<Tran> findAll();
 
-        @Query(value = "SELECT SUM(CASE WHEN tran_type = 'C' THEN amt ELSE -amt END) " //
-                        + "FROM tran WHERE user_id = :userId", nativeQuery = true)
+        @Query(value = """
+SELECT SUM(CASE WHEN tran_type = 'C' THEN amt ELSE -amt END) 
+  FROM tran WHERE user_id = :userId""", nativeQuery = true)
         BigDecimal getBalByUserAccntId(@Param("userId") Long userId);
 
-        @Query(value = "SELECT SUM(CASE WHEN t.tran_type = 'C' THEN t.amt ELSE -t.amt END) " //
-                        + "FROM tran t JOIN user_accnt u ON t.user_id = u.id " + //
-                        "WHERE u.mongo_id = :mongoId", nativeQuery = true)
+        @Query(value = """
+SELECT SUM(CASE WHEN t.tran_type = 'C' THEN t.amt ELSE -t.amt END) 
+  FROM tran t JOIN user_accnt u ON t.user_id = u.id 
+  WHERE u.mongo_id = :mongoId""", nativeQuery = true)
         BigDecimal getBalByMongoId(@Param("mongoId") String mongoId);
 
-        @Query("SELECT u.userName, t.descCode, COUNT(t), SUM(t.amt) " + //
-                        "FROM Tran t " + //
-                        "JOIN t.userAccount u " + //
-                        "WHERE t.transType = :transType " + //
-                        "GROUP BY u.userName, t.descCode " + //
-                        "ORDER BY u.userName")
+        @Query("""
+SELECT u.userName, t.descCode, COUNT(t), SUM(t.amt) 
+  FROM Tran t 
+  JOIN t.userAccount u 
+  WHERE t.transType = :transType 
+  GROUP BY u.userName, t.descCode 
+  ORDER BY u.userName""")
         List<Object[]> findTranSummaryByUser(@Param("transType") String transType);
 
-        @Query("SELECT t.id, t.ts, u.userName, t.descCode, t.amt " + //
-                        "FROM Tran t " + //
-                        "JOIN t.userAccount u " + //
-                        "ORDER BY t.ts DESC")
+        @Query("""
+SELECT t.id, t.ts, u.userName, t.descCode, t.amt 
+  FROM Tran t 
+  JOIN t.userAccount u 
+  ORDER BY t.ts DESC""")
         List<Object[]> allTrans();
 
         // we use a native query instead of a JPQL query because of a limitation in JPQL
-        @Query(value = "SELECT u.user_name, SUM(CASE WHEN t.tran_type = 'C' THEN t.amt ELSE -t.amt END) AS balance " + //
-                        "FROM tran t " + //
-                        "JOIN user_accnt u ON t.user_id = u.id " + //
-                        "GROUP BY u.mongo_id, u.user_name " + //
-                        "ORDER BY u.user_name", nativeQuery = true)
+        @Query(value = """
+SELECT u.user_name, SUM(CASE WHEN t.tran_type = 'C' THEN t.amt ELSE -t.amt END) AS balance 
+  FROM tran t 
+  JOIN user_accnt u ON t.user_id = u.id 
+  GROUP BY u.mongo_id, u.user_name 
+  ORDER BY u.user_name""", nativeQuery = true)
         List<Object[]> findAllUserBalances();
 }
