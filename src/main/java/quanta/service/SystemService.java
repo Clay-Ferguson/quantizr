@@ -234,6 +234,9 @@ public class SystemService extends ServiceBase {
                 String msg = getFailedSigInfo();
 
                 svc_email.sendDevEmail("Signature Node Problems", msg);
+
+                svc_crypto.getFailedSigNodes().clear(); 
+                svc_crypto.getUnsignedPublicNodes().clear();
             } finally {
                 systemAutoCheckRunning = false;
             }
