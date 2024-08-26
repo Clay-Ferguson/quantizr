@@ -49,7 +49,7 @@ class ProjectLoader:
                     )
 
                     if name in self.blocks:
-                        raise Exception(f"Duplicate Block Name {name}. Block Names must be unique across all files.")
+                        raise Exception(f"Duplicate Block Name `{name}` in file {path}. Block Names must be unique across all files.")
                     else:
                         # n is a non-optional string
                         n = name if name is not None else ""

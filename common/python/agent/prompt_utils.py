@@ -55,6 +55,11 @@ class PromptUtils:
 
 Below is the content of the files in the folder named {folder_path} (using {TAG_FILE_BEGIN} and {TAG_FILE_END} tags to delimit the files):
         """
+
+        # raise an error if the folder does not exist
+        if not os.path.exists(folder_path):
+            raise FileNotFoundError(f"Folder {folder_path} does not exist")
+                
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
                 # Check the file extension
@@ -117,6 +122,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         if matches:
             for folder_name in matches:
                 folder = source_folder if folder_name == "/" else source_folder + folder_name
+                Utils.debug(f"folder_name in prompt: {folder_name}")
                 content: str = PromptUtils.build_folder_content(
                     folder,
                     source_folder_len,

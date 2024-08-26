@@ -330,7 +330,7 @@ services:
             - '${QAI_PORT}:${QAI_PORT}'
         volumes:
             # todo-2: make these two folders visible in Agent Config panel of app (but read-only)
-            - /home/clay/ferguson/Quantizr/QuantaAgent/test_project:/projects
+            - /home/clay/ferguson/Quantizr/src:/projects
             - /home/clay/ai-agent-temp:/data
 
 networks:
