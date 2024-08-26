@@ -17,7 +17,7 @@ PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
 from common.python.agent.app_agent import QuantaAgent
-from common.python.utils import RefactorMode
+from common.python.utils import RefactorMode, Utils
 
 # #ai-model
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
@@ -31,6 +31,8 @@ GEMINI_MODEL_COMPLETION_CHAT = "gemini-1.5-pro"
 GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 
 app = FastAPI()
+
+Utils.init_logging("/data/quanta_ai.log")
 
 class AIBaseMessage(BaseModel):
     type: str
@@ -87,6 +89,7 @@ def api_query(req: AIRequest,
             messages = buildContext(req)
             agent = QuantaAgent()
             agent.run(
+                req.systemPrompt,
                 req.service,
                 RefactorMode.REFACTOR.value,
                 "",

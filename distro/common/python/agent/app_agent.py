@@ -224,25 +224,27 @@ Final Prompt:
         return self.has_filename_inject or self.has_folder_inject
 
 
-    def insert_blocks_into_prompt(self) -> bool:
+    def insert_blocks_into_prompt(self):
         """
         Substitute blocks into the prompt. Prompts can contain ${BlockName} tags, which will be replaced with the
         content of the block with the name 'BlockName'
 
         Returns true only if someblocks were inserted.
         """
-        ret = False
+        # As performance boost, if self.prompt does not contain "block(" then return False
+        if "block(" not in self.prompt:
+            return
+        
         for key, value in self.prj_loader.blocks.items():
-            k = f"block({key})"
-            if k in self.prompt:
-                ret = True
-
             self.prompt = self.prompt.replace(
-                k,
+                f"block({key})",
                 f"""
 {TAG_BLOCK_BEGIN} {key}
 {value.content}
 {TAG_BLOCK_END}
 """,
             )
-        return ret
+            
+            # If no more 'block(' tags are in prompt, then we can break out of the loop
+            if "block(" not in self.prompt:
+                break

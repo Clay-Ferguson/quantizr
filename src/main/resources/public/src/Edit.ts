@@ -7,7 +7,7 @@ import { TabPanel } from "./comp/TabPanel";
 import { Constants as C } from "./Constants";
 import { AskAboutSubgraphDlg } from "./dlg/AskAnotherQuestionDlg";
 import { AskNodeLinkNameDlg } from "./dlg/AskNodeLinkNameDlg";
-import { ConfigureAIDlg } from "./dlg/ConfigureAIDlg";
+import { ConfigureAgentDlg } from "./dlg/ConfigureAIDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditBlockedWordsDlg } from "./dlg/EditBlockedWordsDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
@@ -1214,8 +1214,8 @@ export class Edit {
         await dlg.open();
     };
 
-    configureAI = async (node: NodeInfo) => {
-        const dlg = new ConfigureAIDlg(node);
+    configureAgent = async (node: NodeInfo) => {
+        const dlg = new ConfigureAgentDlg(node);
         await dlg.open();
     };
 

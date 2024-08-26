@@ -50,10 +50,6 @@ public class AIService extends ServiceBase {
             system = new SystemConfig();
         }
 
-        if (StringUtils.isEmpty(system.getPrompt())) {
-            system.setPrompt("You are a helpful assistant.");
-        }
-
         if (node != null) {
             buildChatHistory(node, messages, system);
         }

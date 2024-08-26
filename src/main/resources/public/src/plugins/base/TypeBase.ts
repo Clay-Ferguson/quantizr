@@ -345,12 +345,12 @@ export class TypeBase implements TypeIntf {
             const isRoot = node.id === ast.node?.id;
 
             let aiConfigDiv: Div = null;
-            if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER && S.util.showMetaData(ast, node)) {
+            if (S.props.isMine(node) && node.type !== J.NodeType.AI_ANSWER) {
                 if (S.props.hasAIConfigProps(node)) {
-                    aiConfigDiv = new Div("AI Config", {
-                        onClick: () => S.edit.configureAI(node),
+                    aiConfigDiv = new Div("AI Agent", {
+                        onClick: () => S.edit.configureAgent(node),
                         className: "nodeTags aiTags microMarginBottom float-end",
-                        title: "Configure AI Settings"
+                        title: "Configure Agent Settings"
                     });
                 }
                 else {

@@ -73,52 +73,48 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
     @staticmethod
     def insert_files_into_prompt(
         prompt: str, source_folder: str, file_names: List[str]
-    ) -> Tuple[str, bool]:
+    ) -> str:
         """
         Substitute entire file contents into the prompt. Prompts can contain ${FileName} tags,
         which will be replaced with the content of the file with the name 'FileName'
         """
         if "file(" not in prompt:
-            return prompt, False
+            return prompt
         
-        inserted: bool = False 
         # Use regular expression to find all instances of file(filename) pattern in the prompt. 
-        # The 'matches' collecion will contain all the file names
+        # The 'matches' collection will contain all the file names
         pattern = r'file\((.*?)\)'
         matches = re.findall(pattern, prompt)
 
         if matches:
-            inserted = True
             for file_name in matches:
                 content: str = FileUtils.read_file(source_folder + file_name)
                 prompt = prompt.replace(
                     f"file({file_name})", PromptUtils.get_file_content_block(file_name, content)
                 )
-        return prompt, inserted
+        return prompt
 
     # todo-0: we no longer allow/require a slash as the last character of the folder name in 'folder(folder_name)' and I need
     # to update the docs to say this because currently I think it mentions the slash
     @staticmethod
     def insert_folders_into_prompt(
         prompt: str, source_folder: str, folder_names: List[str], ext_set: Set[str]
-    ) -> Tuple[str, bool]:
+    ) -> str:
         """
         Substitute entire folder contents into the prompt. Prompts can contain ${FolderName} tags,
         which will be replaced with the content of the files inside the folder
         """
         if "folder(" not in prompt:
-            return prompt, False
+            return prompt
         
         source_folder_len: int = len(source_folder)
     
-        inserted: bool = False 
         # Use regular expression to find all instances of folder(foldername) pattern in the prompt. 
-        # The 'matches' collecion will contain all the folder names
+        # The 'matches' collection will contain all the folder names
         pattern = r'folder\((.*?)\)'
         matches = re.findall(pattern, prompt)
 
         if matches:
-            inserted = True
             for folder_name in matches:
                 folder = source_folder if folder_name == "/" else source_folder + folder_name
                 content: str = PromptUtils.build_folder_content(
@@ -129,4 +125,4 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 prompt = prompt.replace(
                     f"folder({folder_name})", content
                 )
-        return prompt, inserted
+        return prompt

@@ -60,6 +60,7 @@ class AppAgentGUI:
             with st.spinner("Thinking..."):
                 agent = QuantaAgent()
                 agent.run(
+                    "",
                     st.session_state.p_ai_service,
                     st.session_state.p_mode,
                     "",

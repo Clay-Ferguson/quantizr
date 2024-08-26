@@ -12,7 +12,7 @@ import { Selection } from "../comp/core/Selection";
 import { TextArea } from "../comp/core/TextArea";
 import { TextField } from "../comp/core/TextField";
 
-export class ConfigureAIDlg extends DialogBase {
+export class ConfigureAgentDlg extends DialogBase {
     static promptState: Validator = new Validator();
     static maxWordsState: Validator = new Validator();
     static temperatureState: Validator = new Validator();
@@ -20,7 +20,7 @@ export class ConfigureAIDlg extends DialogBase {
     textScrollPos = new ScrollPos();
 
     constructor(public node: NodeInfo) {
-        super("Configure AI");
+        super("Configure AI Agent");
     }
 
     renderDlg(): Comp[] {
@@ -28,21 +28,21 @@ export class ConfigureAIDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new FlexLayout([
-                    new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom bigMarginRight", ConfigureAIDlg.aiServiceState),
+                    new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom bigMarginRight", ConfigureAgentDlg.aiServiceState),
                 ]),
                 new TextArea("System Prompt", {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
-                }, ConfigureAIDlg.promptState, null, false, 3, this.textScrollPos),
+                }, ConfigureAgentDlg.promptState, null, false, 3, this.textScrollPos),
                 new FlexLayout([
                     new TextField({
                         label: "Max Response Words",
-                        val: ConfigureAIDlg.maxWordsState,
+                        val: ConfigureAgentDlg.maxWordsState,
                         inputClass: "maxResponseWords",
                     }),
                     new TextField({
                         label: "Creativity (0.0-1.0, Default=0.7)",
-                        val: ConfigureAIDlg.temperatureState,
+                        val: ConfigureAgentDlg.temperatureState,
                         inputClass: "aiTemperature",
                         outterClass: "marginLeft"
                     }),
@@ -57,28 +57,28 @@ export class ConfigureAIDlg extends DialogBase {
     }
 
     reload = async () => {
-        ConfigureAIDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI_PROMPT, this.node));
-        ConfigureAIDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
-        ConfigureAIDlg.temperatureState.setValue(S.props.getPropStr(J.NodeProp.AI_TEMPERATURE, this.node));
-        ConfigureAIDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
+        ConfigureAgentDlg.promptState.setValue(S.props.getPropStr(J.NodeProp.AI_PROMPT, this.node));
+        ConfigureAgentDlg.maxWordsState.setValue(S.props.getPropStr(J.NodeProp.AI_MAX_WORDS, this.node));
+        ConfigureAgentDlg.temperatureState.setValue(S.props.getPropStr(J.NodeProp.AI_TEMPERATURE, this.node));
+        ConfigureAgentDlg.aiServiceState.setValue(S.props.getPropStr(J.NodeProp.AI_SERVICE, this.node) || "[null]");
     }
 
     save = async () => {
         // Note: The "|| [null]" makes sure the server deletes the entire property rather than leaving empty string.
-        S.props.setPropVal(J.NodeProp.AI_PROMPT, this.node, ConfigureAIDlg.promptState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAIDlg.aiServiceState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, ConfigureAIDlg.maxWordsState.getValue() || "[null]");
-        S.props.setPropVal(J.NodeProp.AI_TEMPERATURE, this.node, ConfigureAIDlg.temperatureState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_PROMPT, this.node, ConfigureAgentDlg.promptState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_SERVICE, this.node, ConfigureAgentDlg.aiServiceState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_MAX_WORDS, this.node, ConfigureAgentDlg.maxWordsState.getValue() || "[null]");
+        S.props.setPropVal(J.NodeProp.AI_TEMPERATURE, this.node, ConfigureAgentDlg.temperatureState.getValue() || "[null]");
 
         await S.edit.saveNode(this.node, true);
         this.close();
     }
 
     reset = async () => {
-        ConfigureAIDlg.promptState.setValue("");
-        ConfigureAIDlg.maxWordsState.setValue("");
-        ConfigureAIDlg.temperatureState.setValue("");
-        ConfigureAIDlg.aiServiceState.setValue("[null]");
+        ConfigureAgentDlg.promptState.setValue("");
+        ConfigureAgentDlg.maxWordsState.setValue("");
+        ConfigureAgentDlg.temperatureState.setValue("");
+        ConfigureAgentDlg.aiServiceState.setValue("[null]");
     }
 
     override async preLoad(): Promise<void> {

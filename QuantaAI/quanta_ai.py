@@ -65,6 +65,9 @@ def api_query(req: AIRequest,
               api_key: Optional[str] = Header(None, alias="X-api-key")
     ) -> AIResponse:
     try:        
+        # Log the request as pretty json
+        # Utils.debug("Request received", Utils.pretty_json(req.model_dump_json()))
+        
         # for now we'll max out at 100k tokens allowed
         if (req.maxTokens > 100000): 
             req.maxTokens = 100000
@@ -89,6 +92,7 @@ def api_query(req: AIRequest,
             messages = buildContext(req)
             agent = QuantaAgent()
             agent.run(
+                req.systemPrompt,
                 req.service,
                 RefactorMode.REFACTOR.value,
                 "",
