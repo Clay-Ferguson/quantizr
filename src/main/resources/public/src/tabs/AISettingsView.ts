@@ -12,14 +12,19 @@ import { TextField } from "../comp/core/TextField";
 import { TabIntf } from "../intf/TabIntf";
 import { Validator } from "../Validator";
 import { Span } from "../comp/core/Span";
+import { TextArea } from "../comp/core/TextArea";
+import { ScrollPos } from "../comp/base/Comp";
 
 export class AISettingsView extends AppTab<any, AISettingsView> {
     fileExtState: Validator = new Validator("");
+    foldersToIncludeState: Validator = new Validator();
+    foldersToIncludeScrollPos = new ScrollPos();
 
     constructor(data: TabIntf<any, AISettingsView>) {
         super(data);
         data.inst = this;
         this.fileExtState.setValue(getAs().userPrefs.aiAgentFileExtensions);
+        this.foldersToIncludeState.setValue(getAs().userPrefs.aiAgentFoldersToInclude);
     }
 
     sectionTitle(title: string): Heading {
@@ -65,6 +70,10 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                 S.quanta.config.aiAgentEnabled ? new Div(null, {
                     className: "bigMarginRight"
                 }, [
+                    new TextArea("Folders to Include", {
+                        rows: 4,
+                        placeholder: "List folders to include (optional)"
+                    }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos),
                     new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
                     new Button("Save", this.save, { className: "marginTop" })
                 ]) : null,
@@ -74,7 +83,10 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
     }
 
     save = async () => {
-        await S.util.saveUserPrefs(s => s.userPrefs.aiAgentFileExtensions = this.fileExtState.getValue());
+        await S.util.saveUserPrefs(s => {
+            s.userPrefs.aiAgentFileExtensions = this.fileExtState.getValue();
+            s.userPrefs.aiAgentFoldersToInclude = this.foldersToIncludeState.getValue();
+        });
         // flash confirmation message
         S.util.flashMessage("Saved settings", "Note");
     }

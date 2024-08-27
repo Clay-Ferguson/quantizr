@@ -1055,6 +1055,7 @@ export interface UserPreferences {
     mainPanelCols: number;
     aiService: string;
     aiAgentFileExtensions: string;
+    aiAgentFoldersToInclude: string;
     maxUploadFileSize: number;
 }
 
@@ -1152,6 +1153,7 @@ export const enum NodeProp {
     USER_PREF_MAIN_PANEL_COLS = "sn:mainPanelCols",
     USER_PREF_AI_SERVICE = "sn:aiService",
     USER_PREF_AI_FILE_EXTENSIONS = "sn:aiAgentFileExtensions",
+    USER_PREF_AI_FOLDERS_TO_INCLUDE = "sn:aiAgentFoldersToInclude",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",

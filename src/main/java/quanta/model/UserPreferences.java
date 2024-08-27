@@ -22,6 +22,7 @@ public class UserPreferences {
     private long mainPanelCols = 6;
     private String aiService;
     private String aiAgentFileExtensions;
+    private String aiAgentFoldersToInclude;
 
     @JsonProperty(required = false)
     private long maxUploadFileSize;
@@ -108,6 +109,14 @@ public class UserPreferences {
 
     public void setAiAgentFileExtensions(String aiAgentFileExtensions) {
         this.aiAgentFileExtensions = aiAgentFileExtensions;
+    }
+
+    public String getAiAgentFoldersToInclude() {
+        return aiAgentFoldersToInclude;
+    }
+
+    public void setAiAgentFoldersToInclude(String aiAgentFoldersToInclude) {
+        this.aiAgentFoldersToInclude = aiAgentFoldersToInclude;
     }
 
     public boolean isAiWritingMode() {

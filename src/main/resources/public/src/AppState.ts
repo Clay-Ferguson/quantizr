@@ -127,6 +127,7 @@ export class AppState {
         mainPanelCols: 6,
         aiService: J.AIModel.OPENAI,
         aiAgentFileExtensions: "txt,md,html,htm,java,js,css,ts,tsx,py,sh,sql,json,yaml,yml,xml,properties,ini,conf,config,env,log,mdx,jsx,tsx,graphql,mdx,md,markdown",
+        aiAgentFoldersToInclude: "",
     };
 
     exportSettings: ExportSettings = {

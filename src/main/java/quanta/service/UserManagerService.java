@@ -637,6 +637,7 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS, reqUserPrefs.getMainPanelCols());
             prefsNode.set(NodeProp.USER_PREF_AI_SERVICE, reqUserPrefs.getAiService());
             prefsNode.set(NodeProp.USER_PREF_AI_FILE_EXTENSIONS, reqUserPrefs.getAiAgentFileExtensions());
+            prefsNode.set(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE, reqUserPrefs.getAiAgentFoldersToInclude());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setAiWritingMode(reqUserPrefs.isAiWritingMode());
@@ -648,6 +649,7 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
             userPrefs.setAiService(reqUserPrefs.getAiService());
             userPrefs.setAiAgentFileExtensions(reqUserPrefs.getAiAgentFileExtensions());
+            userPrefs.setAiAgentFoldersToInclude(reqUserPrefs.getAiAgentFoldersToInclude());
             return null;
         });
         return res;
@@ -928,6 +930,7 @@ public class UserManagerService extends ServiceBase {
                 aiAgentFileExtensions = "txt,md,html,java,js,ts,css,py,sh,xml,json";
             }
             userPrefs.setAiAgentFileExtensions(aiAgentFileExtensions);
+            userPrefs.setAiAgentFoldersToInclude(prefsNode.getStr(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE));
 
             return null;
         });
