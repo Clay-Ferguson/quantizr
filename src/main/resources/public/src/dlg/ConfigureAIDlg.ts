@@ -37,11 +37,11 @@ export class ConfigureAgentDlg extends DialogBase {
                     rows: 7,
                     placeholder: "You are a helpful assistant."
                 }, ConfigureAgentDlg.promptState, null, false, 3, this.systemPromptScrollPos),
-                new TextArea("Folders to Include", {
+                S.quanta.config.aiAgentEnabled ? new TextArea("Folders to Include", {
                     rows: 4,
                     placeholder: "List folders to include (optional)"
-                }, ConfigureAgentDlg.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos),
-                new TextField({ label: "File Extensions (ex: java,py,txt)", val: ConfigureAgentDlg.fileExtState }),
+                }, ConfigureAgentDlg.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos) : null,
+                S.quanta.config.aiAgentEnabled ? new TextField({ label: "File Extensions (ex: java,py,txt)", val: ConfigureAgentDlg.fileExtState }) : null,
                 new FlexLayout([
                     new TextField({
                         label: "Max Response Words",

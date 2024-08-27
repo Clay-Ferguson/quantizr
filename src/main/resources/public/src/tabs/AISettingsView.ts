@@ -70,11 +70,11 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                 S.quanta.config.aiAgentEnabled ? new Div(null, {
                     className: "bigMarginRight"
                 }, [
-                    new TextArea("Folders to Include", {
+                    S.quanta.config.aiAgentEnabled ? new TextArea("Folders to Include", {
                         rows: 4,
                         placeholder: "List folders to include (optional)"
-                    }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos),
-                    new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
+                    }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos) : null,
+                    S.quanta.config.aiAgentEnabled ? new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }) : null,
                     new Button("Save", this.save, { className: "marginTop" })
                 ]) : null,
             ])
