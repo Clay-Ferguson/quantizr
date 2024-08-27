@@ -18,16 +18,18 @@ class ProjectMutator:
     """Performs all project mutations that the AI has requested."""
 
     blocks: Dict[str, TextBlock] = {}
+    folders_to_include: List[str] = []
 
     def __init__(
         self,
         mode: str,
         source_folder: str,
+        folders_to_include: List[str],
         ai_answer: str,
         ts: str,
         suffix: Optional[str],
         blocks: Dict[str, TextBlock],
-        ext_set: Set[str]
+        ext_set: Set[str],
     ):
         """Initializes the ProjectMutator object."""
         self.mode: str = mode
@@ -38,6 +40,7 @@ class ProjectMutator:
         self.ts: str = ts
         self.blocks = blocks
         self.ext_set = ext_set
+        self.folders_to_include = folders_to_include
 
     def run(self):
         """Performs all the project mutations which may be new files, updated files, or updated blocks in files."""
@@ -160,8 +163,10 @@ class ProjectMutator:
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(self.source_folder):
             for filename in filenames:
+                short_dir: str = dirpath[self.source_folder_len :]
+                 
                 # Check the file extension
-                if Utils.should_include_file(self.ext_set, filename):
+                if Utils.has_included_file_extension(self.ext_set, filename)  and Utils.has_included_folder(self.folders_to_include, short_dir):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # Call the visitor function for each file

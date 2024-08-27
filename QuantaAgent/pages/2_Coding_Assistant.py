@@ -67,6 +67,7 @@ class AppAgentGUI:
                     st.session_state.p_agent_messages,
                     user_input,
                     self.cfg.source_folder,
+                    "",
                     self.cfg.data_folder,
                     AppConfig.ext_set,
                     llm

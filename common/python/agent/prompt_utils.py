@@ -47,7 +47,7 @@ class PromptUtils:
 """
 
     @staticmethod
-    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str]) -> str:
+    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str]) -> str:
         """Builds the content of a folder. Which will contain all the filenames and their content."""
         print(f"Building content for folder: {folder_path}")
 
@@ -62,8 +62,10 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
+                short_dir: str = dirpath[source_folder_len :]
+                
                 # Check the file extension
-                if Utils.should_include_file(ext_set, filename):
+                if Utils.has_included_file_extension(ext_set, filename) and Utils.has_included_folder(folders_to_include, short_dir):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder
@@ -103,7 +105,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
     # to update the docs to say this because currently I think it mentions the slash
     @staticmethod
     def insert_folders_into_prompt(
-        prompt: str, source_folder: str, folder_names: List[str], ext_set: Set[str]
+        prompt: str, source_folder: str, folders_to_include: List[str], ext_set: Set[str]
     ) -> str:
         """
         Substitute entire folder contents into the prompt. Prompts can contain ${FolderName} tags,
@@ -127,6 +129,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                     folder,
                     source_folder_len,
                     ext_set,
+                    folders_to_include
                 )
                 prompt = prompt.replace(
                     f"folder({folder_name})", content

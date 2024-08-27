@@ -41,6 +41,10 @@ public class AIUtil extends ServiceBase {
             system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
         }
 
+        if (StringUtils.isEmpty(system.getFoldersToInclude()) && node.hasProp(NodeProp.AI_FOLDERS_TO_INCLUDE.s())) {
+            system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
+        }
+
         if (StringUtils.isEmpty(system.getService()) && node.hasProp(NodeProp.AI_SERVICE.s())) {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
         }

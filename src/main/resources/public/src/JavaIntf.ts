@@ -109,6 +109,7 @@ export interface SchemaOrgRange {
 
 export interface SystemConfig {
     prompt: string;
+    foldersToInclude: string;
     template: string;
     model: string;
     service: string;
@@ -1191,6 +1192,7 @@ export const enum NodeProp {
     DATE_FULL = "p.date",
     UNPUBLISHED = "unpub",
     AI_PROMPT = "ai",
+    AI_FOLDERS_TO_INCLUDE = "aiFolders",
     AI_SERVICE = "aiService",
     AI_QUERY_TEMPLATE = "aiTemplate",
     AI_MAX_WORDS = "aiMaxWords",

@@ -36,6 +36,7 @@ class QuantaAgent:
         self.system_prompt: str = ""
         self.prj_loader = None
         self.source_folder = ""
+        self.folders_to_include: List[str] = []
         self.data_folder = ""
         self.dry_run: bool = False
     
@@ -48,6 +49,7 @@ class QuantaAgent:
         messages: List[BaseMessage],
         input_prompt: str,
         source_folder: str,
+        folders_to_include: List[str],
         data_folder: str,
         ext_set: Set[str],
         llm: BaseChatModel
@@ -58,7 +60,8 @@ class QuantaAgent:
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set)
+        self.folders_to_include = folders_to_include
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include)
         self.prompt = input_prompt
         self.mode = mode
         self.ext_set = ext_set
@@ -75,7 +78,7 @@ class QuantaAgent:
             self.prompt, self.source_folder, self.prj_loader.file_names
         )
         self.prompt = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.source_folder, self.prj_loader.folder_names, self.ext_set
+            self.prompt, self.source_folder, self.folders_to_include, self.ext_set
         )
         
         if user_system_prompt:
@@ -84,7 +87,7 @@ class QuantaAgent:
                 user_system_prompt, self.source_folder, self.prj_loader.file_names
             )
             user_system_prompt = PromptUtils.insert_folders_into_prompt(
-                user_system_prompt, self.source_folder, self.prj_loader.folder_names, self.ext_set
+                user_system_prompt, self.source_folder, self.folders_to_include, self.ext_set
             )
         
         self.build_system_prompt(user_system_prompt)
@@ -174,6 +177,7 @@ Final Prompt:
             ProjectMutator(
                 self.mode,
                 self.source_folder,
+                self.folders_to_include,
                 self.answer,
                 self.ts,
                 None,

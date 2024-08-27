@@ -87,6 +87,7 @@ public class AIService extends ServiceBase {
         AIRequest request = new AIRequest();
         request.setSystemPrompt(system.getPrompt());
         request.setPrompt(input);
+        request.setFoldersToInclude(system.getFoldersToInclude());
         request.setMessages(messages);
         request.setModel(svc.getModel());
         request.setService(svc.getService());

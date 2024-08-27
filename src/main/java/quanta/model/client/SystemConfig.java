@@ -2,6 +2,7 @@ package quanta.model.client;
 
 public class SystemConfig {
     private String prompt; // ex: "you are a helpful assistant"
+    private String foldersToInclude; // newline delimited list of file paths
     private String template;
     private String model; // ex: "gpt-4"
     private String service;
@@ -15,6 +16,14 @@ public class SystemConfig {
 
     public void setPrompt(String prompt) {
         this.prompt = prompt;
+    }
+
+    public String getFoldersToInclude() {
+        return foldersToInclude;
+    }
+
+    public void setFoldersToInclude(String filesToInclude) {
+        this.foldersToInclude = filesToInclude;
     }
 
     public String getModel() {

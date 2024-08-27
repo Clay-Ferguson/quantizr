@@ -47,6 +47,7 @@ class AIResponse(BaseModel):
 class AIRequest(BaseModel):
     systemPrompt: Optional[str] = Field(default=None)
     prompt: str
+    foldersToInclude: str
     messages: List[AIBaseMessage]
     service: str
     model: str
@@ -89,6 +90,10 @@ def api_query(req: AIRequest,
              # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
             ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
 
+            folders_to_include = []
+            if req.foldersToInclude:
+                folders_to_include = req.foldersToInclude.split("\n")
+
             messages = buildContext(req)
             agent = QuantaAgent()
             agent.run(
@@ -100,6 +105,7 @@ def api_query(req: AIRequest,
                 req.prompt,
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
+                folders_to_include,
                 "/data",
                 ext_set,
                 llm)
