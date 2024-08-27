@@ -47,7 +47,7 @@ class PromptUtils:
 """
 
     @staticmethod
-    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str]) -> str:
+    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str]) -> str:
         """Builds the content of a folder. Which will contain all the filenames and their content."""
         print(f"Building content for folder: {folder_path}")
 
@@ -55,10 +55,17 @@ class PromptUtils:
 
 Below is the content of the files in the folder named {folder_path} (using {TAG_FILE_BEGIN} and {TAG_FILE_END} tags to delimit the files):
         """
+
+        # raise an error if the folder does not exist
+        if not os.path.exists(folder_path):
+            raise FileNotFoundError(f"Folder {folder_path} does not exist")
+                
         for dirpath, _, filenames in os.walk(folder_path):
             for filename in filenames:
+                short_dir: str = dirpath[source_folder_len :]
+                
                 # Check the file extension
-                if Utils.should_include_file(ext_set, filename):
+                if Utils.has_included_file_extension(ext_set, filename) and Utils.has_included_folder(folders_to_include, short_dir):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder
@@ -73,60 +80,58 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
     @staticmethod
     def insert_files_into_prompt(
         prompt: str, source_folder: str, file_names: List[str]
-    ) -> Tuple[str, bool]:
+    ) -> str:
         """
         Substitute entire file contents into the prompt. Prompts can contain ${FileName} tags,
         which will be replaced with the content of the file with the name 'FileName'
         """
         if "file(" not in prompt:
-            return prompt, False
+            return prompt
         
-        inserted: bool = False 
         # Use regular expression to find all instances of file(filename) pattern in the prompt. 
-        # The 'matches' collecion will contain all the file names
+        # The 'matches' collection will contain all the file names
         pattern = r'file\((.*?)\)'
         matches = re.findall(pattern, prompt)
 
         if matches:
-            inserted = True
             for file_name in matches:
                 content: str = FileUtils.read_file(source_folder + file_name)
                 prompt = prompt.replace(
                     f"file({file_name})", PromptUtils.get_file_content_block(file_name, content)
                 )
-        return prompt, inserted
+        return prompt
 
     # todo-0: we no longer allow/require a slash as the last character of the folder name in 'folder(folder_name)' and I need
     # to update the docs to say this because currently I think it mentions the slash
     @staticmethod
     def insert_folders_into_prompt(
-        prompt: str, source_folder: str, folder_names: List[str], ext_set: Set[str]
-    ) -> Tuple[str, bool]:
+        prompt: str, source_folder: str, folders_to_include: List[str], ext_set: Set[str]
+    ) -> str:
         """
         Substitute entire folder contents into the prompt. Prompts can contain ${FolderName} tags,
         which will be replaced with the content of the files inside the folder
         """
         if "folder(" not in prompt:
-            return prompt, False
+            return prompt
         
         source_folder_len: int = len(source_folder)
     
-        inserted: bool = False 
         # Use regular expression to find all instances of folder(foldername) pattern in the prompt. 
-        # The 'matches' collecion will contain all the folder names
+        # The 'matches' collection will contain all the folder names
         pattern = r'folder\((.*?)\)'
         matches = re.findall(pattern, prompt)
 
         if matches:
-            inserted = True
             for folder_name in matches:
                 folder = source_folder if folder_name == "/" else source_folder + folder_name
+                Utils.debug(f"folder_name in prompt: {folder_name}")
                 content: str = PromptUtils.build_folder_content(
                     folder,
                     source_folder_len,
                     ext_set,
+                    folders_to_include
                 )
                 prompt = prompt.replace(
                     f"folder({folder_name})", content
                 )
-        return prompt, inserted
+        return prompt

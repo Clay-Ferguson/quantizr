@@ -13,12 +13,15 @@ class ProjectLoader:
     # All filen names encountered during the scan, relative to the source folder
     file_names: List[str] = []
     folder_names: List[str] = []
+    folders_to_include: List[str] = []
 
-    def __init__(self, source_folder_len: int, ext_set: Set[str]):
+    # folders_to_include is a newline (\n) separated list of folders to include in the scan
+    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str]):
         self.source_folder_len = source_folder_len
         self.ext_set = ext_set
+        self.folders_to_include = folders_to_include
         
-
+        
     def reset(self):
         self.blocks = {}
         self.file_names = []
@@ -49,7 +52,7 @@ class ProjectLoader:
                     )
 
                     if name in self.blocks:
-                        raise Exception(f"Duplicate Block Name {name}. Block Names must be unique across all files.")
+                        raise Exception(f"Duplicate Block Name `{name}` in file {path}. Block Names must be unique across all files.")
                     else:
                         # n is a non-optional string
                         n = name if name is not None else ""
@@ -88,7 +91,7 @@ class ProjectLoader:
             self.folder_names.append(short_dir)
 
             for filename in filenames:
-                if Utils.should_include_file(self.ext_set, filename):
+                if Utils.has_included_file_extension(self.ext_set, filename) and Utils.has_included_folder(self.folders_to_include, short_dir):
                     # print(f"visit file {filename} in {dirpath}")
                     # build the full path
                     path: str = os.path.join(dirpath, filename)

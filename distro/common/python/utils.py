@@ -55,11 +55,22 @@ class Utils:
         return ret
 
     @staticmethod
-    def should_include_file(ext_set: Set[str], file_name: str) -> bool:
-        """Returns True if the file should be included in the scan."""
+    def has_included_file_extension(ext_set: Set[str], file_name: str) -> bool:
+        """Returns True if the file's extension should be included in the scan."""
         # return file_name.endswith(tuple(AppConfig.ext_set)) # <--- AI suggested this. Didn't investigate further
         _, ext = os.path.splitext(file_name)
         return ext.lower() in ext_set
+    
+    @staticmethod
+    def has_included_folder(folders: List[str], short_folder: str) -> bool:
+        """Returns True if the file's path should be included in the scan."""
+        if folders == None or len(folders) == 0:
+            return True
+        
+        for folder in folders:
+            if short_folder.startswith(folder):
+                return True
+        return False
 
     @staticmethod
     def has_tag_lines(prompt: str, tag: str) -> bool:

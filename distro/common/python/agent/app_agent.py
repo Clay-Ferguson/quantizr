@@ -18,7 +18,8 @@ from ..file_utils import FileUtils
 from .tags import (
     TAG_BLOCK_BEGIN,
     TAG_BLOCK_END,
-    MORE_INSTRUCTIONS,
+    AGENT_INSTRUCTIONS,
+    GENERAL_INSTRUCTIONS
 )
 from ..utils import RefactorMode
 from .prompt_utils import PromptUtils
@@ -33,21 +34,22 @@ class QuantaAgent:
         self.mode = RefactorMode.NONE.value
         self.prompt: str = ""
         self.system_prompt: str = ""
-        self.has_filename_inject = False
-        self.has_folder_inject = False
         self.prj_loader = None
         self.source_folder = ""
+        self.folders_to_include: List[str] = []
         self.data_folder = ""
         self.dry_run: bool = False
     
     def run(
         self,
+        user_system_prompt: str,
         ai_service: str,
         mode: str,
         output_file_name: str,
         messages: List[BaseMessage],
         input_prompt: str,
         source_folder: str,
+        folders_to_include: List[str],
         data_folder: str,
         ext_set: Set[str],
         llm: BaseChatModel
@@ -58,7 +60,8 @@ class QuantaAgent:
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set)
+        self.folders_to_include = folders_to_include
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include)
         self.prompt = input_prompt
         self.mode = mode
         self.ext_set = ext_set
@@ -70,9 +73,24 @@ class QuantaAgent:
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
 
-        self.insert_blocks_into_prompt()
-        self.insert_files_and_folders_into_prompt()
-        self.build_system_prompt()
+        self.prompt = self.insert_blocks_into_prompt(self.prompt)
+        self.prompt = PromptUtils.insert_files_into_prompt(
+            self.prompt, self.source_folder, self.prj_loader.file_names
+        )
+        self.prompt = PromptUtils.insert_folders_into_prompt(
+            self.prompt, self.source_folder, self.folders_to_include, self.ext_set
+        )
+        
+        if user_system_prompt:
+            user_system_prompt = self.insert_blocks_into_prompt(user_system_prompt)
+            user_system_prompt = PromptUtils.insert_files_into_prompt(
+                user_system_prompt, self.source_folder, self.prj_loader.file_names
+            )
+            user_system_prompt = PromptUtils.insert_folders_into_prompt(
+                user_system_prompt, self.source_folder, self.folders_to_include, self.ext_set
+            )
+        
+        self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:
             # If dry_run is True, we simulate the AI response by reading from a file
@@ -159,6 +177,7 @@ Final Prompt:
             ProjectMutator(
                 self.mode,
                 self.source_folder,
+                self.folders_to_include,
                 self.answer,
                 self.ts,
                 None,
@@ -166,7 +185,7 @@ Final Prompt:
                 self.ext_set
             ).run()
 
-    def build_system_prompt(self):
+    def build_system_prompt(self, user_system_prompt: str):
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,
         folders, and creating files.
 
@@ -178,9 +197,13 @@ Final Prompt:
         self.system_prompt = PromptUtils.get_template(
             "../common/python/agent/prompt_templates/agent_system_prompt.txt"
         )
-        self.system_prompt += MORE_INSTRUCTIONS
+        self.system_prompt += AGENT_INSTRUCTIONS
         self.add_file_handling_instructions()
         self.add_block_handling_instructions()
+        
+        # Users themselves may have provided a system prompt so add that if so.
+        if user_system_prompt:
+            self.system_prompt += GENERAL_INSTRUCTIONS + user_system_prompt
 
 
     def add_block_handling_instructions(self):
@@ -208,23 +231,8 @@ Final Prompt:
             self.system_prompt += PromptUtils.get_template(
                 "../common/python/agent/prompt_templates/file_edit_instructions.txt"
             )
-           
 
-    def insert_files_and_folders_into_prompt(self) -> bool:
-        """Inserts the file and folder names into the prompt. Prompts can contain ${FileName} and ${FolderName/} tags
-
-        Returns true only if some files or folders were inserted.
-        """
-        self.prompt, self.has_filename_inject = PromptUtils.insert_files_into_prompt(
-            self.prompt, self.source_folder, self.prj_loader.file_names
-        )
-        self.prompt, self.has_folder_inject = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.source_folder, self.prj_loader.folder_names, self.ext_set
-        )
-        return self.has_filename_inject or self.has_folder_inject
-
-
-    def insert_blocks_into_prompt(self):
+    def insert_blocks_into_prompt(self, prompt: str) -> str:
         """
         Substitute blocks into the prompt. Prompts can contain ${BlockName} tags, which will be replaced with the
         content of the block with the name 'BlockName'
@@ -232,11 +240,15 @@ Final Prompt:
         Returns true only if someblocks were inserted.
         """
         # As performance boost, if self.prompt does not contain "block(" then return False
-        if "block(" not in self.prompt:
-            return
+        if "block(" not in prompt:
+            return prompt
         
+        # ret = False
         for key, value in self.prj_loader.blocks.items():
-            self.prompt = self.prompt.replace(
+            # if k in prompt:
+                # ret = True
+
+            prompt = prompt.replace(
                 f"block({key})",
                 f"""
 {TAG_BLOCK_BEGIN} {key}
@@ -246,5 +258,7 @@ Final Prompt:
             )
             
             # If no more 'block(' tags are in prompt, then we can break out of the loop
-            if "block(" not in self.prompt:
+            if "block(" not in prompt:
                 break
+            
+        return prompt

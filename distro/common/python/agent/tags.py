@@ -2,7 +2,8 @@
 
 from typing import Dict
 
-MORE_INSTRUCTIONS = "\n----\nAdditional Instructions:\n"
+AGENT_INSTRUCTIONS = "\n----\nCoding Agent Instructions:\n"
+GENERAL_INSTRUCTIONS = "\n----\nGeneral Instructions:\n"
 
 # block_begin/end are used like this in source code projects:
 #     // block_begin: block_name
