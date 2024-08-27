@@ -118,6 +118,7 @@ public enum NodeProp {
     UNPUBLISHED("unpub"), //
     AI_PROMPT("ai"), //
     AI_FOLDERS_TO_INCLUDE("aiFolders"), //
+    AI_FILE_EXTENSIONS("aiFileExt"), //
     AI_SERVICE("aiService"), //
     AI_QUERY_TEMPLATE("aiTemplate"), //
     AI_MAX_WORDS("aiMaxWords"), //
