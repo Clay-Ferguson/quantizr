@@ -31,7 +31,6 @@ export class NodeCompButtonBar extends Div {
             return false;
         }
 
-        let sharedIcon: Icon;
         let openButton: IconButton;
         let expnButton: IconButton;
         let selCheckbox: Checkbox;
@@ -67,23 +66,6 @@ export class NodeCompButtonBar extends Div {
                 deleteAllowed = true;
             }
         }
-
-        /* DO NOT DELETE
-            todo-2: need to make this if condition:
-             if ((state.isAdminUser || S.props.isMine(node, state)) && S.props.isShared(node)) {
-            show cause a clickable link to show up on the "shared to: " text
-            to run the editNodeSharing()
-           (I may bring this back eventually, but for now the fact that the sharing is being presented
-            in the header of each node we don't need this icon and popup text )
-        if (S.props.isShared(node)) {
-            let sharingNames = S.util.getSharingNames(node, true);
-            sharedIcon = new Icon({
-                className: "fa fa-share-alt fa-lg rowIcon",
-                onClick: () => S.edit.editNodeSharing(state, node),
-                title: "Shared to:\n" + sharingNames
-            });
-        }
-        */
 
         // const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
         const allowExpnButton = !ast.isAnonUser && !this.isTableCell; // && (!layout || layout == "c1");
@@ -251,8 +233,8 @@ export class NodeCompButtonBar extends Div {
             buttonBar = new ButtonBar(btnArray);
         }
 
-        if (dragIcon || selCheckbox || sharedIcon || buttonBar) {
-            this.children = [dragIcon, selCheckbox, sharedIcon, buttonBar];
+        if (dragIcon || selCheckbox || buttonBar) {
+            this.children = [dragIcon, selCheckbox, buttonBar];
             return true;
         }
         return false;
