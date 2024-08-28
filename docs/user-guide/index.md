@@ -1,11 +1,15 @@
-# Quanta User Guide
-
+* [Quanta User Guide](#quanta-user-guide)
 * [About Quanta](#about-quanta)
     * [What is Quanta](#what-is-quanta)
     * [Concepts and Terminology](#concepts-and-terminology)
     * [Sharing and Publishing](#sharing-and-publishing)
     * [A New Collaboration Model](#a-new-collaboration-model)
 * [Application Layout](#application-layout)
+    * [Views Menu](#views-menu)
+        * [Timeline](#timeline)
+        * [Thread History](#thread-history)
+        * [Document View](#document-view)
+        * [Node Graph](#node-graph)
 * [Content Editing](#content-editing)
     * [Edit Mode](#edit-mode)
     * [Edit Dialog](#edit-dialog)
@@ -65,9 +69,8 @@
         * [Meta Llama 3](#meta-llama-3)
     * [AI Conversations](#ai-conversations)
     * [A Node that Asks a Question to AI](#a-node-that-asks-a-question-to-ai)
-    * [Asking Questions to the AI](#asking-questions-to-the-ai)
     * [Questions about a Subgraph](#questions-about-a-subgraph)
-    * [Configure AI](#configure-ai)
+    * [Custom AI Agents](#custom-ai-agents)
         * [System Prompt Examples](#system-prompt-examples)
     * [AI Service Selection](#ai-service-selection)
         * [AI Cloud Services Supported](#ai-cloud-services-supported)
@@ -82,7 +85,13 @@
                 * [Step by Step Screenshots](#step-by-step-screenshots)
             * [Why use Book Writing Features](#why-use-book-writing-features)
     * [AI Agent for Code Refactoring](#ai-agent-for-code-refactoring)
-        * [Configuring the Coding Agent](#configuring-the-coding-agent)
+        * [Enabling Coding Agent Features](#enabling-coding-agent-features)
+        * [Using the Coding Agent](#using-the-coding-agent)
+            * [Block Syntax](#block-syntax)
+                * [Block Examples](#block-examples)
+            * [File and Folder Syntax](#file-and-folder-syntax)
+                * [File Example](#file-example)
+        * [Creating Custom Coding Agents](#creating-custom-coding-agents)
         * [Quanta Agent Standalone App](#quanta-agent-standalone-app)
 * [Customizing Content Display](#customizing-content-display)
     * [Image Layout](#image-layout)
@@ -148,7 +157,6 @@
     * [Content Types](#content-types)
         * [HTML](#html)
         * [Markdown](#markdown)
-            * [Special Markdown Options](#special-markdown-options)
         * [JSON](#json)
         * [Files and Folders](#files-and-folders)
     * [Export Tips](#export-tips)
@@ -191,13 +199,16 @@
 * [Addendum](#addendum)
     * [Example ChatGPT Q and A](#example-chatgpt-q-and-a)
 
-#### Quanta User Guide
 
-# About Quanta
+# Quanta User Guide
+
+[View on GitHub](https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md)
+
+## About Quanta
 
 General overview and terminology
 
-## What is Quanta
+### What is Quanta
 
 Quanta is a web platform for creating, editing, and sharing hierarchical content, with features similar to Wikis, Content Management Systems, and Social Media platforms.
 
@@ -205,7 +216,7 @@ Create hierarchically organized content that's editable like a document, blog, o
 
 Quanta is `re-brandable` so it can be run with your own custom logos and branding images and text. The `quanta.wiki` website itself is just a 'demo instance' to showcase the capabilities of the platform.
 
-## Concepts and Terminology
+### Concepts and Terminology
 
 To allow a fine-grained hierarchical approach to content organization, the platform `"quantizes"` each piece of information into `Tree Nodes` (thus the name `"Quanta"`). 
 
@@ -225,7 +236,7 @@ Each user owns one branch of the tree (their account root node, and whatever you
 
 The final important thing to realize about `Nodes` is that in general the way you reply to a piece of content is by creating a `subnode under the node you're replying to`. So this means when multiple people are creating content collaboratively it automatically becomes the logical equivalent of a "Social Media Thread", and in Quanta these threads are therefore hierarchical. However, unlike a `chat room` there's never any confusion about what any post is a reply to because the parent node is understood to be that.
 
-## Sharing and Publishing
+### Sharing and Publishing
 
 Each node automatically has its own unique URL, and can be shared with others or kept private. You can also (optionally) enter a name on any node to make it available by a more user-friendly URL, that uses the name you give it instead of the default numerical identifier (Record ID).
 
@@ -233,7 +244,7 @@ For example, below is an example URL for a node owned by user 'bob' that's named
 
 * https://quanta.wiki/u/bob/blog
 
-## A New Collaboration Model
+### A New Collaboration Model
 
 The hierarchical structure is powerful for organizing data and documents, but is also what enables ad-hoc discussion threads to form under any node in the content. When collaborating on a document, for example, any piece of content can have arbitrarily large discussion threads branching off underneath it.
 
@@ -269,7 +280,7 @@ As remote work (i.e. "Working from Home") becomes the norm for many tech compani
 
 Importantly, these kinds of Deep Documents can also be powerful for their ability to preserve the thought processes, and discussions from all contributors, that led up to the final version of a document. This is obviously great for better accountability of decision making and for future reference regarding why a collaborative document ended up as it did.
 
-# Application Layout
+## Application Layout
 
 Main application sections described
 
@@ -296,11 +307,34 @@ In the screenshot below the `Folders Tab` is selected. `Think of the "Folders Ta
 ![file-p](attachments/63f2c99055770e1b97de0b29_p.png)
 
 
-# Content Editing
+### Views Menu
+
+Under `Menu -> View` here are several very commonly used views you can use to work with nodes in a particular order, or in a particular way. The View Menu looks like this:
+
+![file-p](attachments/66ca78453d26ec1bae8749ad_p.png)
+
+
+#### Timeline
+
+For the currently selected node, this will display all the contents under that node sorted chronologically.
+
+#### Thread History
+
+This will show all the parent nodes, of the selected node, going all the way up on the tree and display them all in order of creation. For example if this node is part of a conversation, it will show the entire "context" of the discussion which will consist of every part of the discussion that led up to the node itself.
+
+#### Document View
+
+The normal behavior of Quanta (i.e. the Folders view) is to display one level of the tree at a time, and requires you to expand nodes to navigate to various pieces of content. So the Document View is a way to display everything under a node all at once. It's called "Document" view because you're essentially displaying a tree branch formatted as a conventional monolithic document.
+
+#### Node Graph
+
+Displays a Graphical representation of the current node, and all it's child nodes.
+
+## Content Editing
 
 How to create and edit content.
 
-## Edit Mode
+### Edit Mode
 
 To start editing first enable "Edit Mode" via the menu.
 
@@ -317,7 +351,7 @@ Just like the file system on your computer has a single root folder, your accoun
 
 Tip: Click `Folders -> My Account` to go to your root node.
 
-## Edit Dialog
+### Edit Dialog
 
 Here's a screenshot of the Editor Dialog, which is where all editing is done. You can edit one node at a time.
 
@@ -352,16 +386,16 @@ Buttons at bottom of the editor do the following (from left to right):
 
 * Close editor without saving
 
-## Advanced Options
+### Advanced Options
 
 The "Advanced" section contains more features/capabilities, like entering a node name, priority, word wrap, encryption, signature setting, etc.
 
 ![file-p](attachments/6287b4e5a487d37f9989df9c_p.png)
 
 
-## Tips and Tricks
+### Tips and Tricks
 
-### Including URLS
+#### Including URLS
 
 When you put a url in any node the system will by default display it using a small image and snippet of text from the website if the website supports that kind of thing. For example if you put a youtube url in some content the GUI will display the image and title and description of that video at the bottom of the node.
 
@@ -383,11 +417,11 @@ Or this, to show the preview image but neither a long description nor the URL.
  -- https://somesite.com
 ```
 
-### Automatic Clipboard Attach
+#### Automatic Clipboard Attach
 
 If you hold down the CTRL key when you click an insert button (the Plus '+' Icon) your clipboard text will be automatically inserted as your node content and immediately saved.
 
-### Centering Text
+#### Centering Text
 
 If you want to center some text, simply wrap the line with `->` and `<-` as follows:
 
@@ -397,11 +431,11 @@ If you want to center some text, simply wrap the line with `->` and `<-` as foll
 
 You can also use markdown headers or other markdown but the centering can only be done on a single line.
 
-### Adding Empty Vertical Space
+#### Adding Empty Vertical Space
 
 You can add more vertical spacing between paragraphs or between anything at all just by putting a single dash (`-`) character on a line all by itself. Each line that contains just a dash will turn into vertical space.
 
-### Expandable Sections
+#### Expandable Sections
 
 You can add an expandable section of markdown that will display as a link the user can expand and collapse and defaults to 'collapsed', using the following syntax:
 
@@ -424,11 +458,11 @@ This is the text that was hidden until you clicked the Collapsible Heading
 
 To designate the end of the collapsible section put two blank lines in the text, to separate your collapsible section from any content that may come below it.
 
-# Tree Editing
+## Tree Editing
 
 Features for editing structured documents
 
-## Search and Replace
+### Search and Replace
 
 Under `Menu -> Edit -> Search and Replace` you'll find the same kind of "Search and Replace" feature that exists in most text editors. You can replace text under all nodes in the subgraph of the selected node.
 
@@ -437,7 +471,7 @@ Under `Menu -> Edit -> Search and Replace` you'll find the same kind of "Search 
 ![file-p](attachments/63eda70f32831373361c49fe_p.png)
 
 
-## Copy - Cut - Paste - Delete
+### Copy - Cut - Paste - Delete
 
 You can Cut, Paste, and Delete nodes in a hierarchical way similar to how you do it in your computer's file system.
 
@@ -445,33 +479,33 @@ When `Edit Mode` is enabled you'll see a checkbox to the left of each node that 
 
 If you want to rapidly un-check all checkbox selections, use `Menu -> Edit -> Clear Selections`
 
-### Delete
+#### Delete
 
 To delete nodes use the `Trash Can Icon` on the node, and that will delete all the nodes you've selected, or if you haven't selected multiple nodes it will just delete the node where you clicked the icon.
 
-### Cut and Paste
+#### Cut and Paste
 
 To move nodes to some other location (on the Tree), select the nodes to move, and click the `Scissors Icon` on one of the nodes. Then use the "Paste Here" buttons that start appearing on the page to paste the nodes elsewhere.
 
 If you decide you don't want to paste the nodes, click `Menu -> Edit -> Undo Cut` before you paste anywhere. Nothing actually changes in the database until you actually Paste the nodes.
 
-### Copy and Paste
+#### Copy and Paste
 
 Copy and Paste works just like Cut and Paste described above except since the "Copy/Paste" is a function used much less frequently, the Copy option is only available on the menu at `Menu -> Edit -> Copy`.
 
-## Moving Nodes
+### Moving Nodes
 
 Use the up and down arrow icons on each node to move nodes up or down one position. Child nodes are ordered and maintain their position, unless you move them.
 
-### Move To Top
+#### Move To Top
 
 `Menu -> Edit -> Move to Top` moves the selected node to the top position (above all other nodes) in its parent.
 
-### Move To Bottom
+#### Move To Bottom
 
 `Menu -> Edit -> Move to Bottom` moves the selected node to the bottom position below all other nodes at its level under the parent.
 
-## Drag and Drop
+### Drag and Drop
 
 When `Edit Mode` is enabled, you can generally drag any node to any other location on the tree, by using the mouse to click the dragable icon that looks like this vertical bar of dots: 
 ![drag-icon](attachments/6226813b990f3a11b5c54d1d_img1.png)
@@ -485,31 +519,31 @@ After you drag and drop a node you'll be prompted about what to do as your "Drop
 
 In the dialog above you can choose to Paste the node `Inside` (meaning as a child) the node you dragged it over or as another sibling under its same parent which is the `Inline` option.
 
-### Drop to Link Nodes
+#### Drop to Link Nodes
 
 You can also use the `Drag Gesture` to make the node you dragged have a "Link To" the node you dropped it on, and to do that you enter a "Link Name" of your choice, then click "Link". 
 
 After you've done this nothing will have moved in the database but your "Source Node" (the one dragged) will always have a link on it that you can click to jump to the "Target Node".
 
-### Drag to Upload Files
+#### Drag to Upload Files
 
 Files or URLs can be dragged over the app to immediately upload directly into Quanta's DB.
 
 * Upload a file by dragging it over the editor dialog.
 * Upload a file into a new node by dragging it over any of the '+' (Plus Buttons) that you see on the page when you have "Edit Mode" turned on.
 
-### Drag To and From History
+#### Drag To and From History
 
 You can also drag nodes to and from the History Panel (right-hand-side of page, at the bottom). Each History item displayed there is the chronological display of what nodes you've visited. This is the quickest way to move nodes from one part of the tree too some other perhaps distant part of the tree without using Cut-and-Paste.
 
-## Splitting and Joining
+### Splitting and Joining
 
 The split and join functions are located at `Menu -> Edit -> ...` and below you can see how to use these features.
 
 ![file-p](attachments/64f64d24f8127d7dc133a38a_p.png)
 
 
-### Split Node
+#### Split Node
 
 When editing a node it's common to end up with multiple paragraphs of text on a single node that you end up deciding you want saved as multiple *individual* nodes instead. This is easy to fix using the 'Split Node' feature.
 
@@ -520,11 +554,11 @@ Here's the dialog you'll see pop up when you save some text that has double spac
 
 Nodes can be automatically split apart, in two ways:
 
-#### Split Inline
+##### Split Inline
 
 Splits up the selected node into multiple nodes at the same level (under same parent) by using places where text is double-spaced as the delimiter (or divider) where things should be broken apart. 
 
-#### Split into Children
+##### Split into Children
 
 Performs the same kind of transformation as 'Split Inline' except it leaves the first chunk of text where it is, and then makes all the other chunks become children under that.
 
@@ -535,7 +569,7 @@ In the dialog you specify what the delimiter to split on is, as well is whether 
 ![file-p](attachments/64e57b8a0d3d9d7b99ea2f55_p.png)
 
 
-### Join Nodes
+#### Join Nodes
 
 This does the reverse of `Split Node`. This function combines multiple nodes into one node, by merging the content of all selected nodes into one block of text in one node. 
 
@@ -543,7 +577,7 @@ To join nodes first select (via check boxes) all the nodes you want to join, and
 
 NOTE: If any of the nodes being joined have attachments those attachments will also end up being added to the 'joined' node.
 
-### Append To Parent
+#### Append To Parent
 
 This is similar to the `Join Nodes` function but instead of joining a set of nodes to the first one in the set, this function will append all the content of the selected nodes to their parent node.
 
@@ -551,13 +585,13 @@ One nice way to use this feature is when authoring documents using ChatGPT to he
 
 For example if you've asked GPT something like "Rewrite this content to make it better." and you want to accept the content, this gives you a way to append it's reply content up to the parent node where you probably are wanting it inserted. So this `Append to Parent` feature saves you a bit of "Cut-and-Paste" effort in this case.
 
-## Set Headings
+### Set Headings
 
 Using `Menu -> Edit -> Set Headings` you can automatically update the markdown heading levels in all content under the selected node.
 
 For example, if your selected node starts with `## My Heading` that would be a markdown heading level of "2" (two hash marks), so running `Set Headings` (when you have that node selected) would update the entire content tree heading levels below that, so direct children's headings would be level 3 (###), and below them level 4 (####) etc. for all contained hierarchical levels of content.
 
-## Node Signatures
+### Node Signatures
 
 How to add digital signatures to nodes.
 
@@ -570,7 +604,7 @@ To add a digital signature to a node (signed using your browser's signature keys
 
 To sign all the nodes (that you own) under an entire branch of the tree, first select the node by clicking it, and then click `Menu -> Signature -> Sign`.
 
-### Purpose of Signatures
+#### Purpose of Signatures
 
 There are many different uses for signed nodes (to prove authenticity of nodes), but the following is how it's currently used in Quanta:
 
@@ -578,25 +612,25 @@ Whenever the server is generating a page of content it checks to see if the node
 
 Also for admin-owned content, if a signature fails, that node won't be displayed to the user at all, as an additional safety against database hacks. In other words, if a hacker gets all the way inside the Quanta database where they can alter data at will, they still will not be able to cause any of their hacked content to appear on the actual web page, because the only person in possession of the signature key is the admin's actual browser itself, and the admin signature key is not even stored on the server.
 
-### Verify Signatures 
+#### Verify Signatures 
 
 You can (as the admin) request a verification of all signatures on an entire branch of the tree, by selecting that branch of the tree, and then `Menu -> Signature -> Verify`
 
-### Remove Signatures 
+#### Remove Signatures 
 
 You can (as the admin) remove all signatures on an entire branch of the tree, by selecting that branch of the tree, and then `Menu -> Signature -> Remove`
 
 *todo: Add more info and/or link to page discussing uploading public keys*
 
-## Node Types
+### Node Types
 
 Every node has a 'type', which allows the system to customize the editing and visual presentation. Normally you can just ignore node types, because the 'Markdown Type' is used automatically by default.
 
 The most common exception to this is that the 'reply button' does automatically create a "Reply Type" node, that behaves like a markdown node but that the system can use to filter out or include "reply content" as desired by the user, and to be able to distinguish "main content" from "commentary" on large documents.
 
-[See Also - Semantic Web](index.md)
+[See Also - Semantic Web](#semantic-web)
 
-## Transfers
+### Transfers
 
 You can transfer nodes you own to a different user, so they can edit them directly, and then potentially transfer them back to you, or to someone else. A node Transfer doesn't change the location of the nodes, or alter their content in any way other than to change the node's owner.
 
@@ -621,23 +655,23 @@ This will open a dialog like the one below, where you'll enter the usernames of 
 
 In the dialog above you can select `Include Subnodes` if you'd like to transfer *all* subnodes that you own under the subgraph to the other person. If there are also subnodes under that branch of the tree that you don't own, then of course none of those nodes will be transferred. Only nodes owned by the "From" user will get transferred.
 
-### About Admin Transfers
+#### About Admin Transfers
 
 If you're the admin and you open the Transfer dialog you'll have the option of specifying the "Transfer From" user name as well as the "Transfer To" user name. This means the admin can initiate a transfer from any arbitrary person to any other arbitrary person.
 
 However even if the admin initiates the transfer in this way, the person on the receiving end of the transfer can still reject the transfer, and the nodes will revert back to being owned by previous owner.
 
-## Tips
+### Tips
 
 * Use the post-it note icon (at the upper right of the page) to rapidly insert a node into your "Notes" folder. You can always jump to your Notes folder using 'Menu -> Folders -> Notes'. This is the quickest way to take arbitrary notes, without having to waste time deciding where you want that info initially stored.
 
 * You can also Drag-n-Drop a file onto the post-it icon to save the file onto a Notes node automatically.
 
-# Uploading
+## Uploading
 
 Below are the steps to upload an image or other file attachment to a node.
 
-## Upload Image
+### Upload Image
 
 The `Node Editor Dialog` (shown below) has an upload button that you can use to add any number of attachments to the node. We'll show an example of uploading an image here,.
 
@@ -665,7 +699,7 @@ If a node has one or more images attached, the images are automatically displaye
 
 If the attachment is a media file (audio or video) there will be a "Play Audio" or "Play Video" button that opens an HTML-based streaming player, right in your browser.
 
-## Upload from Various Sources
+### Upload from Various Sources
 
 As you saw in the screenshot above, are several kinds of sources from which you can upload:
 
@@ -682,26 +716,26 @@ As you saw in the screenshot above, are several kinds of sources from which you 
 
 When uploading from a URL you can leave the checkbox labeled "Store a copy on this server" unchecked and this will save only the URL of the external file, rather than uploading it. This is useful if you don't want to load a file directly into your Quanta storage (consuming some of your quota), but would rather leave it as a link external to your personal storage space.
 
-## Account Quotas
+### Account Quotas
 
 Each user account is allotted a specific amount of storage space (quota) which controls how much data they're allowed to upload. The platform will automatically deduct from your quota any time you upload a file to the DB.
 
-## Tips
+### Tips
 
 * Upload a file by dragging it over the editor dialog.
 * Upload a file into a new node by dragging it over any of the '+' (Plus Buttons) that you see on the page when you have "Edit Mode" turned on.
 
-# Sharing
+## Sharing
 
 Sharing nodes makes them visible to other people, so they can browse directly to them and see them in their Feeds.
 
-## Node Ownership
+### Node Ownership
 
 When you create a node you're automatically set as the 'owner' of the node, and by default if you don't mention any other usernames in the text (or add shares in the Sharing Dialog) then the node will be private to you and only visible to you. 
 
 However, any node can be shared with specific other users, or made public to everyone by adding Shares to the node.
 
-## Basic Sharing Example
+### Basic Sharing Example
 
 One way to share nodes with people is to 'mention' their username in the text, as is done in most other Social Media apps, including Mastodon.
 
@@ -746,7 +780,7 @@ Since these are local usernames (local to the current instance we're on, quanta.
 
 The node is now shared with two people, and to the public, but we can still alter the sharing any time we want, by going back into the Sharing Dialog again. So for example if we decide we don't want the node public we can just delete the "Public" entry, and then only adam and jetson would be able to see the node.
 
-## Unpublished Option
+### Unpublished Option
 
 This is handy when you're working on a document you've shared as public already and don't want each and every paragraph edit you do to get broadcast out to everyone's feeds.
 
@@ -757,7 +791,7 @@ The 'Unpublished' option doesn't make the node private at all, because as long a
 ![file-p](attachments/628cfcd0e585752ab4b72a51_p.png)
 
 
-## Sharing Indicators
+### Sharing Indicators
 
 You can tell if a node is shared by looking at the upper right corner of the node itself, and if you see a 'world icon' or an 'envelope icon' that means the node is being shared to (i.e. is visible to) other people in addition to its owner.
 
@@ -765,23 +799,23 @@ The `World Icon` indicates the node is public, and the `Envelope Icon` indicates
 
 *Note: Those two icons won't be displayed unless you've enabled the extra node info via `Menu -> Options -> Node Info`*
 
-## Finding your Shared Nodes
+### Finding your Shared Nodes
 
 There's a "Search" menu (on the left side of the page) which lets you find which nodes you've shared.
 
-### Show All Shared Nodes
+#### Show All Shared Nodes
 
 Select `Menu -> Search -> Shared Nodes` to display all the nodes you own that are shared to other users.
 
-### Show Public Read-Only
+#### Show Public Read-Only
 
 Select `Menu -> Search -> Public Read-only` to display all the nodes you own that you've shared with the public, and which `do not allow replies`.
 
-### Show Public Appendable
+#### Show Public Appendable
 
 Select `Menu -> Search -> Public Appendable` to display all the nodes you own that you've shared with the public, that `*do* allow replies`.
 
-# Artificial Intelligence - LLMs
+## Artificial Intelligence - LLMs
 
 Converse with AI, write books or documents collaboratively with the AI. 
 
@@ -789,43 +823,43 @@ In local deployments of Quanta (that you run yourself) Quanta provides an agent 
 
 Interact with AI by asking questions and getting answers automatically saved into your tree. The AI can assist you with almost any kind of task, or help you improve your written content, and it retains a contextual memory of all conversations, by using the tree location as "context".
 
-When you ask a question to the AI you'll automatically be switched over to the `Thread View` tab so you can see the current AI conversation thread all in a simple chronological view, and ask follow up questions, in an "AI Chat". See the [Thread View User Guide Section](index.md) for more on how the Thread View itself works.
+When you ask a question to the AI you'll automatically be switched over to the `Thread View` tab so you can see the current AI conversation thread all in a simple chronological view, and ask follow up questions, in an "AI Chat". See the [Thread View User Guide Section](#thread-view) for more on how the Thread View itself works.
 
-## AI Services Supported
+### AI Services Supported
 
 By a selection in your account in `Menu -> Account -> Settings -> AI -> AI Service` you can choose which AI Service to use in your account. You can choose OpenAI, Gemini, or Perplexity.
 
 If you're doing image recognition, image generation, or speech generation, you can only use the "OpenAI" Service, but if you're doing purely conversational AI where you're having a conversation with an AI Chatbot then you can use any of the three services.
 
-### Anthropic
+#### Anthropic
 
 Including both **Sonnet** (best combination of performance and speed), and **Opus** (most intelligent and advanced model) Chat models.
 
 <img src='attachments/65f1f0fbe1bcaf0c420fca43_p.png' style='width:20%'/>
 
 
-### OpenAI
+#### OpenAI
 
 Including Chat Model, Text to Image (Image Generation), Image Understand, Text to Speech (Speech to MP3 Generation)
 
 <img src='attachments/65c5a9043e8c3b6aec82835c_img1.png' style='width:20%'/>
 
 
-### Perplexity
+#### Perplexity
 
 Including models: Sonar, Sonar Online, Meta's Llama 3
 
 <img src='attachments/65c5a91a3e8c3b6aec82835d_p.png' style='width:20%'/>
 
 
-### Google Gemini
+#### Google Gemini
 
 Includes google's new chat model, for interactive chats.
 
 <img src='attachments/65c5a9543e8c3b6aec82835e_p.png' style='width:20%'/>
 
 
-### Meta Llama 3
+#### Meta Llama 3
 
 Meta's best Open Source AI LLM.
 
@@ -841,23 +875,21 @@ Everything in Quanta is offered for free except for AI Capabilities. Since AI is
 * Ask questions about the content of any Quanta tree branch
 * Request Code Refactoring via the `Quanta Agent`
 
-## AI Conversations
+### AI Conversations
 
 The screenshot below shows how to ask a question to the AI, and get it's answer back. `Answers` are always inserted as a new node directly under the `question` node. This means AI conversations are actually a tree and not a top-to-bottom list.
 
 <img src='attachments/6591ebdbc9873822b24fa632_img1.gif' style='width:100%'/>
 
 
-## A Node that Asks a Question to AI
+### A Node that Asks a Question to AI
 
 The screenshot below shows the easiest way to ask the AI a question. You just type your question and click the `Ask GPT` button. The answer to the node content will be inserted as a subnode directly under the node containing the question.
 
 ![file-p](attachments/64f9194706a5b22fcf32ed0d_p.png)
 
 
-## Asking Questions to the AI
-
-You can ask questions to ChatGPT, and it's answer will be saved as a subnode under the question node. This means you can have a more `hierarchical` way of chatting with the AI, than what most chat systems provide, where any location in this hierarchy has it's own unique "context". 
+You can ask questions to ChatGPT, and it's answer will be saved as a subnode under the question node. This means you can have a more `hierarchical` way of chatting with the AI, than what most chat systems provide, where any location in this hierarchy has it's own unique "context".
 
 By "context" we simply mean the AI knows exactly what has been previously said during any conversation, and will resume talking to you at any point starting with that specific set of "memories" in it's "mind".
 
@@ -865,11 +897,11 @@ In other words, if you're having a conversation (i.e. asking questions) and go b
 
 Once you've gotten an answer back from the AI, you can then select the answer node, and create another question node under it using the same process, to continue with the conversation (i.e. asking more questions).
 
-You can keep asking more follow-up questions as long as you want, and that will just extend the length of that "conversation branch" under the tree. You can of course go back to any location in the tree and ask a different follow-up question and you will get an answer equivalent to if you had rolled-back the "memory" of the AI back to that point in time. 
+You can keep asking more follow-up questions as long as you want, and that will just extend the length of that "conversation branch" under the tree. You can of course go back to any location in the tree and ask a different follow-up question and you will get an answer equivalent to if you had rolled-back the "memory" of the AI back to that point in time.
 
 This memory of the conversation state is called Hierarchical Contextual Memory (HCM). Stated another way, we could say that the "context" (the AI's memory and understanding of the conversation) for any question always includes all "parent nodes" at higher levels up in the tree, going back to when you asked your original question.
 
-## Questions about a Subgraph
+### Questions about a Subgraph
 
 Use `Menu -> AI -> Ask about Subgraph` to open a text entry box where you can enter a question (to be answered by AI) about the content under the selected branch of the tree. In other words you can select a node that is at the top level of whatever you want to ask questions about, and then click this menu item.
 
@@ -877,39 +909,43 @@ The term *subgraph*, of course means just "everything under that branch". All of
 
 If you only want to ask an AI question about a limited subset of nodes you can use the checkboxes on each node (when `Edit Mode` is enabled) to select one or more nodes and this will cause the subgraph to be filtered to only included your selected nodes as input context to the AI.
 
-## Configure AI
+### Custom AI Agents
 
-Use `Menu -> AI -> Configure AI` to configure a node (any node), so that all questions anywhere on the tree under that node will have the prompt settings you specify. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers.
+Use `Menu -> AI -> Configure Agent` to configure a node (any node), to act as an AI Agent, so that all questions anywhere on the tree under that node will be answered by the Agent. You define the Agent by putting into a text field a description (i.e. instructions) for the role the AI Agent should play. The technical term for these instructions is called the `System Prompt`. All it really means is that you can describe a `role` for the AI to assume during it's answers. The AI itself is interpreting whatever you type for this role description, so you can pretty much say anything you want, to give the AI instructions on what it's task will be for how it will respond to user prompts.
 
-![file-p](attachments/65b6b364e6d38a174f58684d_p.png)
+The image below shows a simple, single sentence, `System Prompt` that tells the Agent being defined there that it's a Physics expert helping out with writing tasks.
+
+<img src='attachments/65b6b364e6d38a174f58684d_p.png' style='width:100%'/>
 
 
-### System Prompt Examples
+#### System Prompt Examples
 
 Here are some other examples to give you an idea of just how flexible and intelligent the AI is at assuming various roles. The `System Prompt` is where you tell the AI what role it is going to play in the discussion. Here are some more examples:
 
 * You are a helpful assistant. *(This is the default System Prompt if one is not specified)*
 
-* Summarize content you are provided with for a second-grade student.
+* You will summarize content you are provided with for a second-grade student.
 
 * You will be provided with a piece of code, and your task is to explain it in a concise way.
 
 * You will be provided with a block of text, and your task is to extract a list of keywords from it.
 
-* Create a Python function from a specification.
+* You will create a Python function from a specification.
 
 * You will be provided with a sentence in English, and your task is to translate it into French.
 
-* Convert natural language into SQL queries.
+* You will convert natural language into SQL queries.
 
-## AI Service Selection
+Note that all these start with `You will` or `You are`. This is not required but always makes sense, because what you're doing is describing to the AI how it will be have, and you give those instructions as if you were a person talking to it, instructing it.
+
+### AI Service Selection
 
 Quanta can connect to several different AI APIs on the back end, which is what performs the actual AI services. Any time you ask the AI a question it goes to your currently active Service. You can change what service you want to use any time using the selection in your Account Settings at `Menu -> AI -> AI Settings`, as shown in the following image:
 
 <img src='attachments/65bc2b7bcf425c5fe6f2dde2_p.png' style='width:100%'/>
 
 
-### AI Cloud Services Supported
+#### AI Cloud Services Supported
 
 No matter what AI service you use, you will be charged only exactly what you consume based on OpenAI and/or Perplexity's pricing models. Quanta doesn't charge extra for use of AI, but merely passes your costs thru without any markup.
 
@@ -927,12 +963,12 @@ Here's the list of the available AI Services:
 | **Perplexity: Sonar** | Perplexity's best high-end powerful general-purpose AI.                    |
 | **Perplexity: Sonar Online** | Perplexity's AI which has access to the latest news and content from the web. |
 
-## Using AI for Writing
+### Using AI for Writing
 
 <img src='attachments/660b1b75b2d57601ed09274c_img1.png' style='width:20%'/>
 
 
-### Generating Content with AI
+#### Generating Content with AI
 
 Let's say you're writing a research paper, and you want to get AI assistance with your writing, or even let AI do all your writing for you.
 
@@ -940,7 +976,7 @@ In this scenario you would first create the top level "root" of your document on
 
 There are only two simple steps to start creating documents using AI assisted writing (or completely AI-Generated) writing, as follows:
 
-#### Step 1 - Configure Document Root Node to have AI Settings
+##### Step 1 - Configure Document Root Node to have AI Settings
 
 You would then select that document root node and click `Menu -> AI -> Configure AI` settings and enter into that dialog something like the following: 
 
@@ -949,7 +985,7 @@ The above system prompt at the root of the document gives the AI the ability to 
 <img src='attachments/64f7a2a206a5b22fcf329784_p.png' style='width:100%'/>
 
 
-#### Step 2 - Turn on AI Writing Mode
+##### Step 2 - Turn on AI Writing Mode
 
 In the AI menu simply check the `Writing Mode` checkbox. This will make it so that as long as that check box is enabled every node you insert into your content will have a text field where you describe the content you want to create, and then when you click the `Ask AI` button at the bottom of the editor you get whatever written content you've requested.
 
@@ -975,17 +1011,17 @@ Of course now if we open the node again, we see the content that was generated, 
 <img src='attachments/66a47ac13035ce3a41d93a7b_p.png' style='width:100%'/>
 
 
-#### Summary
+##### Summary
 
 To summarize the above writing process. You can simply check the `Menu -> AI -> Writing Mode` checkbox, and that will put the app in a mode where it always displays an `AI Query` text field at the bottom of the editor where you can tell the AI what content you want it to generate, and it will generate that content for you when you click `Ask AI`.
 
 You can then edit the generated content yourself if you want or update your AI Query and regenerate another version of what you asked for. Just beware that when you click `Ask AI` it will overwrite your current node content with the generated content.
 
-### Writing an Entire Book with AI
+#### Writing an Entire Book with AI
 
 *Note: If you're wondering why in the world you'd be interested in "writing a book" when you're not an even author, scroll down to the last section below, where we discuss the power of what's really going on during the "writing" process and how you can use it even if you have no intentions of sharing your "writing".*
 
-#### Overview of the Writing Process
+##### Overview of the Writing Process
 
 You can use Quanta to write an entire book, on any topic, for any target audience! Here's the general approach for how the writing and creative process works:
 
@@ -1001,11 +1037,11 @@ There are numerous reasons we considered it better to generate the book content 
 
 The chapters and sections, and the overall purpose of the book (that you provided when you created the initial scaffolding) will always be taken into account as you auto-generate new paragraphs of content, but you can also customize the content creation instructions, specific to each paragraph, as shown in the actual example steps in the screenshots below.
 
-#### Example - Write a Book on Bicycling
+##### Example - Write a Book on Bicycling
 
 Let's look at the actual steps to create a book about bicycling for adults getting into the sport. The screenshots below show the process of creating this book from scratch and then generating a couple of nodes of content for it, although you could finish the entire book simply by adding content under each section which only takes a single mouse click to do.
 
-##### Step by Step Screenshots
+###### Step by Step Screenshots
 
 The next 17 screenshots below show you how to create books (i.e. auto-generate content), or other structured texts using AI.
 
@@ -1077,7 +1113,7 @@ These default instructions were carefully crafted to give the user a good book w
 <img src='attachments/660b36fcb2d57601ed0927d6_p.png' style='width:100%'/>
 
 
-#### Why use Book Writing Features
+##### Why use Book Writing Features
 
 (If you're not even an author!)
 
@@ -1095,47 +1131,144 @@ In summary, the reason the Book Writing feature of Quanta is important to author
 
 Remember, there's an "Export to PDF" feature in Quanta too, so if you do want to create something (a book, or document) that's easily shareable outside the Quanta server instance, you can always export it to PDF, and let that be your final product.
 
-## AI Agent for Code Refactoring
+### AI Agent for Code Refactoring
 
-*Note: This section is only for developers and admins, and is not applicable to most users because the `Coding Agent` isn't available on the quanta.wiki website.*
+*Note: This section is only for developers and technical people, and is not applicable to most users because the `Coding Agent` isn't available on the quanta.wiki website.*
 
-The Coding Agent is only available for local deployments that you run yourself, and is not available on quanta.wiki website because it requires direct access to your code so it can read the code, analyze it, and make changes to it.
+The Coding Agent is only available for local deployments that you run yourself, and is not available on quanta.wiki website because it requires direct access to your code so it can read the code, analyze it, and make changes to it, automatically in real-time.
 
-Note: The Coding Agent is also available as a Streamlit app that's checked into the `quantizr` monorepo on Github in the [QuantaAgent folder](https://github.com/Clay-Ferguson/quantizr/tree/master/QuantaAgent)
+Note: The Coding Agent is also available as a Streamlit app that's checked into the `quantizr` monorepo on Github in the [QuantaAgent folder](https://github.com/Clay-Ferguson/quantizr/tree/main/QuantaAgent). The [README](https://github.com/Clay-Ferguson/quantizr/blob/main/QuantaAgent/README.md)
+ in the Coding Agent project contains all the docs on how to use it.
 
-### Configuring the Coding Agent
+#### Enabling Coding Agent Features
 
-The docker compose file named `dc-dev.yaml` shows an example of a setup that enables the Coding Agent in the QAI Microservice. The important parts of that yaml that activate the Coding Agent are that there's a volume named `/projects` and `/data` in the QAI service configuration, and there's a variable `aiAgentEnabled: "true"` that's defined in the Quanta service itself which tells the app to enable the agent.
+The docker compose file named `dc-dev.yaml` shows an example of a setup that enables the Coding Agent in the QAI Microservice (which enables the Coding Agent in the Quanta app also). The important parts of that yaml that activate the Coding Agent are 1) the two volumes named `/projects` and `/data` in the QAI service configuration, and 2) the variable `aiAgentEnabled: "true"` that's defined in the Quanta service itself which tells the app to enable the agent. After these two changes the Coding Agent features in the app will become available.
 
-Once you've made these changes the AI menu will show an `Agent Mode` checkbox (in addition to the `Writing Mode` one), which will let you submit AI prompts to the Coding Agent using the `Ask AI` button on the Node Editor. Also once this is activated you'll see a text field in your AI Settings (`Menu -> AI -> Settings`) panel which lets you provide a comma delimited list of file extensions which you want to include in the `/projects` folder scans. These file extensions are now you narrow down what you want the coding agent to see. Normally you would put extensions of code files like py (Python), js (JavaScript), etc.
+#### Using the Coding Agent
 
-### Quanta Agent Standalone App
+Once you've made these changes to the docker YAML the AI menu in the app will show an `Agent Mode` checkbox (in addition to the `Writing Mode` one), which if checked, will let you submit AI prompts to the Coding Agent using the `Ask AI` button on the Node Editor.
+
+Also once this is activated you'll see a text field in your AI Settings (`Menu -> AI -> Settings`) panel which lets you provide a comma delimited list of file extensions to include from the `/projects` folder scans. These file extensions are how you narrow down what you want the coding agent to see. Normally you would put extensions of code files like py (Python), js (JavaScript), etc.
+
+Once you've enabled these AI settings mentioned above, any questions you ask to the AI will be assumed to be questions about your codebase (i.e. whatever's in `/projects` docker volume, per docker YAML) and you can either ask questions about the code or ask for actual refactoring to be done!
+
+If you ask for refactoring to be done, the Quanta AI agent will actually make those changes directly in your code in real-time, as it answers your questions, or performs what you ask it to do. So the best practice is to be working in a git branch where you can allow the AI to modify your code and then you can use git (or your IDE Git integration/extension, to be more specific) to immediately show you the changes the AI has made which you can then either accept or reject.
+
+When working with the Coding Agent your System Prompt (Agent Definition) and ordinary prompts (Questions on nodes) can have three different types of special syntaxes which allow you to refer directly to specific parts of your code by name. These syntax elements are `block`, `file`, and `folder`, described as follows:
+
+##### Block Syntax
+
+You can define `Named Blocks` in your code to identify specific areas which you'd like to ask questions about by name (name of a block), to save you from having to continually paste those sections of code into AI prompts.
+
+In other words, this tool will scan your project and extract named snippets (or sections of code) called `blocks` (i.e. fragments of files, that you identify using structured comments, described below) which are then automatically injected into your prompts.
+
+Named blocks are defined using this kind syntax to wrap part of your files:
+
+```sql
+-- block_begin SQL_Scripts
+...some sql scripts...
+-- block_end 
+```
+
+--or--
+
+```java
+// block_begin My_Java
+...some source code...
+// block_end 
+```
+
+In the example above, the text that comes after the `block_begin` is considered the `Block Name` and, so those blocks, anywhere in your code, can now be referred to as `block(SQL_Scripts)` and/or `block(My_Java)` in the text of any prompt, and it will be replaced with the block content (actual source). You can also request for those blocks to be refactored and updates by the AI as well.
+
+Just be aware that wherever you actually put `block(block_name)` in your prompt the entire content of that block will be included right there in the prompt, in it's entirety, but wrapped in a way that the Agent will also understand that it is a named piece of code, and is a "block".
+
+If you want to mention a block in your prompt in a way that the AI Agent will know what you're talking about just omit the parenthesis and talk about the block by name. For example, the following prompt would make sense to the AI: `"What are the names of my SQL tables that are in block SQL_Scripts?"` In that prompt you're just asking a question about a block. You could also request refactoring by mentioning block names like this: `"In block SQL_Scripts add a new table create SQL statement that creates a table named 'people' and has 'first_name' and 'last_name' columns in it."`
+
+In summary: The block syntax lets you create named sections in your codebase, which you can then discuss with the AI, and it will understand exactly what's in the Named Blocks simply by you referring to the blocks by name, and you can also ask for specific refactoring to be done in one or more blocks, simply by telling the AI what you want done and the Block Name for where you want it done.
+
+###### Block Examples
+
+Suppose you have a Java file that contains the following, somewhere (anywhere) in your project:
+
+```java
+// block_begin Adding_Numbers
+int total = a + b;
+// block_end
+```
+
+You can run LLM Prompts/Queries like this:
+
+    What is happening in the following code:
+
+    block(Adding_Numbers)
+
+So you're basically labeling (or naming) specific sections of your code (or other text files) in such a way that this tool can find them, answer questions about them, and/or modify them directly. You can go anywhere in your codebase and wrap sections of code with this `block_begin` and `block_end` syntax, to create named blocks which are then template substituded automatically into your prompt. Also once the AI has seen any code with the named block in it, it can also automatically refactor any of that code for you, and in any number of named blocks, simultaneously.
+
+##### File and Folder Syntax
+
+The `file` and `folder` syntax works very similarly to the `block` syntax so you should read the above `Block Syntax` section before you read this. Whenever you want to refer to a specific file when talking to the AI Agent about your code you can simply include something like `file(/my/file/Name.java)` in a prompt or System Prompt, and the entire content of that file will be embedded right into your prompt in a way such that the AI knows which file it is and what it's file name is. 
+
+Similarly, when you include something like `folder(/my/folder/name)` in a prompt, the entire content of that folder and all the content of all the files it contains will be embedded into the prompt in such a way that the AI understands all of it.
+
+So once you refer to files and/or folders in this way the AI will then be able to answer questions about any of it and also perform any kinds of code refactoring you might ask for.
+
+###### File Example
+
+The simplest possible refactoring prompt, using `file()` would be something like this:
+
+```txt
+Modify the following Python file, so that it's using a 
+class that has a public static `run` method to do what it does.
+
+file(/temperature_convert.py)
+```
+
+In the above prompt we're using the `file()` syntax to inject the entire `temperature_convert.py` file into the prompt, and the tool will actually *do* what you're asking for to the actual file when you run the tool! In other words this tool will modify your source files if you ask for a refactor. The default `config.yaml` already points to the `test_project` folder, which contains a `temperature_convert.py` which is not implemented as a class. So running the prompt example above will update the actual python file and make it into a class as the prompt requested.
+
+#### Creating Custom Coding Agents
+
+By simply enabling the `Coding Agent` features (described above) you'll have access to a general purpose Coding Agent which knows how to do simple refactoring of your project. However, for lots of use cases, it's more convenient to define a specific Agent which focuses on a particular area or aspect of your codebase, so that each time you need to work on that area of the code the Agent already will understand the full context.
+
+For example if your project has SQL and a Database there will be specific files and folders that always need to be the focal point of any refactoring discussions related to the SQL and DB. So here's how you'd configure such an Agent:
+
+Here's an example of an AI Agent configured to be an SQL expert for working on a codebase. Note that since we have Coding Agents enabled for the app the additional fields for `Folders to Include` and `File Extensions` appear on the AI config panels, so that any Custom Agents you define can be given not just the specific instructions, but they also can be told which files and extensions to include and will ignore any files not on those folders or not matching the provided file extensions.
+
+<img src='attachments/66ce0a8a0843c4114d7be58b_p.png' style='width:100%'/>
+
+
+To create a `Coding Agent` like the one above, simply create a node and enter into it's content text something like `SQL Coding Agent`. Then select that node and choose `Menu -> AI -> Coding Agent` which will display the `Configure AI Agent` dialog (shown above). Then in this dialog you'll describe an SQL Agent who knows exactly where your SQL-related code is in the project. Once you've done this, your node will be used for all questions asked in sub-branches under it.
+
+You can then start asking questions or requesting refactoring to be done, and the agent will be active for those questions, as long as you have `Menu -> AI -> Agent Mode` checkbox selected. This checkbox makes the app assume all your questions are going to an agent and are related to code refactoring.
+
+The way you submit requests (i.e. prompts) to the agent is to create a subnode anywhere under the `SQL Coding Agent` node (or any node you've configured to be an agent) and enter node content/questions like, for example, "What are the names of our SQL tables?" and then click `Ask AI` button. The system will notice your question is being asked within a part of the tree under the `SQL Coding Agent` and will therefore let that specific Agent handle the question, and give you the answer, or do whatever refactoring you've asked for.
+
+#### Quanta Agent Standalone App
 
 The original form of the Quanta Agent was a Streamlit app, that can run all by itself (outside of the Quanta app) as a pure Python app that you can run locally, and this app is still available, although it's now just sitting in a folder named `QuantaAgent` inside the quantizr monorepo.
 
 To run this standalone Python app, you can just take the `QuantaAgent` and `common` folders out of the root of the monorepo and put them somewhere in some other folder (but as siblings, in same parent folder), and then you can just run the `Quanta_Agent.py` script and it should just work as a Streamlit app.
 
-The `QuantaAgent` folder itself contains only files related to the `Streamlit` app, and all of the actual implementation of the AI Agent is contained in the `common` folder so that it can be used by both the Quanta AI Microservice (QAI) and the Streamlit app.
+The `QuantaAgent` folder itself contains only files related to the `Streamlit` app, and all of the actual implementation of the AI Agent is contained in the `common` folder so that it can be shared by both the Quanta AI Microservice (QAI) and the Streamlit app.
 
 Instructions for how to do the prompting in your Coding Agent prompts can be found in the following files, and are the same regardless if whether you're doing Coding Agent prompting from the Quanta app or the standalone Streamlit app.
 
-### Coding Agent Docs:
+#### Coding Agent Docs:
 
-* [README](https://github.com/Clay-Ferguson/quantizr/blob/master/QuantaAgent/README.md)
+* [README](https://github.com/Clay-Ferguson/quantizr/blob/main/QuantaAgent/README.md)
 
-* [Docs Folder](https://github.com/Clay-Ferguson/quantizr/tree/master/QuantaAgent/docs)
+* [Docs Folder](https://github.com/Clay-Ferguson/quantizr/tree/main/QuantaAgent/docs)
 
-**[ChatGPT Example Q&A](index.md)**
+**[ChatGPT Example Q&A](#chatgpt-examples)**
 
-# Customizing Content Display
+## Customizing Content Display
 
 How to organize how images and subnodes are displayed.
 
-## Image Layout
+### Image Layout
 
 When you upload multiple images onto a node, the images will, by default, be arranged and displayed from left to right, and top to bottom according to the widths of each image.
 
-### Example Layout 1 
+#### Example Layout 1 
 
 Below you can see we've uploaded 4 images to a node, and set their widths to 100%, 33%, 33%, 33%.
 
@@ -1149,7 +1282,7 @@ If you wanted a 2 column tabular layout you could set all images to 50%, 3 colum
 <img src='attachments/63674133e5ff8517e39ebe04_p.png' style='width:100%'/>
 
 
-### Example Layout 2
+#### Example Layout 2
 
 Next we'll edit the Node Attachments and set them all to 50% width.
 
@@ -1161,7 +1294,7 @@ Here's how the above settings will display the images (below). As expected, we s
 <img src='attachments/63f2a78e55770e1b97ddff53_p.png' style='width:100%'/>
 
 
-### Positioning Images
+#### Positioning Images
 
 If you want one or more images to appear at arbitrary locations in the content text of the node you can specify the "Position" option as "File Tag". Here's an example of that on a node with one single image, which we've chosen to insert in the middle of some content text.
 
@@ -1178,7 +1311,7 @@ Other positioning options are as shown in the screenshot below (`Center, Top Lef
 ![Screenshot from 2023-02-19 17-08-25.png](attachments/63f2abd255770e1b97de0086_p.png)
 
 
-## Node Layout
+### Node Layout
 
 You can also configure how subnodes are displayed under any given node, if you want something other than the normal top-to-bottom view of content. 
 
@@ -1201,14 +1334,14 @@ You can also click the option for `Inline Subnodes` which is the double down arr
 
 which will expand the subnodes on the page with their parent so that the user can see them without expanding the tree.
 
-## Tips
+### Tips
 
 1) Click on any uploaded image to view it full-screen, or navigate around between all images under the same parent node. 
 
 
 2) CTRL-Click any image to zoom in/out on the location of the image where you clicked
 
-## Collapsible Sections
+### Collapsible Sections
 
 Quanta supports a special syntax to make content expandable/collapsible, which looks like the following (in the editor image below), which is how the node you're now reading was created.
 
@@ -1224,19 +1357,19 @@ The content up until the double spaced area (two blank lines) is assumed to be t
 
 As you saw in the example above, the expand/collapse link text will be whatever text is between the `-**` and `**-`, which is a syntax that will render just as a normal bold font, on systems that don't support this non-standard Markdown syntax feature.
 
-## URL Previews
+### URL Previews
 
 When you include a url/link on a line all by itself in the content, it will be rendered as a clickable markdown link, and will also have the Content Preview Image, Title, and Description for that link (whenever that link provides that content preview info of course, because not all URLs do) displayed on the page.
 
 If you want to display just the link itself and not any Preview, then start the line with the url with an asterisk an asterisk and a space (i.e. `"* "`) before the url. To display *only* the Preview and not the link text itself, start the line with `"- "`. If you want only the Preview Image and Title (without the description) then start the line with `"-- "`.
 
-# Document View
+## Document View
 
 Viewing tree content as a top-to-bottom linear document.
 
 Most of the time you'll find it easier to browse the content tree using the `Folders Tab` where you can only see one section (or subbranch) of the tree at a time. However sometimes it's more convenient to view a branch of the tree as if it were actually a single-page document, and that's what the "Document View" does.
 
-[Here is a screencast](index.md) demonstrating the Document View
+[Here is a screencast](#doc-view-example) demonstrating the Document View
 
 Use the Document Icon at the upper right of the page to display whatever you're viewing in Folders Tab as a Document View.
 
@@ -1263,7 +1396,7 @@ If we want to have more interactivity with each node, other than to just read th
 
 Note that in the screenshot above we had switched back to the "Menu" (via radio button at upper left) and so now although the `Table of Contents` is no longer visible you can still get back to it. The `Doc Index` radio button will stay available always, during your session, so you can navigate around in that document at any time.
 
-# Thread View
+## Thread View
 
 Viewing all ancestors (parent) of a node.
 
@@ -1278,7 +1411,7 @@ Here's what the menu looks like, after you click the `"..."` icon:
 
 Since each node has only one parent node, you can envision the process of walking up the tree node by node, always taking the parent and then the parent above that, etc, repeatedly. This process builds up the 'reply chain' above the node (if the node is part of a conversation), going back to the beginning of the conversation. Then the Thread View displays the entire conversation, from top to bottom.
 
-## AI Chat - Use Case for Thread View
+### AI Chat - Use Case for Thread View
 
 One scenario where the Thread View is very useful is when chatting with AI (Large Language Models). For this reason, any time you ask a question to an AI, the app will automatically switch you over to the Thread View so you can see the entire back and forth conversation thread between you and the AI. You can then ask followup questions by clicking a button at the bottom, similar to how most other AI chat interfaces work.
 
@@ -1286,11 +1419,11 @@ When doing AI chats in this way, it's also important to know that whatever you s
 
 As mentioned in the AI Section of this User Guide, you can always jump back over to your Content Tree (Folders Tab), and branch off at any prior location in the past conversation, by asking a different question than you had originally asked. When you branch off like this, the entire tree is persisted of course, but the actual "Context" for the AI Conversation will still be just the sum total of all parents above the node where you ask the question at any time.
 
-# Searching
+## Searching
 
 How to run a full-text search under any branch of the tree.
 
-## Full-Text Search
+### Full-Text Search
 
 Let's say we want to search the entire book `War and Peace` which is part of the sample data on the Quanta[.wiki] website. Searches are always done only inside the node you're viewing, so we navigate to that node to make it the top node on the page, and click the `Search Icon`.
 
@@ -1313,11 +1446,11 @@ The ability to search all subnodes (targeted to specific document sections), or 
 
 For example, if you're working on a team collaboration on a large document you can select the root of that document and search inside it only, to search only within that entire document. Similarly if you only want to search a specific sub-section of a document you can do that as well.
 
-## Specialized Searches
+### Specialized Searches
 
 The first node at the top of the page (the 'parent' of the other nodes on the page) will have a Search button (magnifying glass icon), which can be used to search the entire subgraph under said parent node, as you've just seen above. However there are also Search options on the main Menu which are described as follows:
 
-### By Content
+#### By Content
 
 Select `Menu -> Search -> By Content` to find text under any branch of the tree. This does the same kind of search as using the Search button (Magnifying glass icon) at the top of the page. Remember, the search will be performed *only* underneath the selected node (and optionally all its subnodes as well).
 
@@ -1328,21 +1461,21 @@ Here's what the search dialog looks like. There are various options allowing you
 ![file-p](attachments/5fa1926c6b842575d0e925f7_p.png)
 
 
-### By Node Name
+#### By Node Name
 
 Select `Menu -> Search -> By Node Name` to search for nodes by looking for the identical matching node name. Each node can optionally have a 'name' set for it (using the 'Advanced Section' of the Node Editor Dialog). The main reason to name a node is to allow the node to have a more friendly URL.
 
 ![file-p](attachments/5fa1926c6b842575d0e925f8_p.png)
 
 
-### By Node ID
+#### By Node ID
 
 Select `Menu -> Search -> By Node ID` to search for the node that has a specific ID. Each node has an auto-generated unique Record ID that can always be used to reference the node.
 
 ![file-p](attachments/5fa1926c6b842575d0e925f9_p.png)
 
 
-# Timelines
+## Timelines
 
 View a rev-chron listing of the subgraph under any node.
 
@@ -1350,7 +1483,7 @@ In the context of the Quanta platform, we have a very specific meaning for the t
 
 In other words a `timeline` consists of everything (every node) under that branch of the tree presented as a list (not a tree), with the newest on top". A common abbreviation for this is "rev-chron".
 
-## Terminology
+### Terminology
 
 Although the term 'timeline' has become associated with Social Media feeds in recent years, the term timeline, as used in Quanta, is a more specific feature and just means some rev-chron list, generated by the user 'on demand' similar to a type of 'search results' view.
 
@@ -1358,7 +1491,7 @@ So you can "View a Timeline" of any node that just means generating this rev-chr
 
 Quanta does have a Social Media Feed, but that's under the 'Feed Tab', and it's not generally referred to as a `timeline` but is referred to as a `feed`.
 
-## Powerful Collaboration
+### Powerful Collaboration
 
 Timelines give you a powerful way to find out what the newest content is under any branch of the tree, with a single click. This is extremely useful for collaborative document editing.
 
@@ -1391,7 +1524,7 @@ So here is our node again, in a different set of results, but still at the top s
 <img src='attachments/6287d7c896d3696042d5d7a3_p.png' style='width:100%'/>
 
 
-## Practical Use Cases
+### Practical Use Cases
 
 If you're working collaboratively with a team on a document (with multiple other people), you can view a timeline to see everyone's latest contributions to the document (or even just a sub-section of the doc), as a rev-chron list. With one click you can also jump from the rev-chron listing (aka. Timeline) to the actual node in the main content tree.
 
@@ -1399,33 +1532,33 @@ The Timeline capability is also useful for reading discussion threads and allows
 
 This is true because the "reply" button on any node will create a subnode under the node you're replying to, and so this builds up a tree structure that organizes the conversation very well. So the Timeline View is a way to view the tree not as a tree but as a rev-chron list.
 
-## Timeline Sort Options
+### Timeline Sort Options
 
 You can generate a timeline based on when nodes were first created, or when nodes were last modified. Usually the "Last Modified" option is what you want so that any recently edited nodes will show up near the top based on the time they were last edited, which is usually more important than the time when the node was first created.
 
 Use `Menu -> Timeline` for the following other sort options.
 
-### Created
+#### Created
 
 Displays a timeline based on each subnode's creation time.
 
-### Modified
+#### Modified
 
 Displays a timeline based on each subnode's modification time.
 
-### Created non-Recursive
+#### Created non-Recursive
 
 Displays the timeline (by node create time) just for the direct child nodes of the current node.
 
-### Modified non-Recursive
+#### Modified non-Recursive
 
 Displays the timeline (by node modification time) just for the direct child nodes of the current node.
 
-# Chat Rooms
+## Chat Rooms
 
 Real-time updated chronological view of content under any node.
 
-## Chat Rooms are Timelines
+### Chat Rooms are Timelines
 
 Because Quanta supports a real-time (i.e. Live) updates to timeline views, this is what we use to create a `Chat Room` experience. In other words, now that recent versions of Quanta have a `Live` option and a `Chronological` option (as opposed to only Rev-Chron), we can have an identical experience to a Chat Room simply by selecting the Live option and the Chronological ordering of posts.
 
@@ -1437,7 +1570,7 @@ So we have this terminology called a "Chat Room" in Quanta, but that's really ju
 
 Another advantage Quanta gets from this "Timeline-based" chat capability is that **any node** can operate as a "Chat Room" simply because of the fact that anyone who has access to a node can open a "Timeline View" of that node.
 
-## Create a Chat Room
+### Create a Chat Room
 
 There are two steps required to create a Chat Room experience where you can share the room to other users. First of all remember since a chat room is ultimately a timeline of a node, that node will be the 'root' node for all content in the chat room. In other words, the chat room is composed of an ordered (by time) view of the entire sub-graph under the root node.
 
@@ -1448,7 +1581,7 @@ Here are the two steps:
 
 Since both of those steps are described in other sections of this document we won't explain those features here.
 
-## Share your Chat Room
+### Share your Chat Room
 
 Once you've created a node, given it a name, and shared it, you can then share the link with others and they can start adding content under that node (i.e. a Chat Room experience) if you share the URL with them.
 
@@ -1459,7 +1592,7 @@ If you look at the URL itself you can also see all it's really doing is appendin
 <img src='attachments/65c13322a14be04b61ad43d0_p.png' style='width:100%'/>
 
 
-# Playing Audio or Video
+## Playing Audio or Video
 
 How to play audio or video file attachments.
 
@@ -1479,7 +1612,7 @@ To see live examples of the Audio and Video players go here:
 
 * https://quanta.wiki/n/demo-data
 
-# Recording Audio or Video
+## Recording Audio or Video
 
 Recording audio or video thru your webcam
 
@@ -1490,11 +1623,11 @@ The A/V recording option is available in the `File Attachment Dialog` accessible
 ![file-p](attachments/5f8b75db9d8e1d1be249e48b_p.png)
 
 
-# Node Info
+## Node Info
 
 The `Menu -> Info` menu lets you access various information and statistics about the `currently selected node`. First click a node to select it, and then choose one of the following menu options.
 
-## Show URLs
+### Show URLs
 
 Each node is automatically accessible via its own unique URL. Only the owner of a node and people its owner has shared the node with can access the URL.
 
@@ -1509,11 +1642,11 @@ Here's an example of that dialog, showing the URLs for a node:
 
 See also: The "Custom URLs" section of this User Guide.
 
-## Show Raw Data
+### Show Raw Data
 
 This is a technical feature that displays the content of the node in a human-readable text format called JSON (JavaScript Object Notation). This data is the exact content of the node's "Database Record", in the Quanta MongoDB database.
 
-## Node Stats
+### Node Stats
 
 Select `Menu -> Tools -> Node Stats` to generate a statistics report for the selected node. Any node subgraph can be analyzed this way to find the top most frequently used words, hashtags, and mentions, under that node.
 
@@ -1521,36 +1654,36 @@ This opens a dialog showing the top words (and hashtags, and mentions) by freque
 
 You can click on any word displayed in this dialog to automatically run a search that finds all the places where the word is found.
 
-# RSS and Podcasts
+## RSS and Podcasts
 
-## Create an RSS Aggregator
+### Create an RSS Aggregator
 
 To aggregate multiple RSS feeds, first create the RSS Feed node, and then enter one or more RSS Feed URLs into it (one per line). The node will then render a "View Feed" button that can be used to display a reverse-chronological view of all the RSS feed content, which will automatically update itself every 30 minutes.
 
 Below are screenshots showing the steps to subscribe to some RSS feeds.
 
-### Set the Node Type
+#### Set the Node Type
 
 First click the `Node Type` icon in the editor on a node where you want to host the RSS Subscription from, and then pick `RSS Feed` as the new node type.
 
 ![set-node-type-to-rss.png](attachments/65722797fc3f094a7cc0ae1a_p.png)
 
 
-### Enter RSS URLs
+#### Enter RSS URLs
 
 After changing a node to `RSS Feed` type it will automatically display a place for you to enter the URLs you want to subscribe to.
 
 ![enter-feed-urls.png](attachments/657227f9fc3f094a7cc0ae3c_p.png)
 
 
-### Request to View Feeds
+#### Request to View Feeds
 
 After saving the node you'll see a `View Feeds` button appearing on the node which you can click to retrieve all the latest RSS content.
 
 ![view-feeds-node.png](attachments/65722839fc3f094a7cc0ae4c_p.png)
 
 
-### Have Fun Reading the News
+#### Have Fun Reading the News
 
 After clicking `View Feed` the app will switch over to the `RSS Feed Tab` to display the RSS. You can always click `Folders Tab` to get back to your tree. The contents of this Feed view will be the merged and sorted (newest on top) aggregate view of all feeds you had listed. 
 
@@ -1559,7 +1692,7 @@ You can update your list of URLs any time, and everything will just continue to 
 <img src='attachments/6572288dfc3f094a7cc0ae67_p.png' style='width:100%'/>
 
 
-## Comment on a Podcast
+### Comment on a Podcast
 
 The Audio Player has a "Post" button, so you can share the article title and link along with a comment/post.
 
@@ -1574,9 +1707,9 @@ Here's a screenshot of the audio player, showing this "Post" button:
 ![file-p](attachments/622512ed67a3a60f9a5d3210_p.png)
 
 
-# Encryption
+## Encryption
 
-## Encrypting a Node
+### Encrypting a Node
 
 To encrypt a node, open the Node Editor, expand the "Advanced" section, and click the Encrypt checkbox. Once that checkbox is checked, the content will be encrypted, on the server, and only you and others you've shared it to will be able to see it. You can still edit the node, and every time you save the node it gets re-encrypted again.
 
@@ -1584,11 +1717,11 @@ The padlock icon will show up on the node to let you know it's encrypted.
 
 You can visually verify that your data is being encrypted by selecting the encrypted node and using `Menu -> Info -> Show Raw Data`. The content property of the node will be the unreadable hexadecimal of the encrypted data, and this encrypted data is what's stored on the server. The server never sees the unencrypted text, so even in the event of a server security breach/hack, none of the encrypted data can ever be exposed.
 
-## Technical Notes
+### Technical Notes
 
 The browser's built-in JavaScript Crypto API and RSA PKE (Public Key Encryption) is used. We use the industry-standard PKE scheme where neither the private key nor the un-encrypted text ever leaves the browser. This is commonly called "End-to-End" (E2E) encryption.
 
-## Encryption Strategy
+### Encryption Strategy
 
 ----
 
@@ -1610,7 +1743,7 @@ Also this all happens automatically. Both Bob's browser and Cory's browser autom
 
 In case that was confusing here's the gist of the tricky parts: When data is encrypted with a PublicKey of a keypair then only the PrivateKey (of that keypair) can decrypt that data. And the inverse is also true. When the PrivateKey encrypts some data then only the matching PublicKey can decrypt the data. Based on this logic people can securely communicate encrypted data without a need to secretly send 'passwords' to each other. This entier strategy is what's commonly referred to as "Public Key Encrytion".
 
-## Key Management
+### Key Management
 
 todo: Docs below need to be updated because the new Security Keys Dialog is a slightly different process than what's described below:
 
@@ -1628,7 +1761,7 @@ Caveat/Warning: If user 'A' encrypts a node and then shares with user 'B', this 
 
 This is a minor limitation, and will be made easier to use in a future release of the app.
 
-# Interactive Graphs
+## Interactive Graphs
 
 Example of a Node Graph, created by a search for the word "Nicholas" in the book War and Peace.
 
@@ -1646,9 +1779,9 @@ Graphs like the one above are also highly interactive. You can use the mouse to 
 
 You can use the mouse wheel to zoom in and out in the graphical viewport. You can also hover the mouse over any node, and a popup will appear containing a snippet of the actual node content.
 
-# Text-to-Speech
+## Text-to-Speech
 
-## Text-to-Speech Tab
+### Text-to-Speech Tab
 
 The TTS Tab is shown in the image below and it will open whenever the browser is reading content aloud. The buttons at the top are self-explanatory: They let you Stop, Pause, Restart, etc. 
 
@@ -1659,7 +1792,7 @@ You can choose your preferred Voice (American Accent, British, etc), and you can
 ![file-p](attachments/63ae6cb49e10b95fe6502341_p.png)
 
 
-## TTS in the Node Editor Dialog
+### TTS in the Node Editor Dialog
 
 Whenever you're editing a node you can listen to the TTS of the content text by clicking the speaker icon at the upper right of the text editor.
 
@@ -1670,40 +1803,40 @@ If you don't yet see the "Text-to-Speech" link then activate it by selecting `Me
 ![file-p](attachments/63eee29a4975b00199700f44_p.png)
 
 
-## TTS from any Node
+### TTS from any Node
 
 If you have `Node Info` enabled, every node will have a TTS Icon displaying that you can click to have the node content narrated aloud to you.
 
 <img src='attachments/64e77bdd03bc775e03563948_p.png' style='width:100%'/>
 
 
-## TTS Text via Drag-and-Drop
+### TTS Text via Drag-and-Drop
 
 The image at the top of this section shows the TTS Tab, where all the TTS buttons and options are. To read text, for example from a webpage, you can simply open that webpage in a separate browser window, then highlight some text to read, and then use the mouse to "Drag" that selected region of text right over the TTS Tab, and drop it there, and the text will automatically be read aloud.
 
-## TTS for Text you Enter Manually
+### TTS for Text you Enter Manually
 
 Another way to TTS text is to enable the input area by clicking the "Text Input" checkbox (see below) and then entering some text to read, and then clicking the "Speaker" icon.
 
 ![file-p](attachments/64e77d7103bc775e035639b1_p.png)
 
 
-# Export and Import
+## Export and Import
 
-## Export 
+### Export 
 
 Select `Menu -> Tools -> Export` to export any node (and all its subnodes) into a downloadable archive file, or PDF.
 
 ![file-p](attachments/5fa1926c6b842575d0e9261c_p.png)
 
 
-## File Types
+### File Types
 
-### ZIP and TAR
+#### ZIP and TAR
 
 These options control what type of file you'll be packaging the exported files into.
 
-### PDF
+#### PDF
 
 Generates a PDF file containing the entire content of the sub-branch of the tree.
 
@@ -1713,47 +1846,33 @@ Similar to how conventional Word Processors (Document editors) can use headings 
 
 Note: As mentioned above, the `Set Headings` option will ensure the heading levels in your content match the tree structure of the content. This can be used to ensure a consistent Table of Contents in all your exported PDFs.
 
-## Content Types
+### Content Types
 
-### HTML
+#### HTML
 
 Creates a single HTML file containing the content of the subgraph of the exported node. This HTML file along with all the image files and other attachments are packaged into the archive file so that when you expand the archive file you can then view the HTML file offline in your browser.
 
-### Markdown
+#### Markdown
 
-Exporting to Markdown exports the content pretty much verbatim as it's stored in the cloud database, because the app uses Markdown as it's primary editing format. Your exported content will be merged into a single markdown file in the exported archive unless you use the `file` and/or `folder` properties of nodes to build up a virtual folder structure which will then determine the actual delineation between files and folders in the exported content.
+Exporting to Markdown exports the content pretty much verbatim as it's stored in the cloud database, because the app uses Markdown as it's primary editing format. Your exported content will be merged into a single markdown file in the exported archive. Image attachments will all go into a folder named 'attachments' in the archive, and the markdown content will display those images inline.
 
-#### Special Markdown Options
-
-When exporting to markdown there's away to control which files and folders get created to hold the content being exported. You can use the `Node Property Editing` in the editor to set a `file` property and/or the `folder` property on any node. 
-
-When you set the `file` property on a node to something like `myfile.md` (you should always use 'md' extension) that will cause the entire content of that node and it's subgraph to end up going into that file. You can give a full path for that file as well (like: `/my/path/myfile.md`), and the exported archive file will create directories as needed and store the file in that subfolder.
-
-However using the `file` and `folder` properties is not necessary and if omitted you'll just get a single file named `index.md` that contains all the exported data.
-
-The folders that are found during the export are also allowed to be used in a hierarchical way so that if you have perhaps a node with folder "docs" set on it, and it has a child node with a folderl prop of `/subfolder/*` then the content of `subfolder` will end up in the exported archive file as `/docs/folder/index.md`. Note that in this example two things happened 1) The folder names were concatenated and the `/*` was automatically assumed as the default abbreviation for `/index.md`.
-
-The export as Markdown will result in a folder structure that's directly usable on `Github Pages` as well. For example the 'docs' folder of the Quantizr project (i.e. Quanta) on github was generated by an export of the top level root node of the Quanta website, as you can see here:
-
-#### [Quana Docs on Github](https://github.com/Clay-Ferguson/quantizr/blob/master/docs/index.md)
-
-### JSON
+#### JSON
 
 If you want to export content as a way of doing a backup (that can later be restored/imported) select the JSON format. A JSON format will contain all the actual raw data content from the nodes. The other file export types (Markdown and HTML) are primarily for creating browsable offline copies of the data.
 
-### Files and Folders
+#### Files and Folders
 
 Exports an archive file that's the best way to browse your tree directly on your file system after extracting the files and folders. You will end up with a folder structure where each node is a folder, and you'll have a `content.md` file in each folder that is the content of the nodes. The folder names are auto-generated as readable text based on the first line of content in each node. The main purpose of this kind of export is so that you can create usable backups that allow you to browse your data completely without the use of the Quanta App.
 
 This export feature also provides a good path of egress if you should decide after using Quanta that you want to stop using Quanta and move all your data out into files and folders.
 
-## Export Tips
+### Export Tips
 
-### noexport
+#### noexport
 
 If there are one or more nodes you don't want included in your export, you can add a property named `noexport` to the node and give it any value like '1'. This will basically truncate that entire branch of the tree from the export and none of the subnodes under that Branch will be exported .
 
-## Import
+### Import
 
 Select `Menu -> Tools -> Import` to import a file that was previously exported. The only export formats that are supported for re-importing are the ZIP and TAR formats with the JSON content option. 
 
@@ -1761,7 +1880,7 @@ To import a file, click an empty node (i.e. a node with no subnodes) you want to
 
 The uploaded file will recreate a copy of the data that was exported, including its content text and attachments.
 
-# Bookmarks
+## Bookmarks
 
 To bookmark a node open the popup menu for the node and select "Bookmark". This will add a shortcut to that node on the Bookmarks Menu, that will take you to the node when clicked. The Bookmarks menu is displayed near top of the Menu on the left-hand side of the page.
 
@@ -1772,60 +1891,60 @@ todo: This screenshot is obsolete now because the "Boomark" option has been move
 <img src='attachments/629185986abed30d5b3c995b_p.png' style='width:100%'/>
 
 
-# Account Profile and Settings
+## Account Profile and Settings
 
-## User Profile
+### User Profile
 
 Edit your user profile using `Menu -> Account -> Profile`. This is how you setup your display name, bio text, avatar image, and heading image. Here's how it looks:
 
 ![Screenshot from 2023-02-20 00-10-40.png](attachments/63f30ee855770e1b97de196e_p.png)
 
 
-## Account Settings
+### Account Settings
 
 The Account Settings Tab can be accessed by `Menu -> Account -> Settings` as shown here:
 
 ![file-p](attachments/6407e6c57d69fa44622efd4c_p.png)
 
 
-## Settings
+### Settings
 
-### Manage Hashtags
+#### Manage Hashtags
 
 Opens a Dialog where you can input any number of custom hashtags that you use frequently. The Node Editor has a way of letting you select these from a list.
 
-### Blocked Words
+#### Blocked Words
 
 Lets you specify which words you'd like to never see in your feed. Any posts containing any words in your blocked words list will be excluded from your feed.
 
-### Comments
+#### Comments
 
 This option lets you control whether to include `Comment`-Type nodes or not. The main use case for this would be if you have a large document that you've opened up for commentary where other users can create subnodes in this document for the purposes of collaboration or feedback.
 
 Unselecting this option will therefore only show the main body of the content excluding all the commentary. This is a useful feature, because if a lot of discussion has happened in the document the amount of comments can easily be much larger than the document itself.
 
-### Properties
+#### Properties
 
 Turns on the display of internal properties for nodes. Users can create their own custom properties on nodes, although this is a niche and not often used feature.
 
-### Content Width
+#### Content Width
 
 Lets you control how wide the center app panel is.
 
-### Bulk Delete
+#### Bulk Delete
 
 Running this will delete all nodes that you own which are not directly stored under your own account node. Any places you've created content under other people shared nodes for example, will be deleted.
 
 If you want to delete your account and all content you've ever created you should run `Bulk Delete` before `Close Account` because close account will only remove your account tree root and it's entire set of sub-branches (subgraph).
 
-## Storage Space
+### Storage Space
 
 Shows how much of your allotted space on the server you've consumed:
 
 ![Screenshot from 2023-02-20 00-14-26.png](attachments/63f30fcc55770e1b97de19c2_p.png)
 
 
-## Manage Keys
+### Manage Keys
 
 Opens the `Security Keys` dialog where you can reset, republish, export/import your security keys. These are the keys used for setting Digital Signatures on nodes (currently an admin-only feature), and for Encryption of data. 
 
@@ -1842,13 +1961,13 @@ The `Import Key` lets you update the Selected Key type, from text content that y
 ![file-p](attachments/6572050efc3f094a7cc0a2eb_p.png)
 
 
-# Semantic Web
+## Semantic Web
 
 *This section discusses how to use industry standard data types.*
 
 Quanta doesn't require you to know about `Data Types`, because every node is just automatically the "Markdown Type" (i.e. assumed to contain markdown text). However we do fully support the Semantic Web types.
 
-## Semantic Web Basics
+### Semantic Web Basics
 
 The `Semantic Web` is a set of standards that allow data on the web to have specific `Data Types` (i.e. Objects with Properties), so that computers can automatically parse and understand the data. The goal of the `Semantic Web` is to make internet data machine-readable.
 
@@ -1867,39 +1986,39 @@ However, with the Semantic Web we have Objects with Properties. So in the Semant
 <img src='attachments/6418e2ffa4db9e5e43bb72b2_p.png' style='width:25%'/>
 
 
-## Person Type Example
+### Person Type Example
 
 Here's an example (below) of how to create a `Person object`, then edit it, and see how it displays. We can select `Menu -> Create -> Choose Type...` which will lead to the following selection list where we can select `Person` as the type of the thing we want to create.
 
 ![choose-type.png](attachments/64193b62dfa8e71dac2b1018_p.png)
 
 
-## Editing a Person
+### Editing a Person
 
 We're now editing the Person type we just created (above) and can `enter the properties` as shown in the image below:
 
 ![edit-type.png](attachments/64193c39dfa8e71dac2b1040_p.png)
 
 
-## Object Display
+### Object Display
 
 After clicking `Save` in the record editor dialog (above) the node will be saved, and will be displayed as shown below:
 
 <img src='attachments/64193c7fdfa8e71dac2b104e_p.png' style='width:100%'/>
 
 
-## Adding more Properties
+### Adding more Properties
 
 As shown above, there are only a handful of properties that are assigned to the Person object by default in this experimental feature, but we can add more properties, by going back into the `Node Editor` at any time and clicking the `Plus Icon` to add more properties and pick from the full list of all `Schema.org` Person properties (or any other type of object's properties):
 
 <img src='attachments/64193cf4dfa8e71dac2b1066_p.png' style='width:100%'/>
 
 
-## Technical Info
+### Technical Info
 
 The rest of this section is for software developers and/or technical readers only:
 
-### YAML Config
+#### YAML Config
 
 This document is a `User Guide` rather than a `Technical Guide`, but nonetheless it's insightful to show just how easy it was to get the above editor and display working `without writing any special computer code`.
 
@@ -1935,7 +2054,7 @@ props:
       showTime: false
 ```
 
-### About the YAML
+#### About the YAML
 
 As you can see, the above YAML config is simple but it's all Quanta needs to be able to present a `nicely formatted display` of information, as well as an Object editor that works `without a programmer` having to write code for each type.
 
@@ -1945,13 +2064,13 @@ Then we list below it all the `properties` that we want to use, and the `order` 
 
 So in summary, once this tiny bit of config YAML is created for any of the Schema.org types we want to use, we `instantly get a GUI that does everything` we're doing in the above images, and as said, it happens automatically without any custom coding!
 
-### Full Schema_org Support
+#### Full Schema_org Support
 
 Even though the above example for the `Person Object` has that specific YAML file we just saw, be aware that it was still optional to write that special YAML. Even if we add none of our own YAML configs for any of the types we can still use `any of the other 100s of other types` that exist in Schema.org, because Quanta supports all of them by default.
 
 So to clarify, the only reason we **did** add a specific YAML object config for the `Person Object` (above) was to get the specific desired `page and editor layout`. Without that specific YAML config the Person Object would still work just fine, but the properties editor and display of the person would've been ugly because the properties would've been in simple alphabetical order and displayed arranged vertically, rather than the nice looking layout form our YAML defined.
 
-### Non-Schema_org Properties
+#### Non-Schema_org Properties
 
 Arbitrary `Key/Value` pairs can also be added to any node including properties that are not part of schema.org. In the example below we have added `'prop1', 'prop2', and 'prop3'` to demonstrate this. 
 
@@ -1960,7 +2079,7 @@ Those properties could've been named anything, and they could've been assigned a
 ![arbitrary-prop-create.png](attachments/6419e044dfa8e71dac2b33ba_p.png)
 
 
-### Default Property Display
+#### Default Property Display
 
 Since those properties are not part of an object that has been configured to display in some special way (referring to the YAML approach talked about earlier), they simply display on the page as a vertical list, as shown in the image below:
 
@@ -1969,11 +2088,11 @@ Since those properties are not part of an object that has been configured to dis
 ![arbitrary-property-display.png](attachments/6419e457dfa8e71dac2b353f_p.png)
 
 
-### Semantic Web References
+#### Semantic Web References
 
 **Quanta's copy of Semantic.org Definitions:**
 
-* https://github.com/Clay-Ferguson/quantizr/tree/master/src/main/resources/public/schemaorg
+* https://github.com/Clay-Ferguson/quantizr/tree/main/src/main/resources/public/schemaorg
 
 **The Spec:**
 
@@ -1985,17 +2104,17 @@ Since those properties are not part of an object that has been configured to dis
 
 *NOTE: Quanta doesn't currently use `Block Protocol` to edit, display, or embed types because of the simper YAML approach discussed earlier, but we provide the blockprotocol link above just for the sake of completeness.*
 
-### WordPress and Semantic Web
+#### WordPress and Semantic Web
 
 * https://www.smashingmagazine.com/2022/02/implications-wordpress-joining-block-protocol/
 
 Recommended reading: Search for "Project Gutenberg" in WordPress online information. There's a new Semantic Web ecosystem that's emerging!
 
-# RDF Triples
+## RDF Triples
 
 How to link two nodes together. (i.e. make clickable links from one node to another)
 
-## Node Linking
+### Node Linking
 
 The term `RDF Triple` is the technical name for a very simple concept, which in the context of Quanta means you're linking two nodes together with a `Predicate`. The simplest (and the default) predicate can just be the word `link` itself, to indicate the relationship between two nodes is that one links to the other. Indeed the way nodes can be `linked` is to use an `RDF Triple`.
 
@@ -2007,7 +2126,7 @@ The images below show the basic concept of an RDF Tripe. It's called a `triple` 
 <img src='attachments/65bbdbeecf425c5fe6f2ddcf_p.png' style='width:75%'/>
 
 
-## How to Link two Nodes
+### How to Link two Nodes
 
 ![file-p](attachments/65bbdd3bcf425c5fe6f2ddd4_p.png)
 
@@ -2023,7 +2142,7 @@ The `Create Triple` function will ask you to enter the `Predicate` but you can j
 
 That's it! Once you've linked the nodes then the `Subject` node will always display the links (predicates) on the page, that you can click on to jump to the `Object` node.
 
-### Create Triple 
+#### Create Triple 
 
 The `Create Triple` function mentioned above leads to the following dialog where you can enter the Triple Information. The default Predicate is always simply `link` so that your association is simply a link from one node to another, but as stated above you can change that to some other word/relationship.
 
@@ -2032,23 +2151,23 @@ The `Embed Content` option can be selected if you want to actually also **displa
 ![file-p](attachments/65be7c46cf425c5fe6f2de07_p.png)
 
 
-## Find Subjects
+### Find Subjects
 
 In the menu above you saw `Menu -> RDF Triple -> Find Subjects`. This menu can be used to do the reverse of jumping from a Subject to an Object node. When you click a node to highlight it, and it's the Object of one ore more `RDF Triples` you can use the `Find Subjects` function to find all the places that link to that Object node (i.e. all the nodes that are participating in an RDF Triple using the selected node as the subject)
 
-## Link Nodes by Drag and Drop
+### Link Nodes by Drag and Drop
 
 You can also link nodes using the Drag and Drop feature. Whenever you drag a node over another node, and do the mouse Drop gesture, you will be presented with the `RDF Link` dialog shown above, and in this way you can link two nodes simply by dragging one node over the other.
 
 *Tip: The `History Panel` (lower right section of page) can be used both as a drag gesture source, and drag gesture target, for node linking or any other Drag and Drop initiated function.*
 
-## RDF Links on Node Graphs
+### RDF Links on Node Graphs
 
 You can optionally display `RDF Links` on node graphs using the controls at the top right of the Graph Display window. You have the option to either display the links as an information-only link (green dashed line) or you can choose to have the link apply a gravitational field force like the rest of the nodes in the Graph View.
 
-# Addendum
+## Addendum
 
-## Example ChatGPT Q and A
+### Example ChatGPT Q and A
 
 The examples below were created by asking ChatGPT AI all these questions.
 
