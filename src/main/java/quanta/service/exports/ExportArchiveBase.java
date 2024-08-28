@@ -362,8 +362,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             List<Attachment> atts = node.getOrderedAttachments();
             // we save off the 'content' into htmlContent, because we need a copy that doesn't have
             // attachments inserted into it for the special case of inserting HTML attachments
-            Val<String> htmlContent = new Val<>(content);
-            Val<String> mdContent = new Val<>(content);
+            Val<String> contentVal = new Val<>(content);
             String targetFolder = null;
 
             // if we have a markdown file, all the attachments go into that folder
@@ -380,8 +379,17 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (!"ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, true, null, mdContent, deeperPath, targetFolder, writeFile, att);
+                    handleAttachment(node, true, null, contentVal, deeperPath, targetFolder, writeFile, att);
                 }
+            }
+
+            switch (req.getContentType()) {
+                case "md":
+                case "html":
+                    removeSpecialSyntax(contentVal);
+                    break;
+                default:
+                    break;
             }
 
             switch (req.getContentType()) {
@@ -393,10 +401,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (req.isIncludeMetaComments()) {
                         fullMd.append(buildMarkdownHeader(node));
                     }
-                    fullMd.append(mdContent.getVal() + "\n");
+
+                    fullMd.append(contentVal.getVal() + "\n");
                     break;
                 case "html":
-                    htmlContent.setVal(formatContentToHtml(node, htmlContent.getVal()));
+                    contentVal.setVal(formatContentToHtml(node, contentVal.getVal()));
                     // special handling for htmlContent we have to do this File Tag injection AFTER the html escaping
                     // and processing that's done in the line above
                     if (atts != null) {
@@ -405,10 +414,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
                             if (!"ft".equals(att.getPosition())) {
                                 continue;
                             }
-                            handleAttachment(node, true, htmlContent, null, deeperPath, targetFolder, writeFile, att);
+                            handleAttachment(node, true, contentVal, null, deeperPath, targetFolder, writeFile, att);
                         }
                     }
-                    fullHtml.append(htmlContent.getVal());
+                    fullHtml.append(contentVal.getVal());
                     break;
                 default:
                     break;
@@ -435,6 +444,34 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw ExUtil.wrapEx(ex);
         }
         return ret;
+    }
+
+    // Tokenize contentVal into lines and remove any lines that are just a single dash, but leave intact
+    // any inside code blocks
+    private void removeSpecialSyntax(Val<String> contentVal) {
+        String[] lines = contentVal.getVal().split("\n");
+        StringBuilder sb = new StringBuilder();
+        boolean inCodeBlock = false;
+        for (String line : lines) {
+            if (line.startsWith("```")) {
+                inCodeBlock = !inCodeBlock;
+            }
+
+            // Remove the "centering" markdown syntax
+            if (line.contains("->") && line.contains("<-")) {
+                String temp = line.trim();
+                // if line starts with "->" and ends with "<-" then remove those substrings
+                if (temp.startsWith("->") && temp.endsWith("<-")) {
+                    line = temp.substring(2, temp.length() - 2);
+                }
+            }
+
+            if (!line.equals("-") || inCodeBlock) {
+                sb.append(line);
+            }
+            sb.append("\n");
+        }
+        contentVal.setVal(sb.toString().trim());
     }
 
     private String buildMarkdownHeader(SubNode node) {
