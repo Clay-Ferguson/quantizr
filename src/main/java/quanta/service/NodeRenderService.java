@@ -571,7 +571,7 @@ public class NodeRenderService extends ServiceBase {
                     if (!StringUtils.isEmpty(node.getName())) {
                         content = node.getName();
                     } else {
-                        content = "";
+                        content = "[empty]";
                     }
                 } else if (content.startsWith(Constant.ENC_TAG.s())) {
                     content = "[encrypted]";
@@ -608,27 +608,35 @@ public class NodeRenderService extends ServiceBase {
      * in the tree view. It is also used to generate the title of the page when the node is rendered in
      * the browser.
      */
-    public String getFirstLineAbbreviation(String content, int maxLen) {
-        if (content == null)
-            return null;
-        // if this is a node starting with hashtags or usernames then chop them all
-        while (content.startsWith("@") || content.startsWith("#")) {
-            int spaceIdx = content.indexOf(" ");
-            if (spaceIdx == -1) {
-                spaceIdx = content.indexOf("\n");
-            }
-            if (spaceIdx > 0) {
-                content = content.substring(spaceIdx + 1);
+    public String getFirstLineAbbreviation(String input, int maxLen) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+
+        int runLen = 0;
+        int start = -1;
+        int length = input.length();
+
+        for (int i = 0; i < length; i++) {
+            char c = input.charAt(i);
+
+            if (Character.isLetterOrDigit(c) || (runLen > 0 && c == ' ')) {
+                if (runLen == 0) {
+                    start = i;
+                }
+                runLen++;
+                if (runLen == maxLen) {
+                    break;
+                }
+            } else {
+                if (runLen > 3) {
+                    break;
+                }
+                runLen = 0;
+                start = -1;
             }
         }
-        content = XString.truncAfterFirst(content, "\n");
-        content = XString.truncAfterFirst(content, "\r");
-        String removes = "\"'`.!?=-_~@#$%^&*()[]{}|\\;:<>";
-        content = XString.removeCharsFromBeginning(content, removes);
-        content = XString.removeCharsFromEnd(content, removes);
-        if (content.length() > maxLen) {
-            content = content.substring(0, maxLen) + "...";
-        }
-        return content.trim();
+
+        return runLen > 0 ? input.substring(start, start + runLen): "";
     }
 }
