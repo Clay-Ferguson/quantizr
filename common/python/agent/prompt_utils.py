@@ -101,8 +101,6 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 )
         return prompt
 
-    # todo-0: we no longer allow/require a slash as the last character of the folder name in 'folder(folder_name)' and I need
-    # to update the docs to say this because currently I think it mentions the slash
     @staticmethod
     def insert_folders_into_prompt(
         prompt: str, source_folder: str, folders_to_include: List[str], ext_set: Set[str]

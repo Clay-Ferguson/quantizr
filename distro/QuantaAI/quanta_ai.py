@@ -32,7 +32,7 @@ GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 
 app = FastAPI()
 
-Utils.init_logging("/data/quanta_ai.log")
+Utils.init_logging("/log/quanta_ai.log")
 
 class AIBaseMessage(BaseModel):
     type: str
@@ -47,7 +47,7 @@ class AIResponse(BaseModel):
 class AIRequest(BaseModel):
     systemPrompt: Optional[str] = Field(default=None)
     prompt: str
-    foldersToInclude: str
+    foldersToInclude: Optional[str] = Field(default=None)
     messages: List[AIBaseMessage]
     service: str
     model: str
