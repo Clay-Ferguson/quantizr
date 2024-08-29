@@ -620,7 +620,7 @@ public class NodeRenderService extends ServiceBase {
         for (int i = 0; i < length; i++) {
             char c = input.charAt(i);
 
-            if (Character.isLetterOrDigit(c) || (runLen > 0 && c == ' ')) {
+            if (Character.isLetterOrDigit(c) || (runLen > 0 && (c == ' ' || c=='\''))) {
                 if (runLen == 0) {
                     start = i;
                 }
