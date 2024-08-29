@@ -616,11 +616,16 @@ public class NodeRenderService extends ServiceBase {
         int runLen = 0;
         int start = -1;
         int length = input.length();
+        int lastWordBreak = -1;
 
         for (int i = 0; i < length; i++) {
             char c = input.charAt(i);
 
-            if (Character.isLetterOrDigit(c) || (runLen > 0 && (c == ' ' || c=='\''))) {
+            if (c == ' ' && runLen > 0) {
+                lastWordBreak = i;
+            }
+
+            if (Character.isLetterOrDigit(c) || (runLen > 0 && (c == ' ' || c == '\''))) {
                 if (runLen == 0) {
                     start = i;
                 }
@@ -637,6 +642,8 @@ public class NodeRenderService extends ServiceBase {
             }
         }
 
-        return runLen > 0 ? input.substring(start, start + runLen): "";
+        return runLen > 0
+                ? input.substring(start, (lastWordBreak != -1 && runLen == maxLen) ? lastWordBreak : start + runLen)
+                : "";
     }
 }
