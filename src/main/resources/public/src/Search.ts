@@ -517,7 +517,7 @@ export class Search {
     }
 
     clickHandler = (evt: Event) => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         const node = S.nodeUtil.findNode(nodeId);
         if (!node) return;

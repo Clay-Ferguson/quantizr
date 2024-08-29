@@ -9,12 +9,6 @@ import remarkMath from "remark-math";
 
 // Good styles are: a11yDark, nightOwl, oneLight
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
-// import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-// const schema = JSON.parse(JSON.stringify(defaultSchema));
-// schema.attributes.img = ["src", "alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
-// schema.attributes.span = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
-// schema.attributes.div = ["alt", "title", "width", "height", "class", "className", "style", "data-nid", "data-attkey"];
-// rehypePlugins: [rehypeKatex, [rehypeSanitize, schema]],
 
 const ReactMarkdownComp = forwardRef((props: any, ref) => {
     props = props || {};

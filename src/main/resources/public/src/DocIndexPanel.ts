@@ -43,7 +43,7 @@ export class DocIndexPanel extends Div {
         const html = new Html(index, null,
             // click function to jump to node that's clicked on
             (evt: Event) => {
-                const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+                const nodeId = S.domUtil.getNodeIdFromDom(evt);
                 if (nodeId) {
                     this.clickItem(nodeId);
                 }

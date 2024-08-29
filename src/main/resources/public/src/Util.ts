@@ -113,7 +113,7 @@ export class Util {
     render */
     allowIdFromEvent = (evt: Event, id: string): string => {
         if (id) return id;
-        return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        return S.domUtil.getNodeIdFromDom(evt);
     }
 
     formatMemory = (val: number): string => {
@@ -943,7 +943,7 @@ export class Util {
     }
 
     getNodeFromEvent = (evt: Event): NodeInfo => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         return S.nodeUtil.findNode(nodeId);
     }

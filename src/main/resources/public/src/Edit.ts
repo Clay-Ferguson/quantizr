@@ -1700,7 +1700,7 @@ export class Edit {
             S.util.showMessage("Login to create content and reply to nodes.", "Login!");
         }
         else {
-            const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+            const nodeId = S.domUtil.getNodeIdFromDom(evt);
             if (!nodeId) return;
             S.edit.addNode(nodeId, J.NodeType.COMMENT, null, null);
         }

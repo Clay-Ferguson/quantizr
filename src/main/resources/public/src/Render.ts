@@ -92,6 +92,7 @@ export class Render {
         }) : null;
     }
 
+    // todo-0: don't set the attrib here
     setNodeDropHandler = (attribs: any, node: NodeInfo) => {
         if (!node) return;
 

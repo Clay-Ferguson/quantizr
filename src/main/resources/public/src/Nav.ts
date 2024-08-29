@@ -591,7 +591,7 @@ export class Nav {
     }
 
     jumpToNode = (evt: Event) => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (nodeId) {
             S.view.jumpToId(nodeId);
         }
@@ -642,25 +642,25 @@ export class Nav {
     }
 
     clickSearchNode = (evt: Event) => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         S.srch.clickSearchNode(nodeId);
     }
 
     searchByNodeIdClick = (evt: Event) => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         this.runSearchByNodeId(nodeId);
     }
 
     runTimelineByClick = (evt: Event) => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         this.runTimelineByNodeId(nodeId);
     }
 
     openDocViewByClick = (evt: Event) => {
-        const nodeId = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+        const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         S.srch.showDocument(nodeId, true);
     }

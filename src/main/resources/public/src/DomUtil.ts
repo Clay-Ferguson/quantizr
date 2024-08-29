@@ -77,6 +77,10 @@ export class DomUtil {
         return sanitizedHtml;
     }
 
+    getNodeIdFromDom = (evt: Event): string => { 
+        return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
+    }
+
     getPropFromDom = (evt: Event, prop: string): string => {
         let val = null;
 
