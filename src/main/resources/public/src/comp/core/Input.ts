@@ -16,7 +16,7 @@ export class Input extends Comp {
         this.tag = "input";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.attribs.value = this.getState<LS>().value || "";
         return true;
     }

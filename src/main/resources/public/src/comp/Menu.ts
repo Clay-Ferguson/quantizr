@@ -8,7 +8,7 @@ export class Menu extends Comp {
         super({ key: name, className: "menuCard" });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const expanded = getAs().expandedMenus.has(this.name);
         const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");

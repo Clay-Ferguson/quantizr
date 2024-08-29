@@ -11,7 +11,7 @@ export class Div extends Comp {
         this.children = children;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.content = this.getState<LS>().content;
         return true;
     }

@@ -78,7 +78,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         this.onMount(() => this.input?.focus());
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state = this.getState<LS>();
         const children = [new ErrorDiv(this.valState.e)];
 

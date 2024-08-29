@@ -36,7 +36,7 @@ export class RSSView extends AppTab<any, RSSView> {
         data.inst = this;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         let comp: NodeCompMarkdown = null;
         let feedContent: Comp = null;

@@ -9,7 +9,7 @@ export class DropdownMenu extends Comp {
         this.tag = "span";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const id = "ddMenu-" + this.getId();
         this.children = [
             new Icon({

@@ -12,7 +12,7 @@ export class TourPanel extends Div {
         this.attribs.id = "tourPanelId";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const children = [];
         const ast = getAs();
         const tour = ast.tour;

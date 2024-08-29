@@ -25,7 +25,7 @@ export class NodeCompRowHeader extends Div {
             (indentLevel <= 1 && this.idx == 1 ? "rowHeaderEditFirst" : "rowHeaderEdit") : "row-header";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         let displayName = null;
@@ -118,7 +118,7 @@ export class NodeCompRowHeader extends Div {
                             title: "Speech-to-Text (Read Aloud)",
                             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                             onMouseOut: () => { S.quanta.selectedForTts = null; },
-                            [C.DOM_ID_ATTR]: this.getContentDomId(),
+                            [C.DOM_ID_ATTR]: this._getContentDomId(),
                             onClick: S.nav.ttsClick
                         }));
                     }
@@ -332,13 +332,13 @@ export class NodeCompRowHeader extends Div {
         return true;
     }
 
-    getTextContent = (): string => {
-        const id = this.getContentDomId();
-        const elm = document.getElementById(id);
-        return elm ? elm.textContent : null;
-    }
+    // getTextContent = (): string => {
+    //     const id = this.getContentDomId();
+    //     const elm = document.getElementById(id);
+    //     return elm ? elm.textContent : null;
+    // }
 
-    getContentDomId = () => {
+    _getContentDomId = () => {
         return NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;
     }
 }

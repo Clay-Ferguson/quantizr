@@ -20,7 +20,7 @@ export class Button extends Comp {
         this.tag = "button";
     }
 
-    setEnabled = (enabled: boolean) => {
+    setEnabled(enabled: boolean) {
         this.mergeState<LS>({ enabled });
     }
 
@@ -28,7 +28,7 @@ export class Button extends Comp {
         this.mergeState<LS>({ text });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const text: string = this.getState<LS>().text;
 
         if (this.getState<LS>().enabled) {

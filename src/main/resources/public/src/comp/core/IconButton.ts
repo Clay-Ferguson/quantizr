@@ -32,7 +32,7 @@ export class IconButton extends Comp {
         this.mergeState({ waiting: true });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state = this.getState<LS>();
 
         // this gets activated when the user clicks an infinite scrolling button, so it turns into a spinner

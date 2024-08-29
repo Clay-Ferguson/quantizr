@@ -7,7 +7,7 @@ export class Para extends Comp {
         this.tag = "p";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.children = [this.cont];
         return true;
     }

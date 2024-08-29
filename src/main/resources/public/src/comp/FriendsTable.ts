@@ -15,7 +15,7 @@ export class FriendsTable extends ListBox {
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         if (this.friends) {
             const friendsComps = this.friends.map(friend => {
                 if (!friend) return null;
@@ -32,11 +32,11 @@ export class FriendsTable extends ListBox {
         return true;
     }
 
-    override getScrollPos = (): number => {
+    override getScrollPos(): number {
         return FriendsTable.scrollPos;
     }
 
-    override setScrollPos = (pos: number): void => {
+    override setScrollPos(pos: number): void {
         FriendsTable.scrollPos = pos;
     }
 }

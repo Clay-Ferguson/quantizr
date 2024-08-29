@@ -12,7 +12,7 @@ export class BreadcrumbsPanel extends Div {
         });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.children = [this.createBreadcrumbs()];
         return true;
     }

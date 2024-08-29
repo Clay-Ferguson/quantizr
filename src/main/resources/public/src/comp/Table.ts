@@ -8,7 +8,7 @@ export class Table extends Comp {
         this.tag = "table";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const children = this.children;
         this.children = [
             // special case where tbody always needs to be immediate child of table

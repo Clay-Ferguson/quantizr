@@ -41,7 +41,7 @@ export class LeftNavPanel extends Div {
         LeftNavPanel.inst = this;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const myMessages = ast.myNewMessageCount > 0
             ? (ast.myNewMessageCount + " new posts") : "";

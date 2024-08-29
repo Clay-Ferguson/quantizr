@@ -17,7 +17,7 @@ export class DocIndexPanel extends Div {
         this.attribs.className = "docIndexPanel";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;

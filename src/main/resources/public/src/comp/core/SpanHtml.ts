@@ -6,7 +6,7 @@ export class SpanHtml extends Comp {
         this.tag = "span";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.attribs.dangerouslySetInnerHTML = Comp.getDangerousHtml(this.cont);
         return true;
     }

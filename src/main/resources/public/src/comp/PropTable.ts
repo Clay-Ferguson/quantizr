@@ -12,7 +12,7 @@ export class PropTable extends Comp {
         });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const children = [];
         const type = S.plugin.getType(this.node.type);
         if (this.node.properties) {

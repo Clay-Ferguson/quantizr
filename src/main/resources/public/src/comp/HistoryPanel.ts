@@ -18,11 +18,11 @@ export class HistoryPanel extends Div {
         });
     }
 
-    static historyLockChanged = (checked: boolean) => {
+    static historyLockChanged(checked: boolean) {
         dispatch("historyLockChanged", s => s.nodeHistoryLocked = checked)
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         if (ast.nodeHistory.length === 0) {
@@ -67,7 +67,7 @@ export class HistoryPanel extends Div {
             children.push(parentDropTarg = new Div(null, {
                 id: h.id + "_hist",
                 [C.NODE_ID_ATTR]: h.id,
-                onClick: this.jumpToId,
+                onClick: this._jumpToId,
                 className: "nodeHistoryItem",
                 ...dragProps
             }, [
@@ -84,7 +84,7 @@ export class HistoryPanel extends Div {
     }
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
-    jumpToId = (evt: any) => {
+    _jumpToId = (evt: any) => {
         const id = S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
         PubSub.pub(C.PUBSUB_closeNavPanel);
         S.view.jumpToId(id);

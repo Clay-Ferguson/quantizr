@@ -12,7 +12,7 @@ export class Selection extends Comp {
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const children = [];
 
         const select = new Select({

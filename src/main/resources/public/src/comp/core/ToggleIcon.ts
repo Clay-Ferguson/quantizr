@@ -21,7 +21,7 @@ export class ToggleIcon extends Comp {
         this.mergeState<LS>({ toggle: !state.toggle });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state = this.getState<LS>();
         this.attribs.className = state.className + " " + (state.toggle ? this.toggleOnClass : this.toggleOffClass);
         return true;

@@ -38,11 +38,11 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    override domRemoveEvent = () => {
+    override domRemoveEvent() {
         S.rpcUtil.removedDomIds.push(this.getId());
     }
 
-    override domAddEvent = () => {
+    override _domAddEvent = () => {
         const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState<LS>().og) {
             return;
@@ -150,7 +150,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state = this.getState<LS>();
         const ast = getAs();
         if (state.loading || !state.og) {

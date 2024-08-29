@@ -44,10 +44,9 @@ export abstract class Comp {
 
     // default all these to null so that unless derived class sets the value we never need to create
     // some of the useEffect calls
-    public domPreUpdateEvent: React.EffectCallback = null;
-    public domUpdateEvent: React.EffectCallback = null;
-    public domRemoveEvent: React.EffectCallback = null;
-    public domAddEvent: () => void = null;
+    public _domPreUpdateEvent: React.EffectCallback = null;
+    public _domUpdateEvent: React.EffectCallback = null;
+    public _domAddEvent: () => void = null;
 
     public preRenderRejected: boolean = false;
     public ordinal: number;
@@ -94,8 +93,11 @@ export abstract class Comp {
         this.attribs.key = this.attribs.key || this.attribs.id;
     }
 
+    public domRemoveEvent(): void {
+    }
+
     /* Not currently used, but let's keep this */
-    public getRefAsync = (_warn: boolean = true): Promise<HTMLElement> => {
+    public getRefAsync(_warn: boolean = true): Promise<HTMLElement> {
         return new Promise<HTMLElement>((resolve, _reject) => {
             const elm = this.getRef();
 
@@ -107,7 +109,7 @@ export abstract class Comp {
         });
     }
 
-    public getRef = (): HTMLElement => {
+    public getRef(): HTMLElement {
         if (this.preRenderRejected) {
             // console.warn("getRef was called on id " + this.getId() + " (class: " +
             // this.getCompClass() + ") which will return null because of preRenderRejected");
@@ -126,7 +128,7 @@ export abstract class Comp {
         return this.attribs.id;
     }
 
-    getCompClass = (): string => {
+    getCompClass(): string {
         return this.constructor.name + "_" + this.getId();
     }
 
@@ -147,7 +149,7 @@ export abstract class Comp {
             console.log("queueing onMount function on " + this.getCompClass());
         }
 
-        // queue up the 'func' to be called once the domAddEvent gets executed.
+        // queue up the 'func' to be called once the _domAddEvent gets executed.
         this.domAddFuncs = this.domAddFuncs || [];
         this.domAddFuncs.push(func);
     }
@@ -192,7 +194,7 @@ export abstract class Comp {
                 if (child instanceof Comp) {
                     try {
                         child.parent = this; // only done for debugging.
-                        acc.push(createElement(child.render, child.attribs));
+                        acc.push(createElement(child._render, child.attribs));
                     }
                     catch (e) {
                         S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
@@ -222,14 +224,14 @@ export abstract class Comp {
         });
     }
 
-    public static getDangerousHtml = (content: string) => {
+    public static getDangerousHtml(content: string) {
         return { __html: S.domUtil.sanitizeHtml(content) };
     }
 
     /* Renders this node to a specific tag, including support for non-React children Note: Tag can
     also be a type here, not just a string.
     */
-    reactNode = (type: any): ReactNode => {
+    reactNode(type: any): ReactNode {
         let ret: ReactNode = null;
 
         // If this is a raw HTML component just render using 'attribs', which is what react expects.
@@ -261,7 +263,7 @@ export abstract class Comp {
     }
 
     // add type argument here (not 'any')
-    checkState = (): boolean => {
+    checkState(): boolean {
         if (!this.stateMgr) {
             if (!this.rendered) {
                 // we allow a lazy creation of a State as long as component hasn't rendered yet.
@@ -283,7 +285,7 @@ export abstract class Comp {
         this.stateMgr.mergeState(moreState);
     }
 
-    setState = <T>(newState: T) => {
+    setState<T>(newState: T) {
         if (!this.checkState()) return;
         this.stateMgr.setState(newState);
     }
@@ -295,7 +297,7 @@ export abstract class Comp {
 
     // Core 'render' function used by react. This is THE function for the functional component this
     // object represents
-    renderCore = (_props, _ref): any => {
+    renderCore(_props, _ref): any {
         this.rendered = true;
 
         try {
@@ -304,7 +306,7 @@ export abstract class Comp {
             }
 
             // This 'useEffect' with the empty dependency array (last param) is essentially the
-            // 'componentDidMount' effect, and our app maps this to calling the 'domAddEvent'
+            // 'componentDidMount' effect, and our app maps this to calling the '_domAddEvent'
             useEffect(() => {
                 // Supposedly React 18+ will call useEffect twice on a mount (in strict mode, at
                 // least) so that's the only reason we're checking for !mounted here in this if
@@ -314,7 +316,7 @@ export abstract class Comp {
                     // because of the empty dependencies array in useEffect this only gets called
                     // once when the component mounts.
                     this.domAdd();
-                    if (this.domAddEvent) this.domAddEvent(); // call overridable method.
+                    if (this._domAddEvent) this._domAddEvent(); // call overridable method.
 
                     if (this.getScrollPos() !== null) {
                         this.scrollDomAddEvent();
@@ -326,7 +328,7 @@ export abstract class Comp {
                 // 'compnentWillUnmount'
                 return () => {
                     this.mounted = false;
-                    if (this.domRemoveEvent) this.domRemoveEvent();
+                    this.domRemoveEvent();
 
                     // DO NOT DELETE (#monitor-lifecycle)
                     // Comp.allCompIds.delete(this.getId());
@@ -335,11 +337,11 @@ export abstract class Comp {
 
             // Note: The useEffect with no array as second parameter (dependencies) is how we
             // capture an update event for all state changes.
-            if (this.domUpdateEvent) useEffect(this.domUpdateEvent);
-            if (this.domPreUpdateEvent) useLayoutEffect(this.domPreUpdateEvent);
+            if (this._domUpdateEvent) useEffect(this._domUpdateEvent);
+            if (this._domPreUpdateEvent) useLayoutEffect(this._domPreUpdateEvent);
 
             if (this.getScrollPos() !== null) {
-                useLayoutEffect(this.scrollDomPreUpdateEvent);
+                useLayoutEffect(this._scrollDomPreUpdateEvent);
             }
 
             Comp.renderCounter++;
@@ -347,7 +349,7 @@ export abstract class Comp {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
-            if (this.preRender && this.preRender() === false) {
+            if (this.preRender() === false) {
                 this.preRenderRejected = true;
                 if (this.debug)
                     console.log("preRender Rejected: " + this.getCompClass());
@@ -370,7 +372,7 @@ export abstract class Comp {
     // Note: forwardRef is a wrapper around the render method, so we can have 'ref' in the attribs.
     // If we didn't need 'ref' we could have just use the render core method directly.
     // eslint-disable-next-line
-    render = forwardRef((props, ref) => {
+    _render = forwardRef((props, ref) => {
         return this.renderCore(props, ref);
     });
 
@@ -386,11 +388,11 @@ export abstract class Comp {
         return stack;
     }
 
-    private domAdd = (): void => {
+    private domAdd(): void {
         // DO NOT DELETE (#monitor-lifecycle)
         // Comp.allCompIds.add(this.getId());
 
-        // console.log("domAddEvent: " + this.getCompClass());
+        // console.log("_domAddEvent: " + this.getCompClass());
         const elm = this.getRef();
         if (!elm) {
             return;
@@ -399,14 +401,14 @@ export abstract class Comp {
         this.runQueuedFuncs(elm);
     }
 
-    maybeFocus = () => {
+    maybeFocus() {
         /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
         if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
             S.domUtil.focusId(Comp.focusElmId);
         }
     }
 
-    runQueuedFuncs = (elm: HTMLElement) => {
+    runQueuedFuncs(elm: HTMLElement) {
         if (!this.domAddFuncs) return;
         this.domAddFuncs.forEach(func => func(elm));
         this.domAddFuncs = null;
@@ -414,17 +416,19 @@ export abstract class Comp {
 
     /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this
     method should be just to set the children. To indicate to NOT render the component at all return
-    false from this method */
-    preRender: () => boolean
+    false from this method. Returning null means this component is not saying anything about rendering. */
+    preRender(): boolean | null {
+        return null;
+    }
 
     // This is the function you override/define to implement the actual render method, which is
     // simple and decoupled from state management aspects that are wrapped in 'render' which is what
     // calls this, and the ONLY function that calls this.
-    compRender = (): ReactNode => {
+    compRender(): ReactNode {
         return this.reactNode(this.tag || "div");
     }
 
-    scrollDomAddEvent = () => {
+    scrollDomAddEvent() {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollDomAddEvent: " + this.getCompClass());
         }
@@ -443,7 +447,7 @@ export abstract class Comp {
         }
     }
 
-    scrollDomPreUpdateEvent = () => {
+    _scrollDomPreUpdateEvent = () => {
         if (!Comp.allowScrollSets) return;
         const elm = this.getRef();
         if (elm) {
@@ -464,15 +468,15 @@ export abstract class Comp {
      WARNING: Be sure to actually have these methods on the same DOM Element that has the scrollbar
      itself (normally customScrollBar class), or else it won't work!
      */
-    getScrollPos = (): number => {
+    getScrollPos(): number {
         return null;
     }
 
-    setScrollPos = (_pos: number): void => {
+    setScrollPos(_pos: number): void {
     }
 
     /* Components should call this method instad of setting scrollTop directly on an element */
-    setScrollTop = (pos: number): void => {
+    setScrollTop(pos: number): void {
         // if this returns null it means we're not persisting scrolling in this comp and we skip
         // that logic.
         if (this.getScrollPos()) {
@@ -490,7 +494,7 @@ export abstract class Comp {
 
     // There are a few very special places where we need to sort components that may have been added
     // in an order we don't want this this is how we do it.
-    ordinalSortChildren = () => {
+    ordinalSortChildren() {
         this.children?.sort((a, b) => a.ordinal - b.ordinal);
     }
 }
@@ -500,11 +504,11 @@ value in a higher level object, and not have to worry about the value being out 
 export class ScrollPos {
     scrollPos: number = 0;
 
-    getVal = (): number => {
+    getVal(): number {
         return this.scrollPos;
     }
 
-    setVal = (p: number): void => {
+    setVal(p: number): void {
         this.scrollPos = p;
     }
 }

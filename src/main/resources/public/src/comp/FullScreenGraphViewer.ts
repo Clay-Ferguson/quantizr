@@ -24,10 +24,10 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    // This technique of overriding the domUpdateEvent() method is used to ensure that the Graphg
+    // This technique of overriding the _domUpdateEvent() method is used to ensure that the Graphg
     // DOM element which is not managed by react, is always maintained across renders, so that it
     // doesn't loose state
-    override domUpdateEvent = () => {
+    override _domUpdateEvent = () => {
         const elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected) return;
 

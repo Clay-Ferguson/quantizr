@@ -134,7 +134,7 @@ export abstract class DialogBase extends Comp {
         return null;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const isTopmost = this.isTopmost();
 
@@ -297,7 +297,7 @@ export abstract class DialogBase extends Comp {
         }
         this.isDown = false;
 
-        clickDiv.domAddEvent = () => {
+        clickDiv._domAddEvent = () => {
             const clickDivElm: HTMLElement = clickDiv.getRef();
 
             clickDivElm.addEventListener("mousedown", (e) => {
@@ -341,7 +341,7 @@ export abstract class DialogBase extends Comp {
             }/*, true */);
         }
 
-        this.domAddEvent = () => {
+        this._domAddEvent = () => {
             const elm: HTMLElement = this.getRef();
             if (!elm) return;
 
@@ -383,11 +383,11 @@ export abstract class DialogBase extends Comp {
         return valid;
     }
 
-    override getScrollPos = (): number => {
+    override getScrollPos(): number {
         return DialogBase.scrollPos[this.zIndex] || 0;
     }
 
-    override setScrollPos = (pos: number): void => {
+    override setScrollPos(pos: number): void {
         DialogBase.scrollPos[this.zIndex] = pos;
     }
 }

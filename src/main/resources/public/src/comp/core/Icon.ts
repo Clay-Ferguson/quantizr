@@ -9,7 +9,7 @@ export class Icon extends Comp {
         this.tag = "i";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.children = [this.label];
         return true;
     }

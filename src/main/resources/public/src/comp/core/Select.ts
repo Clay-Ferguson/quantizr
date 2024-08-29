@@ -23,7 +23,7 @@ export class Select extends Comp {
         this.tag = "select";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.attribs.value = this.getState<LS>().value;
         return true;
     }

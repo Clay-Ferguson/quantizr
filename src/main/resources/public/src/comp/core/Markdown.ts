@@ -8,7 +8,7 @@ export class Markdown extends Comp {
         this.tag = "div"; //<-- not used
     }
 
-    override compRender = (): ReactNode => {
+    override compRender(): ReactNode {
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 

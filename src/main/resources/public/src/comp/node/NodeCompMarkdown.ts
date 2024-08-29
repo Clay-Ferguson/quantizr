@@ -75,7 +75,7 @@ export class NodeCompMarkdown extends Comp {
         return val;
     }
 
-    insertMarkdownLinks = (urls: Map<string, UrlInfo>, val: string): string => {
+    insertMarkdownLinks(urls: Map<string, UrlInfo>, val: string): string {
         if (!urls || !val) return val;
         urls.forEach((ui: UrlInfo) => {
             if (val.indexOf("(" + ui.url) == -1) {
@@ -85,7 +85,7 @@ export class NodeCompMarkdown extends Comp {
         return val;
     }
 
-    translateLaTex = (val: string): string => {
+    translateLaTex(val: string): string {
         if (!val) return val;
         val = val.replaceAll(" $", " \\$");
         if (val.indexOf("\\") == -1) return val;
@@ -96,7 +96,7 @@ export class NodeCompMarkdown extends Comp {
             .replaceAll("\\]", "$$");
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {
@@ -130,7 +130,7 @@ export class NodeCompMarkdown extends Comp {
         return true;
     }
 
-    override compRender = (): ReactNode => {
+    override compRender(): ReactNode {
         const state = this.getState<LS>();
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
@@ -149,7 +149,7 @@ export class NodeCompMarkdown extends Comp {
         rendered as a collapsible section where everything below the section title, up to a double
         blank line, will be hidden until the user clicks the section title to expand it. 
     */
-    processSpecialMarkdown = (state: LS) => {
+    processSpecialMarkdown(state: LS) {
         let hasCollapse = false;
         if (state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
             state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
@@ -249,7 +249,7 @@ export class NodeCompMarkdown extends Comp {
         return null;
     }
 
-    addCollapsible = (children: ReactNode[], curBuf: string, collapseTitle: string, suffix: string) => {
+    addCollapsible(children: ReactNode[], curBuf: string, collapseTitle: string, suffix: string) {
         const key = this.node.id + "_" + collapseTitle;
         const expanded = (getAs().expandedCollapsibles.has(key));
 
@@ -276,7 +276,7 @@ export class NodeCompMarkdown extends Comp {
         }
     }
 
-    decrypt = async () => {
+    async decrypt() {
         if (!S.crypto.avail) return;
         const state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;

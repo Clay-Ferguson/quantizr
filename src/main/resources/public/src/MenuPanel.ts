@@ -162,7 +162,7 @@ export class MenuPanel extends Div {
     static signAllSubGraph = () => S.view.signSubGraph(false);
     static signUnsignedSubGraph = () => S.view.signSubGraph(true);
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         const hltNode = S.nodeUtil.getHighlightedNode();

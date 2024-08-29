@@ -22,7 +22,7 @@ export class NodeCompMainNode extends Div {
         });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const node = ast.node;
 

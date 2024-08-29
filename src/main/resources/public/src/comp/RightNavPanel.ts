@@ -43,7 +43,7 @@ export class RightNavPanel extends Div {
         return cols;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         if (!ast.mobileMode) {

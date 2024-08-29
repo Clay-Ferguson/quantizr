@@ -17,7 +17,7 @@ export class Checkbox extends Comp {
         this.tag = "span";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         let cbInput = null;
         // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox'
         // but it adds space to the right NOTE: custom-switch or custom-checkbox will work here with

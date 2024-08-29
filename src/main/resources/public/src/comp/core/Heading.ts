@@ -7,7 +7,7 @@ export class Heading extends Comp {
         this.tag = "h" + this.level;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.children = [this.cont];
         return true;
     }

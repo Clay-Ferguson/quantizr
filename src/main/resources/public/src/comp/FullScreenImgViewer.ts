@@ -13,7 +13,7 @@ export class FullScreenImgViewer extends Main {
         this.attribs.className = "fullScreenViewer customScrollBar"
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
@@ -42,9 +42,9 @@ export class FullScreenImgViewer extends Main {
         return true;
     }
 
-    override domUpdateEvent = () => {
+    override _domUpdateEvent = () => {
         if (C.DEBUG_SCROLLING) {
-            console.log("domUpdateEvent scroll top");
+            console.log("_domUpdateEvent scroll top");
         }
         if (S.view.docElm) {
             // NOTE: Since the docElm component doesn't manage scroll position, we can get away with just

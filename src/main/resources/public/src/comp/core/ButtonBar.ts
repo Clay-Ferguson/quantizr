@@ -12,7 +12,7 @@ export class ButtonBar extends Comp {
         this.children = buttons;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const props = {
             className: "btn-group btnGroup flex-wrap " + (this.extraClass ? this.extraClass : ""),
             role: "group"

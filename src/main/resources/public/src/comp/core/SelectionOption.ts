@@ -8,7 +8,7 @@ export class SelectionOption extends Comp {
         this.tag = "option";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.attribs.className = "selectOption";
         this.children = [this.val];
         return true;

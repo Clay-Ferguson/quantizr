@@ -34,7 +34,7 @@ export class Html extends Comp {
         this.mergeState<LS>({ content });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         if (this.hasChildren()) {
             console.error("Html component had children. This is always a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
@@ -57,7 +57,7 @@ export class Html extends Comp {
         return true;
     }
 
-    override domPreUpdateEvent = (): void => {
+    override _domPreUpdateEvent = (): void => {
         const elm = this.getRef();
         if (!elm) return;
 

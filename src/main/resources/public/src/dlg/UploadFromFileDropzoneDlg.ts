@@ -286,7 +286,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         };
 
-        this.dropzoneDiv.domPreUpdateEvent = (): void => {
+        this.dropzoneDiv._domPreUpdateEvent = (): void => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
             const maxUploadSize = getAs().userPrefs.maxUploadFileSize;
 

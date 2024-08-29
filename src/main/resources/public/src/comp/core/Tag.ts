@@ -8,7 +8,7 @@ export class Tag extends Comp {
         this.tag = tagName;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         if (this.textChild) {
             this.children = [this.textChild];
         }

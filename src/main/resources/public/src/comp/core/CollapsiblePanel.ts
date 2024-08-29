@@ -30,7 +30,7 @@ export class CollapsiblePanel extends Comp {
         this.mergeState<LS>({ expanded });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state = this.getState<LS>();
         const style = this.textLink ? "collapsePanelLink" : "btn btn-primary";
         const collapseClass = state.expanded ? "expand" : "collapse";

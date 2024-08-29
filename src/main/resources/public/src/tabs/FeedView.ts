@@ -25,7 +25,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         data.inst = this;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         /*

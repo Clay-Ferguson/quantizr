@@ -79,7 +79,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         return this.cfg.val.getValue();
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state = this.getState<LS>();
 
         const label = this.cfg.label ? new Label(this.cfg.label, {

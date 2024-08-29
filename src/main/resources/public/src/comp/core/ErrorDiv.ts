@@ -12,7 +12,7 @@ export class ErrorDiv extends Comp {
         this.attribs.className = "validationError";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.content = this.getState<LS>().error;
         return true;
     }

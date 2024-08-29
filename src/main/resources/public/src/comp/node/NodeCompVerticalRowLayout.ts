@@ -17,7 +17,7 @@ export class NodeCompVerticalRowLayout extends Div {
         super();
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const childCount: number = this.node.children.length;
         const comps: Comp[] = [];

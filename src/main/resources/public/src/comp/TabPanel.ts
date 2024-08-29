@@ -31,7 +31,7 @@ export class TabPanel extends Div {
         });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         if (!ast.tabPanelVisible) {

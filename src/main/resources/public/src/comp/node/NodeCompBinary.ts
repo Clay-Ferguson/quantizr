@@ -27,7 +27,7 @@ export class NodeCompBinary extends Div {
         this.mergeState<LS>({ node });
     }
 
-    makeImageComp = (node: NodeInfo): Img => {
+    makeImageComp(node: NodeInfo): Img {
         const ast = getAs();
         if (!node) return null;
         const att = S.props.getAttachment(this.attName, node);
@@ -108,7 +108,7 @@ export class NodeCompBinary extends Div {
 
     /* This method needs to be called statically and we cannot use 'this' in it,
     because it's referenced by the plain HTML text that's used when positioned images are inserted in the content */
-    static clickOnImage = (elm: HTMLImageElement, evt: MouseEvent, id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) => {
+    static clickOnImage(elm: HTMLImageElement, evt: MouseEvent, id: string, attName: string, isEditorEmbed: boolean, isFullScreenEmbed: boolean) {
         if (evt.ctrlKey) {
             NodeCompBinary.toggleZoom(elm, evt);
             return;
@@ -138,7 +138,7 @@ export class NodeCompBinary extends Div {
         });
     }
 
-    static toggleZoom = (elm: HTMLImageElement, evt: MouseEvent) => {
+    static toggleZoom(elm: HTMLImageElement, evt: MouseEvent) {
         // Get the current zoom state from the attribute
         const isZoomedIn = elm.getAttribute("data-zoomed") === "true";
 
@@ -171,7 +171,7 @@ export class NodeCompBinary extends Div {
         }
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const node = this.getState<LS>().node;
         if (!node) {
             this.children = null;

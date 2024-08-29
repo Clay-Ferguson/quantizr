@@ -24,7 +24,7 @@ export class EditAttachmentsPanel extends Div {
         super(null, { className: "binaryEditorSection" });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         if (!this.node.attachments && !ast.cutAttachments) return null;
         this.children = [];

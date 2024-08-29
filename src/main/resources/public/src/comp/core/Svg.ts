@@ -13,7 +13,7 @@ export class Svg extends Comp {
         this.tag = "svg";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.content = this.getState<LS>().content;
         return true;
     }

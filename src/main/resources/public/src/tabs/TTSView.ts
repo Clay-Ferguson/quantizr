@@ -41,7 +41,7 @@ export class TTSView extends AppTab<any, TTSView> {
         }
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const speakBtn = !ast.mobileMode ? new Icon({
             className: "fa fa-volume-up fa-2x clickable",

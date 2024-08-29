@@ -29,7 +29,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) {

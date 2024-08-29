@@ -29,7 +29,7 @@ export class NodeCompRow extends Div {
         });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         if (this.allowHeaders) {

@@ -36,7 +36,7 @@ export class NodeCompContent extends Div {
         });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         if (!this.node) {
@@ -116,7 +116,7 @@ export class NodeCompContent extends Div {
         return true;
     }
 
-    maybeRenderDateTime = (children: Comp[], propName: string, node: NodeInfo) => {
+    maybeRenderDateTime(children: Comp[], propName: string, node: NodeInfo) {
         const timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
             const dateVal: Date = new Date(parseInt(timestampVal));
@@ -169,7 +169,7 @@ export class NodeCompContent extends Div {
         }
     }
 
-    override domPreUpdateEvent = () => {
+    override _domPreUpdateEvent = () => {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);
         }

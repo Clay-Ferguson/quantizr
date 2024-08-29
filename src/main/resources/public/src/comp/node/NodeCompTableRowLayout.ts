@@ -15,7 +15,7 @@ export class NodeCompTableRowLayout extends Div {
         super(null, { className: "nodeGridTable" });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         let curRow = new Div(null, { className: "nodeGridRow" });
         const children: Comp[] = [];

@@ -23,8 +23,8 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
     if (props.className) props.className += " mkBody";
     else props.className = "mkBody";
     props.components = {
-        code: codeFunc,
-        a: anchorFunc
+        code: _codeFunc,
+        a: _anchorFunc
     }
 
     return createElement(Markdown as any, {
@@ -36,11 +36,11 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
     });
 });
 
-const anchorFunc = (props: any) => {
+const _anchorFunc = (props: any) => {
     return createElement("a", { href: props.href, target: "blank" }, props.children);
 }
 
-const codeFunc = ({ node, inline, className, children, ...props }) => {
+const _codeFunc = ({ node, inline, className, children, ...props }) => {
     const childrenStr = String(children);
 
     // After upgrading to latest version 'inline' is undefined so we set it ourselves.

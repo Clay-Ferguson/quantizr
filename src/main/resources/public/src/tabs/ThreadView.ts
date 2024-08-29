@@ -24,7 +24,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         data.inst = this;
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         const results = this.data?.props?.results;
         if (!results) {

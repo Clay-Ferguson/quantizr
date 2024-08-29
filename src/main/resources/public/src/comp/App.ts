@@ -27,7 +27,7 @@ export class App extends Main {
         super(null, { id: "appPanelId", role: "main" });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
 
         if (!ast.appInitComplete) {
@@ -85,7 +85,7 @@ export class App extends Main {
 
     /* This is where we send an event that lets code hook into the render cycle to process whatever
         needs to be done AFTER the main render is complete, like doing scrolling for example */
-    override domUpdateEvent = () => {
+    override _domUpdateEvent = () => {
         PubSub.pub(C.PUBSUB_mainWindowScroll);
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
     };
@@ -148,7 +148,7 @@ export class App extends Main {
         return null;
     }
 
-    override domPreUpdateEvent = (): void => {
+    override _domPreUpdateEvent = (): void => {
         const elm = this.getRef();
         if (!elm) return;
 

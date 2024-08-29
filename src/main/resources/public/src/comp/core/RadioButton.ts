@@ -13,7 +13,7 @@ export class RadioButton extends Comp {
         this.tag = "span";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         let cbInput = null;
         this.attribs.className = "form-check " + (this.layoutClass || "");
         this.children = [

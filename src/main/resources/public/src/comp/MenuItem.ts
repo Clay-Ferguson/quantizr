@@ -21,7 +21,7 @@ export class MenuItem extends Div {
         this.mergeState({ visible: true, enabled });
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const state: LS = this.getState<LS>();
         const enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 

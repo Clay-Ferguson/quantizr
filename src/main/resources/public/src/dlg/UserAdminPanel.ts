@@ -14,7 +14,7 @@ export class UserAdminPanel extends Div {
         this.attribs.className = "userAdminPanel";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const userProfile = this.dlg.getState<UserProfileDlgState>().userProfile;
         this.children = [
             new Div("User Admin", { className: "userAdminHeading" }),

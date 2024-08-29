@@ -20,7 +20,7 @@ export class FriendsTableRow extends ListBoxRow {
         this.attribs.className = "personsListItem";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         const ast = getAs();
         let src: string = null;
 

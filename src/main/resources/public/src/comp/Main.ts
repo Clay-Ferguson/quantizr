@@ -13,7 +13,7 @@ export class Main extends Comp {
         this.tag = "main";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.content = this.getState<LS>().content;
         return true;
     }

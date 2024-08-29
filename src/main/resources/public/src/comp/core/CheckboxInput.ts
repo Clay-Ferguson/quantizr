@@ -20,7 +20,7 @@ export class CheckboxInput extends Comp {
         this.tag = "input";
     }
 
-    override preRender = (): boolean => {
+    override preRender(): boolean | null {
         this.attribs.checked = this.getState<LS>().checked;
         return true;
     }
