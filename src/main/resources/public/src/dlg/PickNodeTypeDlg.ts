@@ -77,7 +77,7 @@ export class PickNodeTypeDlg extends DialogBase {
                 new NodeTypeListBox(this.valIntf, this.searchTextState.getValue()),
                 new ButtonBar([
                     new Button("Ok", this.setNodeType, null, "btn-primary"),
-                    new Button("Cancel", this.close)
+                    new Button("Cancel", this._close)
                 ], "marginTop")
             ])
         ];

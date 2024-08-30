@@ -197,7 +197,7 @@ export class SearchContentDlg extends DialogBase {
                     new Button("Graph", this.graph),
                     // todo-2: this is currently not implemented on the server.
                     // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

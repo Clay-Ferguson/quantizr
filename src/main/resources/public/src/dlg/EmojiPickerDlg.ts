@@ -31,7 +31,7 @@ export class EmojiPickerDlg extends DialogBase {
             new Div(null, null, [
                 new EmojiPicker(this.selectionValueIntf),
                 new ButtonBar([
-                    new Button("Cancel", this.close)
+                    new Button("Cancel", this._close)
                 ], "marginTop")
             ])
         ];

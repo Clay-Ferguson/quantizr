@@ -35,7 +35,7 @@ export class ChangePasswordDlg extends DialogBase {
                 }),
                 new ButtonBar([
                     new Button("Change Password", this.changePassword, null, "btn-primary"),
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

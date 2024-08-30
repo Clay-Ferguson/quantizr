@@ -28,7 +28,7 @@ export class MultiFollowDlg extends DialogBase {
                 new TextField({ label: "Tags (optional)", val: this.tagState }),
                 new ButtonBar([
                     new Button("Follow All", this.follow, null, "btn-primary"),
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

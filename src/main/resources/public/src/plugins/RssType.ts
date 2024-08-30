@@ -48,10 +48,8 @@ export class RssType extends TypeBase {
         return true;
     }
 
-    // @ts-ignore
-    super_render = this.render;
-    override render = (node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp => {
-        const baseComp = this.super_render(node, tabData, rowStyling, isTreeView);
+    override render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp {
+        const baseComp = super.render(node, tabData, rowStyling, isTreeView);
         return new Div(null, null, [
             new Button("View Feed", () => {
                 dispatch("LoadingFeed", s => {

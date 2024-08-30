@@ -58,7 +58,7 @@ export class ConfigureAgentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Save", this.save, null, "btn-primary"),
                     new Button("Reset", this.reset, null, "btn-secondary"),
-                    new Button("Cancel", this.close, null, "btn-secondary float-end")
+                    new Button("Cancel", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

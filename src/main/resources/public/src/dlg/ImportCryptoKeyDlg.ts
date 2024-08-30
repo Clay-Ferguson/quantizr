@@ -21,7 +21,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 new TextArea("Key JWK", { rows: 15 }, this.keyState, null, false),
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

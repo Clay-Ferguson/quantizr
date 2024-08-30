@@ -50,7 +50,7 @@ export class FriendType extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.USER);
     }
 
-    override renderEditorSubPanel = (node: NodeInfo): Comp => {
+    override renderEditorSubPanel(node: NodeInfo): Comp {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         return new Heading(3, user);
     }

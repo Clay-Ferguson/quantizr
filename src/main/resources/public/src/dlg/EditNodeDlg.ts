@@ -794,19 +794,15 @@ export class EditNodeDlg extends DialogBase {
         this.addTagsToTextField(dlg);
     }
 
-    // todo-0: we can get rid of this ugly way of doing this
-    // @ts-ignore
-    super_closeByUser = this.closeByUser;
-    override closeByUser = () => {
-        this.super_closeByUser();
+    override closeByUser() {
+        super.closeByUser();
         this.resetAutoSaver();
     }
 
-    // @ts-ignore
-    super_close = this.close;
     override close = () => {
+        console.log("EditNodeDlg.close() called");
         setTimeout(() => S.speech.stopListening(), 100);
-        this.super_close();
+        super.close();
 
         dispatch("endEditing", s => {
             s.editNode = null;

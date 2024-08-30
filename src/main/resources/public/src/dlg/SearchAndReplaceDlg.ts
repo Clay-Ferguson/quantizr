@@ -36,7 +36,7 @@ export class SearchAndReplaceDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Replace", this.replace, null, "btn-primary"),
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

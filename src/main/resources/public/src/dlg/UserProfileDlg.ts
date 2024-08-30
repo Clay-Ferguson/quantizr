@@ -135,7 +135,7 @@ export class UserProfileDlg extends DialogBase {
                     }),
                     !this.readOnly ? new Button("Logout", S.user.logout) : null,
 
-                    new Button(this.readOnly ? "Close" : "Cancel", this.close)
+                    new Button(this.readOnly ? "Close" : "Cancel", this._close)
                 ], "marginTop")
             ])
         ];
@@ -279,10 +279,8 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    // @ts-ignore
-    super_close = this.close;
-    override close = () => {
-        this.super_close();
+    override close() {
+        super.close();
         if (!this.readOnly) {
             S.user.queryUserProfile(this.userNodeId);
         }

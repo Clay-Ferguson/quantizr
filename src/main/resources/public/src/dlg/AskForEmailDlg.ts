@@ -27,7 +27,7 @@ export class AskForEmail extends DialogBase {
                 new TextField({ label: "Email", val: AskForEmail.emailState }),
                 new ButtonBar([
                     new Button("Ok", this.acceptEmail, null, "btn-primary"),
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

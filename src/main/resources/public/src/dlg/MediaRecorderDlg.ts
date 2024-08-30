@@ -332,10 +332,8 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    // @ts-ignore
-    super_closeByUser = this.closeByUser;
-    override closeByUser = () => {
-        this.super_closeByUser();
+    override closeByUser() {
+        super.closeByUser();
         this.stopAndCleanupVideo();
     }
 

@@ -30,7 +30,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
                 this.textArea = new TextArea("Ask a Question...", { rows: 15 }, this.questionState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Submit", this.askQuestion, null, "btn-primary"),
-                    new Button("Close", this.close, null, "btn-secondary")
+                    new Button("Close", this._close, null, "btn-secondary")
                 ], "marginTop")
             ])
         ];

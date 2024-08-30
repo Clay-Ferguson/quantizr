@@ -39,7 +39,7 @@ export class TypeBase implements TypeIntf {
         return this.allowUserSelect;
     }
 
-    renderEditorSubPanel = (_node: NodeInfo): Comp => {
+    renderEditorSubPanel(_node: NodeInfo): Comp {
         return null;
     }
 
@@ -98,7 +98,7 @@ export class TypeBase implements TypeIntf {
 
     // for doing simplest possible layouts we allow types to set the width percent used by each property
     // and then we just let a "display: flex" style take care of rendering them left to right top to bottom
-    getPropConfig = (prop: string): ConfigProp => {
+    getPropConfig(prop: string): ConfigProp {
         return S.quanta.cfg.props?.[this.typeName]?.[prop];
     }
 
@@ -145,19 +145,19 @@ export class TypeBase implements TypeIntf {
         return null;
     }
 
-    hasCustomProp = (prop: string): boolean => {
+    hasCustomProp(prop: string): boolean {
         const props = this.getCustomProperties();
         if (!props) return false;
         return !!props.find(p => p === prop);
     }
 
-    hasSelectableProp = (prop: string): boolean => {
+    hasSelectableProp(prop: string): boolean {
         const props = this.getSelectableProperties();
         if (!props) return false;
         return !!props.find(p => p === prop);
     }
 
-    allowDeleteProperty = (prop: string) => {
+    allowDeleteProperty(prop: string) {
         let ret = true;
         const typeObj = S.quanta.cfg.props?.[this.typeName];
 
@@ -201,7 +201,7 @@ export class TypeBase implements TypeIntf {
         return !isHidden;
     }
 
-    parseUrlsFromHtml = (node: NodeInfo): Map<string, UrlInfo> => {
+    parseUrlsFromHtml(node: NodeInfo): Map<string, UrlInfo> {
         const val = node.content;
 
         // this is just a performance optimization to bypass the function if we know we can 
@@ -231,7 +231,7 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    parseUrlsFromText = (content: string): Map<string, UrlInfo> => {
+    parseUrlsFromText(content: string): Map<string, UrlInfo> {
         if (!content || content.toLowerCase().indexOf("http") === -1) return null;
 
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
@@ -260,7 +260,7 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    render = (node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    render(node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component

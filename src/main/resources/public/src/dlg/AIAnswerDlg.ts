@@ -16,7 +16,7 @@ export class AIAnswerDlg extends DialogBase {
             new Div(null, null, [
                 new Markdown(this.answer),
                 new ButtonBar([
-                    new Button("Close", this.close, null, "btn-secondary")
+                    new Button("Close", this._close, null, "btn-secondary")
                 ], "marginTop")
             ])
         ];

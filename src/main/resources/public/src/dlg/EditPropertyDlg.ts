@@ -61,7 +61,7 @@ export class EditPropertyDlg extends DialogBase {
 
             new ButtonBar([
                 new Button("Save", this.save, null, "btn-primary"),
-                new Button("Cancel", this.close)
+                new Button("Cancel", this._close)
             ], "marginTop")
         ];
 

@@ -91,14 +91,19 @@ export abstract class DialogBase extends Comp {
     public abort = () => {
         if (this.aborted) return;
         this.aborted = true;
-        setTimeout(this.close, 100);
+        setTimeout(this._close, 100);
     }
 
-    closeByUser = () => {
-        // derived classes can hook into this to detect that it was a user click that closed the dialog
+    closeByUser() {
     }
 
-    close = () => {
+    // bound to this
+    _close = () => {
+        this.close();
+    }
+
+    close() {
+        console.log("DialogBase.close() called");
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);

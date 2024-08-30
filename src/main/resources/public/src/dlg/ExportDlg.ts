@@ -83,7 +83,7 @@ export class ExportDlg extends DialogBase {
 
         children.push(new ButtonBar([
             new Button("Export", this.exportNodes, null, "btn-primary"),
-            new Button("Close", this.close, null, "btn-secondary float-end")
+            new Button("Close", this._close, null, "btn-secondary float-end")
         ], "marginTop"));
 
         return children;

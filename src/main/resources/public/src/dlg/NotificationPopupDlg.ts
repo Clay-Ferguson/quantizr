@@ -21,6 +21,6 @@ export class NotificationPopupDlg extends DialogBase {
     show(message: string, title: string, timeout: number = 3000) {
         const dlg = new NotificationPopupDlg(message, title);
         dlg.open();
-        setTimeout(dlg.close, timeout);
+        setTimeout(dlg._close, timeout);
     }
 }
