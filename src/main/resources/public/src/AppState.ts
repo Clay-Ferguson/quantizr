@@ -56,7 +56,6 @@ export class AppState {
     linksToAttachmentsExpanded: boolean = false;
     searchTipsExpanded: boolean = false;
     aiPromptsExpanded: boolean = false;
-    fullScreenControlsExpanded: boolean = false;
 
     /* name of currently logged in user */
     userName: string = PrincipalName.ANON;
@@ -183,7 +182,6 @@ export class AppState {
     serverInfoText: string = null;
     showNodeLinksInGraph: boolean = true;
     attractionLinksInGraph: boolean = true;
-    graphPowerFactor: string = "constant";
 
     // holds nodeId of the current conversation thread leaf node. The one the thread view was
     // 'executed' on.

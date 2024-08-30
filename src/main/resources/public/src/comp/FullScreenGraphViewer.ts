@@ -60,24 +60,6 @@ export class FullScreenGraphViewer extends Main {
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
 
-        let power = 0;
-        switch (ast.graphPowerFactor) {
-            case "constant":
-                power = 0;
-                break;
-            case "linear":
-                power = 1;
-                break;
-            case "quadratic":
-                power = 2;
-                break;
-            case "cubic":
-                power = 3;
-                break;
-            default:
-                break;
-        }
-
         return function (selection: any) {
             const margin = { top: 0, right: 0, bottom: 0, left: 0 };
             const width = window.innerWidth;
@@ -119,20 +101,14 @@ export class FullScreenGraphViewer extends Main {
                     }
                 });
             }
-
+        
             FullScreenGraphViewer.sim = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(ast.attractionLinksInGraph ? [...links, ...nodeLinks] : links) //
-                    .id(function (d: any) { return d.id; }).distance(0)
+                    .id(function (d: any) { return d.id; }).distance(5)
                     .strength(1)
                 )
 
-                .force("charge", d3.forceManyBody()
-                    .strength(function (d: any) {
-                        if (power === 0) return -50;
-                        return -100 * (1 / ((d.data.level + 1) * power));
-                    })
-                )
-
+                .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
 

@@ -5,12 +5,10 @@ import { Attachment } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
-import { Selection } from "../comp/core/Selection";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { Comp } from "./base/Comp";
 import { ButtonBar } from "./core/ButtonBar";
 import { Checkbox } from "./core/Checkbox";
-import { CollapsiblePanel } from "./core/CollapsiblePanel";
 
 // todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
@@ -62,21 +60,7 @@ export class FullScreenControlBar extends Div {
         }
 
         if (ast.fullScreenConfig.type === FullScreenType.GRAPH) {
-            comps.push(new CollapsiblePanel("More", "Less", null, [
-                new Selection(null, null, [
-                    { key: "constant", val: "Constant" },
-                    { key: "linear", val: "Linear" },
-                    { key: "quadratic", val: "Quadratic" },
-                    { key: "cubic", val: "Cubic" }
-                ], null, "selectPowerFactorDropDown", {
-                    setValue: (val: string) => {
-                        dispatch("setPowerFactor", s => {
-                            FullScreenGraphViewer.reset();
-                            s.graphPowerFactor = val;
-                        });
-                    },
-                    getValue: (): string => getAs().graphPowerFactor
-                }),
+            comps.push(new Div(null, { className: "inlineBlock" }, [
                 new Checkbox("Links", { title: "Show NodeLinks" }, {
                     setValue: (checked: boolean) => {
                         dispatch("setShowNodeLinks", s => {
@@ -86,7 +70,8 @@ export class FullScreenControlBar extends Div {
                     },
                     getValue: (): boolean => ast.showNodeLinksInGraph
                 }, "form-switch form-check-inline"),
-                ast.showNodeLinksInGraph ? new Checkbox("Forces", { title: "NodeLinks Force Attractions" }, {
+                // if there are no force links we should hide this
+                ast.showNodeLinksInGraph ? new Checkbox("Force", { title: "NodeLinks Force Attractions" }, {
                     setValue: (checked: boolean) => {
                         dispatch("setLinkForces", s => {
                             FullScreenGraphViewer.reset();
@@ -95,11 +80,7 @@ export class FullScreenControlBar extends Div {
                     },
                     getValue: (): boolean => ast.attractionLinksInGraph
                 }, "form-switch form-check-inline") : null
-            ], true, (exp: boolean) => {
-                dispatch("ExpandFullScreenControls", s => {
-                    s.fullScreenControlsExpanded = exp;
-                });
-            }, ast.fullScreenControlsExpanded, "inlineBlock", "inlineBlock", null, "div"));
+            ]));
 
             buttons.push(
                 new IconButton("fa-window-minimize fa-lg", null, {
