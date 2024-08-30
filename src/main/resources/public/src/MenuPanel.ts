@@ -284,8 +284,8 @@ export class MenuPanel extends Div {
                 new MenuItem("Append to Parent", MenuPanel.joinNodesToParent, onMainTab && selNodeIsMine, null, true), //
 
                 new MenuItemSeparator(), //
-                new MenuItem("Cut", S.edit.cutSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
-                new MenuItem("Copy", S.edit.copySelNodes, onMainTab && !ast.nodesToMove && ast.selectedNodes.size > 0, null, true), //
+                new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
+                new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
                 new MenuItem("Undo Copy/Cut", S.edit.undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
             ], null));
         }

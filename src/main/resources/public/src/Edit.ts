@@ -1068,7 +1068,7 @@ export class Edit {
         });
     }
 
-    copySelNodes = () => {
+    _copySelNodes = () => {
         dispatch("CopySelNodes", s => {
             s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
 
@@ -1084,11 +1084,13 @@ export class Edit {
         });
     }
 
-    cutSelNodes = (evt?: Event) => {
-        const id = S.util.allowIdFromEvent(evt, null);
-
+    _cutSelNodes = () => {
         dispatch("SetNodesToMove", s => {
-            S.nav.setNodeSel(true, id, s);
+            const node = S.nodeUtil.getHighlightedNode();
+            if (node) {
+                S.nav.setNodeSel(true, node.id, s);
+            }
+           
             s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
             s.cutCopyOp = "cut";
             s.selectedNodes.clear();
