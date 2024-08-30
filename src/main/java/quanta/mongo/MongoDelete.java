@@ -466,14 +466,6 @@ public class MongoDelete extends ServiceBase {
     }
 
     public DeleteNodesResponse bulkDeleteNodes() {
-        /*
-         * todo-0: disabling until we have a way to do this without the possibility of deleting subnodes
-         * owned by other users AND so I may do away this method completely because of that. We can instead
-         * allow a query that shows these nodes to users as a search result.
-         */
-        if (true)
-            throw new RuntimeException("Sorry, this feature is temporarily disabled.");
-
         DeleteNodesResponse res = new DeleteNodesResponse();
         SubNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
