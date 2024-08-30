@@ -16,7 +16,7 @@ export class FullScreenGraphViewer extends Main {
     isDragging: boolean;
     mouseOverTimeoutId: any;
 
-    static reset = () => {
+    static reset() {
         FullScreenGraphViewer.div = null;
         if (FullScreenGraphViewer.sim) {
             FullScreenGraphViewer.sim.stop();
@@ -52,7 +52,7 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    forceDirectedTree = () => {
+    forceDirectedTree() {
         /* We use 'thiz' to capture 'this' because the methods below to expect to have their own
          'this' that will be set based on code outside our control that is expected by the Graph
          Implementation itself. */
@@ -334,7 +334,7 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    updateTooltip = async (d: any, x: number, y: number) => {
+    async updateTooltip(d: any, x: number, y: number) {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
             upLevel: false,
@@ -353,7 +353,7 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    showTooltip = (d: any, _x: number, _y: number) => {
+    showTooltip(d: any, _x: number, _y: number) {
         this.tooltip.transition()
             .duration(300)
             .style("opacity", (_d: any) => this.isDragging ? 0 : 0.97);

@@ -17,7 +17,7 @@ export class BreadcrumbsPanel extends Div {
         return true;
     }
 
-    createBreadcrumbs = (): Comp => {
+    createBreadcrumbs(): Comp {
         let children: Comp[] = [];
 
         const ast = getAs();

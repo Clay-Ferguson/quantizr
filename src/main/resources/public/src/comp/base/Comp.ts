@@ -140,7 +140,7 @@ export abstract class Comp {
         // else we add 'func' to the queue of functions to call when component does get mounted.
         const elm = this.getRef();
         if (elm) {
-            this.runQueuedFuncs(elm); // <-- new 7/20/24, just because this seems right, not to fix any problmes.
+            this.runQueuedFuncs(elm); 
             func(elm);
             return;
         }
@@ -295,6 +295,35 @@ export abstract class Comp {
         return this.stateMgr.state;
     }
 
+    /* Classes don't override or alter this method directly, but can alter _domAddEvent instead */
+    private _componentDidMount = () => {
+        // Supposedly React 18+ will call useEffect twice on a mount (in strict mode, at
+        // least) so that's the only reason we're checking for !mounted here in this if
+        // condition.
+        if (!this.mounted) {
+            this.mounted = true;
+            // because of the empty dependencies array in useEffect this only gets called
+            // once when the component mounts.
+            this.domAdd();
+            if (this._domAddEvent) this._domAddEvent(); // call overridable method.
+
+            if (this.getScrollPos() !== null) {
+                this.scrollDomAddEvent();
+            }
+        }
+
+        // the return value of the useEffect function is what will get called when component
+        // unmounts, and was in the original pre-hooks React analogous to
+        // 'compnentWillUnmount'
+        return () => {
+            this.mounted = false;
+            this.domRemoveEvent();
+
+            // DO NOT DELETE (#monitor-lifecycle)
+            // Comp.allCompIds.delete(this.getId());
+        };
+    }
+
     // Core 'render' function used by react. This is THE function for the functional component this
     // object represents
     renderCore(_props, _ref): any {
@@ -307,33 +336,7 @@ export abstract class Comp {
 
             // This 'useEffect' with the empty dependency array (last param) is essentially the
             // 'componentDidMount' effect, and our app maps this to calling the '_domAddEvent'
-            useEffect(() => {
-                // Supposedly React 18+ will call useEffect twice on a mount (in strict mode, at
-                // least) so that's the only reason we're checking for !mounted here in this if
-                // condition.
-                if (!this.mounted) {
-                    this.mounted = true;
-                    // because of the empty dependencies array in useEffect this only gets called
-                    // once when the component mounts.
-                    this.domAdd();
-                    if (this._domAddEvent) this._domAddEvent(); // call overridable method.
-
-                    if (this.getScrollPos() !== null) {
-                        this.scrollDomAddEvent();
-                    }
-                }
-
-                // the return value of the useEffect function is what will get called when component
-                // unmounts, and was in the original pre-hooks React analogous to
-                // 'compnentWillUnmount'
-                return () => {
-                    this.mounted = false;
-                    this.domRemoveEvent();
-
-                    // DO NOT DELETE (#monitor-lifecycle)
-                    // Comp.allCompIds.delete(this.getId());
-                };
-            }, []);
+            useEffect(this._componentDidMount, []);
 
             // Note: The useEffect with no array as second parameter (dependencies) is how we
             // capture an update event for all state changes.
@@ -356,7 +359,6 @@ export abstract class Comp {
                 return null;
             }
             const ret = this.compRender();
-
             // if (this.debug) { // console.log("render done: " + this.getCompClass() + " counter="
             //     + Comp.renderCounter + " ID=" + this.getId());
             // }
@@ -378,7 +380,7 @@ export abstract class Comp {
 
     /* Get a printable string that contains the parentage of the component as far as we know it back
     to the root level */
-    getAncestry() {
+    getAncestry(): string {
         let stack = "";
         let comp: Comp = this;
         while (comp) {
