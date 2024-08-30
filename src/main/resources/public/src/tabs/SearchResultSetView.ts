@@ -36,11 +36,11 @@ export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView
             false);
     }
 
-    override extraPagingComps = (): Comp[] => {
+    override extraPagingComps(): Comp[] {
         return null;
     }
 
-    override getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp(): Comp {
         return null;
     }
 }

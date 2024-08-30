@@ -25,7 +25,7 @@ export class TabPanel extends Div {
         }
     }
 
-    setVisibility = async (visible: boolean): Promise<void> => {
+    async setVisibility(visible: boolean): Promise<void> {
         return promiseDispatch("SetTabPanelVis", s => {
             s.tabPanelVisible = visible;
         });
@@ -51,7 +51,7 @@ export class TabPanel extends Div {
         return true;
     }
 
-    buildTabs = (): AppTab[] => {
+    buildTabs(): AppTab[] {
         const ast = getAs();
         const tabs = ast.tabData.map(tab => {
             if (tab.isVisible() && tab.id === ast.activeTab) {

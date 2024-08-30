@@ -69,11 +69,11 @@ export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSe
             });
     }
 
-    override extraPagingComps = (): Comp[] => {
+    override extraPagingComps(): Comp[] {
         return null;
     }
 
-    override getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp(): Comp {
         return null;
     }
 }

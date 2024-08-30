@@ -115,7 +115,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         return true;
     }
 
-    configDragAndDrop = (c: Comp, ast: AppState, id: string) => {
+    configDragAndDrop(c: Comp, ast: AppState, id: string) {
         if (!ast.mobileMode && ast.userPrefs.editMode && !ast.editNode) {
             S.domUtil.setNodeDragHandler(c.attribs, id);
             S.domUtil.makeDropTarget(c.attribs, id);

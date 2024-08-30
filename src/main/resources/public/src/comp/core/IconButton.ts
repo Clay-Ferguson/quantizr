@@ -28,7 +28,7 @@ export class IconButton extends Comp {
         this.mergeState({ visible: true });
     }
 
-    replaceWithWaitIcon = (): void => {
+    replaceWithWaitIcon(): void {
         this.mergeState({ waiting: true });
     }
 

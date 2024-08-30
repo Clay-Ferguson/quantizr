@@ -30,7 +30,7 @@ export class TTSView extends AppTab<any, TTSView> {
         this.mergeState<LS>({});
     }
 
-    spanClick = (evt: Event) => {
+    _spanClick = (evt: Event) => {
         let clickId = S.domUtil.getPropFromDom(evt, "id");
         if (clickId && clickId.startsWith("tts")) {
             clickId = clickId.substring(3);
@@ -120,7 +120,7 @@ export class TTSView extends AppTab<any, TTSView> {
                     const utterTrim = utter.trim();
                     const isQuote = utterTrim.startsWith("\"") && utterTrim.endsWith("\"");
                     curDiv.addChild(new Span(utter + "  ", {
-                        onClick: this.spanClick,
+                        onClick: this._spanClick,
                         id: "tts" + idx,
                         className: "ttsSpan" + (hltIdx === idx ? " ttsHlt" : "") +
                             (isQuote ? " ttsQuote" : "")
@@ -168,7 +168,7 @@ export class TTSView extends AppTab<any, TTSView> {
         return true;
     }
 
-    makeVoiceChooser = (voiceKey: string, primaryVoice: boolean): Selection => {
+    makeVoiceChooser(voiceKey: string, primaryVoice: boolean): Selection {
         const data: any[] = [];
         let idx = 0;
         S.speech.getVoices()?.forEach(voice => {
@@ -194,7 +194,7 @@ export class TTSView extends AppTab<any, TTSView> {
         });
     }
 
-    makeRateChooser = (): Selection => {
+    makeRateChooser(): Selection {
         return new Selection(null, "Rate", [
             { key: "slowest", val: "Slowest" },
             { key: "slower", val: "Slower" },

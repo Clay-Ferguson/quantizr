@@ -43,12 +43,12 @@ export class TextArea extends Span implements I.TextEditorIntf {
         this.valState.setError(error);
     }
 
-    getSelStart = (): number => {
+    getSelStart(): number {
         return this.input.getRef() ? (this.input.getRef() as any).selectionStart : -1;
     }
 
     /* if pos is passed in we use it for the selection pos, or else use the live actual pos of the input */
-    insertTextAtCursor = (text: string, pos: number = -1) => {
+    insertTextAtCursor(text: string, pos: number = -1) {
         this.input?.onMount((elm: any) => {
             if (pos === -1) {
                 pos = elm.selectionStart;

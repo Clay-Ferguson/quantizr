@@ -25,11 +25,11 @@ export class SharedNodesResultSetView<PT extends SharesRSInfo> extends ResultSet
             this.data.props.accessOption);
     }
 
-    override extraPagingComps = (): Comp[] => {
+    override extraPagingComps(): Comp[] {
         return null;
     }
 
-    override getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp(): Comp {
         return null;
     }
 }

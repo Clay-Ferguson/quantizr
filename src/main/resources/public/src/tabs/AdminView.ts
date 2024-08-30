@@ -110,7 +110,7 @@ export class AdminView extends AppTab<any, AdminView> {
         return true;
     }
 
-    settingsLink = (name: string, onClick: () => void, moreClasses: string = ""): Div => {
+    settingsLink(name: string, onClick: () => void, moreClasses: string = ""): Div {
         return new Div(name, {
             className: "settingsLink " + moreClasses,
             onClick

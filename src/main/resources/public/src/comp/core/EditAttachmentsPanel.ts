@@ -60,7 +60,7 @@ export class EditAttachmentsPanel extends Div {
         return true;
     }
 
-    makeAttPanel = (att: Attachment, isFirst: boolean): Div => {
+    makeAttPanel(att: Attachment, isFirst: boolean): Div {
         const ast = getAs();
         if (!att) return null;
         const key = (att as any).key;
@@ -181,7 +181,7 @@ export class EditAttachmentsPanel extends Div {
         ]);
     }
 
-    askMakeAllSameSize = async (node: NodeInfo, val: string): Promise<void> => {
+    async askMakeAllSameSize(node: NodeInfo, val: string): Promise<void> {
         setTimeout(() => {
             const attachments = S.props.getOrderedAtts(node);
             if (attachments?.length > 1) {
@@ -200,7 +200,7 @@ export class EditAttachmentsPanel extends Div {
         }, 250);
     }
 
-    moveAttDown = (att: Attachment, node: NodeInfo) => {
+    moveAttDown(att: Attachment, node: NodeInfo) {
         const list: Attachment[] = S.props.getOrderedAtts(node);
         if (!list) return;
         let idx: number = 0;
@@ -225,7 +225,7 @@ export class EditAttachmentsPanel extends Div {
         dispatch("attachmentMoveUp", _s => { });
     }
 
-    moveAttUp = (att: Attachment, node: NodeInfo) => {
+    moveAttUp(att: Attachment, node: NodeInfo) {
         const list: Attachment[] = S.props.getOrderedAtts(node);
         if (!list) return;
         let idx: number = 0;
@@ -249,7 +249,7 @@ export class EditAttachmentsPanel extends Div {
         dispatch("attachmentMoveUp", _s => { });
     }
 
-    createImgSizeSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {
+    createImgSizeSelection(label: string, extraClasses: string, valueIntf: ValueIntf): Selection {
         const options = [
             { key: "0", val: "Actual" },
             { key: "20%", val: "20%" },
@@ -269,7 +269,7 @@ export class EditAttachmentsPanel extends Div {
         return new Selection(null, label, options, null, extraClasses, valueIntf);
     }
 
-    createImgPositionSelection = (label: string, extraClasses: string, valueIntf: ValueIntf): Selection => {
+    createImgPositionSelection(label: string, extraClasses: string, valueIntf: ValueIntf): Selection {
         const options = [
             { key: "auto", val: "Auto" },
             { key: "c", val: "Center" },

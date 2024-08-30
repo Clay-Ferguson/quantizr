@@ -60,7 +60,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    processOgEntry = async (entry: any, _elm: HTMLElement) => {
+    async processOgEntry(entry: any, _elm: HTMLElement) {
         if (!entry.isIntersecting) return;
         this.disconnect();
         await this.loadOpenGraph();
@@ -72,7 +72,7 @@ export class OpenGraphPanel extends Div {
     'correct' functioning, but it does offer an extremely nice smooth experience when scrolling down
     thru content even including content with lots and lots of openGraph queries happening in the
     background. */
-    loadNext = async () => {
+    async loadNext() {
         let found = false;
         let count = 0;
         if (!this.tabData || !this.tabData.openGraphComps) return;
@@ -90,7 +90,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    private loadOpenGraph = async () => {
+    private async loadOpenGraph() {
         if (this.loading) return;
         let og = S.quanta.openGraphData.get(this.ui.url);
         if (!og) {
@@ -124,7 +124,7 @@ export class OpenGraphPanel extends Div {
         }
     }
 
-    disconnect = () => {
+    disconnect() {
         if (this.observer) {
             this.observer.disconnect();
             this.observer = null;
@@ -135,13 +135,12 @@ export class OpenGraphPanel extends Div {
     // NodeInfo objects we ever get from the server should already have the open graph property
     // (sn:og) set on them so normally the only time this method ever runs will be when browsing an
     // RSS feed.
-    queryOpenGraph = async (url: string): Promise<J.OpenGraph> => {
+    async queryOpenGraph(url: string): Promise<J.OpenGraph> {
         if (!url) return null;
         try {
             const res: J.GetOpenGraphResponse = await S.rpcUtil.rpc<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
                 url
             }, true, false, true, this.getId());
-
             return res.openGraph;
         }
         catch (e) {

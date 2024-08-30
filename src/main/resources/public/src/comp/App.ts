@@ -90,7 +90,7 @@ export class App extends Main {
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
     };
 
-    getFullScreenViewer = (): Comp => {
+    getFullScreenViewer(): Comp {
         switch (getAs().fullScreenConfig.type) {
             case FullScreenType.IMAGE:
                 return new FullScreenImgViewer();
@@ -103,7 +103,7 @@ export class App extends Main {
         }
     }
 
-    getTopMobileBar = (): Comp => {
+    getTopMobileBar(): Comp {
         const ast = getAs();
         if (ast.mobileMode) {
             // DO NOT DELETE:

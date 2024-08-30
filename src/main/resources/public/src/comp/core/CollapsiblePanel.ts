@@ -49,7 +49,7 @@ export class CollapsiblePanel extends Comp {
                         className: style + " " + this.extraToggleButtonClass + (state.expanded ? " iconUp" : " iconDown"),
                         // Warning: This can't be camel case!
                         "data-bs-toggle": collapseClass,
-                        onClick: this.onToggle
+                        onClick: this._onToggle
                     }),
                     ...this.compChildren
                 ])
@@ -63,7 +63,7 @@ export class CollapsiblePanel extends Comp {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " iconUp" : " iconDown"),
                     // Warning: This can't be camel case!
                     "data-bs-toggle": collapseClass,
-                    onClick: this.onToggle
+                    onClick: this._onToggle
                 }),
 
                 // This div and it's children holds the actual collapsible content.
@@ -76,7 +76,7 @@ export class CollapsiblePanel extends Comp {
         return true;
     }
 
-    onToggle = () => {
+    _onToggle = () => {
         const expanded = !this.getState<LS>().expanded;
         this.setExpanded(expanded);
         if (this.stateCallback) {

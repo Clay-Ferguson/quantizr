@@ -28,7 +28,7 @@ export class RightNavPanel extends Div {
         RightNavPanel.inst = this;
     }
 
-    static calcWidthCols = (): number => {
+    static calcWidthCols(): number {
         let panelCols = getAs().userPrefs.mainPanelCols || 6;
         if (panelCols < 4) panelCols = 4;
         if (panelCols > 8) panelCols = 8;
@@ -219,7 +219,7 @@ export class RightNavPanel extends Div {
         return true;
     }
 
-    makeRHSAvatarDiv = (): Comp => {
+    makeRHSAvatarDiv(): Comp {
         const ast = getAs();
         if (!ast.userProfile) return null;
         let src: string = S.render.getAvatarImgUrl(ast.userProfile.userNodeId, ast.userProfile.avatarVer);

@@ -13,7 +13,7 @@ export class TextContent extends Comp {
         this.tag = this.preformatted ? "pre" : "div";
     }
 
-    setText = (text: string) => {
+    setText(text: string) {
         this.mergeState<LS>({ text });
     }
 

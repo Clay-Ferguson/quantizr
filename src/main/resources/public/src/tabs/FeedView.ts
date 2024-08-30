@@ -212,7 +212,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         return new Div(this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
-    getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
+    getFeedSubHeading(data: TabIntf<FeedViewProps>) {
         let subHeading = null;
 
         if (data.props.feedFilterToDisplayName) {
@@ -254,7 +254,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         return subHeading ? subHeading : "";
     }
 
-    clearSearch = () => {
+    clearSearch() {
         if (this.data.props.searchTextState.getValue()) {
             this.data.props.searchTextState.setValue("");
             S.srch.refreshFeed();

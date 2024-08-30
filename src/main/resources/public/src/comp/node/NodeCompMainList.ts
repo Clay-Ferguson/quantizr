@@ -33,7 +33,7 @@ export class NodeCompMainList extends Div {
         return true;
     }
 
-    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, pageTop: boolean) => {
+    addPaginationButtons(children: Comp[], endReached: boolean, moreClasses: string, pageTop: boolean) {
         let firstButton: IconButton;
         let prevButton: IconButton;
         let moreButton: IconButton;

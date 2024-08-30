@@ -28,7 +28,7 @@ export class TabPanelButtons extends Div {
         return true;
     }
 
-    buildTabButtons = (): Comp[] => {
+    buildTabButtons(): Comp[] {
         const items: Comp[] = [];
         getAs().tabData.forEach(tab => {
             items.push(this.getTabButton(tab));

@@ -33,9 +33,9 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         }
 
         const floatEndDiv = new Div(null, { className: "float-end tinyMarginBottom" }, [
-            !this.data.props.endReached ? new Button("More History...", this.moreHistory,
+            !this.data.props.endReached ? new Button("More History...", this._moreHistory,
                 { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
-            new Button("Save as PDF", this.saveAsPDF,
+            new Button("Save as PDF", this._saveAsPDF,
                 { className: "float-end tinyMarginBottom" }),
         ]);
 
@@ -111,17 +111,17 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         return true;
     }
 
-    moreHistory = () => {
+    _moreHistory = () => {
         S.srch.showThread(getAs().threadViewFromNodeId);
     }
 
-    saveAsPDF = async () => {
+    _saveAsPDF = async () => {
         const dlg =new ExportDlg("thread-view", getAs().threadViewFromNodeId, true);
         await dlg.open();
         this.exportResponse(dlg.res);
     }
 
-    exportResponse = (res: J.ExportResponse) => {
+    exportResponse(res: J.ExportResponse) {
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
         eventually the plan is to have the export return the actual md5 of the export for use here
         */

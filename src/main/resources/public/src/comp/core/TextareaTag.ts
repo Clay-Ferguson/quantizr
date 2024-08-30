@@ -17,7 +17,7 @@ export class TextareaTag extends Comp {
         this.tag = "textarea";
     }
 
-    splitLines = (str: string): string[] => {
+    splitLines(str: string): string[] {
         // todo-2: in the TTS engine we have something like this done differently. Research which is best
         return str.split(/\r?\n/);
     }

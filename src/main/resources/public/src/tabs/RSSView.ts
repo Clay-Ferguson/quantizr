@@ -121,7 +121,7 @@ export class RSSView extends AppTab<any, RSSView> {
         return true;
     }
 
-    static loadFeed = (ust: AppState, feedSrcHash: string, urls: string) => {
+    static loadFeed(ust: AppState, feedSrcHash: string, urls: string) {
         if (RSSView.loading) return;
 
         setTimeout(() => {
@@ -182,7 +182,7 @@ export class RSSView extends AppTab<any, RSSView> {
     }
 
     // Repair URLs. This is a hackernoon bug, not a Quanta bug we're working around.
-    urlFix = (url: string): string => {
+    urlFix(url: string): string {
         if (!url) return url;
         return url.replace("https://hackernoon.com/https://cdn.hackernoon.com", "https://cdn.hackernoon.com");
     }
@@ -250,7 +250,7 @@ export class RSSView extends AppTab<any, RSSView> {
         return feedList;
     }
 
-    makeNavButtonBar = (page: number, feedSrc: string, feedSrcHash: string, clazz: string): ButtonBar => {
+    makeNavButtonBar(page: number, feedSrc: string, feedSrcHash: string, clazz: string): ButtonBar {
         return new ButtonBar([
             page > 2 ? new IconButton("fa-angle-double-left", null, {
                 onClick: (event: Event) => {
@@ -279,7 +279,7 @@ export class RSSView extends AppTab<any, RSSView> {
         ], clazz);
     }
 
-    pageBump = (feedSrc: string, feedSrcHash: string, bump: number) => {
+    pageBump(feedSrc: string, feedSrcHash: string, bump: number) {
         const ast = getAs();
         let page: number = ast.rssFeedPage[feedSrcHash];
         if (!page) {
@@ -289,7 +289,7 @@ export class RSSView extends AppTab<any, RSSView> {
         this.setPage(feedSrc, feedSrcHash, page + bump);
     }
 
-    setPage = (feedSrc: string, feedSrcHash: string, page: number) => {
+    setPage(feedSrc: string, feedSrcHash: string, page: number) {
         console.log("RSS Page Bump: page=" + page);
         dispatch("RSSUpdated", s => {
             // deleting will force a requery from the server

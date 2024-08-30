@@ -28,11 +28,11 @@ export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSe
         return new Div("@" + this.data.props.showingFollowingOfUser + " is Following...", { className: "tabTitle" });
     }
 
-    override extraPagingComps = (): Comp[] => {
+    override extraPagingComps(): Comp[] {
         return null;
     }
 
-    override getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp(): Comp {
         return null;
     }
 }

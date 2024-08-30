@@ -26,7 +26,7 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
             page, this.data.props.recursive);
     }
 
-    override extraPagingComps = (): Comp[] => {
+    override extraPagingComps(): Comp[] {
         return [
             new Checkbox("Live", { className: "bigMarginLeft" }, {
                 setValue: (checked: boolean) => {
@@ -54,7 +54,7 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
         ];
     }
 
-    override getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp(): Comp {
         return new Button("Post", S.edit.postFromTimeline, { className: "float-end" }, "btn-primary marginRight")
     }
 }

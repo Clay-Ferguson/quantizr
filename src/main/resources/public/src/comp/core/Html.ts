@@ -30,7 +30,7 @@ export class Html extends Comp {
         this.setText(content);
     }
 
-    setText = (content: string) => {
+    setText(content: string) {
         this.mergeState<LS>({ content });
     }
 

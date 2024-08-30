@@ -44,7 +44,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, itemClass, itemClassHighlight, style);
     }
 
-    override getFloatRightHeaderComp = (): Comp => {
+    override getFloatRightHeaderComp(): Comp {
         const ast = getAs();
         return new Div(null, { className: "float-end" }, [
             ast.mobileMode ? null : new Checkbox("Images", {
@@ -88,7 +88,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         ]);
     }
 
-    override extraPagingComps = (): Comp[] => {
+    override extraPagingComps(): Comp[] {
         return null;
     }
 }
