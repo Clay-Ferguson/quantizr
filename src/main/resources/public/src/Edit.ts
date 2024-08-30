@@ -790,7 +790,7 @@ export class Edit {
         // node editing without asking user to confirm.
         // if (this.checkEditPending()) return;
         if (getAs().editNode) {
-            EditNodeDlg.currentInst.utl.cancelEdit(EditNodeDlg.currentInst);
+            EditNodeDlg.dlg.utl.cancelEdit();
             setTimeout(() => this.runEditNodeByClickImmediate(evt, id), 500);
         }
         else {
@@ -1514,7 +1514,7 @@ export class Edit {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (_dlg: EditNodeDlg, node: NodeInfo) => {
+    editNodeSharing = async (node: NodeInfo) => {
         node = node || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");

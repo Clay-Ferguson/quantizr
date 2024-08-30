@@ -35,11 +35,11 @@ export class EditAttachmentsPanel extends Div {
             this.addChild(new ButtonBar([
                 new Span("Attachments ", { className: "bigMarginRight alignBottom" }),
                 atts?.size > 0 ? new IconButton("fa-trash fa-lg", "", {
-                    onClick: () => this.dlg.utl.deleteUploads(this.dlg),
+                    onClick: () => this.dlg.utl.deleteUploads(),
                     title: "Delete selected Attachments"
                 }) : null,
                 !ast.cutAttachmentsFromId ? new IconButton("fa-cut fa-lg", "", {
-                    onClick: () => this.dlg.utl.cutUploads(this.dlg),
+                    onClick: () => this.dlg.utl.cutUploads(),
                     title: "Cut selected Attachments"
                 }) : null,
                 ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil.clearCut, { className: "clickable marginLeft" }) : null,

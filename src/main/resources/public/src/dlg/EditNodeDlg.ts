@@ -44,9 +44,9 @@ export interface LS {
  */
 export class EditNodeDlg extends DialogBase {
     static autoSaveTimer: any = null;
-    static currentInst: EditNodeDlg = null;
     static pendingUploadFile: File = null;
-    public utl: EditNodeDlgUtil = new EditNodeDlgUtil();
+    static dlg: EditNodeDlg = null;
+    public utl: EditNodeDlgUtil = null;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: Validator = new Validator();
     decryptFailed: boolean = false;
@@ -77,6 +77,8 @@ export class EditNodeDlg extends DialogBase {
     constructor(encrypt: boolean, private showJumpButton: boolean, mode: DialogMode) {
         super("[none]", "appModalCont " + C.TAB_MAIN, null, mode);
         const ast = getAs();
+        EditNodeDlg.dlg = this;
+        this.utl = new EditNodeDlgUtil(this);
 
         let signCheckboxVal = false;
         let encryptCheckboxVal = false;
@@ -87,10 +89,6 @@ export class EditNodeDlg extends DialogBase {
             encryptCheckboxVal = S.props.isEncrypted(ast.editNode);
         }
 
-        // we have this inst just so we can let the autoSaveTimer be static and always reference the
-        // latest one.
-        EditNodeDlg.currentInst = this;
-
         this.mergeState<LS>({
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>(),
@@ -100,14 +98,14 @@ export class EditNodeDlg extends DialogBase {
         });
 
         this.allowEditAllProps = ast.isAdminUser;
-        this.utl.initStates(this);
+        this.utl.initStates();
         this.initialProps = S.util.arrayClone(ast.editNode.properties);
 
         /* This 'encrypt' will trigger this node to be encrypted whenever we're replying to
         an encrypted node. (i.e. the parent of this node is encrypted) */
         if (encrypt) {
             setTimeout(() => {
-                this.utl.setEncryption(this, true);
+                this.utl.setEncryption(true);
             }, 500);
         }
 
@@ -130,18 +128,18 @@ export class EditNodeDlg extends DialogBase {
                 if (!ast || !ast.editNode) return;
                 S.localDB.setVal(C.STORE_EDITOR_DATA, {
                     nodeId: ast.editNode.id,
-                    content: EditNodeDlg.currentInst.contentEditorState.getValue()
+                    content: EditNodeDlg.dlg.contentEditorState.getValue()
                 });
             }, 5000);
         }
 
         // if we're editing a DATE property expand properties panel automatically
         if (S.props.getProp(J.NodeProp.DATE, ast.editNode)) {
-            dispatch("setPropsPanelExpanded", s => { s.propsPanelExpanded = true; }, true);
+            dispatch("setPropsPanelExpanded", s => s.propsPanelExpanded = true, true);
         }
     }
 
-    immediateUploadFiles = async (files: File[]) => {
+    async immediateUploadFiles(files: File[]) {
         const ast = getAs();
         await S.domUtil.uploadFilesToNode(files, ast.editNode.id, false);
         await S.edit.refreshFromServer(ast.editNode);
@@ -149,7 +147,7 @@ export class EditNodeDlg extends DialogBase {
         this.binaryDirty = true;
     }
 
-    resetAutoSaver = async () => {
+    async resetAutoSaver() {
         if (EditNodeDlg.autoSaveTimer) {
             clearInterval(EditNodeDlg.autoSaveTimer);
             EditNodeDlg.autoSaveTimer = null;
@@ -157,7 +155,7 @@ export class EditNodeDlg extends DialogBase {
         S.localDB.setVal(C.STORE_EDITOR_DATA, null);
     }
 
-    createLayoutSelection = (): Selection => {
+    createLayoutSelection(): Selection {
         const ast = getAs();
         const selection: Selection = new Selection(null, "Layout", [
             { key: "v", val: "1 col" },
@@ -170,7 +168,7 @@ export class EditNodeDlg extends DialogBase {
         return selection;
     }
 
-    createPrioritySelection = (): Selection => {
+    createPrioritySelection(): Selection {
         const ast = getAs();
         return new Selection(null, "Priority", [
             { key: "0", val: "none" },
@@ -194,7 +192,7 @@ export class EditNodeDlg extends DialogBase {
                 span.addChild(new Icon({
                     title: `Node Type: ${type.getName()}`,
                     className: iconClass + " dlgIcon clickable",
-                    onClick: this.openChangeNodeTypeDlg
+                    onClick: this._openChangeNodeTypeDlg
                 }));
             }
 
@@ -207,7 +205,7 @@ export class EditNodeDlg extends DialogBase {
             }
             span.addChild(new Span(type.getName(), {
                 className: "marginRight clickable",
-                onClick: this.openChangeNodeTypeDlg
+                onClick: this._openChangeNodeTypeDlg
             }));
         }
         else {
@@ -215,7 +213,7 @@ export class EditNodeDlg extends DialogBase {
             span.addChild(new Icon({
                 title: "Node Type: Unknown",
                 className: "fa fa-question-circle fa-lg dlgIcon clickable",
-                onClick: this.openChangeNodeTypeDlg
+                onClick: this._openChangeNodeTypeDlg
             }));
             span.addChild(new Span("Unknown Type", { className: "marginRight" }));
         }
@@ -226,7 +224,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Jump to Node",
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
-                    this.utl.cancelEdit(this);
+                    this.utl.cancelEdit();
                     S.nav.closeFullScreenViewer();
                     S.view.jumpToId(ast.editNode.id);
                 }
@@ -349,7 +347,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection float-end" }, [
-            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this.removeTag, this.selectTags) : null,
+            this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this._removeTag, this._selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
 
@@ -374,14 +372,14 @@ export class EditNodeDlg extends DialogBase {
                                 dispatch("setPropsPanelExpanded", s => {
                                     s.propsPanelExpanded = true;
                                 });
-                                await this.utl.addProperty(this);
+                                await this.utl.addProperty();
                             },
                             title: "Add property"
                         }),
                         // DELETE PROP ICON
                         state.selectedProps.size > 0 ? new Icon({
                             className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
-                            onClick: () => this.utl.deletePropsGesture(this),
+                            onClick: () => this.utl.deletePropsGesture(),
                             title: "Delete property"
                         }) : null
                     ])
@@ -407,11 +405,11 @@ export class EditNodeDlg extends DialogBase {
                 new Span("Shared to: ", {
                     title: "Node Sharing",
                     onClick: () => {
-                        this.utl.share(this);
+                        this.utl.share();
                     }
                 }),
                 ...shareComps,
-                !isPublic ? new Button("Make Public", () => { this.makePublic(true); }, { className: "marginLeft" }) : null,
+                !isPublic ? new Button("Make Public", () => this.makePublic(true), { className: "marginLeft" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
@@ -538,7 +536,7 @@ export class EditNodeDlg extends DialogBase {
         return children;
     }
 
-    makePublic = async (allowAppends: boolean) => {
+    async makePublic(allowAppends: boolean) {
         const ast = getAs();
         if (this.getState<LS>().encryptCheckboxVal) {
             S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
@@ -559,7 +557,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* returns true if props table is not empty. */
-    buildPropsEditPanel = (_: { propsParent: Comp, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean => {
+    buildPropsEditPanel(_: { propsParent: Comp, state: LS, type: TypeIntf, customProps: string[], flexPropsEditPanel: boolean }): boolean {
         let ret = false;
         const ast = getAs();
 
@@ -593,12 +591,12 @@ export class EditNodeDlg extends DialogBase {
         return ret;
     }
 
-    hasTag = (tag: string): boolean => {
+    hasTag(tag: string): boolean {
         const tags = this.tagsState.getValue().split(" ");
         return tags.includes(tag);
     }
 
-    addTag = (tag: string) => {
+    _addTag = (tag: string) => {
         let val = this.tagsState.getValue();
         val = val.trim();
         if (val) val += " ";
@@ -607,7 +605,7 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState({});
     }
 
-    removeTag = (removeTag: string) => {
+    _removeTag = (removeTag: string) => {
         let val = this.tagsState.getValue();
         val = val.trim();
         const tags: string[] = val.split(" ");
@@ -624,7 +622,7 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState({});
     }
 
-    sortTags = (tagStr: string) => {
+    sortTags(tagStr: string) {
         if (!tagStr) return tagStr;
         let tags: string[] = tagStr.split(" ");
         tags = Array.from(new Set(tags)); // removes duplicates
@@ -632,7 +630,7 @@ export class EditNodeDlg extends DialogBase {
         return tags.join(" ");
     }
 
-    addTagsToTextField = (dlg: SelectTagsDlg) => {
+    addTagsToTextField(dlg: SelectTagsDlg) {
         let val = this.tagsState.getValue();
         val = val.trim();
         const tags: string[] = val.split(" ");
@@ -649,13 +647,13 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState({});
     }
 
-    makeCheckboxesRow = (advancedOpts: EditorOptions): Comp[] => {
+    makeCheckboxesRow(advancedOpts: EditorOptions): Comp[] {
         const ast = getAs();
 
         const encryptCheckBox = advancedOpts.encrypt ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean) => {
                 if (S.crypto.encKeyOk()) {
-                    this.utl.setEncryption(this, checked);
+                    this.utl.setEncryption(checked);
                 }
             },
             getValue: (): boolean => this.getState<LS>().encryptCheckboxVal
@@ -692,10 +690,10 @@ export class EditNodeDlg extends DialogBase {
         };
     }
 
-    save = async () => {
+    _save = async () => {
         // it's important to call saveNode before close, because close destroys some of our state,
         // what we need to complete the updating and page refresh.
-        const savedOk: boolean = await this.utl.saveNode(this);
+        const savedOk: boolean = await this.utl.saveNode();
         if (savedOk) {
             this.close();
         }
@@ -705,10 +703,10 @@ export class EditNodeDlg extends DialogBase {
         }, true);
     }
 
-    askAI = async () => {
+    _askAI = async () => {
         // it's important to call saveNode before close, because close destroys some of our state,
         // what we need to complete the updating and page refresh.
-        const savedOk: boolean = await this.utl.saveNode(this);
+        const savedOk: boolean = await this.utl.saveNode();
         if (savedOk) {
             this.close();
         }
@@ -728,7 +726,7 @@ export class EditNodeDlg extends DialogBase {
         const allowUpload: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.upload, ast.editNode)) : true;
         const allowShare: boolean = type ? (getAs().isAdminUser || type.allowAction(NodeActionType.share, ast.editNode)) : true;
         const datePropExists = S.props.getProp(J.NodeProp.DATE, ast.editNode);
-        const numPropsShowing = this.utl.countPropsShowing(this);
+        const numPropsShowing = this.utl.countPropsShowing();
         const advancedButtons: boolean = !!this.contentEditor;
         const allowPropAdd: boolean = type ? type.getAllowPropertyAdd() : true;
 
@@ -738,16 +736,16 @@ export class EditNodeDlg extends DialogBase {
         }
 
         return new ButtonBar([
-            new Button("Save", this.save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
+            new Button("Save", this._save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
 
             allowUpload ? new IconButton("fa-upload", null, {
-                onClick: () => this.utl.upload(null, this),
+                onClick: () => this.utl.upload(null),
                 title: "Upload file attachment"
             }) : null,
 
 
             allowShare ? new IconButton("fa-share-alt", null, {
-                onClick: () => this.utl.share(this),
+                onClick: () => this.utl.share(),
                 title: "Share Node"
             }, "ui-editor-share") : null,
 
@@ -756,13 +754,13 @@ export class EditNodeDlg extends DialogBase {
                     dispatch("setPropsPanelExpanded", s => {
                         s.propsPanelExpanded = true;
                     });
-                    await this.utl.addProperty(this);
+                    await this.utl.addProperty();
                 },
                 title: "Add Property"
             }) : null,
 
             !this.tagsState.getValue() ? new IconButton("fa-tag fa-lg", "", {
-                onClick: this.selectTags,
+                onClick: this._selectTags,
                 title: "Select Hashtags"
             }) : null,
 
@@ -777,25 +775,26 @@ export class EditNodeDlg extends DialogBase {
             // Note: CALENDAR types contain Calendar Entries but are not themselves Calendar Entries.
             advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar-plus-o", null, {
                 title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
-                onClick: () => this.utl.addDateProperty(this)
+                onClick: () => this.utl.addDateProperty()
             }) : null,
 
             ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask AI", {
-                onClick: this.askAI,
+                onClick: this._askAI,
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService
             }) : null,
 
 
-            new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary"),
+            new Button("Cancel", () => this.utl.cancelEdit(), null, "btn-secondary"),
         ]);
     }
 
-    selectTags = async () => {
+    _selectTags = async () => {
         const dlg = new SelectTagsDlg("edit", this.tagsState.getValue(), false);
         await dlg.open();
         this.addTagsToTextField(dlg);
     }
 
+    // todo-0: we can get rid of this ugly way of doing this
     // @ts-ignore
     super_closeByUser = this.closeByUser;
     override closeByUser = () => {
@@ -824,7 +823,7 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    openChangeNodeTypeDlg = async () => {
+    _openChangeNodeTypeDlg = async () => {
         const ast = getAs();
         const dlg = new PickNodeTypeDlg(ast.editNode.type);
         await dlg.open();
@@ -835,8 +834,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* Creates the editing field for a single property 'propEntry' */
-    makePropEditField = (type: TypeIntf, propEntry: PropertyInfo, durationPropEntry: PropertyInfo,
-        allowCheckbox: boolean, rows: number, flexPropsEditPanel: boolean): Div => {
+    makePropEditField(type: TypeIntf, propEntry: PropertyInfo, durationPropEntry: PropertyInfo,
+        allowCheckbox: boolean, rows: number, flexPropsEditPanel: boolean): Div {
         const ast = getAs();
 
         // Warning: Don't put any left/right margins on this row because the widths to allow widths
@@ -882,7 +881,7 @@ export class EditNodeDlg extends DialogBase {
 
             let addTagFunc = null;
             if (propEntry.name === J.NodeProp.DATE && !this.hasTag("#due")) {
-                addTagFunc = this.addTag;
+                addTagFunc = this._addTag;
             }
 
             valEditor = new DateTimeField(propState, durationState, !propConfig || propConfig.showTime, addTagFunc);
@@ -988,14 +987,14 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    decryptFail = (): void => {
+    decryptFail(): void {
         this.decryptFailed = true;
         if (this.contentEditor) {
             this.contentEditor.setEnabled(false);
         }
     }
 
-    makeContentEditor = (rows: string, minRows: number): Div => {
+    makeContentEditor(rows: string, minRows: number): Div {
         const ast = getAs();
         const editItems: Comp[] = [];
 
@@ -1021,26 +1020,26 @@ export class EditNodeDlg extends DialogBase {
             new Icon({
                 className: (S.speech.speechActive ? "fa fa-lg fa-microphone-slash editorIcon" : "fa fa-microphone editorIcon"),
                 title: "Toggle on/off Speech Recognition to input text",
-                onClick: () => this.utl.toggleRecognition(this)
+                onClick: () => this.utl.toggleRecognition()
             }),
 
             new Icon({
                 className: "fa fa-lg fa-smile-o editorIcon",
                 title: "Insert emoji at cursor",
-                onClick: () => this.utl.insertEmoji(this)
+                onClick: () => this.utl.insertEmoji()
             }),
 
             new Icon({
                 className: "fa fa-lg fa-user editorIcon",
                 title: "Insert Username(s) at cursor",
-                onClick: () => this.utl.insertUserNames(this)
+                onClick: () => this.utl.insertUserNames()
             }),
 
             !ast.isAnonUser && !ast.mobileMode &&  S.speech.ttsSupported() ? new Icon({
                 className: "fa fa-lg fa-volume-up editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
-                onClick: () => this.utl.speakerClickInEditor(this),
+                onClick: () => this.utl.speakerClickInEditor(),
                 title: "Text-to-Speech: Editor Text or Selection"
             }) : null,
             new Selection(null, null, [
@@ -1053,43 +1052,13 @@ export class EditNodeDlg extends DialogBase {
                 { key: "h6", val: "H6" }
             ], "compactFormSelect", "headingDropDown", {
                 setValue: (val: string) => {
-                    this.utl.setHeadingLevel(this, val);
+                    this.utl.setHeadingLevel(val);
                 },
-                getValue: (): string => this.utl.getHeadingLevel(this)
+                getValue: (): string => this.utl.getHeadingLevel()
             })
         ], "float-end microMarginBottom"));
         editItems.push(this.contentEditor as any as Comp);
 
         return new Div(null, { className: "contentEditor" }, editItems);
-    }
-
-    // NOTE: Be careful renaming this method. It's referenced in an "as any" way in one place.
-    addSharingToContentText = () => {
-        const ast = getAs();
-        if (ast.editNode.ac?.length > 0) {
-            let content: string = this.contentEditorState.getValue();
-            let newLine = false;
-            let accum = 0;
-            for (const ac of ast.editNode.ac) {
-                if (ac.principalName !== PrincipalName.PUBLIC) {
-                    const insertName = S.util.getFriendlyPrincipalName(ac);
-
-                    if (content.indexOf(insertName) === -1) {
-                        if (!newLine) {
-                            content += "\n\n";
-                            newLine = true;
-                        }
-                        content += insertName + " ";
-
-                        // new line afer every 7 names.
-                        if (++accum >= 7) {
-                            content += "\n";
-                            accum = 0;
-                        }
-                    }
-                }
-            }
-            this.contentEditorState.setValue(content.trim());
-        }
     }
 }

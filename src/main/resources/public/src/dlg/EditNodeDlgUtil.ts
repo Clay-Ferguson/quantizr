@@ -17,7 +17,10 @@ import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 export class EditNodeDlgUtil {
-    public countPropsShowing = (dlg: EditNodeDlg): number => {
+    constructor (private dlg: EditNodeDlg) {
+    }
+
+    public countPropsShowing(): number {
         const ast = getAs();
         const type = S.plugin.getType(ast.editNode.type);
         if (type) {
@@ -28,11 +31,11 @@ export class EditNodeDlgUtil {
 
         // This loop creates all the editor input fields for all the properties
         ast.editNode.properties?.forEach(prop => {
-            if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name)) {
+            if (!this.dlg.allowEditAllProps && !S.render.allowPropertyEdit(ast.editNode, prop.name)) {
                 return;
             }
 
-            if (dlg.allowEditAllProps || (
+            if (this.dlg.allowEditAllProps || (
                 !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                 if (!S.props.isGuiControlBasedProp(prop) && !S.props.isHiddenProp(prop)) {
@@ -43,14 +46,14 @@ export class EditNodeDlgUtil {
         return numPropsShowing;
     }
 
-    public saveNode = async (dlg: EditNodeDlg): Promise<boolean> => {
+    public async saveNode(): Promise<boolean> {
         const ast = getAs();
         const editNode = ast.editNode;
 
         let content: string;
         let clearText: string;
-        if (dlg.contentEditor) {
-            content = clearText = dlg.contentEditor.getValue();
+        if (this.dlg.contentEditor) {
+            content = clearText = this.dlg.contentEditor.getValue();
 
             if (S.crypto.avail) {
                 const cipherKey = S.props.getCryptoKey(editNode);
@@ -70,17 +73,17 @@ export class EditNodeDlgUtil {
         }
 
         editNode.content = content;
-        editNode.name = dlg.nameState.getValue();
-        editNode.tags = dlg.tagsState.getValue();
+        editNode.name = this.dlg.nameState.getValue();
+        editNode.tags = this.dlg.tagsState.getValue();
 
-        this.savePropsToNode(editNode, dlg);
-        this.saveAttFileNamesToNode(editNode, dlg);
+        this.savePropsToNode(editNode);
+        this.saveAttFileNamesToNode(editNode);
 
         /*
         Note: if this is an encrypted node we will be signing the cipher text (encrypted string),
         because content has already  been encrypted just above. */
 
-        if (dlg.getState<EditNodeDlgState>().signCheckboxVal) {
+        if (this.dlg.getState<EditNodeDlgState>().signCheckboxVal) {
             if (S.crypto.avail) {
                 // Note: this needs to come AFTER the 'savePropsToNode' call above because we're
                 // overriding what was possibly in there.
@@ -91,16 +94,16 @@ export class EditNodeDlgUtil {
             S.props.setPropVal(J.NodeProp.CRYPTO_SIG, editNode, "[null]");
         }
 
-        dlg.resetAutoSaver();
+        this.dlg.resetAutoSaver();
         await S.edit.saveNode(editNode, true);
         return true;
     }
 
     // Takes all the propStates values and converts them into node properties on the node
-    savePropsToNode = (editNode: NodeInfo, dlg: EditNodeDlg) => {
+    savePropsToNode(editNode: NodeInfo) {
         const type = S.plugin.getType(editNode.type);
         editNode.properties?.forEach(prop => {
-            const propState = dlg.propStates.get(prop.name);
+            const propState = this.dlg.propStates.get(prop.name);
 
             if (propState) {
                 // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON
@@ -126,19 +129,19 @@ export class EditNodeDlgUtil {
         });
     }
 
-    saveAttFileNamesToNode = (editNode: NodeInfo, dlg: EditNodeDlg) => {
+    saveAttFileNamesToNode(editNode: NodeInfo) {
         const list: Attachment[] = S.props.getOrderedAtts(editNode);
         list?.forEach(att => {
-            const propState = dlg.attFileNames.get((att as any).key);
+            const propState = this.dlg.attFileNames.get((att as any).key);
             if (propState) {
                 att.f = propState.getValue();
             }
         });
     }
 
-    addProperty = async (dlg: EditNodeDlg): Promise<void> => {
+    async addProperty(): Promise<void> {
         const ast = getAs();
-        const state: EditNodeDlgState = dlg.getState<EditNodeDlgState>();
+        const state: EditNodeDlgState = this.dlg.getState<EditNodeDlgState>();
         const propDlg = new EditPropertyDlg(ast.editNode);
         await propDlg.open();
 
@@ -151,8 +154,8 @@ export class EditNodeDlgUtil {
             ast.editNode.properties.push(prop);
 
             // this forces a rerender, even though it looks like we're doing nothing to state.
-            dlg.mergeState<EditNodeDlgState>(state);
-            this.initPropState(dlg, ast.editNode, prop);
+            this.dlg.mergeState<EditNodeDlgState>(state);
+            this.initPropState(ast.editNode, prop);
         }
         else {
             propDlg.getState<EditPropertyDlgState>().selections.forEach(sop => {
@@ -166,18 +169,18 @@ export class EditNodeDlgUtil {
                     value: ""
                 }
                 ast.editNode.properties.push(prop);
-                this.initPropState(dlg, ast.editNode, prop);
+                this.initPropState(ast.editNode, prop);
             });
 
             // this forces a rerender, even though it looks like we're doing nothing to state.
-            dlg.mergeState<EditNodeDlgState>(state);
+            this.dlg.mergeState<EditNodeDlgState>(state);
         }
         // we don't need to return an actual promise here
         return null;
     }
 
-    addDateProperty = async (dlg: EditNodeDlg) => {
-        const state = dlg.getState<EditNodeDlgState>();
+    async addDateProperty() {
+        const state = this.dlg.getState<EditNodeDlgState>();
         const ast = getAs();
         ast.editNode.properties = ast.editNode.properties || [];
 
@@ -195,32 +198,32 @@ export class EditNodeDlgUtil {
             value: "01:00"
         });
 
-        const tags = dlg.tagsState.getValue();
+        const tags = this.dlg.tagsState.getValue();
         if (!tags || tags.indexOf("due") === -1) {
-            dlg.tagsState.setValue(tags ? (tags + " #due") : "#due");
+            this.dlg.tagsState.setValue(tags ? (tags + " #due") : "#due");
         }
 
-        dlg.mergeState<EditNodeDlgState>(state);
+        this.dlg.mergeState<EditNodeDlgState>(state);
     }
 
-    share = async (dlg: EditNodeDlg) => {
+    async share() {
         const ast = getAs();
-        await S.edit.editNodeSharing(dlg, ast.editNode);
+        await S.edit.editNodeSharing(ast.editNode);
         S.edit.updateNode(ast.editNode);
     }
 
-    upload = async (file: File, dlg: EditNodeDlg) => {
+    async upload(file: File) {
         const ast = getAs();
 
         const uploadDlg = new UploadFromFileDropzoneDlg(ast.editNode.id, "", file, false, true, async () => {
             await S.edit.refreshFromServer(ast.editNode);
             S.edit.updateNode(ast.editNode);
-            dlg.binaryDirty = true;
+            this.dlg.binaryDirty = true;
         }, true);
         await uploadDlg.open();
     }
 
-    deleteProperties = async (dlg: EditNodeDlg, propNames: string[]) => {
+    async deleteProperties(propNames: string[]) {
         if (!propNames) return;
         const ast = getAs();
         const type = S.plugin.getType(ast.editNode.type);
@@ -233,62 +236,62 @@ export class EditNodeDlgUtil {
         });
 
         if (S.util.checkSuccess("Delete property", res)) {
-            const state = dlg.getState<EditNodeDlgState>();
+            const state = this.dlg.getState<EditNodeDlgState>();
             propNames.forEach(propName => S.props.deleteProp(ast.editNode, propName));
-            dlg.mergeState<EditNodeDlgState>(state);
+            this.dlg.mergeState<EditNodeDlgState>(state);
         }
     }
 
-    deletePropsGesture = async (dlg: EditNodeDlg) => {
+    async deletePropsGesture() {
         const confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             "btn-danger", "alert alert-danger");
         await confirmDlg.open();
         if (confirmDlg.yes) {
-            this.deleteSelectedProperties(dlg);
+            this.deleteSelectedProperties();
         }
     }
 
-    deleteSelectedProperties = (dlg: EditNodeDlg) => {
+    deleteSelectedProperties() {
         const keys: string[] = [];
-        const delProps = dlg.getState<EditNodeDlgState>().selectedProps;
+        const delProps = this.dlg.getState<EditNodeDlgState>().selectedProps;
 
         // special case: If user is deleting a date also delete the duration, because these go together.
         if (delProps.has("date")) {
             delProps.add("duration");
         }
         delProps.forEach(prop => keys.push(prop));
-        this.deleteProperties(dlg, keys);
+        this.deleteProperties(keys);
     }
 
-    setEncryption = async (dlg: EditNodeDlg, encrypt: boolean) => {
-        dlg.mergeState({ encryptCheckboxVal: encrypt });
-        const state = dlg.getState<EditNodeDlgState>();
+    async setEncryption(encrypt: boolean) {
+        this.dlg.mergeState({ encryptCheckboxVal: encrypt });
+        const state = this.dlg.getState<EditNodeDlgState>();
         const ast = getAs();
         if (encrypt && S.props.isPublic(ast.editNode)) {
             S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
             return;
         }
-        if (dlg.pendingEncryptionChange) return;
+        if (this.dlg.pendingEncryptionChange) return;
 
         const encrypted: boolean = S.props.isEncrypted(ast.editNode);
 
         /* only if the encryption setting changed do we need to do anything here */
         if (encrypted !== encrypt) {
-            dlg.pendingEncryptionChange = true;
+            this.dlg.pendingEncryptionChange = true;
             try {
                 /* If we're turning off encryption for the node */
                 if (!encrypt) {
                     /* Take what's in the editor and put that into this.node.content, because it's
                     the correct and only place the correct updated text is guaranteed to be in the
                     case where the user made some changes before disabling encryption. */
-                    ast.editNode.content = dlg.contentEditor.getValue();
+                    ast.editNode.content = this.dlg.contentEditor.getValue();
                     S.props.setPropVal(J.NodeProp.ENC_KEY, ast.editNode, null);
                 }
                 /* Else need to ensure node is encrypted */
                 else {
                     // if we need to encrypt and the content is not currently encrypted.
                     if (S.crypto.avail && !ast.editNode.content?.startsWith(J.Constant.ENC_TAG)) {
-                        const content = dlg.contentEditor.getValue();
+                        const content = this.dlg.contentEditor.getValue();
                         const skdp: SymKeyDataPackage = await S.crypto.encryptSharableString(null, content);
 
                         if (skdp.cipherKey && skdp.cipherKey) {
@@ -303,16 +306,16 @@ export class EditNodeDlgUtil {
                     }
                 }
 
-                dlg.mergeState<EditNodeDlgState>(state);
+                this.dlg.mergeState<EditNodeDlgState>(state);
             }
             finally {
-                dlg.pendingEncryptionChange = false;
+                this.dlg.pendingEncryptionChange = false;
             }
         }
     }
 
-    cutUploads = async (dlg: EditNodeDlg) => {
-        const attSet = dlg.getState<EditNodeDlgState>().selectedAttachments;
+    async cutUploads() {
+        const attSet = this.dlg.getState<EditNodeDlgState>().selectedAttachments;
         if (!attSet || attSet.size === 0) return;
 
         dispatch("cutAttachments", (s: AppState) => {
@@ -320,13 +323,13 @@ export class EditNodeDlgUtil {
             s.cutAttachments = new Set(attSet);
         });
 
-        dlg.mergeState<EditNodeDlgState>({
+        this.dlg.mergeState<EditNodeDlgState>({
             selectedAttachments: new Set<string>()
         });
     }
 
-    deleteUploads = async (dlg: EditNodeDlg) => {
-        if (dlg.getState<EditNodeDlgState>().selectedAttachments?.size === 0) return;
+    async deleteUploads() {
+        if (this.dlg.getState<EditNodeDlgState>().selectedAttachments?.size === 0) return;
 
         const confirmDlg = new ConfirmDlg("Delete the selected Attachments?", "Confirm Delete",
             "btn-danger", "alert alert-danger");
@@ -335,7 +338,7 @@ export class EditNodeDlgUtil {
 
         const ast = getAs();
         let delAttKeys = "";
-        dlg.getState<EditNodeDlgState>().selectedAttachments?.forEach(prop => {
+        this.dlg.getState<EditNodeDlgState>().selectedAttachments?.forEach(prop => {
             delete ast.editNode.attachments[prop];
 
             if (delAttKeys) {
@@ -355,15 +358,15 @@ export class EditNodeDlgUtil {
             ast.editNode.attachments = null;
         }
 
-        dlg.mergeState<EditNodeDlgState>({
+        this.dlg.mergeState<EditNodeDlgState>({
             selectedAttachments: new Set<string>()
         });
 
         S.edit.updateNode(ast.editNode);
-        dlg.binaryDirty = true;
+        this.dlg.binaryDirty = true;
     }
 
-    initPropState = (dlg: EditNodeDlg, node: NodeInfo, propEntry: PropertyInfo) => {
+    initPropState(node: NodeInfo, propEntry: PropertyInfo) {
         const allowEditAllProps: boolean = getAs().isAdminUser;
         const isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         const propVal = propEntry.value;
@@ -371,10 +374,10 @@ export class EditNodeDlgUtil {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        let propState: Validator = dlg.propStates.get(propEntry.name);
+        let propState: Validator = this.dlg.propStates.get(propEntry.name);
         if (!propState) {
             propState = new Validator(propVal);
-            dlg.propStates.set(propEntry.name, propState);
+            this.dlg.propStates.set(propEntry.name, propState);
         }
 
         if (!allowEditAllProps && isReadOnly) {
@@ -395,40 +398,40 @@ export class EditNodeDlgUtil {
         }
     }
 
-    toggleRecognition = (dlg: EditNodeDlg) => {
+    toggleRecognition() {
         S.speech.setListenerCallback((transcript: string) => {
-            if (dlg.contentEditor && transcript) {
-                dlg.contentEditor.insertTextAtCursor(transcript + " ");
+            if (this.dlg.contentEditor && transcript) {
+                this.dlg.contentEditor.insertTextAtCursor(transcript + " ");
             }
         });
 
-        const speechActive = !dlg.getState<EditNodeDlgState>().speechActive;
+        const speechActive = !this.dlg.getState<EditNodeDlgState>().speechActive;
         if (speechActive) {
             S.speech.startListening();
         }
         else {
             S.speech.stopListening();
         }
-        dlg.mergeState<EditNodeDlgState>({ speechActive });
+        this.dlg.mergeState<EditNodeDlgState>({ speechActive });
 
         setTimeout(() => {
-            if (dlg.contentEditor) {
-                dlg.contentEditor.focus();
+            if (this.dlg.contentEditor) {
+                this.dlg.contentEditor.focus();
             }
         }, 250);
     }
 
-    initStates = (dlg: EditNodeDlg) => {
+    initStates() {
         const ast = getAs();
 
-        dlg.onMount((_elm: HTMLElement) => {
-            dlg.initContent();
+        this.dlg.onMount((_elm: HTMLElement) => {
+            this.dlg.initContent();
         });
 
         /* Initialize node name state */
-        dlg.nameState.setValue(ast.editNode.name);
-        dlg.tagsState.setValue(ast.editNode.tags);
-        this.initPropStates(dlg, ast.editNode);
+        this.dlg.nameState.setValue(ast.editNode.name);
+        this.dlg.tagsState.setValue(ast.editNode.tags);
+        this.initPropStates(ast.editNode);
     }
 
     /* Initializes the propStates for every property in 'node', and optionally if
@@ -436,7 +439,7 @@ export class EditNodeDlgUtil {
     'S.props.allBinaryProps' list, which is how we have to update the propStates after an upload has
     been added or removed.
     */
-    initPropStates = (dlg: EditNodeDlg, node: NodeInfo): any => {
+    initPropStates(node: NodeInfo): any {
         const type = S.plugin.getType(node.type);
         if (type) {
             type.ensureDefaultProperties(node);
@@ -444,23 +447,23 @@ export class EditNodeDlgUtil {
 
         if (node.properties) {
             node.properties.forEach(prop => {
-                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name)) {
+                if (!this.dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name)) {
                     return;
                 }
 
-                if (dlg.allowEditAllProps || (
+                if (this.dlg.allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!S.props.isGuiControlBasedProp(prop) && !S.props.isHiddenProp(prop)) {
-                        this.initPropState(dlg, node, prop);
+                        this.initPropState(node, prop);
                     }
                 }
             });
         }
     }
 
-    getHeadingLevel = (dlg: EditNodeDlg): string => {
-        const content = dlg.contentEditor?.getValue() || getAs().editNode.content;
+    getHeadingLevel(): string {
+        const content = this.dlg.contentEditor?.getValue() || getAs().editNode.content;
         const level = S.util.countLeadingChars(content, "#");
         if (level > 6) {
             return "h6";
@@ -469,11 +472,11 @@ export class EditNodeDlgUtil {
     }
 
     // Makes sure the editor text starts with 'level' number of "#" characters (markdown headings)
-    setHeadingLevel = (dlg: EditNodeDlg, level: string) => {
+    setHeadingLevel(level: string) {
         // get integer from second character in string
         const levelInt = parseInt(level.substring(1));
 
-        let content = dlg.contentEditor?.getValue();
+        let content = this.dlg.contentEditor?.getValue();
         const curLevel = S.util.countLeadingChars(content, "#");
         if (levelInt == curLevel) return;
         content = S.util.stripAllLeading(content, "#");
@@ -482,25 +485,25 @@ export class EditNodeDlgUtil {
         }
         content = "#".repeat(levelInt) + content;
         content = content.trim();
-        dlg.contentEditor?.setValue(content);
+        this.dlg.contentEditor?.setValue(content);
     }
 
-    insertEmoji = async (dlg: EditNodeDlg) => {
-        if (!dlg.contentEditor) return;
+    async insertEmoji() {
+        if (!this.dlg.contentEditor) return;
         // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus
         // will make us also loose the cursor position.
-        const selStart = dlg.contentEditor.getSelStart();
+        const selStart = this.dlg.contentEditor.getSelStart();
         const eDlg: EmojiPickerDlg = new EmojiPickerDlg();
         await eDlg.open();
         if (eDlg.getState<EmojiPickerDlgState>().selectedEmoji) {
-            dlg.contentEditor.insertTextAtCursor(eDlg.getState<EmojiPickerDlgState>().selectedEmoji, selStart);
+            this.dlg.contentEditor.insertTextAtCursor(eDlg.getState<EmojiPickerDlgState>().selectedEmoji, selStart);
         }
     }
 
-    insertUserNames = async (dlg: EditNodeDlg) => {
-        if (!dlg.contentEditor) return;
+    async insertUserNames() {
+        if (!this.dlg.contentEditor) return;
         // get the selStart immediately or it can be wrong, after renders.
-        const selStart = dlg.contentEditor.getSelStart();
+        const selStart = this.dlg.contentEditor.getSelStart();
         // we have to capture the cursor position BEFORE we open a dialog, because the loss of focus
         // will make us also loose the cursor position.
 
@@ -511,31 +514,31 @@ export class EditNodeDlgUtil {
             const names: string[] = [];
             friendsDlg.getState<FriendsDlgState>().selections.forEach(n => names.push("@" + n));
             const namesStr = names.join(" ");
-            dlg.contentEditor.insertTextAtCursor(" " + namesStr + " ", selStart);
+            this.dlg.contentEditor.insertTextAtCursor(" " + namesStr + " ", selStart);
         }
     }
 
-    speakerClickInEditor = (dlg: EditNodeDlg) => {
+    speakerClickInEditor() {
         if (getAs().speechSpeaking) {
             S.speech.stopSpeaking();
         }
         else {
-            const content = S.quanta.selectedForTts ? S.quanta.selectedForTts : dlg.contentEditorState.getValue();
+            const content = S.quanta.selectedForTts ? S.quanta.selectedForTts : this.dlg.contentEditorState.getValue();
             if (content) {
                 S.speech.speakText(content, false);
             }
         }
     }
 
-    cancelEdit = (dlg: EditNodeDlg) => {
+    cancelEdit() {
         const ast = getAs();
-        dlg.closeByUser();
-        dlg.close();
+        this.dlg.closeByUser();
+        this.dlg.close();
 
         // rollback properties.
-        ast.editNode.properties = dlg.initialProps;
+        ast.editNode.properties = this.dlg.initialProps;
 
-        if (dlg.binaryDirty) {
+        if (this.dlg.binaryDirty) {
             S.quanta.refresh();
         }
 
@@ -544,7 +547,7 @@ export class EditNodeDlgUtil {
         }, true);
     }
 
-    renderLinksEditing = (): Div => {
+    renderLinksEditing(): Div {
         const ast = getAs();
         if (!ast.editNode.links) return null;
 
@@ -564,7 +567,7 @@ export class EditNodeDlgUtil {
         return hasLinks ? new Div(null, { className: "linksPanelInEditor" }, linkComps) : null;
     }
 
-    editLink = async (name: string) => {
+    async editLink(name: string) {
         const link = getAs().editNode.links.find(link => link.name == name);
         const dlg = new AskNodeLinkNameDlg(link);
         await dlg.open();
