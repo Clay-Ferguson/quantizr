@@ -106,7 +106,6 @@ public class TransferService extends ServiceBase {
                 svc_acl.addPrivilege(null, node, null, ownerAccnt,
                         Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
             }
-            node.adminUpdate = true;
             ops.inc();
         } //
         else if (op.equals(TransferOp.ACCEPT.s())) { //
@@ -122,7 +121,6 @@ public class TransferService extends ServiceBase {
                             Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
                 }
                 node.setTransferFrom(null);
-                node.adminUpdate = true;
                 ops.inc();
             }
         } //
@@ -140,7 +138,6 @@ public class TransferService extends ServiceBase {
                     svc_acl.addPrivilege(null, node, null, frmUsrNode,
                             Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
                 }
-                node.adminUpdate = true;
                 ops.inc();
             }
         } //
@@ -158,9 +155,9 @@ public class TransferService extends ServiceBase {
                     svc_acl.addPrivilege(null, node, null, frmUsrNode,
                             Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
                 }
-                node.adminUpdate = true;
                 ops.inc();
             }
         }
+        svc_mongoUpdate.saveAP(node);
     }
 }

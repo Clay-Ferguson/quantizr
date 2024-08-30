@@ -23,7 +23,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import quanta.config.ServiceBase;
-import quanta.config.SessionContext;
 import quanta.model.client.NodeType;
 import quanta.rest.request.AddCreditRequest;
 import quanta.rest.request.AddFriendRequest;

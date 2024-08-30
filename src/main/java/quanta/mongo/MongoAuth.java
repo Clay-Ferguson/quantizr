@@ -249,8 +249,6 @@ public class MongoAuth extends ServiceBase {
         if (node == null) {
             throw new RuntimeEx("Auth Failed. Node did not exist.");
         }
-        if (node.adminUpdate)
-            return;
 
         if (TL.getSC() == null) {
             // when we get here it normally means we should've called "arun.exec" to manage
@@ -300,9 +298,6 @@ public class MongoAuth extends ServiceBase {
         if (node == null || !MongoRepository.fullInit) {
             return;
         }
-        // this adminUpdate flag is specifically for the purpose if disabling auth checks
-        if (node.adminUpdate)
-            return;
 
         if (verbose)
             log.trace("auth: " + node.getPath());

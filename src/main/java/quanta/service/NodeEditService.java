@@ -209,6 +209,7 @@ public class NodeEditService extends ServiceBase {
         SubNode parent = svc_mongoRead.getParentAP(node);
         if (parent != null) {
             parent.setHasChildren(true);
+            svc_mongoUpdate.saveIfDirtyAP(parent);
         }
         // Send notification to local server or to remote server when a node is added (and not by admin)
         if (!PrincipalName.ADMIN.s().equals(sessionUserName)) {
@@ -347,6 +348,7 @@ public class NodeEditService extends ServiceBase {
         }
         if (req.getSplitType().equalsIgnoreCase("children")) {
             parentForNewNodes.setHasChildren(true);
+            svc_mongoUpdate.saveIfDirtyAP(parentForNewNodes);
         }
         return res;
     }

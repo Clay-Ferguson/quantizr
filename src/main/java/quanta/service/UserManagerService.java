@@ -1416,7 +1416,10 @@ public class UserManagerService extends ServiceBase {
         svc_auth.requireAdmin();
         userNode =
                 svc_mongoCreate.createNode(usersNode, NodeType.ACCOUNT.s(), null, CreateNodeLocation.LAST, true, null);
+        
         usersNode.setHasChildren(true);
+        svc_mongoUpdate.saveIfDirtyAP(usersNode);
+
         ObjectId id = new ObjectId();
         userNode.setId(id);
         userNode.setOwner(id);

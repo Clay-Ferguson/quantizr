@@ -312,7 +312,6 @@ public class MongoCreate extends ServiceBase {
         }
 
         svc_auth.writeAuth(parentNode);
-        parentNode.adminUpdate = true;
 
         // note: redundant security
         if (svc_acl.isAdminOwned(parentNode) && !TL.hasAdminPrivileges()) {
@@ -452,7 +451,7 @@ public class MongoCreate extends ServiceBase {
             throw new RuntimeException("Unable to find parent note to insert under: " + parentId);
         }
         svc_auth.writeAuth(parentNode);
-        parentNode.adminUpdate = true;
+        
         // note: redundant security
         if (svc_acl.isAdminOwned(parentNode) && !TL.hasAdminPrivileges()) {
             throw new ForbiddenException();

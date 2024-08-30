@@ -156,12 +156,14 @@ public class MongoRead extends ServiceBase {
         }
         boolean ret = directChildrenExist(node.getPath());
         node.setHasChildren(ret);
+        svc_mongoUpdate.saveIfDirtyAP(node);
         return ret;
     }
 
     public void forceCheckHasChildren(SubNode node) {
         boolean ret = directChildrenExist(node.getPath());
         node.setHasChildren(ret);
+        svc_mongoUpdate.saveIfDirtyAP(node);
     }
 
     public boolean directChildrenExist(String path) {
@@ -189,7 +191,7 @@ public class MongoRead extends ServiceBase {
 
             // repair inconsistency
             node.setHasChildren(true);
-            svc_mongoUpdate.saveSession();
+            svc_mongoUpdate.saveIfDirtyAP(node);
 
             // terminate user operation
             throw new RuntimeException("One or more nodes were in an invalid state.");

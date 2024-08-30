@@ -57,7 +57,8 @@ public class MongoDelete extends ServiceBase {
     public long deleteUnderPath(String path) {
         Query q = new Query();
         q.addCriteria(svc_mongoUtil.subGraphCriteria(path));
-        SubNode parent = svc_mongoRead.getNodeAP(path);
+        SubNode parent = svc_mongoRead.getNode(path);
+        svc_auth.writeAuth(parent);
         if (parent != null) {
             parent.setHasChildren(false);
         }
@@ -124,6 +125,7 @@ public class MongoDelete extends ServiceBase {
     public DeleteResult delete(SubNode node) {
         SubNode parent = svc_mongoRead.getParentAP(node);
         if (parent != null) {
+            svc_auth.ownerAuth(parent);
             parent.setHasChildren(null);
         }
         return svc_ops.remove(node);

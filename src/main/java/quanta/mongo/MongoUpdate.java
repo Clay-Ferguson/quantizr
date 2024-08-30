@@ -67,7 +67,20 @@ public class MongoUpdate extends ServiceBase {
         svc_mongoRead.hasChildren(node);
         beforeSave(node);
         svc_ops.save(node);
-        TL.clean(node);
+    }
+
+    public void saveIfDirtyAP(SubNode node) {
+        if (node == null || !TL.hasDirtyNode(node.getId()))
+            return;
+        saveAP(node);
+    }
+
+    public void saveAP(SubNode node) {
+        svc_arun.run(() -> {
+            beforeSave(node);
+            svc_ops.save(node);
+            return null;
+        });
     }
 
     public void saveSession() {
@@ -223,9 +236,10 @@ public class MongoUpdate extends ServiceBase {
             node.setModifyTime(now);
         }
 
-        // New nodes can be given a path where they will allow the ID to play the role
-        // of the leaf 'name'
-        // part of the path
+        /*
+         * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
+         * part of the path
+         */
         if (node.getPath().endsWith("/?")) {
             String path = svc_mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
             node.setPath(path);
@@ -295,8 +309,6 @@ public class MongoUpdate extends ServiceBase {
         if (!MongoRepository.fullInit) {
             return;
         }
-        if (node.adminUpdate)
-            return;
 
         if (TL.getSC() == null) {
             String msg = "No session context found for save";
