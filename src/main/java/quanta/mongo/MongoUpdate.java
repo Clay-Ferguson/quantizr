@@ -284,11 +284,6 @@ public class MongoUpdate extends ServiceBase {
         // Since we're saving this node already make sure none of our setters above left
         // it flagged as dirty or it might unnecessarily get saved twice.
         TL.clean(node);
-
-        // keep track of root node
-        if (NodePath.ROOT_PATH.equals(node.getPath())) {
-            svc_mongoRead.setDbRoot(node);
-        }
     }
 
     private void verifyParentExists(SubNode node, boolean isNew) {

@@ -45,22 +45,15 @@ import quanta.util.val.Val;
 public class MongoRead extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(MongoRead.class);
     private static final Object rootLock = new Object();
-    private SubNode dbRoot;
+    private AccountNode dbRoot;
     private static int MAX_TREE_GRAPH_SIZE = 100000;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
-    public SubNode getDbRoot() {
+    public AccountNode getDbRoot() {
         synchronized (rootLock) {
             if (dbRoot == null) {
-                dbRoot = findNodeByPathAP(NodePath.ROOT_PATH);
+                dbRoot = findNodeByPathAP(NodePath.ROOT_PATH, AccountNode.class);
             }
-            return dbRoot;
-        }
-    }
-
-    public SubNode setDbRoot(SubNode node) {
-        synchronized (rootLock) {
-            dbRoot = node;
             return dbRoot;
         }
     }
@@ -390,13 +383,21 @@ public class MongoRead extends ServiceBase {
         return svc_arun.run(() -> findNodeByPath(path));
     }
 
+    public <T extends SubNode> T findNodeByPathAP(String path, Class<T> clazz) {
+        return svc_arun.run(() -> findNodeByPath(path, clazz));
+    }
+
     public SubNode findNodeByPath(String path) {
+        return findNodeByPath(path, SubNode.class);
+    }
+
+    public <T extends SubNode> T findNodeByPath(String path, Class<T> clazz) {
         path = XString.stripIfEndsWith(path, "/");
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).is(path);
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
-        return svc_ops.findOne(q);
+        return svc_ops.findOne(q, clazz);
     }
 
     public boolean pathExists(String path) {

@@ -1309,7 +1309,7 @@ public class UserManagerService extends ServiceBase {
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {
-            return (AccountNode)svc_mongoRead.getDbRoot();
+            return svc_mongoRead.getDbRoot();
         }
         // Otherwise for ordinary users root is based off their username
         // case-insensitive lookup of username:

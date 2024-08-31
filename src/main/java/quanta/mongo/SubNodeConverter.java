@@ -11,8 +11,8 @@ import quanta.mongo.model.SubNode;
 
 @Component
 @ReadingConverter
-public class SubNodeReadConverter implements Converter<Document, SubNode> {
-    private static Logger log = LoggerFactory.getLogger(SubNodeReadConverter.class);
+public class SubNodeConverter implements Converter<Document, SubNode> {
+    private static Logger log = LoggerFactory.getLogger(SubNodeConverter.class);
 
     @Override
     public SubNode convert(Document doc) {

@@ -203,7 +203,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
      @Override
     public MongoCustomConversions customConversions() {
         List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new SubNodeReadConverter());
+        converters.add(new SubNodeConverter());
         return new MongoCustomConversions(converters);
     }
 }

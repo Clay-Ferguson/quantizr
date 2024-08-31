@@ -50,7 +50,7 @@ public class MongoAuth extends ServiceBase {
         }
         synchronized (adminSessionLck) {
             if (adminSC == null) {
-                SubNode root = svc_mongoRead.getDbRoot();
+                AccountNode root = svc_mongoRead.getDbRoot();
                 adminSC = new SessionContext();
                 adminSC.setUserName(PrincipalName.ADMIN.s());
                 adminSC.setUserNodeId(root.getId().toHexString());
