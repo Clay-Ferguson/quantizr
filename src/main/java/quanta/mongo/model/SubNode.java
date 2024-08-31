@@ -164,9 +164,6 @@ public class SubNode {
     }
 
     public SubNode(org.bson.Document doc) {
-        // todo-0: without the converter does the default mongo way of creating SubNodes and initialize them
-        // call the setters ??? It must right? So be careful what we're doing here with direct access. Make
-        // sure nothing important is being missed by setting directly.
         id = doc.getObjectId(SubNode.ID);
         ordinal = doc.getLong(SubNode.ORDINAL);
         hch = doc.getBoolean(SubNode.HAS_CHILDREN);
