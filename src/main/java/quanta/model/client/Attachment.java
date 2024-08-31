@@ -9,6 +9,13 @@ import org.springframework.data.annotation.Transient;
 import quanta.mongo.model.SubNode;
 import quanta.util.TL;
 
+/*
+ * todo-0: All the single letter abbreviated prop names in here were a bad idea. Run a conversion on
+ * those to make them be full names, but be careful there are lots of uses of this on the client
+ * side
+ *
+ * Use a static variable naming like "NodeLink.java" does for all property names.
+ */
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment {
@@ -37,6 +44,33 @@ public class Attachment {
         this.ownerNode = ownerNode;
     }
 
+    public Attachment(org.bson.Document doc) {
+        if (doc.containsKey("width"))
+            setWidth(doc.getInteger("width"));
+        if (doc.containsKey("height"))
+            setHeight(doc.getInteger("height"));
+        if (doc.containsKey("position"))
+            setPosition(doc.getString("position"));
+        if (doc.containsKey("mime"))
+            setMime(doc.getString("mime"));
+        if (doc.containsKey("fileName"))
+            setFileName(doc.getString("fileName"));
+        if (doc.containsKey("size"))
+            setSize(doc.getLong("size"));
+        if (doc.containsKey("bin"))
+            setBin(doc.getString("bin"));
+        if (doc.containsKey("binData"))
+            setBinData(doc.getString("binData"));
+        if (doc.containsKey("url"))
+            setUrl(doc.getString("url"));
+        if (doc.containsKey("cssSize"))
+            setCssSize(doc.getString("cssSize"));
+        if (doc.containsKey("ordinal"))
+            setOrdinal(doc.getInteger("ordinal"));
+        if (doc.containsKey("aiPrompt"))
+            setAiPrompt(doc.getString("aiPrompt"));
+    }
+
     @JsonProperty("w")
     public Integer getWidth() {
         return width;
@@ -44,7 +78,7 @@ public class Attachment {
 
     @JsonProperty("w")
     public void setWidth(Integer width) {
-        TL.dirty(ownerNode);
+        TL.dirty(ownerNode); // todo-0: shouldn't all these dirty calls check to see if the value is actually changing?
         this.width = width;
     }
 
@@ -164,12 +198,6 @@ public class Attachment {
     @JsonProperty("ai")
     public void setAiPrompt(String aiPrompt) {
         this.aiPrompt = aiPrompt;
-    }
-
-    @Transient
-    @JsonIgnore
-    public SubNode getOwnerNode() {
-        return ownerNode;
     }
 
     @Transient

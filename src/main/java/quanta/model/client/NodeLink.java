@@ -24,6 +24,20 @@ public class NodeLink {
 
     public NodeLink() {}
 
+    public NodeLink(org.bson.Document doc) {
+        if (doc.containsKey(NodeLink.ID)) {
+            setNodeId(doc.getString(NodeLink.ID));
+        }
+        
+        if (doc.containsKey(NodeLink.NAME)) {
+            setName(doc.getString(NodeLink.NAME));
+        }
+        
+        if (doc.containsKey(NodeLink.EMBED)) {
+            setEmbed(doc.getBoolean(NodeLink.EMBED));
+        }
+    }
+
     @JsonProperty(ID)
     public String getNodeId() {
         return nodeId;

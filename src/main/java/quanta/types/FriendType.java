@@ -7,6 +7,7 @@ import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 
 // IMPORTANT: See TypePluginMgr, and ServiceBase instantiation to initialize tyese Plugin types
@@ -33,7 +34,7 @@ public class FriendType extends TypeBase {
          * be null, and is normal
          */
         if (accountId != null) {
-            SubNode accountNode = svc_mongoRead.getNodeAP(accountId);
+            AccountNode accountNode = svc_user.getAccountNodeAP(accountId);
 
             /*
              * to load up a friend node for the browser to display, we have to populate these "Client Props", on

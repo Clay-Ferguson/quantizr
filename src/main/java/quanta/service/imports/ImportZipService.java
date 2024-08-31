@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
@@ -61,7 +62,7 @@ public class ImportZipService extends ImportArchiveBase {
             throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
         }
         used = true;
-        SubNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
+        AccountNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
         if (userNode == null) {
             throw new RuntimeEx("UserNode not found: " + sc.getUserName());
         }

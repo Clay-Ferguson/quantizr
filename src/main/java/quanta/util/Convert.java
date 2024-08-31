@@ -26,6 +26,7 @@ import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.model.AccessControl;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.types.TypeBase;
 
@@ -96,7 +97,7 @@ public class Convert extends ServiceBase {
         String nameProp = null;
         String displayName = null;
         String owner = PrincipalName.ADMIN.s();
-        SubNode ownerAccnt = svc_mongoRead.getOwnerAP(node);
+        AccountNode ownerAccnt = svc_user.getAccountNodeAP(node);
 
         if (ownerAccnt != null) {
             nameProp = ownerAccnt.getStr(NodeProp.USER);

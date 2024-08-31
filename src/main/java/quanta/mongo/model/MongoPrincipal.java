@@ -3,6 +3,8 @@ package quanta.mongo.model;
 import org.bson.types.ObjectId;
 
 /*
+ * todo-0: This isn't used in actual DB persistence so move it to a different folder/package.
+ * 
  * userNodeId is required. userName is optional
  *
  * accessLevels: w = read/write r = readonly

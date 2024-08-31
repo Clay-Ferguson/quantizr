@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
@@ -39,7 +40,7 @@ public class ImportTarService extends ImportArchiveBase {
             throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
         }
         used = true;
-        SubNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
+        AccountNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         if (userNode == null) {
             throw new RuntimeEx("UserNode not found: " + TL.getSC().getUserName());
         }

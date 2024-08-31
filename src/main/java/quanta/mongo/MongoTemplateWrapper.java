@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
 import com.mongodb.client.result.DeleteResult;
 import quanta.config.ServiceBase;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.perf.PerfEvent;
 import quanta.util.TL;
@@ -69,8 +70,6 @@ public class MongoTemplateWrapper extends ServiceBase {
 
     public List<SubNode> find(Query query) {
         List<SubNode> nodes = executeOperation(query, "find", () -> mt.find(query, SubNode.class));
-        if (nodes != null)
-            nodes.forEach(n -> svc_mongoUtil.validate(n));
         return nodes;
     }
 
@@ -79,27 +78,34 @@ public class MongoTemplateWrapper extends ServiceBase {
     // code must be bypassed so we call directly onto 'mt.findOne' instead of thru executeOptionation
     public SubNode adminFindOne(Query query) {
         SubNode node = mt.findOne(query, SubNode.class);
-        if (node != null)
-            svc_mongoUtil.validate(node);
         return node;
     }
 
     public SubNode findOne(Query query) {
-        SubNode node = executeOperation(query, "findOne", () -> mt.findOne(query, SubNode.class));
-        if (node != null)
-            svc_mongoUtil.validate(node);
+        return findOne(query, SubNode.class);
+    }
+
+    public <T extends SubNode> T findOne(Query query, Class<T> clazz) {
+        T node = executeOperation(query, "findOne", () -> mt.findOne(query, clazz));
         return node;
     }
 
+    public AccountNode findUserAccountNode(Query query) {
+       return findOne(query, AccountNode.class);
+    }
+
     public SubNode findById(Object id) {
+        return findById(id, SubNode.class);
+    }
+
+    public <T extends SubNode> T findById(Object id, Class<T> clazz) {
         if (id == null)
             return null;
 
         return executeOperation(null, "findById", () -> {
-            SubNode node = mt.findById(id, SubNode.class);
+            T node = mt.findById(id, clazz);
 
             if (node != null) {
-                svc_mongoUtil.validate(node);
                 svc_auth.readAuth(node);
             }
             return node;
@@ -114,15 +120,15 @@ public class MongoTemplateWrapper extends ServiceBase {
         AggregationResults<SubNode> ret = mt.aggregate(aggregation, SubNode.class, SubNode.class);
 
         // call onAfterLoad on all results
-        if (ret != null && ret.getMappedResults() != null) {
-            ret.getMappedResults().forEach(n -> svc_mongoUtil.validate(n));
-        }
+        // if (ret != null && ret.getMappedResults() != null) {
+        //     ret.getMappedResults().forEach(n -> svc_mongoUtil.validate(n));
+        // }
 
         return ret;
     }
 
     public SubNode save(SubNode node) {
-        svc_mongoUtil.validate(node);
+        MongoUtil.validate(node);
         return mt.save(node);
     }
 
@@ -136,7 +142,6 @@ public class MongoTemplateWrapper extends ServiceBase {
 
     public void forEach(Query query, Consumer<SubNode> consumer) {
         mt.stream(query, SubNode.class).forEach(n -> {
-            svc_mongoUtil.validate(n);
             consumer.accept(n);
         });
     }

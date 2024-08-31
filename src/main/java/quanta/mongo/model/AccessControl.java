@@ -35,6 +35,16 @@ public class AccessControl {
         this.prvs = prvs;
     }
 
+    public AccessControl(org.bson.Document doc) { 
+        if (doc.containsKey(AccessControl.FIELD_PRVS)) {
+            setPrvs(doc.getString(AccessControl.FIELD_PRVS));
+        }
+        
+        if (doc.containsKey(AccessControl.FIELD_KEY)) {
+            setKey(doc.getString(AccessControl.FIELD_KEY));
+        }
+    }
+
     @JsonProperty(FIELD_PRVS)
     public String getPrvs() {
         return this.prvs;

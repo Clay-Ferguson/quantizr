@@ -21,6 +21,7 @@ import quanta.model.NodeInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.CheckMessagesRequest;
 import quanta.rest.request.NodeFeedRequest;
@@ -183,7 +184,7 @@ public class UserFeedService extends ServiceBase {
          * a single rev-chron.
          */
         else {
-            SubNode toUserNode = svc_user.getAccountByUserNameAP(req.getToUser());
+            AccountNode toUserNode = svc_user.getAccountByUserNameAP(req.getToUser());
             if (myAcntNode == null) {
                 myAcntNode = svc_mongoRead.getNode(sc.getUserNodeId());
             }
@@ -290,7 +291,7 @@ public class UserFeedService extends ServiceBase {
         // Add 'Blocked Words' criteria only if we're not doing a "From Me" or "From Friends" kind of feed.
         if (!req.getFromMe() && !req.getFromFriends() && TL.getSC().getUserNodeId() != null) {
             // Filter USER_BLOCK_WORDS if user has defined any
-            SubNode userNode = svc_ops.findById(new ObjectId(TL.getSC().getUserNodeId()));
+            AccountNode userNode = svc_user.getAccountNode(new ObjectId(TL.getSC().getUserNodeId()));
             if (userNode != null) {
                 String blockedWords = userNode.getStr(NodeProp.USER_BLOCK_WORDS);
                 if (StringUtils.isNotEmpty(blockedWords)) {

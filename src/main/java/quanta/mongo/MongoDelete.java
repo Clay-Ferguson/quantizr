@@ -19,6 +19,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.DeleteNodesRequest;
 import quanta.rest.request.DeletePropertyRequest;
@@ -376,7 +377,7 @@ public class MongoDelete extends ServiceBase {
         }
 
         DeleteNodesResponse res = new DeleteNodesResponse();
-        SubNode userNode = svc_user.getSessionUserAccount();
+        AccountNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }
@@ -467,7 +468,7 @@ public class MongoDelete extends ServiceBase {
 
     public DeleteNodesResponse bulkDeleteNodes() {
         DeleteNodesResponse res = new DeleteNodesResponse();
-        SubNode userNode = svc_user.getSessionUserAccount();
+        AccountNode userNode = svc_user.getSessionUserAccount();
         if (userNode == null) {
             throw new RuntimeEx("User not found.");
         }

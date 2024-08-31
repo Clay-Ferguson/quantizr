@@ -1,0 +1,31 @@
+package quanta.mongo;
+
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.stereotype.Component;
+import quanta.mongo.model.AccountNode;
+import quanta.mongo.model.SubNode;
+
+@Component
+@ReadingConverter
+public class SubNodeReadConverter implements Converter<Document, SubNode> {
+    private static Logger log = LoggerFactory.getLogger(SubNodeReadConverter.class);
+
+    @Override
+    public SubNode convert(Document doc) {
+        SubNode node = null;
+        switch (doc.getString(SubNode.TYPE)) {
+            case "sn:account":
+                node = new AccountNode(doc);
+                break;
+            default:
+                node = new SubNode(doc);
+                break;
+        }
+        MongoUtil.validate(node);
+        return node;
+    }
+}

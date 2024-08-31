@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import quanta.config.ServiceBase;
-import quanta.mongo.model.SubNode;
+import quanta.mongo.model.AccountNode;
 import quanta.postgres.table.Tran;
 import quanta.rest.response.AddCreditResponse;
 
@@ -36,7 +36,7 @@ public class PostgresTransactional extends ServiceBase {
         return svc_user.addCreditByEmail(emailAdr, amount, timestamp);
     }
 
-    public BigDecimal updateUserCredit(SubNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
+    public BigDecimal updateUserCredit(AccountNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
         return svc_aiUtil.updateUserCredit(userNode, curBal, cost, serviceCode);
     }
 }

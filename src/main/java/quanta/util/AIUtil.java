@@ -15,6 +15,7 @@ import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
 import quanta.model.client.SystemConfig;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.postgres.PgTranMgr;
 import quanta.postgres.table.Tran;
@@ -163,7 +164,7 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    public BigDecimal getBalance(SubNode userNode) {
+    public BigDecimal getBalance(AccountNode userNode) {
         BigDecimal balance = null;
         String userName = userNode.getStr(NodeProp.USER);
         if (svc_pgTrans.initialGrant(userNode.getIdStr(), userName)) {
@@ -182,7 +183,7 @@ public class AIUtil extends ServiceBase {
     }
 
     // updates the user's credit, and returns new balance
-    public BigDecimal updateUserCredit(SubNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
+    public BigDecimal updateUserCredit(AccountNode userNode, BigDecimal curBal, BigDecimal cost, String serviceCode) {
         PgTranMgr.ensureTran();
         UserAccount user = svc_userRepo.findByMongoId(userNode.getIdStr());
 

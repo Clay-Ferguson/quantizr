@@ -61,6 +61,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoTranMgr;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.DeleteAttachmentRequest;
 import quanta.rest.request.PasteAttachmentsRequest;
@@ -163,7 +164,7 @@ public class AttachmentService extends ServiceBase {
              * Also we only do this check if not admin. Admin can upload unlimited amounts.
              */
             if (!TL.getSC().isAdmin() && files.length > 1) {
-                SubNode userNode = svc_user.getSessionUserAccount();
+                AccountNode userNode = svc_user.getSessionUserAccount();
                 // get how many bytes of storage the user currently holds
                 Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
                 if (binTotal == null) {
@@ -325,7 +326,7 @@ public class AttachmentService extends ServiceBase {
         }
         att.setMime(mimeType);
 
-        SubNode userNode = svc_mongoRead.getNode(node.getOwner());
+        AccountNode userNode = svc_user.getAccountNode(node.getOwner());
         if (imageBytes == null) {
             try {
                 att.setSize(size);
@@ -783,7 +784,7 @@ public class AttachmentService extends ServiceBase {
     }
 
     public void writeStream(boolean importMode, String attName, SubNode node, LimitedInputStreamEx stream,
-            String fileName, String mimeType, SubNode userNode) {
+            String fileName, String mimeType, AccountNode userNode) {
         // don't create attachment here, there shuold already be one, but we pass create=true anyway
         Attachment att = node.getAttachment(attName, !importMode, false);
         svc_auth.ownerAuth(node);
@@ -813,7 +814,7 @@ public class AttachmentService extends ServiceBase {
      * means we should only delete from the GRID DB, and not touch any of the properties on the node
      * itself
      */
-    public void deleteBinary(String attName, SubNode node, SubNode userNode, boolean gridOnly) {
+    public void deleteBinary(String attName, SubNode node, AccountNode userNode, boolean gridOnly) {
         if (node == null)
             return;
         HashMap<String, Attachment> attachments = node.getAttachments();

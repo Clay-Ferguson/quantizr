@@ -26,6 +26,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
 import quanta.util.TL;
@@ -127,7 +128,7 @@ public class MongoAuth extends ServiceBase {
             String userName = parent.getStr(NodeProp.USER);
             // if we have a userProp, find the account node for the user
             if (userName != null) {
-                SubNode accountNode = svc_user.getAccountByUserNameAP(userName);
+                AccountNode accountNode = svc_user.getAccountByUserNameAP(userName);
                 if (accountNode != null) {
                     child.putAc(accountNode.getIdStr(), new AccessControl(null, Const.RDWR));
                 }
@@ -564,7 +565,7 @@ public class MongoAuth extends ServiceBase {
     }
 
     public void asUser(String userName) {
-        SubNode userNode = svc_user.getAccountByUserNameAP(userName);
+        AccountNode userNode = svc_user.getAccountByUserNameAP(userName);
         if (userNode == null) {
             throw new RuntimeException("UserNode not found for userName " + userName);
         }

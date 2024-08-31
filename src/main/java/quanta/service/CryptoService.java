@@ -30,8 +30,8 @@ import quanta.config.SessionContext;
 import quanta.model.Jwk;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
-import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoTranMgr;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.RemoveSignaturesRequest;
 import quanta.rest.request.SavePublicKeyRequest;
@@ -478,7 +478,7 @@ public class CryptoService extends ServiceBase {
         String json = sc.getPubSigKeyJson();
 
         if (json == null) {
-            SubNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
+            AccountNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
             if (userNode == null) {
                 throw new RuntimeException("Unknown user: " + sc.getUserName());
             }
@@ -561,7 +561,7 @@ public class CryptoService extends ServiceBase {
         SavePublicKeyResponse res = new SavePublicKeyResponse();
         String userName = TL.getSC().getUserName();
         svc_arun.run(() -> {
-            SubNode userNode = svc_user.getAccountByUserNameAP(userName);
+            AccountNode userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode != null) {
                 if (!StringUtils.isEmpty(req.getAsymEncKey())) {
                     userNode.set(NodeProp.USER_PREF_PUBLIC_KEY, req.getAsymEncKey());

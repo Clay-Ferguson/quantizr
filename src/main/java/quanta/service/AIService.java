@@ -17,6 +17,7 @@ import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
 import quanta.model.client.NodeType;
 import quanta.model.client.SystemConfig;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.util.TL;
 import quanta.util.Util;
@@ -38,7 +39,7 @@ public class AIService extends ServiceBase {
         if (svc == null) {
             throw new RuntimeException("No AI service selected.");
         }
-        SubNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
+        AccountNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         if (userNode == null) {
             throw new RuntimeException("Unknown user.");
         }

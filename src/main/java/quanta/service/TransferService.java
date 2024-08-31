@@ -12,6 +12,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.PrivilegeType;
 import quanta.model.client.TransferOp;
 import quanta.mongo.MongoTranMgr;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.TransferNodeRequest;
 import quanta.rest.response.TransferNodeResponse;
@@ -39,7 +40,7 @@ public class TransferService extends ServiceBase {
             throw new RuntimeEx("Node not found: " + nodeId);
         }
         // get user node of person being transfered to
-        SubNode toUserNode = null;
+        AccountNode toUserNode = null;
         if (req.getOperation().equals(TransferOp.TRANSFER.s())) {
             toUserNode = svc_user.getAccountByUserNameAP(req.getToUser());
             if (toUserNode == null) {
@@ -47,7 +48,7 @@ public class TransferService extends ServiceBase {
             }
         }
         // get account node of person doing the transfer
-        SubNode fromUserNode = null;
+        AccountNode fromUserNode = null;
         if (!StringUtils.isEmpty(req.getFromUser())) {
             fromUserNode = svc_user.getAccountByUserNameAP(req.getFromUser());
             if (fromUserNode == null) {
@@ -96,7 +97,7 @@ public class TransferService extends ServiceBase {
             if (!TL.getSC().getUserNodeObjId().equals(node.getOwner())) {
                 return;
             }
-            SubNode ownerAccnt = (SubNode) svc_arun.run(() -> svc_mongoRead.getNode(node.getOwner()));
+            AccountNode ownerAccnt = svc_user.getAccountNodeAP(node.getOwner());
             ObjectId fromOwnerId = node.getOwner();
             node.setOwner(toUserNode.getOwner());
             node.setTransferFrom(fromOwnerId);
@@ -115,7 +116,7 @@ public class TransferService extends ServiceBase {
             }
             if (node.getTransferFrom() != null) {
                 // get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
-                SubNode frmUsrNode = (SubNode) svc_arun.run(() -> svc_mongoRead.getNode(node.getTransferFrom()));
+                AccountNode frmUsrNode = svc_user.getAccountNodeAP(node.getTransferFrom());
                 if (frmUsrNode != null) {
                     svc_acl.addPrivilege(null, node, null, frmUsrNode,
                             Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
@@ -131,7 +132,7 @@ public class TransferService extends ServiceBase {
             }
             if (node.getTransferFrom() != null) {
                 // get user node of the person pointed to by the 'getTransferFrom' value to share back to them.
-                SubNode frmUsrNode = (SubNode) svc_arun.run(() -> svc_mongoRead.getNode(node.getOwner()));
+                AccountNode frmUsrNode = svc_user.getAccountNodeAP(node.getOwner());
                 node.setOwner(node.getTransferFrom());
                 node.setTransferFrom(null);
                 if (frmUsrNode != null) {
@@ -148,7 +149,7 @@ public class TransferService extends ServiceBase {
                     // skip nodes that don't apply
                     return;
                 }
-                SubNode frmUsrNode = (SubNode) svc_arun.run(() -> svc_mongoRead.getNode(node.getOwner()));
+                AccountNode frmUsrNode = svc_user.getAccountNodeAP(node.getOwner());
                 node.setOwner(node.getTransferFrom());
                 node.setTransferFrom(null);
                 if (frmUsrNode != null) {

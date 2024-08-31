@@ -1,5 +1,6 @@
 package quanta.mongo.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -160,6 +161,75 @@ public class SubNode {
         Date now = Calendar.getInstance().getTime();
         setModifyTime(now);
         setCreateTime(now);
+    }
+
+    public SubNode(org.bson.Document doc) {
+        // todo-0: without the converter does the default mongo way of creating SubNodes and initialize them
+        // call the setters ??? It must right? So be careful what we're doing here with direct access. Make
+        // sure nothing important is being missed by setting directly.
+        id = doc.getObjectId(SubNode.ID);
+        ordinal = doc.getLong(SubNode.ORDINAL);
+        hch = doc.getBoolean(SubNode.HAS_CHILDREN);
+        path = doc.getString(SubNode.PATH);
+        type = doc.getString(SubNode.TYPE);
+        content = doc.getString(SubNode.CONTENT);
+        tags = doc.getString(SubNode.TAGS);
+        name = doc.getString(SubNode.NAME);
+        owner = doc.getObjectId(SubNode.OWNER);
+        transferFrom = doc.getObjectId(SubNode.XFR);
+        createTime = doc.getDate(SubNode.CREATE_TIME);
+        modifyTime = doc.getDate(SubNode.MODIFY_TIME);
+
+        if (doc.containsKey(SubNode.PROPS)) {
+            org.bson.Document d = doc.get(SubNode.PROPS, org.bson.Document.class);
+            if (d != null) {
+                props = new HashMap<>();
+                for (String key : d.keySet()) {
+                    props.put(key, d.get(key));
+                }
+            }
+        }
+
+        if (doc.containsKey(SubNode.ATTACHMENTS)) {
+            org.bson.Document d = doc.get(SubNode.ATTACHMENTS, org.bson.Document.class);
+            if (d != null) {
+                attachments = new HashMap<>();
+                for (String key : d.keySet()) {
+                    Attachment att = new Attachment((org.bson.Document) d.get(key));
+                    att.setOwnerNode(this);
+                    attachments.put(key, att);
+                }
+            }
+        }
+
+        if (doc.containsKey(SubNode.AC)) {
+            org.bson.Document d = doc.get(SubNode.AC, org.bson.Document.class);
+            if (d != null) {
+                ac = new HashMap<>();
+                for (String key : d.keySet()) {
+                    ac.put(key, new AccessControl((org.bson.Document) d.get(key)));
+                }
+            }
+        }
+
+        if (doc.containsKey(SubNode.LINKS)) {
+            List<org.bson.Document> d = doc.getList(SubNode.LINKS, org.bson.Document.class);
+            if (d != null) {
+                links = new ArrayList<>();
+                for (org.bson.Document link : d) {
+                    links.add(new NodeLink(link));
+                }
+            }
+        }
+
+        if (doc.containsKey(SubNode.LIKES)) {
+            List<String> likesList = doc.getList(SubNode.LIKES, String.class);
+            if (likesList != null)
+                likes = new HashSet<>(likesList);
+        }
+
+        mcid = doc.getString(SubNode.MCID);
+        prevMcid = doc.getString(SubNode.PREV_MCID);
     }
 
     // we don't annotate this because we have a custom getter.

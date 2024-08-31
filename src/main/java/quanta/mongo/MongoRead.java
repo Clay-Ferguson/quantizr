@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -28,11 +27,11 @@ import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
 import quanta.util.TL;
-import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
@@ -73,7 +72,7 @@ public class MongoRead extends ServiceBase {
         if (node.getOwner() == null) {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
         }
-        SubNode userNode = getNode(node.getOwner());
+        AccountNode userNode = svc_user.getAccountNode(node.getOwner());
         return userNode.getStr(NodeProp.USER);
     }
 
@@ -287,7 +286,7 @@ public class MongoRead extends ServiceBase {
         name = XString.stripIfStartsWith(name, ":");
         ObjectId nodeOwnerId;
         int colonIdx = -1;
-        SubNode userNode = null;
+        AccountNode userNode = null;
         // if 'name' doesn't contain a colon it's known to be just an admin-owned global named node
         // without a user prefix
         if ((colonIdx = name.indexOf(":")) == -1) {
@@ -412,16 +411,6 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         q.addCriteria(Criteria.where(SubNode.ID).is(id));
         return svc_ops.exists(q);
-    }
-
-    public SubNode getOwnerAP(SubNode node) {
-        return svc_arun.run(() -> getOwner(node));
-    }
-
-    public SubNode getOwner(SubNode node) {
-        if (node == null)
-            return null;
-        return svc_ops.findById(node.getOwner());
     }
 
     public SubNode getParentAP(SubNode node) {
@@ -955,7 +944,7 @@ public class MongoRead extends ServiceBase {
      * Accepts either the 'userName' or the 'userNode' for the user. It's best to pass userNode if you
      * have it, to avoid a DB query.
      */
-    public SubNode getUserNodeByType(String userName, SubNode userNode, String content, String type,
+    public SubNode getUserNodeByType(String userName, AccountNode userNode, String content, String type,
             List<String> publicPrivs, boolean autoCreate) {
         if (userNode == null) {
             if (userName == null) {
@@ -1010,7 +999,7 @@ public class MongoRead extends ServiceBase {
      * not existing. Caller can pass userNode if its available, or else userName will be used to look it
      * up
      */
-    public SubNode findNodeByUserAndType(SubNode node, SubNode userNode, String userName, String type) {
+    public SubNode findNodeByUserAndType(SubNode node, AccountNode userNode, String userName, String type) {
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {

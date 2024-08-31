@@ -29,6 +29,7 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.AccessControl;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.MongoPrincipal;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.AddPrivilegeRequest;
@@ -189,7 +190,7 @@ public class AclService extends ServiceBase {
      *
      * If BulkOperations is non-null we use it instead of a non-bulk operation.
      */
-    public boolean addPrivilege(BulkOperations bops, SubNode node, String principal, SubNode principalNode,
+    public boolean addPrivilege(BulkOperations bops, SubNode node, String principal, AccountNode principalNode,
             List<String> privileges, AddPrivilegeResponse res) {
         if ((principal == null && principalNode == null) || node == null)
             return false;
@@ -380,7 +381,7 @@ public class AclService extends ServiceBase {
                  * to client, and the client should be able to deal with that (i think). depends on how much
                  * ownership info we need to show user. ownerSet.add(p.getUserNodeId());
                  */
-                SubNode userNode = svc_mongoRead.getNode(p.getUserNodeId());
+                AccountNode userNode = svc_user.getAccountNode(p.getUserNodeId());
                 String userName = userNode.getStr(NodeProp.USER);
                 ownerSet.add(userName);
             }

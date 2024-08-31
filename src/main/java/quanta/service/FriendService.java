@@ -21,6 +21,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoTranMgr;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.AddFriendRequest;
@@ -43,15 +44,15 @@ import quanta.util.val.Val;
 public class FriendService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(FriendService.class);
 
-    public SubNode createFriendNode(SubNode parentFriendsList, String userToFollow, String tags) {
+    public AccountNode createFriendNode(SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
-        SubNode userNode = svc_user.getAccountByUserNameAP(userToFollow);
+        AccountNode userNode = svc_user.getAccountByUserNameAP(userToFollow);
         if (userNode != null) {
             List<PropertyInfo> properties = new LinkedList<>();
             properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
             properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
 
-            SubNode friendNode = svc_mongoCreate.createNode(parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+            AccountNode friendNode = (AccountNode)svc_mongoCreate.createNode(parentFriendsList, null, NodeType.FRIEND.s(), 0L,
                     CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true, null);
             friendNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 
@@ -83,7 +84,7 @@ public class FriendService extends ServiceBase {
         if (friendUserName != null) {
             // when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
             if (userNodeId == null) {
-                Val<SubNode> userNode = new Val<SubNode>();
+                Val<AccountNode> userNode = new Val<>();
 
                 userNode.setVal(svc_user.getAccountByUserNameAP(friendUserName));
 
@@ -125,7 +126,7 @@ public class FriendService extends ServiceBase {
         }
         // If we don't know the account id of the person doing the follow, then look it up.
         if (accntIdDoingFollow == null) {
-            SubNode followerAcctNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userDoingFollow));
+            AccountNode followerAcctNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userDoingFollow));
             if (followerAcctNode == null) {
                 throw new RuntimeException("Unable to find user: " + userDoingFollow);
             }
@@ -157,7 +158,7 @@ public class FriendService extends ServiceBase {
 
         // the passed in 'ms' may or may not be admin session, but we always DO need this with admin, so we
         // must use arun.
-        SubNode userNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userToFollow));
+        AccountNode userNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userToFollow));
         if (userNode == null)
             return;
 
@@ -183,7 +184,7 @@ public class FriendService extends ServiceBase {
             fi.setUserName(userName);
             fi.setTags(friendNode.getTags());
             String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-            SubNode friendAccountNode = svc_mongoRead.getNodeAP(userNodeId);
+            AccountNode friendAccountNode = svc_user.getAccountNodeAP(userNodeId);
             if (friendAccountNode != null) {
                 fi.setDisplayName(svc_user.getFriendlyNameFromNode(friendAccountNode));
                 Attachment att = friendAccountNode.getAttachment(Constant.ATTACHMENT_PRIMARY.s(), false, false);
@@ -377,11 +378,11 @@ public class FriendService extends ServiceBase {
         });
     }
 
-    public long countFollowersOfUser(String userMakingRequest, SubNode userNode, String userName) {
+    public long countFollowersOfUser(String userMakingRequest, AccountNode userNode, String userName) {
         return countFollowersOfLocalUser(userNode, userName);
     }
 
-    public long countFollowersOfLocalUser(SubNode userNode, String userName) {
+    public long countFollowersOfLocalUser(AccountNode userNode, String userName) {
         Query q = getPeopleByUserName_query(userNode, userName);
         if (q == null)
             return 0L;
@@ -389,7 +390,7 @@ public class FriendService extends ServiceBase {
     }
 
     /* caller can pass userName only or else pass userNode if it's already available */
-    public Query getPeopleByUserName_query(SubNode userNode, String userName) {
+    public Query getPeopleByUserName_query(AccountNode userNode, String userName) {
         Query q = new Query();
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
@@ -483,7 +484,7 @@ public class FriendService extends ServiceBase {
      *
      * Note: Blocked users are also stored as a "FriendNode", but under the "blocked list"
      */
-    public SubNode findFriendNode(ObjectId ownerId, SubNode userNode, String userName) {
+    public SubNode findFriendNode(ObjectId ownerId, AccountNode userNode, String userName) {
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {

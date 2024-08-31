@@ -56,7 +56,7 @@ public class MongoUtil extends ServiceBase {
      */
     static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOQSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
-    public void validate(SubNode node) {
+    public static void validate(SubNode node) {
         if (TL.hasDirtyNode(node.getId())) {
             log.warn("DIRTY READ (onAfterLoad): " + node.getIdStr());
         }

@@ -18,6 +18,7 @@ import quanta.util.TL;
 public class AdminRun extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AdminRun.class);
 
+    // todo-0: look for all calls to this that contain nothing but a single "myMethodAP()" AP call becasue it will be unnecessary to call this for those.
     // Runs with full authority, but as the same user as on the current session.
     public <T> T run(Supplier<T> runner) {
         boolean hasAdminAuth = TL.getHasAdminAuthority();
