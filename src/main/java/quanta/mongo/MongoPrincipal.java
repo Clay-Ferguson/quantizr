@@ -1,4 +1,4 @@
-package quanta.mongo.model;
+package quanta.mongo;
 
 import org.bson.types.ObjectId;
 
