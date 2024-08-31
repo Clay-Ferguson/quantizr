@@ -4,7 +4,6 @@ import { DocumentRSInfo } from "./DocumentRSInfo";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
-import { Clearfix } from "./comp/core/Clearfix";
 import { Div } from "./comp/core/Div";
 import { Html } from "./comp/core/Html";
 import { TabIntf } from "./intf/TabIntf";
@@ -49,11 +48,7 @@ export class DocIndexPanel extends Div {
                 }
             });
 
-        let backToDocLink = null;
-        if (ast.activeTab != C.TAB_DOCUMENT) {
-            backToDocLink = new Div("Back to Doc", { className: "backToDocLink float-end", onClick: this.goToDocTab })
-        }
-        this.children = [backToDocLink, backToDocLink ? new Clearfix() : null, html];
+        this.children = [html];
         return true;
     }
 
@@ -80,10 +75,6 @@ export class DocIndexPanel extends Div {
             }
             idx++;
         }
-    }
-
-    goToDocTab = () => {
-        S.tabUtil.selectTab(C.TAB_DOCUMENT);
     }
 
     getLevelBullet = (level: number) => {
