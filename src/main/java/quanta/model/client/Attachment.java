@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Transient;
 import quanta.mongo.model.SubNode;
 import quanta.util.TL;
+import quanta.util.Util;
 
 /*
  * todo-0: All the single letter abbreviated prop names in here were a bad idea. Run a conversion on
@@ -32,10 +33,13 @@ public class Attachment {
     private String binData;
     private String url;
     private String aiPrompt;
+
+    // Transient (not persisted)
     private SubNode ownerNode;
 
     // key in the SubNode hashmap that points to this. May be null unless retrieved
     // thru certain API cals
+    // Transient (not persisted)
     private String key;
 
     public Attachment() {}
@@ -78,7 +82,9 @@ public class Attachment {
 
     @JsonProperty("w")
     public void setWidth(Integer width) {
-        TL.dirty(ownerNode); // todo-0: shouldn't all these dirty calls check to see if the value is actually changing?
+        if (Util.equalObjs(width, this.width))
+            return;
+        TL.dirty(ownerNode);
         this.width = width;
     }
 
@@ -89,6 +95,8 @@ public class Attachment {
 
     @JsonProperty("h")
     public void setHeight(Integer height) {
+        if (Util.equalObjs(height, this.height))
+            return;
         TL.dirty(ownerNode);
         this.height = height;
     }
@@ -100,6 +108,9 @@ public class Attachment {
 
     @JsonProperty("p")
     public void setPosition(String position) {
+        if (Util.equalObjs(position, this.position))
+            return;
+        TL.dirty(ownerNode);
         this.position = position;
     }
 
@@ -110,6 +121,8 @@ public class Attachment {
 
     @JsonProperty("m")
     public void setMime(String mime) {
+        if (Util.equalObjs(mime, this.mime))
+            return;
         TL.dirty(ownerNode);
         this.mime = mime;
     }
@@ -121,6 +134,8 @@ public class Attachment {
 
     @JsonProperty("f")
     public void setFileName(String fileName) {
+        if (Util.equalObjs(fileName, this.fileName))
+            return;
         TL.dirty(ownerNode);
         this.fileName = fileName;
     }
@@ -132,6 +147,8 @@ public class Attachment {
 
     @JsonProperty("s")
     public void setSize(Long size) {
+        if (Util.equalObjs(size, this.size))
+            return;
         TL.dirty(ownerNode);
         this.size = size;
     }
@@ -143,6 +160,8 @@ public class Attachment {
 
     @JsonProperty("b")
     public void setBin(String bin) {
+        if (Util.equalObjs(bin, this.bin))
+            return;
         TL.dirty(ownerNode);
         this.bin = bin;
     }
@@ -154,6 +173,8 @@ public class Attachment {
 
     @JsonProperty("d")
     public void setBinData(String binData) {
+        if (Util.equalObjs(binData, this.binData))
+            return;
         TL.dirty(ownerNode);
         this.binData = binData;
     }
@@ -165,6 +186,8 @@ public class Attachment {
 
     @JsonProperty("u")
     public void setUrl(String url) {
+        if (Util.equalObjs(url, this.url))
+            return;
         TL.dirty(ownerNode);
         this.url = url;
     }
@@ -176,6 +199,8 @@ public class Attachment {
 
     @JsonProperty("c")
     public void setCssSize(String cssSize) {
+        if (Util.equalObjs(cssSize, this.cssSize))
+            return;
         TL.dirty(ownerNode);
         this.cssSize = cssSize;
     }
@@ -187,6 +212,9 @@ public class Attachment {
 
     @JsonProperty("o")
     public void setOrdinal(Integer ordinal) {
+        if (Util.equalObjs(ordinal, this.ordinal))
+            return;
+        TL.dirty(ownerNode);
         this.ordinal = ordinal;
     }
 
@@ -197,6 +225,9 @@ public class Attachment {
 
     @JsonProperty("ai")
     public void setAiPrompt(String aiPrompt) {
+        if (Util.equalObjs(aiPrompt, this.aiPrompt))
+            return;
+        TL.dirty(ownerNode);
         this.aiPrompt = aiPrompt;
     }
 
