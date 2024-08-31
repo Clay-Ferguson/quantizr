@@ -196,6 +196,7 @@ public class SubNode {
                 attachments = new HashMap<>();
                 for (String key : d.keySet()) {
                     Attachment att = new Attachment((org.bson.Document) d.get(key));
+                    att.setKey(key);
                     att.setOwnerNode(this);
                     attachments.put(key, att);
                 }
@@ -571,6 +572,7 @@ public class SubNode {
         if (attachments != null) {
             if (forceNew) {
                 ret = new Attachment(this);
+                ret.setKey(name);
                 attachments.put(name, ret);
                 TL.dirty(this);
             } else {
@@ -580,12 +582,14 @@ public class SubNode {
                 }
                 if (create) {
                     ret = new Attachment(this);
+                    ret.setKey(name);
                     attachments.put(name, ret);
                     TL.dirty(this);
                 }
             }
         } else if (create || forceNew) {
             ret = new Attachment(this);
+            ret.setKey(name);
             attachments = new HashMap<>();
             attachments.put(name, ret);
             TL.dirty(this);
