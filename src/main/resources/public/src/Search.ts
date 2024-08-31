@@ -77,7 +77,6 @@ export class Search {
 
             dispatch("RenderThreadResults", s => {
                 s.highlightSearchNodeId = node.id;
-
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScroll(C.TAB_THREAD, -1); // -1 scrolls to bottom
 
@@ -95,7 +94,6 @@ export class Search {
 
                 s.threadViewFromNodeId = node.id;
                 data.openGraphComps = [];
-
                 data.props.results = res.nodes;
 
                 // if apReplies then we set endReached to 'true' always.
@@ -124,7 +122,6 @@ export class Search {
                 s.repliesViewFromTab = s.activeTab;
                 s.repliesViewNodeId = node.id;
                 data.openGraphComps = [];
-
                 data.props.results = res.nodes;
                 data.props.endReached = true;
                 S.tabUtil.selectTabStateOnly(data.id);
@@ -190,7 +187,6 @@ export class Search {
                 s.highlightText = searchText;
 
                 data.openGraphComps = [];
-
                 data.props.results = res.searchResults;
                 data.props.page = page;
                 data.props.searchType = searchType;
