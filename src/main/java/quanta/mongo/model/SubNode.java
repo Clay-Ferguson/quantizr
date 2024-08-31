@@ -381,6 +381,8 @@ public class SubNode {
 
     @JsonProperty(CREATE_TIME)
     public void setCreateTime(Date createTime) {
+        if (Util.equalObjs(createTime, this.createTime))
+            return;
         TL.dirty(this);
         this.createTime = createTime;
     }
@@ -392,6 +394,8 @@ public class SubNode {
 
     @JsonProperty(MODIFY_TIME)
     public void setModifyTime(Date modifyTime) {
+        if (Util.equalObjs(modifyTime, this.modifyTime))
+            return;
         TL.dirty(this);
         this.modifyTime = modifyTime;
     }
