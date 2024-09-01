@@ -13,7 +13,7 @@ export class FullScreenGraphViewer extends Main {
     static sim: any;
 
     tooltip: any;
-    isDragging: boolean;
+    dragging: boolean;
     mouseOverTimeoutId: any;
 
     static reset() {
@@ -37,7 +37,6 @@ export class FullScreenGraphViewer extends Main {
             FullScreenGraphViewer.div.className = "d3Graph";
             reload = true;
         }
-
         elm.appendChild(FullScreenGraphViewer.div);
 
         if (reload) {
@@ -53,21 +52,14 @@ export class FullScreenGraphViewer extends Main {
     }
 
     forceDirectedTree() {
-        /* We use 'thiz' to capture 'this' because the methods below to expect to have their own
-         'this' that will be set based on code outside our control that is expected by the Graph
-         Implementation itself. */
-        const thiz = this;
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
 
-        return function (selection: any) {
+        return (selection: any) => {
             const margin = { top: 0, right: 0, bottom: 0, left: 0 };
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-
             const data = selection.datum();
-            const chartWidth = width - margin.left - margin.right;
-            const chartHeight = height - margin.top - margin.bottom;
+            const chartWidth = window.innerWidth - margin.left - margin.right;
+            const chartHeight = window.innerHeight - margin.top - margin.bottom;
 
             const root = d3.hierarchy(data);
             const links: any = root.links();
@@ -77,19 +69,16 @@ export class FullScreenGraphViewer extends Main {
             // nodes. we need do to this so we can always grab a clump of nodes centered around
             // their parent for example
             nodes.sort((a, b) => b.data.level - a.data.level);
-
             const nodeLinks: any = [];
 
             if (ast.showNodeLinksInGraph) {
                 // map from any id to the node
                 const nodesMap = new Map<string, string>();
-                nodes.forEach((n: any) => {
-                    nodesMap.set(n.data.id, n);
-                });
+                nodes.forEach((n: any) => nodesMap.set(n.data.id, n));
 
                 // for each node add links
                 nodes.forEach((n: any) => {
-                    // does node have elinks
+                    // does node have links
                     if (n.data.links) {
                         // scan each link (link will be object with {id, name} of a target)
                         n.data.links.forEach(link => {
@@ -104,36 +93,35 @@ export class FullScreenGraphViewer extends Main {
         
             FullScreenGraphViewer.sim = d3.forceSimulation(nodes)
                 .force("link", d3.forceLink(ast.attractionLinksInGraph ? [...links, ...nodeLinks] : links) //
-                    .id(function (d: any) { return d.id; }).distance(5)
+                    .id((d: any) => d.id).distance(5)
                     .strength(1)
                 )
-
                 .force("charge", d3.forceManyBody().strength(-50))
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
 
-            thiz.tooltip = selection
+            this.tooltip = selection
                 .append("div")
                 .attr("class", "tooltip graphPopup")
                 .style("pointer-events", "none");
 
-            const drag = function (simulation: any) {
+            const drag = (sim: any) => {
                 return d3.drag()
-                    .on("start", function (event: any, d: any) {
-                        thiz.isDragging = true;
-                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                    .on("start", (event: any, d: any) => {
+                        this.dragging = true;
+                        if (!event.active) sim.alphaTarget(0.3).restart();
                         d.fx = d.x;
                         d.fy = d.y;
                     })
-                    .on("drag", function (event: any, d: any) {
+                    .on("drag", (event: any, d: any) => {
                         d.fx = event.x;
                         d.fy = event.y;
                     })
-                    .on("end", function (event: any, d: any) {
-                        if (!event.active) simulation.alphaTarget(0);
+                    .on("end", (event: any, d: any) => {
+                        if (!event.active) sim.alphaTarget(0);
                         d.fx = null;
                         d.fy = null;
-                        thiz.isDragging = false;
+                        this.dragging = false;
                     });
             };
 
@@ -151,13 +139,6 @@ export class FullScreenGraphViewer extends Main {
 
             const link = g.append("g")
                 .attr("stroke", "#999")
-                // Tip: Do not Delete:
-                // (I think many (most?) of these things that support a value also
-                // support using a function to return the val based on data like
-                // this example)
-                // .style("stroke", function (d: any) {
-                //     return "#999"
-                // })
                 .attr("stroke-width", 1)
                 .attr("stroke-opacity", 0.6)
                 .selectAll("line")
@@ -167,9 +148,7 @@ export class FullScreenGraphViewer extends Main {
             let nodeLink: any = null;
             if (ast.showNodeLinksInGraph && nodeLinks?.length > 0) {
                 nodeLink = g.append("g")
-                    .style("stroke", function (_d: any) {
-                        return "green"
-                    })
+                    .style("stroke", (_d: any) => "green")
                     .attr("stroke-width", 1)
                     .attr("stroke-opacity", 0.6)
                     .attr("stroke-dasharray", "1,1")
@@ -185,7 +164,7 @@ export class FullScreenGraphViewer extends Main {
                 .data(nodes)
                 .join("circle")
 
-                .attr("fill", function (d: any) {
+                .attr("fill", (d: any) => {
                     let color = "black";
                     if (d.data.id === nodeId) {
                         color = "red";
@@ -195,43 +174,41 @@ export class FullScreenGraphViewer extends Main {
                     }
                     return color;
                 })
-                .attr("stroke", function (d: any) {
-                    return thiz.getColorForLevel(d.data.level);
-                })
-                .attr("r", function (d: any) {
+                .attr("stroke", (d: any) => this.getColorForLevel(d.data.level))
+                .attr("r", (d: any) => {
                     if (d.data.id === nodeId) return 5;
                     return 3.5;
                 })
 
-                .on("mouseover", function (event: any, d: any) {
-                    if (thiz.mouseOverTimeoutId) {
-                        clearTimeout(thiz.mouseOverTimeoutId);
-                        thiz.mouseOverTimeoutId = null;
+                .on("mouseover", (event: any, d: any) => {
+                    if (this.mouseOverTimeoutId) {
+                        clearTimeout(this.mouseOverTimeoutId);
+                        this.mouseOverTimeoutId = null;
                     }
 
-                    thiz.mouseOverTimeoutId = setTimeout(() => {
+                    this.mouseOverTimeoutId = setTimeout(() => {
                         if (d.data.id.startsWith("/")) {
-                            thiz.updateTooltip(d, event.pageX, event.pageY);
+                            this.updateTooltip(d, event.pageX, event.pageY);
                         }
                         else {
-                            thiz.showTooltip(d, event.pageX, event.pageY);
+                            this.showTooltip(d, event.pageX, event.pageY);
                         }
-                        thiz.mouseOverTimeoutId = null;
+                        this.mouseOverTimeoutId = null;
                     }, 800);
                 })
-                .on("mouseout", function () {
-                    if (thiz.mouseOverTimeoutId) {
-                        clearTimeout(thiz.mouseOverTimeoutId);
-                        thiz.mouseOverTimeoutId = null;
+                .on("mouseout", () => {
+                    if (this.mouseOverTimeoutId) {
+                        clearTimeout(this.mouseOverTimeoutId);
+                        this.mouseOverTimeoutId = null;
                     }
-                    thiz.tooltip.transition()
+                    this.tooltip.transition()
                         .duration(300)
                         .style("opacity", 0);
                 })
 
-                .on("click", function (_event: any, d: any) {
-                    d3.select(this)
-                        .style("fill", "green");
+                .on("click", (event: any, d: any) => {
+                    d3.select(event.currentTarget) 
+                        .attr("fill", "green");
 
                     if (d.data.id) {
                         if (S.util.ctrlKeyCheck()) {
@@ -244,28 +221,28 @@ export class FullScreenGraphViewer extends Main {
                 })
                 .call(drag(FullScreenGraphViewer.sim));
 
-            FullScreenGraphViewer.sim.on("tick", function () {
+            FullScreenGraphViewer.sim.on("tick", () => {
                 link
-                    .attr("x1", function (d: any) { return d.source.x; })
-                    .attr("y1", function (d: any) { return d.source.y; })
-                    .attr("x2", function (d: any) { return d.target.x; })
-                    .attr("y2", function (d: any) { return d.target.y; });
+                    .attr("x1", (d: any) => d.source.x)
+                    .attr("y1", (d: any) => d.source.y)
+                    .attr("x2", (d: any) => d.target.x)
+                    .attr("y2", (d: any) => d.target.y);
 
                 if (ast.showNodeLinksInGraph && nodeLink && nodeLinks?.length > 0) {
                     nodeLink
-                        .attr("x1", function (d: any) { return d.source.x; })
-                        .attr("y1", function (d: any) { return d.source.y; })
-                        .attr("x2", function (d: any) { return d.target.x; })
-                        .attr("y2", function (d: any) { return d.target.y; });
+                        .attr("x1", (d: any) => d.source.x)
+                        .attr("y1", (d: any) => d.source.y)
+                        .attr("x2", (d: any) => d.target.x)
+                        .attr("y2", (d: any) => d.target.y);
                 }
 
                 node
-                    .attr("cx", function (d: any) { return d.x; })
-                    .attr("cy", function (d: any) { return d.y; });
+                    .attr("cx", (d: any) => d.x)
+                    .attr("cy", (d: any) => d.y);
             });
 
             const zoomHandler = d3.zoom()
-                .on("zoom", function (event: any) {
+                .on("zoom", (event: any) => {
                     const { transform } = event;
                     g.attr("stroke-width", 1 / transform.k);
                     g.attr("transform", transform);
@@ -332,7 +309,7 @@ export class FullScreenGraphViewer extends Main {
     showTooltip(d: any, _x: number, _y: number) {
         this.tooltip.transition()
             .duration(300)
-            .style("opacity", (_d: any) => this.isDragging ? 0 : 0.97);
+            .style("opacity", (_d: any) => this.dragging ? 0 : 0.97);
 
         let content = d.data.name;
         if (d.data.links) {

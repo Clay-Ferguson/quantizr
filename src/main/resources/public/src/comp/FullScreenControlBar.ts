@@ -61,7 +61,7 @@ export class FullScreenControlBar extends Div {
 
         if (ast.fullScreenConfig.type === FullScreenType.GRAPH) {
             comps.push(new Div(null, { className: "inlineBlock" }, [
-                new Checkbox("Links", { title: "Show NodeLinks" }, {
+                new Checkbox("RDF Links", { title: "Show NodeLinks" }, {
                     setValue: (checked: boolean) => {
                         dispatch("setShowNodeLinks", s => {
                             FullScreenGraphViewer.reset();
@@ -71,7 +71,7 @@ export class FullScreenControlBar extends Div {
                     getValue: (): boolean => ast.showNodeLinksInGraph
                 }, "form-switch form-check-inline"),
                 // if there are no force links we should hide this
-                ast.showNodeLinksInGraph ? new Checkbox("Force", { title: "NodeLinks Force Attractions" }, {
+                ast.showNodeLinksInGraph ? new Checkbox("RDF Forces", { title: "NodeLinks Force Attractions" }, {
                     setValue: (checked: boolean) => {
                         dispatch("setLinkForces", s => {
                             FullScreenGraphViewer.reset();
