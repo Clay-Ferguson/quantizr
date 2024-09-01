@@ -250,15 +250,15 @@ public class MongoAuth extends ServiceBase {
         if (node == null) {
             throw new RuntimeEx("Auth Failed. Node did not exist.");
         }
-
+        if (TL.hasAdminPrivileges()) {
+            return;
+        }
         if (TL.getSC() == null) {
             // when we get here it normally means we should've called "arun.exec" to manage
             // the thread instead of justs passing in an 'ms' or null
             throw new RuntimeException("ThreadLocals doesn't have session.");
         }
-        if (TL.hasAdminPrivileges()) {
-            return;
-        }
+    
         if (TL.getSC().getUserNodeObjId() == null) {
             throw new RuntimeException("session has no userNode: " + XString.prettyPrint(TL.getSC()));
         }
