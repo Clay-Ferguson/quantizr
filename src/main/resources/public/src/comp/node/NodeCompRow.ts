@@ -177,7 +177,7 @@ export class NodeCompRow extends Div {
 
         // if we're on the tree view and have a simple layout where all we copuld need is an expand/collapse button and markdown
         // then we display the expand button and markdonw in a size by side layout
-        if (this.node.hasChildren && this.tabData.id === C.TAB_MAIN && !ast.userPrefs.editMode && !ast.userPrefs.showMetaData) {
+        if (this.node.hasChildren && this.tabData.id === C.TAB_MAIN && !ast.userPrefs.editMode) {
             const exp = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node);
             const isMine = S.props.isMine(this.node);
             let openButton = null;
