@@ -339,7 +339,9 @@ public class MongoDelete extends ServiceBase {
             if (svc_auth.ownedBy(sc, node)) {
                 mineCount++;
             } else {
-                throw new RuntimeEx("You can't delete a node that you don't own.");
+                if (!sc.isAdmin()) {
+                    throw new RuntimeEx("You can't delete a node that you don't own.");
+                }
             }
 
             Iterable<SubNode> results = svc_arun.run(() -> svc_mongoRead.getSubGraph(node, null, 0, false, null));
