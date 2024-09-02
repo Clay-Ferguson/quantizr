@@ -661,7 +661,6 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => this.getState<LS>().encryptCheckboxVal
         }) : null;
 
-        // todo-0: somehow this seems to be stuck on true now. Unchecking does nothing.
         const signCheckBox = S.crypto.avail ? new Checkbox("Sign", null, {
             setValue: (checked: boolean) => {
                 if (checked && S.crypto.sigKeyOk()) {
@@ -803,7 +802,6 @@ export class EditNodeDlg extends DialogBase {
     }
 
     override close = () => {
-        console.log("EditNodeDlg.close() called");
         setTimeout(() => S.speech.stopListening(), 100);
         super.close();
 

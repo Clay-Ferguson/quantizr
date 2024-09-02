@@ -103,7 +103,6 @@ export abstract class DialogBase extends Comp {
     }
 
     close() {
-        console.log("DialogBase.close() called");
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);

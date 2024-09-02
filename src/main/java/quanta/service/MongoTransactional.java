@@ -1,5 +1,6 @@
 package quanta.service;
 
+import java.util.HashSet;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -177,7 +178,7 @@ public class MongoTransactional extends ServiceBase {
         return svc_move.setNodePosition(req);
     }
 
-    public MoveNodesResponse cm_moveNodes(MoveNodesRequest req) {
-        return svc_move.moveNodes(req);
+    public MoveNodesResponse cm_moveNodes(MoveNodesRequest req, HashSet<String> nodesModified) {
+        return svc_move.moveNodes(req, nodesModified);
     }
 }

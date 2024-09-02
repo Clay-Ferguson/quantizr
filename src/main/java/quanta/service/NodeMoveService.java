@@ -1,6 +1,7 @@
 package quanta.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,22 @@ import quanta.util.val.LongVal;
 public class NodeMoveService extends ServiceBase {
     @SuppressWarnings("unused")
     private static Logger log = LoggerFactory.getLogger(NodeMoveService.class);
+
+    public MoveNodesResponse moveNodes(MoveNodesRequest req) {
+        HashSet<String> nodesModified = new HashSet<String>();
+        MoveNodesResponse ret = svc_mongoTrans.cm_moveNodes(req, nodesModified);
+
+        /*
+         * if any nodes were signed and are now dirty signatures, we need to resign them. We allow the above
+         * code to actually update the DB, but ending up with "tbd" in the signature, for consistency,
+         * because the process of resigning the nodes is slightly elaborate and could fail so we run it all
+         * now as a separate process.
+         */
+        if (nodesModified.size() > 0) {
+            svc_crypto.signNodesById(new ArrayList<String>(nodesModified));
+        }
+        return ret;
+    }
 
     /*
      * Moves the the node to a new ordinal/position location (relative to parent)
@@ -210,10 +227,11 @@ public class NodeMoveService extends ServiceBase {
     /*
      * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
      */
-    public MoveNodesResponse moveNodes(MoveNodesRequest req) {
+    public MoveNodesResponse moveNodes(MoveNodesRequest req, HashSet<String> nodesModified) {
         MongoTranMgr.ensureTran();
         MoveNodesResponse res = new MoveNodesResponse();
-        moveNodesInternal(req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), req.isCopyPaste(), res);
+        moveNodesInternal(req.getLocation(), req.getTargetNodeId(), req.getNodeIds(), req.isCopyPaste(), nodesModified,
+                res);
         return res;
     }
 
@@ -224,7 +242,7 @@ public class NodeMoveService extends ServiceBase {
      * siblings posted in below it)
      */
     private void moveNodesInternal(String location, String targetId, List<String> nodeIds, boolean copyPaste,
-            MoveNodesResponse res) {
+            HashSet<String> nodesModified, MoveNodesResponse res) {
         if (nodeIds == null || nodeIds.size() == 0) {
             throw new RuntimeException("No nodes specified to move.");
         }
@@ -294,7 +312,8 @@ public class NodeMoveService extends ServiceBase {
                 }
                 // find any new Path available under the paste target location 'parentPath'
                 String newPath = svc_mongoUtil.findAvailablePath(parentPath + "/");
-                changePathOfSubGraph(node, node.getPath(), newPath, copyPaste, res);
+                changePathOfSubGraph(node, node.getPath(), newPath, copyPaste, nodesModified, res);
+                nodesModified.add(node.getIdStr());
                 node.setPath(newPath);
 
                 // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
@@ -341,11 +360,10 @@ public class NodeMoveService extends ServiceBase {
      * all the children under it
      */
     public void changePathOfSubGraph(SubNode graphRoot, String oldPathPrefix, String newPathPrefix, boolean copyPaste,
-            MoveNodesResponse res) {
+            HashSet<String> nodesModified, MoveNodesResponse res) {
         String originalPath = graphRoot.getPath();
         BulkOperations bops = null;
         int batchSize = 0;
-        List<String> nodeIdsToReSign = new ArrayList<String>();
 
         for (SubNode node : svc_mongoRead.getSubGraphAP(graphRoot, null, 0, false, null)) {
             if (!node.getPath().startsWith(originalPath)) {
@@ -381,12 +399,15 @@ public class NodeMoveService extends ServiceBase {
 
             // if node is signed, we need to invalidate the signature, if not already invalidated (via tbd)
             String nodeSig = node.getStr(NodeProp.CRYPTO_SIG);
-            if (nodeSig != null && !nodeSig.equals(Constant.SIG_TBD.s())) {
-                nodeIdsToReSign.add(node.getIdStr());
-                // Since we're about to sign nodes below, setting to "tbd" is not necessary but is safer
-                // in case anything does go wrong, including even the user closing their browser as a thing that
-                // could break this, but by setting to "tbd" we're safe.
-                update = update.set(NodeProp.CRYPTO_SIG.s(), Constant.SIG_TBD.s());
+            if (nodeSig != null) {
+                nodesModified.add(node.getIdStr());
+
+                if (!nodeSig.equals(Constant.SIG_TBD.s())) {
+                    // Since we're about to sign nodes below, setting to "tbd" is not necessary but is safer
+                    // in case anything does go wrong, including even the user closing their browser as a thing that
+                    // could break this, but by setting to "tbd" we're safe.
+                    update = update.set(NodeProp.CRYPTO_SIG.s(), Constant.SIG_TBD.s());
+                }
             }
 
             bops.updateOne(query, update);
@@ -398,11 +419,6 @@ public class NodeMoveService extends ServiceBase {
         }
         if (bops != null) {
             bops.execute();
-        }
-
-        // if any nodes were signed and are now dirty signatures, we need to resign them.
-        if (nodeIdsToReSign.size() > 0) {
-            svc_crypto.signNodesById(nodeIdsToReSign);
         }
     }
 

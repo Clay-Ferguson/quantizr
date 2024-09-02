@@ -168,9 +168,9 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
-        return svc_callProc.run("getMultiRssFeed", false, false, req, session, () -> {
-            return svc_rssFeed.cm_getMultiRssFeed(req);
-        });
+        // todo-0: make all calls in here look like this with the simple lambda syntax
+        return svc_callProc.run("getMultiRssFeed", false, false, req, session,
+                () -> svc_rssFeed.cm_getMultiRssFeed(req));
     }
 
     @RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
@@ -448,7 +448,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
         return svc_callProc.run("moveNodes", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_moveNodes(req);
+            return svc_move.moveNodes(req);
         });
     }
 
@@ -517,7 +517,7 @@ public class AppController extends ServiceBase implements ErrorController {
             return svc_user.cm_resetPassword(req);
         });
     }
-    
+
     @RequestMapping({FILE_PATH + "/id/{id}", FILE_PATH + "/{nameOnAdminNode}",
             FILE_PATH + "/{userName}/{nameOnUserNode}"})
     public void attachment(
@@ -568,8 +568,7 @@ public class AppController extends ServiceBase implements ErrorController {
      */
     @RequestMapping(value = FILE_PATH + "/export/{fileName:.+}", method = RequestMethod.GET)
     public void getFile(@PathVariable("fileName") String fileName,
-            @RequestParam(name = "disp", required = false) String disposition,
-            HttpSession session,
+            @RequestParam(name = "disp", required = false) String disposition, HttpSession session,
             HttpServletResponse response) {
         svc_callProc.run("file", false, false, null, session, () -> {
             svc_attach.cm_getFile(fileName, disposition, response);
@@ -581,8 +580,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * todo-3: we should return proper HTTP codes when file not found, etc.
      */
     @RequestMapping(value = FILE_PATH + "/export-friends", method = RequestMethod.GET)
-    public void exportFriends(@RequestParam(name = "disp", required = false) String disposition,
-            HttpSession session,
+    public void exportFriends(@RequestParam(name = "disp", required = false) String disposition, HttpSession session,
             HttpServletResponse response) {
         svc_callProc.run("exportFriends", false, false, null, session, () -> {
             svc_user.cm_exportPeople(response, disposition, NodeType.FRIEND_LIST.s());
@@ -594,8 +592,7 @@ public class AppController extends ServiceBase implements ErrorController {
      * todo-3: we should return proper HTTP codes when file not found, etc.
      */
     @RequestMapping(value = FILE_PATH + "/export-blocks", method = RequestMethod.GET)
-    public void exportBlocks(@RequestParam(name = "disp", required = false) String disposition,
-            HttpSession session,
+    public void exportBlocks(@RequestParam(name = "disp", required = false) String disposition, HttpSession session,
             HttpServletResponse response) {
         svc_callProc.run("exportBlocks", false, false, null, session, () -> {
             svc_user.cm_exportPeople(response, disposition, NodeType.BLOCKED_USERS.s());

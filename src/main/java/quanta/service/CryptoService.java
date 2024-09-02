@@ -78,7 +78,8 @@ public class CryptoService extends ServiceBase {
     }
 
     public boolean nodeSigVerify(SubNode node, String sig) {
-        if (sig.equals(Constant.SIG_TBD.s())) return false;
+        if (sig.equals(Constant.SIG_TBD.s()))
+            return false;
         return nodeSigVerify(node, sig, null);
     }
 
@@ -91,9 +92,8 @@ public class CryptoService extends ServiceBase {
             return false;
         PublicKey pubKey = null;
         try {
-            // todo-0: search for all occurances of 'getOwner()' to see where it's being used to lookup an Account,
-            // and put the typesafe AccountNode type in those places.
-            AccountNode ownerAccntNode = accountNodeMap != null ? accountNodeMap.get(node.getOwner().toHexString()) : null;
+            AccountNode ownerAccntNode =
+                    accountNodeMap != null ? accountNodeMap.get(node.getOwner().toHexString()) : null;
 
             // if we didn't have a cache or didn't find in cache try to get node from db
             if (ownerAccntNode == null) {
@@ -140,8 +140,11 @@ public class CryptoService extends ServiceBase {
         return false;
     }
 
-    /* Builds the string that will be the raw data that's cryptographically signed */
-    // todo-0: does a version of this method also exist on client code? If so cross-reference here by a hashtag
+    /*
+     * Builds the string that will be the raw data that's cryptographically signed
+     * 
+     * see: #signature-format (in Java)
+     */
     public String getNodeSigData(SubNode node) {
         String path = node.getPath();
         if (path.startsWith(NodePath.PENDING_PATH + "/")) {
@@ -263,26 +266,17 @@ public class CryptoService extends ServiceBase {
         return new SignNodesResponse();
     }
 
-    /*
-     * DO NOT DELETE
-     * 
-     * this method is not currently used but likey will be in the future.
-     */
     public void signNodesById(List<String> ids) {
         if (ids == null || ids.size() == 0)
             return;
         SessionContext sc = TL.getSC();
 
-        // todo-0: we no longer need this Val wapper right?
-        Val<NodeSigPushInfo> pushInfo = new Val<>();
-        pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
-        pushInfo.getVal().setListToSign(new LinkedList<>());
+        NodeSigPushInfo pushInfo = new NodeSigPushInfo(Math.abs(rand.nextInt()));
         int errorCount = 0;
 
         for (String id : ids) {
-            if (pushInfo.getVal() == null) {
-                pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
-                pushInfo.getVal().setListToSign(new LinkedList<>());
+            if (pushInfo == null) {
+                pushInfo = new NodeSigPushInfo(Math.abs(rand.nextInt()));
             }
 
             SubNode node = svc_mongoRead.getNode(id);
@@ -292,25 +286,25 @@ public class CryptoService extends ServiceBase {
 
             // add this node.
             String sigData = getNodeSigData(node);
-            pushInfo.getVal().getListToSign().add(new NodeSigData(node.getIdStr(), sigData));
+            pushInfo.getListToSign().add(new NodeSigData(node.getIdStr(), sigData));
             if (debugSigning) {
                 log.debug("signed: nodeId=" + node.getIdStr() + " sig=" + sigData);
             }
 
             // if we have enough to send a block send it.
-            if (pushInfo.getVal().getListToSign().size() >= SIGN_BLOCK_SIZE) {
-                if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+            if (pushInfo.getListToSign().size() >= SIGN_BLOCK_SIZE) {
+                if (!waitForBrowserSentSigs(sc, pushInfo)) {
                     errorCount++;
                     continue;
                 }
                 // reset the push object.
-                pushInfo.setVal(null);
+                pushInfo = null;
             }
         }
 
         // process any remainder
-        if (pushInfo.getVal() != null && pushInfo.getVal().getListToSign().size() > 0) {
-            if (!waitForBrowserSentSigs(sc, pushInfo.getVal())) {
+        if (pushInfo != null && pushInfo.getListToSign().size() > 0) {
+            if (!waitForBrowserSentSigs(sc, pushInfo)) {
                 errorCount++;
             }
         }

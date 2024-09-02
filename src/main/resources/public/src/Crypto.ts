@@ -839,7 +839,7 @@ export class Crypto {
             path = "/r/" + path.substring(5);
         }
 
-        // see: #signature-format
+        // see: #signature-format (in Java)
         let signData: string = path + "-" + node.ownerId;
         if (node.content) {
             signData += "-" + node.content;

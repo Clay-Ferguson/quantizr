@@ -163,9 +163,6 @@ public class Attachment {
         if (Util.equalObjs(bin, this.bin))
             return;
         TL.dirty(ownerNode);
-        if (ownerNode != null) {
-            ownerNode.invalidateSignature();
-        }
         this.bin = bin;
     }
 
@@ -179,9 +176,6 @@ public class Attachment {
         if (Util.equalObjs(binData, this.binData))
             return;
         TL.dirty(ownerNode);
-        if (ownerNode != null) {
-            ownerNode.invalidateSignature();
-        }
         this.binData = binData;
     }
 

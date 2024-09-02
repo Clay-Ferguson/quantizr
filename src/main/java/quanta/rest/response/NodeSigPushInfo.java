@@ -1,6 +1,7 @@
 
 package quanta.rest.response;
 
+import java.util.LinkedList;
 import java.util.List;
 /* Holds a list of data to be pushed down to client for signing */
 public class NodeSigPushInfo extends ServerPushInfo {
@@ -10,6 +11,7 @@ public class NodeSigPushInfo extends ServerPushInfo {
 	public NodeSigPushInfo(Integer workloadId) {
 		super("sigPush");
 		this.workloadId = workloadId;
+		listToSign = new LinkedList<>();
 	}
 	
 	public Integer getWorkloadId() {
