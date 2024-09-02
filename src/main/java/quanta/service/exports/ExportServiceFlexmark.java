@@ -26,6 +26,7 @@ import quanta.config.ServiceBase;
 import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.ExportRequest;
 import quanta.rest.response.ExportResponse;
@@ -185,7 +186,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
         String id = req.isIncludeIDs() ? (" (id:" + node.getIdStr() + ")") : "";
         if (req.isIncludeOwners()) {
-            SubNode accntNode = svc_mongoRead.getNode(node.getOwner());
+            AccountNode accntNode = svc_user.getAccountNode(node.getOwner());
             if (accntNode != null) {
                 nodeMarkdown += "Owner: " + accntNode.getStr(NodeProp.USER) + id + "\n";
             }
@@ -213,7 +214,6 @@ public class ExportServiceFlexmark extends ServiceBase {
         content = insertPropertySubstitutions(content, node);
         nodeMarkdown += content + "\n";
         nodeMarkdown = writeImages(node, nodeMarkdown);
-
         markdown.append(nodeMarkdown);
     }
 
