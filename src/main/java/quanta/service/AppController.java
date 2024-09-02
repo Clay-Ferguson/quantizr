@@ -168,7 +168,6 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
-        // todo-0: make all calls in here look like this with the simple lambda syntax
         return svc_callProc.run("getMultiRssFeed", false, false, req, session,
                 () -> svc_rssFeed.cm_getMultiRssFeed(req));
     }
@@ -185,17 +184,14 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
     @ResponseBody
     public Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
-        return svc_callProc.run("login", false, false, req, session, () -> {
-            return svc_mongoTrans.cm_login(httpReq, req);
-        });
+        return svc_callProc.run("login", false, false, req, session, () -> svc_mongoTrans.cm_login(httpReq, req));
     }
 
     @RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
     @ResponseBody
     public Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
-        return svc_callProc.run("closeAccount", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_closeAccount(req, session);
-        });
+        return svc_callProc.run("closeAccount", true, true, req, session,
+                () -> svc_mongoTrans.cm_closeAccount(req, session));
     }
 
     @RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
@@ -216,50 +212,40 @@ public class AppController extends ServiceBase implements ErrorController {
     @ResponseBody
     public Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, HttpServletRequest httpReq,
             HttpSession session) {
-        return svc_callProc.run("renderCalendar", true, true, req, session, () -> {
-            return svc_render.cm_renderCalendar(req);
-        });
+        return svc_callProc.run("renderCalendar", true, true, req, session, () -> svc_render.cm_renderCalendar(req));
     }
 
     @RequestMapping(value = API_PATH + "/likeNode", method = RequestMethod.POST)
     @ResponseBody
     public Object likeNode(@RequestBody LikeNodeRequest req, //
             HttpServletRequest httpReq, HttpSession session) {
-        return svc_callProc.run("likeNode", false, false, req, session, () -> {
-            return svc_mongoTrans.cm_likeNode(req);
-        });
+        return svc_callProc.run("likeNode", false, false, req, session, () -> svc_mongoTrans.cm_likeNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-        return svc_callProc.run("getNodeThreadView", false, false, req, session, () -> {
-            return svc_friend.cm_getNodeThreadView(req.getNodeId(), req.isLoadOthers());
-        });
+        return svc_callProc.run("getNodeThreadView", false, false, req, session,
+                () -> svc_friend.cm_getNodeThreadView(req.getNodeId(), req.isLoadOthers()));
     }
 
     @RequestMapping(value = API_PATH + "/getNodeRepliesView", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeRepliesView(@RequestBody GetThreadViewRequest req, HttpSession session) {
-        return svc_callProc.run("getNodeRepliesView", false, false, req, session, () -> {
-            return svc_friend.cm_getNodeReplies(req.getNodeId());
-        });
+        return svc_callProc.run("getNodeRepliesView", false, false, req, session,
+                () -> svc_friend.cm_getNodeReplies(req.getNodeId()));
     }
 
     @RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
     @ResponseBody
     public Object renderNode(@RequestBody RenderNodeRequest req, HttpServletRequest httpReq, HttpSession session) {
-        return svc_callProc.run("renderNode", false, false, req, session, () -> {
-            return svc_render.cm_renderNode(req);
-        });
+        return svc_callProc.run("renderNode", false, false, req, session, () -> svc_render.cm_renderNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
     @ResponseBody
     public Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
-        return svc_callProc.run("initNodeEdit", true, true, req, session, () -> {
-            return svc_edit.cm_initNodeEdit(req);
-        });
+        return svc_callProc.run("initNodeEdit", true, true, req, session, () -> svc_edit.cm_initNodeEdit(req));
     }
 
     /*
@@ -270,252 +256,201 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
-        return svc_callProc.run("getOpenGraph", false, false, req, session, () -> {
-            return svc_openGraph.cm_getOpenGraph(req);
-        });
+        return svc_callProc.run("getOpenGraph", false, false, req, session, () -> svc_openGraph.cm_getOpenGraph(req));
     }
 
     @RequestMapping(value = API_PATH + "/getSchemaOrgTypes", method = RequestMethod.POST)
     @ResponseBody
     public Object getSchemaOrgTypes(@RequestBody GetSchemaOrgTypesRequest req, HttpSession session) {
-        return svc_callProc.run("getSchemaOrgTypes", false, false, req, session, () -> {
-            return svc_schema.cm_getSchemaOrgTypes();
-        });
+        return svc_callProc.run("getSchemaOrgTypes", false, false, req, session,
+                () -> svc_schema.cm_getSchemaOrgTypes());
     }
 
     @RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
-        return svc_callProc.run("getNodePrivileges", true, true, req, session, () -> {
-            return svc_acl.cm_getNodePrivileges(req);
-        });
+        return svc_callProc.run("getNodePrivileges", true, true, req, session, () -> svc_acl.cm_getNodePrivileges(req));
     }
 
     @RequestMapping(value = API_PATH + "/getPeople", method = RequestMethod.POST)
     @ResponseBody
     public Object getPeople(@RequestBody GetPeopleRequest req, HttpSession session) {
-        return svc_callProc.run("getPeople", false, false, req, session, () -> {
-            return svc_user.cm_getPeople(req);
-        });
+        return svc_callProc.run("getPeople", false, false, req, session, () -> svc_user.cm_getPeople(req));
     }
 
     @RequestMapping(value = API_PATH + "/addPrivilege", method = RequestMethod.POST)
     @ResponseBody
     public Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
-        return svc_callProc.run("addPrivilege", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_addPrivilege(req);
-        });
+        return svc_callProc.run("addPrivilege", true, true, req, session, () -> svc_mongoTrans.cm_addPrivilege(req));
     }
 
     @RequestMapping(value = API_PATH + "/setUnpublished", method = RequestMethod.POST)
     @ResponseBody
     public Object setUnpublished(@RequestBody SetUnpublishedRequest req, HttpSession session) {
-        return svc_callProc.run("setUnpublished", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_setUnpublished(req);
-        });
+        return svc_callProc.run("setUnpublished", true, true, req, session,
+                () -> svc_mongoTrans.cm_setUnpublished(req));
     }
 
     @RequestMapping(value = API_PATH + "/copySharing", method = RequestMethod.POST)
     @ResponseBody
     public Object copySharing(@RequestBody CopySharingRequest req, HttpSession session) {
-        return svc_callProc.run("copySharing", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_copySharing(req);
-        });
+        return svc_callProc.run("copySharing", true, true, req, session, () -> svc_mongoTrans.cm_copySharing(req));
     }
 
     @RequestMapping(value = API_PATH + "/removePrivilege", method = RequestMethod.POST)
     @ResponseBody
     public Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
-        return svc_callProc.run("removePrivilege", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_removePrivilege(req);
-        });
+        return svc_callProc.run("removePrivilege", true, true, req, session,
+                () -> svc_mongoTrans.cm_removePrivilege(req));
     }
 
     @RequestMapping(value = API_PATH + "/savePublicKeys", method = RequestMethod.POST)
     @ResponseBody
     public Object savePublicKeys(@RequestBody SavePublicKeyRequest req, HttpSession session) {
-        return svc_callProc.run("savePublicKeys", true, false, req, session, () -> {
-            return svc_crypto.cm_savePublicKeys(req);
-        });
+        return svc_callProc.run("savePublicKeys", true, false, req, session, () -> svc_crypto.cm_savePublicKeys(req));
     }
 
     @RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
     @ResponseBody
     public Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
-        return svc_callProc.run("setCipherKey", true, true, req, session, () -> {
-            return svc_acl.cm_setCipherKey(req);
-        });
+        return svc_callProc.run("setCipherKey", true, true, req, session, () -> svc_acl.cm_setCipherKey(req));
     }
 
     @RequestMapping(value = API_PATH + "/export", method = RequestMethod.POST)
     @ResponseBody
     public Object export(@RequestBody ExportRequest req, HttpSession session) {
-        return svc_callProc.run("export", true, true, req, session, () -> {
-            return svc_system.cm_export(req);
-        });
+        return svc_callProc.run("export", true, true, req, session, () -> svc_system.cm_export(req));
     }
 
     @RequestMapping(value = API_PATH + "/subGraphHash", method = RequestMethod.POST)
     @ResponseBody
     public Object subGraphHash(@RequestBody SubGraphHashRequest req, HttpSession session) {
-        return svc_callProc.run("subGraphHash", true, true, req, session, () -> {
-            return svc_crypto.cm_subGraphHash(req);
-        });
+        return svc_callProc.run("subGraphHash", true, true, req, session, () -> svc_crypto.cm_subGraphHash(req));
     }
 
     @RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
     @ResponseBody
     public Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
-        return svc_callProc.run("export", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_transferNode(req);
-        });
+        return svc_callProc.run("export", true, true, req, session, () -> svc_mongoTrans.cm_transferNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/searchAndReplace", method = RequestMethod.POST)
     @ResponseBody
     public Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
-        return svc_callProc.run("searchAndReplace", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_searchAndReplace(req);
-        });
+        return svc_callProc.run("searchAndReplace", true, true, req, session,
+                () -> svc_mongoTrans.cm_searchAndReplace(req));
     }
 
     @RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
     @ResponseBody
     public Object streamImport(@RequestParam(value = "nodeId", required = true) String nodeId,
             @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
-        return svc_callProc.run("streamImport", true, true, null, session, () -> {
-            return svc_mongoTrans.cm_streamImport(nodeId, uploadFiles);
-        });
+        return svc_callProc.run("streamImport", true, true, null, session,
+                () -> svc_mongoTrans.cm_streamImport(nodeId, uploadFiles));
     }
 
     @RequestMapping(value = API_PATH + "/setNodePosition", method = RequestMethod.POST)
     @ResponseBody
     public Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
-        return svc_callProc.run("setNodePosition", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_setNodePosition(req);
-        });
+        return svc_callProc.run("setNodePosition", true, true, req, session,
+                () -> svc_mongoTrans.cm_setNodePosition(req));
     }
 
     @RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
     @ResponseBody
     public Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
-        return svc_callProc.run("createSubNode", true, true, req, session, () -> {
-            return svc_mongoCreate.cm_createSubNode(req);
-        });
+        return svc_callProc.run("createSubNode", true, true, req, session, () -> svc_mongoCreate.cm_createSubNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
     @ResponseBody
     public Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
-        return svc_callProc.run("insertNode", true, true, req, session, () -> {
-            return svc_mongoCreate.cm_insertNode(req);
-        });
+        return svc_callProc.run("insertNode", true, true, req, session, () -> svc_mongoCreate.cm_insertNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/deleteNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
-        return svc_callProc.run("deleteNodes", true, true, req, session, () -> {
-            return svc_mongoDelete.cm_delete(req);
-        });
+        return svc_callProc.run("deleteNodes", true, true, req, session, () -> svc_mongoDelete.cm_delete(req));
     }
 
     @RequestMapping(value = API_PATH + "/joinNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
-        return svc_callProc.run("joinNodes", true, true, req, session, () -> {
-            return svc_move.cm_joinNodes(req);
-        });
+        return svc_callProc.run("joinNodes", true, true, req, session, () -> svc_move.cm_joinNodes(req));
     }
 
     @RequestMapping(value = API_PATH + "/selectAllNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
-        return svc_callProc.run("selectAllNodes", true, true, req, session, () -> {
-            return svc_move.cm_selectAllNodes(req);
-        });
+        return svc_callProc.run("selectAllNodes", true, true, req, session, () -> svc_move.cm_selectAllNodes(req));
     }
 
     @RequestMapping(value = API_PATH + "/updateHeadings", method = RequestMethod.POST)
     @ResponseBody
     public Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
-        return svc_callProc.run("updateHeadings", true, true, req, session, () -> {
-            return svc_edit.cm_updateHeadings(req.getNodeId());
-        });
+        return svc_callProc.run("updateHeadings", true, true, req, session,
+                () -> svc_edit.cm_updateHeadings(req.getNodeId()));
     }
 
     @RequestMapping(value = API_PATH + "/moveNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
-        return svc_callProc.run("moveNodes", true, true, req, session, () -> {
-            return svc_move.moveNodes(req);
-        });
+        return svc_callProc.run("moveNodes", true, true, req, session, () -> svc_move.moveNodes(req));
     }
 
     @RequestMapping(value = API_PATH + "/pasteAttachments", method = RequestMethod.POST)
     @ResponseBody
     public Object moveNodes(@RequestBody PasteAttachmentsRequest req, HttpSession session) {
-        return svc_callProc.run("pasteAttachments", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_pasteAttachments(req);
-        });
+        return svc_callProc.run("pasteAttachments", true, true, req, session,
+                () -> svc_mongoTrans.cm_pasteAttachments(req));
     }
 
     @RequestMapping(value = API_PATH + "/linkNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object linkNodes(@RequestBody LinkNodesRequest req, HttpSession session) {
-        return svc_callProc.run("linkNodes", true, true, req, session, () -> {
-            return svc_edit.cm_linkNodes(req);
-        });
+        return svc_callProc.run("linkNodes", true, true, req, session, () -> svc_edit.cm_linkNodes(req));
     }
 
     @RequestMapping(value = API_PATH + "/deleteProperties", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
-        return svc_callProc.run("deleteProperties", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_deleteProperties(req);
-        });
+        return svc_callProc.run("deleteProperties", true, true, req, session,
+                () -> svc_mongoTrans.cm_deleteProperties(req));
     }
 
     @RequestMapping(value = API_PATH + "/updateFriendNode", method = RequestMethod.POST)
     @ResponseBody
     public Object updateFriendNode(@RequestBody UpdateFriendNodeRequest req, HttpSession session) {
-        return svc_callProc.run("updateFriendNode", true, true, req, session, () -> {
-            return svc_friend.cm_updateFriendNode(req);
-        });
+        return svc_callProc.run("updateFriendNode", true, true, req, session,
+                () -> svc_friend.cm_updateFriendNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
-        return svc_callProc.run("saveNode", true, true, req, session, () -> {
-            // NOTE: We don't call saveNode inside a transaction because only the owner can save the node and
-            // so there's no concurrent update risk at all, and also we want this absolutely as fast as possible
-            return svc_edit.saveNode(req);
-        });
+        // NOTE: We don't call saveNode inside a transaction because only the owner can save the node and
+        // so there's no concurrent update risk at all, and also we want this absolutely as fast as possible
+        return svc_callProc.run("saveNode", true, true, req, session, () -> svc_edit.saveNode(req));
     }
 
     @RequestMapping(value = API_PATH + "/toggleNodeExpanded", method = RequestMethod.POST)
     @ResponseBody
     public Object toggleNodeExpanded(@RequestBody SetExpandedRequest req, HttpSession session) {
-        return svc_callProc.run("toggleNodeExpanded", true, true, req, session, () -> {
-            return svc_edit.cm_toggleExpanded(req);
-        });
+        return svc_callProc.run("toggleNodeExpanded", true, true, req, session, () -> svc_edit.cm_toggleExpanded(req));
     }
 
     @RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
     @ResponseBody
     public Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
-        return svc_callProc.run("changePassword", false, false, req, session, () -> {
-            return svc_mongoTrans.cm_changePassword(req);
-        });
+        return svc_callProc.run("changePassword", false, false, req, session,
+                () -> svc_mongoTrans.cm_changePassword(req));
     }
 
     @RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
     @ResponseBody
     public Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
-        return svc_callProc.run("resetPassword", false, false, req, session, () -> {
-            return svc_user.cm_resetPassword(req);
-        });
+        return svc_callProc.run("resetPassword", false, false, req, session, () -> svc_user.cm_resetPassword(req));
     }
 
     @RequestMapping({FILE_PATH + "/id/{id}", FILE_PATH + "/{nameOnAdminNode}",
@@ -608,18 +543,16 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(name = "att", required = false) final String attName, //
             @RequestHeader HttpHeaders headers, //
             HttpServletRequest request, HttpServletResponse response, HttpSession session) {
-        return (ResponseEntity<ResourceRegion>) svc_callProc.run("stream", false, false, null, session, () -> {
-            return svc_attach.cm_getStreamResource(headers, nodeId, attName);
-        });
+        return (ResponseEntity<ResourceRegion>) svc_callProc.run("stream", false, false, null, session,
+                () -> svc_attach.cm_getStreamResource(headers, nodeId, attName));
     }
 
     @RequestMapping(value = API_PATH + "/parseFiles", method = RequestMethod.POST)
     @ResponseBody
     public Object parseFiles(@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles,
             HttpSession session) {
-        return svc_callProc.run("parseFiles", true, true, null, session, () -> {
-            return svc_attach.cm_parseUploadFiles(uploadFiles);
-        });
+        return svc_callProc.run("parseFiles", true, true, null, session,
+                () -> svc_attach.cm_parseUploadFiles(uploadFiles));
     }
 
     @RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
@@ -629,250 +562,198 @@ public class AppController extends ServiceBase implements ErrorController {
             @RequestParam(value = "explodeZips", required = false) String explodeZips,
             @RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, HttpSession session) {
         final String _attName = attName == null ? "" : attName;
-        return svc_callProc.run("upload", true, true, null, session, () -> {
-            return svc_mongoTrans.cm_uploadMultipleFiles(_attName, nodeId, uploadFiles, //
-                    "true".equalsIgnoreCase(explodeZips));
-        });
+        return svc_callProc.run("upload", true, true, null, session,
+                () -> svc_mongoTrans.cm_uploadMultipleFiles(_attName, nodeId, uploadFiles, //
+                        "true".equalsIgnoreCase(explodeZips)));
     }
 
     @RequestMapping(value = API_PATH + "/deleteAttachment", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
-        return svc_callProc.run("deleteAttachment", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_deleteAttachment(req);
-        });
+        return svc_callProc.run("deleteAttachment", true, true, req, session,
+                () -> svc_mongoTrans.cm_deleteAttachment(req));
     }
 
     @RequestMapping(value = API_PATH + "/uploadFromUrl", method = RequestMethod.POST)
     @ResponseBody
     public Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
-        return svc_callProc.run("uploadFromUrl", true, true, req, session, () -> {
-            return svc_attach.cm_readFromUrl(req);
-        });
+        return svc_callProc.run("uploadFromUrl", true, true, req, session, () -> svc_attach.cm_readFromUrl(req));
     }
 
     @RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
     @ResponseBody
     public Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
-        return svc_callProc.run("anonPageLoad", false, false, req, session, () -> {
-            return svc_render.cm_anonPageLoad(req);
-        });
+        return svc_callProc.run("anonPageLoad", false, false, req, session, () -> svc_render.cm_anonPageLoad(req));
     }
 
     @RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
     @ResponseBody
     public Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
-        return svc_callProc.run("nodeSearch", false, false, req, session, () -> {
-            return svc_search.cm_search(req);
-        });
+        return svc_callProc.run("nodeSearch", false, false, req, session, () -> svc_search.cm_search(req));
     }
 
     @RequestMapping(value = API_PATH + "/renderDocument", method = RequestMethod.POST)
     @ResponseBody
     public Object renderDocument(@RequestBody RenderDocumentRequest req, HttpSession session) {
-        return svc_callProc.run("renderDocument", false, false, req, session, () -> {
-            return svc_search.cm_renderDocument(req);
-        });
+        return svc_callProc.run("renderDocument", false, false, req, session, () -> svc_search.cm_renderDocument(req));
     }
 
     @RequestMapping(value = API_PATH + "/askSubGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object askSubGraph(@RequestBody AskSubGraphRequest req, HttpSession session) {
-        return svc_callProc.run("askSubGraph", false, false, req, session, () -> {
-            return svc_aiUtil.cm_askSubGraph(req);
-        });
+        return svc_callProc.run("askSubGraph", false, false, req, session, () -> svc_aiUtil.cm_askSubGraph(req));
     }
 
     @RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
-        return svc_callProc.run("getFollowers", false, false, req, session, () -> {
-            return svc_friend.cm_getFollowers(req);
-        });
+        return svc_callProc.run("getFollowers", false, false, req, session, () -> svc_friend.cm_getFollowers(req));
     }
 
     @RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
     @ResponseBody
     public Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
-        return svc_callProc.run("getFollowing", false, false, req, session, () -> {
-            return svc_friend.cm_getFollowing(req);
-        });
+        return svc_callProc.run("getFollowing", false, false, req, session, () -> svc_friend.cm_getFollowing(req));
     }
 
     @RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
     @ResponseBody
     public Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
-        return svc_callProc.run("nodeFeed", false, false, req, session, () -> {
-            return svc_userFeed.cm_generateFeed(req);
-        });
+        return svc_callProc.run("nodeFeed", false, false, req, session, () -> svc_userFeed.cm_generateFeed(req));
     }
 
     @RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
     @ResponseBody
     public Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
-        return svc_callProc.run("checkMessages", true, true, req, session, () -> {
-            return svc_userFeed.cm_checkMessages(req);
-        });
+        return svc_callProc.run("checkMessages", true, true, req, session, () -> svc_userFeed.cm_checkMessages(req));
     }
 
     @RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
-        return svc_callProc.run("getSharedNodes", false, false, req, session, () -> {
-            return svc_search.cm_getSharedNodes(req);
-        });
+        return svc_callProc.run("getSharedNodes", false, false, req, session, () -> svc_search.cm_getSharedNodes(req));
     }
 
     @RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
     @ResponseBody
     public Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
-        return svc_callProc.run("saveUserPreferences", true, true, req, session, () -> {
-            return svc_user.cm_saveUserPreferences(req);
-        });
+        return svc_callProc.run("saveUserPreferences", true, true, req, session,
+                () -> svc_user.cm_saveUserPreferences(req));
     }
 
     @RequestMapping(value = API_PATH + "/deleteUserTransactions", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteUserTransactions(@RequestBody DeleteUserTransactionsRequest req, HttpSession session) {
-        return svc_callProc.run("deleteUserTransactions", true, true, req, session, () -> {
-            return svc_user.cm_deleteUserTransactions(req);
-        });
+        return svc_callProc.run("deleteUserTransactions", true, true, req, session,
+                () -> svc_user.cm_deleteUserTransactions(req));
     }
 
     @RequestMapping(value = API_PATH + "/addCredit", method = RequestMethod.POST)
     @ResponseBody
     public Object addCredit(@RequestBody AddCreditRequest req, HttpSession session) {
-        return svc_callProc.run("addCredit", true, true, req, session, () -> {
-            return svc_pgTrans.cm_addCredit(req.getUserId(), req.getAmount());
-        });
+        return svc_callProc.run("addCredit", true, true, req, session,
+                () -> svc_pgTrans.cm_addCredit(req.getUserId(), req.getAmount()));
     }
 
     @RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
-        return svc_callProc.run("getUserProfile", false, false, req, session, () -> {
-            return svc_user.cm_getUserProfile(req);
-        });
+        return svc_callProc.run("getUserProfile", false, false, req, session, () -> svc_user.cm_getUserProfile(req));
     }
 
     @RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
     @ResponseBody
     public Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
-        return svc_callProc.run("saveUserProfile", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_saveUserProfile(req);
-        });
+        return svc_callProc.run("saveUserProfile", true, true, req, session,
+                () -> svc_mongoTrans.cm_saveUserProfile(req));
     }
 
     @RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
     @ResponseBody
     public Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
-        return svc_callProc.run("addFriend", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_addFriend(req);
-        });
+        return svc_callProc.run("addFriend", true, true, req, session, () -> svc_mongoTrans.cm_addFriend(req));
     }
 
     @RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
     @ResponseBody
     public Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
-        return svc_callProc.run("deleteFriend", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_deleteFriend(req.getUserNodeId(), NodeType.FRIEND_LIST.s());
-        });
+        return svc_callProc.run("deleteFriend", true, true, req, session,
+                () -> svc_mongoTrans.cm_deleteFriend(req.getUserNodeId(), NodeType.FRIEND_LIST.s()));
     }
 
     @RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
     @ResponseBody
     public Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
-        return svc_callProc.run("blockUser", true, true, req, session, () -> {
-            return svc_user.cm_blockUsers(req);
-        });
+        return svc_callProc.run("blockUser", true, true, req, session, () -> svc_user.cm_blockUsers(req));
     }
 
     @RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
     @ResponseBody
     public Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
-        return svc_callProc.run("unblockUser", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_deleteFriend(req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
-        });
+        return svc_callProc.run("unblockUser", true, true, req, session,
+                () -> svc_mongoTrans.cm_deleteFriend(req.getUserNodeId(), NodeType.BLOCKED_USERS.s()));
     }
 
     @RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
     @ResponseBody
     public Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
-        return svc_callProc.run("getUserAcccountInfo", false, false, req, session, () -> {
-            return svc_user.cm_getUserAccountInfo(req);
-        });
+        return svc_callProc.run("getUserAcccountInfo", false, false, req, session,
+                () -> svc_user.cm_getUserAccountInfo(req));
     }
 
     @RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
     @ResponseBody
     public Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
-        return svc_callProc.run("getBookmarks", true, true, req, session, () -> {
-            return svc_search.cm_getBookmarks(req);
-        });
+        return svc_callProc.run("getBookmarks", true, true, req, session, () -> svc_search.cm_getBookmarks(req));
     }
 
     @RequestMapping(value = API_PATH + "/signNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object signNodes(@RequestBody SignNodesRequest req, HttpSession session) {
-        return svc_callProc.run("signNodes", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_signNodes(req);
-        });
+        return svc_callProc.run("signNodes", true, true, req, session, () -> svc_mongoTrans.cm_signNodes(req));
     }
 
     @RequestMapping(value = API_PATH + "/signSubGraph", method = RequestMethod.POST)
     @ResponseBody
     public Object signSubGraph(@RequestBody SignSubGraphRequest req, HttpSession session) {
-        return svc_callProc.run("signSubGraph", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_signSubGraph(req);
-        });
+        return svc_callProc.run("signSubGraph", true, true, req, session, () -> svc_mongoTrans.cm_signSubGraph(req));
     }
 
     @RequestMapping(value = API_PATH + "/removeSignatures", method = RequestMethod.POST)
     @ResponseBody
     public Object removeSignatures(@RequestBody RemoveSignaturesRequest req, HttpSession session) {
-        return svc_callProc.run("removeSignatures", false, false, req, session, () -> {
-            return svc_mongoTrans.cm_removeSignatures(req);
-        });
+        return svc_callProc.run("removeSignatures", false, false, req, session,
+                () -> svc_mongoTrans.cm_removeSignatures(req));
     }
 
     @RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
-        return svc_callProc.run("getNodeStats", false, false, req, session, () -> {
-            return svc_search.cm_getNodeStats(req);
-        });
+        return svc_callProc.run("getNodeStats", false, false, req, session, () -> svc_search.cm_getNodeStats(req));
     }
 
     @RequestMapping(value = API_PATH + "/getNodeJson", method = RequestMethod.POST)
     @ResponseBody
     public Object getNodeJson(@RequestBody GetNodeJsonRequest req, HttpSession session) {
-        return svc_callProc.run("getNodeJson", false, false, req, session, () -> {
-            return svc_edit.cm_getNodeJson(req);
-        });
+        return svc_callProc.run("getNodeJson", false, false, req, session, () -> svc_edit.cm_getNodeJson(req));
     }
 
     @RequestMapping(value = API_PATH + "/saveNodeJson", method = RequestMethod.POST)
     @ResponseBody
     public Object saveNodeJson(@RequestBody SaveNodeJsonRequest req, HttpSession session) {
-        return svc_callProc.run("SaveNodeJson", false, false, req, session, () -> {
-            return svc_mongoTrans.cm_saveNodeJson(req);
-        });
+        return svc_callProc.run("SaveNodeJson", false, false, req, session, () -> svc_mongoTrans.cm_saveNodeJson(req));
     }
 
     @RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)
     @ResponseBody
     public Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
-        return svc_callProc.run("getServerInfo", true, true, req, session, () -> {
-            return svc_system.cm_getServerInfo(req);
-        });
+        return svc_callProc.run("getServerInfo", true, true, req, session, () -> svc_system.cm_getServerInfo(req));
     }
 
     @RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
     @ResponseBody
     public Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-        return svc_callProc.run("graphNodes", false, false, req, session, () -> {
-            return svc_graphNodes.cm_graphNodes(req);
-        });
+        return svc_callProc.run("graphNodes", false, false, req, session, () -> svc_graphNodes.cm_graphNodes(req));
     }
 
     @RequestMapping(value = "/health", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
@@ -884,57 +765,44 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
     @ResponseBody
     public Object ping(@RequestBody PingRequest req, HttpSession session) {
-        return svc_callProc.run("ping", false, false, req, session, () -> {
-            return svc_system.cm_ping();
-        });
+        return svc_callProc.run("ping", false, false, req, session, () -> svc_system.cm_ping());
     }
 
     @RequestMapping(value = API_PATH + "/sendTestEmail", method = RequestMethod.POST)
     @ResponseBody
     public Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
-        return svc_callProc.run("sendTestEmail", true, true, req, session, () -> {
-            return svc_system.cm_sendTestEmail();
-        });
+        return svc_callProc.run("sendTestEmail", true, true, req, session, () -> svc_system.cm_sendTestEmail());
     }
 
     @RequestMapping(value = API_PATH + "/sendLogText", method = RequestMethod.POST)
     @ResponseBody
     public Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
-        return svc_callProc.run("sendLogText", true, true, req, session, () -> {
-            return svc_system.cm_sendLogText(req);
-        });
+        return svc_callProc.run("sendLogText", true, true, req, session, () -> svc_system.cm_sendLogText(req));
     }
 
     @RequestMapping(value = API_PATH + "/importJson", method = RequestMethod.POST)
     @ResponseBody
     public Object importJson(@RequestBody ImportJsonRequest req, HttpSession session) {
-        return svc_callProc.run("importJson", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_importJson(req);
-        });
+        return svc_callProc.run("importJson", true, true, req, session, () -> svc_mongoTrans.cm_importJson(req));
     }
 
     @RequestMapping(value = API_PATH + "/generateBookByAI", method = RequestMethod.POST)
     @ResponseBody
     public Object generateBookByAI(@RequestBody GenerateBookByAIRequest req, HttpSession session) {
-        return svc_callProc.run("generateBookByAI", true, true, req, session, () -> {
-            return svc_aiUtil.cm_generateBookByAI(req);
-        });
+        return svc_callProc.run("generateBookByAI", true, true, req, session,
+                () -> svc_aiUtil.cm_generateBookByAI(req));
     }
 
     @RequestMapping(value = API_PATH + "/sendFeedback", method = RequestMethod.POST)
     @ResponseBody
     public Object sendFeedback(@RequestBody SendFeedbackRequest req, HttpSession session) {
-        return svc_callProc.run("sendFeedback", false, false, req, session, () -> {
-            return svc_user.cm_sendFeedback(req);
-        });
+        return svc_callProc.run("sendFeedback", false, false, req, session, () -> svc_user.cm_sendFeedback(req));
     }
 
     @RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
     @ResponseBody
     public Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
-        return svc_callProc.run("splitNode", true, true, req, session, () -> {
-            return svc_mongoTrans.cm_splitNode(req);
-        });
+        return svc_callProc.run("splitNode", true, true, req, session, () -> svc_mongoTrans.cm_splitNode(req));
     }
 
     @GetMapping(API_PATH + "/serverPush/{token}")
@@ -946,9 +814,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_GIF_VALUE)
     @ResponseBody
     public byte[] captcha(HttpSession session) {
-        return (byte[]) svc_callProc.run("captcha", false, false, null, session, () -> {
-            return CaptchaMaker.cm_getCaptcha();
-        });
+        return (byte[]) svc_callProc.run("captcha", false, false, null, session, () -> CaptchaMaker.cm_getCaptcha());
     }
 
     /*
