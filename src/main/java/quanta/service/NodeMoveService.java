@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.SubNode;
@@ -380,12 +381,12 @@ public class NodeMoveService extends ServiceBase {
 
             // if node is signed, we need to invalidate the signature, if not already invalidated (via tbd)
             String nodeSig = node.getStr(NodeProp.CRYPTO_SIG);
-            if (nodeSig != null && !nodeSig.equals("tbd")) {
+            if (nodeSig != null && !nodeSig.equals(Constant.SIG_TBD.s())) {
                 nodeIdsToReSign.add(node.getIdStr());
                 // Since we're about to sign nodes below, setting to "tbd" is not necessary but is safer
                 // in case anything does go wrong, including even the user closing their browser as a thing that
                 // could break this, but by setting to "tbd" we're safe.
-                update = update.set(NodeProp.CRYPTO_SIG.s(), "tbd");
+                update = update.set(NodeProp.CRYPTO_SIG.s(), Constant.SIG_TBD.s());
             }
 
             bops.updateOne(query, update);

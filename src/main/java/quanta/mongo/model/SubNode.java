@@ -977,6 +977,6 @@ public class SubNode {
 
     public void invalidateSignature() {
         if (getStr(NodeProp.CRYPTO_SIG) != null)
-            set(NodeProp.CRYPTO_SIG, "tbd");
+            set(NodeProp.CRYPTO_SIG, Constant.SIG_TBD.s());
     }
 }

@@ -29,6 +29,7 @@ import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.Jwk;
 import quanta.model.client.Attachment;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.AccountNode;
@@ -77,6 +78,7 @@ public class CryptoService extends ServiceBase {
     }
 
     public boolean nodeSigVerify(SubNode node, String sig) {
+        if (sig.equals(Constant.SIG_TBD.s())) return false;
         return nodeSigVerify(node, sig, null);
     }
 

@@ -19,7 +19,8 @@ public enum Constant {
     FEED_LOCAL("local"), //
     FEED_NODEFEED("nodeFeed"), //
     ATTACHMENT_PRIMARY("p"), //
-    ATTACHMENT_HEADER("h");
+    ATTACHMENT_HEADER("h"), //
+    SIG_TBD("tbd");
 
     @JsonValue
     private final String value;
