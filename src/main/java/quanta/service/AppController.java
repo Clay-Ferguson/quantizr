@@ -802,7 +802,7 @@ public class AppController extends ServiceBase implements ErrorController {
     @RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
     @ResponseBody
     public Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
-        return svc_callProc.run("splitNode", true, true, req, session, () -> svc_mongoTrans.cm_splitNode(req));
+        return svc_callProc.run("splitNode", true, true, req, session, () -> svc_edit.splitNode(req));
     }
 
     @GetMapping(API_PATH + "/serverPush/{token}")

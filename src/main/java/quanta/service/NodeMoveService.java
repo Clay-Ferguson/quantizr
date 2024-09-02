@@ -143,13 +143,23 @@ public class NodeMoveService extends ServiceBase {
         svc_mongoUpdate.saveSession();
     }
 
+    public JoinNodesResponse cm_joinNodes(JoinNodesRequest req) {
+        HashSet<String> nodesModified = new HashSet<String>();
+        JoinNodesResponse ret = svc_mongoTrans.joinNodes(req, nodesModified);
+
+        if (nodesModified.size() > 0) {
+            svc_crypto.signNodesById(new ArrayList<String>(nodesModified));
+        }
+        return ret;
+    }
+
     /*
      * Note: Browser can send nodes in any order, in the request, and always the lowest ordinal is the
      * one we keep and join to.
      * 
      * If join to parent is true, that means we merge all the NodeIds onto their parent.
      */
-    public JoinNodesResponse cm_joinNodes(JoinNodesRequest req) {
+    public JoinNodesResponse joinNodes(JoinNodesRequest req, HashSet<String> nodesModified) {
         JoinNodesResponse res = new JoinNodesResponse();
         LinkedList<String> delIds = new LinkedList<>();
         // add to list because we will sort
@@ -212,6 +222,7 @@ public class NodeMoveService extends ServiceBase {
             targetNode.setContent(sb.toString());
         }
         targetNode.touch();
+        nodesModified.add(targetNode.getIdStr());
         svc_mongoUpdate.saveSession();
 
         /*

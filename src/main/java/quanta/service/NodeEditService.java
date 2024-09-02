@@ -1,7 +1,7 @@
 package quanta.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
@@ -272,6 +272,16 @@ public class NodeEditService extends ServiceBase {
         });
     }
 
+    public SplitNodeResponse splitNode(SplitNodeRequest req) {
+        HashSet<String> nodesModified = new HashSet<String>();
+        SplitNodeResponse ret = svc_mongoTrans.cm_splitNode(req, nodesModified);
+
+        if (nodesModified.size() > 0) {
+            svc_crypto.signNodesById(new ArrayList<String>(nodesModified));
+        }
+        return ret;
+    }
+
     /*
      * When user pastes in a large amount of text and wants to have this text broken out into individual
      * nodes they can pass into here and double spaces become splitpoints, and this splitNode method
@@ -279,7 +289,7 @@ public class NodeEditService extends ServiceBase {
      *
      * req.splitType == 'inline' || 'children'
      */
-    public SplitNodeResponse splitNode(SplitNodeRequest req) {
+    public SplitNodeResponse splitNode(SplitNodeRequest req, HashSet<String> nodesModified) {
         MongoTranMgr.ensureTran();
         SplitNodeResponse res = new SplitNodeResponse();
         NodeChanges nodeChanges = new NodeChanges();
@@ -321,8 +331,6 @@ public class NodeEditService extends ServiceBase {
         }
         int idx = 0;
 
-        List<String> sigDirtyNodes = new LinkedList<>();
-
         for (String part : contentParts) {
             part = part.trim();
             if (idx == 0) {
@@ -332,7 +340,7 @@ public class NodeEditService extends ServiceBase {
                 }
                 node.touch();
                 svc_mongoUpdate.save(node);
-                sigDirtyNodes.add(node.getIdStr());
+                nodesModified.add(node.getIdStr());
             } else {
                 // This is not a mistake that we pass null for nodeChagnes here (we already captured the shift above
                 // for the node we need to worry about)
@@ -342,8 +350,9 @@ public class NodeEditService extends ServiceBase {
                 newNode.setAc(node.getAc());
                 newNode.touch();
                 svc_mongoUpdate.save(newNode);
-                sigDirtyNodes.add(newNode.getIdStr());
+                nodesModified.add(newNode.getIdStr());
             }
+            
             idx++;
         }
         if (req.getSplitType().equalsIgnoreCase("children")) {

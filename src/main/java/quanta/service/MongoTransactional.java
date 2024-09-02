@@ -16,6 +16,7 @@ import quanta.rest.request.CopySharingRequest;
 import quanta.rest.request.DeleteAttachmentRequest;
 import quanta.rest.request.DeletePropertyRequest;
 import quanta.rest.request.ImportJsonRequest;
+import quanta.rest.request.JoinNodesRequest;
 import quanta.rest.request.LikeNodeRequest;
 import quanta.rest.request.LoginRequest;
 import quanta.rest.request.MoveNodesRequest;
@@ -41,6 +42,7 @@ import quanta.rest.response.DeleteAttachmentResponse;
 import quanta.rest.response.DeleteFriendResponse;
 import quanta.rest.response.DeletePropertyResponse;
 import quanta.rest.response.ImportJsonResponse;
+import quanta.rest.response.JoinNodesResponse;
 import quanta.rest.response.LikeNodeResponse;
 import quanta.rest.response.LoginResponse;
 import quanta.rest.response.MoveNodesResponse;
@@ -162,8 +164,12 @@ public class MongoTransactional extends ServiceBase {
         return svc_import.importJson(req);
     }
 
-    public SplitNodeResponse cm_splitNode(SplitNodeRequest req) {
-        return svc_edit.splitNode(req);
+    public SplitNodeResponse cm_splitNode(SplitNodeRequest req, HashSet<String> nodesModified) {
+        return svc_edit.splitNode(req, nodesModified);
+    }
+
+    public JoinNodesResponse joinNodes(JoinNodesRequest req, HashSet<String> nodesModified) {
+        return svc_move.joinNodes(req, nodesModified);
     }
 
     public SearchAndReplaceResponse cm_searchAndReplace(SearchAndReplaceRequest req) {
