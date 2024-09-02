@@ -69,12 +69,9 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, this.node);
-        if (signed) {
-            children.push(new Icon({
-                title: "Crypto Signature Verified",
-                className: "fa fa-certificate fa-lg signatureIcon mediumMarginRight"
-            }));
+        const sigIcon: Icon = S.render.getSignatureIcon(this.node);
+        if (sigIcon) {
+            children.push(sigIcon);
         }
 
         if (S.props.isEncrypted(this.node)) {

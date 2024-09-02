@@ -238,10 +238,12 @@ export class EditNodeDlg extends DialogBase {
 
         if (this.getState<LS>().signCheckboxVal) {
             comps = comps || [];
-            comps.push(new Icon({
-                title: "Crypto Signature Verified",
-                className: "fa fa-certificate fa-lg bigSignatureIcon iconMarginLeft"
-            }));
+
+            const sigIcon: Icon = S.render.getSignatureIcon(getAs().editNode);
+            if (sigIcon) {
+                comps.push(sigIcon);
+            }
+
             if (getAs().isAdminUser) {
                 comps.push(new Span("<-Admin"));
             }
@@ -659,6 +661,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => this.getState<LS>().encryptCheckboxVal
         }) : null;
 
+        // todo-0: somehow this seems to be stuck on true now. Unchecking does nothing.
         const signCheckBox = S.crypto.avail ? new Checkbox("Sign", null, {
             setValue: (checked: boolean) => {
                 if (checked && S.crypto.sigKeyOk()) {
@@ -1031,7 +1034,7 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.insertUserNames()
             }),
 
-            !ast.isAnonUser && !ast.mobileMode &&  S.speech.ttsSupported() ? new Icon({
+            !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new Icon({
                 className: "fa fa-lg fa-volume-up editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },

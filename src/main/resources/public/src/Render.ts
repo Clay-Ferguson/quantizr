@@ -28,6 +28,7 @@ import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
 import { Tag } from "./comp/core/Tag";
+import { Icon } from "./comp/core/Icon";
 
 export class Render {
     private debug: boolean = false;
@@ -819,5 +820,23 @@ export class Render {
                 onClick: S.edit.endDelete
             })
         ]);
+    }
+
+    getSignatureIcon = (node: NodeInfo) => {
+        const sigFail: string = S.props.getClientPropStr(J.NodeProp.SIG_FAIL, node);
+        if (sigFail) {
+            return new Icon({
+                title: "Crypto Signature Verification Failed",
+                className: "fa fa-certificate fa-lg failedSignatureIcon mediumMarginRight"
+            });
+        } else {
+            const signed = S.props.getPropStr(J.NodeProp.CRYPTO_SIG, node);
+            if (signed) {
+                return new Icon({
+                    title: "Crypto Signature Verified",
+                    className: "fa fa-certificate fa-lg signatureIcon mediumMarginRight"
+                });
+            }
+        }
     }
 }

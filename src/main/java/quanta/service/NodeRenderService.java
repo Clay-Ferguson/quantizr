@@ -30,6 +30,7 @@ import quanta.model.client.Constant;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.RenderCalendarRequest;
 import quanta.rest.request.RenderNodeRequest;
@@ -154,7 +155,7 @@ public class NodeRenderService extends ServiceBase {
         boolean showReplies = true;
         boolean adminOnly = false;
         SessionContext sc = TL.getSC();
-        HashMap<String, SubNode> nodeMap = new HashMap<>();
+        HashMap<String, AccountNode> accountNodeMap = new HashMap<>(); 
 
         // this is not anon user, we set the flag based on their preferences
         if (sc != null && !sc.isAnon()) {
@@ -174,7 +175,7 @@ public class NodeRenderService extends ServiceBase {
         if (req.isJumpToRss() && node != null && NodeType.RSS_FEED.s().equals(node.getType())) {
             res.setRssNode(true);
             NodeInfo nodeInfo = svc_convert.toNodeInfo(adminOnly, TL.getSC(), node, false,
-                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, nodeMap);
+                    Convert.LOGICAL_ORDINAL_IGNORE, false, false, false, true, accountNodeMap);
             res.setNode(nodeInfo);
             return res;
         }
@@ -193,7 +194,7 @@ public class NodeRenderService extends ServiceBase {
         if (req.isSingleNode()) {
             // that loads these all asynchronously.
             NodeInfo nodeInfo = svc_convert.toNodeInfo(adminOnly, TL.getSC(), node, false,
-                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, nodeMap);
+                    Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, true, accountNodeMap);
             res.setNode(nodeInfo);
             return res;
         }
@@ -256,7 +257,7 @@ public class NodeRenderService extends ServiceBase {
         res.setBreadcrumbs(breadcrumbs);
         svc_render.getBreadcrumbs(node, breadcrumbs);
         NodeInfo nodeInfo =
-                svc_render.processRenderNode(adminOnly, req, res, node, scanToNode, -1, 0, limit, showReplies, nodeMap);
+                svc_render.processRenderNode(adminOnly, req, res, node, scanToNode, -1, 0, limit, showReplies, accountNodeMap);
         if (nodeInfo != null) {
             res.setNode(nodeInfo);
         } else {
@@ -267,9 +268,9 @@ public class NodeRenderService extends ServiceBase {
 
     public NodeInfo processRenderNode(boolean adminOnly, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
             SubNode scanToNode, long logicalOrdinal, int level, int limit, boolean showReplies,
-            HashMap<String, SubNode> nodeMap) {
+            HashMap<String, AccountNode> accountNodeMap) {
         NodeInfo nodeInfo = svc_convert.toNodeInfo(adminOnly, TL.getSC(), node, false, logicalOrdinal, level > 0, false,
-                false, true, nodeMap);
+                false, true, accountNodeMap);
         if (nodeInfo == null) {
             return null;
         }
@@ -381,7 +382,7 @@ public class NodeRenderService extends ServiceBase {
                                 SubNode sn = slidingWindow.get(i);
                                 relativeIdx--;
                                 ninfo = svc_render.processRenderNode(adminOnly, req, res, sn, null, relativeIdx,
-                                        level + 1, limit, showReplies, nodeMap);
+                                        level + 1, limit, showReplies, accountNodeMap);
                                 nodeInfo.getChildren().add(0, ninfo);
 
                                 /*
@@ -420,7 +421,7 @@ public class NodeRenderService extends ServiceBase {
             }
             // if we get here we're accumulating rows
             ninfo = svc_render.processRenderNode(adminOnly, req, res, n, null, idx - 1L, level + 1, limit, showReplies,
-                    nodeMap);
+                    accountNodeMap);
             nodeInfo.getChildren().add(ninfo);
             if (!iterator.hasNext()) {
                 // since we query for 'limit+1', we will end up here if we're at the true end of the records.
@@ -443,7 +444,7 @@ public class NodeRenderService extends ServiceBase {
                     SubNode sn = slidingWindow.get(i);
                     relativeIdx--;
                     ninfo = svc_render.processRenderNode(adminOnly, req, res, sn, null, (long) relativeIdx, level + 1,
-                            limit, showReplies, nodeMap);
+                            limit, showReplies, accountNodeMap);
                     nodeInfo.getChildren().add(0, ninfo);
                     // If we have enough records we're done
                     if (nodeInfo.getChildren().size() >= limit) {

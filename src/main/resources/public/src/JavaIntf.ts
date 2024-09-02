@@ -1124,6 +1124,7 @@ export const enum Constant {
     FEED_NODEFEED = "nodeFeed",
     ATTACHMENT_PRIMARY = "p",
     ATTACHMENT_HEADER = "h",
+    SIG_TBD = "tbd",
 }
 
 export const enum ConstantInt {
@@ -1201,6 +1202,7 @@ export const enum NodeProp {
     AI_TEMPERATURE = "aiTemp",
     DURATION = "duration",
     IN_PENDING_PATH = "pendingPath",
+    SIG_FAIL = "sigFail",
     OPEN_GRAPH = "sn:og",
     TRUNCATED = "trunc",
 }

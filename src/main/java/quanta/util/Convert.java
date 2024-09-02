@@ -48,12 +48,12 @@ public class Convert extends ServiceBase {
      */
     public NodeInfo toNodeInfo(boolean adminOnly, SessionContext sc, SubNode node, boolean initNodeEdit,
             long logicalOrdinal, boolean allowInlineChildren, boolean lastChild, boolean getFollowers,
-            boolean loadLikes, HashMap<String, SubNode> nodeMap) {
+            boolean loadLikes, HashMap<String, AccountNode> accountNodeMap) {
         String sig = node.getStr(NodeProp.CRYPTO_SIG);
 
         // if we have a signature, check it.
         boolean sigFail = false;
-        if (sig != null && !svc_crypto.nodeSigVerify(node, sig, nodeMap)) {
+        if (sig != null && !svc_crypto.nodeSigVerify(node, sig, accountNodeMap)) {
             sigFail = true;
         }
 
@@ -160,6 +160,10 @@ public class Convert extends ServiceBase {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.IN_PENDING_PATH.s(), "1"));
         }
 
+        if (sigFail) {
+            nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.SIG_FAIL.s(), "1"));
+        }
+
         if (allowInlineChildren) {
             processInlineChildren(sc, node, initNodeEdit, allowInlineChildren, lastChild, loadLikes, nodeInfo);
         }
@@ -248,8 +252,8 @@ public class Convert extends ServiceBase {
         return imageSize;
     }
 
-    public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
-            boolean initNodeEdit, boolean sigFail) {
+    public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, boolean initNodeEdit,
+            boolean sigFail) {
         List<PropertyInfo> props = null;
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {

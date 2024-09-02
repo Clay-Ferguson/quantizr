@@ -126,6 +126,7 @@ public enum NodeProp {
     AI_TEMPERATURE("aiTemp"), //
     DURATION("duration"), //
     IN_PENDING_PATH("pendingPath"), //
+    SIG_FAIL("sigFail"), //
 
     OPEN_GRAPH("sn:og"), //
     TRUNCATED("trunc"); //
