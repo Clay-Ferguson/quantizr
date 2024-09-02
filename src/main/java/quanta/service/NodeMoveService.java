@@ -296,13 +296,6 @@ public class NodeMoveService extends ServiceBase {
                 changePathOfSubGraph(node, node.getPath(), newPath, copyPaste, res);
                 node.setPath(newPath);
 
-                // crypto sig uses path as part of it, so we just invalidated the signature.
-                if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
-                    node.delete(NodeProp.CRYPTO_SIG);
-                    if (res != null) {
-                        res.setSignaturesRemoved(true);
-                    }
-                }
                 // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
                 // to verify the parent exists upon saving, because we know the path is fine.
                 node.verifyParentPath = false;
@@ -351,6 +344,7 @@ public class NodeMoveService extends ServiceBase {
         String originalPath = graphRoot.getPath();
         BulkOperations bops = null;
         int batchSize = 0;
+        List<String> nodeIdsToReSign = new ArrayList<String>();
 
         for (SubNode node : svc_mongoRead.getSubGraphAP(graphRoot, null, 0, false, null)) {
             if (!node.getPath().startsWith(originalPath)) {
@@ -384,11 +378,14 @@ public class NodeMoveService extends ServiceBase {
             Query query = new Query().addCriteria(crit);
             Update update = new Update().set(SubNode.PATH, newPath);
 
-            if (node.getStr(NodeProp.CRYPTO_SIG) != null) {
-                // crypto sig uses path as part of it, so we just invalidated the signature.
-                node.getProps().remove(NodeProp.CRYPTO_SIG.s());
-                update.set(SubNode.PROPS, node.getProps());
-                res.setSignaturesRemoved(true);
+            // if node is signed, we need to invalidate the signature, if not already invalidated (via tbd)
+            String nodeSig = node.getStr(NodeProp.CRYPTO_SIG);
+            if (nodeSig != null && !nodeSig.equals("tbd")) {
+                nodeIdsToReSign.add(node.getIdStr());
+                // Since we're about to sign nodes below, setting to "tbd" is not necessary but is safer
+                // in case anything does go wrong, including even the user closing their browser as a thing that
+                // could break this, but by setting to "tbd" we're safe.
+                update = update.set(NodeProp.CRYPTO_SIG.s(), "tbd");
             }
 
             bops.updateOne(query, update);
@@ -400,6 +397,11 @@ public class NodeMoveService extends ServiceBase {
         }
         if (bops != null) {
             bops.execute();
+        }
+
+        // if any nodes were signed and are now dirty signatures, we need to resign them.
+        if (nodeIdsToReSign.size() > 0) {
+            svc_crypto.signNodesById(nodeIdsToReSign);
         }
     }
 

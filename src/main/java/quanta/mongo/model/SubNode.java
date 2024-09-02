@@ -290,6 +290,7 @@ public class SubNode {
         ServiceBase.svc_auth.ownerAuth(this);
         this.verifyParentPath = true;
         TL.dirty(this);
+        invalidateSignature();
         this.path = path;
     }
 
@@ -346,6 +347,7 @@ public class SubNode {
         if (Util.equalObjs(owner, this.owner))
             return;
         TL.dirty(this);
+        invalidateSignature();
         this.owner = owner;
     }
 
@@ -480,6 +482,7 @@ public class SubNode {
         if (attachments == null && this.attachments == null)
             return;
         TL.dirty(this);
+        invalidateSignature();
         this.attachments = attachments;
     }
 
@@ -540,6 +543,7 @@ public class SubNode {
             attachments = new HashMap<>();
         }
         attachments.put(att.getKey(), att);
+        invalidateSignature();
         TL.dirty(this);
     }
 
@@ -575,6 +579,7 @@ public class SubNode {
                 ret = new Attachment(this);
                 ret.setKey(name);
                 attachments.put(name, ret);
+                invalidateSignature();
                 TL.dirty(this);
             } else {
                 ret = attachments.get(name);
@@ -585,6 +590,7 @@ public class SubNode {
                     ret = new Attachment(this);
                     ret.setKey(name);
                     attachments.put(name, ret);
+                    invalidateSignature();
                     TL.dirty(this);
                 }
             }
@@ -593,6 +599,7 @@ public class SubNode {
             ret.setKey(name);
             attachments = new HashMap<>();
             attachments.put(name, ret);
+            invalidateSignature();
             TL.dirty(this);
         }
         return ret;
@@ -922,6 +929,7 @@ public class SubNode {
         if (Util.equalObjs(content, this.content))
             return;
         TL.dirty(this);
+        invalidateSignature();
         this.content = content;
     }
 
@@ -965,5 +973,10 @@ public class SubNode {
             return;
         TL.dirty(this);
         this.prevMcid = prevMcid;
+    }
+
+    public void invalidateSignature() {
+        if (getStr(NodeProp.CRYPTO_SIG) != null)
+            set(NodeProp.CRYPTO_SIG, "tbd");
     }
 }

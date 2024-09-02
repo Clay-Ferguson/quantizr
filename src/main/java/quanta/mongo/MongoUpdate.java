@@ -127,13 +127,22 @@ public class MongoUpdate extends ServiceBase {
                         if (asAdmin) {
                             svc_arun.run(() -> {
                                 for (SubNode node : nodes) {
-                                    save(node);
+                                    try {
+                                        save(node);
+                                    } catch (Exception e) {
+                                        ExUtil.error(log, "Error saving node as admin: " + XString.prettyPrint(node),
+                                                e);
+                                    }
                                 }
                                 return null;
                             });
                         } else {
                             for (SubNode node : nodes) {
-                                save(node);
+                                try {
+                                    save(node);
+                                } catch (Exception e) {
+                                    ExUtil.error(log, "Error saving node: " + XString.prettyPrint(node), e);
+                                }
                             }
                         }
                     }

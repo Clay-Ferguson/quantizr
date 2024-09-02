@@ -254,7 +254,7 @@ public class Convert extends ServiceBase {
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {
             for (String propName : propMap.keySet()) {
-                // inticate to the client the signature is no good by not even sending the bad signature to client.
+                // indicate to the client the signature is no good by not even sending the bad signature to client.
                 if (sigFail && NodeProp.CRYPTO_SIG.s().equals(propName)) {
                     continue;
                 }

@@ -89,11 +89,15 @@ public class CryptoService extends ServiceBase {
             return false;
         PublicKey pubKey = null;
         try {
+            // todo-0: how can we make this be AccountNode type
+            // todo-0: search for all occurances of 'getOwner()' to see where it's being used to lookup an Account,
+            // and put the typesafe AccountNode type in those places.
             SubNode ownerAccntNode = nodeMap != null ? nodeMap.get(node.getOwner().toHexString()) : null;
 
             // if we didn't have a cache or didn't find in cache try to get node from db
             if (ownerAccntNode == null) {
                 // log.debug("Cache Miss: " + node.getOwner());
+                // todo-0: create a 'getNodeAP()' method here that of course runs as privileged
                 ownerAccntNode = svc_arun.run(() -> svc_mongoRead.getNode(node.getOwner()));
                 if (ownerAccntNode == null) {
                     log.error("sig check failed. Can't find owner of node: " + node.getIdStr());
@@ -137,6 +141,7 @@ public class CryptoService extends ServiceBase {
     }
 
     /* Builds the string that will be the raw data that's cryptographically signed */
+    // todo-0: does a version of this method also exist on client code? If so cross-reference here by a hashtag
     public String getNodeSigData(SubNode node) {
         String path = node.getPath();
         if (path.startsWith(NodePath.PENDING_PATH + "/")) {
@@ -268,6 +273,7 @@ public class CryptoService extends ServiceBase {
             return;
         SessionContext sc = TL.getSC();
 
+        // todo-0: we no longer need this Val wapper right?
         Val<NodeSigPushInfo> pushInfo = new Val<>();
         pushInfo.setVal(new NodeSigPushInfo(Math.abs(rand.nextInt())));
         pushInfo.getVal().setListToSign(new LinkedList<>());

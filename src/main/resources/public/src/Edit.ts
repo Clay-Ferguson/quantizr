@@ -174,12 +174,6 @@ export class Edit {
     /* nodeId is optional and represents what to highlight after the paste if anything */
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean) => {
         if (S.util.checkSuccess("Move nodes", res)) {
-            if (res.signaturesRemoved) {
-                setTimeout(() => {
-                    S.util.showMessage("Signatures on these nodes were removed, because signature is dependent upon path location.", "Signatures");
-                }, 500);
-            }
-
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
                 s.cutCopyOp = null;

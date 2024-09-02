@@ -822,7 +822,6 @@ export interface LogoutResponse extends ResponseBase {
 }
 
 export interface MoveNodesResponse extends ResponseBase {
-    signaturesRemoved: boolean;
     nodeChanges: NodeChanges;
 }
 

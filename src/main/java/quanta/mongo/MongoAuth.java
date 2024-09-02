@@ -258,12 +258,14 @@ public class MongoAuth extends ServiceBase {
             // the thread instead of justs passing in an 'ms' or null
             throw new RuntimeException("ThreadLocals doesn't have session.");
         }
-    
+
         if (TL.getSC().getUserNodeObjId() == null) {
             throw new RuntimeException("session has no userNode: " + XString.prettyPrint(TL.getSC()));
         }
+
         if (!TL.getSC().getUserNodeObjId().equals(node.getOwner())) {
-            log.error("Unable to save Node (expected ownerId " + TL.getSC().getUserNodeObjId().toHexString() + "): "
+            log.error("Unable to save Node (expected ownerId " + TL.getSC().getUserNodeObjId().toHexString()
+                    + ") but found ownerId " + node.getIdStr() + " on the session) for node: "
                     + XString.prettyPrint(node));
             throw new ForbiddenException();
         }
