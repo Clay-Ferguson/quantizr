@@ -396,7 +396,7 @@ public class MongoCreate extends ServiceBase {
         }
         setDefaultTags(parentNode, newNode);
         if (req.isAiWritingMode()) {
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "");
         }
         svc_mongoUpdate.save(newNode);
 
@@ -504,7 +504,7 @@ public class MongoCreate extends ServiceBase {
 
         setDefaultTags(parentNode, newNode);
         if (req.isAiWritingMode()) {
-            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "?");
+            newNode.set(NodeProp.AI_QUERY_TEMPLATE, "");
         }
 
         // we save right away here so we get the node ID

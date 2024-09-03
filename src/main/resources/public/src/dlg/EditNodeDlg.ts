@@ -133,8 +133,11 @@ export class EditNodeDlg extends DialogBase {
             }, 5000);
         }
 
+        // Note: even if aiTemplate is an empty string we still want to expand props panel
+        const aiTemplate = S.props.getProp(J.NodeProp.AI_QUERY_TEMPLATE, ast.editNode);
+
         // if we're editing a DATE property expand properties panel automatically
-        if (S.props.getProp(J.NodeProp.DATE, ast.editNode)) {
+        if (S.props.getProp(J.NodeProp.DATE, ast.editNode) || aiTemplate !== null) {
             dispatch("setPropsPanelExpanded", s => s.propsPanelExpanded = true, true);
         }
     }

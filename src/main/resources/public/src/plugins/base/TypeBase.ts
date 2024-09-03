@@ -355,7 +355,7 @@ export class TypeBase implements TypeIntf {
                 }
                 else {
                     const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
-                    if (template) {
+                    if (template !== null) {
                         aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                             new Div("AI Prompt", {
                                 className: "aiPrompt microMarginBottom float-end",
