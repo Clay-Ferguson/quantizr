@@ -9,6 +9,7 @@ import { Comp } from "../../comp/base/Comp";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { Html } from "../../comp/core/Html";
+import { Markdown } from "../../comp/core/Markdown";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
@@ -354,13 +355,14 @@ export class TypeBase implements TypeIntf {
                     });
                 }
                 else {
-                    const template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
+                    let template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
                     if (template != null) {
+                        template = template.replace("\n-\n", "\n__________\n");
                         aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                             new Div("AI Prompt", {
                                 className: "aiPrompt microMarginBottom float-end",
                             }),
-                            template ? new Div(template, { className: "microMarginBottom" }) : null
+                            template ? new Markdown(template, { className: "microMarginBottom" }) : null
                         ]);
                     }
                 }

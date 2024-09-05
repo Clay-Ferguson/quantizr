@@ -318,7 +318,6 @@ public class MongoCreate extends ServiceBase {
             throw new ForbiddenException();
         }
 
-        // Get AI_OVERWRITE property from parent node
         boolean aiOverwrite = parentNode.hasProp(NodeProp.AI_QUERY_TEMPLATE.s()) && req.isAllowAiOverwrite();
         SubNode newNode = null;
         if (!aiOverwrite) {

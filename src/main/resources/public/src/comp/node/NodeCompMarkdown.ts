@@ -137,7 +137,7 @@ export class NodeCompMarkdown extends Comp {
         delete this.attribs.ref;
 
         // Process with special markdown if there is any.
-        const sections = this.processSpecialMarkdown(state);
+        const sections = this.processSpecialMarkdown(state.content);
         if (sections) {
             return sections;
         }
@@ -149,24 +149,24 @@ export class NodeCompMarkdown extends Comp {
         rendered as a collapsible section where everything below the section title, up to a double
         blank line, will be hidden until the user clicks the section title to expand it. 
     */
-    processSpecialMarkdown(state: LS) {
+    processSpecialMarkdown(content: string) {
         let hasCollapse = false;
-        if (state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
-            state.content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
+        if (content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
+            content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
             hasCollapse = true;
         }
 
         let hasCentering = false;
-        if (state.content.indexOf(NodeCompMarkdown.CENTERING_START) != -1 && //
-            state.content.indexOf(NodeCompMarkdown.CENTERING_END) != -1) {
+        if (content.indexOf(NodeCompMarkdown.CENTERING_START) != -1 && //
+            content.indexOf(NodeCompMarkdown.CENTERING_END) != -1) {
             hasCentering = true;
         }
 
         if (!hasCollapse && !hasCentering) return null;
 
-        state.content = state.content || "";
-        state.content = state.content.replaceAll("\r", "");
-        const lines = state.content.split("\n");
+        content = content || "";
+        content = content.replaceAll("\r", "");
+        const lines = content.split("\n");
         let inCollapse: boolean = false;
         let blankLines = 0;
         const children: ReactNode[] = [];
