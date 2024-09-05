@@ -171,7 +171,7 @@ export class EditAttachmentsPanel extends Div {
             }
         }
 
-        const aiPrompt = att.ai ? new CollapsiblePanel("AI Prompt", "Hide AI Prompt", null,
+        const aiPrompt = att.ai ? new CollapsiblePanel("Show AI Prompt", "Hide AI Prompt", null,
             [new Div(att.ai, { className: "smallMarginTop marginLeft" })], true, (exp: boolean) => {
                 dispatch("ExpandAIPrompt", s => s.aiPromptsExpanded = exp);
             }, getAs().aiPromptsExpanded, null, "smallMarginTop", "smallMarginTop") : null;

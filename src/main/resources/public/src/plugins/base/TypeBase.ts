@@ -356,7 +356,7 @@ export class TypeBase implements TypeIntf {
                 }
                 else {
                     let template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
-                    if (template != null) {
+                    if (template != null && template.trim().length > 0) {
                         template = template.replace("\n-\n", "\n__________\n");
                         aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                             new Div("AI Prompt", {
