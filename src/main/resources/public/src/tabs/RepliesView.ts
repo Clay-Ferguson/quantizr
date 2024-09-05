@@ -56,9 +56,8 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
 
         results.forEach(node => {
             const clazzName = ast.threadViewFromNodeId === node.id ? "threadFeedItemTarget" : "threadFeedItem";
-            const highlightClazzName = ast.threadViewFromNodeId === node.id ? "threadFeedItemHighlightTarget" : "threadFeedItemHighlight";
 
-            const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, highlightClazzName);
+            const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, "threadFeedItemHighlight");
             if (c) {
                 children.push(c);
             }

@@ -78,9 +78,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
 
         results.forEach(node => {
             const clazzName = ast.repliesViewNodeId === node.id ? "threadFeedItemTarget" : "threadFeedItem";
-            const highlightClazzName = ast.repliesViewNodeId === node.id ? "threadFeedItemHighlightTarget" : "threadFeedItemHighlight";
-
-            const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, highlightClazzName);
+            const c = this.renderItem(node, i, rowCount, jumpButton, clazzName, "threadFeedItemHighlight");
             if (c) {
                 lastNode = node;
                 children.push(c);

@@ -21,20 +21,17 @@
     cursor: pointer;
 }
 
-.inactiveFeedRow {
-    border-left: 2px solid $nodeBorderBottomColor;
-}
-
 .userFeedItem {
     padding-top: 10px;
-    border-top: 1px solid $nodeBorderBottomColor;
+    border-top: 3px dotted $nodeBorderBottomColor;
     padding-bottom: $tinyGap;
 }
 
 .userFeedItemHighlight {
-    border: 2px solid olivedrab;
+    border: 3px solid olivedrab;
     padding: 10px;
     border-radius: $border-radius;
+    margin-bottom: 4px;
 }
 
 .userFeedParent {

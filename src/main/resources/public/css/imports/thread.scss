@@ -6,44 +6,40 @@
     margin-top: 8px;
     padding-top: 10px;
     padding-right: 8px;
+    border: 3px solid transparent;
 }
 
 .threadFeedItem {
     @extend .threadFeedItemBase;
     &:not(:last-child) {
-        border-bottom: 1px solid $nodeBorderBottomColor;
+        border-bottom: 3px dotted $nodeBorderBottomColor;
     }
 }
 
 .threadFeedItemTarget {
     @extend .threadFeedItemBase;
     border-radius: $border-radius;
-    border: 4px solid $nodeBorderBottomColor;
+    border: 3px solid $nodeBorderBottomColor;
 }
 
 .threadFeedItemHighlight {
     @extend .threadFeedItemBase;
     border-radius: $border-radius;
-    border: 1px solid olivedrab;
-}
-
-.threadFeedItemHighlightTarget {
-    @extend .threadFeedItemBase;
-    border-radius: $border-radius;
-    border: 4px solid olivedrab;
+    border: 3px solid olivedrab;
+    margin-bottom: 4px;
 }
 
 .threadFeedSubItem {
     padding-top: 10px;
 
     &:not(:last-child) {
-        border-bottom: 1px solid $nodeBorderBottomColor;
+        border-bottom: 3px solid $nodeBorderBottomColor;
     }
 
     &:last-child {
         margin-bottom: 16px;
     }
 
-    border-left: 1px solid $nodeBorderBottomColor;
+    border-left: 3px solid $nodeBorderBottomColor;
     margin-left: 4rem;
 }
