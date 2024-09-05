@@ -87,7 +87,7 @@ export class NodeCompMarkdown extends Comp {
 
     translateLaTex(val: string): string {
         if (!val) return val;
-        val = val.replaceAll(" $", " \\$");
+        // val = val.replaceAll(" $", " \\$"); // this thing will be the death of me.
         if (val.indexOf("\\") == -1) return val;
 
         return val.replaceAll("\\(", "$")//
