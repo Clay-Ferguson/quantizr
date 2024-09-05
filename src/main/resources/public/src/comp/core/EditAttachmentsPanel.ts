@@ -33,7 +33,7 @@ export class EditAttachmentsPanel extends Div {
 
         if (atts?.size > 0 || ast.cutAttachmentsFromId) {
             this.addChild(new ButtonBar([
-                new Span("Attachments ", { className: "bigMarginRight alignBottom" }),
+                new Span(null, { className: "alignBottom" }),
                 atts?.size > 0 ? new IconButton("fa-trash fa-lg", "", {
                     onClick: () => this.dlg.utl.deleteUploads(),
                     title: "Delete selected Attachments"
