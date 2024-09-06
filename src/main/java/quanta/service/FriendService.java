@@ -484,6 +484,7 @@ public class FriendService extends ServiceBase {
      *
      * Note: Blocked users are also stored as a "FriendNode", but under the "blocked list"
      */
+    // todo-0: make this return an AccountNode type
     public SubNode findFriendNode(ObjectId ownerId, AccountNode userNode, String userName) {
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);

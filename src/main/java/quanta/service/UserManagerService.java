@@ -710,7 +710,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     private void blockUser(String userToBlock, ObjectId accntIdDoingBlock, SubNode blockedList) {
-        AccountNode userNode = (AccountNode)svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
+        AccountNode userNode = (AccountNode) svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
 
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !svc_mongoUtil.isChildOf(blockedList, userNode)) {
@@ -861,8 +861,8 @@ public class UserManagerService extends ServiceBase {
             return false;
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block. Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
-        AccountNode userNode =
-                (AccountNode)svc_mongoRead.findNodeByUserAndType(friendsList, inUserNode, maybeFollowedUser, NodeType.FRIEND.s());
+        SubNode userNode =
+                svc_mongoRead.findNodeByUserAndType(friendsList, inUserNode, maybeFollowedUser, NodeType.FRIEND.s());
         return userNode != null;
     }
 
@@ -874,8 +874,8 @@ public class UserManagerService extends ServiceBase {
         // note: findFriend() could work here, but findFriend doesn't tell us IF it's INDEED a Friend or
         // Block.
         // Our FRIEND type is used for both Friends and BLOCKs, which is kind of confusing.
-        AccountNode userNode =
-                (AccountNode)svc_mongoRead.findNodeByUserAndType(blockedList, inUserNode, maybeBlockedUser, NodeType.FRIEND.s());
+        SubNode userNode =
+                svc_mongoRead.findNodeByUserAndType(blockedList, inUserNode, maybeBlockedUser, NodeType.FRIEND.s());
         return userNode != null;
     }
 
