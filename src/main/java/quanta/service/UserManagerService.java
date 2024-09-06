@@ -600,6 +600,12 @@ public class UserManagerService extends ServiceBase {
             return res;
         }
         UserPreferences reqUserPrefs = req.getUserPreferences();
+
+        // set default chat mode if not existing
+        if (StringUtils.isEmpty(reqUserPrefs.getAiMode())) {
+            reqUserPrefs.setAiMode(Constant.AI_MODE_CHAT.s());
+        }
+
         String userName = TL.getSC().getUserName();
 
         svc_arun.run(() -> {
@@ -886,7 +892,13 @@ public class UserManagerService extends ServiceBase {
                 prefsNode = svc_user.getAccountByUserNameAP(userName);
             }
             userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
-            userPrefs.setAiMode(prefsNode.getStr(NodeProp.USER_PREF_AI_MODE));
+
+            String aiMode = prefsNode.getStr(NodeProp.USER_PREF_AI_MODE);
+            if (StringUtils.isEmpty(aiMode)) {
+                aiMode = Constant.AI_MODE_CHAT.s();
+            }
+            userPrefs.setAiMode(aiMode);
+
             userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
             userPrefs.setShowProps(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PROPS));
             userPrefs.setAutoRefreshFeed(prefsNode.getBool(NodeProp.USER_PREF_AUTO_REFRESH_FEED)); // #add-prop
