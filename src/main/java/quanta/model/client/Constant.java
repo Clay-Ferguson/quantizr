@@ -20,6 +20,9 @@ public enum Constant {
     FEED_NODEFEED("nodeFeed"), //
     ATTACHMENT_PRIMARY("p"), //
     ATTACHMENT_HEADER("h"), //
+    AI_MODE_CHAT("chat"), //
+    AI_MODE_AGENT("agent"), //
+    AI_MODE_WRITING("writing"), //
     SIG_TBD("tbd");
 
     @JsonValue

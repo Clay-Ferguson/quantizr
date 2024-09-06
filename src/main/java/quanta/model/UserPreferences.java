@@ -10,8 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserPreferences {
 
     private boolean editMode;
-    private boolean aiWritingMode;
-    private boolean aiAgentMode;
+    private String aiMode;
 
     private boolean showMetaData;
     private boolean showProps;
@@ -119,20 +118,12 @@ public class UserPreferences {
         this.aiAgentFoldersToInclude = aiAgentFoldersToInclude;
     }
 
-    public boolean isAiWritingMode() {
-        return aiWritingMode;
+    public String getAiMode() {
+        return aiMode;
     }
 
-    public void setAiWritingMode(boolean aiWritingMode) {
-        this.aiWritingMode = aiWritingMode;
-    }
-
-    public boolean isAiAgentMode() {
-        return aiAgentMode;
-    }
-
-    public void setAiAgentMode(boolean aiAgentMode) {
-        this.aiAgentMode = aiAgentMode;
+    public void setAiMode(String aiMode) {
+        this.aiMode = aiMode;
     }
 
     public UserPreferences() {}

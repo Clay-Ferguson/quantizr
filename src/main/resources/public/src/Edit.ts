@@ -246,7 +246,7 @@ export class Edit {
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     initialValue: clipboardText,
-                    aiWritingMode: false
+                    aiMode: J.Constant.AI_MODE_CHAT
                 });
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 if (blob) {
@@ -259,7 +259,6 @@ export class Edit {
                     pendingEdit: false,
                     nodeId: parentId,
                     aiService: null,
-                    agentic: false,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     createAtTop,
@@ -268,7 +267,7 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     payloadType: null,
-                    aiWritingMode: getAs().userPrefs.aiWritingMode,
+                    aiMode: getAs().userPrefs.aiMode,
                     allowAiOverwrite: false
                 });
 
@@ -292,7 +291,7 @@ export class Edit {
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     initialValue: "",
-                    aiWritingMode: getAs().userPrefs.aiWritingMode
+                    aiMode: getAs().userPrefs.aiMode
                 });
                 S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 this.insertNodeResponse(res);
@@ -301,7 +300,6 @@ export class Edit {
                     pendingEdit: true,
                     nodeId: parentId,
                     aiService: null,
-                    agentic: false,
                     newNodeName: "",
                     typeName: J.NodeType.NONE,
                     createAtTop,
@@ -310,7 +308,7 @@ export class Edit {
                     properties: null,
                     shareToUserId: null,
                     payloadType: null,
-                    aiWritingMode: getAs().userPrefs.aiWritingMode,
+                    aiMode: getAs().userPrefs.aiMode,
                     allowAiOverwrite: false
                 });
 
@@ -637,21 +635,9 @@ export class Edit {
         this.setUserPreferenceVal(s => s.userPrefs.editMode = val);
     }
 
-    setAiWritingMode = async (val: boolean) => {
+    setAiMode = async (val: string) => {
         this.setUserPreferenceVal(s => {
-            s.userPrefs.aiWritingMode = val;
-            if (val) {
-                s.userPrefs.aiAgentMode = false;
-            }
-        });
-    }
-
-    setAiAgentMode = async (val: boolean) => {
-        this.setUserPreferenceVal(s => {
-            s.userPrefs.aiAgentMode = val;
-            if (val) {
-                s.userPrefs.aiWritingMode = false;
-            }
+            s.userPrefs.aiMode = val;
         });
     }
 
@@ -1132,9 +1118,9 @@ export class Edit {
 
         // First check for inconsistency about what the user's intention might be. Writing Mode uses query template, and non-writing mode uses
         // just the node content as the prompt
-        if (ast.userPrefs.aiWritingMode) {
+        if (ast.userPrefs.aiMode == J.Constant.AI_MODE_WRITING) {
             if (!S.props.getProp(J.NodeProp.AI_QUERY_TEMPLATE, node)) {
-                S.util.showMessage("When `Writing Mode` is enabled, your questions are expected to be in a prompt property on the node. "+
+                S.util.showMessage("When `Writing Mode` is enabled, your questions are expected to be in a prompt property on the node. " +
                     "When you create a new node with `Writing Mode` enabled it creates this prompt property for you automatically."
                     , "Warning");
                 return;
@@ -1158,7 +1144,6 @@ export class Edit {
             pendingEdit: false,
             nodeId: node.id,
             aiService: ast.userPrefs.aiService,
-            agentic: ast.userPrefs.aiAgentMode,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1167,7 +1152,7 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             payloadType: null,
-            aiWritingMode: false,
+            aiMode: ast.userPrefs.aiMode,
 
             // this flag means if the node has an AI template on it, we use that as the prompt and then overwrite content with the answer
             // rather than the normal behavior of putting the AI answer in a subnode
@@ -1258,7 +1243,6 @@ export class Edit {
             pendingEdit: false,
             nodeId: parentId,
             aiService: null,
-            agentic: false,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1267,7 +1251,7 @@ export class Edit {
             properties: null,
             shareToUserId: null,
             payloadType: null,
-            aiWritingMode: false,
+            aiMode: J.Constant.AI_MODE_CHAT,
             allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1330,7 +1314,6 @@ export class Edit {
             pendingEdit: true,
             nodeId: null,
             aiService: null,
-            agentic: false,
             newNodeName: "",
             typeName: J.NodeType.BOOKMARK,
             createAtTop: true,
@@ -1339,7 +1322,7 @@ export class Edit {
             payloadType: "linkBookmark",
             properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null,
-            aiWritingMode: false,
+            aiMode: J.Constant.AI_MODE_CHAT,
             allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1378,7 +1361,6 @@ export class Edit {
             pendingEdit: true,
             nodeId,
             aiService: null,
-            agentic: false,
             newNodeName: "",
             typeName: typeName || J.NodeType.NONE,
             createAtTop: true,
@@ -1387,7 +1369,7 @@ export class Edit {
             properties: null,
             shareToUserId,
             payloadType: null,
-            aiWritingMode: false,
+            aiMode: J.Constant.AI_MODE_CHAT,
             allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1400,7 +1382,6 @@ export class Edit {
             pendingEdit,
             nodeId: node ? node.id : null,
             aiService: null,
-            agentic: false,
             newNodeName: "",
             typeName,
             createAtTop: true,
@@ -1409,7 +1390,7 @@ export class Edit {
             properties: null,
             payloadType: null,
             shareToUserId: null,
-            aiWritingMode: false,
+            aiMode: J.Constant.AI_MODE_CHAT,
             allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
@@ -1431,7 +1412,6 @@ export class Edit {
             pendingEdit: false,
             nodeId: getAs().fullScreenConfig.nodeId,
             aiService: null,
-            agentic: false,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1440,7 +1420,7 @@ export class Edit {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null,
             payloadType: null,
-            aiWritingMode: false,
+            aiMode: J.Constant.AI_MODE_CHAT,
             allowAiOverwrite: false
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);

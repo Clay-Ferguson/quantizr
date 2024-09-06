@@ -61,8 +61,9 @@ export class MenuPanel extends Div {
 
     static showBlockedUsers = () => { new BlockedUsersDlg("Blocked").open(); }
     static toggleEditMode = () => { S.edit.setEditMode(!getAs().userPrefs.editMode); }
-    static toggleAiWritingMode = () => { S.edit.setAiWritingMode(!getAs().userPrefs.aiWritingMode); }
-    static toggleAiAgentMode = () => { S.edit.setAiAgentMode(!getAs().userPrefs.aiAgentMode); }
+    static setAiWritingMode = () => S.edit.setAiMode(J.Constant.AI_MODE_WRITING);
+    static setAiAgentMode = () => S.edit.setAiMode(J.Constant.AI_MODE_AGENT);
+    static setAiChatMode = () => S.edit.setAiMode(J.Constant.AI_MODE_CHAT);
     static toggleInfoMode = () => { S.edit.setShowMetaData(!getAs().userPrefs.showMetaData); }
     static userProfile = () => { new UserProfileDlg(null).open(); }
     static openUserGuide = () => S.nav.openContentNode(":user-guide", false);
@@ -207,7 +208,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Document View", MenuPanel.openDocumentView, onMainTab && !!hltNode, null, true),
                 new MenuItem("Node Graph", MenuPanel.viewNodeGraph, onMainTab && !!hltNode, null, true),
             ], null));
-        
+
             children.push(new Menu("Search", [
                 new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
@@ -384,10 +385,12 @@ export class MenuPanel extends Div {
                 new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(),
-                ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.toggleAiWritingMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiWritingMode, false, "ui-menu-options-editmode"),
-                ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.toggleAiAgentMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiAgentMode, false, "ui-menu-options-editmode"),
+                ast.isAnonUser ? null : new MenuItem("Chat Mode", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
+                ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.setAiWritingMode, allowEditMode && !fullScreenViewer, //
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_WRITING, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
+                ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.setAiAgentMode, allowEditMode && !fullScreenViewer, //
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
                 new MenuItem("Settings", S.nav.showAISettings)
             ], null));
         }

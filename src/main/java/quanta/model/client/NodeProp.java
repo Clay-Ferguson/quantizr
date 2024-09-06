@@ -25,8 +25,7 @@ public enum NodeProp {
     USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey"), //
 
     USER_PREF_EDIT_MODE("sn:editMode"), //
-    USER_PREF_AI_WRITING_MODE("sn:aiWritingMode"), //
-    USER_PREF_AI_AGENT_MODE("sn:aiAgentMode"), //
+    USER_PREF_AI_MODE("sn:aiMode"), //
     USER_PREF_SHOW_METADATA("sn:showMetaData"), //
     USER_PREF_SHOW_PROPS("sn:showProps"), //
     USER_PREF_AUTO_REFRESH_FEED("sn:autoRefreshFeed"), // #add-prop

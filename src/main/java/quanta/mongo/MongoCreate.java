@@ -22,6 +22,7 @@ import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.UserPreferences;
 import quanta.model.client.AIModel;
+import quanta.model.client.Constant;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -304,7 +305,7 @@ public class MongoCreate extends ServiceBase {
                     svc = AIModel.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-                aiResponse = svc_ai.getAnswer(req.isAgentic(), parentNode, null, system, svc, userCredit);
+                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null, system, svc, userCredit);
 
                 res.setGptCredit(userCredit.getVal());
                 typeToCreate = NodeType.AI_ANSWER.s();
@@ -394,7 +395,7 @@ public class MongoCreate extends ServiceBase {
             parentPlugin.childCreated(new Val<>(parentNode), new Val<>(newNode));
         }
         setDefaultTags(parentNode, newNode);
-        if (req.isAiWritingMode()) {
+        if (Constant.AI_MODE_WRITING.s().equals(req.getAiMode())) {
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "");
         }
         svc_mongoUpdate.save(newNode);
@@ -502,7 +503,7 @@ public class MongoCreate extends ServiceBase {
         }
 
         setDefaultTags(parentNode, newNode);
-        if (req.isAiWritingMode()) {
+        if (Constant.AI_MODE_WRITING.s().equals(req.getAiMode())) {
             newNode.set(NodeProp.AI_QUERY_TEMPLATE, "");
         }
 

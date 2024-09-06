@@ -4,6 +4,7 @@ import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
+import { RadioButton } from "./core/RadioButton";
 import { Tag } from "./core/Tag";
 
 interface LS { // Local State
@@ -15,7 +16,7 @@ interface LS { // Local State
 export class MenuItem extends Div {
 
     constructor(public name: string, public clickFunc: () => void, enabled: boolean = true, private stateFunc: () => boolean = null,
-        private treeOp: boolean = null, private moreClasses: string = "") {
+        private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null) {
         super(name, { key: name });
         this.onClick = this.onClick.bind(this);
         this.mergeState({ visible: true, enabled });
@@ -28,10 +29,18 @@ export class MenuItem extends Div {
         let innerSpan: Comp;
         let innerClazz: string;
         if (this.stateFunc) {
-            innerSpan = new Checkbox(state.content, { className: "marginRight" }, {
-                setValue: this.onClick,
-                getValue: this.stateFunc
-            });
+            if (this.radioGroup) {
+                innerSpan = new RadioButton(state.content, this.stateFunc(), this.radioGroup, null, {
+                    setValue: this.onClick,
+                    getValue: this.stateFunc
+                });
+            }
+            else {
+                innerSpan = new Checkbox(state.content, { className: "marginRight" }, {
+                    setValue: this.onClick,
+                    getValue: this.stateFunc
+                });
+            }
             innerClazz = "listGroupMenuItemCompact " + this.moreClasses;
         }
         else {
