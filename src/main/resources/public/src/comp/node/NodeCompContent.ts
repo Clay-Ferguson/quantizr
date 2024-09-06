@@ -24,8 +24,8 @@ export class NodeCompContent extends Div {
         public isTreeView: boolean,
         public wrapperClass: string) {
 
+        wrapperClass = wrapperClass || "";
         if (node.id == getAs().indexHighlightNode) {
-            wrapperClass = wrapperClass || "";
             wrapperClass += " docNodeHighlight";
         }
 

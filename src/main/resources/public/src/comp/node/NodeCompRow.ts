@@ -133,10 +133,10 @@ export class NodeCompRow extends Div {
 
         let selectionClass;
         if (selected) {
-            selectionClass = " activeRow";
+            selectionClass = this.isTableCell ? " activeRowCell" : " activeRow";
         }
         else {
-            selectionClass = " inactiveRow";
+            selectionClass = this.isTableCell ? " inactiveRowCell" : " inactiveRow";
         }
         this.attribs.className = (layoutClass || "") + selectionClass;
         const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;

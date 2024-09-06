@@ -270,6 +270,10 @@ i'm backing out for now
     border-bottom: 3px solid $primary; 
 }
 
+.activeRowCell {
+    border-left: $highlightBorderSize solid $primary;
+}
+
 .activeRow:hover {
     // This lightens the row the mouse is over, but I currently find it just annoying, so I'm removing it.
     // see other places with a lighten function on a ":hover"
@@ -279,6 +283,10 @@ i'm backing out for now
 .inactiveRow {
     border-left: $highlightBorderSize solid transparent;
     border-bottom: 3px dotted gray; 
+}
+
+.inactiveRowCell {
+    border-left: $highlightBorderSize solid transparent; 
 }
 
 .inactiveRow:hover {
