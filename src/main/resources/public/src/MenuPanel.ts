@@ -381,8 +381,9 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
             children.push(new Menu("AI", [
-                new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Settings", S.nav.showAISettings),
                 new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(),
                 ast.isAnonUser ? null : new MenuItem("Chat Mode", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
@@ -390,8 +391,7 @@ export class MenuPanel extends Div {
                 ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.setAiWritingMode, allowEditMode && !fullScreenViewer, //
                     () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_WRITING, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
                 ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.setAiAgentMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
-                new MenuItem("Settings", S.nav.showAISettings)
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, "ui-menu-options-editmode", "aiModeRadioGroup")
             ], null));
         }
 
