@@ -34,8 +34,8 @@ import quanta.util.val.Val;
 public class AIService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
-    public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system,
-            AIModel svc, Val<BigDecimal> userCredit) {
+    public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system, AIModel svc,
+            Val<BigDecimal> userCredit) {
         if (svc == null) {
             throw new RuntimeException("No AI service selected.");
         }
@@ -89,7 +89,12 @@ public class AIService extends ServiceBase {
         request.setSystemPrompt(system.getPrompt());
         request.setPrompt(input);
         request.setFoldersToInclude(system.getFoldersToInclude());
-        request.setMessages(messages);
+
+        // if we have a template we're in Writing Mode (not conversation mode), so we don't pass context
+        if (system.getTemplate() == null) {
+            request.setMessages(messages);
+        }
+
         request.setModel(svc.getModel());
         request.setService(svc.getService());
         request.setTemperature(0.7f);
@@ -98,8 +103,8 @@ public class AIService extends ServiceBase {
         request.setCodingAgent(agentic);
         request.setAgentFileExtensions(system.getFileExtensions());
 
-        log.debug("AI Req: USER: " + TL.getSC().getUserName() + " AI Service: " + svc.getService() + ", Model=" + svc.getModel()
-                + ": " + XString.prettyPrint(request));
+        log.debug("AI Req: USER: " + TL.getSC().getUserName() + " AI Service: " + svc.getService() + ", Model="
+                + svc.getModel() + ": " + XString.prettyPrint(request));
         AIResponse aiRes = null;
         String res = Util.httpCall(webClient, request);
         try {

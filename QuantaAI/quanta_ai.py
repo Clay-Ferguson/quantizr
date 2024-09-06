@@ -48,7 +48,7 @@ class AIRequest(BaseModel):
     systemPrompt: Optional[str] = Field(default=None)
     prompt: str
     foldersToInclude: Optional[str] = Field(default=None)
-    messages: List[AIBaseMessage]
+    messages: Optional[List[AIBaseMessage]] = Field(default=None)
     service: str
     model: str
     temperature: float
@@ -76,6 +76,9 @@ def api_query(req: AIRequest,
         llm = getChatModel(req, api_key)
         
         # Estimate input tokens
+        if req.messages == None:
+            req.messages = []
+            
         input_text = "".join([msg.content for msg in req.messages])
         input_tokens = int((len(input_text)+3) / 3)
                 
@@ -128,6 +131,7 @@ def api_query(req: AIRequest,
 # Builds list of past messages
 def buildContext(req) -> List[BaseMessage]:
     messages = []
+    
     for msg in req.messages:
         if msg.type == "human":
             messages.append(HumanMessage(content=msg.content))

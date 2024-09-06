@@ -1084,7 +1084,7 @@ export class Edit {
             if (node) {
                 S.nav.setNodeSel(true, node.id, s);
             }
-           
+
             s.nodesToMove = S.nodeUtil.getSelNodeIdsArray();
             s.cutCopyOp = "cut";
             s.selectedNodes.clear();
@@ -1127,18 +1127,38 @@ export class Edit {
         this.pasteSelNodes(id, "inline");
     }
 
-    askAiQuestion = async (nodeId: string, agentic: boolean) => {
-        const aiService = getAs().userPrefs.aiService;
+    askAiQuestion = async (node: J.NodeInfo) => {
+        const ast = getAs();
+
+        // First check for inconsistency about what the user's intention might be. Writing Mode uses query template, and non-writing mode uses
+        // just the node content as the prompt
+        if (ast.userPrefs.aiWritingMode) {
+            if (!S.props.getProp(J.NodeProp.AI_QUERY_TEMPLATE, node)) {
+                S.util.showMessage("When `Writing Mode` is enabled, your questions are expected to be in a prompt property on the node. "+
+                    "When you create a new node with `Writing Mode` enabled it creates this prompt property for you automatically."
+                    , "Warning");
+                return;
+            }
+        }
+        else {
+            if (S.props.getProp(J.NodeProp.AI_QUERY_TEMPLATE, node)) {
+                S.util.showMessage("You need to enable `Writing Mode` if you want to ask questions using the prompt property of this node.", "Warning");
+                return;
+            }
+        }
+        const aiService = ast.userPrefs.aiService;
+
         if (!aiService || aiService === J.AIModel.NONE) {
             S.util.showMessage("You must select an AI Service. Go to `Menu -> Account -> Settings -> AI Service`", "Warning");
             return;
         }
 
+        // todo-0: It's super confusing we wrapped the askAI functionality into 'createSubNode' (make a dedicated rpc call for this)
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
-            nodeId,
-            aiService: getAs().userPrefs.aiService,
-            agentic,
+            nodeId: node.id,
+            aiService: ast.userPrefs.aiService,
+            agentic: ast.userPrefs.aiAgentMode,
             newNodeName: "",
             typeName: J.NodeType.NONE,
             createAtTop: true,
@@ -1149,7 +1169,7 @@ export class Edit {
             payloadType: null,
             aiWritingMode: false,
 
-            // this flag means if the node has an AI template on it, we use that as the prompt and then overwrite content with the anwer
+            // this flag means if the node has an AI template on it, we use that as the prompt and then overwrite content with the answer
             // rather than the normal behavior of putting the AI answer in a subnode
             allowAiOverwrite: true
         });
@@ -1167,7 +1187,7 @@ export class Edit {
                 S.srch.showThread(res.newNode.id);
                 jumpToNode = false;
             }
-            else if (!contentOverwrite && ast.threadViewQuestionId === nodeId && ast.activeTab == C.TAB_THREAD) {
+            else if (!contentOverwrite && ast.threadViewQuestionId === node.id && ast.activeTab == C.TAB_THREAD) {
                 dispatch("AppendToThreadResults", s => {
                     const data = ThreadTab.inst;
                     if (!data) return;
@@ -1185,7 +1205,7 @@ export class Edit {
             });
 
             if (jumpToNode) {
-                S.view.jumpToId(nodeId);
+                S.view.jumpToId(node.id);
             }
         }
     }

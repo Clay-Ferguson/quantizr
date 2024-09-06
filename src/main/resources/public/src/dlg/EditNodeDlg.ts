@@ -716,8 +716,7 @@ export class EditNodeDlg extends DialogBase {
             this.close();
         }
 
-        const agentic = getAs().userPrefs.aiAgentMode;
-        S.edit.askAiQuestion(getAs().editNode.id, agentic);
+        S.edit.askAiQuestion(getAs().editNode);
     }
 
     renderButtons(): Comp {

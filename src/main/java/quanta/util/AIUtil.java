@@ -59,7 +59,7 @@ public class AIUtil extends ServiceBase {
             queryTemplate = stripPrivateNotes(queryTemplate);
             queryTemplate = injectTemplateContext(node, queryTemplate);
 
-            // When we set this, that means this will be the FINAL format for the question.
+            // When we set this, that means this will be the FINAL format for the question, also we're in writing mode here
             system.setTemplate(queryTemplate);
         }
 
