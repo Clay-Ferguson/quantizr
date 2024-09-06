@@ -28,11 +28,8 @@ export class NodeCompRowHeader extends Div {
     override preRender(): boolean | null {
         const ast = getAs();
 
-        let displayName = null;
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
-        if (!displayName) {
-            displayName = this.node.owner;
-        }
+        let displayName = this.node.displayName || this.node.owner;
 
         const isMine = S.props.isMine(this.node);
         const children = [];
