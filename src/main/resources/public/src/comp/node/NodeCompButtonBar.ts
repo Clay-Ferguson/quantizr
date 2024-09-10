@@ -43,7 +43,7 @@ export class NodeCompButtonBar extends Div {
 
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
         const type = S.plugin.getType(this.node.type);
-        const specialAccountNode = type?.isSpecialAccountNode();
+        const specialAccountNode = type?.isSpecialAccountNode() || type?.getTypeName()==J.NodeType.ACCOUNT;
         if (specialAccountNode) this.allowNodeMove = false;
         let editingAllowed = S.edit.isEditAllowed(this.node);
         let deleteAllowed = false;
@@ -134,11 +134,9 @@ export class NodeCompButtonBar extends Div {
             const checkboxForEdit = editingAllowed && (ast.isAdminUser || S.render.allowAction(type, NodeActionType.editNode, this.node));
             const checkboxForDelete = ast.isAdminUser || deleteAllowed;
 
-            if ((checkboxForEdit || checkboxForDelete) &&
-                // no need to ever select home node, or special nodes
-                this.node.id !== ast.node.id && !specialAccountNode) {
+            if ((checkboxForEdit || checkboxForDelete) && !specialAccountNode) {
                 selCheckbox = new Checkbox(null, {
-                    title: "Select Nodes."
+                    title: "Select nodes"
                 }, {
                     setValue: (checked: boolean) => {
                         dispatch("NodeCheckboxChange", s => {
@@ -164,7 +162,7 @@ export class NodeCompButtonBar extends Div {
 
             const editInsertAllowed = S.props.isMine(this.node); //S.props.isWritableByMe(this.node);
 
-            if (!isPageRootNode && C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
+            if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"
