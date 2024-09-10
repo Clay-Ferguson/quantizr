@@ -14,6 +14,7 @@ export default defineConfig({
     define: {
         BUILDTIME: JSON.stringify(new Date().toLocaleString())
     },
+    mode: process.env.DOCKER_ENV === "dev" ? "development" : "production",
     build: {
         chunkSizeWarningLimit: 3000,
         minify: process.env.DOCKER_ENV === "dev" ? false : true,
