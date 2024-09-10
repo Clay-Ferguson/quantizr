@@ -228,13 +228,14 @@ export class NodeCompBinary extends Div {
                 });
             }
 
+            const fileIcon = S.util.getFileIcon(fileType);
             const titleSuffix = `File Size:${fileSize}\n\nType:${fileType}`;
             this.children = [
                 new Div(null, {
                     className: "binary-link"
                 }, [
                     new Icon({
-                        className: "fa fa-file fa-lg smallMarginRight"
+                        className: "fa " + fileIcon + " fa-lg smallMarginRight xlIcon"
                     }),
                     new Span(null, null, [
                         new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {

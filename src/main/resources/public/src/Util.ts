@@ -77,6 +77,16 @@ export class Util {
         sh: true
     };
 
+    getFileIcon(mime: string) {
+        if (!mime) return "fa-file";
+        if (mime=="application/pdf") return "fa-file-pdf-o";
+        if (mime.startsWith("text")) return "fa-file-text-o";
+        if (mime.startsWith("image")) return "fa-file-image-o";
+        if (mime.startsWith("audio")) return "fa-file-audio-o";
+        if (mime.startsWith("video")) return "fa-file-video-o";
+        return "fa-file";
+    }
+
     findFirstVisibleElm = (parentId: string, childrenClass: string): Element => {
         const parent: HTMLElement = document.getElementById(parentId);
         if (parent) {
