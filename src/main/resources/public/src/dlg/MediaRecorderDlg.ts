@@ -56,6 +56,10 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     override async preLoad(): Promise<void> {
+        await this.initDevices();
+    }
+
+    async initDevices() {
         try {
             await this.scanDevices();
             await this.resetStream();
@@ -63,7 +67,7 @@ export class MediaRecorderDlg extends DialogBase {
         catch (e) {
             console.log("Can't access recording devices, or user refused.");
             // just close this dialog if we can't access recording devices.
-            this.abort();
+            // this.abort();
         }
     }
 
@@ -74,9 +78,13 @@ export class MediaRecorderDlg extends DialogBase {
         let audioInput: string = await S.localDB.getVal(C.LOCALDB_AUDIO_SOURCE);
         let videoInput: string = await S.localDB.getVal(C.LOCALDB_VIDEO_SOURCE);
 
+        // We have to call this first in case it would ask the user for permission.
+        await navigator.mediaDevices.getUserMedia(this.videoMode ? { audio: true, video: true } : { audio: true });
+
         const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
         devices.forEach(device => {
+            // console.log("Device: Kind=" + device.kind + " Label=" + device.label);
             if (device.kind === "audioinput") {
                 // take the first one here
                 if (!audioInput) {
@@ -101,19 +109,6 @@ export class MediaRecorderDlg extends DialogBase {
         });
 
         this.mergeState<LS>({ audioInput, videoInput, audioInputOptions, videoInputOptions });
-
-        /* if videoMode and we don't have at least one audio and video input then abort */
-        if (this.videoMode) {
-            if (audioInputOptions.length === 0 && videoInputOptions.length === 0) {
-                this.abort();
-            }
-        }
-        /* if audio mode and we don't have at least one audio input then abort */
-        else {
-            if (audioInputOptions.length === 0) {
-                this.abort();
-            }
-        }
     }
 
     renderDlg(): Comp[] {
@@ -122,6 +117,9 @@ export class MediaRecorderDlg extends DialogBase {
         // This creates the video display showing just the live feed of the camera always,
         // regardless of whether currently recrding.
         if (this.videoMode) {
+            if (!state.videoInputOptions?.length) {
+                return [new Div("No video input device available yet.", { className: "alert alert-danger" })];
+            }
             this.videoPlayer = new VideoPlayer({
                 style: {
                     width: getAs().mobileMode ? "50%" : "100%",
@@ -146,6 +144,11 @@ export class MediaRecorderDlg extends DialogBase {
             even if we didn't just create the video element because react can unmount the old one
             during re-renders. */
             this.displayStream();
+        }
+        else {
+            if (!state.audioInputOptions?.length) {
+                return [new Div("No audio input device available yet.", { className: "alert alert-danger" })];
+            }
         }
 
         const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "marginTop", {
@@ -212,16 +215,12 @@ export class MediaRecorderDlg extends DialogBase {
 
             this.closeStream();
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-            if (!this.stream) {
-                this.abort();
-            }
 
             if (this.videoMode) {
                 this.displayStream();
             }
         }
         catch (e) {
-            this.abort();
         }
     }
 

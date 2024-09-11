@@ -746,7 +746,7 @@ export class Util {
         if (audioUrl) {
             const startTimeStr = this.getParameterByName("t");
             const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
-            setTimeout(() => S.nav.showAVTab(audioUrl, startTime), 500);
+            setTimeout(() => S.nav.showAudioPlayerTab(audioUrl, startTime), 500);
         }
     }
 

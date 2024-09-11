@@ -32,7 +32,6 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
     public customDiv: Comp;
     public static sourceUrl: string;
     public static startTimePendingOverride: number;
-    public playingMemoryBlob: boolean
 
     player: HTMLAudioElement;
     audioPlayer: AudioPlayer;
@@ -112,7 +111,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                         }
                     })
                 ]),
-                !this.playingMemoryBlob ? new Div(null, null, [
+                new Div(null, null, [
                     // (todo-0: fix this), but for now I'm using a div to limit width
                     new Div(null, { className: "timeRemainingEditField" }, [
                         this.timeLeftTextField = new TextField({
@@ -121,7 +120,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                             val: this.timeLeftState
                         })
                     ])
-                ]) : null,
+                ]),
                 this.customDiv
             ])
         ];

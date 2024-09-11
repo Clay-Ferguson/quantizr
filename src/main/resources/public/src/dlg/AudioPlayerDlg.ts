@@ -1,4 +1,3 @@
-import { getAs } from "../AppContext";
 import { Comp } from "../comp/base/Comp";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { Button } from "../comp/core/Button";
@@ -8,12 +7,11 @@ import { Icon } from "../comp/core/Icon";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
-import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
-// todo-0: I'll leave this class here for reference, for now, 
-// but it's all been moved into AVView (a Tab), and so this class will be deleted soon
+// todo-0: we need to extract the common parts of this class and AudioPlayerView
+// into a single audio component that packages everything up nicely.
 export class AudioPlayerDlg extends DialogBase {
 
     player: HTMLAudioElement;
@@ -143,8 +141,6 @@ export class AudioPlayerDlg extends DialogBase {
                 ]),
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
-                        !this.playingMemoryBlob ? new Button("Copy", this.copyToClipboard) : null,
-                        !this.playingMemoryBlob && !getAs().isAnonUser ? new Button("Post", this.postComment) : null,
                         new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
                     !this.playingMemoryBlob ? new Div(null, { className: "col-3 float-end" }, [
@@ -224,22 +220,6 @@ export class AudioPlayerDlg extends DialogBase {
             this.player.pause();
         }
         this.cancel();
-    }
-
-    postComment = () => {
-        const link = this.getLink();
-        S.edit.addNode(null, J.NodeType.COMMENT, "\n\n" + link, null);
-    }
-
-    copyToClipboard = () => {
-        const link = this.getLink();
-        S.util.copyToClipboard(link);
-    }
-
-    getLink = (): string => {
-        const port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
-        const link = location.protocol + "//" + location.hostname + port + "?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
-        return link;
     }
 
     restoreStartTime = () => {

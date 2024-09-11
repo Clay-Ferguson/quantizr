@@ -279,7 +279,7 @@ export class Nav {
         }
     }
 
-    showAVTab = (mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) => {
+    showAudioPlayerTab = (mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) => {
         AudioPlayerTab.tabShown = true; 
         AudioPlayerView.sourceUrl = mediaUrl;
         AudioPlayerView.startTimePendingOverride = startTime;
