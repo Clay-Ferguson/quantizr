@@ -7,7 +7,7 @@ export class SettingsTab extends TabBase<any> {
     tooltip = "Edit your Account Settings";
     id = C.TAB_SETTINGS;
     static inst: SettingsTab = null;
-    static tabSelected: boolean = false;
+    static tabShown: boolean = false;
 
     constructor() {
         super();
@@ -15,7 +15,7 @@ export class SettingsTab extends TabBase<any> {
     }
 
     isVisible() {
-        return SettingsTab.tabSelected;
+        return SettingsTab.tabShown;
     };
 
     constructView(data: TabBase) {

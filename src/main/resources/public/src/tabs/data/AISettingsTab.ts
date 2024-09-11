@@ -7,7 +7,7 @@ export class AISettingsTab extends TabBase<any> {
     tooltip = "Edit your AI Settings";
     id = C.TAB_AI_SETTINGS;
     static inst: AISettingsTab = null;
-    static tabSelected: boolean = false;
+    static tabShown: boolean = false;
 
     constructor() {
         super()
@@ -15,7 +15,7 @@ export class AISettingsTab extends TabBase<any> {
     }
 
     isVisible() {
-        return AISettingsTab.tabSelected;
+        return AISettingsTab.tabShown;
     };
 
     constructView(data: TabBase) {

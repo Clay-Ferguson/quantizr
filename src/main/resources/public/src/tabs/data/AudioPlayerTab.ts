@@ -7,7 +7,7 @@ export class AudioPlayerTab extends TabBase<any> {
     tooltip = "Audio Player";
     id = C.TAB_AUDIO_PLAYER;
     static inst: AudioPlayerTab = null;
-    static tabSelected: boolean = false;
+    static tabShown: boolean = false;
     static sourceUrl: string;
 
     constructor() {
@@ -16,7 +16,7 @@ export class AudioPlayerTab extends TabBase<any> {
     }
 
     isVisible() {
-        return AudioPlayerTab.tabSelected;
+        return AudioPlayerTab.tabShown;
     };
 
     constructView(data: TabBase) {

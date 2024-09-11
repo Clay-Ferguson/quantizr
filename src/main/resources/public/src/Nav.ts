@@ -280,7 +280,7 @@ export class Nav {
     }
 
     showAVTab = (mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) => {
-        AudioPlayerTab.tabSelected = true; // todo-0: this is kind of an anti-pattern to have the tab have a tabSelected prop. Belongs in global state
+        AudioPlayerTab.tabShown = true; 
         AudioPlayerView.sourceUrl = mediaUrl;
         AudioPlayerView.startTimePendingOverride = startTime;
         AudioPlayerView.customTitle = title;
@@ -289,12 +289,12 @@ export class Nav {
     }
 
     showUserSettings = () => {
-        SettingsTab.tabSelected = true; // todo-0: this is kind of an anti-pattern to have the tab have a tabSelected prop. Belongs in global state
+        SettingsTab.tabShown = true;
         S.tabUtil.selectTab(C.TAB_SETTINGS);
     }
 
     showAISettings = () => {
-        AISettingsTab.tabSelected = true;
+        AISettingsTab.tabShown = true;
         S.tabUtil.selectTab(C.TAB_AI_SETTINGS);
     }
 
