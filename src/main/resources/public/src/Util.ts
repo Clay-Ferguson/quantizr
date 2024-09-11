@@ -3,7 +3,6 @@ import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
-import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
@@ -747,9 +746,7 @@ export class Util {
         if (audioUrl) {
             const startTimeStr = this.getParameterByName("t");
             const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
-            setTimeout(() => {
-                new AudioPlayerDlg(null, null, null, audioUrl, startTime, false).open();
-            }, 500);
+            setTimeout(() => S.nav.showAVTab(audioUrl, startTime), 500);
         }
     }
 

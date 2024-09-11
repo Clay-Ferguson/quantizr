@@ -5,7 +5,6 @@ import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { DialogMode } from "../../DialogBase";
-import { AudioPlayerDlg } from "../../dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { FullScreenType } from "../../Interfaces";
 import { NodeInfo } from "../../JavaIntf";
@@ -200,9 +199,7 @@ export class NodeCompBinary extends Div {
             this.children = [
                 new FlexRowLayout([
                     new IconButton("fa-play", "Audio", {
-                        onClick: () => {
-                            new AudioPlayerDlg(null, null, null, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, false).open();
-                        }
+                        onClick: () => S.nav.showAVTab(S.attachment.getStreamUrlForNodeAttachment(node, this.attName))
                     }, "btn-primary marginRight"),
                     new Span(null, {
                         className: "downloadLink marginRight"

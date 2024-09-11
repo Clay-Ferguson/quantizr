@@ -4,31 +4,33 @@ import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { TabIntf } from "../../intf/TabIntf";
 import { NodeInfo } from "../../JavaIntf";
-import { SettingsView } from "../SettingsView";
+import { AudioPlayerView } from "../AudioPlayerView";
 
-export class SettingsTab implements TabIntf<any> {
-    name = "Settings";
-    tooltip = "Edit your Account Settings";
-    id = C.TAB_SETTINGS;
+export class AudioPlayerTab implements TabIntf<any> {
+    name = "Audio Player";
+    tooltip = "Audio Player";
+    id = C.TAB_AUDIO_PLAYER;
     scrollPos = 0;
     props = {};
-    openGraphComps: OpenGraphPanel[] = []; // todo-0: this shouldn't be here.
-    topmostVisibleElmId: string = null; // todo-0: this shouldn't be here.
+    openGraphComps: OpenGraphPanel[] = [];
+    topmostVisibleElmId: string = null;
 
-    static inst: SettingsTab = null;
+    static inst: AudioPlayerTab = null;
     static tabSelected: boolean = false;
+    static sourceUrl: string;
 
     constructor() {
-        SettingsTab.inst = this;
+        AudioPlayerTab.inst = this;
     }
 
     isVisible = () => {
-        return SettingsTab.tabSelected;
+        return AudioPlayerTab.tabSelected;
     };
 
-    constructView = (data: TabIntf) => new SettingsView(data);
+    constructView = (data: TabIntf) => new AudioPlayerView(data);
     getTabSubOptions = (): Div => { return null; };
 
+    // todo-0: change these fat arrows to normal methods acroass the board
     findNode = (_nodeId: string): NodeInfo => {
         return null;
     }

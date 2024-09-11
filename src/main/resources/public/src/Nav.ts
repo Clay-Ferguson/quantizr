@@ -21,6 +21,8 @@ import { MainTab } from "./tabs/data/MainTab";
 import { SettingsTab } from "./tabs/data/SettingsTab";
 import { AISettingsTab } from "./tabs/data/AISettingsTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
+import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
+import { AudioPlayerView } from "./tabs/AudioPlayerView";
 
 export class Nav {
     parentVisibleToUser = (): boolean => {
@@ -277,8 +279,17 @@ export class Nav {
         }
     }
 
+    showAVTab = (mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) => {
+        AudioPlayerTab.tabSelected = true; // todo-0: this is kind of an anti-pattern to have the tab have a tabSelected prop. Belongs in global state
+        AudioPlayerView.sourceUrl = mediaUrl;
+        AudioPlayerView.startTimePendingOverride = startTime;
+        AudioPlayerView.customTitle = title;
+        AudioPlayerView.customSubTitle = subTitle;
+        S.tabUtil.selectTab(C.TAB_AUDIO_PLAYER);
+    }
+
     showUserSettings = () => {
-        SettingsTab.tabSelected = true;
+        SettingsTab.tabSelected = true; // todo-0: this is kind of an anti-pattern to have the tab have a tabSelected prop. Belongs in global state
         S.tabUtil.selectTab(C.TAB_SETTINGS);
     }
 

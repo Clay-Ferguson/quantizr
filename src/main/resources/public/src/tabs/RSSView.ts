@@ -19,7 +19,6 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { Constants as C } from "../Constants";
-import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
@@ -357,10 +356,9 @@ export class RSSView extends AppTab<any, RSSView> {
                 if (enc.type && enc.type.indexOf("audio/") !== -1) {
                     audioUrl = enc.url;
                     const downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
-                    const audioButton = new Button("Play Audio", () => {
-                        const dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, false);
-                        dlg.open();
-                    }, { className: "marginTop" }, "btn-primary");
+                    const audioButton = new Button("Play Audio", () => 
+                        S.nav.showAVTab(enc.url, 0, feed.title, entry.title), 
+                    { className: "marginTop" }, "btn-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));
                 }
             });

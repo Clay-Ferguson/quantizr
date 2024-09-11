@@ -53,6 +53,7 @@ export class Constants {
     static TAB_TTS: string = "ttsTab";
     static TAB_RSS: string = "rssTab";
     static TAB_SETTINGS: string = "settingsTab";
+    static TAB_AUDIO_PLAYER: string = "avTab";
     static TAB_AI_SETTINGS: string = "aiSettingsTab";
     static TAB_ADMIN: string = "adminTab";
 

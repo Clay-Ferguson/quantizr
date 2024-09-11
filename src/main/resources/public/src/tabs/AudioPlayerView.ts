@@ -1,20 +1,38 @@
-import { getAs } from "../AppContext";
+import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
+import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
-import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
-import * as J from "../JavaIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
-// todo-0: I'll leave this class here for reference, for now, 
-// but it's all been moved into AVView (a Tab), and so this class will be deleted soon
-export class AudioPlayerDlg extends DialogBase {
+/**
+ * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does
+ * functionally work!), but croud sourcing the collection of the time-offsets of the begin/end array
+ * of commercial segments has not yet been implemented. Also I decided creating technology to
+ * destroy podcast's ability to collect ad-revenue is counter-productive to the entire podcasting
+ * industry which is an industry i love, and I won't want to be associated with such a hostile act
+ * against podcasters as trying to eliminate their ads!! So the ad-skipping technology in here is
+ * disabled.
+ *
+ * https://www.w3.org/2010/05/video/mediaevents.html 
+ * See also: VideoPlayerDlg (which is very similar)
+ */
+export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
+
+    public static customTitle: string;
+    public static customSubTitle: string;
+    public customDiv: Comp;
+    public static sourceUrl: string;
+    public static startTimePendingOverride: number;
+    public playingMemoryBlob: boolean
 
     player: HTMLAudioElement;
     audioPlayer: AudioPlayer;
@@ -28,7 +46,6 @@ export class AudioPlayerDlg extends DialogBase {
     */
     private adSegments: I.AdSegment[] = null;
     private saveTimer: any = null;
-    urlHash: string;
 
     timeLeftTextField: TextField;
     timeLeftState: Validator = new Validator();
@@ -37,26 +54,110 @@ export class AudioPlayerDlg extends DialogBase {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(customTitle: string, private customSubTitle: string, private customDiv: Comp, private sourceUrl: string, private startTimePendingOverride: number,
-        private playingMemoryBlob: boolean) {
-        super(customTitle || "Audio Player");
-        this.urlHash = S.util.hashOfString(sourceUrl);
-        this.startTimePending = localStorage[this.urlHash];
-        this.intervalTimer = setInterval(() => {
-            this.oneMinuteTimeslice();
-        }, 60000);
-
-        setTimeout(() => {
-            this.updatePlayButton();
-        }, 750);
+    constructor(data: TabIntf<any, AudioPlayerView>) {
+        super(data);
+        data.inst = this;
     }
 
-    override preUnmount(): any {
+    override preRender(): boolean | null {
+        this.init();
+
+        this.children = [
+            this.headingBar = new TabHeading([
+                new Div("Audio Player", { className: "tabTitle" })
+            ], null),
+            new Div(null, { className: "bigMarginTop bigMarginRight" }, [
+                AudioPlayerView.customTitle ? new Heading(2, AudioPlayerView.customTitle) : null,
+                AudioPlayerView.customSubTitle ? new Heading(4, AudioPlayerView.customSubTitle) : null,
+                this.audioPlayer = new AudioPlayer({
+                    src: AudioPlayerView.sourceUrl,
+                    className: "audioPlayer",
+                    onPause: () => this.savePlayerInfo(this.player.src, this.player.currentTime),
+                    onTimeUpdate: this.onTimeUpdate,
+                    onCanPlay: this.restoreStartTime,
+                    onEnded: this.onEnded,
+                    controls: "controls",
+                    autoPlay: "autoplay",
+                    preload: "auto",
+                    controlsList: "nodownload"
+                }),
+                new Div(null, { className: "row" }, [
+                    // todo-0: make speed choices be a radio button group
+                    new ButtonBar([
+                        new Button("1x", () => this.speed(1)),
+                        new Button("1.25x", () => this.speed(1.25)),
+                        new Button("1.5x", () => this.speed(1.5)),
+                        new Button("1.75x", () => this.speed(1.75)),
+                        new Button("2x", () => this.speed(2))
+                    ], "col-9"),
+                    new ButtonBar([
+                        new Button("< 30s", () => this.skip(-30)),
+                        new Button("30s >", () => this.skip(30))
+                    ], "col-3 float-end")
+                ]),
+                new Div(null, { className: "playerButtonsContainer" }, [
+                    this.playButton = new Icon({
+                        className: "playerButton fa fa-play fa-3x",
+                        style: { display: "none" },
+                        onClick: () => {
+                            S.quanta.audioPlaying = true;
+                            this.player?.play();
+                        }
+                    }),
+                    this.pauseButton = new Icon({
+                        className: "playerButton fa fa-pause fa-3x",
+                        onClick: () => {
+                            S.quanta.audioPlaying = false;
+                            this.player?.pause();
+                        }
+                    })
+                ]),
+                !this.playingMemoryBlob ? new Div(null, null, [
+                    // currently TextField seems to ignore styles to limit width 
+                    // (todo-0: fix this), but for now I'm using a div to limit width
+                    new Div(null, { className: "timeRemainingEditField" }, [
+                        this.timeLeftTextField = new TextField({
+                            label: "Timer (mins.)",
+                            labelLeft: true,
+                            val: this.timeLeftState
+                        })
+                    ])
+                ]) : null,
+                this.customDiv
+            ])
+        ];
+
+        this.audioPlayer.onMount((elm: HTMLElement) => {
+            this.player = elm as HTMLAudioElement;
+            if (!this.player) return;
+            this.player.onpause = (_event) => this.updatePlayButton();
+            this.player.onplay = (_event) => this.updatePlayButton();
+            this.player.onended = (_event) => this.updatePlayButton();
+        });
+        return true;
+    }
+
+    init() {
+        const urlHash = S.util.hashOfString(AudioPlayerView.sourceUrl);
+        this.startTimePending = localStorage[urlHash];
+
+        if (this.intervalTimer) {
+            this.intervalTimer = setInterval(() => {
+                this.oneMinuteTimeslice();
+            }, 60000);
+
+            setTimeout(() => {
+                this.updatePlayButton();
+            }, 750);
+        }
+    }
+
+    override domRemoveEvent(): any {
+        super.domRemoveEvent();
         S.quanta.audioPlaying = false;
         if (this.intervalTimer) {
             clearInterval(this.intervalTimer);
         }
-
         if (this.saveTimer) {
             clearInterval(this.saveTimer);
         }
@@ -80,104 +181,6 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    renderDlg(): Comp[] {
-        const children = [
-            new Div(null, null, [
-                this.customSubTitle ? new Div(this.customSubTitle, { className: "dialogSubTitle" }) : null,
-                this.audioPlayer = new AudioPlayer({
-                    src: this.sourceUrl,
-                    className: "audioPlayer",
-                    onPause: () => { this.savePlayerInfo(this.player.src, this.player.currentTime); },
-                    onTimeUpdate: this.onTimeUpdate,
-                    onCanPlay: this.restoreStartTime,
-                    onEnded: this.onEnded,
-                    controls: "controls",
-                    autoPlay: "autoplay",
-                    preload: "auto",
-                    controlsList: "nodownload"
-                }),
-                new Div(null, { className: "row" }, [
-                    new ButtonBar([
-                        new Button("1x", () => {
-                            this.speed(1);
-                        }),
-                        new Button("1.25x", () => {
-                            this.speed(1.25);
-                        }),
-                        new Button("1.5x", () => {
-                            this.speed(1.5);
-                        }),
-                        new Button("1.75x", () => {
-                            this.speed(1.75);
-                        }),
-                        new Button("2x", () => {
-                            this.speed(2);
-                        })
-                    ], "col-9"),
-                    new ButtonBar([
-                        new Button("< 30s", () => {
-                            this.skip(-30);
-                        }),
-                        new Button("30s >", () => {
-                            this.skip(30);
-                        })
-                    ], "col-3 float-end")
-                ]),
-
-                new Div(null, { className: "playerButtonsContainer" }, [
-                    this.playButton = new Icon({
-                        className: "playerButton fa fa-play fa-3x",
-                        style: { display: "none" },
-                        onClick: () => {
-                            S.quanta.audioPlaying = true;
-                            this.player?.play();
-                        }
-                    }),
-                    this.pauseButton = new Icon({
-                        className: "playerButton fa fa-pause fa-3x",
-                        onClick: () => {
-                            S.quanta.audioPlaying = false;
-                            this.player?.pause();
-                        }
-                    })
-                ]),
-                new Div(null, { className: "row" }, [
-                    new ButtonBar([
-                        !this.playingMemoryBlob ? new Button("Copy", this.copyToClipboard) : null,
-                        !this.playingMemoryBlob && !getAs().isAnonUser ? new Button("Post", this.postComment) : null,
-                        new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
-                    ], "col-9 d-flex align-items-end"),
-                    !this.playingMemoryBlob ? new Div(null, { className: "col-3 float-end" }, [
-                        this.timeLeftTextField = new TextField({
-                            label: "Timer (mins.)",
-                            inputClass: "timeRemainingEditField",
-                            labelLeft: true,
-                            val: this.timeLeftState
-                        })
-                    ]) : null
-                ]),
-                this.customDiv
-            ])
-        ];
-
-        this.audioPlayer.onMount((elm: HTMLElement) => {
-            this.player = elm as HTMLAudioElement;
-            if (!this.player) return;
-
-            this.player.onpause = (_event) => {
-                this.updatePlayButton();
-            };
-            this.player.onplay = (_event) => {
-                this.updatePlayButton();
-            };
-            this.player.onended = (_event) => {
-                this.updatePlayButton();
-            };
-        });
-
-        return children;
-    }
-
     updatePlayButton = () => {
         if (!this.player) return;
         this.updatePlayingState();
@@ -199,7 +202,6 @@ export class AudioPlayerDlg extends DialogBase {
 
     cancel(): void {
         S.quanta.audioPlaying = false;
-        this.close();
         if (this.player) {
             this.player.pause();
             this.player.remove();
@@ -218,36 +220,21 @@ export class AudioPlayerDlg extends DialogBase {
         }
     }
 
-    destroyPlayer = () => {
-        S.quanta.audioPlaying = false;
-        if (this.player) {
-            this.player.pause();
-        }
-        this.cancel();
-    }
-
-    postComment = () => {
-        const link = this.getLink();
-        S.edit.addNode(null, J.NodeType.COMMENT, "\n\n" + link, null);
-    }
-
-    copyToClipboard = () => {
-        const link = this.getLink();
-        S.util.copyToClipboard(link);
-    }
-
-    getLink = (): string => {
-        const port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
-        const link = location.protocol + "//" + location.hostname + port + "?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
-        return link;
-    }
+    // keeping for now. This was what the dialog "close" button ran
+    // destroyPlayer = () => {
+    //     S.quanta.audioPlaying = false;
+    //     if (this.player) {
+    //         this.player.pause();
+    //     }
+    //     this.cancel();
+    // }
 
     restoreStartTime = () => {
         /* makes player always start wherever the user last was when they clicked "pause" */
         if (this.player) {
-            if (this.startTimePendingOverride > 0) {
-                this.player.currentTime = this.startTimePendingOverride;
-                this.startTimePendingOverride = null;
+            if (AudioPlayerView.startTimePendingOverride > 0) {
+                this.player.currentTime = AudioPlayerView.startTimePendingOverride;
+                AudioPlayerView.startTimePendingOverride = null;
                 this.startTimePending = null;
             }
             else if (this.startTimePending) {

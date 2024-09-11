@@ -23,6 +23,7 @@ import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TrendingTab } from "./tabs/data/TrendingTab";
 import { TTSTab } from "./tabs/data/TTSTab";
+import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
 
 export class TabUtil {
     selectTab = (tabName: string) => {
@@ -84,6 +85,7 @@ export class TabUtil {
                 new TTSTab(),
                 new RSSTab(),
                 new SettingsTab(),
+                new AudioPlayerTab(),
                 new AISettingsTab(),
                 new AdminTab()
 
