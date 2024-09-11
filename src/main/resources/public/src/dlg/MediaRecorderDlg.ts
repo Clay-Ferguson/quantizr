@@ -303,7 +303,7 @@ export class MediaRecorderDlg extends DialogBase {
                 new VideoPlayerDlg("recorder", url, null, DialogMode.POPUP).open();
             }
             else {
-                new AudioPlayerDlg(null, null, null, url, 0, true).open();
+                new AudioPlayerDlg(url).open();
             }
         }
     }

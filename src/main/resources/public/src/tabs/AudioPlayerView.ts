@@ -218,15 +218,6 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    // keeping for now. This was what the dialog "close" button ran
-    // destroyPlayer = () => {
-    //     S.quanta.audioPlaying = false;
-    //     if (this.player) {
-    //         this.player.pause();
-    //     }
-    //     this.cancel();
-    // }
-
     restoreStartTime = () => {
         /* makes player always start wherever the user last was when they clicked "pause" */
         if (this.player) {
