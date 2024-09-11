@@ -112,14 +112,12 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     })
                 ]),
                 new Div(null, null, [
-                    // (todo-0: fix this), but for now I'm using a div to limit width
-                    new Div(null, { className: "timeRemainingEditField" }, [
-                        this.timeLeftTextField = new TextField({
-                            label: "Timer (mins.)",
-                            labelLeft: true,
-                            val: this.timeLeftState
-                        })
-                    ])
+                    this.timeLeftTextField = new TextField({
+                        outterClass: "timeRemainingEditField",
+                        label: "Timer (mins.)",
+                        labelLeft: true,
+                        val: this.timeLeftState
+                    })
                 ]),
                 this.customDiv
             ])
