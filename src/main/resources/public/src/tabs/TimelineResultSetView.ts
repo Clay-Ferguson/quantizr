@@ -5,12 +5,12 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Selection } from "../comp/core/Selection";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { ResultSetView } from "./ResultSetView";
 
 export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetView<PT, TimelineResultSetView<PT>> {
 
-    constructor(data: TabIntf<PT, TimelineResultSetView<PT>>) {
+    constructor(data: TabBase<PT, TimelineResultSetView<PT>>) {
         super(data);
         data.inst = this;
     }

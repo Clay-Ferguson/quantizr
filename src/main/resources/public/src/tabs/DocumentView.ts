@@ -12,7 +12,7 @@ import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 
 /* This class does client-side paging so that we don't overload React renderer with too many items.
 which can render too slow, so we max out at only 100 items per page. */
@@ -22,7 +22,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
     showContentHeading: boolean = true;
     pagingContainerClass: string = "marginBottom marginTop";
 
-    constructor(data: TabIntf<PT, TT>) {
+    constructor(data: TabBase<PT, TT>) {
         super(data);
     }
 
@@ -45,7 +45,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
                             else if (ast.searchViewFromTab) {
                                 S.tabUtil.selectTab(ast.searchViewFromTab);
                                 setTimeout(() => {
-                                    const data: TabIntf = S.tabUtil.getAppTabData(ast.searchViewFromTab);
+                                    const data: TabBase = S.tabUtil.getAppTabData(ast.searchViewFromTab);
                                     if (ast.searchViewFromNode && data.inst) {
                                         data.inst.scrollToNode(ast.searchViewFromNode.id);
                                     }

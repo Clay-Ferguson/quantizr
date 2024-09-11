@@ -2,7 +2,7 @@ import { Comp } from "../comp/base/Comp";
 import { ConfigProp, EditorOptions } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
-import { TabIntf } from "./TabIntf";
+import { TabBase } from "./TabBase";
 
 /* This interface is how Type Plugins are handled */
 export interface TypeIntf {
@@ -10,7 +10,7 @@ export interface TypeIntf {
     schemaOrg: J.SchemaOrgClass;
     getTypeName(): string;
     getName(): string;
-    render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp;
+    render(node: NodeInfo, tabData: TabBase<any>, rowStyling: boolean, isTreeView: boolean): Comp;
     getIconClass(): string;
     allowAction(action: NodeActionType, node: NodeInfo): boolean;
     allowDeleteProperty(prop: string): boolean;

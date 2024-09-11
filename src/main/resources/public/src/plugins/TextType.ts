@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Pre } from "../comp/core/Pre";
 import { EditorOptions } from "../Interfaces";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
@@ -14,7 +14,7 @@ export class TextType extends TypeBase {
         super(J.NodeType.PLAIN_TEXT, "Text", "fa-file-text", true);
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         const wordWrap = S.props.getPropStr(J.NodeProp.NOWRAP, node) !== "1";
         return new Pre(S.domUtil.escapeHtml(node.content), { className: "textTypeContent" + (wordWrap ? " preWordWrap" : "") });
     }

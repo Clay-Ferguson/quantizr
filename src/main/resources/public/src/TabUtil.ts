@@ -2,7 +2,7 @@ import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { AppState } from "./AppState";
 import { AppTab } from "./comp/AppTab";
 import { Constants as C } from "./Constants";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
 import { AdminTab } from "./tabs/data/AdminTab";
@@ -45,7 +45,7 @@ export class TabUtil {
         });
     }
 
-    makeDomIdForNode = (tabData: TabIntf<any>, id: string) => {
+    makeDomIdForNode = (tabData: TabBase<any>, id: string) => {
         return tabData.id + id;
     }
 
@@ -115,7 +115,7 @@ export class TabUtil {
 
     // ast param is important because sometimes we do pass in an 'ast' that's not 'committed' yet
     // for this method to use, and in that case we can't call getAs() to get state
-    getAppTabData = (tabId: string, ast: AppState = null): TabIntf => {
+    getAppTabData = (tabId: string, ast: AppState = null): TabBase => {
         ast = ast || getAs();
         if (!ast.tabData) return null;
         return ast.tabData.find(d => d.id === tabId);

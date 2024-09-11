@@ -5,14 +5,14 @@ import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeInfo } from "../JavaIntf";
 import { RepliesRSInfo } from "../RepliesRSInfo";
 import { S } from "../Singletons";
 
 export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesView<PT>> {
 
-    constructor(data: TabIntf<PT, RepliesView<PT>>) {
+    constructor(data: TabBase<PT, RepliesView<PT>>) {
         super(data);
         data.inst = this;
     }
@@ -40,7 +40,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
                         else {
                             S.tabUtil.selectTab(ast.repliesViewFromTab);
                             setTimeout(() => {
-                                const data: TabIntf = S.tabUtil.getAppTabData(ast.repliesViewFromTab);
+                                const data: TabBase = S.tabUtil.getAppTabData(ast.repliesViewFromTab);
                                 data.inst?.scrollToNode(ast.repliesViewNodeId);
                             }, 700);
                         }

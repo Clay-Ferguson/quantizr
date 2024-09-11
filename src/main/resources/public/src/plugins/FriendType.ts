@@ -2,7 +2,7 @@ import { Comp } from "../comp/base/Comp";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { EditorOptions } from "../Interfaces";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -55,7 +55,7 @@ export class FriendType extends TypeBase {
         return new Heading(3, user);
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, isTreeView: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, isTreeView: boolean): Comp => {
         const user: string = S.props.getPropStr(J.NodeProp.USER, node);
         const userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         const userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);

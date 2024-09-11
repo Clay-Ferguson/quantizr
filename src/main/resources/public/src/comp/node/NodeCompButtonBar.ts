@@ -7,7 +7,7 @@ import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo } from "../../JavaIntf";
@@ -17,7 +17,7 @@ import { Span } from "../core/Span";
 export class NodeCompButtonBar extends Div {
 
     constructor(public node: NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean,
-        private extraButtons: Comp[], extraClass: string, public tabData: TabIntf<any>) {
+        private extraButtons: Comp[], extraClass: string, public tabData: TabBase<any>) {
         super(null, {
             id: "ncbb_" + node.id,
             className: "nodeCompButtonBar " + (extraClass || "")

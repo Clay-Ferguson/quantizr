@@ -5,7 +5,7 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import { TypeBase } from "./base/TypeBase";
 
@@ -31,7 +31,7 @@ export class AccountType extends TypeBase {
         return true;
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         const name = S.nodeUtil.getDisplayName(node);
         return new Div(null, {
             className: "systemNodeContent"

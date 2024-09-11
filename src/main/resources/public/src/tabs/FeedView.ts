@@ -13,14 +13,14 @@ import { Spinner } from "../comp/core/Spinner";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FeedViewProps } from "./FeedViewProps";
 
 export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
-    constructor(data: TabIntf<FeedViewProps, FeedView>) {
+    constructor(data: TabBase<FeedViewProps, FeedView>) {
         super(data);
         data.inst = this;
     }
@@ -212,7 +212,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         return new Div(this.getFeedSubHeading(this.data), { className: "tabTitle" });
     }
 
-    getFeedSubHeading(data: TabIntf<FeedViewProps>) {
+    getFeedSubHeading(data: TabBase<FeedViewProps>) {
         let subHeading = null;
 
         if (data.props.feedFilterToDisplayName) {

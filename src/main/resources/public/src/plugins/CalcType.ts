@@ -2,7 +2,7 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Markdown } from "../comp/core/Markdown";
 import { Pre } from "../comp/core/Pre";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -30,7 +30,7 @@ export class CalcType extends TypeBase {
         return true;
     }
 
-    override render = (node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         if (!S.props.isMine(node)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }

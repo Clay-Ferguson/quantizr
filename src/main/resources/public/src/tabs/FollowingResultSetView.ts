@@ -1,13 +1,13 @@
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { FollowingRSInfo } from "../FollowingRSInfo";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class FollowingResultSetView<PT extends FollowingRSInfo> extends ResultSetView<PT, FollowingResultSetView<PT>> {
 
-    constructor(data: TabIntf<PT, FollowingResultSetView<PT>>) {
+    constructor(data: TabBase<PT, FollowingResultSetView<PT>>) {
         super(data);
         this.allowHeader = false;
         data.inst = this;

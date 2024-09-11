@@ -1,5 +1,5 @@
 import { getAs } from "../../AppContext";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import { BreadcrumbsPanel } from "../BreadcrumbsPanel";
 import { Comp } from "../base/Comp";
 import { Clearfix } from "./Clearfix";
@@ -7,7 +7,7 @@ import { Div } from "./Div";
 
 export class TabHeading extends Div {
 
-    constructor(children: Comp[], data: TabIntf) {
+    constructor(children: Comp[], data: TabBase) {
         super();
 
         if (data) {

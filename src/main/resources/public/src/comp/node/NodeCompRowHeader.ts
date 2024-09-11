@@ -5,7 +5,7 @@ import { Icon } from "../../comp/core/Icon";
 import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo, NodeType, PrincipalName } from "../../JavaIntf";
@@ -16,7 +16,7 @@ import { NodeCompContent } from "./NodeCompContent";
 
 export class NodeCompRowHeader extends Div {
     constructor(private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
-        public tabData: TabIntf<any>, private jumpButton: boolean,
+        public tabData: TabBase<any>, private jumpButton: boolean,
         private prefix: string, private idx: number, indentLevel: number, isTableCell: boolean) {
         super(null);
 

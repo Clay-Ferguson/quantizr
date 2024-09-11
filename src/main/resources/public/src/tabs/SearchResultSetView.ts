@@ -1,12 +1,12 @@
 import { Comp } from "../comp/base/Comp";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class SearchResultSetView<PT extends ResultSetInfo> extends ResultSetView<PT, SearchResultSetView<PT>> {
 
-    constructor(data: TabIntf<PT, SearchResultSetView<PT>>) {
+    constructor(data: TabBase<PT, SearchResultSetView<PT>>) {
         super(data);
         data.inst = this;
     }

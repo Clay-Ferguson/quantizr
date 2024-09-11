@@ -1,7 +1,7 @@
 import { dispatch, getAs } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
@@ -164,7 +164,7 @@ export class ServerPush {
         }
     }
 
-    pushToLiveTab = (node: NodeInfo, inst: TabIntf) => {
+    pushToLiveTab = (node: NodeInfo, inst: TabBase) => {
         if (!inst) return;
         inst.props.results = inst.props.results || [];
         const idx = inst.props.results.findIndex(item => item.id === node.id);

@@ -9,7 +9,7 @@ import { Heading } from "../comp/core/Heading";
 import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { Validator } from "../Validator";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
@@ -20,7 +20,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
     foldersToIncludeState: Validator = new Validator();
     foldersToIncludeScrollPos = new ScrollPos();
 
-    constructor(data: TabIntf<any, AISettingsView>) {
+    constructor(data: TabBase<any, AISettingsView>) {
         super(data);
         data.inst = this;
         this.fileExtState.setValue(getAs().userPrefs.aiAgentFileExtensions);

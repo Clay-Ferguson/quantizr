@@ -6,7 +6,7 @@ import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 import { Div } from "./comp/core/Div";
 import { Html } from "./comp/core/Html";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 
 export class DocIndexPanel extends Div {
     static initialized: boolean = false;
@@ -17,7 +17,7 @@ export class DocIndexPanel extends Div {
     }
 
     override preRender(): boolean | null {
-        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+        const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;
         if (!info.results || info.results.length < 2) return false;
@@ -54,7 +54,7 @@ export class DocIndexPanel extends Div {
 
     // This click function opens up the document tab and scrolls to the node that was clicked on
     clickItem = async (id: string) => {
-        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+        const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;
         if (!info.results) return false;

@@ -2,7 +2,7 @@ import { getAs } from "../AppContext";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -40,7 +40,7 @@ export class TabPanelButtons extends Div {
         return items;
     }
 
-    getTabButton(data: TabIntf): Li {
+    getTabButton(data: TabBase): Li {
         const ast = getAs();
         let clazz = "nav-link appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : "");
 

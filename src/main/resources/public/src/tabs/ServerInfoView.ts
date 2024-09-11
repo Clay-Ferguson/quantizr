@@ -5,12 +5,12 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Pre } from "../comp/core/Pre";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 
 export class ServerInfoView extends AppTab<any, ServerInfoView> {
 
-    constructor(data: TabIntf<any, ServerInfoView>) {
+    constructor(data: TabBase<any, ServerInfoView>) {
         super(data);
         data.inst = this;
     }

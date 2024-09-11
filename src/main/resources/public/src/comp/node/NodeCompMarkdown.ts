@@ -2,7 +2,7 @@ import { ReactNode, createElement } from "react";
 import { dispatch, getAs } from "../../AppContext";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import { Comp } from "../base/Comp";
 import ReactMarkdownComp from "../core/ReactMarkdownComp";
 import { NodeInfo } from "../../JavaIntf";
@@ -30,7 +30,7 @@ export class NodeCompMarkdown extends Comp {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
-    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabIntf<any>, urls: Map<string, UrlInfo>) {
+    constructor(public node: NodeInfo, extraContainerClass: string, _tabData: TabBase<any>, urls: Map<string, UrlInfo>) {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();

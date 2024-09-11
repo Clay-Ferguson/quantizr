@@ -3,14 +3,14 @@ import { Comp } from "../comp/base/Comp";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { DocumentRSInfo } from "../DocumentRSInfo";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { DocumentView } from "./DocumentView";
 
 export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentView<TT, DocumentResultSetView<TT>> {
 
-    constructor(data: TabIntf<TT, DocumentResultSetView<TT>>) {
+    constructor(data: TabBase<TT, DocumentResultSetView<TT>>) {
         super(data);
         data.inst = this;
 

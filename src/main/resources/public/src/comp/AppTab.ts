@@ -1,6 +1,6 @@
 import { getAs } from "../AppContext";
 import { Div } from "../comp/core/Div";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { Comp } from "./base/Comp";
 import { S } from "../Singletons";
 
@@ -12,7 +12,7 @@ and also the IDs on each of those elements needs to be repeatable across all ren
 export class AppTab<PT = any, TT = any> extends Div {
     headingBar: Comp = null;
 
-    constructor(public data: TabIntf<PT, TT>, private extraEditModeClass: string = null) {
+    constructor(public data: TabBase<PT, TT>, private extraEditModeClass: string = null) {
         super(null, {
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.

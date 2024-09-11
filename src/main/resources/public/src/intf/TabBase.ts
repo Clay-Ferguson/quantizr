@@ -5,7 +5,7 @@ import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { NodeInfo } from "../JavaIntf";
 
 // PT=PropsType, TT=TabType
-export interface TabIntf<PT = any, TT = any> {
+export class TabBase<PT = any, TT = any> {
     // display name shown on the tab
     name: string;
 
@@ -19,27 +19,30 @@ export interface TabIntf<PT = any, TT = any> {
     This 'id' is used as an 'identification-only' class name on each of the rows/nodes displayed on any tab
     */
     id: string;
-    scrollPos: number;
+    scrollPos: number = 0;
     inst?: TT; // AppTab;
 
     // used for re-scrolling screen back to same place after the page layout may have changed due to 'edit mode' or 'info mode'
     // turning on/off or other places.
-    topmostVisibleElmId: string;
+    topmostVisibleElmId: string = null;
 
-    constructView(data: TabIntf): AppTab;
-    getTabSubOptions(): Div;
+    props: PT = {} as PT;
+    openGraphComps: OpenGraphPanel[] = [];
+
+    constructView(_data: TabBase): AppTab { return null; }
 
     // controls whether to show tab button or not.
-    isVisible(): boolean;
+    isVisible(): boolean { return false; }
 
-    // tabs are required to be able to search their known nodes and find any that are found, or null if not found
-    findNode(nodeId: string): NodeInfo;
-    findNodeByPath(path: string): NodeInfo;
-    nodeDeleted(ust: AppState, nodeId: string): void;
-    replaceNode(ust: AppState, newNode: NodeInfo): void;
-    processNode(ust: AppState, func: (node: NodeInfo) => void): void;
+    getTabSubOptions(): Div { return null; };
 
-    props: PT;
+    findNode(_nodeId: string): NodeInfo { return null; }
 
-    openGraphComps: OpenGraphPanel[];
+    findNodeByPath(_path: string): NodeInfo { return null; }
+
+    nodeDeleted(_ust: AppState, _nodeId: string): void { }
+
+    replaceNode(_ust: AppState, _newNode: NodeInfo): void { }
+
+    processNode(_ust: AppState, _func: (node: NodeInfo) => void): void { }
 }

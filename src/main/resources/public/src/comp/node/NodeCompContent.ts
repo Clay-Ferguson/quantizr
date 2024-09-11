@@ -1,7 +1,7 @@
 import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Div } from "../../comp/core/Div";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -16,7 +16,7 @@ export class NodeCompContent extends Div {
     static PRE_PREFIX = "nc_";
 
     constructor(public node: NodeInfo,
-        public tabData: TabIntf<any>,
+        public tabData: TabBase<any>,
         public rowStyling: boolean,
         public showHeader: boolean,
         public idPrefix: string,

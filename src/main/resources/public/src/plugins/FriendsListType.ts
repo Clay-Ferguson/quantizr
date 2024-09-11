@@ -4,7 +4,7 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { FriendsDlg } from "../dlg/FriendsDlg";
 import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -23,7 +23,7 @@ export class FriendsListType extends TypeBase {
         return false;
     }
 
-    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, "Follows"),
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),

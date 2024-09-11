@@ -10,7 +10,7 @@ import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeInfo } from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
@@ -22,7 +22,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     showContentHeading: boolean = true;
     pagingContainerClass: string = "marginBottom marginTop";
 
-    constructor(data: TabIntf<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
+    constructor(data: TabBase<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
         if (infiniteScrolling && showPageNumber) {
             throw new Error("page numbering incompatable with infinite scrolling")
@@ -61,7 +61,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                             else if (ast.searchViewFromTab) {
                                 S.tabUtil.selectTab(ast.searchViewFromTab);
                                 setTimeout(() => {
-                                    const data: TabIntf = S.tabUtil.getAppTabData(ast.searchViewFromTab);
+                                    const data: TabBase = S.tabUtil.getAppTabData(ast.searchViewFromTab);
                                     if (ast.searchViewFromNode && data.inst) {
                                         data.inst.scrollToNode(ast.searchViewFromNode.id);
                                     }

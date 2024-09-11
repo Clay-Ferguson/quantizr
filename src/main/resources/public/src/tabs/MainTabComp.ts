@@ -10,12 +10,12 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 
 export class MainTabComp extends AppTab<any, MainTabComp> {
 
-    constructor(data: TabIntf<any, MainTabComp>) {
+    constructor(data: TabBase<any, MainTabComp>) {
         super(data, null);
         this.attribs.key = "mainTabCompKey";
         data.inst = this;

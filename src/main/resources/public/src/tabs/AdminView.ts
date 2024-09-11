@@ -5,12 +5,12 @@ import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { TabHeading } from "../comp/core/TabHeading";
 import { SignupDlg } from "../dlg/SignupDlg";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 
 export class AdminView extends AppTab<any, AdminView> {
 
-    constructor(data: TabIntf<any, AdminView>) {
+    constructor(data: TabBase<any, AdminView>) {
         super(data);
         data.inst = this;
     }

@@ -3,7 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import * as J from "../JavaIntf";
 import { UrlInfo } from "../plugins/base/TypeBase";
 import { S } from "../Singletons";
@@ -19,7 +19,7 @@ export class OpenGraphPanel extends Div {
     loading: boolean;
     observer: IntersectionObserver;
 
-    constructor(private tabData: TabIntf<any>, key: string, private ui: UrlInfo, private wrapperClass: string,
+    constructor(private tabData: TabBase<any>, key: string, private ui: UrlInfo, private wrapperClass: string,
         private imageClass: string, private showTitle: boolean, _allowBookmarkIcon: boolean, private includeImage: boolean) {
         super(null, {
             title: ui.url,

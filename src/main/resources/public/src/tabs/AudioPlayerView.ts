@@ -9,7 +9,7 @@ import { Icon } from "../comp/core/Icon";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import * as I from "../Interfaces";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
@@ -54,7 +54,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
     playButton: Icon;
     pauseButton: Icon;
 
-    constructor(data: TabIntf<any, AudioPlayerView>) {
+    constructor(data: TabBase<any, AudioPlayerView>) {
         super(data);
         data.inst = this;
     }
@@ -113,7 +113,6 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     })
                 ]),
                 !this.playingMemoryBlob ? new Div(null, null, [
-                    // currently TextField seems to ignore styles to limit width 
                     // (todo-0: fix this), but for now I'm using a div to limit width
                     new Div(null, { className: "timeRemainingEditField" }, [
                         this.timeLeftTextField = new TextField({

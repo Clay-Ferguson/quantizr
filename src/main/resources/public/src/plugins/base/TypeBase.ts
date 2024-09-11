@@ -11,7 +11,7 @@ import { Div } from "../../comp/core/Div";
 import { Html } from "../../comp/core/Html";
 import { Markdown } from "../../comp/core/Markdown";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 
 export type UrlInfo = {
@@ -261,7 +261,7 @@ export class TypeBase implements TypeIntf {
         return ret;
     }
 
-    render(node: NodeInfo, tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp {
+    render(node: NodeInfo, tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp {
         // const prop = S.props.getProp(J.NodeProp.ORDER_BY, node);
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component

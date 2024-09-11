@@ -19,7 +19,7 @@ import { SetNodeUsingJsonDlg } from "./dlg/SetNodeUsingJsonDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { FullScreenType } from "./Interfaces";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
@@ -392,7 +392,7 @@ export class Edit {
                 }
             }
             else if (ast.activeTab === C.TAB_DOCUMENT) {
-                const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
                     S.srch.showDocument(data.props.node.id, false);
                 }
@@ -671,7 +671,7 @@ export class Edit {
             S.quanta.refresh();
         }
         else if (ast.activeTab === C.TAB_DOCUMENT) {
-            const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
             if (data) {
                 S.srch.showDocument(data.props.node.id, true);
             }
@@ -1489,7 +1489,7 @@ export class Edit {
                 });
             }
             else if (ast.activeTab === C.TAB_DOCUMENT) {
-                const data: TabIntf<any, DocumentResultSetView<any>> = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                const data: TabBase<any, DocumentResultSetView<any>> = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
                     data.inst.pageChange(null);
                 }
@@ -1667,7 +1667,7 @@ export class Edit {
                 S.view.jumpToId(res.jumpTargetId);
             }
             else if (ast.activeTab === C.TAB_DOCUMENT) {
-                const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
+                const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
                     S.srch.showDocument(data.props.node.id, false);
                 }

@@ -1,48 +1,24 @@
-import { AppState } from "../../AppState";
-import { Div } from "../../comp/core/Div";
-import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
-import { TabIntf } from "../../intf/TabIntf";
-import { NodeInfo } from "../../JavaIntf";
+import { TabBase } from "../../intf/TabBase";
 import { SettingsView } from "../SettingsView";
 
-export class SettingsTab implements TabIntf<any> {
+export class SettingsTab extends TabBase<any> {
     name = "Settings";
     tooltip = "Edit your Account Settings";
     id = C.TAB_SETTINGS;
-    scrollPos = 0;
-    props = {};
-    openGraphComps: OpenGraphPanel[] = []; // todo-0: this shouldn't be here.
-    topmostVisibleElmId: string = null; // todo-0: this shouldn't be here.
-
     static inst: SettingsTab = null;
     static tabSelected: boolean = false;
 
     constructor() {
+        super();
         SettingsTab.inst = this;
     }
 
-    isVisible = () => {
+    isVisible() {
         return SettingsTab.tabSelected;
     };
 
-    constructView = (data: TabIntf) => new SettingsView(data);
-    getTabSubOptions = (): Div => { return null; };
-
-    findNode = (_nodeId: string): NodeInfo => {
-        return null;
-    }
-
-    findNodeByPath = (_path: string): NodeInfo => {
-        return null;
-    }
-
-    nodeDeleted = (_ust: AppState, _nodeId: string): void => {
-    }
-
-    replaceNode = (_ust: AppState, _newNode: NodeInfo): void => {
-    }
-
-    processNode = (_ust: AppState, _func: (node: NodeInfo) => void): void => {
+    constructView(data: TabBase) {
+        return new SettingsView(data);
     }
 }

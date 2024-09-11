@@ -19,7 +19,7 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { MainTab } from "../tabs/data/MainTab";
@@ -30,7 +30,7 @@ export class RSSView extends AppTab<any, RSSView> {
     static lastGoodPage: number;
     static loading: boolean = false;
 
-    constructor(data: TabIntf<any, RSSView>) {
+    constructor(data: TabBase<any, RSSView>) {
         super(data);
         data.inst = this;
     }

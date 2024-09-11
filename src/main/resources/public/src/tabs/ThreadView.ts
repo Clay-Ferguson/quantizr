@@ -7,7 +7,7 @@ import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
@@ -19,7 +19,7 @@ import { ExportDlg } from "../dlg/ExportDlg";
 
 export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
 
-    constructor(data: TabIntf<PT, ThreadView<PT>>) {
+    constructor(data: TabBase<PT, ThreadView<PT>>) {
         super(data);
         data.inst = this;
     }
@@ -57,7 +57,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                         else {
                             S.tabUtil.selectTab(ast.threadViewFromTab);
                             setTimeout(() => {
-                                const data: TabIntf = S.tabUtil.getAppTabData(ast.threadViewFromTab);
+                                const data: TabBase = S.tabUtil.getAppTabData(ast.threadViewFromTab);
                                 if (ast.threadViewFromNodeId && data.inst) {
                                     data.inst.scrollToNode(ast.threadViewFromNodeId);
                                 }

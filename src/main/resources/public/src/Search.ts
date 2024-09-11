@@ -11,7 +11,7 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
@@ -528,7 +528,7 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page
      */
-    renderSearchResultAsListItem = (node: NodeInfo, tabData: TabIntf<any>, jumpButton: boolean, allowHeader: boolean, 
+    renderSearchResultAsListItem = (node: NodeInfo, tabData: TabBase<any>, jumpButton: boolean, allowHeader: boolean, 
         outterClass: string, outterClassHighlight: string,
         extraStyle: any): Comp => {
         const ast = getAs();

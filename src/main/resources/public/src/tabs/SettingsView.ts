@@ -12,10 +12,10 @@ import { ManageCryptoKeysDlg } from "../dlg/ManageCryptoKeysDlg";
 import { ManageStorageDlg } from "../dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "../dlg/MediaRecorderDlg";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 
 export class SettingsView extends AppTab<any, SettingsView> {
-    constructor(data: TabIntf<any, SettingsView>) {
+    constructor(data: TabBase<any, SettingsView>) {
         super(data);
         data.inst = this;
     }

@@ -8,7 +8,7 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
 import * as I from "./Interfaces";
 import { ConfigProp } from "./Interfaces";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName, PropertyInfo } from "./JavaIntf";
 import { S } from "./Singletons";
@@ -930,7 +930,7 @@ export class Util {
     }
 
     willRenderDocIndex = (ast: AppState = null): boolean => {
-        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_DOCUMENT, ast);
+        const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT, ast);
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;
         if (!info.results || info.results.length < 2) return false;

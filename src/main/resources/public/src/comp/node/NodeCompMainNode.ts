@@ -4,7 +4,7 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -14,7 +14,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompMainNode extends Div {
 
-    constructor(public tabData: TabIntf<any>) {
+    constructor(public tabData: TabBase<any>) {
         super(null, {
             id: C.TAB_MAIN + getAs().node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling

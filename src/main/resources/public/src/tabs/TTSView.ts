@@ -11,7 +11,7 @@ import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextArea } from "../comp/core/TextArea";
 import { Constants as C } from "../Constants";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
 
@@ -23,7 +23,7 @@ export class TTSView extends AppTab<any, TTSView> {
     static inst: TTSView = null;
     static ttsHighlightIdx: number = -1;
 
-    constructor(data: TabIntf<any, TTSView>) {
+    constructor(data: TabBase<any, TTSView>) {
         super(data);
         data.inst = this;
         TTSView.inst = this;

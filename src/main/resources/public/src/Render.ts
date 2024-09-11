@@ -23,7 +23,7 @@ import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PasteOrLinkDlg } from "./dlg/PasteOrLinkDlg";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
@@ -396,7 +396,7 @@ export class Render {
                         s.node = res.node;
                         s.endReached = res.endReached;
 
-                        const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_MAIN);
+                        const data: TabBase = S.tabUtil.getAppTabData(C.TAB_MAIN);
                         if (!data || !data.props) return false;
                         data.props.breadcrumbs = res.breadcrumbs;
 
@@ -515,7 +515,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean): Comp => {
+    renderChildren = (node: NodeInfo, tabData: TabBase<any>, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
         /*
@@ -685,7 +685,7 @@ export class Render {
         ]);
     }
 
-    renderLinks = (node: NodeInfo, tabData: TabIntf): Div => {
+    renderLinks = (node: NodeInfo, tabData: TabBase): Div => {
         if (!node.links) return null;
 
         const linkComps: Comp[] = [];

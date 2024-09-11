@@ -2,13 +2,13 @@ import { AppTab } from "../comp/AppTab";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { LogViewIntf } from "../intf/LogViewIntf";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { Log } from "../Log";
 
 export class LogView extends AppTab<any, LogView> implements LogViewIntf {
     static logs: string = "";
 
-    constructor(data: TabIntf<any, LogView>) {
+    constructor(data: TabBase<any, LogView>) {
         super(data);
         data.inst = this;
 

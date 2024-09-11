@@ -2,7 +2,7 @@ import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -18,7 +18,7 @@ export class CalendarType extends TypeBase {
         return true;
     }
 
-    override render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp {
+    override render(node: NodeInfo, tabData: TabBase<any>, rowStyling: boolean, isTreeView: boolean): Comp {
         const baseComp = super.render(node, tabData, rowStyling, isTreeView);
         return new Div(null, null, [
             baseComp,

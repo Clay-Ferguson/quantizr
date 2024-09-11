@@ -1,12 +1,12 @@
 import { Comp } from "../comp/base/Comp";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class SharedNodesResultSetView<PT extends SharesRSInfo> extends ResultSetView<PT, SharedNodesResultSetView<PT>> {
 
-    constructor(data: TabIntf<PT, SharedNodesResultSetView<PT>>) {
+    constructor(data: TabBase<PT, SharedNodesResultSetView<PT>>) {
         super(data);
         data.inst = this;
         this.showContentHeading = false;

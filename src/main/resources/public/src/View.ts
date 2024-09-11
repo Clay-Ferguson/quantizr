@@ -2,7 +2,7 @@ import { dispatch, getAs } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { FullScreenType } from "./Interfaces";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -290,7 +290,7 @@ export class View {
                     // part of the window making scrollIntoView appear not to work.
                     // elm.scrollIntoView(true);
                     // ---------------------------
-                    const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_MAIN);
+                    const data: TabBase = S.tabUtil.getAppTabData(C.TAB_MAIN);
                     if (data) {
                         data.inst.scrollToElm(elm);
                     }
@@ -320,7 +320,7 @@ export class View {
 
         dispatch("showNodeStats", s => {
             // lookup data for TAB_TRENDING and set the data with res
-            const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_TRENDING);
+            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_TRENDING);
             data.props.res = res;
 
             S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
@@ -351,7 +351,7 @@ export class View {
         });
 
         dispatch("showNodeStats", s => {
-            const data: TabIntf = S.tabUtil.getAppTabData(C.TAB_TRENDING);
+            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_TRENDING);
             data.props.res = res;
             S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
             s.activeTab = C.TAB_TRENDING;

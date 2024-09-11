@@ -10,12 +10,12 @@ import { Spinner } from "../comp/core/Spinner";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { SearchContentDlg } from "../dlg/SearchContentDlg";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 
 export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
     static inst: TrendingView = null;
 
-    constructor(data: TabIntf<TrendingRSInfo, TrendingView>) {
+    constructor(data: TabBase<TrendingRSInfo, TrendingView>) {
         super(data);
         data.inst = TrendingView.inst = this;
     }

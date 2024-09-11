@@ -1,7 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -20,7 +20,7 @@ export class BookmarkListType extends TypeBase {
         return false;
     }
 
-    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
             new Div("Delete, edit, or order your bookmarks here.", { className: "marginLeft" })

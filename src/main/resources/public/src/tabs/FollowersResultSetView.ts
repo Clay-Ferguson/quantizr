@@ -3,7 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FollowersRSInfo } from "../FollowersRSInfo";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
@@ -11,7 +11,7 @@ import { ResultSetView } from "./ResultSetView";
 
 export class FollowersResultSetView<PT extends FollowersRSInfo> extends ResultSetView<PT, FollowersResultSetView<PT>> {
 
-    constructor(data: TabIntf<PT, FollowersResultSetView<PT>>) {
+    constructor(data: TabBase<PT, FollowersResultSetView<PT>>) {
         super(data);
         data.inst = this;
         this.showContentHeading = false;

@@ -3,7 +3,7 @@ import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -11,7 +11,7 @@ import { NodeCompRow } from "./NodeCompRow";
 
 export class NodeCompTableRowLayout extends Div {
 
-    constructor(public node: NodeInfo, private tabData: TabIntf<any>, public level: number, public layout: string, public allowNodeMove: boolean, private allowHeaders: boolean) {
+    constructor(public node: NodeInfo, private tabData: TabBase<any>, public level: number, public layout: string, public allowNodeMove: boolean, private allowHeaders: boolean) {
         super(null, { className: "nodeGridTable" });
     }
 

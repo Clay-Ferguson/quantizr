@@ -6,7 +6,7 @@ import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo, PrincipalName } from "../../JavaIntf";
@@ -18,7 +18,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompRow extends Div {
 
-    constructor(public node: NodeInfo, public tabData: TabIntf<any>, private type: TypeIntf, //
+    constructor(public node: NodeInfo, public tabData: TabBase<any>, private type: TypeIntf, //
         public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private internalComp: Div) {

@@ -4,7 +4,7 @@ import { Button } from "../../comp/core/Button";
 import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
-import { TabIntf } from "../../intf/TabIntf";
+import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -13,7 +13,7 @@ import { NodeCompRow } from "./NodeCompRow";
 export class NodeCompVerticalRowLayout extends Div {
     static showSpecialNodes = true;
 
-    constructor(public node: NodeInfo, private tabData: TabIntf<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
+    constructor(public node: NodeInfo, private tabData: TabBase<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
         super();
     }
 

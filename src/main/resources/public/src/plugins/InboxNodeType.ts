@@ -4,7 +4,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { NodeActionType } from "../intf/TypeIntf";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
@@ -32,7 +32,7 @@ export class InboxNodeType extends TypeBase {
         return false;
     }
 
-    override render = (_node: NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new FlexRowLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([

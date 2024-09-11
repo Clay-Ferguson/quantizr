@@ -3,7 +3,7 @@ import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { NodeHistoryItem } from "./HistoryUtil";
 import { FullScreenConfig, FullScreenType } from "./Interfaces";
-import { TabIntf } from "./intf/TabIntf";
+import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { Tour } from "./Tour";
@@ -81,7 +81,7 @@ export class AppState {
 
     /* data for each tab, which we DO want to keep separate from the GUI view components themselves
     */
-    tabData: TabIntf[] = [];
+    tabData: TabBase[] = [];
 
     // null means we haven't read the yet and the server will get them as needed.
     friendHashTags: string[] = null;

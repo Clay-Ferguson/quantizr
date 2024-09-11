@@ -3,7 +3,7 @@ import { S } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { TabIntf } from "../intf/TabIntf";
+import { TabBase } from "../intf/TabBase";
 import { TypeBase } from "./base/TypeBase";
 
 export class ExportsType extends TypeBase {
@@ -23,7 +23,7 @@ export class ExportsType extends TypeBase {
         return true;
     }
 
-    override render = (_node: J.NodeInfo, _tabData: TabIntf<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
+    override render = (_node: J.NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, "Exports", { className: "noMargin" })
         ]);
