@@ -81,7 +81,6 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     controlsList: "nodownload"
                 }),
                 new Div(null, { className: "row" }, [
-                    // todo-0: make speed choices be a radio button group
                     new ButtonBar([
                         new Button("1x", () => this.speed(1)),
                         new Button("1.25x", () => this.speed(1.25)),

@@ -56,7 +56,7 @@ public class AIUtil extends ServiceBase {
 
         if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
-            queryTemplate = stripPrivateNotes(queryTemplate);
+            queryTemplate = removeHtmlComments(queryTemplate);
             queryTemplate = injectTemplateContext(node, queryTemplate);
 
             // When we set this, that means this will be the FINAL format for the question, also we're in writing mode here
@@ -72,23 +72,12 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    // we break up the query into lines (by '\n' delimiter) and then remove all lines that come after
-    // the first line we see that contains just "-" all by itself. A single dash on a line means everything
-    // after that is a private note.
     // todo-0: add to documentation that this is a feature.
-    public String stripPrivateNotes(String queryTemplate) {
-        if (queryTemplate == null) {
+    public String removeHtmlComments(String val) {
+        if (val == null) {
             return null;
         }
-        String[] lines = queryTemplate.split("\n");
-        StringBuilder sb = new StringBuilder();
-        for (String line : lines) {
-            if (line.trim().equals("-")) {
-                break;
-            }
-            sb.append(line + "\n");
-        }
-        return sb.toString();
+        return val.replaceAll("(?s)<!--.*?-->", "");
     }
 
     public String injectTemplateContext(SubNode node, String prompt) {

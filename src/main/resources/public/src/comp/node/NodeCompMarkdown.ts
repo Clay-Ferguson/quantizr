@@ -67,6 +67,10 @@ export class NodeCompMarkdown extends Comp {
         content = content || this.cont || "";
         let val = "";
         val = S.render.injectSubstitutions(node, content);
+
+        if (S.props.isMine(node)) {
+            val = S.util.makeHtmlCommentsVisible(val);
+        }
         val = this.translateLaTex(val);
 
         // NOTE: we must call removeHiddenUrls before insertMarkdownLinks because the latter will insert markdown links

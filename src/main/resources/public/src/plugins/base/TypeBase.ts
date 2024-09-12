@@ -357,7 +357,9 @@ export class TypeBase implements TypeIntf {
                 else {
                     let template: string = S.props.getPropStr(J.NodeProp.AI_QUERY_TEMPLATE, node);
                     if (template != null && template.trim().length > 0) {
-                        template = template.replace("\n-\n", "\n__________\n");
+                        if (S.props.isMine(node)) {
+                            template = S.util.makeHtmlCommentsVisible(template);
+                        }
                         aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                             new Div("AI Prompt", {
                                 className: "aiPrompt microMarginBottom float-end",

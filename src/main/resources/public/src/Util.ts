@@ -76,6 +76,17 @@ export class Util {
         sh: true
     };
 
+    makeHtmlCommentsVisible(content: string): string {
+        if (content == null) {
+            return null;
+        }
+        if (content.indexOf("<!--") != -1 && content.indexOf("-->") != -1) {
+            content = content.replace("<!--", "**_Private:_** ");
+            content = content.replace("-->", "");
+        }
+        return content;
+    }
+
     getFileIcon(mime: string) {
         if (!mime) return "fa-file";
         if (mime=="application/pdf") return "fa-file-pdf-o";
