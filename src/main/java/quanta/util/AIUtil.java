@@ -72,7 +72,6 @@ public class AIUtil extends ServiceBase {
         }
     }
 
-    // todo-0: add to documentation that this is a feature.
     public String removeHtmlComments(String val) {
         if (val == null) {
             return null;
