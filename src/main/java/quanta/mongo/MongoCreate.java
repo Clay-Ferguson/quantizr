@@ -56,8 +56,7 @@ public class MongoCreate extends ServiceBase {
 
     public SubNode createNode(SubNode parent, String type, Long ordinal, CreateNodeLocation location,
             boolean updateParentOrdinals, NodeChanges nodeChanges) {
-        return createNode(parent, null, type, ordinal, location, null, null, updateParentOrdinals, true,
-                nodeChanges);
+        return createNode(parent, null, type, ordinal, location, null, null, updateParentOrdinals, true, nodeChanges);
     }
 
     public SubNode createNode(String path) {
@@ -82,9 +81,9 @@ public class MongoCreate extends ServiceBase {
      *
      * relPath can be null if no path is known
      */
-    public SubNode createNode(SubNode parent, String relPath, String type, Long ordinal,
-            CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals,
-            boolean updateParent, NodeChanges nodeChanges) {
+    public SubNode createNode(SubNode parent, String relPath, String type, Long ordinal, CreateNodeLocation location,
+            List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals, boolean updateParent,
+            NodeChanges nodeChanges) {
         if (relPath == null) {
             // Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
             relPath = "?";
@@ -258,8 +257,8 @@ public class MongoCreate extends ServiceBase {
         // Node still null, then try other ways of getting it
         if (parentNode == null) {
             if (linkBookmark) {
-                parentNode = svc_mongoRead.getUserNodeByType(TL.getSC().getUserName(), null,
-                        "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null, false);
+                parentNode = svc_mongoRead.getUserNodeByType(TL.getSC().getUserName(), null, "### Bookmarks",
+                        NodeType.BOOKMARK_LIST.s(), null, false);
             } //
             else if (nodeId != null && nodeId.equals("~" + NodeType.NOTES.s())) {
                 parentNode = svc_mongoRead.getUserNodeByType(TL.getSC().getUserName(), null, "### Notes",
@@ -305,7 +304,8 @@ public class MongoCreate extends ServiceBase {
                     svc = AIModel.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null, system, svc, userCredit);
+                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null,
+                        system, svc, userCredit);
 
                 res.setGptCredit(userCredit.getVal());
                 typeToCreate = NodeType.AI_ANSWER.s();
@@ -330,8 +330,8 @@ public class MongoCreate extends ServiceBase {
                 req.getProperties().add(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
 
             }
-            newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, 0L, createLoc,
-                    req.getProperties(), null, true, true, nodeChanges);
+            newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
+                    null, true, true, nodeChanges);
             if (req.isPendingEdit()) {
                 newNode.setPath(svc_mongoUtil.setPendingPathState(newNode.getPath(), true));
             }
@@ -350,7 +350,7 @@ public class MongoCreate extends ServiceBase {
             }
             parentNode.touch();
             svc_mongoUpdate.save(parentNode);
-            NodeInfo nodeInfo = svc_convert.toNodeInfo( false, TL.getSC(), parentNode, false,
+            NodeInfo nodeInfo = svc_convert.toNodeInfo(false, TL.getSC(), parentNode, false,
                     Convert.LOGICAL_ORDINAL_GENERATE, true, false, false, true, null);
             res.setNewNode(nodeInfo);
             return res;
@@ -400,7 +400,7 @@ public class MongoCreate extends ServiceBase {
         }
         svc_mongoUpdate.save(newNode);
 
-        res.setNewNode(svc_convert.toNodeInfo( false, TL.getSC(), newNode, false, //
+        res.setNewNode(svc_convert.toNodeInfo(false, TL.getSC(), newNode, false, //
                 req.isCreateAtTop() ? 0 : Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, null));
 
         return res;
@@ -451,13 +451,13 @@ public class MongoCreate extends ServiceBase {
             throw new RuntimeException("Unable to find parent note to insert under: " + parentId);
         }
         svc_auth.writeAuth(parentNode);
-        
+
         // note: redundant security
         if (svc_acl.isAdminOwned(parentNode) && !TL.hasAdminPrivileges()) {
             throw new ForbiddenException();
         }
-        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, req.getTypeName(),
-                req.getTargetOrdinal(), CreateNodeLocation.ORDINAL, null, null, true, true, changes);
+        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
+                CreateNodeLocation.ORDINAL, null, null, true, true, changes);
         if (req.getInitialValue() != null) {
             newNode.setContent(req.getInitialValue());
         } else {
@@ -510,7 +510,7 @@ public class MongoCreate extends ServiceBase {
         // we save right away here so we get the node ID
         svc_mongoUpdate.save(newNode);
 
-        res.setNewNode(svc_convert.toNodeInfo( false, TL.getSC(), newNode, false, //
+        res.setNewNode(svc_convert.toNodeInfo(false, TL.getSC(), newNode, false, //
                 Convert.LOGICAL_ORDINAL_GENERATE, false, false, false, false, null));
         return res;
     }

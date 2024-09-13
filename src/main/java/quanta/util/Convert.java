@@ -53,7 +53,7 @@ public class Convert extends ServiceBase {
 
         // if we have a signature, check it.
         boolean sigFail = false;
-        if (sig != null && !svc_crypto.nodeSigVerify(node, sig, accountNodeMap)) {
+        if (sig != null && !Constant.SIG_TBD.s().equals(sig) && !svc_crypto.nodeSigVerify(node, sig, accountNodeMap)) {
             sigFail = true;
         }
 
@@ -258,15 +258,18 @@ public class Convert extends ServiceBase {
         HashMap<String, Object> propMap = node.getProps();
         if (propMap != null && propMap.keySet() != null) {
             for (String propName : propMap.keySet()) {
+                Object propVal = propMap.get(propName);
+
                 // indicate to the client the signature is no good by not even sending the bad signature to client.
-                if (sigFail && NodeProp.CRYPTO_SIG.s().equals(propName)) {
+                // But leave the SIG_TBD so the client can know it's due to be signed immediately
+                if (sigFail && NodeProp.CRYPTO_SIG.s().equals(propName) && !Constant.SIG_TBD.s().equals(propVal)) {
                     continue;
                 }
                 // lazy create props
                 if (props == null) {
                     props = new LinkedList<>();
                 }
-                PropertyInfo propInfo = toPropInfo(sc, node, propName, propMap.get(propName), initNodeEdit);
+                PropertyInfo propInfo = toPropInfo(sc, node, propName, propVal, initNodeEdit);
                 props.add(propInfo);
             }
         }

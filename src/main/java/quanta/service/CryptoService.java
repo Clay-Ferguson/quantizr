@@ -88,7 +88,9 @@ public class CryptoService extends ServiceBase {
      * nodeMap to this method for a performance boost
      */
     public boolean nodeSigVerify(SubNode node, String sig, HashMap<String, AccountNode> accountNodeMap) {
-        if (sig == null || node == null)
+        // Nodes with TBD in their signature are in the process of being signed
+        // or about to be signed.
+        if (sig == null || node == null || Constant.SIG_TBD.s().equals(sig))
             return false;
         PublicKey pubKey = null;
         try {
@@ -143,7 +145,7 @@ public class CryptoService extends ServiceBase {
     /*
      * Builds the string that will be the raw data that's cryptographically signed
      * 
-     * see: #signature-format (in Java)
+     * see: #signature-format (in TypeScript)
      */
     public String getNodeSigData(SubNode node) {
         String path = node.getPath();
