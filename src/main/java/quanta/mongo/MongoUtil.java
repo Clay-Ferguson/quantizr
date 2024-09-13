@@ -91,14 +91,21 @@ public class MongoUtil extends ServiceBase {
      * Note that since we don't require to end with "/" this function can be extending an existing leaf
      * name, or if the path does end with "/", then it has the effect of finding a new leaf from
      * scratch.
+     * 
+     * The reserving set is used to ensure that we know which ones a given worker thread has reserved so
+     * it won't try to use it again, for a diferent node, because this can happen since our transaction
+     * is not committed yet
      */
-    public String findAvailablePath(String path) {
+    public String findAvailablePath(String path, HashSet<String> reserved) {
         /*
          * If the path we want doesn't exist at all we can use it, so check that case first, but only if we
          * don't have a path ending with slash because that means we KNOW we need to always find a new child
          * regardless of any existing ones
          */
-        if (!path.endsWith("/") && pathIsAvailable(path)) {
+        if (!path.endsWith("/") && (reserved == null || !reserved.contains(path)) && pathIsAvailable(path)) {
+            if (reserved != null) {
+                reserved.add(path);
+            }
             return path;
         }
         int tries = 0;
@@ -122,12 +129,15 @@ public class MongoUtil extends ServiceBase {
             if (tries >= 4) {
                 path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
             }
-            if (pathIsAvailable(path)) {
+            if ((reserved == null || !reserved.contains(path)) && pathIsAvailable(path)) {
                 // we must proactively delete any orphaned nodes that might be existing and would be 'ressurected'
                 // which would be BAD!
                 long orphans = svc_mongoDelete.simpleDeleteUnderPath(path);
                 if (orphans > 0) {
                     log.debug("New Path Found: " + path + " deleted " + orphans + " orphans");
+                }
+                if (reserved != null) {
+                    reserved.add(path);
                 }
                 return path;
             }
@@ -167,7 +177,7 @@ public class MongoUtil extends ServiceBase {
         else if (!pending && path.startsWith(NodePath.PENDING_PATH_S)) {
             // get pending path out of the path, first
             String p = path.replace(NodePath.PENDING_PATH_S, NodePath.ROOT_PATH_S);
-            p = findAvailablePath(p);
+            p = findAvailablePath(p, null);
             return p;
         }
         return path;

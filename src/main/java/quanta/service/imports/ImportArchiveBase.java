@@ -2,6 +2,7 @@ package quanta.service.imports;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
@@ -29,6 +30,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
     public String targetPath;
     public SubNode importRootNode;
     public SubNode curNode;
+    public HashSet<String> reservedPaths = new HashSet<>();
 
     public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
         String name = entry.getName();
@@ -78,7 +80,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                             n.setId(null);
                         }
 
-                        String newPath = svc_mongoUtil.findAvailablePath(targetPath + n.getPath());
+                        String newPath = svc_mongoUtil.findAvailablePath(targetPath + n.getPath(), reservedPaths);
                         n.setPath(newPath);
                         // verifyParentPath=false signals to MongoListener to not waste cycles checking the path on this
                         // to verify the parent exists upon saving, because we know the path is fine correct.

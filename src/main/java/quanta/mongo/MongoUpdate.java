@@ -251,7 +251,7 @@ public class MongoUpdate extends ServiceBase {
          * part of the path
          */
         if (node.getPath().endsWith("/?")) {
-            String path = svc_mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
+            String path = svc_mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()), null);
             node.setPath(path);
             isNew = true;
         }

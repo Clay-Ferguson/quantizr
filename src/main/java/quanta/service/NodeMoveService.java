@@ -313,6 +313,7 @@ public class NodeMoveService extends ServiceBase {
         nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 
         SubNode _nodeParent = nodeParent;
+        HashSet<String> reservedPaths = new HashSet<String>();
         svc_arun.run(() -> {
             // process all nodes being moved.
             for (SubNode node : nodesToMove) {
@@ -322,7 +323,7 @@ public class NodeMoveService extends ServiceBase {
                     throw new RuntimeEx("Impossible node move requested.");
                 }
                 // find any new Path available under the paste target location 'parentPath'
-                String newPath = svc_mongoUtil.findAvailablePath(parentPath + "/");
+                String newPath = svc_mongoUtil.findAvailablePath(parentPath + "/", reservedPaths);
                 changePathOfSubGraph(node, node.getPath(), newPath, copyPaste, nodesModified, res);
                 nodesModified.add(node.getIdStr());
                 node.setPath(newPath);
