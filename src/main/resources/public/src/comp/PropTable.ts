@@ -7,9 +7,7 @@ import { Comp } from "./base/Comp";
 
 export class PropTable extends Comp {
     constructor(private node: NodeInfo) {
-        super({
-            className: "propertyTable"
-        });
+        super();
     }
 
     override preRender(): boolean | null {

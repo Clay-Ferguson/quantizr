@@ -179,7 +179,7 @@ export abstract class DialogBase extends Comp {
             contentAreaClass = "appModalContentAreaPopup" + (isTopmost ? " dlgContentBorderTopmost" : " dlgContentBorderNormal");
         }
         else {
-            contentAreaClass = ast.mobileMode ? "appModalContentAreaEmbedMobile" : "appModalContentAreaEmbed";
+            contentAreaClass = ast.mobileMode ? "" : "appModalContentAreaEmbed";
         }
 
         this.children = [

@@ -10,7 +10,7 @@ export class SchemaOrgPropsTable extends ListBox {
     constructor(public props: SchemaOrgProp[], private dlg: EditPropertyDlg) {
         super();
         const maxHeight: number = window.innerHeight > 300 ? (window.innerHeight * 0.5) : 300;
-        this.attribs.className = "scrollY scrollBorder propsList customScrollbar";
+        this.attribs.className = "scrollY scrollBorder customScrollbar";
         this.attribs.style = { maxHeight: maxHeight + "px" };
     }
 

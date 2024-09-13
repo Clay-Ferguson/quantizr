@@ -2,7 +2,7 @@
     margin-left: $smallGap;
 }
 
-.nav-link-base {
+.navLinkBase {
     padding: .5rem .5rem .5rem .8rem;
     cursor: pointer;
     font-weight: bold;
@@ -17,18 +17,18 @@
 }
 
 .nav-tabs>.nav-item>.nav-link {
-    @extend .nav-link-base;
+    @extend .navLinkBase;
     border: 5px solid transparent;
 }
 
 .nav-tabs>.nav-item>.nav-link:hover {
-    @extend .nav-link-base;
+    @extend .navLinkBase;
     border: 5px solid transparent;
 }
 
 .nav-tabs>.nav-item>.nav-link.active,
 .nav-tabs>.nav-item>.nav-link.active:hover,
 .nav-tabs>.nav-item>.nav-link.active:focus {
-    @extend .nav-link-base;
+    @extend .navLinkBase;
     border: 5px solid $nodeBorderBottomColor;
 }

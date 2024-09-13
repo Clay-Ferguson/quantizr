@@ -144,7 +144,6 @@
     margin-left: 0;
 }
 
-
 .transferPending {
     @extend .created-by;
     background: darkkhaki;
@@ -171,7 +170,7 @@
     vertical-align: middle;
 }
 
-.row-header {
+.rowHeader {
     margin-left: $smallGap;
     min-height: 2rem; // warning: don't make this less than 2rem!
     margin-bottom: $tinyGap;

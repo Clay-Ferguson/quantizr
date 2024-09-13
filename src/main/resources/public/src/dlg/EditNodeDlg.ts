@@ -447,7 +447,7 @@ export class EditNodeDlg extends DialogBase {
                         dispatch("setPropsPanelExpanded", s => {
                             s.propsPanelExpanded = expanded;
                         });
-                    }, getAs().propsPanelExpanded || autoExpandProps, "", "propsPanelExpanded", "propsPanelCollapsed float-end", "div");
+                    }, getAs().propsPanelExpanded || autoExpandProps, "", "", "float-end", "div");
             }
             // if schema.org type show properties in visible panel always
             else {

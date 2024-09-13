@@ -186,10 +186,6 @@ th {
     margin-bottom: $smallGap;
 }
 
-.propsPanelExpanded {}
-
-.propsPanelCollapsed {}
-
 .scrollingPropsTable {
     width: 100%;
     overflow-x: auto;
@@ -243,15 +239,11 @@ th {
     flex-wrap: wrap;
 }
 
-.propsList {}
-
 .propsListItemCheckBox {
     vertical-align: middle;
     margin-left: $microGap;
     margin-right: 0 !important;
 }
-
-.propertyTable {}
 
 .propTableRow {
     width: 100%;
