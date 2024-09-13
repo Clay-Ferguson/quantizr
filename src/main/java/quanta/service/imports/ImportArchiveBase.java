@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
@@ -91,7 +92,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                     }
                 });
                 if (node == null) {
-                    throw new RuntimeException("import unmarshalling failed.");
+                    throw new RuntimeEx("import unmarshalling failed.");
                 }
                 curNode = node;
                 /*
@@ -114,7 +115,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                     nodeFound = svc_mongoRead.getNodeByNameAP(nodeName, null);
                 }
                 if (nodeFound != null) {
-                    throw new RuntimeException(
+                    throw new RuntimeEx(
                             "Failed to save node " + node.getIdStr() + ". Name already exists: " + nodeName);
                 }
                 node.setName(nodeName);

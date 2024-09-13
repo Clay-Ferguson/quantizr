@@ -26,6 +26,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoRepository;
 import reactor.core.publisher.Mono;
 
@@ -63,13 +64,13 @@ public class Util {
                     .block();
         } catch (WebClientResponseException e) {
             // This exception is thrown for HTTP status code errors
-            throw new RuntimeException("Error: " + e.getMessage() + " Status Code: " + e.getStatusCode(), e);
+            throw new RuntimeEx("Error: " + e.getMessage() + " Status Code: " + e.getStatusCode(), e);
         } catch (WebClientRequestException e) {
             // This exception is thrown for errors while making the request (e.g., connectivity issues)
-            throw new RuntimeException("Error: " + e.getMessage(), e);
+            throw new RuntimeEx("Error: " + e.getMessage(), e);
         } catch (Exception e) {
             // This is a generic exception handler for other exceptions
-            throw new RuntimeException("Error: " + e.getMessage(), e);
+            throw new RuntimeEx("Error: " + e.getMessage(), e);
         }
         return response;
     }
@@ -114,7 +115,7 @@ public class Util {
                 } catch (Exception e) {
                 }
             } else { // silently ignore this exception.
-                throw new RuntimeException("Server not yet started.");
+                throw new RuntimeEx("Server not yet started.");
             }
         }
         return MongoRepository.fullInit;

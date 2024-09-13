@@ -186,7 +186,7 @@ public class MongoRead extends ServiceBase {
             svc_mongoUpdate.saveIfDirtyAP(node);
 
             // terminate user operation
-            throw new RuntimeException("One or more nodes were in an invalid state.");
+            throw new RuntimeEx("One or more nodes were in an invalid state.");
         }
     }
 
@@ -223,7 +223,7 @@ public class MongoRead extends ServiceBase {
             }
         }
         // If we get here this is definitely a bug.
-        throw new RuntimeException("isOrphan algo failure.");
+        throw new RuntimeEx("isOrphan algo failure.");
     }
 
     /*
@@ -1155,7 +1155,7 @@ public class MongoRead extends ServiceBase {
     public TreeNode getSubGraphTree(String rootId, Criteria criteria, HashMap<String, TreeNode> idMap) {
         SubNode rootNode = getNode(new ObjectId(rootId));
         if (rootNode == null)
-            throw new RuntimeException("unable to access node: " + rootId);
+            throw new RuntimeEx("unable to access node: " + rootId);
 
         TreeNode rootTreeNode = new TreeNode(rootNode);
         if (idMap != null) {
@@ -1170,7 +1170,7 @@ public class MongoRead extends ServiceBase {
         for (SubNode n : getSubGraph(rootNode, null, 0, false, criteria)) {
             nodeMap.put(n.getPath(), new TreeNode(n));
             if (nodeMap.size() > MAX_TREE_GRAPH_SIZE) {
-                throw new RuntimeException(
+                throw new RuntimeEx(
                         "Too much data to return. Max is " + String.valueOf(MAX_TREE_GRAPH_SIZE) + " nodes.");
             }
         }

@@ -12,6 +12,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import quanta.exception.base.RuntimeEx;
 import reactor.core.publisher.Mono;
 
 public class StreamUtil {
@@ -33,7 +34,7 @@ public class StreamUtil {
             return is;
         } catch (Exception e) {
             ExUtil.error(log, "Failed Reading: " + sourceUrl, e);
-            throw new RuntimeException("Stream failed. Are you out of server storage space?");
+            throw new RuntimeEx("Stream failed. Are you out of server storage space?");
         }
     }
 

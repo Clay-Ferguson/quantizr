@@ -191,7 +191,7 @@ public class MongoAuth extends ServiceBase {
         // if anonymous check for public nodes
         if (TL.getSC().isAnon()) {
             if (write) {
-                throw new RuntimeException("Unable to build writable query by unknown session context");
+                throw new RuntimeEx("Unable to build writable query by unknown session context");
             }
 
             // if we have no 'ands', just tack on to existing criteria
@@ -209,7 +209,7 @@ public class MongoAuth extends ServiceBase {
             // if unknown person then again only a condition for public is what we want
             if (myAcntNode == null) {
                 if (write) {
-                    throw new RuntimeException("Unable to build writable query by unknown user");
+                    throw new RuntimeEx("Unable to build writable query by unknown user");
                 }
 
                 // if we have no 'ands', just tack on to existing criterial
@@ -256,11 +256,11 @@ public class MongoAuth extends ServiceBase {
         if (TL.getSC() == null) {
             // when we get here it normally means we should've called "arun.exec" to manage
             // the thread instead of justs passing in an 'ms' or null
-            throw new RuntimeException("ThreadLocals doesn't have session.");
+            throw new RuntimeEx("ThreadLocals doesn't have session.");
         }
 
         if (TL.getSC().getUserNodeObjId() == null) {
-            throw new RuntimeException("session has no userNode: " + XString.prettyPrint(TL.getSC()));
+            throw new RuntimeEx("session has no userNode: " + XString.prettyPrint(TL.getSC()));
         }
 
         if (!TL.getSC().getUserNodeObjId().equals(node.getOwner())) {
@@ -569,7 +569,7 @@ public class MongoAuth extends ServiceBase {
     public void asUser(String userName) {
         AccountNode userNode = svc_user.getAccountByUserNameAP(userName);
         if (userNode == null) {
-            throw new RuntimeException("UserNode not found for userName " + userName);
+            throw new RuntimeEx("UserNode not found for userName " + userName);
         }
 
         SessionContext sc = new SessionContext();

@@ -13,6 +13,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
@@ -62,7 +63,7 @@ public class MongoTestService extends ServiceBase {
         try {
             adminsChild.setPath(adminsChild.getPath() + "abc");
             svc_mongoUpdate.save(adminsChild);
-            throw new RuntimeException("failed to block path alter.");
+            throw new RuntimeEx("failed to block path alter.");
         } catch (ForbiddenException e) {
             svc_testUtil.log("Successful path alter blocked.");
         }
@@ -71,7 +72,7 @@ public class MongoTestService extends ServiceBase {
         try {
             @SuppressWarnings("unused")
             SubNode updateNode = svc_mongoRead.getNode(insertedId);
-            throw new RuntimeException("failed to block.");
+            throw new RuntimeEx("failed to block.");
         } catch (ForbiddenException e) {
             svc_testUtil.log("Successful auth block.");
         }

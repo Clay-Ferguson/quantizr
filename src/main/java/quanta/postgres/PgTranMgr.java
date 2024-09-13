@@ -6,6 +6,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
+import quanta.exception.base.RuntimeEx;
 
 /**
  * PostgreSQL Transaction Manager
@@ -27,7 +28,7 @@ public class PgTranMgr implements PlatformTransactionManager {
 
     public static void ensureTran() {
         if (!isTranActive()) {
-            throw new RuntimeException("This method must be called within a PostgreSQL transaction.");
+            throw new RuntimeEx("This method must be called within a PostgreSQL transaction.");
         }
     }
 

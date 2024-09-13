@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
@@ -62,7 +63,7 @@ public class MongoUtil extends ServiceBase {
         }
 
         if (node.getOwner() == null) {
-            throw new RuntimeException("Node has no owner: " + node.getIdStr());
+            throw new RuntimeEx("Node has no owner: " + node.getIdStr());
             // if (svc_auth.getAdminSession() != null) {
             // node.setOwner(svc_auth.getAdminSession().getUserNodeId());
             // log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
@@ -98,7 +99,7 @@ public class MongoUpdate extends ServiceBase {
                     synchronized (TL.getSC()) {
                         TL.getDirtyNodes().forEach((key, value) -> {
                             if (!key.toHexString().equals(value.getIdStr())) {
-                                throw new RuntimeException("Node originally cached as ID " + key.toHexString()
+                                throw new RuntimeEx("Node originally cached as ID " + key.toHexString()
                                         + " now has key" + value.getIdStr());
                             }
                         });
@@ -302,7 +303,7 @@ public class MongoUpdate extends ServiceBase {
                 svc_mongoRead.checkParentExists(node.getPath());
             } catch (Exception e) {
                 node.setId(null);
-                throw new RuntimeException("Parent path did not exist: " + node.getPath());
+                throw new RuntimeEx("Parent path did not exist: " + node.getPath());
             }
         }
     }
@@ -337,7 +338,7 @@ public class MongoUpdate extends ServiceBase {
                  * working where as nullifying the ID does indeed abort the save.
                  */
                 node.setId(null);
-                throw new RuntimeException("unable to get node parent: " + node.getParentPath());
+                throw new RuntimeEx("unable to get node parent: " + node.getParentPath());
             }
 
             svc_auth.writeAuth(parent);

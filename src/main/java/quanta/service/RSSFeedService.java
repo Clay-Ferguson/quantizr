@@ -48,6 +48,7 @@ import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -356,11 +357,11 @@ public class RSSFeedService extends ServiceBase {
                             .block();
                 } catch (WebClientResponseException e) {
                     // This exception is thrown for HTTP status code errors
-                    throw new RuntimeException("Error while calling the RSS feed service: " + e.getMessage()
+                    throw new RuntimeEx("Error while calling the RSS feed service: " + e.getMessage()
                             + " Status Code: " + e.getStatusCode(), e);
                 } catch (WebClientRequestException e) {
                     // This exception is thrown for errors while making the request (e.g., connectivity issues)
-                    throw new RuntimeException("Request error while calling the RSS feed service: " + e.getMessage(),
+                    throw new RuntimeEx("Request error while calling the RSS feed service: " + e.getMessage(),
                             e);
                 } catch (Exception e) {
                     /*
@@ -372,7 +373,7 @@ public class RSSFeedService extends ServiceBase {
                      * First known example of this tactic for me was: https://defence-blog.com/feed
                      */
                     // This is a generic exception handler for other exceptions
-                    throw new RuntimeException("General error while calling the RSS feed service: " + e.getMessage(),
+                    throw new RuntimeEx("General error while calling the RSS feed service: " + e.getMessage(),
                             e);
                 }
 
@@ -385,7 +386,7 @@ public class RSSFeedService extends ServiceBase {
             }
 
             if (response == null) {
-                throw new RuntimeException("Could not read feed: " + url);
+                throw new RuntimeEx("Could not read feed: " + url);
             }
             // log.debug("RSS Response: " + response);
 
@@ -396,7 +397,7 @@ public class RSSFeedService extends ServiceBase {
                 XmlReader xmlReader = new XmlReader(inputStream, true);
                 inFeed = input.build(xmlReader);
             } catch (Exception e) {
-                throw new RuntimeException("Could not parse response for feed: " + url, e);
+                throw new RuntimeEx("Could not parse response for feed: " + url, e);
             }
 
             long time = System.currentTimeMillis() - start;
@@ -860,7 +861,7 @@ public class RSSFeedService extends ServiceBase {
                 writer.write(feedStr);
             } catch (Exception e) {
                 ExUtil.error(log, "writeFeed Error: ", e);
-                throw new RuntimeException("internal server error");
+                throw new RuntimeEx("internal server error");
             }
         }
     }

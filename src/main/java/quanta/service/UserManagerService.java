@@ -126,11 +126,11 @@ public class UserManagerService extends ServiceBase {
     public void authBearer() {
         SessionContext sc = TL.getSC();
         if (sc == null) {
-            throw new RuntimeException("Unable to get SessionContext to check token.");
+            throw new RuntimeEx("Unable to get SessionContext to check token.");
         }
 
         if (StringUtils.isEmpty(sc.getUserName())) {
-            throw new RuntimeException("No user name in session context.");
+            throw new RuntimeEx("No user name in session context.");
         }
 
         // NOTE: This token (if in header, request url, or session variable) will have been set in the
@@ -178,13 +178,13 @@ public class UserManagerService extends ServiceBase {
         // Admin Login
         else if (PrincipalName.ADMIN.s().equalsIgnoreCase(req.getUserName().trim())) {
             if (!svc_prop.getAdminPassword().equals(req.getPassword())) {
-                throw new RuntimeException("Unauthorized");
+                throw new RuntimeEx("Unauthorized");
             }
 
             svc_arun.run(() -> {
                 AccountNode userNode = svc_user.getAccountByUserNameAP(req.getUserName());
                 if (userNode == null) {
-                    throw new RuntimeException("User not found: " + req.getUserName());
+                    throw new RuntimeEx("User not found: " + req.getUserName());
                 }
                 userNodeVal.setVal(userNode);
                 setAuthenticated(sc, req.getUserName(), userNode.getId());
@@ -197,14 +197,14 @@ public class UserManagerService extends ServiceBase {
             svc_arun.run(() -> {
                 AccountNode userNode = svc_user.getAccountByUserNameAP(req.getUserName());
                 if (userNode == null) {
-                    throw new RuntimeException("User not found: " + req.getUserName());
+                    throw new RuntimeEx("User not found: " + req.getUserName());
                 }
                 userNodeVal.setVal(userNode);
                 String userName = userNode.getStr(NodeProp.USER);
                 String checkHash = userNode.getStr(NodeProp.PWD_HASH);
                 String reqHash = svc_mongoUtil.getHashOfPassword(req.getPassword());
                 if (!checkHash.equals(reqHash)) {
-                    throw new RuntimeException("Unauthorized");
+                    throw new RuntimeEx("Unauthorized");
                 }
                 setAuthenticated(sc, userName, userNode.getId());
                 return null;
@@ -228,7 +228,7 @@ public class UserManagerService extends ServiceBase {
     /* This is called only upon successful login of a non-anon user */
     public void setAuthenticated(SessionContext sc, String userName, ObjectId userNodeId) {
         if (userName.equals(PrincipalName.ANON.s())) {
-            throw new RuntimeException("invalid call to setAuthenticated for anon.");
+            throw new RuntimeEx("invalid call to setAuthenticated for anon.");
         }
 
         // only generate a token if not already set, because this SessionContext is shared across
@@ -276,7 +276,7 @@ public class UserManagerService extends ServiceBase {
         }
         String id = userNode.getIdStr();
         if (id == null) {
-            throw new RuntimeException("userNode id is null for user: " + userName);
+            throw new RuntimeEx("userNode id is null for user: " + userName);
         }
         sc.setUserNodeId(id);
         UserPreferences userPreferences = getUserPreferences(userName, userNode);
@@ -563,7 +563,7 @@ public class UserManagerService extends ServiceBase {
             svc_push.pushInfo(TL.getSC(), pushInfo);
             return tran;
         } else {
-            throw new RuntimeException("addCreditByEmail: user not found for email: " + emailAdr);
+            throw new RuntimeEx("addCreditByEmail: user not found for email: " + emailAdr);
         }
     }
 
@@ -611,11 +611,11 @@ public class UserManagerService extends ServiceBase {
         svc_arun.run(() -> {
             SubNode prefsNode = svc_mongoRead.getNode(req.getUserNodeId());
             if (prefsNode == null)
-                throw new RuntimeException("Unable to update preferences.");
+                throw new RuntimeEx("Unable to update preferences.");
             // Make sure the account node we're about to modify does belong to the current user.
 
             if (!userName.equals(prefsNode.getStr(NodeProp.USER))) {
-                throw new RuntimeException("Not your node.");
+                throw new RuntimeEx("Not your node.");
             }
 
             // Assign preferences as properties on this node,
@@ -1112,7 +1112,7 @@ public class UserManagerService extends ServiceBase {
         else if ("blocks".equals(type)) { //
             nodeType = NodeType.BLOCKED_USERS.s();
         } else {
-            throw new RuntimeException("Invalid type: " + type);
+            throw new RuntimeEx("Invalid type: " + type);
         }
         List<SubNode> friendNodes = getSpecialNodesList(null, nodeType, userName, true, moreCriteria);
         if (friendNodes != null) {
@@ -1429,7 +1429,7 @@ public class UserManagerService extends ServiceBase {
             Val<SubNode> postsNodeVal) {
         AccountNode userNode = svc_user.getAccountByUserNameAP(newUserName);
         if (userNode != null) {
-            throw new RuntimeException("User already existed: " + newUserName);
+            throw new RuntimeEx("User already existed: " + newUserName);
         }
         if (PrincipalName.ADMIN.s().equals(newUserName)) {
             throw new RuntimeEx("createUser should not be called for admin user.");

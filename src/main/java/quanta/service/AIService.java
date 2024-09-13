@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.AIMessage;
 import quanta.model.AIRequest;
 import quanta.model.AIResponse;
@@ -37,11 +38,11 @@ public class AIService extends ServiceBase {
     public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system, AIModel svc,
             Val<BigDecimal> userCredit) {
         if (svc == null) {
-            throw new RuntimeException("No AI service selected.");
+            throw new RuntimeEx("No AI service selected.");
         }
         AccountNode userNode = svc_user.getAccountByUserNameAP(TL.getSC().getUserName());
         if (userNode == null) {
-            throw new RuntimeException("Unknown user.");
+            throw new RuntimeEx("Unknown user.");
         }
         BigDecimal balance = svc_aiUtil.getBalance(userNode);
 
@@ -136,7 +137,7 @@ public class AIService extends ServiceBase {
             case "gemini":
                 return svc_prop.getGeminiAiKey();
             default:
-                throw new RuntimeException("Unknown service: " + service);
+                throw new RuntimeEx("Unknown service: " + service);
         }
     }
 

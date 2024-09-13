@@ -194,7 +194,7 @@ public class NodeMoveService extends ServiceBase {
                 if (req.isJoinToParent()) {
                     targetNode = svc_mongoRead.getParent(n);
                     if (targetNode == null) {
-                        throw new RuntimeException("Failed to find parent of node: " + n.getIdStr());
+                        throw new RuntimeEx("Failed to find parent of node: " + n.getIdStr());
                     }
                 } else {
                     targetNode = n;
@@ -255,7 +255,7 @@ public class NodeMoveService extends ServiceBase {
     private void moveNodesInternal(String location, String targetId, List<String> nodeIds, boolean copyPaste,
             HashSet<String> nodesModified, MoveNodesResponse res) {
         if (nodeIds == null || nodeIds.size() == 0) {
-            throw new RuntimeException("No nodes specified to move.");
+            throw new RuntimeEx("No nodes specified to move.");
         }
         NodeChanges nodeChanges = new NodeChanges();
         res.setNodeChanges(nodeChanges);
@@ -299,7 +299,7 @@ public class NodeMoveService extends ServiceBase {
 
             // Verify all nodes being pasted are siblings
             if (sourceParentPath != null && !sourceParentPath.equals(node.getParentPath())) {
-                throw new RuntimeException("Nodes to move must be all from the same parent.");
+                throw new RuntimeEx("Nodes to move must be all from the same parent.");
             }
             sourceParentPath = node.getParentPath();
             // get the nodeParent if we don't have it already.
@@ -319,7 +319,7 @@ public class NodeMoveService extends ServiceBase {
                 // if a parent node is attempting to be pasted into one of it's children that's an impossible move
                 // so we reject the attempt.
                 if (parentToPasteInto.getPath().startsWith(node.getPath() + "/")) {
-                    throw new RuntimeException("Impossible node move requested.");
+                    throw new RuntimeEx("Impossible node move requested.");
                 }
                 // find any new Path available under the paste target location 'parentPath'
                 String newPath = svc_mongoUtil.findAvailablePath(parentPath + "/");

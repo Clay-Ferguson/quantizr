@@ -481,7 +481,7 @@ public class AttachmentService extends ServiceBase {
             // We always allow access to account nodes becasue they only contain avatars and header images.
             InputStream is = svc_auth.isAnAccountNode(node) ? getStreamAP(attName, node) : getStream(attName, node);
             if (is == null) {
-                throw new RuntimeException("Image not found.");
+                throw new RuntimeEx("Image not found.");
             }
             long size = att.getSize();
             response.setContentType(mimeTypeProp);
@@ -1084,14 +1084,14 @@ public class AttachmentService extends ServiceBase {
         }
 
         if (id == null) {
-            throw new RuntimeException("No ID specified.");
+            throw new RuntimeEx("No ID specified.");
         }
 
         // we don't check ownership of node at this time, but merely check sanity of
         // whether this ID is even existing or not.
         SubNode node = svc_mongoRead.getNode(id);
         if (node == null) {
-            throw new RuntimeException("Node not found.");
+            throw new RuntimeEx("Node not found.");
         }
 
         svc_attach.getBinary(attName, node, null, null, download != null, response);
@@ -1109,7 +1109,7 @@ public class AttachmentService extends ServiceBase {
 
         SubNode node = svc_mongoRead.getNodeAP(nodeId);
         if (node == null) {
-            throw new RuntimeException("Node not found.");
+            throw new RuntimeEx("Node not found.");
         }
 
         // if node is account node we can get ANY attachments from it.

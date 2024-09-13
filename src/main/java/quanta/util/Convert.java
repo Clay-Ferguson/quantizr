@@ -15,6 +15,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.AccessControlInfo;
 import quanta.model.ImageSize;
 import quanta.model.NodeInfo;
@@ -90,7 +91,7 @@ public class Convert extends ServiceBase {
         List<PropertyInfo> propList = buildPropertyInfoList(sc, node, initNodeEdit, sigFail);
         List<AccessControlInfo> acList = svc_acl.buildAccessControlList(sc, node);
         if (node.getOwner() == null) {
-            throw new RuntimeException("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
+            throw new RuntimeEx("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
         }
         String ownerId = node.getOwner().toHexString();
         String avatarVer = null;

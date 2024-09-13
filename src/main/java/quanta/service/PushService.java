@@ -176,7 +176,7 @@ public class PushService extends ServiceBase {
             SessionContext sc = svc_redis.get(token);
             if (sc == null) {
                 // todo-2: We were getting this a LOT in the log file, just from outdated sessions (i think) so let's ignore it for now.
-                // throw new RuntimeException("bad token for push emitter: " + token); 
+                // throw new RuntimeEx("bad token for push emitter: " + token); 
                 return;
             }
             SseEmitter pushEmitter = svc_user.getPushEmitter(token);

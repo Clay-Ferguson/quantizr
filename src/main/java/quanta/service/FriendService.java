@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
@@ -63,7 +64,7 @@ public class FriendService extends ServiceBase {
             svc_mongoUpdate.save(friendNode);
             return friendNode;
         } else {
-            throw new RuntimeException("User not found: " + userToFollow);
+            throw new RuntimeEx("User not found: " + userToFollow);
         }
     }
 
@@ -72,7 +73,7 @@ public class FriendService extends ServiceBase {
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
         svc_auth.ownerAuth(node);
         if (!NodeType.FRIEND.s().equals(node.getType())) {
-            throw new RuntimeException("Not a Friend node.");
+            throw new RuntimeEx("Not a Friend node.");
         }
         node.setTags(req.getTags());
         return res;
@@ -128,7 +129,7 @@ public class FriendService extends ServiceBase {
         if (accntIdDoingFollow == null) {
             AccountNode followerAcctNode = svc_arun.run(() -> svc_user.getAccountByUserNameAP(userDoingFollow));
             if (followerAcctNode == null) {
-                throw new RuntimeException("Unable to find user: " + userDoingFollow);
+                throw new RuntimeEx("Unable to find user: " + userDoingFollow);
             }
             accntIdDoingFollow = followerAcctNode.getId();
         }

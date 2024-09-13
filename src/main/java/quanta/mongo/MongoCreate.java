@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.ForbiddenException;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
@@ -137,7 +138,7 @@ public class MongoCreate extends ServiceBase {
                 ordinal = svc_mongoCreate.insertOrdinal(parent, ordinal, 1L, nodeChanges);
                 break;
             default:
-                throw new RuntimeException("Unknown ordinal");
+                throw new RuntimeEx("Unknown ordinal");
         }
         svc_mongoUpdate.saveSession(false);
         return ordinal;
@@ -280,7 +281,7 @@ public class MongoCreate extends ServiceBase {
         }
 
         if (parentNode == null) {
-            throw new RuntimeException("unable to locate parent for insert");
+            throw new RuntimeEx("unable to locate parent for insert");
         }
 
         // if user is adding a node under one of their parent nodes then we inherit the sharing
@@ -436,19 +437,19 @@ public class MongoCreate extends ServiceBase {
          */
         if (StringUtils.isEmpty(parentId)) {
             if (StringUtils.isEmpty(req.getSiblingId())) {
-                throw new RuntimeException("No parent or sibling specified for insert");
+                throw new RuntimeEx("No parent or sibling specified for insert");
             }
             SubNode siblingNode = svc_mongoRead.getNode(req.getSiblingId());
             SubNode parentNode = svc_mongoRead.getParent(siblingNode);
             if (parentNode == null) {
-                throw new RuntimeException("Unable to find parent note to insert under: " + parentId);
+                throw new RuntimeEx("Unable to find parent note to insert under: " + parentId);
             }
             parentId = parentNode.getIdStr();
         }
 
         SubNode parentNode = svc_mongoRead.getNode(parentId);
         if (parentNode == null) {
-            throw new RuntimeException("Unable to find parent note to insert under: " + parentId);
+            throw new RuntimeEx("Unable to find parent note to insert under: " + parentId);
         }
         svc_auth.writeAuth(parentNode);
 

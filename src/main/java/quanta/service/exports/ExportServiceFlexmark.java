@@ -23,6 +23,7 @@ import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
@@ -147,7 +148,7 @@ public class ExportServiceFlexmark extends ServiceBase {
                 wroteFile = true;
                 StreamUtil.close(out);
             } else {
-                throw new RuntimeException("invalid format.");
+                throw new RuntimeEx("invalid format.");
             }
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);

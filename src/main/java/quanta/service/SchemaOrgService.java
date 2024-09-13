@@ -14,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.SchemaOrgClass;
 import quanta.model.client.SchemaOrgProp;
 import quanta.model.client.SchemaOrgRange;
@@ -123,7 +124,7 @@ public class SchemaOrgService extends ServiceBase {
             Object comment = mitem.get("rdfs:comment");
             String scomment = getStringValue(comment);
             if (slabel == null) {
-                throw new RuntimeException("label not available: " + XString.prettyPrint(mitem));
+                throw new RuntimeEx("label not available: " + XString.prettyPrint(mitem));
             }
             soc.setLabel(slabel);
             soc.setId(sid);
@@ -210,7 +211,7 @@ public class SchemaOrgService extends ServiceBase {
                     sop.setLabel(slabel);
                     soc.getProps().add(sop);
                 } else {
-                    throw new RuntimeException("Unable to parse 'rdfs:label' from " + XString.prettyPrint(prop));
+                    throw new RuntimeEx("Unable to parse 'rdfs:label' from " + XString.prettyPrint(prop));
                 }
             }
         }

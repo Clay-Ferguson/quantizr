@@ -65,7 +65,7 @@ public class NodeEditService extends ServiceBase {
             svc_arun.run(() -> {
                 SubNode node = svc_mongoRead.getNode(req.getId());
                 if (node == null) {
-                    throw new RuntimeException("Unable to find node: " + req.getId());
+                    throw new RuntimeEx("Unable to find node: " + req.getId());
                 }
                 if (node.getLikes() == null) {
                     node.setLikes(new HashSet<>());
@@ -212,7 +212,7 @@ public class NodeEditService extends ServiceBase {
             if (!svc_crypto.nodeSigVerify(node, sig)) {
                 // stop this node from being saved with 'clean'
                 TL.clean(node);
-                throw new RuntimeException("Signature failed.");
+                throw new RuntimeEx("Signature failed.");
             }
         }
         svc_openGraph.parseNode(node, true);

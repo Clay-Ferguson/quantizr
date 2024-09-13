@@ -301,9 +301,9 @@ public class SystemService extends ServiceBase {
         svc_arun.run(() -> {
             SubNode node = svc_mongoRead.getNode(req.getNodeId());
             if (node == null)
-                throw new RuntimeException("Node not found: " + req.getNodeId());
+                throw new RuntimeEx("Node not found: " + req.getNodeId());
             if (!svc_auth.ownedByThreadUser(node)) {
-                throw new RuntimeException("You can only export nodes you own");
+                throw new RuntimeEx("You can only export nodes you own");
             }
             return null;
         });
@@ -462,20 +462,20 @@ public class SystemService extends ServiceBase {
 
     public SseEmitter cm_serverPush(String token) {
         if (StringUtils.isEmpty(token)) {
-            throw new RuntimeException("No token for serverPush");
+            throw new RuntimeEx("No token for serverPush");
         }
 
         SessionContext sc = svc_redis.get(token);
         if (sc == null) {
             // todo-2: We were getting this a LOT in the log file, just from outdated sessions (i think) so
             // let's ignore it for now.
-            // throw new RuntimeException("bad token for push emitter: " + token);
+            // throw new RuntimeEx("bad token for push emitter: " + token);
             return null;
         }
 
         SseEmitter emitter = svc_user.getPushEmitter(token);
         if (emitter == null) {
-            throw new RuntimeException("Failed getting emitter for token: " + token);
+            throw new RuntimeEx("Failed getting emitter for token: " + token);
         }
         return emitter;
     }

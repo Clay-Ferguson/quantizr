@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.BreadcrumbInfo;
 import quanta.model.NodeInfo;
 import quanta.model.client.Bookmark;
@@ -67,7 +68,7 @@ public class NodeSearchService extends ServiceBase {
         res.setSearchResults(results);
         SubNode node = svc_mongoRead.getNode(req.getRootId());
         if (node == null) {
-            throw new RuntimeException("Node not found: " + req.getRootId());
+            throw new RuntimeEx("Node not found: " + req.getRootId());
         }
         List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(node.getIdStr(), req.isIncludeComments());
         int counter = 0;
@@ -93,7 +94,7 @@ public class NodeSearchService extends ServiceBase {
         if (StringUtils.isEmpty(searchText) && StringUtils.isEmpty(req.getSearchType()) && //
         // note: for timelines this is called but with a sort
                 StringUtils.isEmpty(req.getSortField())) {
-            throw new RuntimeException("Search text or ordering required.");
+            throw new RuntimeEx("Search text or ordering required.");
         }
         List<NodeInfo> searchResults = new LinkedList<>();
         res.setSearchResults(searchResults);
@@ -168,7 +169,7 @@ public class NodeSearchService extends ServiceBase {
                      * inside the searchSubGraph method, or else we can just iterate over the subGraph return list
                      * itself and delete one by one.
                      */
-                    throw new RuntimeException("Delete Matches not currently implemented.");
+                    throw new RuntimeEx("Delete Matches not currently implemented.");
                 } else {
                     for (SubNode node : svc_mongoRead.searchSubGraph(searchRoot, req.getSearchProp(), searchText,
                             req.getSortField(), req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(),

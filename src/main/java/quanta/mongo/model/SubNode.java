@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
@@ -248,7 +249,7 @@ public class SubNode {
         // IDs are allowed to be set to null and ImportArchiveBase does this to force nodes to get saved
         // as a new document when they're being imported.
         if (id != null && this.id != null && !this.id.equals(id)) {
-            throw new RuntimeException("Node IDs are immutable.");
+            throw new RuntimeEx("Node IDs are immutable.");
         }
         this.id = id;
     }

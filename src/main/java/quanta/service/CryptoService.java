@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.Jwk;
 import quanta.model.client.Attachment;
 import quanta.model.client.Constant;
@@ -200,7 +201,7 @@ public class CryptoService extends ServiceBase {
         } catch (Exception e) {
             ExUtil.error(log, "exception in signature", e);
             // todo-2: we need a special exception for this.
-            throw new RuntimeException("Signature Failed", e);
+            throw new RuntimeEx("Signature Failed", e);
         }
     }
 
@@ -436,7 +437,7 @@ public class CryptoService extends ServiceBase {
         String sigProp = SubNode.PROPS + "." + NodeProp.CRYPTO_SIG.s();
 
         if (node == null) {
-            throw new RuntimeException("Unknown node: " + req.getNodeId());
+            throw new RuntimeEx("Unknown node: " + req.getNodeId());
         }
         svc_auth.ownerAuth(node);
 
@@ -482,11 +483,11 @@ public class CryptoService extends ServiceBase {
         if (json == null) {
             AccountNode userNode = svc_user.getAccountByUserNameAP(sc.getUserName());
             if (userNode == null) {
-                throw new RuntimeException("Unknown user: " + sc.getUserName());
+                throw new RuntimeEx("Unknown user: " + sc.getUserName());
             }
             json = userNode.getStr(NodeProp.USER_PREF_PUBLIC_SIG_KEY);
             if (json == null) {
-                throw new RuntimeException("User Account didn't have SIG KEY: userName: " + sc.getUserName());
+                throw new RuntimeEx("User Account didn't have SIG KEY: userName: " + sc.getUserName());
             }
             sc.setPubSigKeyJson(json);
         }
@@ -588,12 +589,12 @@ public class CryptoService extends ServiceBase {
 
         SessionContext sc = TL.getSC();
         if (sc == null) {
-            throw new RuntimeException("Unable to get SessionContext to check token.");
+            throw new RuntimeEx("Unable to get SessionContext to check token.");
         }
 
         String sig = TL.getReqSig();
         if (StringUtils.isEmpty(sig)) {
-            throw new RuntimeException("Request failed. No signature.");
+            throw new RuntimeEx("Request failed. No signature.");
         }
 
         String pkJson = svc_crypto.getPubSigKeyJson(sc);

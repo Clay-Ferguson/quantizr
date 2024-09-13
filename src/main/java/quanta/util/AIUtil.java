@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.AIResponse;
 import quanta.model.client.AIModel;
 import quanta.model.client.NodeProp;
@@ -180,11 +181,11 @@ public class AIUtil extends ServiceBase {
         } else {
             balance = svc_tranRepo.getBalByMongoId(TL.getSC().getUserNodeObjId().toHexString());
             if (balance == null) {
-                throw new RuntimeException("Sorry, you have no more credit.");
+                throw new RuntimeEx("Sorry, you have no more credit.");
             }
             int comparisonResult = balance.compareTo(BigDecimal.ZERO);
             if (comparisonResult <= 0) {
-                throw new RuntimeException("Sorry, you have no more credit.");
+                throw new RuntimeEx("Sorry, you have no more credit.");
             }
         }
         return balance;
@@ -242,15 +243,15 @@ public class AIUtil extends ServiceBase {
             if (!TL.getSC().isAdmin()) {
                 // we can remove these limitations once we have user quotas in place.
                 if (counter > 100) {
-                    throw new RuntimeException("Too many nodes in subgraph.");
+                    throw new RuntimeEx("Too many nodes in subgraph.");
                 }
                 if (sb.length() > 32000) {
-                    throw new RuntimeException("Too many characters in subgraph.");
+                    throw new RuntimeEx("Too many characters in subgraph.");
                 }
             }
         }
         if (counter == 0) {
-            throw new RuntimeException("No context for this query was able to be created.");
+            throw new RuntimeEx("No context for this query was able to be created.");
         }
 
         sb.append("Here is my question:\n");
@@ -266,7 +267,7 @@ public class AIUtil extends ServiceBase {
             res.setAnswer("Q: " + req.getQuestion() + "\n\nA: " + aiResponse.getContent());
         } //
         else {
-            throw new RuntimeException("No answer from AI service: " + req.getAiService());
+            throw new RuntimeEx("No answer from AI service: " + req.getAiService());
         }
         return res;
     }
@@ -342,7 +343,7 @@ public class AIUtil extends ServiceBase {
             String prompt = req.getPrompt();
 
             if (StringUtils.isEmpty(prompt)) {
-                throw new RuntimeException("Book description is required.");
+                throw new RuntimeEx("Book description is required.");
             }
 
             if (!prompt.trim().endsWith(".")) {
@@ -413,7 +414,7 @@ public class AIUtil extends ServiceBase {
         String extractedJson = XString.extractFirstJsonCodeBlock(answer);
         log.debug("Extracted JSON: " + extractedJson);
         if (StringUtils.isEmpty(extractedJson)) {
-            throw new RuntimeException("AI failed to complete Table of Contents phase.");
+            throw new RuntimeEx("AI failed to complete Table of Contents phase.");
         }
 
         HashMap<String, Object> map = null;
@@ -441,7 +442,7 @@ public class AIUtil extends ServiceBase {
     // AIResponse aiResponse = null;
     // AIModels svc = AIModels.fromString(req.getAiService());
     // if (svc.getService() == "gemini") {
-    // throw new RuntimeException("Gemini AI is temporarily unavailable.");
+    // throw new RuntimeEx("Gemini AI is temporarily unavailable.");
     // }
     // SystemConfig system = new SystemConfig();
     // aiUtil.getAIConfigFromAncestorNodes(ms, node, system);

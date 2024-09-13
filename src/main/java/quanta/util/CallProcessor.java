@@ -113,8 +113,8 @@ public class CallProcessor extends ServiceBase {
         if (code != HttpServletResponse.SC_OK || e != null) {
             // only set a message if one is not already set
             if (StringUtils.isEmpty(orb.getMessage())) {
-                // if it's an exception and the exception has ap message, show that message
-                if (e != null && e.getMessage() != null) {
+                // If this is one of our own exceptions we can show the message text to the user.
+                if (e instanceof RuntimeEx) {
                     orb.setMessage("Failed: " + e.getMessage());
                 }
                 // otherwise show a generic message

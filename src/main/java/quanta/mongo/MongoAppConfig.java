@@ -164,7 +164,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
         }
         if (client == null) {
             connectionFailed = true;
-            throw new RuntimeException("Unable to connect to MongoDb");
+            throw new RuntimeEx("Unable to connect to MongoDb");
         }
         return client;
     }
