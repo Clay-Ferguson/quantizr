@@ -78,7 +78,7 @@ public class FriendService extends ServiceBase {
         return res;
     }
 
-    public void updateSavedFriendNode(String userDoingAction, SubNode node) {
+    public void updateSavedFriendNode(String userDoingAction, AccountNode node) {
         String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
         String friendUserName = node.getStr(NodeProp.USER);
         if (friendUserName != null) {
@@ -146,7 +146,7 @@ public class FriendService extends ServiceBase {
             return;
         }
         // lookup to see if this followerFriendList node already has userToFollow already under it.
-        SubNode friendNode = findFriendNode(accntIdDoingFollow, null, userToFollow);
+        AccountNode friendNode = findFriendNode(accntIdDoingFollow, null, userToFollow);
         // if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
         if (friendNode != null && !svc_mongoUtil.isChildOf(followerFriendList, friendNode)) {
             svc_mongoDelete.delete(friendNode);
@@ -484,8 +484,7 @@ public class FriendService extends ServiceBase {
      *
      * Note: Blocked users are also stored as a "FriendNode", but under the "blocked list"
      */
-    // todo-0: make this return an AccountNode type
-    public SubNode findFriendNode(ObjectId ownerId, AccountNode userNode, String userName) {
+    public AccountNode findFriendNode(ObjectId ownerId, AccountNode userNode, String userName) {
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {
@@ -498,7 +497,7 @@ public class FriendService extends ServiceBase {
                 .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
-        SubNode ret = svc_ops.findOne(q);
+        AccountNode ret = svc_ops.findUserAccountNode(q);
         return ret;
     }
 }

@@ -708,7 +708,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     private void blockUser(String userToBlock, ObjectId accntIdDoingBlock, SubNode blockedList) {
-        AccountNode userNode = (AccountNode) svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
+        AccountNode userNode = svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
 
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !svc_mongoUtil.isChildOf(blockedList, userNode)) {

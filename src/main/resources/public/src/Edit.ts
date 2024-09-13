@@ -1147,7 +1147,6 @@ export class Edit {
             return;
         }
 
-        // todo-0: It's super confusing we wrapped the askAI functionality into 'createSubNode' (make a dedicated rpc call for this)
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: node.id,
