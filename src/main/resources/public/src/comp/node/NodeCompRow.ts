@@ -136,11 +136,13 @@ export class NodeCompRow extends Div {
             selectionClass = this.isTableCell ? " activeRowCell" : " activeRow";
         }
         else {
-            selectionClass = this.isTableCell ? " inactiveRowCell" : " inactiveRow";
+            selectionClass = this.isTableCell ? " inactiveRowCell" : (indentLevel > 1 ? " inactiveRowIndented" : " inactiveRow");
         }
         this.attribs.className = (layoutClass || "") + selectionClass;
-        const style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-        this.attribs.style = style;
+
+        if (indentLevel > 0) {
+            this.attribs.style = { marginLeft: "" + ((indentLevel - 1) * 30) + "px" };
+        }
 
         if (S.render.enableRowFading && S.render.fadeInId === this.node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
@@ -194,7 +196,7 @@ export class NodeCompRow extends Div {
                 S.render.renderLinkLabel(this.node.id),
                 header,
                 new FlexLayout([
-                    openButton, 
+                    openButton,
                     new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, "inlineBlock")
                 ], "flexAlignChildrenTop"),
                 this.internalComp,

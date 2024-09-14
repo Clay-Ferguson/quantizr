@@ -267,6 +267,7 @@ i'm backing out for now
 .activeRow {
     border-left: $highlightBorderSize solid $primary;
     border-bottom: 3px solid $primary; 
+    padding-left: 0;
 }
 
 .activeRowCell {
@@ -282,6 +283,12 @@ i'm backing out for now
 .inactiveRow {
     border-left: $highlightBorderSize solid transparent;
     border-bottom: 3px dotted gray; 
+}
+
+.inactiveRowIndented {
+    border-left: 1px solid gray;
+    border-bottom: 3px dotted gray; 
+    padding-left: $highlightBorderSizeMinus1;
 }
 
 .inactiveRowCell {

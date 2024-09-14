@@ -146,6 +146,9 @@ export class NodeCompTableRowLayout extends Div {
             S.edit.helpNewUserEdit();
         }
 
+        if (this.level > 0) {
+            this.attribs.style = { paddingLeft: "" + ((this.level - 1) * 30) + "px" };
+        }
         this.children = children;
         return true;
     }
