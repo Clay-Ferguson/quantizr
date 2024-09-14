@@ -62,9 +62,9 @@ export class Render {
             const list: Attachment[] = S.props.getOrderedAtts(node);
 
             for (const a of list) {
-                if (a.p !== "ft") continue;
+                if (a.position !== "ft") continue;
 
-                let imgSize = a ? a.c : null;
+                let imgSize = a ? a.cssSize : null;
                 // 'actual size' designation is stored as prop val == "0"
                 if (!imgSize || imgSize === "0") {
                     imgSize = "";
@@ -74,7 +74,7 @@ export class Render {
                 const imgUrl = S.attachment.getUrlForNodeAttachment(node, key, false);
                 // DO NOT DELETE: This approach with <img> tag doesn't work based on our current markdown sanitizer, but I want to keep this code.
                 // val = val.replaceAll(`{{${a.f}}}`, `\n\n<img class="imgBlock enlargableImg" style="margin-bottom: 12px" width="${imgSize}" src="${imgUrl}" ${C.NODE_ID_ATTR}="${node.id}" data-attkey="${key}">\n\n`);
-                val = val.replaceAll(`{{${a.f}}}`, `![](${imgUrl})`);
+                val = val.replaceAll(`{{${a.fileName}}}`, `![](${imgUrl})`);
             }
         }
 
@@ -290,10 +290,10 @@ export class Render {
             const atts: Attachment[] = S.props.getOrderedAtts(node);
             for (const att of atts) {
                 attComps.push(new Tag("hr"));
-                const bin = att ? att.b : null;
+                const bin = att ? att.bin : null;
                 if (bin) {
                     attComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
-                    attComps.push(this.titleDiv(att.f + " (" + S.util.formatMemory(att.s) + " " + att.m + ")"));
+                    attComps.push(this.titleDiv(att.fileName + " (" + S.util.formatMemory(att.size) + " " + att.mime + ")"));
                     const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
 
                     const attByIdUrl = window.location.origin + "/f/id/" + node.id;

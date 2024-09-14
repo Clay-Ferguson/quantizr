@@ -134,7 +134,7 @@ export class EditNodeDlgUtil {
         list?.forEach(att => {
             const propState = this.dlg.attFileNames.get((att as any).key);
             if (propState) {
-                att.f = propState.getValue();
+                att.fileName = propState.getValue();
             }
         });
     }

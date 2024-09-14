@@ -2,18 +2,18 @@
 /* eslint-disable */
 
 export interface Attachment {
-    o: number;
-    w: number;
-    h: number;
-    p: string;
-    m: string;
-    f: string;
-    c: string;
-    s: number;
-    b: string;
-    d: string;
-    u: string;
-    ai: string;
+    ordinal: number;
+    width: number;
+    height: number;
+    position: string;
+    mime: string;
+    fileName: string;
+    cssSize: string;
+    size: number;
+    bin: string;
+    binData: string;
+    url: string;
+    aiPrompt: string;
 }
 
 export interface Bookmark {

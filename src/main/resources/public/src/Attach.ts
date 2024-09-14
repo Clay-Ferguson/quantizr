@@ -41,11 +41,11 @@ export class Attach {
     }
 
     getAttUrl = (urlPart: string, att: Attachment, nodeId: string, downloadLink: boolean, attName: string): string => {
-        if (att.u) {
-            return att.u;
+        if (att.url) {
+            return att.url;
         }
 
-        const bin = att.b;
+        const bin = att.bin;
         if (bin) {
             let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId + "&att=" + attName;
 

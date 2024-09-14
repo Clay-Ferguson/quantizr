@@ -60,19 +60,19 @@ export class NodeCompContent extends Div {
                 if (S.nodeUtil.isCutAttachment(att, this.node.id)) return;
 
                 // don't process here, we process below
-                if (!att.p || att.p === "auto" || att.p === "ft") return;
+                if (!att.position || att.position === "auto" || att.position === "ft") return;
                 let clazz = null;
 
                 // Center Top
-                if (att.p === "c") {
+                if (att.position === "c") {
                     clazz = "imgUpperCenter";
                 }
                 // Upper Left
-                else if (att.p === "ul") {
+                else if (att.position === "ul") {
                     clazz = "imgUpperLeft";
                 }
                 // Upper Right
-                else if (att.p === "ur") {
+                else if (att.position === "ur") {
                     clazz = "imgUpperRight";
                 }
                 children.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, clazz));
@@ -103,7 +103,7 @@ export class NodeCompContent extends Div {
 
                 // show it here only if there's no "position(p)" for it, because the positioned ones
                 // are layed out via html in 'render.injectSubstitutions'
-                if (!att.p || att.p === "auto") {
+                if (!att.position || att.position === "auto") {
                     attComps.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, null));
                 }
             });

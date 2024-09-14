@@ -123,7 +123,7 @@ export class Props {
         if (!node || !node.attachments) return null;
         let ret: Attachment = null;
         Object.keys(node.attachments).forEach(key => {
-            if (node.attachments[key].u === url) {
+            if (node.attachments[key].url === url) {
                 ret = node.attachments[key];
             }
         });
@@ -142,15 +142,15 @@ export class Props {
                 (node.attachments[key] as any).key = key;
 
                 // fixing ordinal with defaultOrdinal is just to be resilient against bad/duplicate ordinals.
-                if (!node.attachments[key].o) {
-                    node.attachments[key].o = defaultOrdinal++;
+                if (!node.attachments[key].ordinal) {
+                    node.attachments[key].ordinal = defaultOrdinal++;
                 }
                 list.push(node.attachments[key]);
             });
         }
 
         // now sort and return the list
-        list.sort((a, b) => a.o - b.o);
+        list.sort((a, b) => a.ordinal - b.ordinal);
         return list;
     }
 
@@ -160,19 +160,19 @@ export class Props {
 
     hasImage = (node: NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
-        const target = att ? att.m : null;
+        const target = att ? att.mime : null;
         return target?.startsWith("image/");
     }
 
     hasAudio = (node: NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
-        const target = att ? att.m : null;
+        const target = att ? att.mime : null;
         return target?.startsWith("audio/");
     }
 
     hasVideo = (node: NodeInfo, attName: string): boolean => {
         const att = this.getAttachment(attName, node);
-        const target = att ? att.m : null;
+        const target = att ? att.mime : null;
         return target?.startsWith("video/");
     }
 

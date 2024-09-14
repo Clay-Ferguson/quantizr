@@ -37,8 +37,8 @@ export class FullScreenControlBar extends Div {
                 const list: Attachment[] = S.props.getOrderedAtts(node);
 
                 if (list.length > 1) {
-                    onFirst = (list[0].o || 0) === ast.fullScreenConfig.ordinal;
-                    onLast = (list[list.length - 1].o || 0) === ast.fullScreenConfig.ordinal;
+                    onFirst = (list[0].ordinal || 0) === ast.fullScreenConfig.ordinal;
+                    onLast = (list[list.length - 1].ordinal || 0) === ast.fullScreenConfig.ordinal;
                 }
             }
 

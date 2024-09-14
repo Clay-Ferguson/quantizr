@@ -28,7 +28,7 @@ export class FullScreenImgViewer extends Main {
         if (node.attachments) {
             const list: Attachment[] = S.props.getOrderedAtts(node);
             list.forEach(att => {
-                if (att.o === ast.fullScreenConfig.ordinal) {
+                if (att.ordinal === ast.fullScreenConfig.ordinal) {
                     attName = (att as any).key;
                 }
             });

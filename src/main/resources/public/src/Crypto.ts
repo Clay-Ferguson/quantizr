@@ -847,11 +847,11 @@ export class Crypto {
 
         if (node.attachments) {
             S.props.getOrderedAtts(node).forEach(att => {
-                if (att.b) {
-                    signData += "-" + att.b;
+                if (att.bin) {
+                    signData += "-" + att.bin;
                 }
-                if (att.d) {
-                    signData += "-" + att.d;
+                if (att.binData) {
+                    signData += "-" + att.binData;
                 }
             });
         }

@@ -43,7 +43,7 @@ export class NodeCompBinary extends Div {
             style.width = "75px";
         }
         else {
-            size = att.c;
+            size = att.cssSize;
             if (size === "0" || size === "100%") {
                 rtMargin = false;
             }
@@ -71,7 +71,7 @@ export class NodeCompBinary extends Div {
         }
 
         let imgTitleSuffix = "";
-        imgTitleSuffix = att.f ? "\n\n" + att.f + "\n(" + att.m + ")" : "";
+        imgTitleSuffix = att.fileName ? "\n\n" + att.fileName + "\n(" + att.mime + ")" : "";
 
         const className = this.isFullScreenEmbed ? "fullScreenImg" : (this.isEditorEmbed ? "imgInEditor" : "imgInRow");
         const img = new Img();
@@ -116,7 +116,7 @@ export class NodeCompBinary extends Div {
         const att = S.props.getAttachment(attName, node);
 
         if (isEditorEmbed) {
-            S.util.copyToClipboard(att.f);
+            S.util.copyToClipboard(att.fileName);
             return;
         }
 
@@ -130,7 +130,7 @@ export class NodeCompBinary extends Div {
             // if clicking this node first time.
             if (!s.fullScreenConfig.nodeId) {
                 if (node) {
-                    s.fullScreenConfig.ordinal = att.o || 0;
+                    s.fullScreenConfig.ordinal = att.ordinal || 0;
                 }
             }
             s.fullScreenConfig.nodeId = id;
@@ -212,9 +212,9 @@ export class NodeCompBinary extends Div {
          */
         else {
             const att = S.props.getAttachment(this.attName, node);
-            const fileName = att ? att.f : null;
-            const fileSize = att ? att.s : null;
-            const fileType = att ? att.m : null;
+            const fileName = att ? att.fileName : null;
+            const fileSize = att ? att.size : null;
+            const fileType = att ? att.mime : null;
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType?.startsWith("text/")) {

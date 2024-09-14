@@ -85,7 +85,7 @@ export class EditAttachmentsPanel extends Div {
                     setValue: (val: string): void => {
                         const att: Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
-                            att.c = val;
+                            att.cssSize = val;
                             if (isFirst) {
                                 this.askMakeAllSameSize(ast.editNode, val);
                             }
@@ -94,7 +94,7 @@ export class EditAttachmentsPanel extends Div {
                     },
                     getValue: (): string => {
                         const att: Attachment = S.props.getAttachment(key, ast.editNode);
-                        return att && att.c;
+                        return att && att.cssSize;
                     }
                 }) : null;
 
@@ -104,14 +104,14 @@ export class EditAttachmentsPanel extends Div {
                     setValue: (val: string): void => {
                         const att: Attachment = S.props.getAttachment(key, ast.editNode);
                         if (att) {
-                            att.p = val === "auto" ? null : val;
+                            att.position = val === "auto" ? null : val;
                             this.dlg.binaryDirty = true;
                         }
                         this.dlg.mergeState({});
                     },
                     getValue: (): string => {
                         const att: Attachment = S.props.getAttachment(key, ast.editNode);
-                        let ret = att && att.p;
+                        let ret = att && att.position;
                         if (!ret) ret = "auto";
                         return ret;
                     }
@@ -119,7 +119,7 @@ export class EditAttachmentsPanel extends Div {
 
         let fileNameFieldState: Validator = this.dlg.attFileNames.get((att as any).key);
         if (!fileNameFieldState) {
-            fileNameFieldState = new Validator(att.f, [{ name: ValidatorRuleName.REQUIRED }]);
+            fileNameFieldState = new Validator(att.fileName, [{ name: ValidatorRuleName.REQUIRED }]);
             this.dlg.attFileNames.set((att as any).key, fileNameFieldState);
         }
 
@@ -131,8 +131,8 @@ export class EditAttachmentsPanel extends Div {
         });
 
         const list: Attachment[] = S.props.getOrderedAtts(ast.editNode);
-        const firstAttachment = list != null && list[0].o === att.o;
-        const lastAttachment = list != null && list[list.length - 1].o === att.o;
+        const firstAttachment = list != null && list[0].ordinal === att.ordinal;
+        const lastAttachment = list != null && list[list.length - 1].ordinal === att.ordinal;
 
         const topBinRow = new FlexRowLayout([
             attCheckbox,
@@ -155,7 +155,7 @@ export class EditAttachmentsPanel extends Div {
         ]);
 
         let fileNameTagTip = null;
-        if (att.p === "ft") {
+        if (att.position === "ft") {
             const content = this.dlg?.contentEditor?.getValue() || ast.editNode.content;
             const fileName = fileNameFieldState.getValue();
 
@@ -171,8 +171,8 @@ export class EditAttachmentsPanel extends Div {
             }
         }
 
-        const aiPrompt = att.ai ? new CollapsiblePanel("Show AI Prompt", "Hide AI Prompt", null,
-            [new Div(att.ai, { className: "smallMarginTop marginLeft" })], true, (exp: boolean) => {
+        const aiPrompt = att.aiPrompt ? new CollapsiblePanel("Show AI Prompt", "Hide AI Prompt", null,
+            [new Div(att.aiPrompt, { className: "smallMarginTop marginLeft" })], true, (exp: boolean) => {
                 dispatch("ExpandAIPrompt", s => s.aiPromptsExpanded = exp);
             }, getAs().aiPromptsExpanded, null, "smallMarginTop", "smallMarginTop") : null;
 
@@ -190,7 +190,7 @@ export class EditAttachmentsPanel extends Div {
                 dlg.open().then(() => {
                     if (dlg.yes) {
                         if (!this.node.attachments) return null;
-                        attachments.forEach(att => { att.c = val; });
+                        attachments.forEach(att => { att.cssSize = val; });
                         // trick to force screen render
                         this.dlg.mergeState({});
                     }
@@ -208,15 +208,15 @@ export class EditAttachmentsPanel extends Div {
         for (const a of list) {
             const aObj: Attachment = node.attachments[(a as any).key];
             if (setNext !== -1) {
-                aObj.o = setNext;
+                aObj.ordinal = setNext;
                 setNext = -1;
             }
-            else if (a.o === att.o) {
-                aObj.o = idx + 1;
+            else if (a.ordinal === att.ordinal) {
+                aObj.ordinal = idx + 1;
                 setNext = idx;
             }
             else {
-                aObj.o = idx;
+                aObj.ordinal = idx;
             }
             idx++;
         }
@@ -232,14 +232,14 @@ export class EditAttachmentsPanel extends Div {
         let lastA = null;
         for (const a of list) {
             const aObj: Attachment = node.attachments[(a as any).key];
-            if (a.o === att.o) {
-                aObj.o = idx - 1;
+            if (a.ordinal === att.ordinal) {
+                aObj.ordinal = idx - 1;
                 if (lastA) {
                     lastA.o = idx;
                 }
             }
             else {
-                aObj.o = idx;
+                aObj.ordinal = idx;
             }
             idx++;
             lastA = a;

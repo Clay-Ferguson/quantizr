@@ -391,14 +391,14 @@ export class Nav {
             let selAtt: Attachment = list[0];
             let lastAtt: Attachment = null;
             list.forEach(att => {
-                if (att.o === ast.fullScreenConfig.ordinal) {
+                if (att.ordinal === ast.fullScreenConfig.ordinal) {
                     selAtt = lastAtt;
                 }
                 lastAtt = att;
             });
 
             dispatch("PrevFullScreenImgViewer", s => {
-                s.fullScreenConfig.ordinal = selAtt.o || 0;
+                s.fullScreenConfig.ordinal = selAtt.ordinal || 0;
             });
         }
     }
@@ -415,13 +415,13 @@ export class Nav {
                     selAtt = att;
                     takeNext = false;
                 }
-                if (att.o === ast.fullScreenConfig.ordinal) {
+                if (att.ordinal === ast.fullScreenConfig.ordinal) {
                     takeNext = true;
                 }
             });
 
             dispatch("PrevFullScreenImgViewer", s => {
-                s.fullScreenConfig.ordinal = selAtt.o || 0;
+                s.fullScreenConfig.ordinal = selAtt.ordinal || 0;
             });
         }
     }

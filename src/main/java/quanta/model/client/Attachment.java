@@ -20,7 +20,6 @@ import quanta.util.Util;
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment {
-
     private Integer ordinal = 0;
     private Integer width = 0;
     private Integer height = 0;
@@ -38,7 +37,7 @@ public class Attachment {
     private SubNode ownerNode;
 
     // key in the SubNode hashmap that points to this. May be null unless retrieved
-    // thru certain API cals
+    // thru certain API calls
     // Transient (not persisted)
     private String key;
 
@@ -75,12 +74,10 @@ public class Attachment {
             setAiPrompt(doc.getString("aiPrompt"));
     }
 
-    @JsonProperty("w")
     public Integer getWidth() {
         return width;
     }
 
-    @JsonProperty("w")
     public void setWidth(Integer width) {
         if (Util.equalObjs(width, this.width))
             return;
@@ -88,12 +85,10 @@ public class Attachment {
         this.width = width;
     }
 
-    @JsonProperty("h")
     public Integer getHeight() {
         return height;
     }
 
-    @JsonProperty("h")
     public void setHeight(Integer height) {
         if (Util.equalObjs(height, this.height))
             return;
@@ -101,12 +96,10 @@ public class Attachment {
         this.height = height;
     }
 
-    @JsonProperty("p")
     public String getPosition() {
         return position;
     }
 
-    @JsonProperty("p")
     public void setPosition(String position) {
         if (Util.equalObjs(position, this.position))
             return;
@@ -114,12 +107,10 @@ public class Attachment {
         this.position = position;
     }
 
-    @JsonProperty("m")
     public String getMime() {
         return mime;
     }
 
-    @JsonProperty("m")
     public void setMime(String mime) {
         if (Util.equalObjs(mime, this.mime))
             return;
@@ -127,12 +118,10 @@ public class Attachment {
         this.mime = mime;
     }
 
-    @JsonProperty("f")
     public String getFileName() {
         return fileName;
     }
 
-    @JsonProperty("f")
     public void setFileName(String fileName) {
         if (Util.equalObjs(fileName, this.fileName))
             return;
@@ -140,12 +129,10 @@ public class Attachment {
         this.fileName = fileName;
     }
 
-    @JsonProperty("s")
     public Long getSize() {
         return size;
     }
 
-    @JsonProperty("s")
     public void setSize(Long size) {
         if (Util.equalObjs(size, this.size))
             return;
@@ -153,12 +140,10 @@ public class Attachment {
         this.size = size;
     }
 
-    @JsonProperty("b")
     public String getBin() {
         return bin;
     }
 
-    @JsonProperty("b")
     public void setBin(String bin) {
         if (Util.equalObjs(bin, this.bin))
             return;
@@ -166,12 +151,10 @@ public class Attachment {
         this.bin = bin;
     }
 
-    @JsonProperty("d")
     public String getBinData() {
         return binData;
     }
 
-    @JsonProperty("d")
     public void setBinData(String binData) {
         if (Util.equalObjs(binData, this.binData))
             return;
@@ -179,12 +162,10 @@ public class Attachment {
         this.binData = binData;
     }
 
-    @JsonProperty("u")
     public String getUrl() {
         return url;
     }
 
-    @JsonProperty("u")
     public void setUrl(String url) {
         if (Util.equalObjs(url, this.url))
             return;
@@ -192,12 +173,10 @@ public class Attachment {
         this.url = url;
     }
 
-    @JsonProperty("c")
     public String getCssSize() {
         return cssSize;
     }
 
-    @JsonProperty("c")
     public void setCssSize(String cssSize) {
         if (Util.equalObjs(cssSize, this.cssSize))
             return;
@@ -205,12 +184,10 @@ public class Attachment {
         this.cssSize = cssSize;
     }
 
-    @JsonProperty("o")
     public Integer getOrdinal() {
         return ordinal;
     }
 
-    @JsonProperty("o")
     public void setOrdinal(Integer ordinal) {
         if (Util.equalObjs(ordinal, this.ordinal))
             return;
@@ -218,12 +195,10 @@ public class Attachment {
         this.ordinal = ordinal;
     }
 
-    @JsonProperty("ai")
     public String getAiPrompt() {
         return aiPrompt;
     }
 
-    @JsonProperty("ai")
     public void setAiPrompt(String aiPrompt) {
         if (Util.equalObjs(aiPrompt, this.aiPrompt))
             return;
