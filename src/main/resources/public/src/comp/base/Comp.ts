@@ -75,10 +75,8 @@ export abstract class Comp {
         // for debugging, shows classname in every dom element as an attribute.
         if (Comp.renderClassInDom) {
             // if 'c' property not defined from a higher level up define it here as class name
-            if (!this.attribs.c) {
-                // todo-1: I think it's cleaner to use "data-c" (anything "data-*") for cramming data into the DOM, but I'm not sure
-                // how the syntax will look other than "this.attribs['data-c'] = this.constructor.name;" which is probably fine tho.
-                this.attribs.c = this.constructor.name;
+            if (!this.attribs['data-class']) {
+                this.attribs['data-class'] = this.constructor.name;
             }
         }
         else {
