@@ -1,22 +1,14 @@
 package quanta.model.client;
 
+import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.data.annotation.Transient;
 import quanta.mongo.model.SubNode;
 import quanta.util.TL;
 import quanta.util.Util;
 
-/*
- * todo-1: All the single letter abbreviated prop names in here were a bad idea. Run a conversion on
- * those to make them be full names, but be careful there are lots of uses of this on the client
- * side
- *
- * Use a static variable naming like "NodeLink.java" does for all property names.
- */
 @JsonInclude(Include.NON_DEFAULT)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Attachment {

@@ -860,8 +860,7 @@ public class RSSFeedService extends ServiceBase {
                 // log.debug("FEED XML: " + feedStr);
                 writer.write(feedStr);
             } catch (Exception e) {
-                ExUtil.error(log, "writeFeed Error: ", e);
-                throw new RuntimeEx("internal server error");
+                throw new RuntimeEx("writeFeed Error: ", e);
             }
         }
     }

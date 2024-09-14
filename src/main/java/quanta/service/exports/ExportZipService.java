@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import quanta.util.ExUtil;
+import quanta.exception.base.RuntimeEx;
 
 @Component 
 @Scope("prototype")
@@ -23,7 +23,7 @@ public class ExportZipService extends ExportArchiveBase {
         try {
             out = new ZipArchiveOutputStream(new FileOutputStream(fileName));
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -33,7 +33,7 @@ public class ExportZipService extends ExportArchiveBase {
             out.finish();
             out.close();
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -53,7 +53,7 @@ public class ExportZipService extends ExportArchiveBase {
             out.write(bytes);
             out.closeArchiveEntry();
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -69,7 +69,7 @@ public class ExportZipService extends ExportArchiveBase {
             IOUtils.copyLarge(stream, out, 0, length);
             out.closeArchiveEntry();
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 

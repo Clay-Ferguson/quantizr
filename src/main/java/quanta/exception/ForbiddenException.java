@@ -9,6 +9,10 @@ public class ForbiddenException extends RuntimeEx {
         super("Forbidden");
     }
 
+    public ForbiddenException(String message) {
+        super(message);
+    }
+
     public int getCode() {
         return HttpServletResponse.SC_FORBIDDEN;
     }

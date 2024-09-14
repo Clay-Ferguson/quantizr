@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import quanta.config.SessionContext;
 import quanta.exception.ForbiddenException;
+import quanta.exception.base.RuntimeEx;
 import quanta.mongo.model.SubNode;
 import quanta.perf.PerfEvent;
 import quanta.rest.response.base.ResponseBase;
@@ -78,7 +79,7 @@ public class TL {
 
     public static void requireAdmin() {
         if (!TL.hasAdminPrivileges()) {
-            throw ExUtil.wrapEx("admin only function.");
+            throw new RuntimeEx("admin only function.");
         }
     }
 
@@ -218,7 +219,7 @@ public class TL {
         log.debug("Dirty Nodes...");
         getDirtyNodes().forEach((key, value) -> {
             if (!key.toHexString().equals(value.getIdStr())) {
-                throw new RuntimeException(
+                throw new RuntimeEx(
                         "Node originally cached as ID " + key.toHexString() + " now has key" + value.getIdStr());
             }
             log.debug("    " + key.toHexString());
@@ -244,7 +245,7 @@ public class TL {
          */
         if (nodeFound != null) {
             if (nodeFound.hashCode() != node.hashCode()) {
-                ExUtil.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+                log.warn("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
             }
         }
         getDirtyNodes().put(node.getId(), node);

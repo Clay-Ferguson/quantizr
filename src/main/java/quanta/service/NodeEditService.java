@@ -567,7 +567,7 @@ public class NodeEditService extends ServiceBase {
                 return null;
             });
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeEx(e);
         }
         return res;
     }

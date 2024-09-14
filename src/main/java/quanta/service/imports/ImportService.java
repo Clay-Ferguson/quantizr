@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.CreateNodeLocation;
@@ -32,18 +33,18 @@ public class ImportService extends ServiceBase {
     public ResponseEntity<?> streamImport(String nodeId, MultipartFile[] uploadFiles) {
         MongoTranMgr.ensureTran();
         if (nodeId == null) {
-            throw ExUtil.wrapEx("target nodeId not provided");
+            throw new RuntimeEx("target nodeId not provided");
         }
         SubNode node = svc_mongoRead.getNode(nodeId);
         if (node == null) {
-            throw ExUtil.wrapEx("Node not found.");
+            throw new RuntimeEx("Node not found.");
         }
         svc_auth.ownerAuth(node);
 
         // This is critical to be correct so we run the actual query based determination of 'hasChildren'
         boolean hasChildren = svc_mongoRead.directChildrenExist(node.getPath());
         if (hasChildren) {
-            throw ExUtil.wrapEx("You can only import into an empty node. There are direct children under path(a): "
+            throw new RuntimeEx("You can only import into an empty node. There are direct children under path(a): "
                     + node.getPath());
         }
 
@@ -54,7 +55,7 @@ public class ImportService extends ServiceBase {
          */
         svc_mongoDelete.deleteUnderPath(node.getPath());
         if (uploadFiles.length != 1) {
-            throw ExUtil.wrapEx("Multiple file import not allowed");
+            throw new RuntimeEx("Multiple file import not allowed");
         }
         MultipartFile uploadFile = uploadFiles[0];
         String fileName = uploadFile.getOriginalFilename();
@@ -90,10 +91,10 @@ public class ImportService extends ServiceBase {
                     node.setHasChildren(true);
                     svc_mongoUpdate.saveSession();
                 } else {
-                    throw ExUtil.wrapEx("Only ZIP, TAR, TAR.GZ files are supported for importing.");
+                    throw new RuntimeEx("Only ZIP, TAR, TAR.GZ files are supported for importing.");
                 }
             } catch (Exception ex) {
-                throw ExUtil.wrapEx(ex);
+                throw new RuntimeEx(ex);
             } finally {
                 StreamUtil.close(in);
             }

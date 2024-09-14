@@ -184,6 +184,7 @@ public class NodeMoveService extends ServiceBase {
             }
             nodes.add(node);
         }
+
         nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
         StringBuilder sb = new StringBuilder();
         SubNode targetNode = null;
@@ -224,13 +225,6 @@ public class NodeMoveService extends ServiceBase {
         targetNode.touch();
         nodesModified.add(targetNode.getIdStr());
         svc_mongoUpdate.saveSession();
-
-        /*
-         * todo-1: this is really slightly dangerous. We need to probably run with force=false first, and
-         * throw back warnings to the user and roll this transaction back of there are warnings that the
-         * user will be destroying subnode content by doing this join function. Better yet, really if there
-         * are subnodes at all we should just fail to join and throw exception.
-         */
         svc_mongoDelete.deleteNodes(true, delIds);
         return res;
     }

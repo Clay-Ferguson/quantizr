@@ -73,14 +73,12 @@ import quanta.rest.response.UploadResponse;
 import quanta.rest.response.base.ResponseBase;
 import quanta.service.imports.ImportZipService;
 import quanta.util.Convert;
-import quanta.util.ExUtil;
 import quanta.util.ImageUtil;
 import quanta.util.LimitedInputStream;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.MimeUtil;
 import quanta.util.StreamUtil;
 import quanta.util.TL;
-import quanta.util.Util;
 import quanta.util.XString;
 import quanta.util.val.IntVal;
 import quanta.util.val.LongVal;
@@ -127,7 +125,7 @@ public class AttachmentService extends ServiceBase {
                 String mkdown = svc_email.convertEmailToMarkdown(limitedIs);
                 payloads.add(mkdown);
             } catch (Exception e) {
-                throw ExUtil.wrapEx(e);
+                new RuntimeEx(e);
             }
         }
         return resp;
@@ -139,7 +137,7 @@ public class AttachmentService extends ServiceBase {
     public ResponseBase uploadMultipleFiles(String attName, String nodeId, MultipartFile[] files, boolean explodeZips) {
         MongoTranMgr.ensureTran();
         if (nodeId == null) {
-            throw ExUtil.wrapEx("target nodeId not provided");
+            throw new RuntimeEx("target nodeId not provided");
         }
 
         try {
@@ -150,7 +148,7 @@ public class AttachmentService extends ServiceBase {
             boolean allowEmailParse = false;
             SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null) {
-                throw ExUtil.wrapEx("Node not found.");
+                throw new RuntimeEx("Node not found.");
             }
             svc_auth.ownerAuth(node);
             long maxFileSize = svc_user.getUserStorageRemaining();
@@ -210,7 +208,7 @@ public class AttachmentService extends ServiceBase {
             }
             svc_mongoUpdate.saveSession();
         } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         }
         return new ResponseBase();
     }
@@ -316,7 +314,7 @@ public class AttachmentService extends ServiceBase {
                         log.error("Failed to get image length.", e);
                     }
                 } catch (Exception e) {
-                    throw ExUtil.wrapEx(e);
+                    throw new RuntimeEx(e);
                 } finally {
                     if (closeStream) {
                         StreamUtil.close(is, isTemp);
@@ -449,7 +447,7 @@ public class AttachmentService extends ServiceBase {
                 nodeId = node.getIdStr();
             }
             if (node == null) {
-                throw ExUtil.wrapEx("node not found.");
+                throw new RuntimeEx("node not found.");
             }
             Attachment att = null;
             if (node.getAttachments() != null) {
@@ -465,13 +463,13 @@ public class AttachmentService extends ServiceBase {
             if (att == null) {
                 att = node.getAttachment(attName, false, false);
                 if (att == null) {
-                    throw ExUtil.wrapEx("attachment info not found.");
+                    throw new RuntimeEx("attachment info not found.");
                 }
             }
 
             String mimeTypeProp = att.getMime();
             if (mimeTypeProp == null) {
-                throw ExUtil.wrapEx("unable to find mimeType property");
+                throw new RuntimeEx("unable to find mimeType property");
             }
             String fileName = att.getFileName();
             if (fileName == null) {
@@ -526,7 +524,7 @@ public class AttachmentService extends ServiceBase {
      */
     public void cm_getFile(String fileName, String disposition, HttpServletResponse response) {
         if (fileName.contains(".."))
-            throw ExUtil.wrapEx("bad request.");
+        throw new RuntimeEx("bad request.");
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
         try {
@@ -534,9 +532,9 @@ public class AttachmentService extends ServiceBase {
             File file = new File(fullFileName);
             String checkPath = file.getCanonicalPath();
             if (!checkPath.startsWith(svc_prop.getAdminDataFolder()))
-                throw ExUtil.wrapEx("bad request.");
+                throw new RuntimeEx("bad request.");
             if (!file.isFile())
-                throw ExUtil.wrapEx("file not found.");
+                throw new RuntimeEx("file not found.");
             String mimeType = MimeUtil.getMimeType(file);
             if (disposition == null) {
                 disposition = "inline";
@@ -552,7 +550,7 @@ public class AttachmentService extends ServiceBase {
             IOUtils.copy(inStream, outStream);
             outStream.flush();
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             StreamUtil.close(inStream, outStream);
         }
@@ -594,7 +592,7 @@ public class AttachmentService extends ServiceBase {
                     .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + file.getName() + "\"")
                     .contentType(MediaType.parseMediaType(mimeType)).body(stream);
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -605,16 +603,16 @@ public class AttachmentService extends ServiceBase {
         try {
             SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null) {
-                throw ExUtil.wrapEx("node not found.");
+                throw new RuntimeEx("node not found.");
             }
 
             Attachment att = node.getAttachment(attName, false, false);
             if (att == null)
-                throw ExUtil.wrapEx("no attachment info found");
+                throw new RuntimeEx("no attachment info found");
             svc_auth.readAuth(node);
             String mimeTypeProp = att.getMime();
             if (mimeTypeProp == null) {
-                throw ExUtil.wrapEx("unable to find mimeType property");
+                throw new RuntimeEx("unable to find mimeType property");
             }
             String fileName = att.getFileName();
             if (fileName == null) {
@@ -733,7 +731,7 @@ public class AttachmentService extends ServiceBase {
                 }
             }
         } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         } finally {
             /*
              * finally block just for extra safety this stream will have been closed by 'attachBinaryFromStream'
@@ -776,7 +774,7 @@ public class AttachmentService extends ServiceBase {
                 }
             }
         } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         } finally {
             StreamUtil.close(is, is2, reader);
         }

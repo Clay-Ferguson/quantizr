@@ -876,7 +876,6 @@ public class MongoRead extends ServiceBase {
         return results.getMappedResults();
     }
 
-    // todo-2: can these methods be moved into an RDF specific service
     public Iterable<SubNode> getLinkedNodes(String nodeId, String search) {
         SubNode node = getNode(nodeId);
 
@@ -925,7 +924,7 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
-     * todo-2: This is very low hanging fruit to make this a feature on the Search menu. In other words
+     * todo-1: This is very low hanging fruit to make this a feature on the Search menu. In other words
      * implementing an "All Named Nodes" search would be trivial with this.
      */
     public Iterable<SubNode> getNamedNodes(SubNode node) {

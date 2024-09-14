@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
+import quanta.exception.base.RuntimeEx;
 import quanta.rest.response.FeedPushInfo;
 import quanta.service.PushService;
 import quanta.util.Util;
@@ -30,7 +31,7 @@ public class RedisSubscriber implements MessageListener {
                         + XString.prettyPrint(obj));
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeEx(e);
         }
     }
 }

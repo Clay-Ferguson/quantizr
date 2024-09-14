@@ -8,11 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.GraphNode;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.GraphRequest;
 import quanta.rest.response.GraphResponse;
-import quanta.util.ExUtil;
 import quanta.util.TL;
 import quanta.util.XString;
 
@@ -59,7 +59,7 @@ public class GraphNodesService extends ServiceBase {
             processNodes(rootPath, rootLevel, mapByPath);
             res.setRootNode(gnode);
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
         return res;
     }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import quanta.exception.base.RuntimeEx;
 
 public class CaptchaMaker {
     private static final Random rand = new Random();
@@ -174,7 +175,7 @@ public class CaptchaMaker {
     // tmp = new ByteArrayOutputStream();
     // ImageIO.write(scaledImage, "png", tmp);
     // } catch (IOException e) {
-    // throw ExUtil.wrapEx(e);
+    // new RuntimeEx(e);
     // } finally {
     // StreamUtil.close(tmp);
     // }
@@ -187,7 +188,7 @@ public class CaptchaMaker {
         try {
             return CaptchaMaker.makeCaptcha(captcha);
         } catch (IOException e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         }
     }
 }

@@ -296,7 +296,7 @@ public class Convert extends ServiceBase {
             PropertyInfo propInfo = new PropertyInfo(propName, value);
             return propInfo;
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 

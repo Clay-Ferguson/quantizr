@@ -28,7 +28,7 @@ public class ImportTarService extends ImportArchiveBase {
             gis = new GzipCompressorInputStream(is);
             return importFromStream(gis, node, isNonRequestThread);
         } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         } finally {
             StreamUtil.close(gis);
         }
@@ -55,7 +55,7 @@ public class ImportTarService extends ImportArchiveBase {
                 }
             }
         } catch (final Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             StreamUtil.close(zis);
         }

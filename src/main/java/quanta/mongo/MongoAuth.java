@@ -181,9 +181,7 @@ public class MongoAuth extends ServiceBase {
 
         // If we didn't have admin privileges above, then we must have a session context
         if (TL.getSC() == null) {
-            String msg = "ThreadLocals doesn't have SessionContext.";
-            log.error(msg);
-            throw new RuntimeException(msg);
+            throw new RuntimeEx("ThreadLocals doesn't have SessionContext.");
         }
 
         SubNode myAcntNode = null;
@@ -264,10 +262,9 @@ public class MongoAuth extends ServiceBase {
         }
 
         if (!TL.getSC().getUserNodeObjId().equals(node.getOwner())) {
-            log.error("Unable to save Node (expected ownerId " + TL.getSC().getUserNodeObjId().toHexString()
+            throw new ForbiddenException("Unable to save Node (expected ownerId " + TL.getSC().getUserNodeObjId().toHexString()
                     + ") but found ownerId " + node.getIdStr() + " on the session) for node: "
                     + XString.prettyPrint(node));
-            throw new ForbiddenException();
         }
     }
 

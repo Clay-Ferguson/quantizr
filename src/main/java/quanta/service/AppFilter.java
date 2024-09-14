@@ -180,8 +180,7 @@ public class AppFilter extends GenericFilterBean {
             if (mutex != null) {
                 boolean isLockAcquired = mutex.tryLock(30, TimeUnit.SECONDS);
                 if (!isLockAcquired) {
-                    log.debug("MUTEX: Failed to acquire lock for " + httpReq.getRequestURI());
-                    throw new ServerTooBusyException(httpReq.getRequestURI());
+                    throw new ServerTooBusyException("MUTEX: Failed to acquire lock for " + httpReq.getRequestURI());
                 }
             }
         }

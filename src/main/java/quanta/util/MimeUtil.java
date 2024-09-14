@@ -15,6 +15,7 @@ import org.apache.tika.Tika;
 import org.springframework.stereotype.Component;
 import jakarta.activation.MimetypesFileTypeMap;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 
 /**
  * Mime-Type (content type) utilities
@@ -108,7 +109,7 @@ public class MimeUtil extends ServiceBase {
                 ret = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
         return ret;
     }

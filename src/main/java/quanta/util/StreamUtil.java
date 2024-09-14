@@ -92,7 +92,7 @@ public class StreamUtil {
                 return false;
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             close(aBuffered, bBuffered);
         }

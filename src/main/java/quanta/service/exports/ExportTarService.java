@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import quanta.util.ExUtil;
+import quanta.exception.base.RuntimeEx;
 
 @Component 
 @Scope("prototype")
@@ -31,7 +31,7 @@ public class ExportTarService extends ExportArchiveBase {
             out.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
             out.setAddPaxHeadersForNonAsciiNames(true);
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -41,7 +41,7 @@ public class ExportTarService extends ExportArchiveBase {
             out.finish();
             out.close();
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -56,12 +56,12 @@ public class ExportTarService extends ExportArchiveBase {
             out.putArchiveEntry(tarArchiveEntry);
             out.write(bytes);
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             try {
                 out.closeArchiveEntry();
             } catch (Exception e) {
-                throw ExUtil.wrapEx(e);
+                throw new RuntimeEx(e);
             }
         }
     }
@@ -82,12 +82,12 @@ public class ExportTarService extends ExportArchiveBase {
             out.putArchiveEntry(entry);
             IOUtils.copyLarge(stream, out, 0, length);
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             try {
                 out.closeArchiveEntry();
             } catch (Exception e) {
-                throw ExUtil.wrapEx(e);
+                throw new RuntimeEx(e);
             }
         }
     }

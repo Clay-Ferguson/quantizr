@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeMetaInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.Attachment;
@@ -152,7 +153,7 @@ public class SubNodeUtil extends ServiceBase {
         if (!parentPath.equals("/")) {
             parent = svc_mongoRead.getNode(parentPath);
             if (parent == null) {
-                throw ExUtil.wrapEx("Expected parent not found: " + parentPath);
+                throw new RuntimeEx("Expected parent not found: " + parentPath);
             }
         }
         boolean nodesCreated = false;
@@ -168,7 +169,7 @@ public class SubNodeUtil extends ServiceBase {
                 parent = svc_mongoCreate.createNode(parent, tok, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
                         true, true, null);
                 if (parent == null) {
-                    throw ExUtil.wrapEx("unable to create " + tok);
+                    throw new RuntimeEx("unable to create " + tok);
                 }
                 nodesCreated = true;
                 if (defaultContent == null) {

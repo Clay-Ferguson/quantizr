@@ -10,7 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import quanta.config.ServiceBase;
-import quanta.util.ExUtil;
+import quanta.exception.base.RuntimeEx;
 
 /*
  * NOTE: You can either use an ErrorController (which what we are doing) or else you can use the
@@ -50,7 +50,7 @@ public class AppServer extends ServiceBase {
 
     public static void shutdownCheck() {
         if (shuttingDown)
-            throw ExUtil.wrapEx("Server is shutting down.");
+            throw new RuntimeEx("Server is shutting down.");
     }
 
     public static boolean isShuttingDown() {

@@ -1,7 +1,6 @@
 package quanta.util;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import quanta.exception.base.RuntimeEx;
 
 /**
@@ -11,35 +10,9 @@ import quanta.exception.base.RuntimeEx;
  *
  * Note: This code doesn't ignore exceptions or alter our ability to properly handle ALL exceptions
  * of both types, but it just makes the code cleaner, by doing what the Java-language SHOULD have
- * done to begin with.
+ * done to begin with. 
  */
 public class ExUtil {
-    private static Logger log = LoggerFactory.getLogger(ExUtil.class);
-
-    public static void run(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (Exception e) {
-            throw wrapEx(e);
-        }
-    }
-
-    public static RuntimeException logAndWrapEx(Logger logger, String msg, Throwable ex) {
-        error(logger, msg, ex);
-        return wrapEx(ex);
-    }
-
-    public static RuntimeException wrapEx(Throwable ex) {
-        if (ex instanceof RuntimeException o) {
-            return o;
-        }
-        return new RuntimeEx(ex);
-    }
-
-    public static RuntimeEx wrapEx(String msg) {
-        RuntimeEx ex = new RuntimeEx(msg);
-        return ex;
-    }
 
     // Note: We can's use ExceptionUtils.getStackTrace(e), because we support thread
     // argument here
@@ -59,27 +32,38 @@ public class ExUtil {
         return (sb.toString());
     }
 
-    public static void warn(String msg) {
-        log.warn(msg + "\n" + getStackTrace(null));
-    }
-
-    public static void error(String msg) {
-        log.error(msg + "\n" + getStackTrace(null));
+    private static boolean checkLogged(Throwable e) {
+        if (e instanceof RuntimeEx _e) {
+            if (_e.logged) {
+                return true;
+            }
+            _e.logged = true;
+        }
+        return false;
     }
 
     public static void debug(Logger logger, String msg, Throwable e) {
+        if (checkLogged(e)) return;
         logger.debug(msg, e);
         // Not showing all sub-causes in the chain, but just the immediate one
         if (e.getCause() != null) {
-            logger.debug("cause:", e);
+            if (checkLogged(e.getCause())) return;
+            logger.debug("cause:", e.getCause());
         }
     }
 
+    public static void error(Logger logger, Throwable e) {
+        error(logger, null, e);
+    }
+
     public static void error(Logger logger, String msg, Throwable e) {
-        logger.error(msg, e);
+       if (checkLogged(e)) return;
+
+        logger.error(msg == null ? e.getMessage() : msg, e);
         // Not showing all sub-causes in the chain, but just the immediate one
         if (e.getCause() != null) {
-            logger.error("cause:", e);
+            if (checkLogged(e.getCause())) return;
+            logger.error("cause:", e.getCause());
         }
     }
 
@@ -87,7 +71,8 @@ public class ExUtil {
         logger.warn(msg, e);
         // Not showing all sub-causes in the chain, but just the immediate one
         if (e.getCause() != null) {
-            logger.warn("cause:", e);
+            if (checkLogged(e.getCause())) return;
+            logger.warn("cause:", e.getCause());
         }
     }
 }

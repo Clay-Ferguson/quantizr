@@ -316,9 +316,7 @@ public class MongoUpdate extends ServiceBase {
         }
 
         if (TL.getSC() == null) {
-            String msg = "No session context found for save";
-            log.error(msg);
-            throw new RuntimeException(msg);
+            throw new RuntimeEx("No session context found for save");
         }
 
         if (TL.hasAdminPrivileges())

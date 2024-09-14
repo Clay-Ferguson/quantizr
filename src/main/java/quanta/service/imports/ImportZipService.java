@@ -41,7 +41,7 @@ public class ImportZipService extends ImportArchiveBase {
             is = resource.getInputStream();
             rootNode = importFromStream(is, node, true);
         } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         } finally {
             StreamUtil.close(is);
         }
@@ -81,7 +81,7 @@ public class ImportZipService extends ImportArchiveBase {
                 }
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             StreamUtil.close(is);
         }

@@ -66,10 +66,10 @@ public class ExportServiceFlexmark extends ServiceBase {
 
         String nodeId = req.getNodeId();
         if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
-            throw ExUtil.wrapEx("adminDataFolder does not exist");
+            throw new RuntimeEx("adminDataFolder does not exist");
         }
         if (nodeId.equals("/")) {
-            throw ExUtil.wrapEx("Exporting entire repository is not supported.");
+            throw new RuntimeEx("Exporting entire repository is not supported.");
         } else {
             log.info("Exporting to Text File");
             exportNodeToFile(nodeId);
@@ -79,7 +79,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
     private void exportNodeToFile(String nodeId) {
         if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
-            throw ExUtil.wrapEx("adminDataFolder does not exist.");
+            throw new RuntimeEx("adminDataFolder does not exist.");
         }
 
         TreeNode rootNode = req.isThreadAsPDF() ? svc_mongoRead.getThreadGraphTree(nodeId) : //
@@ -151,7 +151,7 @@ public class ExportServiceFlexmark extends ServiceBase {
                 throw new RuntimeEx("invalid format.");
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             StreamUtil.close(out);
             if (wroteFile) {

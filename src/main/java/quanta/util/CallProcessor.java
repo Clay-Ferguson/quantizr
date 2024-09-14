@@ -32,7 +32,7 @@ public class CallProcessor extends ServiceBase {
     public Object run(String command, boolean authBearer, boolean authSig, RequestBase req, HttpSession httpSession,
             Supplier<Object> runner) {
         if (AppServer.isShuttingDown()) {
-            throw ExUtil.wrapEx("Server not available.");
+            throw new RuntimeEx("Server not available.");
         }
 
         // Note: TL.setSC() will have already been called in a web filter

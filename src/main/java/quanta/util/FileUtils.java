@@ -264,7 +264,7 @@ public class FileUtils extends ServiceBase {
                 StreamUtil.close(out);
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 

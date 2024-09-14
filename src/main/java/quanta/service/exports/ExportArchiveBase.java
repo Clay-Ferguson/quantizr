@@ -94,7 +94,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         this.req = req;
         if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
-            throw ExUtil.wrapEx("adminDataFolder does not exist: " + svc_prop.getAdminDataFolder());
+            throw new RuntimeEx("adminDataFolder does not exist: " + svc_prop.getAdminDataFolder());
         }
         String nodeId = req.getNodeId();
         TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, null, null);
@@ -128,7 +128,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             res.setFileName(shortFileName);
             success = true;
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             closeOutputStream();
             if (!success) {
@@ -441,7 +441,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 writeFilesForNode(parentFolder, node, content, atts);
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
         return ret;
     }
@@ -663,7 +663,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 addFileEntry(binFileName, IOUtils.toByteArray(bis));
             }
         } catch (Exception e) {
-            throw ExUtil.wrapEx(e);
+            throw new RuntimeEx(e);
         } finally {
             StreamUtil.close(is);
         }

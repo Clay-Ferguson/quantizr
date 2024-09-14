@@ -3,7 +3,6 @@ package quanta.mongo;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.stereotype.Component;
 import com.mongodb.client.result.DeleteResult;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.SubNode;
 import quanta.perf.PerfEvent;
@@ -51,8 +51,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
             return operation.get();
         } catch (Exception e) {
-            log.error("Mongo OP failed: " + operationName + "\n" + ExceptionUtils.getStackTrace(e));
-            throw new RuntimeException(e);
+            throw new RuntimeEx("Mongo OP failed: " + operationName, e);
         }
     }
 

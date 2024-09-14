@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.mongo.model.SubNode;
-import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.Util;
@@ -38,7 +38,7 @@ public class ExportJsonService extends ServiceBase {
     public String dumpAllNodes(String pathPrefix, String fileName) {
         try {
             if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
-                throw ExUtil.wrapEx("adminDataFolder does not exist");
+                throw new RuntimeEx("adminDataFolder does not exist");
             }
             String targetFolder = svc_prop.getAdminDataFolder() + File.separator + fileName;
             FileUtils.createDirectory(targetFolder);
@@ -82,7 +82,7 @@ public class ExportJsonService extends ServiceBase {
                 });
                 os.flush();
             } catch (Exception ex) {
-                throw ExUtil.wrapEx(ex);
+                throw new RuntimeEx(ex);
             } finally {
                 StreamUtil.close(os);
             }

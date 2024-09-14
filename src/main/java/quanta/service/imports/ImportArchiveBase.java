@@ -12,7 +12,6 @@ import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.Attachment;
 import quanta.mongo.model.SubNode;
-import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.TL;
 import quanta.util.Util;
@@ -124,7 +123,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
                 svc_mongoUpdate.save(node);
             }
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         } finally {
             TL.setParentCheckEnabled(true);
         }

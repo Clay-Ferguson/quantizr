@@ -73,7 +73,7 @@ public class MongoUtil extends ServiceBase {
         // Extra protection to be sure accounts and repo root can't have any sharing
         if (NodeType.ACCOUNT.s().equals(node.getType()) || NodeType.REPO_ROOT.s().equals(node.getType())) {
             if (node.getAc() != null) {
-                throw new RuntimeException(
+                throw new RuntimeEx(
                         "Node of type " + node.getType() + " cannot have any sharing: " + node.getIdStr());
             }
         }

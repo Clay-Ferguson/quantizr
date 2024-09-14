@@ -342,7 +342,7 @@ public class SystemService extends ServiceBase {
             svc.setUseGZip(true);
             svc.export(req, res);
         } else {
-            throw ExUtil.wrapEx("Unsupported file extension: " + req.getExportExt());
+            throw new RuntimeEx("Unsupported file extension: " + req.getExportExt());
         }
         return res;
     }

@@ -199,8 +199,6 @@ public class CryptoService extends ServiceBase {
             verifier.update(dataBytes);
             return verifier.verify(sigBytes);
         } catch (Exception e) {
-            ExUtil.error(log, "exception in signature", e);
-            // todo-2: we need a special exception for this.
             throw new RuntimeEx("Signature Failed", e);
         }
     }
@@ -602,7 +600,7 @@ public class CryptoService extends ServiceBase {
                 sc.getUserName().getBytes(StandardCharsets.UTF_8));
 
         if (!verified) {
-            throw new RuntimeException(
+            throw new RuntimeEx(
                     "Request Sig Failed. Probably wrong signature key in browser for user " + sc.getUserName());
         }
     }

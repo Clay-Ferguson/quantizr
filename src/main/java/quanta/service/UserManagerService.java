@@ -758,7 +758,7 @@ public class UserManagerService extends ServiceBase {
             response.setHeader("Content-Disposition", disposition + "; filename=\"" + fileName + "\"");
             response.getWriter().write(sb.toString());
         } catch (Exception ex) {
-            throw ExUtil.wrapEx(ex);
+            throw new RuntimeEx(ex);
         }
     }
 
@@ -951,12 +951,12 @@ public class UserManagerService extends ServiceBase {
                 }
                 userNode.setVal(svc_user.getAccountNode(userNodeId));
                 if (userNode.getVal() == null) {
-                    throw ExUtil.wrapEx("Invald password reset code.");
+                    throw new RuntimeEx("Invald password reset code.");
                 }
                 String codePart = XString.parseAfterLast(passCode, "-");
                 String nodeCodePart = userNode.getVal().getStr(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE);
                 if (!codePart.equals(nodeCodePart)) {
-                    throw ExUtil.wrapEx("Invald password reset code.");
+                    throw new RuntimeEx("Invald password reset code.");
                 }
                 String password = req.getNewPassword();
                 userName.setVal(userNode.getVal().getStr(NodeProp.USER));
@@ -971,7 +971,7 @@ public class UserManagerService extends ServiceBase {
         } else {
             userNode.setVal(svc_user.getAccountByUserNameAP(TL.getSC().getUserName()));
             if (userNode.getVal() == null) {
-                throw ExUtil.wrapEx("changePassword cannot find user.");
+                throw new RuntimeEx("changePassword cannot find user.");
             }
             if (PrincipalName.ADMIN.s().equals(userName.getVal())) {
                 throw new RuntimeEx("changePassword should not be called fror admin user.");

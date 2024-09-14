@@ -111,13 +111,11 @@ public class AIService extends ServiceBase {
         try {
             aiRes = (AIResponse) Util.mapper.readValue(res, AIResponse.class);
         } catch (Exception e) {
-            String msg = "Error parsing response: " + e.getMessage() + " response\n\n" + res;
-            log.error(msg);
-            throw new RuntimeException(msg);
+            throw new RuntimeEx("Error parsing response: " + e.getMessage() + " response\n\n" + res);
         }
 
         if (!StringUtils.isEmpty(aiRes.getError())) {
-            throw new RuntimeException(aiRes.getError());
+            throw new RuntimeEx(aiRes.getError());
         }
 
         BigDecimal cost = new BigDecimal(aiRes.getCost());

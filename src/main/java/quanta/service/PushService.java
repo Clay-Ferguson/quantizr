@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeInfo;
 import quanta.mongo.model.SubNode;
 import quanta.redis.RedisBrowserPushInfo;
@@ -166,7 +167,7 @@ public class PushService extends ServiceBase {
                 FeedPushInfo info = Util.simpleMapper.readValue(rinfo.getPayload(), FeedPushInfo.class);
                 pushInfo(rinfo.getToken(), info);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeEx(e);
             }
         }
     }
