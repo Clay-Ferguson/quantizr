@@ -875,15 +875,6 @@ export class Edit {
         }
     }
 
-    // todo-2: method is not used?
-    // selectAllNodes = async () => {
-    //     const highlightNode = S.nodeUtil.getHighlightedNode();
-    //     const res = await S.rpcUtil.rpc<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
-    //         parentNodeId: highlightNode.id
-    //     });
-    //     S.nodeUtil.selectAllNodes(res.nodeIds);
-    // }
-
     clearInbox = async () => {
         const ast = getAs();
         S.nodeUtil.clearSelNodes();
@@ -1091,7 +1082,6 @@ export class Edit {
         this.pasteSelNodes(id, "inside", ast);
     }
 
-    // location=inside | inline | inline-above (todo-2: put in java-aware enum)
     pasteSelNodes = async (nodeId: string, location: string, ast?: AppState) => {
         ast = ast || getAs();
         console.log("action nodesToMove: " + S.util.prettyPrint(ast.nodesToMove));

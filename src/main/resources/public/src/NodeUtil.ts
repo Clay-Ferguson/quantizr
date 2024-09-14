@@ -53,16 +53,6 @@ export class NodeUtil {
         dispatch("ClearSelections", s => s.selectedNodes.clear());
     }
 
-    // selectAllNodes = (nodeIds: string[]) => {
-    //     // DO NOT DELETE (feature work in progress)
-    //     // //todo-2: large numbers of selected nodes isn't going to scale well in this design
-    //     // // but i am not letting perfection be the enemy of good here (yet)
-    //     // this.selectedNodes.clear();
-    //     // nodeIds.forEach( (nodeId, index) => {
-    //     //     this.selectedNodes.add(nodeId);
-    //     // });
-    // }
-
     getHighlightedNode = (): NodeInfo => {
         const ast = getAs();
         if (!ast.node) return null;

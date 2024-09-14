@@ -35,8 +35,8 @@ export class SplitNodeDlg extends DialogBase {
         }
 
         this.mergeState<LS>({
-            splitMode, // can be: custom | double | triple (todo-2: make an enum)
-            splitType: "inline", // can be: inline | children (todo-2: make an enum)
+            splitMode, 
+            splitType: "inline", 
             delimiter: "{split}"
         });
     }

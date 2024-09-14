@@ -121,8 +121,6 @@ public class UserManagerService extends ServiceBase {
         return emitter;
     }
 
-    // todo-2: can this function AND "reqBearerToken" (not bearerToken) can be factored out for a
-    // more consistent design letting all the logic be only in AppFilter
     public void authBearer() {
         SessionContext sc = TL.getSC();
         if (sc == null) {

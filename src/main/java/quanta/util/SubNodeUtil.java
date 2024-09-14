@@ -303,7 +303,6 @@ public class SubNodeUtil extends ServiceBase {
         if (bin == null) {
             bin = att.getUrl();
         }
-        // todo-2: will this fail to find "data:" type inline image data?
         return bin;
     }
 
