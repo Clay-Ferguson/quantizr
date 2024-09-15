@@ -1,49 +1,30 @@
-$scrollTrack: $gray-900;
-$scrollThumb: #444;
-$scrollBarWidth: 20px;
-
 .customScrollbar {
+    // this class is not needed but exists in TypeScript as an indicator for where scrollbars are
+    // because it's important for identifying persistence of scroll position across react re-renders
+}
+
+// NOTE: These settings were created mainly to widen the scrollbar but the no longer appear to have any effect
+* {
     scrollbar-width: auto;
     scrollbar-color: $body-bg;
 }
 
-.customScrollbar::-webkit-scrollbar {
-	width: $scrollBarWidth;
-    height: $scrollBarWidth;
+*::-webkit-scrollbar {
+	width: 20px;
+    height: 20px;
 	background-color: $body-bg;
 }
 
-.customScrollbar::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-	background-color: $scrollTrack;
+	background-color: $gray-900;
 }
 
-.customScrollbar::-webkit-scrollbar-thumb {
+*::-webkit-scrollbar-thumb {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
     box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: $scrollThumb;
+	background-color: #444;
     border: 1px solid gray;
 }
 
-textarea::-webkit-scrollbar {
-    width: $scrollBarWidth;
-    height: $scrollBarWidth;
-	background-color: $body-bg;
-    cursor: pointer;
-}
-
-textarea::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-	background-color: $scrollTrack;
-    cursor: pointer;
-}
-
-textarea::-webkit-scrollbar-thumb {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: $scrollThumb;
-    cursor: pointer;
-    border: 1px solid gray;
-}
