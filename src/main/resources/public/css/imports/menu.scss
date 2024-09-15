@@ -67,48 +67,48 @@
     border: 1px solid gray;
 }
 
-.menuCardBody {
+.menuBody {
     padding: 0px 0px 0px 20px;
 }
 
-.menuCard {
+.menu {
     border: none;
     background-color: transparent;
     margin: 4px;
 }
 
-.menuHeading {
+.menuItem {
     cursor: pointer;
     background-color: transparent;
     padding: 5px 5px 5px 15px;
     border: 1px solid transparent;
 }
 
-.menuHeading:hover {
+.menuItem:hover {
     background-color: $primary;
     border: 1px solid gray;
 }
 
-.menuHeadingExpanded {
-    @extend .menuHeading;
+.menuItemExpanded {
+    @extend .menuItem;
     background-color: $secondary;
     border: 1px solid gray;
 }
 
-.subMenuHeading {
+.subMenuItem {
     cursor: pointer;
     background-color: transparent;
     padding: 5px 5px 5px 5px;
     border: 1px 1px 1px 1px solid transparent;
 }
 
-.subMenuHeading:hover {
+.subMenuItem:hover {
     background-color: $primary;
     border: 1px 1px 1px 5px solid gray;
 }
 
-.subMenuHeadingExpanded {
-    @extend .subMenuHeading;
+.subMenuItemExpanded {
+    @extend .subMenuItem;
     background-color: $secondary;
     padding: 5px 5px 5px 15px;
     border: 1px 1px 1px 5px solid gray;

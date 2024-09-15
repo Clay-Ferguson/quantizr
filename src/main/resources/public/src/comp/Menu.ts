@@ -5,13 +5,13 @@ import { Div } from "./core/Div";
 
 export class Menu extends Comp {
     constructor(public name: string, public menuItems: Comp[], private func: () => void = null, private floatRightComp: Comp = null, private moreClasses: string = "", private subMenu: boolean = false) {
-        super({ key: name, className: "menuCard" });
+        super({ key: name, className: "menu" });
     }
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const expanded = getAs().expandedMenus.has(this.name);
-        const clazz = this.subMenu ? (expanded ? "subMenuHeadingExpanded" : "subMenuHeading") : (expanded ? "menuHeadingExpanded" : "menuHeading");
+        const expanded = ast.expandedMenus.has(this.name);
+        const clazz = this.subMenu ? (expanded ? "subMenuItemExpanded" : "subMenuItem") : (expanded ? "menuItemExpanded" : "menuItem");
 
         this.children = [
             new Div(null, {
@@ -28,7 +28,7 @@ export class Menu extends Comp {
 
             expanded ? new Div(null, {
                 id: "itemsCont-" + this.getId(),
-                className: "menuCardBody"
+                className: "menuBody"
             }, [
                 new Div(null, {
                     id: "items-" + this.getId(),
