@@ -1,0 +1,19 @@
+$brickGap: 10px;
+
+.brick { 
+    border: 2px solid orange;
+    margin: $brickGap 0 0 $brickGap;
+}
+
+.brickInline {
+    display: inline-block;
+}
+
+.brickWidth100px {
+    width: 100px;
+}
+
+.brickRow {
+    @extend .brick;
+}
+
