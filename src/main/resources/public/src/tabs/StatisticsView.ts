@@ -1,7 +1,7 @@
 import { getAs } from "../AppContext";
 import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
-import { TrendingRSInfo } from "../TrendingRSInfo";
+import { StatisticsRSInfo } from "../StatisticsRSInfo";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
@@ -12,12 +12,12 @@ import { TextContent } from "../comp/core/TextContent";
 import { SearchContentDlg } from "../dlg/SearchContentDlg";
 import { TabBase } from "../intf/TabBase";
 
-export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
-    static inst: TrendingView = null;
+export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
+    static inst: StatisticsView = null;
 
-    constructor(data: TabBase<TrendingRSInfo, TrendingView>) {
+    constructor(data: TabBase<StatisticsRSInfo, StatisticsView>) {
         super(data);
-        data.inst = TrendingView.inst = this;
+        data.inst = StatisticsView.inst = this;
     }
 
     override preRender(): boolean | null {
@@ -51,7 +51,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     [C.WORD_ATTR]: word,
-                    onClick: TrendingView.searchWord
+                    onClick: StatisticsView.searchWord
                 }));
             });
         }
@@ -63,7 +63,7 @@ export class TrendingView extends AppTab<TrendingRSInfo, TrendingView> {
                 wordPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     [C.WORD_ATTR]: word,
-                    onClick: TrendingView.searchWord
+                    onClick: StatisticsView.searchWord
                 }));
             });
         }

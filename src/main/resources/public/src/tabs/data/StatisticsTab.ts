@@ -4,26 +4,27 @@ import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { TrendingRSInfo } from "../../TrendingRSInfo";
-import { TrendingView } from "../TrendingView";
+import { StatisticsRSInfo } from "../../StatisticsRSInfo";
+import { StatisticsView } from "../StatisticsView";
 
-export class TrendingTab extends TabBase<TrendingRSInfo> {
+export class StatisticsTab extends TabBase<StatisticsRSInfo> {
     name = "Node Stats";
     tooltip = "Statistics about the node and its children";
     id = C.TAB_TRENDING;
-    props = new TrendingRSInfo();
-    static inst: TrendingTab = null;
+    props = new StatisticsRSInfo();
+    static inst: StatisticsTab = null;
     
     constructor() {
         super();
-        TrendingTab.inst = this;
+        StatisticsTab.inst = this;
     }
 
     isVisible() {
         return getAs().statsNodeId !== null;
     }
+    
     constructView(data: TabBase) {
-        return new TrendingView(data);
+        return new StatisticsView(data);
     }
 
     findNode(nodeId: string): NodeInfo {

@@ -20,7 +20,7 @@ import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { SettingsTab } from "./tabs/data/SettingsTab";
 import { AISettingsTab } from "./tabs/data/AISettingsTab";
-import { TrendingTab } from "./tabs/data/TrendingTab";
+import { StatisticsTab } from "./tabs/data/StatisticsTab";
 import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
 import { AudioPlayerView } from "./tabs/AudioPlayerView";
 
@@ -469,8 +469,8 @@ export class Nav {
     }
 
     showTrendingFiltered = (filter: string) => {
-        if (TrendingTab.inst) {
-            TrendingTab.inst.props.filter = filter;
+        if (StatisticsTab.inst) {
+            StatisticsTab.inst.props.filter = filter;
         }
 
         dispatch("SelectTab", s => {
@@ -478,7 +478,7 @@ export class Nav {
             s.activeTab = C.TAB_TRENDING;
 
             // merge props parameter into the feed data props.
-            TrendingTab.inst.props = { ...TrendingTab.inst.props };
+            StatisticsTab.inst.props = { ...StatisticsTab.inst.props };
         });
     }
 

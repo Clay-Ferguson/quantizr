@@ -9,7 +9,7 @@ import * as J from "./JavaIntf";
 import { PrincipalName } from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
-import { TrendingView } from "./tabs/TrendingView";
+import { StatisticsView } from "./tabs/StatisticsView";
 
 export class Quanta {
     // initialized in main.ts
@@ -290,7 +290,7 @@ export class Quanta {
 
         if (initialTab === C.TAB_FEED) {
             if (S.quanta.config.search) {
-                TrendingView.searchWord(null, S.quanta.config.search);
+                StatisticsView.searchWord(null, S.quanta.config.search);
             }
             else {
                 S.tabUtil.selectTab(initialTab);

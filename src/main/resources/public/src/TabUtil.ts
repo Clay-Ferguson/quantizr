@@ -21,7 +21,7 @@ import { AISettingsTab } from "./tabs/data/AISettingsTab";
 import { SharesTab } from "./tabs/data/SharesTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
-import { TrendingTab } from "./tabs/data/TrendingTab";
+import { StatisticsTab } from "./tabs/data/StatisticsTab";
 import { TTSTab } from "./tabs/data/TTSTab";
 import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
 
@@ -80,7 +80,7 @@ export class TabUtil {
                 new FeedTab(),
                 new RepliesTab(),
                 new ThreadTab(),
-                new TrendingTab(),
+                new StatisticsTab(),
                 new ServerInfoTab(),
                 new TTSTab(),
                 new RSSTab(),
