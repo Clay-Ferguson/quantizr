@@ -27,10 +27,8 @@ export class NodeCompRowHeader extends Div {
 
     override preRender(): boolean | null {
         const ast = getAs();
-
         const allowWideViewIcons = !ast.mobileMode || S.quanta.isLandscapeOrientation();
         let displayName = this.node.displayName || this.node.owner;
-
         const isMine = S.props.isMine(this.node);
         const children = [];
         let avatarImg: Img = null;
@@ -77,7 +75,6 @@ export class NodeCompRowHeader extends Div {
                 title: "Node is Encrypted."
             }));
         }
-
         const editInsertAllowed = S.props.isWritableByMe(this.node);
 
         if (!ast.isAdminUser && showInfo && editInsertAllowed) {
@@ -325,12 +322,6 @@ export class NodeCompRowHeader extends Div {
         this.children = children;
         return true;
     }
-
-    // getTextContent = (): string => {
-    //     const id = this.getContentDomId();
-    //     const elm = document.getElementById(id);
-    //     return elm ? elm.textContent : null;
-    // }
 
     _getContentDomId = () => {
         return NodeCompContent.PRE_PREFIX + this.prefix + this.node.id;

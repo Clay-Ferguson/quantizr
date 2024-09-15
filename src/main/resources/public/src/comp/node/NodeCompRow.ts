@@ -18,7 +18,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompRow extends Div {
 
-    constructor(public node: NodeInfo, public tabData: TabBase<any>, private type: TypeIntf, //
+    constructor(public node: NodeInfo, public tabData: TabBase<any>, private type: TypeIntf,
         public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private internalComp: Div) {
@@ -36,7 +36,6 @@ export class NodeCompRow extends Div {
             this.attribs[C.NODE_ID_ATTR] = this.node.id;
             this.attribs.onClick = S.nav.clickTreeNode;
         }
-
         let insertInlineButton = null;
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
 
@@ -112,8 +111,6 @@ export class NodeCompRow extends Div {
             // special class if BOTH edit and info is on
             if (allowHeader && this.tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && //
                 S.util.showMetaData(ast, this.node)) {
-                // obsolete code path.
-                // layoutClass += " rowBorderEditInfo";
             }
             // else if either is on
             else if (ast.userPrefs.editMode || S.util.showMetaData(ast, this.node)) {
@@ -126,7 +123,6 @@ export class NodeCompRow extends Div {
                 layoutClass += " row-border";
             }
         }
-
         const indentLevel = this.isTableCell ? 0 : this.level;
         const focusNode = S.nodeUtil.getHighlightedNode();
         const selected: boolean = (focusNode && focusNode.id === this.node.id);

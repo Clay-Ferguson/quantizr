@@ -53,11 +53,9 @@ export class NodeCompTableRowLayout extends Div {
             const comps: Comp[] = [];
 
             if (!(ast.cutCopyOp == "cut" && ast.nodesToMove && ast.nodesToMove.find(id => id === n.id))) {
-
                 if (this.debug && n) {
                     console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id);
                 }
-
                 const type = S.plugin.getType(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with
@@ -67,13 +65,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-
-                    // experimenting: Still need this?
-                    // if (n.children && !inVerticalSpace) {
-                    //     comps.push(new Div(null, { className: "verticalSpace" }));
-                    // }
                     const row: Comp = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, this.allowHeaders, true, null);
-                    // inVerticalSpace = false;
                     comps.push(row);
                     rowCount++;
                 }
@@ -82,11 +74,6 @@ export class NodeCompTableRowLayout extends Div {
                 // displayed so display them This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-
-                    // experimenting: Still need this?
-                    // comps.push(new Div(null, { className: "verticalSpace" }));
-
-                    // inVerticalSpace = true;
                 }
 
                 const curCol = new Div(null, {

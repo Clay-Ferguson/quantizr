@@ -45,27 +45,17 @@ export class NodeCompVerticalRowLayout extends Div {
                     lastNode = n;
                     let row: Comp = null;
 
-                    // experimenting: Still need this?
-                    // if (n.children && !inVerticalSpace) {
-                    //     comps.push(new Div(null, { className: "verticalSpace" }));
-                    // }
-
                     if (!type?.isSpecialAccountNode() || ast.isAdminUser) {
                         row = new NodeCompRow(n, this.tabData, type, rowIdx, childCount, rowCount + 1, this.level, false, true, this.allowHeaders, isMine, null);
                         rowCount++;
                         comps.push(row);
                     }
-                    // inVerticalSpace = false;
                 }
 
                 // if we have any children on the node they will always have been loaded to be
                 // displayed so display them This is the linline children
                 if (n.children) {
                     comps.push(S.render.renderChildren(n, this.tabData, this.level + 1, this.allowNodeMove));
-
-                    // experimenting: Still need this?
-                    // comps.push(new Div(null, { className: "verticalSpace" }));
-                    // inVerticalSpace = true;
                 }
             }
             rowIdx++;
@@ -132,7 +122,6 @@ export class NodeCompVerticalRowLayout extends Div {
             comps.push(S.render.newUserAccountTips());
             S.edit.helpNewUserEdit();
         }
-
         this.children = comps;
         return true;
     }

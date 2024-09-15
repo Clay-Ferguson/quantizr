@@ -145,7 +145,6 @@ export class NodeCompMarkdown extends Comp {
         if (sections) {
             return sections;
         }
-
         return createElement(ReactMarkdownComp as any, this.attribs, state.content);
     }
 
@@ -220,7 +219,6 @@ export class NodeCompMarkdown extends Comp {
                 blankLines = 0;
                 return;
             }
-
             curBuf += line + "\n";
 
             if (line.trim().length == 0) {
