@@ -31,7 +31,7 @@ export class ExportDlg extends DialogBase {
             ast.exportSettings.contentType === "pdf" || //
             (ast.exportSettings.contentType !== "md" && ast.exportSettings.contentType !== "fs");
 
-        let children: Comp[] = [];
+        const children: Comp[] = [];
 
         if (!this.exportingThread) {
             children.push(new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }));

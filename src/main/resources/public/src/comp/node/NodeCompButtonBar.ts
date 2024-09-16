@@ -203,7 +203,7 @@ export class NodeCompButtonBar extends Div {
         }
 
         let floatEndSpan = null;
-        let spanArray: Comp[] = [
+        const spanArray: Comp[] = [
             addDelete ? new Icon({
                 className: "fa fa-trash fa-lg " + iconClazz,
                 title: "Delete node(s)",

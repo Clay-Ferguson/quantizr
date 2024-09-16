@@ -324,7 +324,7 @@ export class NodeUtil {
                     showMore += "\n";
                 }
                 else {
-                    let nameInSpan = S.util.getFriendlyPrincipalName(ac);
+                    const nameInSpan = S.util.getFriendlyPrincipalName(ac);
                     ret.push(new Span(nameInSpan + suffix, props));
                 }
                 numShares++;

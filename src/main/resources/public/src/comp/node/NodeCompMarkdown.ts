@@ -196,7 +196,7 @@ export class NodeCompMarkdown extends Comp {
             }
             else if (!inGatedSection && line.startsWith(NodeCompMarkdown.CENTERING_START) && //
                 line.endsWith(NodeCompMarkdown.CENTERING_END)) {
-                let centeredText = line.substring(2, line.length - 2).trim();
+                const centeredText = line.substring(2, line.length - 2).trim();
                 children.push(createElement(ReactMarkdownComp as any, { className: "centeredText" }, centeredText));
                 return;
             }

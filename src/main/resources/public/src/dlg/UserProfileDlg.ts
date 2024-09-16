@@ -298,7 +298,7 @@ export class UserProfileDlg extends DialogBase {
     makeProfileImg(_hasHeaderImg: boolean): Comp {
         const state: LS = this.getState<LS>();
         const avatarVer = state.userProfile.avatarVer;
-        let src: string = S.render.getAvatarImgUrl(state.userProfile.userNodeId, avatarVer);
+        const src: string = S.render.getAvatarImgUrl(state.userProfile.userNodeId, avatarVer);
 
         const onClick = async () => {
             if (this.readOnly) return;

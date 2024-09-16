@@ -222,7 +222,7 @@ export class RightNavPanel extends Div {
     makeRHSAvatarDiv(): Comp {
         const ast = getAs();
         if (!ast.userProfile) return null;
-        let src: string = S.render.getAvatarImgUrl(ast.userProfile.userNodeId, ast.userProfile.avatarVer);
+        const src: string = S.render.getAvatarImgUrl(ast.userProfile.userNodeId, ast.userProfile.avatarVer);
 
         if (src) {
             const attr: any = {
