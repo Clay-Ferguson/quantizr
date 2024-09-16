@@ -57,5 +57,5 @@ export class FeedTab extends TabBase<FeedViewProps> {
             ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
             ast.isAnonUser ? null : new AppNavLink("From Follows", S.nav.messagesFromFriends),
         ]);
-    };
+    }
 }

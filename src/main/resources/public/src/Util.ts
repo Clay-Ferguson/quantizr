@@ -709,7 +709,6 @@ export class Util {
             Notification.requestPermission((_status) => { // status is "granted", if accepted by user
                 message = this.removeHtmlTags(message);
 
-                // eslint-disable-next-line no-new
                 new Notification(title, {
                     body: message,
 

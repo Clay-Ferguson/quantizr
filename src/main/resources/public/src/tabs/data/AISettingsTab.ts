@@ -16,7 +16,7 @@ export class AISettingsTab extends TabBase<any> {
 
     isVisible() {
         return AISettingsTab.tabShown;
-    };
+    }
 
     constructView(data: TabBase) {
         return new AISettingsView(data);

@@ -27,6 +27,9 @@ else
     echo "node_modules found."
 fi
 
+yarn run eslint .
+verifySuccess "ESLint"
+
 yarn run ${SASS_SCRIPT}
 verifySuccess "yarn sass run: ${SASS_SCRIPT}"
 

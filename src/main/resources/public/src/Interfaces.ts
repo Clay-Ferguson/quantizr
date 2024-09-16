@@ -9,12 +9,10 @@ export class IndexedDBObj {
 }
 
 export enum FullScreenType {
-    // eslint-disable-next-line no-unused-vars
     NONE, IMAGE, GRAPH, CALENDAR
 }
 
 export class DomainType {
-    // eslint-disable-next-line no-unused-vars
     public static Text: string = "Text";
     public static Date: string = "Date";
     public static Number: string = "Number";

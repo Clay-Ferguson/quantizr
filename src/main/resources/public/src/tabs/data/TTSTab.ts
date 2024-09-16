@@ -17,7 +17,7 @@ export class TTSTab extends TabBase<any> {
 
     isVisible() {
         return getAs().ttsRan || TTSTab.ttsTabSelected;
-    };
+    }
 
     constructView(data: TabBase) {
         return new TTSView(data);

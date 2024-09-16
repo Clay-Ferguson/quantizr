@@ -72,5 +72,5 @@ export class MainTab extends TabBase<any> {
             !ast.isAnonUser ? new AppNavLink("My Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, false)) : null,
             ...S.render.buildCustomLinks(S.quanta.cfg.rhsLinks)
         ]);
-    };
+    }
 }

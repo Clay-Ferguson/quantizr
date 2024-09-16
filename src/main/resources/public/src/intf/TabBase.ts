@@ -34,7 +34,7 @@ export class TabBase<PT = any, TT = any> {
     // controls whether to show tab button or not.
     isVisible(): boolean { return false; }
 
-    getTabSubOptions(): Div { return null; };
+    getTabSubOptions(): Div { return null; }
 
     findNode(_nodeId: string): NodeInfo { return null; }
 

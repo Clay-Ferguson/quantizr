@@ -16,7 +16,7 @@ export class ServerInfoTab extends TabBase<any> {
 
     isVisible() {
         return !!getAs().serverInfoText;
-    };
+    }
 
     constructView(data: TabBase) {
         return new ServerInfoView(data);

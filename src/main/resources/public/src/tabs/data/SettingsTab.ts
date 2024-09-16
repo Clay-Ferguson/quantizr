@@ -16,7 +16,7 @@ export class SettingsTab extends TabBase<any> {
 
     isVisible() {
         return SettingsTab.tabShown;
-    };
+    }
 
     constructView(data: TabBase) {
         return new SettingsView(data);

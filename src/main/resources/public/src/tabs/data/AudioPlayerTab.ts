@@ -17,7 +17,7 @@ export class AudioPlayerTab extends TabBase<any> {
 
     isVisible() {
         return AudioPlayerTab.tabShown;
-    };
+    }
 
     constructView(data: TabBase) {
         return new AudioPlayerView(data);

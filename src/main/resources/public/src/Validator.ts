@@ -110,7 +110,6 @@ export class Validator implements ValueIntf {
 }
 
 export enum ValidatorRuleName {
-    // eslint-disable-next-line no-unused-vars
     REQUIRED, MAXLEN, MINLEN, USERNAME
 }
 

@@ -373,7 +373,6 @@ export abstract class Comp {
 
     // Note: forwardRef is a wrapper around the render method, so we can have 'ref' in the attribs.
     // If we didn't need 'ref' we could have just use the render core method directly.
-    // eslint-disable-next-line
     _render = forwardRef((props, ref) => {
         return this.renderCore(props, ref);
     });

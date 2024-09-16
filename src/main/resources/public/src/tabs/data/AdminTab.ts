@@ -18,7 +18,7 @@ export class AdminTab extends TabBase<any> {
 
     isVisible() {
         return getAs().isAdminUser;
-    };
+    }
 
     constructView(data: TabBase): AppTab { 
         return new AdminView(data); 

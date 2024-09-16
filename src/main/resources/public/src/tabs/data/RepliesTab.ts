@@ -19,7 +19,7 @@ export class RepliesTab extends TabBase<RepliesRSInfo> {
         RepliesTab.inst = this;
     }
 
-    isVisible() { return !!getAs().repliesViewNodeId; };
+    isVisible() { return !!getAs().repliesViewNodeId; }
     constructView(data: TabBase) {
         return new RepliesView(data);
     }
