@@ -18,7 +18,6 @@ export class MenuItem extends Div {
     constructor(public name: string, public clickFunc: () => void, enabled: boolean = true, private stateFunc: () => boolean = null,
         private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null) {
         super(name, { key: name });
-        this.onClick = this.onClick.bind(this);
         this.mergeState({ visible: true, enabled });
     }
 
@@ -31,13 +30,13 @@ export class MenuItem extends Div {
         if (this.stateFunc) {
             if (this.radioGroup) {
                 innerSpan = new RadioButton(state.content, this.stateFunc(), this.radioGroup, null, {
-                    setValue: this.onClick,
+                    setValue: this._onClick,
                     getValue: this.stateFunc
                 });
             }
             else {
                 innerSpan = new Checkbox(state.content, { className: "marginRight" }, {
-                    setValue: this.onClick,
+                    setValue: this._onClick,
                     getValue: this.stateFunc
                 });
             }
@@ -63,11 +62,11 @@ export class MenuItem extends Div {
         this.attribs.style = { display: (state.visible ? "" : "none") };
         this.attribs.className = innerClazz + " list-group-item-action " + enablementClass + "  listGroupTransparent" +
             (getAs().mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses;
-        this.attribs.onClick = this.onClick
+        this.attribs.onClick = this._onClick
         return true
     }
 
-    onClick(): void {
+    _onClick = (): void => {
         const state = this.getState<LS>();
         if (!state.enabled) return;
 

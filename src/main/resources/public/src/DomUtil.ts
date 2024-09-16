@@ -214,12 +214,12 @@ export class DomUtil {
 
     escapeHtml = (str: string): string => {
         if (!str) return str;
-        return str.replace(/[&<>"'`=\/]/g, DomUtil.escapeMapFunc);
+        return str.replace(/[&<>"'`=\/]/g, DomUtil._escapeMapFunc);
     }
 
     // we have this as a separate static function just to avoid the overhead of creating a new function for every call
     // where this is used.
-    static escapeMapFunc(s: any) {
+    static _escapeMapFunc = (s: any) => {
         return DomUtil.escapeMap.get(s) || s;
     }
 

@@ -1718,14 +1718,14 @@ export class Edit {
         S.edit.likeNode(node, !youLiked);
     }
 
-    setLinkSource = () => {
+    _setLinkSource = () => {
         const node = S.nodeUtil.getHighlightedNode();
         dispatch("setLinkSourceNodeId", s => {
             if (node) {
                 s.linkSource = node.id;
             }
         });
-    };
+    }
 
     linkNodesClick = () => {
         dispatch("setLinkSourceNodeId", s => {

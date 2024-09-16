@@ -18,7 +18,7 @@ export class HistoryPanel extends Div {
         });
     }
 
-    static historyLockChanged(checked: boolean) {
+    static _historyLockChanged = (checked: boolean) => {
         dispatch("historyLockChanged", s => s.nodeHistoryLocked = checked)
     }
 
@@ -37,7 +37,7 @@ export class HistoryPanel extends Div {
                 onClick: S.histUtil.clearHistory
             }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
-                setValue: HistoryPanel.historyLockChanged,
+                setValue: HistoryPanel._historyLockChanged,
                 getValue: (): boolean => ast.nodeHistoryLocked
             }, "form-switch formCheckInlineNoMargin")
         ]));

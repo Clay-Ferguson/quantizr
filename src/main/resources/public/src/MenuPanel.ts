@@ -397,7 +397,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("RDF Triple", [
-                new MenuItem("Set Subject (Source)", S.edit.setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
+                new MenuItem("Set Subject (Source)", S.edit._setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
                 new MenuItem("Create Triple (Target)", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource, null, true), //
                 new MenuItemSeparator(), //
                 new MenuItem("Find Subjects", S.srch.findRdfSubjects, onMainTab, null, true) //

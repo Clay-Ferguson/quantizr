@@ -157,7 +157,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                 // When the 'more' button scrolls into view go ahead and load more records.
                 moreButton.onMount((elm: HTMLElement) => {
                     const observer = new IntersectionObserver(entries => {
-                        entries.forEach((entry: any) => {
+                        entries.forEach((entry: IntersectionObserverEntry) => {
                             if (entry.isIntersecting) {
                                 // if this button comes into visibility within 2 seconds of it being
                                 // created that means it was rendered visible without user scrolling

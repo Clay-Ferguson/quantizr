@@ -47,7 +47,7 @@ export class NodeCompContent extends Div {
         const children: Comp[] = [];
         let type = S.plugin.getType(this.node.type);
         type = type || S.plugin.getType(J.NodeType.NONE);
-        this.domPreUpdateFunc = type.domPreUpdateFunction;
+        this.domPreUpdateFunc = (parent: Comp) => type.domPreUpdateFunction(parent);
 
         /* if node owner matches node id this is someone's account root node, so what we're doing
         here is not showing the normal attachment for this node, because that will the same as the
@@ -169,6 +169,7 @@ export class NodeCompContent extends Div {
         }
     }
 
+    // todo-0: this is an oddball right? Aren't we using non-fat arrow funtions for these kinds of base overrides?
     override _domPreUpdateEvent = () => {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);

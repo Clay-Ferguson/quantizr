@@ -156,7 +156,7 @@ export class AppState {
     allowBashScripting: boolean;
 
     allowFileSystemSearch: boolean;
-    anonUserLandingPageNode: any;
+    anonUserLandingPageNode: string;
 
     // Rss feeds (cached by a hash of the feedSrc property text as the key)
     rssFeedCache = {};

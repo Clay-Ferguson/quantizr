@@ -13,6 +13,8 @@ export default [
       sourceType: "module",
       parser: typescript,
       parserOptions: {
+        project: true,
+        tsconfigRootDir: ".", 
         ecmaFeatures: {
           jsx: true,
         },
@@ -29,11 +31,11 @@ export default [
       // "react-hooks/exhaustive-deps": "warn",
       "no-empty": "off",
       "no-useless-escape": "off",
-      "no-debugger": "error",
+      "no-debugger": "off",
       "no-undef": "off",
       "no-extra-semi": "error",
-      "prefer-const": "off",
-      "no-extra-boolean-cast": "off",
+      "prefer-const": "error",
+      "no-extra-boolean-cast": "error",
       "prefer-spread": "off",
       "prefer-rest-params": "off",
       "no-async-promise-executor": "error",
@@ -42,7 +44,7 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-      // "@typescript-eslint/unbound-method": "error", // todo-0: need to enable this so I can remove most of my fat arrow functions
+      "@typescript-eslint/unbound-method": "error", 
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
@@ -50,6 +52,6 @@ export default [
     },
   },
   {
-    ignores: ["dist/**", "**/*.js"],
+    ignores: ["dist/**", "**/*.js", "**/vite.config.ts"],
   },
 ];

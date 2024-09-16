@@ -17,7 +17,7 @@ export class SearchByNameDlg extends DialogBase {
 
     constructor() {
         super("Search Node Names", "appModalContMediumWidth");
-        this.onMount(this.searchTextField?.focus);
+        this.onMount(() => this.searchTextField?.focus());
         this.searchTextState.setValue(SearchByNameDlg.defaultSearchText);
         this.validatedStates = [this.searchTextState];
     }

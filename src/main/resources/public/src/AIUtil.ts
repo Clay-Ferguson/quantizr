@@ -113,7 +113,7 @@ export class AIUtil {
         ]);
     }
 
-    getAiOptions = (): any[] => {
+    getAiOptions = (): AIService[] => {
         const aiOptions = [];
         this.aiServices.forEach(ai => {
             aiOptions.push({ key: ai.name, val: ai.description });

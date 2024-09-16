@@ -50,7 +50,7 @@ export class IconButton extends Comp {
                 src: this.imageUrl
             }) : null,
             new Italic({
-                key: "i_" + this.getId,
+                key: "i_" + this.getId(),
                 className: "fa " + this.iconClass + (this.toggle === "on" ? " iconToggleOn" : " iconToggleOff")
             }),
             this.text ? new Span(this.text, {
