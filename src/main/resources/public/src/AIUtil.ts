@@ -16,7 +16,7 @@ export class AIUtil {
     }
 
     // #ai-model
-    init = () => {
+    init() {
         this.aiServices = [];
         this.aiServices.push({
             name: J.AIModel.NONE,
@@ -88,11 +88,11 @@ export class AIUtil {
         }
     }
 
-    getActiveService = (): AIService => {
+    getActiveService(): AIService {
         return this.getServiceByName(getAs().userPrefs.aiService);
     }
 
-    getServiceByName = (name: string): AIService => {
+    getServiceByName(name: string): AIService {
         if (!this.aiServices) return null;
         const ret = this.aiServices.find(ai => ai.name === name);
         if (!ret) {
@@ -113,7 +113,7 @@ export class AIUtil {
         ]);
     }
 
-    getAiOptions = (): AIService[] => {
+    getAiOptions(): AIService[] {
         const aiOptions = [];
         this.aiServices.forEach(ai => {
             aiOptions.push({ key: ai.name, val: ai.description });

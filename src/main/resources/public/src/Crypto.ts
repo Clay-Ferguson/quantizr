@@ -104,7 +104,7 @@ export class Crypto {
         this.vector = new Uint8Array([71, 73, 79, 83, 89, 37, 41, 47, 53, 67, 97, 103, 107, 109, 127, 131]);
     }
 
-    invalidateKeys = () => {
+    invalidateKeys() {
         console.log("Setting crypto keys to all null");
         this.sigKey = null;
         this.userSignature = null;
@@ -120,7 +120,7 @@ export class Crypto {
        Assumes that Encryption.initKeys() has previously been called, which is safe to assume
        because we run it during app initialization.
     */
-    encryptionTest = async (): Promise<string> => {
+    async encryptionTest(): Promise<string> {
         this.runConversionTest();
         await this.runPublicKeyTest();
         await this.symetricEncryptionTest();
@@ -129,7 +129,7 @@ export class Crypto {
         return "";
     }
 
-    signatureTest = async (): Promise<string> => {
+    async signatureTest(): Promise<string> {
         const myData = "Data to be Signed";
         const signature = await this.sign(null, myData);
         console.log("Signature: " + signature);
@@ -139,7 +139,7 @@ export class Crypto {
     }
 
     /* Returns hex string representing the signature data */
-    sign = async (privateKey: CryptoKey, data: string): Promise<string> => {
+    async sign(privateKey: CryptoKey, data: string): Promise<string> {
         if (!this.avail) return null;
         if (!privateKey) {
             privateKey = await this.getPrivateSigKey();
@@ -154,7 +154,7 @@ export class Crypto {
         return S.util.buf2hex(new Uint8Array(sigBuf));
     }
 
-    verify = async (publicKey: CryptoKey, sigBuf: string, data: string): Promise<boolean> => {
+    async verify(publicKey: CryptoKey, sigBuf: string, data: string): Promise<boolean> {
         if (!this.avail) return null;
         publicKey = publicKey || await this.getPublicSigKey();
 
@@ -164,7 +164,7 @@ export class Crypto {
             new TextEncoder().encode(data));
     }
 
-    secureMessagingTest = async () => {
+    async secureMessagingTest() {
         console.log("running secureMessagingTest...");
         const clearText = "This is cleartext";
         const skdp: SymKeyDataPackage = await this.encryptSharableString(null, clearText);
@@ -173,7 +173,7 @@ export class Crypto {
         console.log("secureMessagingTest: OK");
     }
 
-    symetricEncryptionTest = async (): Promise<boolean> => {
+    async symetricEncryptionTest(): Promise<boolean> {
         const clearText = "Encrypt this string.";
 
         // test symetric encryption
@@ -199,7 +199,7 @@ export class Crypto {
         return false;
     }
 
-    runPublicKeyTest = async (): Promise<boolean> => {
+    async runPublicKeyTest(): Promise<boolean> {
         const clearText = "Encrypt this string.";
         let ret: boolean = false;
 
@@ -239,7 +239,7 @@ export class Crypto {
         return ret;
     }
 
-    runConversionTest = () => {
+    runConversionTest() {
         // First test conversion of clear-text string to hex texct, and back.
         const clearText = "Encrypt this string.";
         const clearTextBytes: Uint8Array = this.convertStringToByteArray(clearText);
@@ -250,23 +250,23 @@ export class Crypto {
         console.log("runConversionTest OK.");
     }
 
-    importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey> => {
+    async importKey(key: JsonWebKey, algos: any, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey> {
         if (!this.avail) return null;
         return crypto.subtle.importKey("jwk", key, algos, extractable, keyUsages);
     }
 
-    importSigKeyPair = async (keyJson: string): Promise<boolean> => {
+    async importSigKeyPair(keyJson: string): Promise<boolean> {
         return this.importKeyPair(keyJson, this.STORE_SIGKEY, this.SIG_ALGO_OBJ,
             this.OP_VERIFY as KeyUsage[], this.OP_SIGN as KeyUsage[]);
     }
 
-    importAsymKeyPair = async (keyJson: string): Promise<boolean> => {
+    async importAsymKeyPair(keyJson: string): Promise<boolean> {
         return this.importKeyPair(keyJson, this.STORE_ASYMKEY, this.ASYM_IMPORT_ALGO,
             this.OP_ENC as KeyUsage[], this.OP_DEC as KeyUsage[]);
     }
 
-    importKeyPair = async (keyPair: string, keyName: string, algoObj: any,
-        publicOps: KeyUsage[], privateOps: KeyUsage[]): Promise<boolean> => {
+    async importKeyPair(keyPair: string, keyName: string, algoObj: any,
+        publicOps: KeyUsage[], privateOps: KeyUsage[]): Promise<boolean> {
         if (!this.avail) return false;
         const keyPairObj: EncryptionKeyPair = JSON.parse(keyPair);
 
@@ -281,7 +281,7 @@ export class Crypto {
     }
 
     // todo-2: need to make this require the password and username to be more secure.
-    initKeys = async (user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) => {
+    async initKeys(user: string, forceUpdate: boolean, republish: boolean, showConfirm: boolean, keyType: string) {
         console.log("Crypto.initKeys");
         if (user === PrincipalName.ANON) {
             console.log("not using crypto: user=" + user);
@@ -352,31 +352,31 @@ export class Crypto {
         }
     }
 
-    getPrivateEncKey = async (): Promise<CryptoKey> => {
+    async getPrivateEncKey(): Promise<CryptoKey> {
         if (this.privateEncKey) return this.privateEncKey;
         this.privateEncKey = await this.getPrivateKey(S.crypto.STORE_ASYMKEY);
         return this.privateEncKey;
     }
 
-    getPublicEncKey = async (): Promise<CryptoKey> => {
+    async getPublicEncKey(): Promise<CryptoKey> {
         if (this.publicEncKey) return this.publicEncKey;
         this.publicEncKey = await this.getPublicKey(S.crypto.STORE_ASYMKEY);
         return this.publicEncKey;
     }
 
-    getPrivateSigKey = async (): Promise<CryptoKey> => {
+    async getPrivateSigKey(): Promise<CryptoKey> {
         if (this.privateSigKey) return this.privateSigKey;
         this.privateSigKey = await this.getPrivateKey(S.crypto.STORE_SIGKEY);
         return this.privateSigKey;
     }
 
-    getPublicSigKey = async (): Promise<CryptoKey> => {
+    async getPublicSigKey(): Promise<CryptoKey> {
         if (this.publicSigKey) return this.publicSigKey;
         this.publicSigKey = await this.getPublicKey(S.crypto.STORE_SIGKEY);
         return this.publicSigKey;
     }
 
-    getPrivateKey = async (storeName: string): Promise<CryptoKey> => {
+    async getPrivateKey(storeName: string): Promise<CryptoKey> {
         const val: IndexedDBObj = await S.localDB.readObject(storeName);
         if (!val || !val.v) {
             console.error("Unable to get private key.");
@@ -387,7 +387,7 @@ export class Crypto {
         }
     }
 
-    getPublicKey = async (storeName: string): Promise<CryptoKey> => {
+    async getPublicKey(storeName: string): Promise<CryptoKey> {
         const val: IndexedDBObj = await S.localDB.readObject(storeName);
         if (!val || !val.v) {
             console.error("Unable to get public key.");
@@ -399,7 +399,7 @@ export class Crypto {
         }
     }
 
-    initSymetricKey = async (forceUpdate: boolean = false) => {
+    async initSymetricKey(forceUpdate: boolean = false) {
         if (!this.avail) {
             return;
         }
@@ -427,7 +427,7 @@ export class Crypto {
     Initialize keys for sign/verify.
     Note: a 'forceUpdate' always triggers the 'republish'
     */
-    initSigKeys = async (forceUpdate: boolean = false): Promise<string> => {
+    async initSigKeys(forceUpdate: boolean = false): Promise<string> {
         if (!this.avail) {
             console.log("crypto not available.");
             return null;
@@ -478,7 +478,7 @@ export class Crypto {
     Init keys for encryption.
     Note: a 'forceUpdate' always triggers the 'republish'
     */
-    initAsymetricKeys = async (forceUpdate: boolean = false): Promise<string> => {
+    async initAsymetricKeys(forceUpdate: boolean = false): Promise<string> {
         if (!this.avail) {
             console.log("crypto not available.");
             return null;
@@ -527,7 +527,7 @@ export class Crypto {
         return pubKeyStr;
     }
 
-    genSymKey = async (): Promise<CryptoKey> => {
+    async genSymKey(): Promise<CryptoKey> {
         if (!this.avail) return null;
         const key: CryptoKey = await window.crypto.subtle.generateKey({
             name: this.SYM_ALGO,
@@ -536,7 +536,7 @@ export class Crypto {
         return key;
     }
 
-    exportAsymKeys = async (): Promise<string> => {
+    async exportAsymKeys(): Promise<string> {
         if (!this.avail) return null;
         let ret = "";
         const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_ASYMKEY);
@@ -559,7 +559,7 @@ export class Crypto {
         return ret;
     }
 
-    exportSymKey = async (): Promise<string> => {
+    async exportSymKey(): Promise<string> {
         if (!this.avail) return null;
         let ret = "";
         const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
@@ -578,7 +578,7 @@ export class Crypto {
      *
      * Export is in JWK format: https://tools.ietf.org/html/rfc7517
      */
-    exportSigKeys = async (): Promise<string> => {
+    async exportSigKeys(): Promise<string> {
         if (!this.avail) return null;
         let ret = "";
 
@@ -630,7 +630,7 @@ export class Crypto {
         return finalString;
     }
 
-    asymEncryptString = async (key: CryptoKey, data: string): Promise<string> => {
+    async asymEncryptString(key: CryptoKey, data: string): Promise<string> {
         return this.encryptString(key, this.ASYM_ALGO, data);
     }
 
@@ -638,7 +638,7 @@ export class Crypto {
      * Does a simplel symmetric encryption of the data using the given key, and if the key
      * is not provided assumes the STORE_SYMKEY
      */
-    symEncryptString = async (key: CryptoKey, data: string): Promise<string> => {
+    async symEncryptString(key: CryptoKey, data: string): Promise<string> {
         if (!key) {
             const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
             if (obj) {
@@ -648,7 +648,7 @@ export class Crypto {
         return this.encryptString(key, this.SYM_ALGO, data);
     }
 
-    symEncryptStringWithCipherKey = async (cipherKey: string, data: string): Promise<string> => {
+    async symEncryptStringWithCipherKey(cipherKey: string, data: string): Promise<string> {
         const privateKey = await S.crypto.getPrivateEncKey();
         const symKeyJsonStr: string = await S.crypto.asymDecryptString(privateKey, cipherKey);
         const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
@@ -676,7 +676,7 @@ export class Crypto {
      * 'publicKey' argument should be the public key of the person doing the encryption (the person
      * doing the encryption) and if null, it's automatically retrieved from the localDB
      */
-    encryptSharableString = async (publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> => {
+    async encryptSharableString(publicKey: CryptoKey, data: string): Promise<SymKeyDataPackage> {
         publicKey = publicKey || await this.getPublicEncKey();
 
         // generate random symmetric key
@@ -703,7 +703,7 @@ export class Crypto {
     }
 
     /* Inverse of encryptSharableString() function */
-    decryptSharableString = async (privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> => {
+    async decryptSharableString(privateKey: CryptoKey, skpd: SymKeyDataPackage): Promise<string> {
         // get hash of the encrypted data
         const cipherHash: string = S.util.hashOfString(skpd.cipherText);
 
@@ -744,7 +744,7 @@ export class Crypto {
     }
 
     /* Encrypts 'data' string and returns a hex representation of the ciphertext */
-    encryptString = async (key: CryptoKey, algo: string, data: string): Promise<string> => {
+    async encryptString(key: CryptoKey, algo: string, data: string): Promise<string> {
         const result: ArrayBuffer = await crypto.subtle.encrypt({ name: algo, iv: this.vector }, //
             key, this.convertStringToByteArray(data));
 
@@ -753,11 +753,11 @@ export class Crypto {
         return encHex;
     }
 
-    asymDecryptString = async (key: CryptoKey, encHex: string): Promise<string> => {
+    async asymDecryptString(key: CryptoKey, encHex: string): Promise<string> {
         return this.decryptString(key, this.ASYM_ALGO, encHex);
     }
 
-    symDecryptString = async (key: CryptoKey, encHex: string): Promise<string> => {
+    async symDecryptString(key: CryptoKey, encHex: string): Promise<string> {
         if (!key) {
             const obj: IndexedDBObj = await S.localDB.readObject(this.STORE_SYMKEY);
             if (obj) {
@@ -768,7 +768,7 @@ export class Crypto {
     }
 
     /* Takes the input as a hex string, and decrypts it into the original non-hex string */
-    decryptString = async (key: CryptoKey, algo: string, encHex: string): Promise<string> => {
+    async decryptString(key: CryptoKey, algo: string, encHex: string): Promise<string> {
         try {
             const encArray: Uint8Array = S.util.hex2buf(encHex);
             const result: ArrayBuffer = await crypto.subtle.decrypt({ name: algo, iv: this.vector }, //
@@ -786,7 +786,7 @@ export class Crypto {
     // NOTE: TextEncoder() and TextDecoder() don't support this yet, so we have these two functions.
     // This can work?? in browser?
     // const messageData = new TextEncoder().encode(message);
-    convertStringToByteArray = (str: string): Uint8Array => {
+    convertStringToByteArray(str: string): Uint8Array {
         const bytes = new Uint8Array(str.length);
         for (let i = 0; i < str.length; i++) {
             bytes[i] = str.charCodeAt(i);
@@ -794,7 +794,7 @@ export class Crypto {
         return bytes;
     }
 
-    convertByteArrayToString = (buffer: Uint8Array): string => {
+    convertByteArrayToString(buffer: Uint8Array): string {
         let str = "";
         for (let i = 0; i < buffer.byteLength; i++) {
             str += String.fromCharCode(buffer[i]);
@@ -804,7 +804,7 @@ export class Crypto {
 
     /* This method will simply sign all the strings in 'dataToSign' and then send it up to the
     server when done */
-    generateAndSendSigs = async (dataToSign: J.NodeSigPushInfo): Promise<void> => {
+    async generateAndSendSigs(dataToSign: J.NodeSigPushInfo): Promise<void> {
 
         if (!this.sigKeyOk()) {
             return null;
@@ -824,7 +824,7 @@ export class Crypto {
         return null;
     }
 
-    signNode = async (node: NodeInfo): Promise<void> => {
+    async signNode(node: NodeInfo): Promise<void> {
         if (!this.sigKeyOk()) {
             return null;
         }
@@ -870,7 +870,7 @@ export class Crypto {
         return null;
     }
 
-    cryptoWarning = () => {
+    cryptoWarning() {
         if (!this.warningShown) {
             this.warningShown = true;
             S.util.showMessage("Crypto not available in browser.", "Crypto");
@@ -878,7 +878,7 @@ export class Crypto {
     }
 
     // returns true of key is ok to use
-    sigKeyOk = () => {
+    sigKeyOk() {
         if (!this.avail) {
             this.cryptoWarning();
             return false;
@@ -886,7 +886,7 @@ export class Crypto {
         return true;
     }
 
-    encKeyOk = () => {
+    encKeyOk() {
         if (!this.avail) {
             this.cryptoWarning();
             return false;
@@ -894,7 +894,7 @@ export class Crypto {
         return true;
     }
 
-    showEncryptionKeyProblem = (keyName: string, featureName: string) => {
+    showEncryptionKeyProblem(keyName: string, featureName: string) {
         // run in async timout to be sure not to interfere with any react state flow (recursive dispatching)
         setTimeout(() => {
             S.util.showMessage("Your " + keyName + " doesn't match the public key that the server has for you: \n" +

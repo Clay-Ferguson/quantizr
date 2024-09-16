@@ -169,7 +169,6 @@ export class NodeCompContent extends Div {
         }
     }
 
-    // todo-0: this is an oddball right? Aren't we using non-fat arrow funtions for these kinds of base overrides?
     override _domPreUpdateEvent = () => {
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);

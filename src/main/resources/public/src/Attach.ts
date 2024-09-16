@@ -4,7 +4,7 @@ import { Attachment, NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Attach {
-    openUploadFromFileDlg = (nodeId: string, autoAddFile: File) => {
+    openUploadFromFileDlg(nodeId: string, autoAddFile: File) {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             nodeId = node?.id;
@@ -18,9 +18,9 @@ export class Attach {
         new UploadFromFileDropzoneDlg(nodeId, "", autoAddFile, false, true, () => {
             S.view.jumpToId(nodeId);
         }, true).open();
-    };
+    }
 
-    openUploadFromUrlDlg = (nodeId: string, onUploadFunc: () => void) => {
+    openUploadFromUrlDlg(nodeId: string, onUploadFunc: () => void) {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (!node) {
@@ -31,16 +31,16 @@ export class Attach {
         }
 
         new UploadFromUrlDlg(nodeId, onUploadFunc).open();
-    };
+    }
 
-    getAttachmentUrl = (urlPart: string, node: NodeInfo, attName: string, downloadLink: boolean): string => {
+    getAttachmentUrl(urlPart: string, node: NodeInfo, attName: string, downloadLink: boolean): string {
         /* If this node attachment points to external URL return that url */
         const att = S.props.getAttachment(attName, node);
         if (!att) return null;
         return this.getAttUrl(urlPart, att, node.id, downloadLink, attName);
     }
 
-    getAttUrl = (urlPart: string, att: Attachment, nodeId: string, downloadLink: boolean, attName: string): string => {
+    getAttUrl(urlPart: string, att: Attachment, nodeId: string, downloadLink: boolean, attName: string): string {
         if (att.url) {
             return att.url;
         }
@@ -58,11 +58,11 @@ export class Attach {
         return null;
     }
 
-    getUrlForNodeAttachment = (node: NodeInfo, attName: string, downloadLink: boolean): string => {
+    getUrlForNodeAttachment(node: NodeInfo, attName: string, downloadLink: boolean): string {
         return this.getAttachmentUrl("bin", node, attName, downloadLink);
     }
 
-    getStreamUrlForNodeAttachment = (node: NodeInfo, attName: string): string => {
+    getStreamUrlForNodeAttachment(node: NodeInfo, attName: string): string {
         return this.getAttachmentUrl("stream", node, attName, false);
     }
 }

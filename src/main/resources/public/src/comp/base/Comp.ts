@@ -43,9 +43,9 @@ export abstract class Comp {
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
     // default all these to null so that unless derived class sets the value we never need to create
-    // some of the useEffect calls
-    // todo-0: make these actual methods that can be overridden in derived classes (not assigned via fat arrows)
-    //         WARNING. You WILL have name collisions (in derived classes) once you remove the underscore prefix.
+    // some of the useEffect calls.
+    // IMPORTANT: We don't use class methods because these need to remain null, and implementing them
+    //            as empty methods would be too wasteful
     public _domPreUpdateEvent: React.EffectCallback = null;
     public _domUpdateEvent: React.EffectCallback = null;
     public _domAddEvent: () => void = null;
