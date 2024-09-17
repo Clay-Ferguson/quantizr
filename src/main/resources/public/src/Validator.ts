@@ -2,11 +2,11 @@ import { State } from "./State";
 import { S } from "./Singletons";
 import { ValueIntf } from "./Interfaces";
 
-export interface ValidatorValue { // Local State
+export interface ValidatorValue {
     value: any;
 }
 
-export interface ValidatorError { // Local State
+export interface ValidatorError {
     error: string;
 }
 
@@ -67,22 +67,22 @@ export class Validator implements ValueIntf {
     checkRule = (rule: ValidatorRule): boolean => {
         switch (rule.name) {
             case ValidatorRuleName.REQUIRED:
-                if (!this.v.state.value) {
+                if (!this.v.getState().value) {
                     return false;
                 }
                 break;
             case ValidatorRuleName.MAXLEN:
-                if (this.v.state.value?.length > rule.payload) {
+                if (this.v.getState().value?.length > rule.payload) {
                     return false;
                 }
                 break;
             case ValidatorRuleName.MINLEN:
-                if (this.v.state.value?.length < rule.payload) {
+                if (this.v.getState().value?.length < rule.payload) {
                     return false;
                 }
                 break;
             case ValidatorRuleName.USERNAME:
-                if (!S.util.validUsername(this.v.state.value)) {
+                if (!S.util.validUsername(this.v.getState().value)) {
                     return false;
                 }
                 break;
@@ -93,7 +93,7 @@ export class Validator implements ValueIntf {
     }
 
     getValue(): any {
-        return this.v.state.value || "";
+        return this.v.getState().value || "";
     }
 
     setValue(value: any): any {
@@ -101,7 +101,7 @@ export class Validator implements ValueIntf {
     }
 
     getError(): string {
-        return this.e.state.error;
+        return this.e.getState().error;
     }
 
     setError = (error: string) => {

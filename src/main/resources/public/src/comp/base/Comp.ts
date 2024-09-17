@@ -294,7 +294,7 @@ export abstract class Comp {
 
     getState<T>(): T {
         if (!this.checkState()) return null;
-        return this.stateMgr.state;
+        return this.stateMgr.getState();
     }
 
     /* Classes don't override or alter this method directly, but can alter _domAddEvent instead */

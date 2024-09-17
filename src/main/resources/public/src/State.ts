@@ -1,63 +1,54 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 /* 
 Encapsulates the state of a component and provides by maintaining the state internally and also
-allowing the ability to monitor state with the "onStateChange" callback. This is useful for
-components that need to maintain state but also need to be able to monitor that state for changes 
+allowing the ability to monitor state with the "onStateChange" callback, as well as support
+for setting a custom state translation function, that can preProcess state changes. This is useful for
+components that need to maintain state but also need to be able to monitor that state for changes.
 */
 export class State<T> {
-    state: T;
-    onStateChange: (val: T) => void;
+    private state: T;
+    private reactStateSetter: Dispatch<SetStateAction<T>>;
 
-    // this is 'overridable/assignable' so that we have a way to monitor values as they get assigned
-    // or even translate a value to some other value during assignment
+    onStateChange: (val: T) => void;
     stateTranslator: (s: T) => T;
 
     constructor(initState: T) {
+        // The app always expects state to not ever be null so initialize to empty object as needed
         this.state = initState || {} as T;
     }
 
-    mergeState(moreState: T): void {
-        const newState = { ...this.state, ...moreState };
-        this.state = this.stateTranslator ? this.stateTranslator(newState) : newState;
-
-        this.setStateEx((state: T) => {
-            const newState = { ...state, ...moreState };
-            return this.state = this.stateTranslator ? this.stateTranslator(newState) : newState;
-        });
+    mergeState = (moreState: T): void => {
+        // Note: It's required to create a brand new object here
+        this.stateChange({ ...this.state, ...moreState });
     }
 
     setState = (newState: T): void => {
-        this.setStateEx((_state: T) => {
-            // We wrap newState with curly braces to be sure we get an actual new object here
-            return this.state = this.stateTranslator ? this.stateTranslator({ ...newState }) : { ...newState };
-        });
+        // Note: It's required to create a brand new object here
+        this.stateChange({ ...newState });
     }
 
-    /* We start out with this initial function which will allow us to set a state even before the
-      'useState' has been called because for functional components (which we're using) the useState
-      hook won't (and cannot) be even called ever until the react function itself is currently
-      executing (per the "Rules of Hooks")
-    */
-    private setStateEx(state: (s?: T) => T): void {
-        this.state = state(this.state);
+    // NOTE: It's assumed that a brand new state object is being passed in here
+    private stateChange = (newState: T) => {
+        // translate the newState into 'this.state'
+        this.state = this.stateTranslator ? this.stateTranslator(newState) : newState;
+
+        // Once a react render has been triggered, the reactStateSetter will be set
+        if (this.reactStateSetter) {
+            this.reactStateSetter(this.state);
+        }
+
+        // Notify the onStateChange callback if it's been set
         if (this.onStateChange) {
             this.onStateChange(this.state);
         }
     }
 
-    useState = () => {
-        const [state, setStateEx] = useState(this.state);
-        this.state = state;
+    useState() {
+        [this.state, this.reactStateSetter] = useState(this.state);
+    }
 
-        if (this.onStateChange) {
-            this.setStateEx = (state: () => T) => {
-                setStateEx(state);
-                this.onStateChange(state());
-            }
-        }
-        else {
-            this.setStateEx = setStateEx.bind(this);
-        }
+    getState() {
+        return this.state;
     }
 }
