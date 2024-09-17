@@ -49,8 +49,8 @@ export class SettingsView extends AppTab<any, SettingsView> {
                             await S.localDB.clearStores();
                             S.util.showMessage("Browser Storage cleared successfully");
                         }),
-                        this.settingsLink("Manage Hashtags", S.edit.editHashtags),
-                        this.settingsLink("Blocked Words", S.edit.editBlockedWords),
+                        this.settingsLink("Manage Hashtags", S.edit._editHashtags),
+                        this.settingsLink("Blocked Words", S.edit._editBlockedWords),
                         S.crypto.avail ? this.settingsLink("Manage Keys", () => new ManageCryptoKeysDlg().open()) : null
                     ])
                 ], horzClass),
@@ -95,7 +95,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Test Web Cam", () => new MediaRecorderDlg(true, false).open())
                     ]),
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("My GEO Location", S.nav.geoLocation), //
+                        this.settingsLink("My GEO Location", S.nav._geoLocation), //
                         this.settingsLink("About Browser", S.util.showBrowserInfo)
                     ])
                 ], horzClass),
@@ -103,7 +103,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 this.sectionTitle("Danger Zone"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Bulk Delete", S.edit.bulkDelete)
+                        this.settingsLink("Bulk Delete", S.edit._bulkDelete)
                     ]),
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Close Account", S.user.closeAccount)

@@ -53,7 +53,7 @@ export class DocIndexPanel extends Div {
     }
 
     // This click function opens up the document tab and scrolls to the node that was clicked on
-    clickItem = async (id: string) => {
+    async clickItem(id: string) {
         const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;
@@ -77,7 +77,7 @@ export class DocIndexPanel extends Div {
         }
     }
 
-    getLevelBullet = (level: number) => {
+    getLevelBullet(level: number) {
         switch (level) {
             case 1: return "&#9688;";
             case 2: return "&#8227;";
@@ -87,7 +87,7 @@ export class DocIndexPanel extends Div {
         return "";
     }
 
-    getShortContent = (node: NodeInfo) => {
+    getShortContent(node: NodeInfo) {
         let content = node.content;
         const idx = content.indexOf("\n");
         if (idx !== -1) {

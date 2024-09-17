@@ -28,7 +28,7 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
-    findSharedNodes = async (node: NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) => {
+    async findSharedNodes(node: NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) {
         const res = await S.rpcUtil.rpc<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
@@ -60,7 +60,7 @@ export class Search {
         }
     }
 
-    showThread = async (nodeId: string) => {
+    async showThread(nodeId: string) {
         // First call the server in case it has enough data already to render the Thread, in which
         // case we don't need to load any events from relays via client
         const res = await S.rpcUtil.rpc<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
@@ -103,7 +103,7 @@ export class Search {
         }
     }
 
-    showReplies = async (node: NodeInfo) => {
+    async showReplies(node: NodeInfo) {
         const res = await S.rpcUtil.rpc<J.GetRepliesViewRequest, J.GetRepliesViewResponse>("getNodeRepliesView", {
             nodeId: node.id
         });
@@ -129,7 +129,7 @@ export class Search {
         }
     }
 
-    listSubgraphByPriority = async () => {
+    async listSubgraphByPriority() {
         const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
@@ -139,10 +139,10 @@ export class Search {
             J.NodeProp.PRIORITY_FULL, "asc", true, false, false, false, false);
     }
 
-    search = async (nodeId: string, prop: string, searchText: string, searchType: string, description: string,
+    async search(nodeId: string, prop: string, searchText: string, searchType: string, description: string,
         searchRoot: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean,
         sortField: string, sortDir: string, requirePriority: boolean, requireAttachment: boolean, deleteMatches: boolean,
-        jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> => {
+        jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> {
 
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             searchRoot,
@@ -221,7 +221,7 @@ export class Search {
         }
     }
 
-    showDocument = async (rootId: string, scrollToTop: boolean) => {
+    async showDocument(rootId: string, scrollToTop: boolean) {
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
             rootId,
             includeComments: getAs().userPrefs.showReplies
@@ -258,7 +258,7 @@ export class Search {
         });
     }
 
-    timelineAfterUserInput = async (prop: string) => {
+    async timelineAfterUserInput(prop: string) {
         let description = prop === "ctm" ? "by Create Time" : "by Modify Time";
         let recursive = false;
         const dlg = new ConfirmDlg("Include all subnodes recursively?", "Timeline Options");
@@ -273,7 +273,8 @@ export class Search {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = async (nodeId: string, prop: string, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
+    async timeline(nodeId: string, prop: string, timeRangeType: string, timelineDescription: string, page: number, 
+        recursive: boolean) {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change
         during pagination including when the page==0 because user is just jumping to beginning. Need
@@ -342,11 +343,11 @@ export class Search {
         });
     }
 
-    removeNodeById = (id: string, ust: AppState) => {
+    removeNodeById(id: string, ust: AppState) {
         ust.tabData.forEach(td => td.nodeDeleted(ust, id));
     }
 
-    refreshFeed = async () => {
+    _refreshFeed = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.page = 0;
             FeedTab.inst.props.refreshCounter++;
@@ -364,7 +365,7 @@ export class Search {
     }
 
     /* growResults==true is the "infinite scrolling" support */
-    feed = async (page: number, searchText: string, growResults: boolean) => {
+    async feed(page: number, searchText: string, growResults: boolean) {
         const ast = getAs();
         if (!FeedTab.inst) {
             return;
@@ -436,7 +437,7 @@ export class Search {
         });
     }
 
-    showFollowers = async (page: number, userName: string) => {
+    async showFollowers(page: number, userName: string) {
         const ast = getAs();
         if (ast.isAnonUser) return;
         userName = userName || ast.userName;
@@ -474,7 +475,7 @@ export class Search {
         }
     }
 
-    showFollowing = async (page: number, userName: string) => {
+    async showFollowing(page: number, userName: string) {
         const ast = getAs();
         if (ast.isAnonUser) return;
         userName = userName || ast.userName;
@@ -512,7 +513,7 @@ export class Search {
         }
     }
 
-    clickHandler = (evt: Event) => {
+    _clickHandler = (evt: Event) => {
         const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         const node = S.nodeUtil.findNode(nodeId);
@@ -528,9 +529,9 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page
      */
-    renderSearchResultAsListItem = (node: NodeInfo, tabData: TabBase<any>, jumpButton: boolean, allowHeader: boolean, 
+    renderSearchResultAsListItem(node: NodeInfo, tabData: TabBase<any>, jumpButton: boolean, allowHeader: boolean, 
         outterClass: string, outterClassHighlight: string,
-        extraStyle: any): Comp => {
+        extraStyle: any): Comp {
         const ast = getAs();
         if (!node) return;
         const prefix = tabData.id;
@@ -561,7 +562,7 @@ export class Search {
             id: S.tabUtil.makeDomIdForNode(tabData, node.id),
             [C.NODE_ID_ATTR]: node.id,
             [C.TAB_ID_ATTR]: tabData.id,
-            onClick: this.clickHandler
+            onClick: this._clickHandler
         };
 
         if (extraStyle) {
@@ -585,7 +586,7 @@ export class Search {
         return itemDiv;
     }
 
-    clickSearchNode = async (id: string) => {
+    async clickSearchNode(id: string) {
         await S.view.jumpToId(id);
 
         dispatch("RenderSearchResults", s => {
@@ -593,7 +594,7 @@ export class Search {
         });
     }
 
-    searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string) => {
+    async searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string) {
         const res = await S.rpcUtil.rpc<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,
@@ -615,7 +616,7 @@ export class Search {
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */
-    findShares = (shareTarget: string = null, accessOption: string = null) => {
+    findShares(shareTarget: string = null, accessOption: string = null) {
         const focusNode = S.nodeUtil.getHighlightedNode();
         if (!focusNode) {
             return;
@@ -632,7 +633,7 @@ export class Search {
         this.findSharedNodes(focusNode, 0, type, shareTarget, accessOption);
     }
 
-    findRdfSubjects = () => {
+    _findRdfSubjects = () => {
         dispatch("findRdfSubjects", _s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {

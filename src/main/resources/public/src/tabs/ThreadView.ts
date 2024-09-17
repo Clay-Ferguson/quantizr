@@ -100,7 +100,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         });
 
         if (lastNode?.type == J.NodeType.AI_ANSWER) {
-            children.push(new Button("Ask AI", S.edit.askAiFromThreadView, {
+            children.push(new Button("Ask AI", S.edit._askAiFromThreadView, {
                 [C.NODE_ID_ATTR]: lastNode.id,
             }, "btn-secondary ui-new-node-plus marginTop", "fa-plus"));
         }

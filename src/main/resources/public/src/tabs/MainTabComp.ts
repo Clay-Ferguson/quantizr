@@ -59,20 +59,20 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                     !ast.mobileMode && !isRootNode ? new Icon({
                         className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
                         title: "Previous Sibling Node",
-                        onClick: S.nav.navToPrev
+                        onClick: S.nav._navToPrev
                     }) : null,
 
                     !ast.mobileMode && !isRootNode ? new Icon({
                         className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
                         title: "Next Sibling Node",
                         [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav.navToNext
+                        onClick: S.nav._navToNext
                     }) : null,
 
                     parentVisible ?
                         new IconButton("fa-folder", "Up", {
                             [C.NODE_ID_ATTR]: ast.node.id,
-                            onClick: S.nav.navUpLevelClick,
+                            onClick: S.nav._navUpLevelClick,
                             title: "Go to Parent Node"
                         }, "btn-primary") : null
                 ]),

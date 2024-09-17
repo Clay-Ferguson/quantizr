@@ -246,7 +246,7 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     edit = async () => {
-        await S.edit.editHashtags();
+        await S.edit._editHashtags();
         const tags = this.parseTags();
         this.mergeState({ tags });
     }

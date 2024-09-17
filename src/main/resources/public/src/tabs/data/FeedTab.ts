@@ -50,12 +50,12 @@ export class FeedTab extends TabBase<FeedViewProps> {
         const ast = getAs();
 
         return new Div(null, { className: "tabSubOptions" }, [
-            ast.isAdminUser ? new AppNavLink("Public Posts", S.nav.publicPosts) : null,
+            ast.isAdminUser ? new AppNavLink("Public Posts", S.nav._publicPosts) : null,
 
-            ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav.messagesToFromMe),
-            ast.isAnonUser ? null : new AppNavLink("To Me", S.nav.messagesToMe),
-            ast.isAnonUser ? null : new AppNavLink("From Me", S.nav.messagesFromMe),
-            ast.isAnonUser ? null : new AppNavLink("From Follows", S.nav.messagesFromFriends),
+            ast.isAnonUser ? null : new AppNavLink("To/From Me", S.nav._messagesToFromMe),
+            ast.isAnonUser ? null : new AppNavLink("To Me", S.nav._messagesToMe),
+            ast.isAnonUser ? null : new AppNavLink("From Me", S.nav._messagesFromMe),
+            ast.isAnonUser ? null : new AppNavLink("From Follows", S.nav._messagesFromFriends),
         ]);
     }
 }

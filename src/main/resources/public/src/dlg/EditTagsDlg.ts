@@ -23,14 +23,14 @@ export class EditTagsDlg extends DialogBase {
                 new Div("Enter custom hashtags, each on a separate line below. Hashtags must start with #."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Save", this.save, null, "btn-primary"),
+                    new Button("Save", this._save, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    reload = async () => {
+    async reload() {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: getAs().userProfile.userNodeId
         });
@@ -40,7 +40,7 @@ export class EditTagsDlg extends DialogBase {
         }
     }
 
-    save = () => {
+    _save = () => {
         const ast = getAs();
         ast.userProfile.userTags = this.tagsState.getValue();
 

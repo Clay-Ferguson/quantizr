@@ -59,6 +59,7 @@ export class MenuPanel extends Div {
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
     // which can be slow in JS.
 
+    // move all these static methods into fat "_" methods in the appropriate singleton class for each one.
     static showBlockedUsers = () => { new BlockedUsersDlg("Blocked").open(); }
     static toggleEditMode = () => { S.edit.setEditMode(!getAs().userPrefs.editMode); }
     static setAiWritingMode = () => S.edit.setAiMode(J.Constant.AI_MODE_WRITING);
@@ -71,7 +72,7 @@ export class MenuPanel extends Div {
     static acceptTransfer = () => { new TransferNodeDlg(J.TransferOp.ACCEPT).open(); };
     static rejectTransfer = () => { new TransferNodeDlg(J.TransferOp.REJECT).open(); };
     static reclaimTransfer = () => { new TransferNodeDlg(J.TransferOp.RECLAIM).open(); };
-    static subgraphHash = () => { S.edit.subGraphHash(); };
+    static subgraphHash = () => { S.edit._subGraphHash(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg().open(); };
     static splitNode = () => { new SplitNodeDlg(null).open(); }
     static joinNodes = () => { S.edit.joinNodes(false); }
@@ -93,9 +94,7 @@ export class MenuPanel extends Div {
     static calendarAllDates = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "all", "All calendar dates (Latest/Future at the top)", 0, true);
     static calendarToday = () => S.srch.timeline(null, J.NodeProp.DATE_FULL, "toay", "Today's calendar dates", 0, true);
     // static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-    static import = () => S.edit.openImportDlg();
     static listSubgraphByPriority = () => S.srch.listSubgraphByPriority();
-    static export = () => S.edit.openExportDlg();
     static viewNodeGraph = () => S.render.showGraph(null, "");
     static sendFeedback = () => { new SendFeedbackDlg(null).open(); }
     static isEditMode = () => getAs().userPrefs.editMode;
@@ -187,11 +186,9 @@ export class MenuPanel extends Div {
         const isPageRootNode = ast.node && hltNode && ast.node.id === hltNode.id;
         const canMoveUp = !isPageRootNode && !ast.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);
         const canMoveDown = !isPageRootNode && !ast.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
-
-        const children = [];
-
         const allowEditMode = !ast.isAnonUser;
         const fullScreenViewer = S.util.fullscreenViewerActive();
+        const children = [];
 
         children.push(new Menu(C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
@@ -251,7 +248,7 @@ export class MenuPanel extends Div {
             if (bookmarkItems.length > 0) {
                 bookmarkItems.push(new MenuItemSeparator());
             }
-            bookmarkItems.push(new MenuItem("Add Bookmark", S.edit.addBookmark, !ast.isAnonUser && !!hltNode, null, true));
+            bookmarkItems.push(new MenuItem("Add Bookmark", S.edit._addBookmark, !ast.isAnonUser && !!hltNode, null, true));
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !ast.isAnonUser));
 
             if (hasBookmarks) {
@@ -271,11 +268,11 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Edit", [
-                ast.isAdminUser ? new MenuItem("Direct Edit JSON", S.edit.setUsingJson, onMainTab, null, true) : null,
+                ast.isAdminUser ? new MenuItem("Direct Edit JSON", S.edit._setUsingJson, onMainTab, null, true) : null,
                 ast.editNode ? new MenuItem("Resume Editing...", MenuPanel.continueEditing) : null, //
                 ast.editNode ? new MenuItemSeparator() : null, //
 
-                new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
+                new MenuItem("Clear Selections", S.nodeUtil._clearSelNodes, onMainTab && ast.selectedNodes.size > 0, null, true), //
 
                 // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
                 new MenuItemSeparator(), //
@@ -287,17 +284,17 @@ export class MenuPanel extends Div {
                 new MenuItemSeparator(), //
                 new MenuItem("Cut", S.edit._cutSelNodes, onMainTab && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
                 new MenuItem("Copy", S.edit._copySelNodes, onMainTab && !ast.nodesToMove && (ast.selectedNodes.size > 0 || !!hltNode), null, true), //
-                new MenuItem("Undo Copy/Cut", S.edit.undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
+                new MenuItem("Undo Copy/Cut", S.edit._undoCutSelNodes, onMainTab && !!ast.nodesToMove, null, true), //
             ], null));
         }
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Move", [
-                new MenuItem("Move Up", S.edit.moveUp, onMainTab && canMoveUp, null, true), //
-                new MenuItem("Move Down", S.edit.moveDown, onMainTab && canMoveDown, null, true), //
+                new MenuItem("Move Up", S.edit._moveUp, onMainTab && canMoveUp, null, true), //
+                new MenuItem("Move Down", S.edit._moveDown, onMainTab && canMoveDown, null, true), //
                 new MenuItemSeparator(), //
-                new MenuItem("Move to Top", S.edit.moveNodeToTop, onMainTab && canMoveUp, null, true), //
-                new MenuItem("Move to Bottom", S.edit.moveNodeToBottom, onMainTab && canMoveDown, null, true), //
+                new MenuItem("Move to Top", S.edit._moveNodeToTop, onMainTab && canMoveUp, null, true), //
+                new MenuItem("Move to Bottom", S.edit._moveNodeToBottom, onMainTab && canMoveDown, null, true), //
             ], null));
         }
 
@@ -348,7 +345,7 @@ export class MenuPanel extends Div {
 
         if (!ast.isAnonUser) {
             children.push(new Menu("Tools", [
-                new MenuItem("Set Headings", S.edit.setHeadings, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Set Headings", S.edit._setHeadings, onMainTab && selNodeIsMine, null, true), //
                 !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new MenuItem("Text-to-Speech Tab", MenuPanel.openTtsTab) : null,
                 new MenuItem("Generate SHA256", MenuPanel.subgraphHash, onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(), //
@@ -359,8 +356,8 @@ export class MenuPanel extends Div {
                 new MenuItem("Node Stats", MenuPanel.nodeStats, onMainTab, null, true), //
                 new MenuItemSeparator(), //
 
-                new MenuItem("Import", MenuPanel.import, onMainTab && importFeatureEnabled, null, true),
-                new MenuItem("Export", MenuPanel.export, onMainTab && exportFeatureEnabled, null, true),
+                new MenuItem("Import", S.edit._openImportDlg, onMainTab && importFeatureEnabled, null, true),
+                new MenuItem("Export", S.edit._openExportDlg, onMainTab && exportFeatureEnabled, null, true),
                 new MenuItemSeparator(), //
 
                 new MenuItem("Import JSON", MenuPanel.importJson, onMainTab && selNodeIsMine, null, true), //
@@ -375,13 +372,13 @@ export class MenuPanel extends Div {
                 S.crypto.avail ? new MenuItem("Sign All", MenuPanel.signAllSubGraph, selNodeIsMine, null, true) : null, //
                 S.crypto.avail ? new MenuItem("Sign Unsigned", MenuPanel.signUnsignedSubGraph, selNodeIsMine, null, true) : null, //
                 new MenuItem("Verify", MenuPanel.nodeSignatureVerify, onMainTab && selNodeIsMine, null, true), //
-                new MenuItem("Remove", S.view.removeSignatures, onMainTab && selNodeIsMine, null, true), //
+                new MenuItem("Remove", S.view._removeSignatures, onMainTab && selNodeIsMine, null, true), //
             ], null));
         }
 
         if (!ast.isAnonUser && (S.quanta.config.useOpenAi || S.quanta.config.usePplxAi || S.quanta.config.useGeminiAi || S.quanta.config.useAnthAi)) {
             children.push(new Menu("AI", [
-                new MenuItem("Settings", S.nav.showAISettings),
+                new MenuItem("Settings", S.nav._showAISettings),
                 new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
@@ -398,9 +395,9 @@ export class MenuPanel extends Div {
         if (!ast.isAnonUser) {
             children.push(new Menu("RDF Triple", [
                 new MenuItem("Set Subject (Source)", S.edit._setLinkSource, onMainTab && ast.userPrefs.editMode && selNodeIsMine, null, true), //
-                new MenuItem("Create Triple (Target)", S.edit.linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource, null, true), //
+                new MenuItem("Create Triple (Target)", S.edit._linkNodesClick, onMainTab && ast.userPrefs.editMode && !!ast.linkSource, null, true), //
                 new MenuItemSeparator(), //
-                new MenuItem("Find Subjects", S.srch.findRdfSubjects, onMainTab, null, true) //
+                new MenuItem("Find Subjects", S.srch._findRdfSubjects, onMainTab, null, true) //
             ]));
         }
 
@@ -416,7 +413,7 @@ export class MenuPanel extends Div {
 
             children.push(new Menu("Account", [
                 new MenuItem("Profile", MenuPanel.userProfile),
-                new MenuItem("Settings", S.nav.showUserSettings)
+                new MenuItem("Settings", S.nav._showUserSettings)
             ]));
         }
 
@@ -435,7 +432,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //
-            new MenuItem("Main Portal Node", S.util.loadAnonPageHome), //
+            new MenuItem("Main Portal Node", S.util._loadAnonPageHome), //
             new MenuItem("Contact Us", MenuPanel.sendFeedback), //
         ], null));
 
@@ -458,7 +455,7 @@ export class MenuPanel extends Div {
 
                     /* special case for feed tab */
                     if (tab === C.TAB_FEED && !getAs().isAnonUser) {
-                        func = S.nav.messagesToFromMe;
+                        func = S.nav._messagesToFromMe;
                     }
                     else {
                         func = () => S.tabUtil.selectTab(tab);

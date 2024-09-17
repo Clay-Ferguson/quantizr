@@ -69,14 +69,14 @@ export class LeftNavPanel extends Div {
                     new Img({
                         className: "leftNavLogoImg",
                         src: "/branding/logo-50px-tr.jpg",
-                        onClick: S.util.loadAnonPageHome,
+                        onClick: S.util._loadAnonPageHome,
                         title: "Go to Portal Home Node"
                     }),
 
                     new Span(null, { className: "float-end" }, [
                         myMessages ? new Span(myMessages, {
                             className: "newMessagesNote",
-                            onClick: S.nav.showMyNewMessages,
+                            onClick: S.nav._showMyNewMessages,
                             title: "Show your new messages"
                         }) : null,
                         ast.userName && ast.isAnonUser ? new Icon({

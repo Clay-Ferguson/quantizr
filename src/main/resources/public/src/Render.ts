@@ -1,4 +1,3 @@
-import { toArray } from "react-emoji-render";
 import { dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Constants as C } from "./Constants";
 import { FullScreenType } from "./Interfaces";
@@ -14,9 +13,11 @@ import { Clearfix } from "./comp/core/Clearfix";
 import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
+import { Icon } from "./comp/core/Icon";
 import { IconButton } from "./comp/core/IconButton";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
+import { Tag } from "./comp/core/Tag";
 import { NodeCompBinary } from "./comp/node/NodeCompBinary";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
@@ -27,8 +28,6 @@ import { TabBase } from "./intf/TabBase";
 import { NodeActionType, TypeIntf } from "./intf/TypeIntf";
 import { RSSView } from "./tabs/RSSView";
 import { MainTab } from "./tabs/data/MainTab";
-import { Tag } from "./comp/core/Tag";
-import { Icon } from "./comp/core/Icon";
 
 export class Render {
     private debug: boolean = false;
@@ -40,11 +39,10 @@ export class Render {
     fadeInId: string;
     allowFadeInId: boolean = false;
 
-    injectSubstitutions = (node: NodeInfo, val: string): string => {
+    injectSubstitutions(node: NodeInfo, val: string): string {
         // note: this is only here to get the markdown renderer to have padding in plain text, but
         // also it means we can leave off the language type and get a plaintext as default
         val = val.replaceAll("```txt\n", "```plaintext\n");
-
         val = val.replaceAll("{{locationOrigin}}", window.location.origin);
 
         /* These allow us to enter into the markdown things like this:
@@ -81,7 +79,7 @@ export class Render {
         return val;
     }
 
-    renderLinkLabel = (id: string) => {
+    renderLinkLabel(id: string) {
         const ast = getAs();
         let linkText = null;
         if (id === ast.linkSource) {
@@ -93,7 +91,7 @@ export class Render {
         }) : null;
     }
 
-    setNodeDropHandler = (attribs: any, node: NodeInfo) => {
+    setNodeDropHandler(attribs: any, node: NodeInfo) {
         if (!node) return;
 
         attribs[C.NODE_ID_ATTR] = node.id;
@@ -154,7 +152,7 @@ export class Render {
     }
 
     /* nodeId is parent node to query for calendar content */
-    showCalendar = async (nodeId: string) => {
+    async showCalendar(nodeId: string) {
         if (!nodeId) {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {
@@ -177,7 +175,7 @@ export class Render {
         });
     }
 
-    showNodeUrl = (node: NodeInfo) => {
+    showNodeUrl(node: NodeInfo) {
         if (!node) {
             node = S.nodeUtil.getHighlightedNode();
         }
@@ -353,16 +351,16 @@ export class Render {
         dlgHolder.dlg.open();
     }
 
-    titleDiv = (title: string): Div => {
+    titleDiv(title: string): Div {
         return new Div(title, { className: "largerFont" });
     }
 
-    allowAction = (type: TypeIntf, action: NodeActionType, node: NodeInfo): boolean => {
+    allowAction(type: TypeIntf, action: NodeActionType, node: NodeInfo): boolean {
         return !type || type.allowAction(action, node);
     }
 
-    renderPage = async (res: J.RenderNodeResponse, scrollToTop: boolean,
-        targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) => {
+    async renderPage(res: J.RenderNodeResponse, scrollToTop: boolean,
+        targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true) {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -515,7 +513,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: NodeInfo, tabData: TabBase<any>, level: number, allowNodeMove: boolean): Comp => {
+    renderChildren(node: NodeInfo, tabData: TabBase<any>, level: number, allowNodeMove: boolean): Comp {
         if (!node || !node.children) return null;
 
         /*
@@ -539,24 +537,24 @@ export class Render {
         }
     }
 
-    newUserAccountTips = (): Div => {
+    newUserAccountTips(): Div {
         return new Div(null, { className: "bigMargin alert alert-info" }, [
             new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "bigMarginBottom" }),
             new Button("View User Guide", () => S.nav.openContentNode(":user-guide", false))
         ]);
     }
 
-    getAvatarImgUrl = (ownerId: string, avatarVer: string) => {
+    getAvatarImgUrl(ownerId: string, avatarVer: string) {
         if (!avatarVer) return null;
         return S.rpcUtil.getRpcPath() + "bin/avatar" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
-    getProfileHeaderImgUrl = (ownerId: string, avatarVer: string) => {
+    getProfileHeaderImgUrl(ownerId: string, avatarVer: string) {
         if (!avatarVer) return null;
         return S.rpcUtil.getRpcPath() + "bin/profileHeader" + "?nodeId=" + ownerId + "&v=" + avatarVer;
     }
 
-    makeHeaderAvatar = (node: NodeInfo) => {
+    makeHeaderAvatar(node: NodeInfo): Img {
         const src: string = node.apAvatar || this.getAvatarImgUrl(node.ownerId, node.avatarVer);
         if (!src) {
             return null;
@@ -570,21 +568,21 @@ export class Render {
             className: "avatarImage",
             title: "User: " + node.owner + "\n\nShow Profile",
             [C.USER_ID_ATTR]: node.ownerId,
-            onClick: S.nav.clickToOpenUserProfile
+            onClick: S.nav._clickToOpenUserProfile
         });
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */
-    allowPropertyEdit = (node: NodeInfo, propName: string): boolean => {
+    allowPropertyEdit(node: NodeInfo, propName: string): boolean {
         const type: TypeIntf = S.plugin.getType(node.type);
         return type ? type.allowPropertyEdit(propName) : true;
     }
 
-    isReadOnlyProperty = (propName: string): boolean => {
+    isReadOnlyProperty(propName: string): boolean {
         return S.props.readOnlyPropertyList.has(propName);
     }
 
-    showGraph = async (node: NodeInfo, searchText: string) => {
+    async showGraph(node: NodeInfo, searchText: string) {
         node = node || S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
@@ -601,25 +599,7 @@ export class Render {
         });
     }
 
-    parseEmojis = (value: any): any => {
-        if (!value) return value;
-        const emojisArray = toArray(value);
-        if (!emojisArray) return value;
-        const newValue = emojisArray.reduce((previous: any, current: any) => {
-            if (typeof current === "string") {
-                return previous + current;
-            }
-            if (current && current.props) {
-                return previous + current.props.children;
-            }
-            else {
-                return previous;
-            }
-        }, "");
-        return newValue;
-    };
-
-    renderTagsDiv = (node: NodeInfo, moreClasses: string = ""): Div => {
+    renderTagsDiv(node: NodeInfo, moreClasses: string = ""): Div {
         if (!node || !node.tags) return null;
         const tags = node.tags.split(" ");
         const spans: Span[] = tags.map(tag => new Span(tag, { className: "nodeTags" }));
@@ -685,9 +665,8 @@ export class Render {
         ]);
     }
 
-    renderLinks = (node: NodeInfo, tabData: TabBase): Div => {
+    renderLinks(node: NodeInfo, tabData: TabBase): Div {
         if (!node.links) return null;
-
         const linkComps: Comp[] = [];
         const idSet: Set<string> = new Set();
         if (node.links) {
@@ -719,7 +698,7 @@ export class Render {
         return linkComps.length > 0 ? new Div(null, { className: "linksPanel" }, linkComps) : null;
     }
 
-    buildCustomLinks = (configArray: any): Comp[] => {
+    buildCustomLinks(configArray: any): Comp[] {
         const items: Comp[] = [];
 
         if (configArray) {
@@ -738,7 +717,7 @@ export class Render {
 
                             /* special case for feed tab */
                             if (tab === C.TAB_FEED && !getAs().isAnonUser) {
-                                func = S.nav.messagesToFromMe;
+                                func = S.nav._messagesToFromMe;
                             }
                             else {
                                 func = () => S.tabUtil.selectTab(tab);
@@ -761,7 +740,7 @@ export class Render {
         return items;
     }
 
-    renderTagsStrDiv = (tagsStr: string, classes: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div => {
+    renderTagsStrDiv(tagsStr: string, classes: string, removeTag: (val: string) => void, labelClickFunc: () => void): Div {
         if (!tagsStr) tagsStr = "";
         const tags = tagsStr.split(" ");
         const spans: Span[] = tags.map(tag => {
@@ -793,7 +772,7 @@ export class Render {
         ]);
     }
 
-    buildCreditDiv = (): Div => {
+    buildCreditDiv(): Div {
         const ast = getAs();
         if (ast.userProfile?.balance) {
             const credit = getAs().userProfile.balance;
@@ -807,7 +786,7 @@ export class Render {
         return null;
     }
 
-    makeDeleteQuestionDiv = (): Div => {
+    makeDeleteQuestionDiv(): Div {
         const ast = getAs();
         const question = ast.nodesToDel.length === 1 ? "Delete" : "Delete " + ast.nodesToDel.length + " nodes";
         return new Div(null, { className: "deleteQuestion" }, [
@@ -817,12 +796,12 @@ export class Render {
             }),
             new Span("Cancel", {
                 className: "alert alert-info askDeleteQuestion",
-                onClick: S.edit.endDelete
+                onClick: S.edit._endDelete
             })
         ]);
     }
 
-    getSignatureIcon = (node: NodeInfo) => {
+    getSignatureIcon(node: NodeInfo) {
         const sigFail: string = S.props.getClientPropStr(J.NodeProp.SIG_FAIL, node);
         if (sigFail) {
             return new Icon({

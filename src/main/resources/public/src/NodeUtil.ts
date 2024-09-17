@@ -12,7 +12,7 @@ import { MainTab } from "./tabs/data/MainTab";
 
 export class NodeUtil {
 
-    applyNodeChanges = (changes: J.NodeChanges): void => {
+    applyNodeChanges(changes: J.NodeChanges): void {
         if (changes == null) return;
 
         // recursively apply to entire tree
@@ -20,7 +20,7 @@ export class NodeUtil {
     }
 
     // returns true if we found the target parent node, and processed it
-    applyNodeChangesInner = (node: NodeInfo, changes: J.NodeChanges): boolean => {
+    applyNodeChangesInner(node: NodeInfo, changes: J.NodeChanges): boolean {
         if (!changes || !node) return;
         if (node?.children) {
             for (const n of node.children) {
@@ -39,21 +39,21 @@ export class NodeUtil {
         return node.id === changes.parentNodeId;
     }
 
-    getSelNodeIdsArray = (): string[] => {
+    getSelNodeIdsArray(): string[] {
         const sels: string[] = [];
         getAs().selectedNodes.forEach(id => sels.push(id));
         return sels;
     }
 
-    getDisplayName = (node: NodeInfo): string => {
+    getDisplayName(node: NodeInfo): string {
         return node.owner;
     }
 
-    clearSelNodes = () => {
+    _clearSelNodes = () => {
         dispatch("ClearSelections", s => s.selectedNodes.clear());
     }
 
-    getHighlightedNode = (): NodeInfo => {
+    getHighlightedNode(): NodeInfo {
         const ast = getAs();
         if (!ast.node) return null;
         const id: string = S.quanta.parentIdToFocusNodeMap.get(ast.node.id);
@@ -64,7 +64,7 @@ export class NodeUtil {
     }
 
     /* Returns true if successful */
-    highlightRowById = (ast: AppState, id: string, scroll: boolean): void => {
+    highlightRowById(ast: AppState, id: string, scroll: boolean): void {
         let node = MainTab.inst?.findNode(id, ast);
 
         if (node) {
@@ -99,7 +99,7 @@ export class NodeUtil {
         }
     }
 
-    highlightNode = (node: NodeInfo, scroll: boolean, ust: AppState) => {
+    highlightNode(node: NodeInfo, scroll: boolean, ust: AppState) {
         ust = ust || getAs();
         if (!node || !ust.node) {
             return;
@@ -120,7 +120,7 @@ export class NodeUtil {
     }
 
     /* Find node by looking everywhere we possibly can on local storage for it */
-    findNode = (nodeId: string): NodeInfo => {
+    findNode(nodeId: string): NodeInfo {
         const ast = getAs();
         for (const data of ast.tabData) {
             const node = data.findNode(nodeId);
@@ -130,7 +130,7 @@ export class NodeUtil {
     }
 
     /* Returns the node if it's currently displaying on the page. */
-    displayingOnTree = (nodeId: string): NodeInfo => {
+    displayingOnTree(nodeId: string): NodeInfo {
         const ast = getAs();
         if (!ast.node) return null;
         if (ast.node.id === nodeId) return ast.node;
@@ -141,7 +141,7 @@ export class NodeUtil {
     /**
      * Recursively search for a node by id in the given node and it's children.
      */
-    nodeOrChilderenMatch = (node: NodeInfo, nodeId: string): NodeInfo => {
+    nodeOrChilderenMatch(node: NodeInfo, nodeId: string): NodeInfo {
         if (!node) return null;
         if (node.id === nodeId) return node;
         if (!node.children) return null;
@@ -152,7 +152,7 @@ export class NodeUtil {
         return null;
     }
 
-    getNodeByName = (node: NodeInfo, name: string, ust: AppState): NodeInfo => {
+    getNodeByName(node: NodeInfo, name: string, ust: AppState): NodeInfo {
         if (!node) return null;
         if (node.name === name) return node;
 
@@ -162,7 +162,7 @@ export class NodeUtil {
         return null;
     }
 
-    getPathPartForNamedNode = (node: NodeInfo): string => {
+    getPathPartForNamedNode(node: NodeInfo): string {
         if (!node || !node.name) return null;
 
         if (node.owner === PrincipalName.ADMIN) {
@@ -173,18 +173,7 @@ export class NodeUtil {
         }
     }
 
-    getPathPartForNamedNodeAttachment = (node: NodeInfo): string => {
-        if (!node || !node.name) return null;
-
-        if (node.owner === PrincipalName.ADMIN) {
-            return "/f/" + node.name;
-        }
-        else {
-            return "/f/" + node.owner + "/" + node.name;
-        }
-    }
-
-    getShortContent = (node: NodeInfo): string => {
+    getShortContent(node: NodeInfo): string {
         let content = node.content;
         if (!content) {
             if (node.name) {
@@ -224,19 +213,7 @@ export class NodeUtil {
         return content.trim();
     }
 
-    // returns true if all children are same owner as parent
-    allChildrenAreSameOwner = (node: NodeInfo): boolean => {
-        if (!node || !node.children) return true;
-
-        for (const child of node.children) {
-            if (node.ownerId !== child.ownerId) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    removePublicShare = async (node: NodeInfo, editorDlg: Comp) => {
+    async removePublicShare(node: NodeInfo, editorDlg: Comp) {
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: node.id,
             principalNodeId: PrincipalName.PUBLIC,
@@ -245,7 +222,7 @@ export class NodeUtil {
         this.removePrivilegeResponse(node, editorDlg);
     }
 
-    removePrivilegeResponse = async (node: NodeInfo, editorDlg: Comp) => {
+    async removePrivilegeResponse(node: NodeInfo, editorDlg: Comp) {
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: node.id
         });
@@ -257,7 +234,7 @@ export class NodeUtil {
         }
     }
 
-    getSharingNames = (node: NodeInfo, editorDlg: Comp): Comp[] => {
+    getSharingNames(node: NodeInfo, editorDlg: Comp): Comp[] {
         if (!node?.ac) return null;
 
         const ret: Comp[] = [];
@@ -302,7 +279,7 @@ export class NodeUtil {
                 if (ac.principalNodeId) {
                     props = {
                         [C.USER_ID_ATTR]: ac.principalNodeId,
-                        onClick: S.nav.clickToOpenUserProfile,
+                        onClick: S.nav._clickToOpenUserProfile,
                         className: "sharingName clickable",
                         title
                     }
@@ -337,7 +314,7 @@ export class NodeUtil {
         return ret;
     }
 
-    getPublicPrivilegsSuffix = (principalName: string, node: NodeInfo): string => {
+    getPublicPrivilegsSuffix(principalName: string, node: NodeInfo): string {
         if (!node || !node.ac) return "";
         let val = "";
         for (const ac of node.ac) {
@@ -360,14 +337,14 @@ export class NodeUtil {
         return val;
     }
 
-    processInboundNodes = (nodes: NodeInfo[]) => {
+    processInboundNodes(nodes: NodeInfo[]) {
         if (!nodes) return;
         for (const node of nodes) {
             this.processInboundNode(node);
         }
     }
 
-    processInboundNode = (node: NodeInfo) => {
+    processInboundNode(node: NodeInfo) {
         if (!node) return;
         const tags: string[] = S.props.getPropObj(J.NodeProp.OPEN_GRAPH, node);
         if (tags) {
@@ -384,19 +361,19 @@ export class NodeUtil {
         }
     }
 
-    isCutAttachment = (att: Attachment, nodeId: string): boolean => {
+    isCutAttachment(att: Attachment, nodeId: string): boolean {
         const ast = getAs();
         return ast.cutAttachmentsFromId === nodeId && ast.cutAttachments && ast.cutAttachments.has((att as any).key);
     }
 
-    clearCut = (): void => {
+    _clearCut = (): void => {
         dispatch("undoCutAttachments", s => {
             s.cutAttachmentsFromId = null;
             s.cutAttachments = null;
         });
     }
 
-    paste = async (dlg: EditNodeDlg) => {
+    async paste(dlg: EditNodeDlg) {
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.PasteAttachmentsRequest, J.PasteAttachmentsResponse>("pasteAttachments", {
             sourceNodeId: ast.cutAttachmentsFromId,
@@ -409,6 +386,6 @@ export class NodeUtil {
         dlg.mergeState<EditNodeDlgState>({
             rerenderAfterClose: true
         });
-        this.clearCut();
+        this._clearCut();
     }
 }

@@ -77,7 +77,7 @@ export class Quanta {
 
     selectedForTts: string = null;
 
-    refresh = () => {
+    refresh() {
         if (C.DEBUG_SCROLLING) {
             console.log("Quanta.refresh");
         }
@@ -94,17 +94,17 @@ export class Quanta {
         });
     }
 
-    invalidateKeys = () => {
+    invalidateKeys() {
         S.crypto.invalidateKeys();
     }
 
-    initKeys = async (user: string) => {
+    async initKeys(user: string) {
         if (S.crypto.avail) {
             await S.crypto.initKeys(user, false, false, false, "all");
         }
     }
 
-    initApp = async () => {
+    async initApp() {
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
         }
@@ -255,12 +255,12 @@ export class Quanta {
         }
     }
 
-    resetPageLoadConfigs = () => {
+    resetPageLoadConfigs() {
         this.config.urlView = null;
         this.config.initialNodeId = null;
     }
 
-    initialRender = async () => {
+    async initialRender() {
         let initialTab = null;
         switch (this.config.urlView) {
             case "doc":
@@ -340,11 +340,11 @@ export class Quanta {
     }
 
     // landscape v.s. portrait
-    isLandscapeOrientation = () => {
+    isLandscapeOrientation() {
         return window.innerWidth > window.innerHeight;
     }
 
-    addPageLevelEventListeners = () => {
+    addPageLevelEventListeners() {
         /* We have to run this timer to wait for document.body to exist because we load our JS in
             the HTML HEAD because we need our styling in place BEFORE the page renders or else you
             get that well-known issue of a momentarily unstyled render before the page finishes
@@ -355,11 +355,6 @@ export class Quanta {
                 return;
             }
             clearInterval(interval);
-
-            document.body.addEventListener("mousemove", function (e: any) {
-                S.domUtil.mouseX = e.clientX;
-                S.domUtil.mouseY = e.clientY;
-            });
 
             document.body.addEventListener("click", function (e: any) {
                 e = e || window.event;
@@ -383,57 +378,48 @@ export class Quanta {
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
                 let ast = getAs();
 
-                if (event.code === "Backquote") {
-                    if (S.util.ctrlKeyCheck()) {
-                        S.domUtil.addAnnotation();
-                    }
+                switch (event.code) {
+                    case "ControlLeft":
+                        this.ctrlKey = true;
+                        this.ctrlKeyTime = new Date().getTime();
+                        break;
+                    case "Escape":
+                        if (S.util.fullscreenViewerActive()) {
+                            S.nav._closeFullScreenViewer();
+                        }
+                        break;
+
+                    // case "ArrowDown":
+                    //     if (this.keyDebounce()) return;
+                    //     ast = getAst()
+                    //     S.view.scrollRelativeToNode("down", ast);
+                    //     break;
+
+                    // case "ArrowUp":
+                    //     if (this.keyDebounce()) return;
+                    //     ast = getAst()
+                    //     S.view.scrollRelativeToNode("up", ast);
+                    //     break;
+
+                    case "ArrowLeft":
+                        if (this.keyDebounce()) return;
+                        // S.nav.navUpLevel();
+                        if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
+                            S.nav._prevFullScreenImgViewer();
+                        }
+                        break;
+
+                    case "ArrowRight":
+                        if (this.keyDebounce()) return;
+                        ast = getAs();
+                        // S.nav.navOpenSelectedNode(state);
+                        if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
+                            S.nav._nextFullScreenImgViewer();
+                        }
+                        break;
+
+                    default: break;
                 }
-                else {
-                    switch (event.code) {
-                        case "ControlLeft":
-                            this.ctrlKey = true;
-                            this.ctrlKeyTime = new Date().getTime();
-                            break;
-                        case "Escape":
-                            S.domUtil.removeAnnotation();
-                            if (S.util.fullscreenViewerActive()) {
-                                S.nav.closeFullScreenViewer();
-                            }
-                            break;
-
-                        // case "ArrowDown":
-                        //     if (this.keyDebounce()) return;
-                        //     ast = getAst()
-                        //     S.view.scrollRelativeToNode("down", ast);
-                        //     break;
-
-                        // case "ArrowUp":
-                        //     if (this.keyDebounce()) return;
-                        //     ast = getAst()
-                        //     S.view.scrollRelativeToNode("up", ast);
-                        //     break;
-
-                        case "ArrowLeft":
-                            if (this.keyDebounce()) return;
-                            // S.nav.navUpLevel();
-                            if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
-                                S.nav.prevFullScreenImgViewer();
-                            }
-                            break;
-
-                        case "ArrowRight":
-                            if (this.keyDebounce()) return;
-                            ast = getAs();
-                            // S.nav.navOpenSelectedNode(state);
-                            if (ast.fullScreenConfig.type === FullScreenType.IMAGE) {
-                                S.nav.nextFullScreenImgViewer();
-                            }
-                            break;
-
-                        default: break;
-                    }
-                }
-                // }
             });
 
             document.body.addEventListener("keyup", (event: KeyboardEvent) => {
@@ -448,7 +434,7 @@ export class Quanta {
         }, 100);
     }
 
-    keyDebounce = () => {
+    keyDebounce() {
         const now = S.util.currentTimeMillis();
         // allow one operation every quarter second.
         if (Quanta.lastKeyDownTime > 0 && now - Quanta.lastKeyDownTime < 250) {
@@ -465,7 +451,7 @@ export class Quanta {
     zero since the overlay is initially visible so that's the correct counter state to start with.
     */
     static overlayCounter: number = 1; // this starting value is important.
-    setOverlay = (showOverlay: boolean) => {
+    setOverlay(showOverlay: boolean) {
         Quanta.overlayCounter += showOverlay ? 1 : -1;
 
         /* if overlayCounter goes negative, that's a mismatch */

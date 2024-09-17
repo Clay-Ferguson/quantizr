@@ -99,7 +99,7 @@ export class NodeCompButtonBar extends Div {
             if (!(exp && !isMine)) {
                 openButton = new IconButton("fa-folder-open", null, {
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.openNodeById,
+                    onClick: S.nav._openNodeById,
                     title: "Explore content of this node"
                 }, "btn-primary");
             }
@@ -108,7 +108,7 @@ export class NodeCompButtonBar extends Div {
             if (isMine && ast.userPrefs.editMode) {
                 expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.toggleNodeInlineChildren,
+                    onClick: S.nav._toggleNodeInlineChildren,
                     title: expandChildren ? "Collapse Children" : "Expand Children"
                 }) : null;
             }
@@ -163,7 +163,7 @@ export class NodeCompButtonBar extends Div {
             const editInsertAllowed = S.props.isMine(this.node); //S.props.isWritableByMe(this.node);
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
-                createSubNodeButton = new Button(null, S.edit.newSubNode, {
+                createSubNodeButton = new Button(null, S.edit._newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"
                 }, "btn-secondary ui-new-node-plus", "fa-plus");
@@ -173,7 +173,7 @@ export class NodeCompButtonBar extends Div {
 
             if (editingAllowed) {
                 if (editableNode && !specialAccountNode) {
-                    editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
+                    editNodeButton = new Button(null, S.edit._runEditNodeByClick, {
                         title: "Edit Node",
                         [C.NODE_ID_ATTR]: this.node.id
                     }, "btn-secondary ui-edit-node", "fa-edit");
@@ -194,10 +194,10 @@ export class NodeCompButtonBar extends Div {
             if (!!ast.nodesToMove && userCanPaste) {
                 pasteSpan = new Span(null, { className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
-                        S.edit.pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton"),
+                        S.edit._pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton"),
 
                     this.node.id !== ast.userProfile?.userNodeId
-                        ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton") : null
+                        ? new Button("Paste Here", S.edit._pasteSelNodes_InlineAbove, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton") : null
                 ]);
             }
         }
@@ -208,7 +208,7 @@ export class NodeCompButtonBar extends Div {
                 className: "fa fa-trash fa-lg " + iconClazz,
                 title: "Delete node(s)",
                 [C.NODE_ID_ATTR]: this.node.id,
-                onClick: this.tabData.id == C.TAB_MAIN ? S.edit.deleteSelNodes : S.edit.deleteOneNode
+                onClick: this.tabData.id == C.TAB_MAIN ? S.edit._deleteSelNodes : S.edit._deleteOneNode
             }) : null
         ];
 

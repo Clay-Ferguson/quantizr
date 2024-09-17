@@ -36,7 +36,7 @@ export class TabUtil {
         */
         dispatch("SelectTab", s => {
             if (tabName === C.TAB_MAIN && !s.node) {
-                S.nav.navToMyAccntRoot();
+                S.nav._navToMyAccntRoot();
             }
             else {
                 this.tabChanging(s.activeTab, tabName);
@@ -57,7 +57,7 @@ export class TabUtil {
             // we need to run immediately but in a timer so it doesn't happen in this call stack and
             // trigger an error that we did a dispatch in a dispatch.
             setTimeout(() => {
-                S.nav.navToMyAccntRoot();
+                S.nav._navToMyAccntRoot();
             }, 1);
         }
         else {

@@ -13,15 +13,7 @@ export class Props {
 
     hiddenPropertyList: Set<string> = new Set<string>();
 
-    moveNodePosition = (props: PropertyInfo[], idx: number, typeName: string): number => {
-        const tagIdx: number = S.util.arrayIndexOfItemByProp(props, "name", typeName);
-        if (tagIdx !== -1) {
-            S.util.arrayMoveItem(props, tagIdx, idx++);
-        }
-        return idx;
-    }
-
-    deleteProp = (node: NodeInfo, propertyName: string) => {
+    deleteProp(node: NodeInfo, propertyName: string) {
         if (node.properties) {
             node.properties = node.properties.filter(p => {
                 return p.name !== propertyName;
@@ -29,11 +21,10 @@ export class Props {
         }
     }
 
-    getClientProp = (propName: string, node: NodeInfo): PropertyInfo => {
+    getClientProp(propName: string, node: NodeInfo): PropertyInfo {
         if (!node?.clientProps) {
             return null;
         }
-
         return node.clientProps.find(p => p.name === propName);
     }
 
@@ -42,7 +33,7 @@ export class Props {
     on the node a copy of the encrypted key that goes with the current user (us, logged in user),
     which should decrypt using our private key.
     */
-    getCryptoKey = (node: NodeInfo) => {
+    getCryptoKey(node: NodeInfo) {
         if (!node) return null;
         let key = null;
 
@@ -57,23 +48,19 @@ export class Props {
         return key;
     }
 
-    isShared = (node: NodeInfo): boolean => {
+    isShared(node: NodeInfo): boolean {
         return !!node.ac;
     }
 
-    hasNonPublicShares = (node: NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId !== PrincipalName.PUBLIC);
-    }
-
-    isPublic = (node: NodeInfo): boolean => {
+    isPublic(node: NodeInfo): boolean {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === PrincipalName.PUBLIC);
     }
 
-    isPublicWritable = (node: NodeInfo): boolean => {
+    isPublicWritable(node: NodeInfo): boolean {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === PrincipalName.PUBLIC && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }
 
-    isWritableByMe = (node: NodeInfo): boolean => {
+    isWritableByMe(node: NodeInfo): boolean {
         if (!node) return false;
         const ast = getAs();
 
@@ -96,30 +83,22 @@ export class Props {
             ace.principalNodeId === ast.userProfile?.userNodeId);
     }
 
-    isPublicReadOnly = (node: NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === PrincipalName.PUBLIC && !this.hasPrivilege(ace, J.PrivilegeType.WRITE));
-    }
-
-    getAcCount = (node: NodeInfo): number => {
-        return node && node.ac ? node.ac.length : 0;
-    }
-
-    hasPrivilege = (ace: J.AccessControlInfo, priv: string): boolean => {
+    hasPrivilege(ace: J.AccessControlInfo, priv: string): boolean {
         if (!ace.privileges) return false;
         return !!ace.privileges.find(p => p.privilegeName.indexOf(priv) !== -1);
     }
 
-    isMine = (node: NodeInfo): boolean => {
+    isMine(node: NodeInfo): boolean {
         const ast = getAs();
         if (!node || !ast.userName || ast.userName === PrincipalName.ANON) return false;
         return ast.userName === node.owner;
     }
 
-    isEncrypted = (node: NodeInfo): boolean => {
+    isEncrypted(node: NodeInfo): boolean {
         return node?.content?.indexOf(J.Constant.ENC_TAG) === 0;
     }
 
-    getAttachmentByUrl = (node: NodeInfo, url: string): Attachment => {
+    getAttachmentByUrl(node: NodeInfo, url: string): Attachment {
         if (!node || !node.attachments) return null;
         let ret: Attachment = null;
         Object.keys(node.attachments).forEach(key => {
@@ -130,7 +109,7 @@ export class Props {
         return ret;
     }
 
-    getOrderedAtts = (node: NodeInfo): Attachment[] => {
+    getOrderedAtts(node: NodeInfo): Attachment[] {
         if (!node.attachments) return null;
         const list: Attachment[] = [];
 
@@ -154,59 +133,59 @@ export class Props {
         return list;
     }
 
-    hasBinary = (node: NodeInfo): boolean => {
+    hasBinary(node: NodeInfo): boolean {
         return !!node.attachments;
     }
 
-    hasImage = (node: NodeInfo, attName: string): boolean => {
+    hasImage(node: NodeInfo, attName: string): boolean {
         const att = this.getAttachment(attName, node);
         const target = att ? att.mime : null;
         return target?.startsWith("image/");
     }
 
-    hasAudio = (node: NodeInfo, attName: string): boolean => {
+    hasAudio(node: NodeInfo, attName: string): boolean {
         const att = this.getAttachment(attName, node);
         const target = att ? att.mime : null;
         return target?.startsWith("audio/");
     }
 
-    hasVideo = (node: NodeInfo, attName: string): boolean => {
+    hasVideo(node: NodeInfo, attName: string): boolean {
         const att = this.getAttachment(attName, node);
         const target = att ? att.mime : null;
         return target?.startsWith("video/");
     }
 
-    getProp = (propName: string, node: NodeInfo): PropertyInfo => {
+    getProp(propName: string, node: NodeInfo): PropertyInfo {
         return node?.properties?.find(p => p?.name === propName);
     }
 
-    hasAIConfigProps = (node: NodeInfo): boolean => {
+    hasAIConfigProps(node: NodeInfo): boolean {
         return !!this.getPropStr(J.NodeProp.AI_PROMPT, node) || //
             !!this.getPropStr(J.NodeProp.AI_SERVICE, node) || //
             !!this.getPropStr(J.NodeProp.AI_MAX_WORDS, node) || //
             !!this.getPropStr(J.NodeProp.AI_TEMPERATURE, node);
     }
 
-    getPropStr = (propertyName: string, node: NodeInfo): string => {
+    getPropStr(propertyName: string, node: NodeInfo): string {
         return this.getProp(propertyName, node)?.value;
     }
 
-    getPropObj = (propertyName: string, node: NodeInfo): any => {
+    getPropObj(propertyName: string, node: NodeInfo): any {
         return this.getProp(propertyName, node)?.value;
     }
 
-    getClientPropStr = (propertyName: string, node: NodeInfo): string => {
+    getClientPropStr(propertyName: string, node: NodeInfo): string {
         return this.getClientProp(propertyName, node)?.value;
     }
 
-    getAttachment = (name: string, node: NodeInfo): Attachment => {
+    getAttachment(name: string, node: NodeInfo): Attachment {
         if (!name) {
             name = J.Constant.ATTACHMENT_PRIMARY;
         }
         return node?.attachments ? node.attachments[name] : null;
     }
 
-    setPropVal = (propertyName: string, node: NodeInfo, val: any) => {
+    setPropVal(propertyName: string, node: NodeInfo, val: any) {
         let prop = this.getProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
@@ -224,7 +203,7 @@ export class Props {
         }
     }
 
-    setProp = (node: NodeInfo, newProp: PropertyInfo) => {
+    setProp(node: NodeInfo, newProp: PropertyInfo) {
         if (!newProp) return;
         const prop = this.getProp(newProp.name, node);
 
@@ -240,7 +219,7 @@ export class Props {
     }
 
     // here's the simple mode property hider!
-    initConstants = () => {
+    initConstants() {
         S.util.addAllToSet(this.readOnlyPropertyList, [ //
             J.NodeProp.ENC_KEY, //
             J.NodeProp.TYPE_LOCK, //
@@ -272,22 +251,22 @@ export class Props {
         ]);
     }
 
-    isGuiControlBasedProp = (prop: PropertyInfo): boolean => {
+    isGuiControlBasedProp(prop: PropertyInfo): boolean {
         return !!S.props.controlBasedPropertyList.has(prop.name);
     }
 
-    isHiddenProp = (prop: PropertyInfo): boolean => {
+    isHiddenProp(prop: PropertyInfo): boolean {
         return this.isHiddenPropName(prop.name);
     }
 
-    isHiddenPropName = (propName: string): boolean => {
+    isHiddenPropName(propName: string): boolean {
         if (this.isSystemProp(propName)) {
             return true;
         }
         return !!S.props.hiddenPropertyList.has(propName);
     }
 
-    isSystemProp = (prop: string): boolean => {
+    isSystemProp(prop: string): boolean {
         switch (prop) {
             case J.NodeProp.RSS_FEED_SRC:
                 return false;
@@ -307,20 +286,20 @@ export class Props {
 
     /* This is kind of a hard-coded hack for the one particular type name
     where we are using it, but needs to work for all properties */
-    getInputClassForType = (typeName: string): string => {
+    getInputClassForType(typeName: string): string {
         if (typeName === J.NodeProp.DURATION) {
             return "durationTypeInput";
         }
         return null;
     }
 
-    getParentPath = (node: NodeInfo): string => {
+    getParentPath(node: NodeInfo): string {
         const slashIdx = node.path.lastIndexOf("/");
         if (slashIdx === -1) return null;
         return node.path.substring(0, slashIdx);
     }
 
-    addRecentType = (type: string): void => {
+    addRecentType(type: string): void {
         const ast = getAs();
         const recentTypes = ast.userProfile.recentTypes;
         let typesArray: string[];
@@ -358,7 +337,7 @@ export class Props {
         });
     }
 
-    hasDisplayableProps = (node: NodeInfo) => {
+    hasDisplayableProps(node: NodeInfo) {
         if (node.properties) {
             for (const prop of node.properties) {
                 if (!S.props.isGuiControlBasedProp(prop) && !S.props.isHiddenProp(prop)) return true;

@@ -13,7 +13,7 @@ declare const BUILDTIME: string;
 export class View {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    searchUnderId = async (id: string, text: string) => {
+    async searchUnderId(id: string, text: string) {
         await S.srch.search(id, null, text, null, "Content: " + text,
             null,
             false,
@@ -29,7 +29,7 @@ export class View {
             false);
     }
 
-    bookmarkClick = async (bookmark: J.Bookmark) => {
+    async bookmarkClick(bookmark: J.Bookmark) {
         const id = bookmark.id || bookmark.selfId;
         if (bookmark.search) {
             await this.searchUnderId(id, bookmark.search);
@@ -39,7 +39,7 @@ export class View {
         }
     }
 
-    jumpToId = async (id: string, forceRenderParent: boolean = false) => {
+    async jumpToId(id: string, forceRenderParent: boolean = false) {
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
@@ -58,7 +58,7 @@ export class View {
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
-    refreshTree = async (a: RefreshTreeArgs) => {
+    async refreshTree(a: RefreshTreeArgs) {
         const ast = getAs();
         if (!a.nodeId && ast.node) {
             a.nodeId = ast.node.id;
@@ -112,11 +112,11 @@ export class View {
         await S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
     }
 
-    firstPage = () => {
+    firstPage() {
         this.loadPage(false, 0, false);
     }
 
-    prevPage = () => {
+    prevPage() {
         const firstChild = S.edit.getFirstChildNode();
         if (firstChild?.logicalOrdinal > 0) {
             let targetOffset = firstChild.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
@@ -128,7 +128,7 @@ export class View {
         }
     }
 
-    nextPage = () => {
+    nextPage() {
         const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
             const targetOffset = lastChild.logicalOrdinal + 1;
@@ -136,14 +136,9 @@ export class View {
         }
     }
 
-    lastPage = () => {
-        // nav.mainOffset += J.ConstantInt.ROWS_PER_PAGE;
-        // this.loadPage(true, targetOffset, state);
-    }
-
     /* As part of 'infinite scrolling', this gets called when the user scrolls to the end of a page
     and we need to load more records automatically, and add to existing page records */
-    growPage = () => {
+    growPage() {
         const lastChild = S.edit.getLastChildNode();
         if (lastChild) {
             const targetOffset = lastChild.logicalOrdinal + 1;
@@ -153,7 +148,7 @@ export class View {
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the
     current view */
-    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean) => {
+    private async loadPage(goToLastPage: boolean, offset: number, growingPage: boolean) {
         const ast = getAs();
 
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -251,7 +246,7 @@ export class View {
     //     }
     // }
 
-    scrollActiveToTop = () => {
+    scrollActiveToTop() {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollAllTop");
         }
@@ -261,7 +256,7 @@ export class View {
         }
     }
 
-    scrollToNode = (node: NodeInfo = null, delay: number = 100) => {
+    scrollToNode(node: NodeInfo = null, delay: number = 100) {
         if (!Comp.allowScrollSets || !node) return;
 
         const func = () => {
@@ -303,13 +298,13 @@ export class View {
         });
     }
 
-    scrollToTop = async () => {
+    async scrollToTop() {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
             this.scrollActiveToTop();
         });
     }
 
-    getNodeStats = async (): Promise<any> => {
+    async getNodeStats(): Promise<any> {
         const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node.id,
@@ -329,7 +324,7 @@ export class View {
         });
     }
 
-    signSubGraph = async (signUnsigned: boolean): Promise<any> => {
+    async signSubGraph(signUnsigned: boolean): Promise<any> {
         if (!S.crypto.sigKeyOk()) {
             return null;
         }
@@ -341,7 +336,7 @@ export class View {
         S.util.showMessage("Signature generation initiated. Leave this browser window open until notified signatures are complete.", "Signatures");
     }
 
-    getNodeSignatureVerify = async (): Promise<any> => {
+    async getNodeSignatureVerify(): Promise<any> {
         const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -359,7 +354,7 @@ export class View {
         });
     }
 
-    removeSignatures = async (): Promise<any> => {
+    _removeSignatures = async (): Promise<any> => {
         const node = S.nodeUtil.getHighlightedNode();
         const res = await S.rpcUtil.rpc<J.RemoveSignaturesRequest, J.RemoveSignaturesResponse>("removeSignatures", {
             nodeId: node ? node.id : null
@@ -373,7 +368,7 @@ export class View {
         }
     }
 
-    runServerCommand = async (command: string, parameter: string, dlgTitle: string, dlgDescription: string) => {
+    async runServerCommand(command: string, parameter: string, dlgTitle: string, dlgDescription: string) {
         const node = S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {

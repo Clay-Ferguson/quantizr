@@ -40,7 +40,7 @@ export class RpcUtil {
     removedDomIds: string[] = [];
     lifoQueue: RpcQueueItem[] = [];
 
-    lifoQueuePush = (qi: RpcQueueItem) => {
+    lifoQueuePush(qi: RpcQueueItem) {
         this.lifoQueue.push(qi);
 
         // Currently this queue processes just OpenGraph querying from the server and we dont't
@@ -52,11 +52,7 @@ export class RpcUtil {
         }
     }
 
-    clearQueue = () => {
-        this.lifoQueue = [];
-    }
-
-    lifoQueueProcessor = () => {
+    _lifoQueueProcessor = () => {
         if (this.lifoQueue.length > 0 && this.concurrency == 0) {
             const idx = this.lifoQueue.length - 1;
             if (this.lifoQueue[idx].func && this.lifoQueue[idx].promise) {
@@ -76,7 +72,7 @@ export class RpcUtil {
         }
     }
 
-    rpcQueInterval = setInterval(this.lifoQueueProcessor, this.lifoInterval);
+    rpcQueInterval = setInterval(this._lifoQueueProcessor, this.lifoInterval);
 
     // For all domIds in removeDomIds we remove those from lifoQueue, and then reset
     // removeDomIds back to empty array
@@ -86,13 +82,13 @@ export class RpcUtil {
         this.removedDomIds = [];
     }, 2000);
 
-    setIntervalSpeed = (interval: number) => {
+    setIntervalSpeed(interval: number) {
         clearInterval(this.rpcQueInterval);
         this.lifoInterval = interval;
-        this.rpcQueInterval = setInterval(this.lifoQueueProcessor, this.lifoInterval);
+        this.rpcQueInterval = setInterval(this._lifoQueueProcessor, this.lifoInterval);
     }
 
-    getRemoteHost = (): string => {
+    getRemoteHost(): string {
         if (this.rhost) {
             return this.rhost;
         }
@@ -102,7 +98,7 @@ export class RpcUtil {
         return this.rhost;
     }
 
-    getRpcPath = (): string => {
+    getRpcPath(): string {
         return this.rpcPath || (this.rpcPath = this.getRemoteHost() + "/api/");
     }
 
@@ -116,9 +112,10 @@ export class RpcUtil {
     'compId' is the elementId of the element requesting the data, such that if we detect the element
     has been remove from the dom we know we can cancel any queued query
     */
-    rpc = <RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
+    rpc<RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
         (postName: string, postData: RequestType = null,
-            background: boolean = false, allowErrorDlg: boolean = true, lifoQueue = false, compId: string = null): Promise<ResponseType> => {
+            background: boolean = false, allowErrorDlg: boolean = true, 
+            lifoQueue = false, compId: string = null): Promise<ResponseType> {
 
         let qi = null;
         if (lifoQueue) {
@@ -237,8 +234,8 @@ export class RpcUtil {
     }
 
     /* Makes calls to server (Called thru 'rpc' rather than called directly) */
-    private rpcInner = <RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
-        (postName: string, callId: number, postData: RequestType = null): Promise<ResponseType> => {
+    private rpcInner<RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
+        (postName: string, callId: number, postData: RequestType = null): Promise<ResponseType> {
 
         return new Promise<ResponseType>((resolve, reject) => {
 
@@ -296,14 +293,14 @@ export class RpcUtil {
         });
     }
 
-    rpcSuccess = (res: J.ResponseBase, background: boolean, postName: string) => {
+    rpcSuccess(res: J.ResponseBase, background: boolean, postName: string) {
         try {
             if (!background) {
                 this.rpcCounter--;
                 if (this.rpcCounter < 0) {
                     this.rpcCounter = 0;
                 }
-                this.progressInterval();
+                this._progressInterval();
             }
 
             if (res?.code == C.RESPONSE_CODE_OK) {
@@ -368,14 +365,14 @@ export class RpcUtil {
      * We should only reach here when there's an actual failure to call the server, and is
      * completely separete from the server perhaps haveing an exception where it sent back an error.
      */
-    rpcFail = (error: any, background: boolean, allowErrorDlg: boolean, postName: string, postData: any) => {
+    rpcFail(error: any, background: boolean, allowErrorDlg: boolean, postName: string, postData: any) {
         try {
             if (!background) {
                 this.rpcCounter--;
                 if (this.rpcCounter < 0) {
                     this.rpcCounter = 0;
                 }
-                this.progressInterval();
+                this._progressInterval();
             }
 
             console.log("FAIL [" + postName + "]\n    ERROR: " + S.util.prettyPrint(error) + //
@@ -409,7 +406,7 @@ export class RpcUtil {
         }
     }
 
-    authFail = async () => {
+    async authFail() {
         if (this.unauthMessageShowing) return;
         this.unauthMessageShowing = true;
 
@@ -423,43 +420,25 @@ export class RpcUtil {
         this.unauthMessageShowing = false;
     }
 
-    incRpcCounter = () => {
-        this.rpcCounter++;
-        S.quanta.setOverlay(true);
-
-        // incrementing waitCounter to 1 will make the progress indicator come up faster
-        this.waitCounter = 1;
-        this.progressInterval();
-    }
-
-    decRpcCounter = () => {
-        this.rpcCounter--;
-        S.quanta.setOverlay(false);
-        if (this.rpcCounter < 0) {
-            this.rpcCounter = 0;
-        }
-        this.progressInterval();
-    }
-
-    isRpcWaiting = (): boolean => {
+    isRpcWaiting(): boolean {
         return this.rpcCounter > 0;
     }
 
-    initRpcTimer = () => {
+    initRpcTimer() {
         // This timer is a singleton that runs always so we don't need to ever clear the timeout.
         // Not a resource leak.
-        this.timer = setInterval(this.progressInterval, this.RPC_TIMER_INTERVAL);
+        this.timer = setInterval(this._progressInterval, this.RPC_TIMER_INTERVAL);
     }
 
-    startBlockingProcess = () => {
+    startBlockingProcess() {
         S.quanta.setOverlay(true);
     }
 
-    stopBlockingProcess = () => {
+    stopBlockingProcess() {
         S.quanta.setOverlay(false);
     }
 
-    progressInterval = () => {
+    _progressInterval = () => {
         const isWaiting = S.rpcUtil.isRpcWaiting();
         if (isWaiting) {
             this.waitCounter++;

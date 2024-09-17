@@ -21,7 +21,7 @@ export class LocalDB {
     static ACCESS_READONLY: IDBTransactionMode = "readonly";
     static KEY_NAME = "k";
 
-    private openDB = (bumpVersion: boolean = false): Promise<IDBDatabase> => {
+    private openDB(bumpVersion: boolean = false): Promise<IDBDatabase> {
         if (!indexedDB) {
             throw new Error("IndexedDB API not available in browser.");
         }
@@ -68,13 +68,13 @@ export class LocalDB {
         });
     }
 
-    clearStores = (): Promise<void[]> => {
+    clearStores(): Promise<void[]> {
         return Promise.all([
             this.clearStore(this.STORE_DEFAULT)
         ]);
     }
 
-    clearStore = (storeName: string): Promise<void> => {
+    clearStore(storeName: string): Promise<void> {
         // don't await, just return promise
         return new Promise<void>((resolve, _reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE, storeName,
@@ -95,7 +95,7 @@ export class LocalDB {
         });
     }
 
-    createStore = (db: IDBDatabase, storeName: string) => {
+    createStore(db: IDBDatabase, storeName: string) {
         // this try/catch is important to ignore times the store already exists, like upgrading the DB.
         try {
             db.createObjectStore(storeName, { keyPath: LocalDB.KEY_NAME });
@@ -106,7 +106,7 @@ export class LocalDB {
     }
 
     /* Runs a transaction by first opening the database, and then running the transaction */
-    private runTrans = async (access: IDBTransactionMode, storeName: string, runner: (store: IDBObjectStore) => void) => {
+    private async runTrans(access: IDBTransactionMode, storeName: string, runner: (store: IDBObjectStore) => void) {
         // if keeping db open and we have it open, then use it.
         if (!this.db) {
             this.db = await this.openDB();
@@ -139,7 +139,7 @@ export class LocalDB {
     }
 
     // gets the value stored under the key (like a simple map/keystore)
-    public getVal = async (k: string, storeName: string = null): Promise<any> => {
+    public async getVal(k: string, storeName: string = null): Promise<any> {
         if (!storeName) storeName = this.STORE_DEFAULT;
         const obj: IndexedDBObj = await this.readObject(k, storeName);
         const ret = obj?.v;
@@ -150,7 +150,7 @@ export class LocalDB {
     }
 
     // stores the value under this key  (like a simple map/keystore)
-    public setVal = async (k: string, v: any, storeName: string = null) => {
+    public async setVal(k: string, v: any, storeName: string = null) {
         if (!storeName) storeName = this.STORE_DEFAULT;
         await this.writeObject({ k, v }, storeName);
         if (this.debug) {
@@ -158,13 +158,13 @@ export class LocalDB {
         }
     }
 
-     // removes the value under this key 
-     public removeByKey = async (k: string, storeName: string = null) => {
+    // removes the value under this key 
+    public async removeByKey(k: string, storeName: string = null) {
         if (!storeName) storeName = this.STORE_DEFAULT;
         await this.removeObject(k, storeName);
     }
 
-    private removeObject = async (k: IDBValidKey, storeName: string = null): Promise<void> => {
+    private async removeObject(k: IDBValidKey, storeName: string = null): Promise<void> {
         if (!storeName) storeName = this.STORE_DEFAULT;
         if (!k) {
             console.error("key property 'k' is missing");
@@ -187,7 +187,7 @@ export class LocalDB {
         });
     }
 
-    private writeObject = async (obj: IndexedDBObj, storeName: string = null): Promise<void> => {
+    private async writeObject(obj: IndexedDBObj, storeName: string = null): Promise<void> {
         if (!storeName) storeName = this.STORE_DEFAULT;
         if (!obj.k) {
             console.error("key property 'k' is missing from object: " + S.util.prettyPrint(obj));
@@ -212,7 +212,7 @@ export class LocalDB {
 
     /* Looks up the object and returns that object which will have the 'name' as a propety in it
     just like it did when stored under that 'name' as the key */
-    public readObject = async (k: string, storeName: string = null): Promise<IndexedDBObj> => {
+    public async readObject(k: string, storeName: string = null): Promise<IndexedDBObj> {
         return new Promise<IndexedDBObj>((resolve) => {
             if (!storeName) storeName = this.STORE_DEFAULT;
 
@@ -232,7 +232,7 @@ export class LocalDB {
     }
 
     // Our DB is determined by the user, so if we set a newUser that will trigger a new DB to be opened
-    public setUser = async (userName: string) => {
+    public async setUser(userName: string) {
         // closes last DB and sets the userName so any future DB calls will reopen with new user.
         if (this.userName === userName) return;
 
@@ -250,7 +250,7 @@ export class LocalDB {
         await S.quanta.initKeys(userName);
     }
 
-    public dumpStore = async (storeName: string): Promise<void> => {
+    public async dumpStore(storeName: string): Promise<void> {
         return new Promise<void>((resolve) => {
             this.runTrans(LocalDB.ACCESS_READONLY, storeName,
                 (store: IDBObjectStore) => {

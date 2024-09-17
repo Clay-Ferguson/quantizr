@@ -791,10 +791,10 @@ export class Util {
         }
     }
 
-    loadAnonPageHome = async () => {
+    _loadAnonPageHome = async () => {
         try {
             if (this.sendAnonUsersToFeed && !getAs().isAnonUser) {
-                await S.nav.messagesToFromMe();
+                await S.nav._messagesToFromMe();
             }
             else {
                 const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", {

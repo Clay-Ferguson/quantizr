@@ -60,7 +60,7 @@ export class EditPropertyDlg extends DialogBase {
             showSchemaOrg && type?.schemaOrg?.props ? new SchemaOrgPropsTable(type.schemaOrg.props, this) : null,
 
             new ButtonBar([
-                new Button("Save", this.save, null, "btn-primary"),
+                new Button("Save", this._save, null, "btn-primary"),
                 new Button("Cancel", this._close)
             ], "marginTop")
         ];
@@ -69,7 +69,7 @@ export class EditPropertyDlg extends DialogBase {
         return ret;
     }
 
-    save = () => {
+    _save = () => {
         const name = this.nameState.getValue();
 
         /* verify first that this property doesn't already exist */

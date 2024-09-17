@@ -55,10 +55,6 @@ const sanitizerProcessor = unified()
 export class DomUtil {
     imgCache: Map<string, string> = new Map<string, string>();
 
-    annotations: HTMLDivElement[] = [];
-    mouseX: number;
-    mouseY: number;
-
     static escapeMap: Map<string, string> = new Map<string, string>([
         ["&", "&amp;"],
         ["<", "&lt;"],
@@ -70,18 +66,18 @@ export class DomUtil {
         ["=", "&#x3D;"]
     ]);
 
-    sanitizeHtml = (html: string): string => {
+    sanitizeHtml(html: string): string {
         const sanitizedHtml = sanitizerProcessor
             .processSync(html) // process the input HTML synchronously
             .toString(); // convert the sanitized HTML to a string
         return sanitizedHtml;
     }
 
-    getNodeIdFromDom = (evt: Event): string => { 
+    getNodeIdFromDom(evt: Event): string { 
         return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
     }
 
-    getPropFromDom = (evt: Event, prop: string): string => {
+    getPropFromDom(evt: Event, prop: string): string {
         let val = null;
 
         // get the id from this node or any parent node.
@@ -101,7 +97,7 @@ export class DomUtil {
     }
 
     /* set focus to element by id */
-    focusId = (id: string) => {
+    focusId(id: string) {
         if (!id) return;
         Comp.focusElmId = id;
         setTimeout(() => {
@@ -120,31 +116,25 @@ export class DomUtil {
     }
 
     /* Takes textarea dom Id (# optional) and returns its value */
-    getTextAreaValById = (id: string): string => {
+    getTextAreaValById(id: string): string {
         const de: HTMLInputElement = <HTMLInputElement>this.domElm(id);
         return de.value;
     }
 
-    setInnerHTML = (elm: HTMLElement, val: string) => {
+    setInnerHTML(elm: HTMLElement, val: string) {
         if (elm) {
             elm.innerHTML = val;
         }
     }
 
-    // domElmObjCss = (elm: HTMLElement, prop: string, val: string) => {
-    //     if (elm) {
-    //         elm.style[prop] = val;
-    //     }
-    // }
-
     // This may fail. oddly the API where i get the object from here wants to reutrn Elements not HTMLElements.
-    domElmObjRemove = (elm: Element) => {
+    domElmObjRemove(elm: Element) {
         if (elm) {
             elm.parentNode.removeChild(elm);
         }
     }
 
-    domElmRemove = (id: string) => {
+    domElmRemove(id: string) {
         const elm = this.domElm(id);
         if (elm) {
             elm.parentNode.removeChild(elm);
@@ -153,7 +143,7 @@ export class DomUtil {
 
     /* We return a promise that resolves to the element, but also support a callback function
     that can be used optionally whenver that's more convenient */
-    getElm = (id: string): Promise<HTMLElement> => {
+    getElm(id: string): Promise<HTMLElement> {
         // Promise is used here instead of async/await because of the resolve being done inside the timer.
         return new Promise<HTMLElement>((resolve) => {
 
@@ -192,7 +182,7 @@ export class DomUtil {
     /*
     * Gets the RAW DOM element and displays an error message if it's not found. Do not prefix with "#"
     */
-    domElm = (id: string): HTMLElement => {
+    domElm(id: string): HTMLElement {
         if (!id) return null;
         if (id.startsWith("#")) {
             console.log("domElm removed obsolete preceding # from ID " + id);
@@ -207,12 +197,12 @@ export class DomUtil {
         return document.getElementById(id);
     }
 
-    forEachElmBySel = (sel: string, callback: (el: HTMLElement, i: any) => any) => {
+    forEachElmBySel(sel: string, callback: (el: HTMLElement, i: any) => any) {
         const elements = document.querySelectorAll(sel);
         Array.prototype.forEach.call(elements, callback);
     }
 
-    escapeHtml = (str: string): string => {
+    escapeHtml(str: string): string {
         if (!str) return str;
         return str.replace(/[&<>"'`=\/]/g, DomUtil._escapeMapFunc);
     }
@@ -223,14 +213,7 @@ export class DomUtil {
         return DomUtil.escapeMap.get(s) || s;
     }
 
-    resetDropHandler = (attribs: any) => {
-        delete attribs.onDragEnter;
-        delete attribs.onDragOver;
-        delete attribs.onDragLeave;
-        delete attribs.onDrop;
-    }
-
-    setNodeDragHandler = (attribs: any, nodeId: string, backgroundImage: boolean = true) => {
+    setNodeDragHandler(attribs: any, nodeId: string, backgroundImage: boolean = true) {
         if (!nodeId) {
             return;
         }
@@ -258,18 +241,18 @@ export class DomUtil {
         };
     }
 
-    enterFetch = () => {
+    enterFetch() {
         S.rpcUtil.rpcCounter++;
         S.quanta.setOverlay(true);
     }
 
-    exitFetch = () => {
+    exitFetch() {
         S.quanta.setOverlay(false);
         S.rpcUtil.rpcCounter--;
-        S.rpcUtil.progressInterval();
+        S.rpcUtil._progressInterval();
     }
 
-    parseFiles = async (files: File[]): Promise<UploadResponse> => {
+    async parseFiles(files: File[]): Promise<UploadResponse> {
         if (!files) return;
 
         return new Promise<UploadResponse>((resolve, reject) => {
@@ -316,7 +299,7 @@ export class DomUtil {
         });
     }
 
-    uploadFilesToNode = async (files: File[], nodeId: string, showConfirm: boolean): Promise<Response> => {
+    async uploadFilesToNode(files: File[], nodeId: string, showConfirm: boolean): Promise<Response> {
         if (!files) return;
         const formData = new FormData();
 
@@ -360,7 +343,7 @@ export class DomUtil {
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
-    setDropHandler = (attribs: any, func: (elm: any) => void) => {
+    setDropHandler(attribs: any, func: (elm: any) => void) {
         attribs.onDragEnter = function (event: any) {
             event.stopPropagation();
             event.preventDefault();
@@ -396,52 +379,6 @@ export class DomUtil {
             event.currentTarget.classList.remove("dragTarget");
             func(event);
         };
-    }
-
-    addAnnotation = () => {
-        let arrowOption = window.prompt("Annotation Location: tl,tr,bl,br");
-        if (!arrowOption) {
-            arrowOption = "tl";
-        }
-
-        const text = window.prompt("Annotation Text:");
-        if (!text) {
-            return;
-        }
-
-        const d = document.createElement("div");
-
-        const a = document.createElement("div");
-        a.className = "arrowUp";
-        a.style.left = `${this.mouseX + 15}px`;
-        a.style.top = `${this.mouseY - 10}px`;
-        document.body.appendChild(a);
-
-        const h = document.createElement("h4");
-        h.className = "annotationText";
-        const c: any = document.createTextNode(text);
-        c.className = "annotationText";
-        h.appendChild(c);
-        d.appendChild(h);
-
-        d.className = "annotationBox";
-        d.style.left = `${this.mouseX}px`;
-        d.style.top = `${this.mouseY}px`;
-        d.setAttribute(C.ARROW_OPTION_ATTR, arrowOption);
-        this.annotations.push(d);
-        this.annotations.push(a);
-        document.body.appendChild(d);
-        this.dragElement(d, a);
-    }
-
-    removeAnnotation = () => {
-        if (this.annotations.length > 0) {
-            const a = this.annotations.pop();
-            a.parentElement.removeChild(a);
-
-            const e = this.annotations.pop();
-            e.parentElement.removeChild(e);
-        }
     }
 
     // from here: https://www.w3schools.com/howto/howto_js_draggable.asp
@@ -522,7 +459,7 @@ export class DomUtil {
         }
     }
 
-    makeDropTarget = (attribs: any, id: string) => {
+    makeDropTarget(attribs: any, id: string) {
         attribs[C.NODE_ID_ATTR] = id;
         S.domUtil.setDropHandler(attribs, (evt: DragEvent) => {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
@@ -559,7 +496,7 @@ export class DomUtil {
     }
 
     // Allow copy to clipboard when backtick text clicked.
-    codeSpanClick = (elm: HTMLElement) => {
+    codeSpanClick(elm: HTMLElement) {
         // if user just selected some text we don't do anything, because it won't make sense
         // becuase this code is incompatable and not appliable to that scenario
         if (window.getSelection()?.toString()) return;
@@ -569,24 +506,9 @@ export class DomUtil {
         }
     }
 
-    highlightBrowserText = (text: string) => {
-        if (!text) return;
-        if ((window as any).find) {
-            // get this string here, because the delay timer would invalidate the idx.
-            let findText = text.trim();
-            // if the exact text being read happens to be onscreen highlight it!
-
-            // trying to find strings longer than about 30 seems to just intermittently fail, but strings
-            // under 30 always work. This appers to be a bug in the browser.
-            findText = findText.substring(0, 30);
-            findText = S.util.chopAtLastChar(findText, " ");
-            (window as any).find(findText, true, false, true);
-        }
-    }
-
     /* Highlights 'text' everywhere it's found in the DOM. Pass 'document.body' as rootElm
        to replace on your whole web page */
-    public highlightText = (rootElm: HTMLElement, text: string) => {
+    public highlightText(rootElm: HTMLElement, text: string) {
         if (text.startsWith("\"") && text.endsWith("\"")) {
             text = text.replaceAll("\"", "");
         }
@@ -597,11 +519,11 @@ export class DomUtil {
         this.domHighlight(rootElm, regex, allRegex);
     }
 
-    public escapeRegEx = (text: string): string => {
+    public escapeRegEx(text: string): string {
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
     }
 
-    private domHighlight = (elm: HTMLElement, regex: RegExp, allRegex: RegExp): void => {
+    private domHighlight(elm: HTMLElement, regex: RegExp, allRegex: RegExp): void {
         if (elm.hasChildNodes()) {
             elm.childNodes.forEach((e: any) => this.domHighlight(e, regex, allRegex));
         }

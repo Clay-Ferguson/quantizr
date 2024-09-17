@@ -59,7 +59,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 null, "friendsTagPickerOnView", {
                 setValue: (val: string) => {
                     this.data.props.friendsTagSearch = val;
-                    S.srch.refreshFeed();
+                    S.srch._refreshFeed();
                 },
                 getValue: (): string => this.data.props.friendsTagSearch
             });
@@ -72,14 +72,14 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
                         val: this.data.props.searchTextState,
                         placeholder: "Search for...",
-                        enter: S.srch.refreshFeed,
+                        enter: S.srch._refreshFeed,
                         outterClass: "feedSearchField marginRight"
                     }) : null,
                     // we show this button just as an icon unless the search field is displaying
                     new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
                         onClick: () => {
                             if (ast.displayFeedSearch) {
-                                S.srch.refreshFeed()
+                                S.srch._refreshFeed()
                             }
                             else {
                                 dispatch("DisplayFeedSearch", s => {
@@ -90,7 +90,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         title: "Search Feed"
                     }),
                     new IconButton("fa-refresh", null, {
-                        onClick: S.srch.refreshFeed,
+                        onClick: S.srch._refreshFeed,
                         title: "Refresh Feed"
                     }),
                     this.data.props.searchTextState.getValue() //
@@ -128,7 +128,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             // if user has never done a refresh at all yet, do the first one for them automatically.
             if (ast.activeTab === C.TAB_FEED) {
                 setTimeout(() => {
-                    S.srch.refreshFeed();
+                    S.srch._refreshFeed();
                 }, 100);
             }
             else {
@@ -257,7 +257,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
     clearSearch() {
         if (this.data.props.searchTextState.getValue()) {
             this.data.props.searchTextState.setValue("");
-            S.srch.refreshFeed();
+            S.srch._refreshFeed();
         }
     }
 

@@ -16,16 +16,15 @@ import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { Attachment } from "./JavaIntf";
 import { S } from "./Singletons";
+import { AudioPlayerView } from "./tabs/AudioPlayerView";
+import { AISettingsTab } from "./tabs/data/AISettingsTab";
+import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
 import { FeedTab } from "./tabs/data/FeedTab";
 import { MainTab } from "./tabs/data/MainTab";
 import { SettingsTab } from "./tabs/data/SettingsTab";
-import { AISettingsTab } from "./tabs/data/AISettingsTab";
-import { StatisticsTab } from "./tabs/data/StatisticsTab";
-import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
-import { AudioPlayerView } from "./tabs/AudioPlayerView";
 
 export class Nav {
-    parentVisibleToUser = (): boolean => {
+    parentVisibleToUser(): boolean {
         const ast = getAs();
         if (!ast.node) return false;
 
@@ -39,7 +38,7 @@ export class Nav {
         }
     }
 
-    upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean) => {
+    upLevelResponse(res: J.RenderNodeResponse, id: string, scrollToTop: boolean) {
         if (!res || !res.node) {
             S.util.showPageMessage("The node above is not accessible.");
         } else {
@@ -47,15 +46,15 @@ export class Nav {
         }
     }
 
-    navToPrev = () => {
+    _navToPrev = () => {
         this.navToSibling(-1);
     }
 
-    navToNext = () => {
+    _navToNext = () => {
         this.navToSibling(1);
     }
 
-    navToSibling = async (siblingOffset: number): Promise<string> => {
+    async navToSibling(siblingOffset: number): Promise<string> {
         const ast = getAs();
         if (!ast.node) return null;
 
@@ -74,14 +73,14 @@ export class Nav {
         this.upLevelResponse(res, null, true);
     }
 
-    navUpLevelClick = async (evt: Event = null, id: string = null) => {
+    _navUpLevelClick = async (evt: Event = null, id: string = null) => {
         // for state management, especially for scrolling, we need to run the node click on the node
         // before upLeveling from it.
-        await this.clickTreeNode(evt, id);
+        await this._clickTreeNode(evt, id);
         this.navUpLevel(false);
     }
 
-    navUpLevel = async (processingDelete: boolean) => {
+    async navUpLevel(processingDelete: boolean) {
         const ast = getAs();
         if (!ast.node) return null;
 
@@ -113,7 +112,7 @@ export class Nav {
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
-    clickTreeNode = async (evt: Event, id: string, ast?: AppState) => {
+    _clickTreeNode = async (evt: Event, id: string, ast?: AppState) => {
         // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>((resolve, _reject) => {
             id = S.util.allowIdFromEvent(evt, id);
@@ -143,7 +142,7 @@ export class Nav {
         });
     }
 
-    openContentNode = async (nodePathOrId: string, jumpToRss: boolean) => {
+    async openContentNode(nodePathOrId: string, jumpToRss: boolean) {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodePathOrId,
             upLevel: false,
@@ -170,7 +169,7 @@ export class Nav {
         this.navPageNodeResponse(res);
     }
 
-    toggleNodeInlineChildren = async (evt: Event) => {
+    _toggleNodeInlineChildren = async (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const ast = getAs();
         const node = MainTab.inst?.findNode(id, ast);
@@ -195,7 +194,7 @@ export class Nav {
         }
     }
 
-    openNodeById = (evt: Event) => {
+    _openNodeById = (evt: Event) => {
         const id = S.util.allowIdFromEvent(evt, null);
         const ast = getAs();
         const node = MainTab.inst?.findNode(id, ast);
@@ -220,7 +219,7 @@ export class Nav {
         }
     }
 
-    setNodeSel = (selected: boolean, id: string, ust: AppState) => {
+    setNodeSel(selected: boolean, id: string, ust: AppState) {
         if (!id) return;
         if (selected) {
             ust.selectedNodes.add(id);
@@ -229,12 +228,12 @@ export class Nav {
         }
     }
 
-    navPageNodeResponse = (res: J.RenderNodeResponse) => {
+    navPageNodeResponse(res: J.RenderNodeResponse) {
         S.render.renderPage(res, true, null, true, true);
         S.tabUtil.selectTab(C.TAB_MAIN);
     }
 
-    geoLocation = () => {
+    _geoLocation = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
                 // todo-2: make this string a configurable property template
@@ -279,7 +278,7 @@ export class Nav {
         }
     }
 
-    showAudioPlayerTab = (mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) => {
+    showAudioPlayerTab(mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) {
         AudioPlayerTab.tabShown = true; 
         AudioPlayerView.sourceUrl = mediaUrl;
         AudioPlayerView.startTimePendingOverride = startTime;
@@ -288,27 +287,27 @@ export class Nav {
         S.tabUtil.selectTab(C.TAB_AUDIO_PLAYER);
     }
 
-    showUserSettings = () => {
+    _showUserSettings = () => {
         SettingsTab.tabShown = true;
         S.tabUtil.selectTab(C.TAB_SETTINGS);
     }
 
-    showAISettings = () => {
+    _showAISettings = () => {
         AISettingsTab.tabShown = true;
         S.tabUtil.selectTab(C.TAB_AI_SETTINGS);
     }
 
-    showMainMenu = () => {
+    _showMainMenu = () => {
         S.quanta.mainMenu = new MainMenuDlg();
         S.quanta.mainMenu.open();
     }
 
-    navToMyAccntRoot = async () => {
+    _navToMyAccntRoot = async () => {
         const ast = getAs();
         S.view.scrollActiveToTop();
 
         if (ast.isAnonUser) {
-            S.util.loadAnonPageHome();
+            S.util._loadAnonPageHome();
         } else {
 
             const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -326,17 +325,7 @@ export class Nav {
         }
     }
 
-    navPublicHome = () => {
-        S.util.loadAnonPageHome();
-    }
-
-    runSearch = (evt: Event) => {
-        const id = S.util.allowIdFromEvent(evt, null);
-        if (!id) return;
-        this.runSearchByNodeId(id);
-    }
-
-    runSearchByNodeId = (id: string) => {
+    runSearchByNodeId(id: string) {
         const node = S.nodeUtil.findNode(id);
         if (!node) return;
         setTimeout(() => {
@@ -344,24 +333,18 @@ export class Nav {
         }, 10);
     }
 
-    openDocumentView = (evt: Event, id: string) => {
+    openDocumentView(evt: Event, id: string) {
         id = S.util.allowIdFromEvent(evt, id);
         S.srch.showDocument(id, true);
     }
 
-    runTimeline = (evt: Event) => {
-        const id = S.util.allowIdFromEvent(evt, null);
-        if (!id) return;
-        this.runTimelineByNodeId(id);
-    }
-
-    runTimelineByNodeId = (id: string) => {
+    runTimelineByNodeId(id: string) {
         setTimeout(() => {
             S.srch.timeline(id, "mtm", null, "by Modify Time", 0, true);
         }, 100);
     }
 
-    closeFullScreenViewer = () => {
+    _closeFullScreenViewer = () => {
         dispatch("CloseFullScreenViewer", s => {
             if (s.savedActiveTab == C.TAB_GRAPH) {
                 s.savedActiveTab = null;
@@ -373,7 +356,7 @@ export class Nav {
         });
     }
 
-    minimizeFullScreenViewer = () => {
+    _minimizeFullScreenViewer = () => {
         dispatch("MinimizeFullScreenViewer", s => {
             if (s.savedActiveTab == C.TAB_GRAPH) {
                 s.savedActiveTab = null;
@@ -383,7 +366,7 @@ export class Nav {
         });
     }
 
-    prevFullScreenImgViewer = () => {
+    _prevFullScreenImgViewer = () => {
         const ast = getAs();
         const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
@@ -403,7 +386,7 @@ export class Nav {
         }
     }
 
-    nextFullScreenImgViewer = () => {
+    _nextFullScreenImgViewer = () => {
         const ast = getAs();
         const node = S.nodeUtil.findNode(ast.fullScreenConfig.nodeId);
         if (node && node.attachments) {
@@ -426,7 +409,7 @@ export class Nav {
         }
     }
 
-    messages = async (props: any) => {
+    async messages(props: any) {
         if (!FeedTab.inst) {
             return;
         }
@@ -443,11 +426,11 @@ export class Nav {
         });
 
         setTimeout(() => {
-            S.srch.refreshFeed();
+            S.srch._refreshFeed();
         }, 10);
     }
 
-    showMyNewMessages = () => {
+    _showMyNewMessages = () => {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
@@ -460,29 +443,7 @@ export class Nav {
         });
     }
 
-    showTrendingHashtags = () => {
-        this.showTrendingFiltered("hashtags");
-    }
-
-    showTrendingWords = () => {
-        this.showTrendingFiltered("words");
-    }
-
-    showTrendingFiltered = (filter: string) => {
-        if (StatisticsTab.inst) {
-            StatisticsTab.inst.props.filter = filter;
-        }
-
-        dispatch("SelectTab", s => {
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
-            s.activeTab = C.TAB_TRENDING;
-
-            // merge props parameter into the feed data props.
-            StatisticsTab.inst.props = { ...StatisticsTab.inst.props };
-        });
-    }
-
-    messagesToFromMe = async () => {
+    _messagesToFromMe = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -498,7 +459,7 @@ export class Nav {
         });
     }
 
-    messagesToMe = async () => {
+    _messagesToMe = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -514,7 +475,7 @@ export class Nav {
         });
     }
 
-    messagesFromMeToUser = (user: string, displayName: string) => {
+    messagesFromMeToUser(user: string, displayName: string) {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -532,7 +493,7 @@ export class Nav {
         });
     }
 
-    messagesFromMe = () => {
+    _messagesFromMe = () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -548,7 +509,7 @@ export class Nav {
         });
     }
 
-    messagesFromFriends = async () => {
+    _messagesFromFriends = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -565,7 +526,7 @@ export class Nav {
         });
     }
 
-    publicPosts = async () => {
+    _publicPosts = async () => {
         if (FeedTab.inst) {
             FeedTab.inst.props.searchTextState.setValue("");
         }
@@ -581,7 +542,7 @@ export class Nav {
         });
     }
 
-    changeMenuExpansion = (ast: AppState, op: string, menuName: string) => {
+    changeMenuExpansion(ast: AppState, op: string, menuName: string) {
         switch (op) {
             case "toggle":
                 if (ast.expandedMenus.has(menuName)) {
@@ -601,33 +562,14 @@ export class Nav {
         }
     }
 
-    jumpToNode = (evt: Event) => {
+    _jumpToNode = (evt: Event) => {
         const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (nodeId) {
             S.view.jumpToId(nodeId);
         }
     }
 
-    showUsersList = (evt: Event) => {
-        const node = S.util.getNodeFromEvent(evt);
-        if (!node) return;
-        S.user.showUsersList(node);
-    }
-
-    showNodeUrl = (evt: Event) => {
-        const node = S.util.getNodeFromEvent(evt);
-        if (!node) return;
-        S.render.showNodeUrl(node);
-    }
-
-
-    showReplies = (evt: Event) => {
-        const node = S.util.getNodeFromEvent(evt);
-        if (!node) return;
-        S.srch.showReplies(node);
-    }
-
-    ttsClick = (evt: Event) => {
+    _ttsClick = (evt: Event) => {
         if (getAs().speechSpeaking) {
             S.speech.stopSpeaking();
         }
@@ -643,7 +585,7 @@ export class Nav {
         }
     }
 
-    clickToOpenUserProfile = (evt: Event) => {
+    _clickToOpenUserProfile = (evt: Event) => {
         evt.stopPropagation();
         evt.preventDefault();
         // Note: It's correct that in some places we don't use USER_ID_ATTR, but instead use the
@@ -652,38 +594,20 @@ export class Nav {
         new UserProfileDlg(userId).open();
     }
 
-    clickSearchNode = (evt: Event) => {
+    _clickSearchNode = (evt: Event) => {
         const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         S.srch.clickSearchNode(nodeId);
     }
 
-    searchByNodeIdClick = (evt: Event) => {
-        const nodeId = S.domUtil.getNodeIdFromDom(evt);
-        if (!nodeId) return;
-        this.runSearchByNodeId(nodeId);
-    }
-
-    runTimelineByClick = (evt: Event) => {
-        const nodeId = S.domUtil.getNodeIdFromDom(evt);
-        if (!nodeId) return;
-        this.runTimelineByNodeId(nodeId);
-    }
-
-    openDocViewByClick = (evt: Event) => {
-        const nodeId = S.domUtil.getNodeIdFromDom(evt);
-        if (!nodeId) return;
-        S.srch.showDocument(nodeId, true);
-    }
-
-    copyNodeNameToClipboard = (evt: Event) => {
+    _copyNodeNameToClipboard = (evt: Event) => {
         const node = S.util.getNodeFromEvent(evt);
         if (!node) return;
         const byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
         S.util.copyToClipboard(byNameUrl);
     }
 
-    jumpToTargetIdClick = (evt: Event) => {
+    _jumpToTargetIdClick = (evt: Event) => {
         const node = S.util.getNodeFromEvent(evt);
         if (!node) return;
 

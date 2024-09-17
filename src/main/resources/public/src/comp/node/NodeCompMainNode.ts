@@ -46,7 +46,7 @@ export class NodeCompMainNode extends Div {
         }
 
         this.attribs[C.NODE_ID_ATTR] = ast.node.id;
-        this.attribs.onClick = S.nav.clickTreeNode;
+        this.attribs.onClick = S.nav._clickTreeNode;
         let header: Comp = null;
         let jumpButton: Comp = null;
         const type = S.plugin.getType(ast.node.type);

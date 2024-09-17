@@ -35,7 +35,7 @@ export class Edit {
     showReadOnlyProperties = false;
     helpNewUserEditCalled = false;
 
-    postFromTimeline = () => {
+    _postFromTimeline = () => {
         const ast = getAs();
         if (ast.isAnonUser) {
             S.util.showMessage("Login to create content and reply to nodes.", "Login!");
@@ -46,7 +46,7 @@ export class Edit {
         }
     }
 
-    saveNode = async (node: NodeInfo, returnInlineChildren: boolean) => {
+    async saveNode(node: NodeInfo, returnInlineChildren: boolean) {
         const res = await S.rpcUtil.rpc<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node,
             returnInlineChildren
@@ -72,7 +72,7 @@ export class Edit {
         S.util.notifyNodeUpdated(res.node.id, res.node.type);
     }
 
-    toggleUserExpansion = async (node: NodeInfo) => {
+    async toggleUserExpansion(node: NodeInfo) {
         const res = await S.rpcUtil.rpc<J.SetExpandedRequest, J.SetExpandedResponse>("toggleNodeExpanded", {
             nodeId: node.id
         });
@@ -89,17 +89,17 @@ export class Edit {
         S.util.notifyNodeUpdated(res.node.id, res.node.type);
     }
 
-    editHashtags = async () => {
+    _editHashtags = async () => {
         const dlg = new EditTagsDlg();
         await dlg.open();
     }
 
-    editBlockedWords = async () => {
+    _editBlockedWords = async () => {
         const dlg = new EditBlockedWordsDlg();
         await dlg.open();
     }
 
-    openImportDlg = (): any => {
+    _openImportDlg = (): any => {
         const node = S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -112,7 +112,7 @@ export class Edit {
         dlg.open();
     }
 
-    openExportDlg = async () => {
+    _openExportDlg = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             const dlg = new ExportDlg(node.name, node.id, false);
@@ -121,7 +121,7 @@ export class Edit {
         }
     }
 
-    exportResponse = (res: J.ExportResponse) => {
+    exportResponse(res: J.ExportResponse) {
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
         eventually the plan is to have the export return the actual md5 of the export for use here
         */
@@ -142,10 +142,10 @@ export class Edit {
         }
     }
 
-    private joinNodesResponse = (res: J.JoinNodesResponse): any => {
+    private joinNodesResponse(res: J.JoinNodesResponse): any {
         const ast = getAs();
         if (S.util.checkSuccess("Join node", res)) {
-            S.nodeUtil.clearSelNodes();
+            S.nodeUtil._clearSelNodes();
             S.view.refreshTree({
                 nodeId: ast.node.id,
                 zeroOffset: false,
@@ -159,8 +159,8 @@ export class Edit {
         }
     }
 
-    public initNodeEditResponse = async (res: J.InitNodeEditResponse, encrypt: boolean,
-        showJumpButton: boolean, afterEditJumpToId: string) => {
+    public async initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean,
+        showJumpButton: boolean, afterEditJumpToId: string) {
 
         if (S.util.checkSuccess("Editing node", res)) {
             const editingAllowed = this.isEditAllowed(res.nodeInfo);
@@ -180,7 +180,7 @@ export class Edit {
     }
 
     /* nodeId is optional and represents what to highlight after the paste if anything */
-    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean) => {
+    private moveNodesResponse(res: J.MoveNodesResponse, nodeId: string, pasting: boolean) {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch("SetNodesToMove", s => {
                 s.nodesToMove = null;
@@ -206,7 +206,7 @@ export class Edit {
         }
     }
 
-    private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string) => {
+    private setNodePositionResponse(res: J.SetNodePositionResponse, id: string) {
         if (S.util.checkSuccess("Change node position", res)) {
             S.view.jumpToId(id, true);
 
@@ -215,7 +215,7 @@ export class Edit {
     }
 
     /* returns true if we are admin or else the owner of the node */
-    isEditAllowed = (node: any): boolean => {
+    isEditAllowed(node: any): boolean {
         const ast = getAs();
         if (!node) return false;
         if (ast.isAdminUser) return true;
@@ -230,8 +230,8 @@ export class Edit {
       If `insertAtLoc` is non-null it holds the node whose offset is where the new node will be
       inserted, and this will be an insert inline kind of insert.
     */
-    startEditingNewNode = async (createAtTop: boolean, parentId: string, siblingId: string, insertAtLoc: NodeInfo,
-        ordinalOffset: number, threadViewAiQuestion: boolean) => {
+    async startEditingNewNode(createAtTop: boolean, parentId: string, siblingId: string, insertAtLoc: NodeInfo,
+        ordinalOffset: number, threadViewAiQuestion: boolean) {
         const afterEditJumpToId = createAtTop ? parentId : null;
 
         if (S.util.ctrlKeyCheck()) {
@@ -337,14 +337,14 @@ export class Edit {
         }
     }
 
-    insertNodeResponse = (res: J.InsertNodeResponse) => {
+    insertNodeResponse(res: J.InsertNodeResponse) {
         if (S.util.checkSuccess("Insert node", res)) {
             S.nodeUtil.highlightNode(res.newNode, false, getAs());
             this.runEditNode(null, res.newNode.id, false, false, false, null);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, afterEditJumpToId: string) => {
+    createSubNodeResponse(res: J.CreateSubNodeResponse, afterEditJumpToId: string) {
         if (S.util.checkSuccess("Create subnode", res)) {
             if (!res.newNode) {
                 S.quanta.refresh();
@@ -356,7 +356,7 @@ export class Edit {
         }
     }
 
-    saveNodeResponse = async (node: NodeInfo, res: J.SaveNodeResponse, newNodeTargetId: string, newNodeTargetOffset: number) => {
+    async saveNodeResponse(node: NodeInfo, res: J.SaveNodeResponse, newNodeTargetId: string, newNodeTargetOffset: number) {
         const ast = getAs();
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
@@ -412,7 +412,7 @@ export class Edit {
         }
     }
 
-    injectUpdatedNode = async (node: NodeInfo) => {
+    async injectUpdatedNode(node: NodeInfo) {
         await promiseDispatch("nodeUpdated", s => {
             // if the node is our page parent (page root)
             if (node.id === s.node?.id) {
@@ -426,7 +426,7 @@ export class Edit {
         });
     }
 
-    replaceNodeRecursive = (node: NodeInfo, newNode: NodeInfo): void => {
+    replaceNodeRecursive(node: NodeInfo, newNode: NodeInfo): void {
         if (!node || !node.children) return;
 
         node.children = node.children.map(n => {
@@ -439,7 +439,7 @@ export class Edit {
     // This must insert newNode into the local browser memory. We know newNodeTargetId is a sibling
     // node of newNode, and newNodeTargetOffset is 0 if we're inserting above, and 1 if we're
     // inserting below.
-    injectNewNodeIntoChildren = (newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> => {
+    injectNewNodeIntoChildren(newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): Promise<void> {
         // we return the promise from the dispatch and to not wait for it here.
         return promiseDispatch("InjectNewNodeIntoChildren", s => {
             const parentPath = S.props.getParentPath(newNode);
@@ -451,7 +451,7 @@ export class Edit {
         });
     }
 
-    pushNodeIntoChildren = (node: NodeInfo, newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): void => {
+    pushNodeIntoChildren(node: NodeInfo, newNode: NodeInfo, newNodeTargetId: string, newNodeTargetOffset: number): void {
         if (node.children) {
             const newChildren: NodeInfo[] = [];
 
@@ -531,7 +531,7 @@ export class Edit {
     //     });
     // }
 
-    distributeKeys = async (node: NodeInfo, aclEntries: J.AccessControlInfo[]) => {
+    async distributeKeys(node: NodeInfo, aclEntries: J.AccessControlInfo[]) {
         if (!aclEntries || !S.props.isEncrypted(node)) {
             return;
         }
@@ -541,23 +541,23 @@ export class Edit {
         }
     }
 
-    setRssHeadlinesOnly = async (val: boolean) => {
+    async setRssHeadlinesOnly(val: boolean) {
         S.util.saveUserPrefs(s => s.userPrefs.rssHeadlinesOnly = val);
     }
 
-    setMainPanelCols = (val: number) => {
+    setMainPanelCols(val: number) {
         setTimeout(() => {
             if (val < 4) val = 4;
             if (val > 8) val = 8;
             S.util.saveUserPrefs(s => s.userPrefs.mainPanelCols = val);
         }, 100);
-    };
+    }
 
-    setAiService = (val: string) => {
+    setAiService(val: string) {
         setTimeout(() => {
             S.util.saveUserPrefs(s => s.userPrefs.aiService = val);
         }, 100);
-    };
+    }
 
     // saveTabsTopmostVisibie and scrollTabsTopmostVisible should always be called as a pair
     saveTabsTopmostVisible = async (): Promise<boolean> => {
@@ -616,7 +616,7 @@ export class Edit {
     }
 
     // WARNING: This func is expected to NOT alter that the active tab is!
-    runScrollAffectingOp = async (func: () => void) => {
+    async runScrollAffectingOp(func: () => void) {
         const doScrolling = await this.saveTabsTopmostVisible();
         if (doScrolling) {
             // turn off Comp stuff so it doesn't interfere with what we're about to do with scrolling.
@@ -633,44 +633,32 @@ export class Edit {
     // We allow a function (func) to run here in such a way that the scroll positions of every tab
     // panel are maintained so the user doesn't loose their place after the screen completely
     // updates.
-    setUserPreferenceVal = (mod: StateModFunc) => {
-        this.runScrollAffectingOp(() => {
-            S.util.saveUserPrefs(mod);
-        });
+    setUserPreferenceVal(mod: StateModFunc) {
+        this.runScrollAffectingOp(() => S.util.saveUserPrefs(mod));
     }
 
-    setEditMode = async (val: boolean) => {
+    async setEditMode(val: boolean) {
         this.setUserPreferenceVal(s => s.userPrefs.editMode = val);
     }
 
-    setAiMode = async (val: string) => {
-        this.setUserPreferenceVal(s => {
-            s.userPrefs.aiMode = val;
-        });
+    async setAiMode(val: string) {
+        this.setUserPreferenceVal(s => s.userPrefs.aiMode = val);
     }
 
-    toggleEditMode = async () => {
-        this.setUserPreferenceVal(s => s.userPrefs.editMode = !s.userPrefs.editMode);
-    }
-
-    setShowMetaData = (val: boolean) => {
+    setShowMetaData(val: boolean) {
         this.setUserPreferenceVal(s => s.userPrefs.showMetaData = val);
     }
 
-    toggleShowMetaData = () => {
-        this.setUserPreferenceVal(s => s.userPrefs.showMetaData = !s.userPrefs.showMetaData);
-    }
-
     // #add-prop
-    setAutoRefreshFeed = async (autoRefreshFeed: boolean) => {
+    async setAutoRefreshFeed(autoRefreshFeed: boolean) {
         return S.util.saveUserPrefs(s => s.userPrefs.autoRefreshFeed = autoRefreshFeed);
     }
 
-    setShowComments = async (showReplies: boolean): Promise<void> => {
+    async setShowComments(showReplies: boolean): Promise<void> {
         return S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
     }
 
-    setShowReplies = async (showReplies: boolean) => {
+    async setShowReplies(showReplies: boolean) {
         await S.util.saveUserPrefs(s => s.userPrefs.showReplies = showReplies);
 
         const ast = getAs();
@@ -692,7 +680,7 @@ export class Edit {
         }
     }
 
-    moveNodeUp = async (id: string) => {
+    async moveNodeUp(id: string) {
         const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
             nodeId: id,
             targetName: "up"
@@ -700,7 +688,7 @@ export class Edit {
         this.setNodePositionResponse(res, id);
     }
 
-    moveNodeDown = async (id: string) => {
+    async moveNodeDown(id: string) {
         const res = await S.rpcUtil.rpc<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
             nodeId: id,
             targetName: "down"
@@ -708,21 +696,21 @@ export class Edit {
         this.setNodePositionResponse(res, id);
     }
 
-    moveUp = async () => {
+    _moveUp = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             S.edit.moveNodeUp(node.id);
         }
     }
 
-    moveDown = async () => {
+    _moveDown = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             S.edit.moveNodeDown(node.id);
         }
     }
 
-    moveNodeToTop = async () => {
+    _moveNodeToTop = async () => {
         const selNode = S.nodeUtil.getHighlightedNode();
         const id = selNode?.id;
 
@@ -736,7 +724,7 @@ export class Edit {
         }
     }
 
-    moveNodeToBottom = async () => {
+    _moveNodeToBottom = async () => {
         const selNode = S.nodeUtil.getHighlightedNode();
         const id = selNode?.id;
 
@@ -749,19 +737,19 @@ export class Edit {
         }
     }
 
-    getFirstChildNode = (): any => {
+    getFirstChildNode(): any {
         const ast = getAs();
         if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
         return ast.node.children[0];
     }
 
-    getLastChildNode = (): NodeInfo => {
+    getLastChildNode(): NodeInfo {
         const ast = getAs();
         if (!ast.node || !ast.node.children || ast.node.children.length === 0) return null;
         return ast.node.children[ast.node.children.length - 1];
     }
 
-    checkEditPending = (): boolean => {
+    checkEditPending(): boolean {
         const ast = getAs();
 
         // state.editNode holds non-null always whenever there is editing underway.
@@ -772,7 +760,7 @@ export class Edit {
         return false;
     }
 
-    runEditNodeByClick = async (evt: Event, id: string) => {
+    _runEditNodeByClick = async (evt: Event, id: string) => {
         // This is a hindrance when going down thru a page and editing all the content, so just for
         // this case I'll allow the abandoment of any content being edited, and start editing a new
         // node editing without asking user to confirm.
@@ -786,7 +774,7 @@ export class Edit {
         }
     }
 
-    runEditNodeByClickImmediate = async (evt: Event, id: string) => {
+    async runEditNodeByClickImmediate(evt: Event, id: string) {
         id = S.util.allowIdFromEvent(evt, id);
 
         // we set noScrollToId just to block the future attempt (one time) to
@@ -802,8 +790,8 @@ export class Edit {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = async (overrideContent: string, id: string, encrypt: boolean,
-        showJumpButton: boolean, editMyFriendNode: boolean, afterEditJumpToId: string) => {
+    async runEditNode(overrideContent: string, id: string, encrypt: boolean,
+        showJumpButton: boolean, editMyFriendNode: boolean, afterEditJumpToId: string) {
         if (S.quanta.config.requireCrypto && !S.crypto.avail) {
             S.util.showMessage("Crypto support not available", "Warning");
             return;
@@ -834,7 +822,7 @@ export class Edit {
     }
 
     /* Inserts a new node as a sibling of 'id' and at id's ordinal + 'ordinalOffset' */
-    insertNode = (id: string, ordinalOffset: number, ast?: AppState) => {
+    async insertNode(id: string, ordinalOffset: number, ast?: AppState) {
         if (this.checkEditPending()) return;
 
         /*
@@ -853,14 +841,14 @@ export class Edit {
         }
     }
 
-    askAiFromThreadView = async (evt: Event, id: string) => {
+    _askAiFromThreadView = async (evt: Event, id: string) => {
         if (this.checkEditPending()) return;
         id = S.util.allowIdFromEvent(evt, id);
         const ast = getAs();
         this.startEditingNewNode(true, id || ast.node.id, null, null, 0, true);
     }
 
-    newSubNode = async (evt: Event, id: string) => {
+    _newSubNode = async (evt: Event, id: string) => {
         if (this.checkEditPending()) return;
 
         id = S.util.allowIdFromEvent(evt, id);
@@ -875,9 +863,9 @@ export class Edit {
         }
     }
 
-    clearInbox = async () => {
+    async clearInbox() {
         const ast = getAs();
-        S.nodeUtil.clearSelNodes();
+        S.nodeUtil._clearSelNodes();
 
         const dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
             "btn-danger", "alert alert-danger");
@@ -894,7 +882,7 @@ export class Edit {
         }
     }
 
-    subGraphHash = async () => {
+    _subGraphHash = async () => {
         const node = S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -917,7 +905,7 @@ export class Edit {
         S.util.showMessage("Request sumitted. Check the node for property " + J.NodeProp.SUBGRAPH_HASH);
     }
 
-    joinNodes = async (joinToParent: boolean = false) => {
+    async joinNodes(joinToParent: boolean = false) {
         const selNodesArray = S.nodeUtil.getSelNodeIdsArray();
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to " + (joinToParent ? "append" : "join") + ".", "Warning");
@@ -939,7 +927,7 @@ export class Edit {
     /*
     * Deletes all nodes owned by you but NOT rooted in your own account root.
     */
-    bulkDelete = async () => {
+    _bulkDelete = async () => {
         const confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
         const dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
             "btn-danger", "alert alert-danger");
@@ -958,7 +946,7 @@ export class Edit {
 
     // clears selections before deleting so only the id passed or the id on the event can be
     // deleted. This is because non-tree views don't have the checkbox for even multiselecting
-    deleteOneNode = async (evt: Event = null, id: string = null) => {
+    _deleteOneNode = async (evt: Event = null, id: string = null) => {
         // if fullscreen (Graph or Calendar) is active, we must delete immediately rather than the normal flow of showing a confirmation on the node first.
         if (S.util.fullscreenViewerActive()) {
             S.edit.immediateDeleteSelNodes([id]);
@@ -970,14 +958,14 @@ export class Edit {
         });
 
         // now we can run this method and we know it will only delete one node.
-        this.deleteSelNodes(evt, id);
+        this._deleteSelNodes(evt, id);
     }
 
     /*
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever
      * the user has currenly selected (via checkboxes)
      */
-    deleteSelNodes = async (evt: Event = null, id: string = null) => {
+    _deleteSelNodes = async (evt: Event = null, id: string = null) => {
         id = S.util.allowIdFromEvent(evt, id);
 
         // if a nodeId was specified we use it as the selected node to delete
@@ -1014,7 +1002,7 @@ export class Edit {
         }
     }
 
-    afterDeleteCleanup = (selNodesArray: string[]) => {
+    afterDeleteCleanup(selNodesArray: string[]) {
         dispatch("AfterDeleteCleanup", s => {
             // remove this node from all data from all the tabs, so they all refresh without
             // the deleted node without being queries from the server again.
@@ -1025,7 +1013,7 @@ export class Edit {
         });
     }
 
-    removeNodesFromCalendarData = (selNodesArray: string[]) => {
+    removeNodesFromCalendarData(selNodesArray: string[]) {
         dispatch("UpdateCalendarData", s => {
             selNodesArray.forEach(id => {
                 if (!s.calendarData) return;
@@ -1034,13 +1022,13 @@ export class Edit {
         });
     }
 
-    setUsingJson = () => {
+    _setUsingJson = () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node)
             new SetNodeUsingJsonDlg(node.id).open();
     }
 
-    undoCutSelNodes = () => {
+    _undoCutSelNodes = () => {
         dispatch("SetNodesToMove", s => {
             s.nodesToMove = null;
             s.cutCopyOp = null;
@@ -1076,13 +1064,13 @@ export class Edit {
         });
     }
 
-    pasteSelNodesInside = (evt: Event, id: string) => {
+    _pasteSelNodesInside = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         const ast = getAs();
         this.pasteSelNodes(id, "inside", ast);
     }
 
-    pasteSelNodes = async (nodeId: string, location: string, ast?: AppState) => {
+    async pasteSelNodes(nodeId: string, location: string, ast?: AppState) {
         ast = ast || getAs();
         console.log("action nodesToMove: " + S.util.prettyPrint(ast.nodesToMove));
 
@@ -1101,17 +1089,17 @@ export class Edit {
         this.moveNodesResponse(res, nodeId, true);
     }
 
-    pasteSelNodes_InlineAbove = (evt: Event, id: string) => {
+    _pasteSelNodes_InlineAbove = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         this.pasteSelNodes(id, "inline-above");
     }
 
-    pasteSelNodes_Inline = (evt: Event, id: string) => {
+    _pasteSelNodes_Inline = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         this.pasteSelNodes(id, "inline");
     }
 
-    askAiQuestion = async (node: J.NodeInfo) => {
+    async askAiQuestion(node: J.NodeInfo) {
         const ast = getAs();
 
         // First check for inconsistency about what the user's intention might be. Writing Mode uses query template, and non-writing mode uses
@@ -1192,7 +1180,7 @@ export class Edit {
         }
     }
 
-    importJson = async (nodeId: string, type: string) => {
+    async importJson(nodeId: string, type: string) {
         const res = await S.rpcUtil.rpc<J.ImportJsonRequest, J.ImportJsonResponse>("importJson", {
             nodeId,
             type
@@ -1202,22 +1190,22 @@ export class Edit {
         }
     }
 
-    askQuestionAboutSubGraph = async (nodeId: string) => {
+    async askQuestionAboutSubGraph(nodeId: string) {
         const dlg = new AskAboutSubgraphDlg(nodeId);
         await dlg.open();
     }
 
-    generateBookByAI = async (node: NodeInfo) => {
+    async generateBookByAI(node: NodeInfo) {
         const dlg = new GenerateBookByAIDlg(node);
         await dlg.open();
-    };
+    }
 
-    configureAgent = async (node: NodeInfo) => {
+    async configureAgent(node: NodeInfo) {
         const dlg = new ConfigureAgentDlg(node);
         await dlg.open();
-    };
+    }
 
-    saveClipboardToChildNode = async (parentId: string, msg: string) => {
+    async saveClipboardToChildNode(parentId: string, msg: string) {
         let clipText: string = await (navigator as any)?.clipboard?.readText();
         if (clipText) {
             clipText = clipText.trim();
@@ -1266,7 +1254,7 @@ export class Edit {
         }
     }
 
-    splitNode = async (node: NodeInfo, splitType: string, delimiter: string) => {
+    async splitNode(node: NodeInfo, splitType: string, delimiter: string) {
         node = node || S.nodeUtil.getHighlightedNode();
 
         if (!node) {
@@ -1283,7 +1271,7 @@ export class Edit {
         this.splitNodeResponse(res);
     }
 
-    splitNodeResponse = (res: J.SplitNodeResponse) => {
+    splitNodeResponse(res: J.SplitNodeResponse) {
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree({
                 nodeId: null,
@@ -1299,14 +1287,14 @@ export class Edit {
         }
     }
 
-    addBookmark = () => {
+    _addBookmark = () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             this.createNode(node, J.NodeType.BOOKMARK, true, null);
         }
     }
 
-    addLinkBookmark = async (content: any, audioUrl: string) => {
+    async addLinkBookmark(content: any, audioUrl: string) {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId: null,
@@ -1327,7 +1315,7 @@ export class Edit {
     }
 
     // like==false means 'unlike'
-    likeNode = async (node: NodeInfo, like: boolean) => {
+    async likeNode(node: NodeInfo, like: boolean) {
         await S.rpcUtil.rpc<J.LikeNodeRequest, J.LikeNodeResponse>("likeNode", {
             id: node.id,
             like
@@ -1347,7 +1335,7 @@ export class Edit {
         });
     }
 
-    addNode = async (nodeId: string, typeName: string, content: string, shareToUserId: string) => {
+    async addNode(nodeId: string, typeName: string, content: string, shareToUserId: string) {
 
         // auto-enable edit mode
         if (!getAs().userPrefs.editMode) {
@@ -1373,8 +1361,8 @@ export class Edit {
         this.createSubNodeResponse(res, null);
     }
 
-    createNode = async (node: NodeInfo, typeName: string,
-        pendingEdit: boolean, content: string) => {
+    async createNode(node: NodeInfo, typeName: string,
+        pendingEdit: boolean, content: string) {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
@@ -1404,7 +1392,7 @@ export class Edit {
         }, 1000);
     }
 
-    addCalendarEntry = async (initDate: number) => {
+    async addCalendarEntry(initDate: number) {
         const res = await S.rpcUtil.rpc<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: getAs().fullScreenConfig.nodeId,
@@ -1424,7 +1412,7 @@ export class Edit {
         this.createSubNodeResponse(res, null);
     }
 
-    linkNodes = async (sourceNodeId: string, targetNodeId: string, link: J.NodeLink, type: string) => {
+    async linkNodes(sourceNodeId: string, targetNodeId: string, link: J.NodeLink, type: string) {
         if (targetNodeId === sourceNodeId) {
             return;
         }
@@ -1451,7 +1439,7 @@ export class Edit {
         }
     }
 
-    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string) => {
+    async moveNodeByDrop(targetNodeId: string, sourceNodeId: string, location: string) {
         /* if node being dropped on itself, then ignore */
         if (!sourceNodeId || targetNodeId === sourceNodeId) {
             return;
@@ -1494,7 +1482,7 @@ export class Edit {
         }
     }
 
-    setHeadings = async () => {
+    _setHeadings = async () => {
         const node = S.nodeUtil.getHighlightedNode();
         if (node) {
             await S.rpcUtil.rpc<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
@@ -1507,7 +1495,7 @@ export class Edit {
     /*
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
-    editNodeSharing = async (node: NodeInfo) => {
+    async editNodeSharing(node: NodeInfo) {
         node = node || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -1524,7 +1512,7 @@ export class Edit {
    so that only the other person who this node is shared to can use their private key to decrypt the
    key to the data, to view the node.
    */
-    addCipherKeyToNode = async (node: NodeInfo, principalPublicKeyStr: string, principalNodeId: string) => {
+    async addCipherKeyToNode(node: NodeInfo, principalPublicKeyStr: string, principalNodeId: string) {
         if (principalNodeId === PrincipalName.PUBLIC || !S.crypto.avail) {
             console.warn("public node has encryption turned on. This is a bug.");
             return;
@@ -1559,18 +1547,18 @@ export class Edit {
         });
     }
 
-    updateNode = (node: NodeInfo) => {
+    updateNode(node: NodeInfo) {
         dispatch("UpdateNode", s => s.editNode = node);
     }
 
-    helpNewUserEdit = () => {
+    helpNewUserEdit() {
         const ast = getAs();
         if (this.helpNewUserEditCalled) return;
         this.helpNewUserEditCalled = true;
         if (ast.userPrefs.editMode && ast.userPrefs.showMetaData) return;
 
         setTimeout(() => {
-            S.edit.setUserPreferenceVal(s => {
+            this.setUserPreferenceVal(s => {
                 S.nav.changeMenuExpansion(s, "expand", C.OPTIONS_MENU_TEXT);
                 s.userPrefs.editMode = true;
                 s.userPrefs.showMetaData = true;
@@ -1579,7 +1567,7 @@ export class Edit {
     }
 
     /* WARNING: despite the name this only refreshes attachments and links */
-    refreshFromServer = async (node: NodeInfo) => {
+    async refreshFromServer(node: NodeInfo) {
         const res = await S.rpcUtil.rpc<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: node.id,
             upLevel: false,
@@ -1598,7 +1586,7 @@ export class Edit {
         }
     }
 
-    public endDelete = async () => {
+    public _endDelete = async () => {
         dispatch("DeleteComplete", s => {
             s.nodeClickedToDel = null;
             s.nodesToDel = null;
@@ -1606,7 +1594,7 @@ export class Edit {
         });
     }
 
-    public immediateDeleteSelNodes = async (nodesToDel: string[] = null) => {
+    public async immediateDeleteSelNodes(nodesToDel: string[] = null) {
         const ast = getAs();
         nodesToDel = nodesToDel || ast.nodesToDel;
 
@@ -1670,7 +1658,7 @@ export class Edit {
                 }
             }
             else if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {
-                S.nav.navToMyAccntRoot();
+                S.nav._navToMyAccntRoot();
             }
             else if (ast.activeTab === C.TAB_MAIN && ast.node.children.length === 0) {
                 S.view.jumpToId(ast.node.id);
@@ -1681,13 +1669,13 @@ export class Edit {
         }
     }
 
-    recursiveDelete = (nodesToDel: string[], node: NodeInfo) => {
+    recursiveDelete(nodesToDel: string[], node: NodeInfo) {
         if (node == null || !node.children) return;
         node.children = node.children.filter(child => !nodesToDel.find(id => id === child?.id));
         node.children.forEach(child => this.recursiveDelete(nodesToDel, child));
     }
 
-    replyToNode = (evt: Event) => {
+    _replyToNode = (evt: Event) => {
         const ast = getAs();
         if (ast.isAnonUser) {
             S.util.showMessage("Login to create content and reply to nodes.", "Login!");
@@ -1727,7 +1715,7 @@ export class Edit {
         });
     }
 
-    linkNodesClick = () => {
+    _linkNodesClick = () => {
         dispatch("setLinkSourceNodeId", s => {
             const node = S.nodeUtil.getHighlightedNode();
             if (node) {

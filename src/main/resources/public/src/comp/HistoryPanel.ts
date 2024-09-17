@@ -34,7 +34,7 @@ export class HistoryPanel extends Div {
             new Span("History", { className: "historyPanelTitle" }),
             new Span("Clear", {
                 className: "clickable",
-                onClick: S.histUtil.clearHistory
+                onClick: S.histUtil._clearHistory
             }),
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: HistoryPanel._historyLockChanged,

@@ -51,7 +51,7 @@ export class FriendsTableRow extends ListBoxRow {
                     new Div(null, {
                         className: "friendListImgDiv centerChild",
                         [C.USER_ID_ATTR]: this.friend.userNodeId,
-                        onClick: S.nav.clickToOpenUserProfile,
+                        onClick: S.nav._clickToOpenUserProfile,
                         title: "Click for Profile"
                     }, [
                         src ? new Img({
@@ -64,7 +64,7 @@ export class FriendsTableRow extends ListBoxRow {
                 new Div(null, {
                     className: "marginLeft marginTop",
                     [C.USER_ID_ATTR]: this.friend.userNodeId,
-                    onClick: S.nav.clickToOpenUserProfile,
+                    onClick: S.nav._clickToOpenUserProfile,
                     title: "Click for Profile"
                 }, [
                     this.friend.displayName ? new Div(this.friend.displayName, { className: "friendName" }) : null,

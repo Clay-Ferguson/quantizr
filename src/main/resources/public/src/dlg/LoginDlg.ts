@@ -25,19 +25,19 @@ export class LoginDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, { c: "LoginContainerDiv" }, [
-                new TextField({ label: "User", enter: this.login, val: this.userState }),
-                new TextField({ label: "Password", inputType: "password", enter: this.login, val: this.pwdState }),
+                new TextField({ label: "User", enter: this._login, val: this.userState }),
+                new TextField({ label: "Password", inputType: "password", enter: this._login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [
-                    new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword }),
+                    new Span("Reset Password", { className: "clickable float-end", onClick: this._resetPassword }),
                     new Clearfix()
                 ])
             ]),
             new ButtonBar([
-                new Button("Login", this.login, null, "btn-primary ui-login"),
+                new Button("Login", this._login, null, "btn-primary ui-login"),
                 new Button("Signup", S.user.userSignup),
                 new Button("Close", () => {
                     this.close();
-                    S.util.loadAnonPageHome();
+                    S.util._loadAnonPageHome();
                 }, null, "btn-secondary float-end")
             ], "marginTop")
         ];
@@ -51,7 +51,7 @@ export class LoginDlg extends DialogBase {
         this.pwdState.setValue(pwd);
     }
 
-    login = async () => {
+    _login = async () => {
         let usr = this.userState.getValue();
 
         /* The word admin is not a secret so let's make it easy for the admin to login using only
@@ -102,7 +102,7 @@ export class LoginDlg extends DialogBase {
         }
     }
 
-    resetPassword = async (): Promise<any> => {
+    _resetPassword = async (): Promise<any> => {
         const usr = this.userState.getValue();
         const dlg = new ConfirmDlg("Reset your password ?", "Confirm");
         await dlg.open();

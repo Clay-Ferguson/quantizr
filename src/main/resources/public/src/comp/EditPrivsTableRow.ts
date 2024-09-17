@@ -57,7 +57,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                             className: "friendListImage",
                             src,
                             [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
-                            onClick: S.nav.clickToOpenUserProfile
+                            onClick: S.nav._clickToOpenUserProfile
                         }) : null
                     ]) : null,
                     isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
@@ -72,11 +72,11 @@ export class EditPrivsTableRow extends ListBoxRow {
                         : new Div(displayName, {
                             className: "friendName",
                             [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
-                            onClick: S.nav.clickToOpenUserProfile
+                            onClick: S.nav._clickToOpenUserProfile
                         }),
                     isPublic ? null : new Div(userNameDisp, {
                         [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
-                        onClick: S.nav.clickToOpenUserProfile
+                        onClick: S.nav._clickToOpenUserProfile
                     })
                 ])
             ])

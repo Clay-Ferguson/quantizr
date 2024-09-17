@@ -43,7 +43,7 @@ export class FriendsDlg extends DialogBase {
             FriendsDlg.dirtyCounter++;
             if (FriendsDlg.dirtyCounter >= 2) {
                 FriendsDlg.searchDirty = false;
-                setTimeout(FriendsDlg.inst.userSearch, 10);
+                setTimeout(FriendsDlg.inst._userSearch, 10);
             }
         }
     }, 500);
@@ -128,7 +128,7 @@ export class FriendsDlg extends DialogBase {
                 null, "friendsTagPickerOnEditor alignBottom", {
                 setValue: (val: string) => {
                     this.friendsTagSearch = val;
-                    this.userSearch();
+                    this._userSearch();
                 },
                 getValue: (): string => this.friendsTagSearch
             });
@@ -159,7 +159,7 @@ export class FriendsDlg extends DialogBase {
                         labelClass: "txtFieldLabelShort",
                         val: this.searchTextState,
                         placeholder: "Search for...",
-                        enter: this.userSearch,
+                        enter: this._userSearch,
                         outterClass: "friendSearchField"
                     })),
 
@@ -179,10 +179,10 @@ export class FriendsDlg extends DialogBase {
                 state.friends?.length > 1 ? new Clearfix() : null,
                 !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
-                    !this.displayOnly && !this.nodeId ? new Button("Ok", this.save, null, "btn-primary") : null,
-                    !this.displayOnly ? new Button("Import", this.import) : null,
-                    state.friends?.length > 0 ? new Button("Export", this.export) : null,
-                    new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
+                    !this.displayOnly && !this.nodeId ? new Button("Ok", this._save, null, "btn-primary") : null,
+                    !this.displayOnly ? new Button("Import", this._import) : null,
+                    state.friends?.length > 0 ? new Button("Export", this._export) : null,
+                    new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this._cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
@@ -190,7 +190,7 @@ export class FriendsDlg extends DialogBase {
         return ret;
     }
 
-    export = () => {
+    _export = () => {
         const hostAndPort: string = S.util.getHostAndPort();
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
         eventually the plan is to have the export return the actual md5 of the export for use here
@@ -210,13 +210,13 @@ export class FriendsDlg extends DialogBase {
     }
 
 
-    import = async () => {
+    _import = async () => {
         const dlg = new MultiFollowDlg();
         await dlg.open();
         this.preLoad();
     }
 
-    setSelectAllPersons = (state: LS, selectAll: boolean) => {
+    setSelectAllPersons(state: LS, selectAll: boolean) {
         state.selections = new Set<string>()
 
         // note: if !selectAll we set empty selections, and this is correct.
@@ -237,27 +237,27 @@ export class FriendsDlg extends DialogBase {
         }
     }
 
-    userSearch = () => {
+    _userSearch = () => {
         this.mergeState<LS>({});
         // warning: keep the fat arrow function here.
         setTimeout(() => this.searchTextField.focus(), 50);
     }
 
-    cancel = () => {
+    _cancel = () => {
         this.mergeState<LS>({
             selections: new Set<string>()
         });
         this.close();
     }
 
-    friendMatchesString = (friend: J.FriendInfo, text: string) => {
+    friendMatchesString(friend: J.FriendInfo, text: string) {
         const ret = (friend.displayName && friend.displayName.toLowerCase().indexOf(text) !== -1) || //
             (friend.userName && friend.userName.toLowerCase().indexOf(text) !== -1) || //
             (friend.tags && friend.tags.toLowerCase().indexOf(text) !== -1);
         return ret;
     }
 
-    save = () => {
+    _save = () => {
         const usersText = this.userNameState.getValue();
         if (usersText) {
             const users: string[] = usersText.split(",");

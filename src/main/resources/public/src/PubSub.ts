@@ -16,7 +16,7 @@ export class PubSub {
 
     private static lastFires: any = {};
 
-    static pub = (name: string, ...args: any[]) => {
+    static pub(name: string, ...args: any[]) {
         if (PubSub.registry[name]) {
             PubSub.lastFires[name] = args;
             PubSub.registry[name].forEach((fn: (...args: any[]) => void) => fn(...args));
@@ -36,7 +36,7 @@ export class PubSub {
     /* 'retro=true' means that at the time we subscribe if an event of that type
     had already been published, then we refire it with the arguments it had last time it fired
     */
-    static sub = (name: string, fn: (payload: any) => void, retro: boolean = true) => {
+    static sub(name: string, fn: (payload: any) => void, retro: boolean = true) {
         if (retro && PubSub.lastFires[name]) {
             fn.apply(null, PubSub.lastFires[name]);
         }
@@ -49,7 +49,7 @@ export class PubSub {
     }
 
     /* Subscribe a fire-and-forget event in a way that multiple things can subscribe */
-    static subOnce = (name: string, fn: (payload: any) => void) => {
+    static subOnce(name: string, fn: (payload: any) => void) {
         if (!PubSub.registryOnce[name]) {
             PubSub.registryOnce[name] = [fn];
         } else {
@@ -58,7 +58,7 @@ export class PubSub {
     }
 
     /* Subscribe a fire-and-forget event in a way that ONE function can subscribe (last subscription wins) */
-    static subSingleOnce = (name: string, fn: (payload: any) => void) => {
+    static subSingleOnce(name: string, fn: (payload: any) => void) {
         PubSub.registrySingleOnce[name] = fn;
     }
 }

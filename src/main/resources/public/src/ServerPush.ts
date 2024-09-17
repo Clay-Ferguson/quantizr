@@ -14,14 +14,14 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 export class ServerPush {
     eventSource: EventSource;
 
-    close = (): any => {
+    close(): any {
         if (this.eventSource) {
             this.eventSource.close();
             this.eventSource = null;
         }
     }
 
-    init = (authToken: string): any => {
+    init(authToken: string): any {
         // if already initialized do nothing
         if (this.eventSource || !authToken) return;
 
@@ -112,7 +112,7 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: NodeInfo) => {
+    forceFeedItem(nodeInfo: NodeInfo) {
         if (!nodeInfo) return;
         FeedTab.inst.props.results = FeedTab.inst.props.results || [];
 
@@ -132,7 +132,7 @@ export class ServerPush {
         }
     }
 
-    nodePushed = (nodeInfo: NodeInfo) => {
+    nodePushed(nodeInfo: NodeInfo) {
         if (!nodeInfo || (!TimelineTab.inst && !FeedTab.inst)) return;
 
         if (S.props.isEncrypted(nodeInfo)) {
@@ -164,7 +164,7 @@ export class ServerPush {
         }
     }
 
-    pushToLiveTab = (node: NodeInfo, inst: TabBase) => {
+    pushToLiveTab(node: NodeInfo, inst: TabBase) {
         if (!inst) return;
         inst.props.results = inst.props.results || [];
         const idx = inst.props.results.findIndex(item => item.id === node.id);

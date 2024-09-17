@@ -45,7 +45,7 @@ export class FullScreenControlBar extends Div {
             if (!onFirst) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: S.nav.prevFullScreenImgViewer,
+                        onClick: S.nav._prevFullScreenImgViewer,
                         title: "View Previous Attachment"
                     }, "btn-primary", "off"));
             }
@@ -53,7 +53,7 @@ export class FullScreenControlBar extends Div {
             if (!onLast) {
                 buttons.push(
                     new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: S.nav.nextFullScreenImgViewer,
+                        onClick: S.nav._nextFullScreenImgViewer,
                         title: "View Next Attachment"
                     }, "btn-primary", "off"));
             }
@@ -84,14 +84,14 @@ export class FullScreenControlBar extends Div {
 
             buttons.push(
                 new IconButton("fa-window-minimize fa-lg", null, {
-                    onClick: S.nav.minimizeFullScreenViewer,
+                    onClick: S.nav._minimizeFullScreenViewer,
                     title: "Minimize Graph"
                 }, "btn-primary", "off"));
         }
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", null, {
-                onClick: S.nav.closeFullScreenViewer,
+                onClick: S.nav._closeFullScreenViewer,
                 title: "Close Viewer (ESC Key)"
             }, "btn-primary", "off"));
 

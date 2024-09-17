@@ -42,7 +42,7 @@ export class EditAttachmentsPanel extends Div {
                     onClick: () => this.dlg.utl.cutUploads(),
                     title: "Cut selected Attachments"
                 }) : null,
-                ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil.clearCut, { className: "clickable marginLeft" }) : null,
+                ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil._clearCut, { className: "clickable marginLeft" }) : null,
                 ast.cutAttachmentsFromId && ast.editNode.id != ast.cutAttachmentsFromId ? //
                     new Button("Paste", () => S.nodeUtil.paste(this.dlg), {
                         className: "clickable marginLeft"

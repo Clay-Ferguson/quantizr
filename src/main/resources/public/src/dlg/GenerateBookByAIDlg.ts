@@ -51,14 +51,14 @@ export class GenerateBookByAIDlg extends DialogBase {
                     })
                 ]),
                 new ButtonBar([
-                    new Button("Generate", this.generate, null, "btn-primary"),
+                    new Button("Generate", this._generate, null, "btn-primary"),
                     new Button("Cancel", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    generate = async () => {
+    _generate = async () => {
         const numChapters = parseInt(GenerateBookByAIDlg.numChapters.getValue());
         if (numChapters < 1 || numChapters > 100) {
             alert("Too many chapters. Max allowed is 100.");

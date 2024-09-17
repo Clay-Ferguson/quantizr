@@ -15,32 +15,32 @@ export class HistoryUtil {
     historyDirty = false;
     static NODEHISTORY_KEY = "NodeHistoryData";
 
-    loadHistoryData = async () => {
+    async loadHistoryData() {
         const val: IndexedDBObj = await S.localDB.readObject(HistoryUtil.NODEHISTORY_KEY);
         if (val) {
             dispatch("loadHistoryData", s => s.nodeHistory = val.v);
         }
     }
 
-    clearHistory = async () => {
+    _clearHistory = async () => {
         dispatch("clearHistoryData", s => s.nodeHistory = []);
         await S.localDB.setVal(HistoryUtil.NODEHISTORY_KEY, []);
         this.historyDirty = false;
     }
 
-    historySaverFunc = async () => {
+    _historySaverFunc = async () => {
         if (!this.historyDirty) return;
         await S.localDB.setVal(HistoryUtil.NODEHISTORY_KEY, getAs().nodeHistory);
         this.historyDirty = false;
     }
 
-    initHistorySaver = () => {
+    initHistorySaver() {
         // if already initialized return
         if (this.historySaverInterval) return;
-        this.historySaverInterval = setInterval(this.historySaverFunc, 5000);
+        this.historySaverInterval = setInterval(this._historySaverFunc, 5000);
     }
 
-    updateHistoryById = (nodeId: string, view: string) => {
+    updateHistoryById(nodeId: string, view: string) {
         let url = window.location.origin + "?id=" + nodeId;
         if (view) {
             url += "&view=" + view;
@@ -51,7 +51,7 @@ export class HistoryUtil {
         history.pushState(newHistObj, "Open View", url);
     }
 
-    updateHistory = (node: NodeInfo) => {
+    updateHistory(node: NodeInfo) {
         if (!node) {
             node = getAs().node;
         }
@@ -97,7 +97,7 @@ export class HistoryUtil {
     // If 'addLater=true' this means we can't alter state right now, because it could destroy text
     // the user is tempting to 'mouse select' and so we just get ready to add to history the next
     // chance we get.
-    updateNodeHistory = (node: NodeInfo, addLater: boolean) => {
+    updateNodeHistory(node: NodeInfo, addLater: boolean) {
         if (!node || !node.id || getAs().nodeHistoryLocked ||
             S.props.getClientPropStr(J.NodeProp.IN_PENDING_PATH, node)) {
             return;
@@ -116,7 +116,7 @@ export class HistoryUtil {
     }
 
     /* Updates 'nodeHistory' when nodes are deleted */
-    removeNodesFromHistory = (selNodesArray: string[]) => {
+    removeNodesFromHistory(selNodesArray: string[]) {
         if (!selNodesArray) return;
         dispatch("removeNodesFromHistory", s => {
             selNodesArray.forEach(id => {

@@ -82,14 +82,14 @@ export class ExportDlg extends DialogBase {
         }));
 
         children.push(new ButtonBar([
-            new Button("Export", this.exportNodes, null, "btn-primary"),
+            new Button("Export", this._exportNodes, null, "btn-primary"),
             new Button("Close", this._close, null, "btn-secondary float-end")
         ], "marginTop"));
 
         return children;
     }
 
-    contentTypeOptions = (): Div => {
+    contentTypeOptions(): Div {
         return new Div(null, { className: "bigMarginBottom" }, [
 
             new Heading(5, "Content Type", { className: "bigMarginTop" }),
@@ -103,7 +103,7 @@ export class ExportDlg extends DialogBase {
         ]);
     }
 
-    contentTypeRadioButton = (name: string, exportType: string) => {
+    contentTypeRadioButton(name: string, exportType: string) {
         return new Span(null, null, [
             new RadioButton(name, false, "contentTypeGroup", null, {
                 setValue: (checked: boolean) => {
@@ -116,7 +116,7 @@ export class ExportDlg extends DialogBase {
         ]);
     }
 
-    makeFileTypeRadioBtn = (name: string, exportType: string) => {
+    makeFileTypeRadioBtn(name: string, exportType: string) {
         return new Span(null, null, [
             new RadioButton(name, false, "exportTypeGroup", null, {
                 setValue: (checked: boolean) => {
@@ -129,7 +129,7 @@ export class ExportDlg extends DialogBase {
         ]);
     }
 
-    exportNodes = async () => {
+    _exportNodes = async () => {
         const ast = getAs();
         if (this.exportingThread) {
             this.res = await S.rpcUtil.rpc<J.ExportRequest, J.ExportResponse>("export", {

@@ -27,14 +27,14 @@ import { AIQueryType } from "./plugins/AIQueryType";
 export class PluginMgr {
     private types: Map<string, TypeIntf> = new Map<string, TypeIntf>();
 
-    addType = (_ordinal: number, type: TypeIntf) => {
+    addType(_ordinal: number, type: TypeIntf) {
         if (this.types.get(type.getTypeName())) {
             throw new Error("duplicate type handler: " + type.getTypeName());
         }
         this.types.set(type.getTypeName(), type);
     }
 
-    getType = (typeName: string): TypeIntf => {
+    getType(typeName: string): TypeIntf {
         const type = this.types.get(typeName);
         if (!type) {
             console.warn("No type handler for: " + typeName);
@@ -42,11 +42,11 @@ export class PluginMgr {
         return type;
     }
 
-    getAllTypes = (): Map<string, TypeIntf> => {
+    getAllTypes(): Map<string, TypeIntf> {
         return this.types;
     }
 
-    getOrderedTypesArray = (recentOnly: boolean): TypeIntf[] => {
+    getOrderedTypesArray(recentOnly: boolean): TypeIntf[] {
         const ast = getAs();
         const ret: TypeIntf[] = [];
         const recentTypes = recentOnly ? ast.userProfile.recentTypes?.split(",") : null;
@@ -59,7 +59,7 @@ export class PluginMgr {
         return ret;
     }
 
-    initPlugins = () => {
+    initPlugins() {
         console.log("initPlugins()");
 
         let ordinal = 0;
@@ -90,7 +90,7 @@ export class PluginMgr {
         this.addSchemaOrgTypes(ordinal);
     }
 
-    addSchemaOrgTypes = async (ordinal: number) => {
+    async addSchemaOrgTypes(ordinal: number) {
         const res = await S.rpcUtil.rpc<J.GetSchemaOrgTypesRequest, J.GetSchemaOrgTypesResponse>("getSchemaOrgTypes");
         res.classes.forEach(soc => {
             const type = new SchemaOrgType(soc.id, soc.label);

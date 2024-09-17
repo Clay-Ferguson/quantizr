@@ -131,7 +131,7 @@ export class UserProfileDlg extends DialogBase {
 
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Settings", () => {
                         this.close();
-                        S.nav.showUserSettings();
+                        S.nav._showUserSettings();
                     }),
                     !this.readOnly ? new Button("Logout", S.user.logout) : null,
 

@@ -60,7 +60,7 @@ export class NodeCompRowHeader extends Div {
                 className: (this.node.transferFromId ? "transferPending" : (isMine ? "createdByMe" : "createdByOther")),
                 title: "Show Profile:\n\n" + this.node.owner,
                 [C.USER_ID_ATTR]: this.node.ownerId,
-                onClick: S.nav.clickToOpenUserProfile
+                onClick: S.nav._clickToOpenUserProfile
             }));
         }
 
@@ -82,7 +82,7 @@ export class NodeCompRowHeader extends Div {
                 title: "Reply to this Post",
                 className: "fa fa-reply fa-lg rowHeaderIcon",
                 [C.NODE_ID_ATTR]: this.node.id,
-                onClick: S.edit.replyToNode
+                onClick: S.edit._replyToNode
             }
             children.push(new Icon(iconProps));
         }
@@ -110,7 +110,7 @@ export class NodeCompRowHeader extends Div {
                             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                             onMouseOut: () => { S.quanta.selectedForTts = null; },
                             [C.DOM_ID_ATTR]: this._getContentDomId(),
-                            onClick: S.nav.ttsClick
+                            onClick: S.nav._ttsClick
                         }));
                     }
                 }
@@ -124,7 +124,7 @@ export class NodeCompRowHeader extends Div {
                     title: "Jump To Node",
                     className: "fa fa-arrow-right fa-lg rowHeaderIcon",
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.clickSearchNode
+                    onClick: S.nav._clickSearchNode
                 }));
             }
         }
@@ -171,7 +171,7 @@ export class NodeCompRowHeader extends Div {
                     className: "nodeNameDisp",
                     title: "Node name (Click to copy link to clipboard)",
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.copyNodeNameToClipboard
+                    onClick: S.nav._copyNodeNameToClipboard
                 }));
             }
         }
@@ -245,14 +245,14 @@ export class NodeCompRowHeader extends Div {
 
             let editButton = null;
             if (this.tabData.id !== C.TAB_MAIN && editingAllowed && editableNode) {
-                editButton = new Button(null, S.edit.runEditNodeByClick, {
+                editButton = new Button(null, S.edit._runEditNodeByClick, {
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id
                 }, "btn-secondary ui-edit-node", "fa-edit");
             }
 
             if (this.tabData.id == C.TAB_DOCUMENT && insertAllowed && editInsertAllowed) {
-                children.push(new Button(null, S.edit.newSubNode, {
+                children.push(new Button(null, S.edit._newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"
                 }, "btn-secondary ui-new-node-plus", "fa-plus"));
@@ -288,7 +288,7 @@ export class NodeCompRowHeader extends Div {
                         className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete node(s)",
                         [C.NODE_ID_ATTR]: this.node.id,
-                        onClick: this.tabData.id == C.TAB_MAIN ? S.edit.deleteSelNodes : S.edit.deleteOneNode
+                        onClick: this.tabData.id == C.TAB_MAIN ? S.edit._deleteSelNodes : S.edit._deleteOneNode
                     }));
                 }
             }
@@ -303,7 +303,7 @@ export class NodeCompRowHeader extends Div {
                 jumpButton = new Icon({
                     className: "fa fa-arrow-right fa-lg buttonBarIcon",
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.jumpToTargetIdClick,
+                    onClick: S.nav._jumpToTargetIdClick,
                     title: "Jump to Tree"
                 });
             }

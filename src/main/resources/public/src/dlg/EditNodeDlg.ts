@@ -228,7 +228,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
                     this.utl.cancelEdit();
-                    S.nav.closeFullScreenViewer();
+                    S.nav._closeFullScreenViewer();
                     S.view.jumpToId(ast.editNode.id);
                 }
             }));
@@ -771,7 +771,7 @@ export class EditNodeDlg extends DialogBase {
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive()
                 ? new Button("Delete", () => {
-                    S.edit.deleteOneNode(null, ast.editNode.id);
+                    S.edit._deleteOneNode(null, ast.editNode.id);
                     this.close();
                 }) : null,
 

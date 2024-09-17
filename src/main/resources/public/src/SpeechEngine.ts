@@ -48,7 +48,7 @@ export class SpeechEngine {
     // --------------------------------------------------------------
     // Speech Recognition
     // --------------------------------------------------------------
-    initRecognition = () => {
+    initRecognition() {
         // already initialized, then return
         if (this.recognition) return;
 
@@ -96,7 +96,7 @@ export class SpeechEngine {
         };
     }
 
-    stopListening = () => {
+    stopListening() {
         // if never initialized just return
         if (!this.recognition) return;
         this.initRecognition();
@@ -105,7 +105,7 @@ export class SpeechEngine {
         this.speechActive = false;
     }
 
-    startListening = () => {
+    startListening() {
         this.initRecognition();
         this.recognition.start();
         this.speechActive = true;

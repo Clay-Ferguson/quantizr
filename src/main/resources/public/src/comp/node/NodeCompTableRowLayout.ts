@@ -115,7 +115,7 @@ export class NodeCompTableRowLayout extends Div {
                     if (lastNode) {
                         S.edit.insertNode(lastNode.id, 1, ast);
                     } else {
-                        S.edit.newSubNode(null, ast.node.id);
+                        S.edit._newSubNode(null, ast.node.id);
                     }
                 }, {
                     title: "Insert new node"
@@ -123,7 +123,7 @@ export class NodeCompTableRowLayout extends Div {
 
                 const userCanPaste = (S.props.isMine(lastNode) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
                 if (!!ast.nodesToMove && userCanPaste) {
-                    children.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "btn-secondary pasteButton marginLeft"));
+                    children.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "btn-secondary pasteButton marginLeft"));
                 }
             }
         }

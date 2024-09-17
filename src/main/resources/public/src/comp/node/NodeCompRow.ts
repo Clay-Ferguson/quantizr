@@ -34,7 +34,7 @@ export class NodeCompRow extends Div {
 
         if (this.allowHeaders) {
             this.attribs[C.NODE_ID_ATTR] = this.node.id;
-            this.attribs.onClick = S.nav.clickTreeNode;
+            this.attribs.onClick = S.nav._clickTreeNode;
         }
         let insertInlineButton = null;
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
@@ -162,7 +162,7 @@ export class NodeCompRow extends Div {
             if (targetId) {
                 jumpButton = new IconButton("fa-arrow-right", null, {
                     [C.NODE_ID_ATTR]: targetId,
-                    onClick: S.nav.jumpToNode,
+                    onClick: S.nav._jumpToNode,
                     title: "Jump to Node"
                 }, "btn-secondary float-end");
             }
@@ -182,7 +182,7 @@ export class NodeCompRow extends Div {
             if (!(exp && !isMine)) {
                 openButton = new IconButton("fa-folder-open", null, {
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav.openNodeById,
+                    onClick: S.nav._openNodeById,
                     title: "Explore content of this node"
                 }, "btn-primary marginLeft");
             }

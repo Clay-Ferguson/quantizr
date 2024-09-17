@@ -110,7 +110,7 @@ export class App extends Main {
             // Currently we have no need to show the menu to anonymous users, but I want to keep
             // this here for future purposes in case we eventually do need this menu.
             const menuButton = new IconButton("fa-bars fa-lg", null, {
-                onClick: S.nav.showMainMenu,
+                onClick: S.nav._showMainMenu,
                 id: "mainMenu"
             }, "btn-primary menuButton", "off");
 
@@ -139,7 +139,7 @@ export class App extends Main {
                 !ast.isAnonUser ? new Div(ast.userName, {
                     className: "clickable marginRight marginTop",
                     // NOTE: No data attribute here. Null opens our own profile
-                    onClick: S.nav.clickToOpenUserProfile
+                    onClick: S.nav._clickToOpenUserProfile
                 }) : null
             ]);
 

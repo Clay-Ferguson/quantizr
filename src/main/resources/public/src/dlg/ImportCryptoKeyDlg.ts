@@ -20,14 +20,14 @@ export class ImportCryptoKeyDlg extends DialogBase {
             new Div(null, null, [
                 new TextArea("Key JWK", { rows: 15 }, this.keyState, null, false),
                 new ButtonBar([
-                    new Button("Import", this.import, null, "btn-primary"),
+                    new Button("Import", this._import, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    import = async () => {
+    _import = async () => {
         const keyText = this.keyState.getValue();
         if (!keyText) {
             S.util.showMessage("Enter key text.", "Warning");
