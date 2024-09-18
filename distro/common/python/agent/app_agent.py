@@ -123,13 +123,13 @@ class QuantaAgent:
                         CreateFileTool("File Creator Tool", self.source_folder),
                         UpdateFileTool("File Updater Tool", self.source_folder),
                     ]
-
+                print("Created Agent Tools")
                 agent_executor = chat_agent_executor.create_tool_calling_executor(
                     llm, tools
                 )
                 initial_message_len = len(messages)
                 response = agent_executor.invoke({"messages": messages})
-                # print(f"Response: {response}")
+                print(f"Response: {response}")
                 resp_messages = response["messages"]
                 new_messages = resp_messages[initial_message_len:]
                 self.answer = ""
@@ -150,6 +150,7 @@ class QuantaAgent:
                 messages[:] = resp_messages
 
             else:
+                print("Running without tools")
                 response = llm.invoke(messages)
                 self.answer = response.content  # type: ignore
                 messages.append(AIMessage(content=response.content))

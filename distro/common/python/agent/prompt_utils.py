@@ -122,7 +122,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
         if matches:
             for folder_name in matches:
                 folder = source_folder if folder_name == "/" else source_folder + folder_name
-                Utils.debug(f"folder_name in prompt: {folder_name}")
+                print(f"folder_name in prompt: {folder_name}")
                 content: str = PromptUtils.build_folder_content(
                     folder,
                     source_folder_len,

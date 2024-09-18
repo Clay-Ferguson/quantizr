@@ -33,6 +33,7 @@ GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 app = FastAPI()
 
 Utils.init_logging("/log/quanta_ai.log")
+print("QuantaAI Microservice is running.")
 
 class AIBaseMessage(BaseModel):
     type: str
@@ -66,7 +67,11 @@ def api_query(req: AIRequest,
               api_key: Optional[str] = Header(None, alias="X-api-key")
     ) -> AIResponse:
     try:        
+        # Log the request as pretty json
+        print(f"REQ received: prompt={req.prompt}\n    service={req.service}\n    codingAgent={req.codingAgent}\n    foldersToInclude: {req.foldersToInclude}")
+        
         # for now we'll max out at 100k tokens allowed
+        # todo-0: This is going to disable large refactorings. Need to think this thru.
         if (req.maxTokens > 100000): 
             req.maxTokens = 100000
             
@@ -82,11 +87,13 @@ def api_query(req: AIRequest,
         # calculate predicted cost
         maxCost: float = calculate_cost(input_tokens, req.maxTokens, req.model)
         if (maxCost > req.credit):
+            print("User is out of credit.")
             return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account, using `Menu -> AI -> Settings -> Add Credit`")         
 
         answer: str = ""
         response: BaseMessage = None
         if req.codingAgent:
+            print("CodingAgent mode")
              # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
             ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
 
@@ -111,6 +118,7 @@ def api_query(req: AIRequest,
                 llm)
             answer = messages[-1].content
         else:
+            print("Chat mode")
             messages = buildMessages(req)
             response = llm.invoke(messages)
             answer = response.content
@@ -174,6 +182,7 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
             verbose=True,
         )
     elif req.service == "perplexity":
+        # todo-0: oops Perplexity code is not even imported!
         llm = ChatPerplexity(
             model=req.model,
             temperature=req.temperature,

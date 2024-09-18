@@ -79,7 +79,7 @@ class ProjectLoader:
         is to build up the 'blocks' dictionary with the content of the blocks in the files, and also
         to collect all the filenames into `file_names`
         """
-        # print("scan_directory: "+ scan_dir)
+        print("scan_directory: "+ scan_dir)
         self.reset()
         # Walk through all directories and files in the directory
         for dirpath, _, filenames in os.walk(scan_dir):
