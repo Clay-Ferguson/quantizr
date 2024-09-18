@@ -3,6 +3,7 @@
 import re
 import os
 import logging
+import builtins
 from enum import Enum
 from typing import List, Set, Optional
 from langchain.schema import AIMessage, BaseMessage, AIMessage
@@ -34,6 +35,20 @@ class Utils:
             level=logging.DEBUG,     # Log level
             format="%(asctime)s - %(levelname)s - %(message)s"
         )
+        
+        # Store the original print function
+        original_print = builtins.print
+        
+        # Redefine the print function
+        def custom_print(*args, **kwargs):
+            # Convert all arguments to strings and join them
+            message = ' '.join(map(str, args))
+            # Call Utils.debug with the joined message
+            Utils.debug(message)
+            original_print(*args, **kwargs)
+        
+        # Replace the built-in print function with our custom one
+        builtins.print = custom_print
 
     @staticmethod
     def debug(message: str):
