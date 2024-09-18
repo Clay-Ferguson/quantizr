@@ -49,12 +49,19 @@ public class MongoRead extends ServiceBase {
     private static int MAX_TREE_GRAPH_SIZE = 100000;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
+    // tag: rootNode
     public AccountNode getDbRoot() {
         synchronized (rootLock) {
             if (dbRoot == null) {
                 dbRoot = findNodeByPathAP(NodePath.ROOT_PATH, AccountNode.class);
             }
             return dbRoot;
+        }
+    }
+
+    public void setRootNode(SubNode node) {
+        synchronized (rootLock) {
+            dbRoot = (AccountNode) node;
         }
     }
 
