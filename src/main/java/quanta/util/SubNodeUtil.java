@@ -128,8 +128,9 @@ public class SubNodeUtil extends ServiceBase {
      * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
      * provides), by creating said node if not already existing or leaving it as is if it does exist.
      */
-    public SubNode ensureNodeExists(String parentPath, String pathName, String defaultContent,
-            String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props, Val<Boolean> created) {
+    public SubNode ensureNodeExists(String parentPath, String pathName, String defaultContent, String primaryTypeName,
+            Class<? extends SubNode> nodeClass, boolean saveImmediate, HashMap<String, Object> props,
+            Val<Boolean> created) {
 
         if (!parentPath.endsWith("/")) {
             parentPath += "/";
@@ -166,8 +167,8 @@ public class SubNodeUtil extends ServiceBase {
                 parent = node;
             } else {
                 // Note if parent PARAMETER here is null we are adding a root node
-                parent = svc_mongoCreate.createNode(parent, tok, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
-                        true, true, null);
+                parent = svc_mongoCreate.createNode(parent, tok, primaryTypeName, nodeClass, 0L,
+                        CreateNodeLocation.LAST, null, null, true, true, null);
                 if (parent == null) {
                     throw new RuntimeEx("unable to create " + tok);
                 }

@@ -45,7 +45,7 @@ import quanta.util.val.Val;
 public class FriendService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(FriendService.class);
 
-    public AccountNode createFriendNode(SubNode parentFriendsList, String userToFollow, String tags) {
+    public SubNode createFriendNode(SubNode parentFriendsList, String userToFollow, String tags) {
         // get userNode of user to follow
         AccountNode userNode = svc_user.getAccountByUserNameAP(userToFollow);
         if (userNode != null) {
@@ -53,7 +53,7 @@ public class FriendService extends ServiceBase {
             properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
             properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
 
-            AccountNode friendNode = (AccountNode)svc_mongoCreate.createNode(parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+            SubNode friendNode = svc_mongoCreate.createNode(parentFriendsList, null, NodeType.FRIEND.s(), null, 0L,
                     CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true, true, null);
             friendNode.set(NodeProp.TYPE_LOCK, Boolean.valueOf(true));
 
@@ -79,7 +79,7 @@ public class FriendService extends ServiceBase {
         return res;
     }
 
-    public void updateSavedFriendNode(String userDoingAction, AccountNode node) {
+    public void updateSavedFriendNode(String userDoingAction, SubNode node) {
         String userNodeId = node.getStr(NodeProp.USER_NODE_ID);
         String friendUserName = node.getStr(NodeProp.USER);
         if (friendUserName != null) {
@@ -147,7 +147,7 @@ public class FriendService extends ServiceBase {
             return;
         }
         // lookup to see if this followerFriendList node already has userToFollow already under it.
-        AccountNode friendNode = findFriendNode(accntIdDoingFollow, null, userToFollow);
+        SubNode friendNode = findFriendNode(accntIdDoingFollow, null, userToFollow);
         // if we have this node but in some obsolete path delete it. Might be the path of BLOCKED_USERS
         if (friendNode != null && !svc_mongoUtil.isChildOf(followerFriendList, friendNode)) {
             svc_mongoDelete.delete(friendNode);
@@ -485,7 +485,7 @@ public class FriendService extends ServiceBase {
      *
      * Note: Blocked users are also stored as a "FriendNode", but under the "blocked list"
      */
-    public AccountNode findFriendNode(ObjectId ownerId, AccountNode userNode, String userName) {
+    public SubNode findFriendNode(ObjectId ownerId, AccountNode userNode, String userName) {
         if (userNode == null) {
             userNode = svc_user.getAccountByUserNameAP(userName);
             if (userNode == null) {
@@ -498,7 +498,7 @@ public class FriendService extends ServiceBase {
                 .and(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s()).is(userNode.getIdStr());
         crit = svc_auth.addReadSecurity(crit);
         q.addCriteria(crit);
-        AccountNode ret = svc_ops.findUserAccountNode(q);
+        SubNode ret = svc_ops.findOne(q);
         return ret;
     }
 }

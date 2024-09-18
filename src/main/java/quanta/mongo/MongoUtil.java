@@ -580,18 +580,18 @@ public class MongoUtil extends ServiceBase {
         log.debug("creating Public Nodes");
         Val<Boolean> created = new Val<>(Boolean.FALSE);
         SubNode publicNode =
-                svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.PUBLIC, "Public", null, true, null, created);
+                svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.PUBLIC, "Public", null, null, true, null, created);
         if (created.getVal()) {
             svc_acl.addPrivilege(null, publicNode, PrincipalName.PUBLIC.s(), null,
                     Arrays.asList(PrivilegeType.READ.s()), null);
         }
         created = new Val<>(Boolean.FALSE);
         // create home node (admin owned node named 'home').
-        svc_snUtil.ensureNodeExists(NodePath.PENDING_PATH, null, "Pending Edits", null, true, null, created);
+        svc_snUtil.ensureNodeExists(NodePath.PENDING_PATH, null, "Pending Edits", null, null, true, null, created);
         created = new Val<>(Boolean.FALSE);
         // create admin home node
         SubNode publicHome = svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH + "/" + NodePath.PUBLIC, "home",
-                "Public Home", null, true, null, created);
+                "Public Home", null, null, true, null, created);
         // make node public
         svc_acl.addPrivilege(null, publicHome, PrincipalName.PUBLIC.s(), null, Arrays.asList(PrivilegeType.READ.s()),
                 null);

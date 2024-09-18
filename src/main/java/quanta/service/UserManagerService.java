@@ -706,7 +706,7 @@ public class UserManagerService extends ServiceBase {
     }
 
     private void blockUser(String userToBlock, ObjectId accntIdDoingBlock, SubNode blockedList) {
-        AccountNode userNode = svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
+        SubNode userNode = svc_friend.findFriendNode(accntIdDoingBlock, null, userToBlock);
 
         // if we have this node but in some obsolete path delete it. Might be the path of FRIENDS_LIST!
         if (userNode != null && !svc_mongoUtil.isChildOf(blockedList, userNode)) {
@@ -1408,10 +1408,14 @@ public class UserManagerService extends ServiceBase {
      */
     public void createAdminUser() {
         String adminUser = svc_prop.getMongoAdminUserName();
+
+        // root will get loaded as AccountNode object if it exists.
         AccountNode adminNode = svc_user.getAccountByUserNameAP(adminUser);
         if (adminNode == null) {
-            adminNode = (AccountNode) svc_snUtil.ensureNodeExists("/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(),
-                    true, null, null);
+            // if account didn't exist we create, and we have to create as "SubNode" because our creation
+            // code doesn't support creating AccountNodes (yet, and may never)
+            adminNode = (AccountNode)svc_snUtil.ensureNodeExists("/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(),
+                    AccountNode.class, true, null, null);
             adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
             adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
             adminNode.set(NodeProp.USER_PREF_AI_MODE, Constant.AI_MODE_CHAT.s());
@@ -1419,7 +1423,7 @@ public class UserManagerService extends ServiceBase {
             adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
             svc_mongoUpdate.save(adminNode);
         }
-        usersNode = svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.USER, "Users", null, true, null, null);
+        usersNode = svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
         svc_mongoUtil.createPublicNodes();
     }
 
@@ -1433,7 +1437,8 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeEx("createUser should not be called for admin user.");
         }
         svc_auth.requireAdmin();
-        userNode = (AccountNode) svc_mongoCreate.createNode(usersNode, NodeType.ACCOUNT.s(), null,
+        // todo-0: this will need to pass the Class<T> to be created.
+        userNode = (AccountNode) svc_mongoCreate.createNode(usersNode, NodeType.ACCOUNT.s(), AccountNode.class, null,
                 CreateNodeLocation.LAST, true, null);
 
         usersNode.setHasChildren(true);

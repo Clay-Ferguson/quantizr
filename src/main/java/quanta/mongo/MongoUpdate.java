@@ -68,12 +68,6 @@ public class MongoUpdate extends ServiceBase {
         svc_mongoRead.hasChildren(node);
         beforeSave(node);
         svc_ops.save(node);
-
-        // todo-0: this probably needs to be in other places as well. We are basically invalidating 
-        // the cached node here.
-        if (svc_mongoRead.getDbRoot().getId().equals(node.getId())) {
-            svc_mongoRead.setRootNode(node);
-        }
     }
 
     public void saveIfDirtyAP(SubNode node) {

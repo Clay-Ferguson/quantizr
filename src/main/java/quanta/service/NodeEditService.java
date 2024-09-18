@@ -360,7 +360,7 @@ public class NodeEditService extends ServiceBase {
             } else {
                 // This is not a mistake that we pass null for nodeChagnes here (we already captured the shift above
                 // for the node we need to worry about)
-                SubNode newNode = svc_mongoCreate.createNode(parentForNewNodes, null, firstOrdinal + idx,
+                SubNode newNode = svc_mongoCreate.createNode(parentForNewNodes, null, null, firstOrdinal + idx,
                         CreateNodeLocation.ORDINAL, false, null);
                 newNode.setContent(part);
                 newNode.setAc(node.getAc());

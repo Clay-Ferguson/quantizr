@@ -18,6 +18,7 @@ public class SubNodeConverter implements Converter<Document, SubNode> {
     public SubNode convert(Document doc) {
         SubNode node = null;
         switch (doc.getString(SubNode.TYPE)) {
+            case "sn:repoRoot":
             case "sn:account":
                 node = new AccountNode(doc);
                 break;

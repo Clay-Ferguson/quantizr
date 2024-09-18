@@ -55,22 +55,25 @@ public class MongoCreate extends ServiceBase {
     // node updates except for once every thousand times.
     private static long RESERVE_BLOCK_SIZE = 1000;
 
-    public SubNode createNode(SubNode parent, String type, Long ordinal, CreateNodeLocation location,
-            boolean updateParentOrdinals, NodeChanges nodeChanges) {
-        return createNode(parent, null, type, ordinal, location, null, null, updateParentOrdinals, true, nodeChanges);
+    public SubNode createNode(SubNode parent, String type, Class<? extends SubNode> nodeClass, Long ordinal,
+            CreateNodeLocation location, boolean updateParentOrdinals, NodeChanges nodeChanges) {
+        return createNode(parent, null, type, nodeClass, ordinal, location, null, null, updateParentOrdinals, true,
+                nodeChanges);
     }
 
     public SubNode createNode(String path) {
-        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, NodeType.NONE.s(), null);
+        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, NodeType.NONE.s(), null); // done
         svc_mongoUpdate.updateParentHasChildren(node);
         return node;
     }
 
-    public SubNode createNode(String path, String type) {
+    public SubNode createNode(String path, String type, Class<? extends SubNode> nodeClass) {
         if (type == null) {
             type = NodeType.NONE.s();
         }
-        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, type, null);
+        // SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, type, null);
+        SubNode node = nodeClass == null ? new SubNode(TL.getSC().getUserNodeObjId(), path, type, null)
+                : NodeFactory.createNode(nodeClass, TL.getSC().getUserNodeObjId(), path, type, null);
         svc_mongoUpdate.updateParentHasChildren(node);
         return node;
     }
@@ -81,10 +84,13 @@ public class MongoCreate extends ServiceBase {
      * node. Only nodes considered to be on the root.
      *
      * relPath can be null if no path is known
+     * 
+     * todo-0: Every node create now needs to have a Class passed in so it can return the correct type
+     * of node, and will have a return type I guess sof Class<T>
      */
-    public SubNode createNode(SubNode parent, String relPath, String type, Long ordinal, CreateNodeLocation location,
-            List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals, boolean updateParent,
-            NodeChanges nodeChanges) {
+    public SubNode createNode(SubNode parent, String relPath, String type, Class<? extends SubNode> nodeClass,
+            Long ordinal, CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId,
+            boolean updateOrdinals, boolean updateParent, NodeChanges nodeChanges) {
         if (relPath == null) {
             // Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
             relPath = "?";
@@ -111,7 +117,9 @@ public class MongoCreate extends ServiceBase {
             }
         }
 
-        SubNode node = new SubNode(ownerId, path, type, ordinal);
+        // SubNode node = new SubNode(ownerId, path, type, ordinal);
+        SubNode node = nodeClass == null ? new SubNode(ownerId, path, type, ordinal)
+                : NodeFactory.createNode(nodeClass, ownerId, path, type, ordinal);
         if (updateParent && parent != null) {
             parent.setHasChildren(true);
             svc_mongoUpdate.saveSession(false);
@@ -331,7 +339,7 @@ public class MongoCreate extends ServiceBase {
                 req.getProperties().add(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
 
             }
-            newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, 0L, createLoc, req.getProperties(),
+            newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, null, 0L, createLoc, req.getProperties(),
                     null, true, true, nodeChanges);
             if (req.isPendingEdit()) {
                 newNode.setPath(svc_mongoUtil.setPendingPathState(newNode.getPath(), true));
@@ -457,7 +465,7 @@ public class MongoCreate extends ServiceBase {
         if (svc_acl.isAdminOwned(parentNode) && !TL.hasAdminPrivileges()) {
             throw new ForbiddenException();
         }
-        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
+        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, req.getTypeName(), null, req.getTargetOrdinal(),
                 CreateNodeLocation.ORDINAL, null, null, true, true, changes);
         if (req.getInitialValue() != null) {
             newNode.setContent(req.getInitialValue());

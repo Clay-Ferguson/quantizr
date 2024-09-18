@@ -278,7 +278,7 @@ public class ImportService extends ServiceBase {
     }
 
     private SubNode addJsonNode(SubNode parentNode, String content, Long ordinal, String tag, String aiSystemPrompt) {
-        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, ordinal, CreateNodeLocation.LAST, false, null);
+        SubNode newNode = svc_mongoCreate.createNode(parentNode, null, null, ordinal, CreateNodeLocation.LAST, false, null);
         newNode.setContent(content);
         newNode.setAc(parentNode.getAc());
         newNode.touch();

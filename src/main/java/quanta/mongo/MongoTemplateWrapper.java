@@ -90,7 +90,7 @@ public class MongoTemplateWrapper extends ServiceBase {
     }
 
     public AccountNode findUserAccountNode(Query query) {
-       return findOne(query, AccountNode.class);
+        return findOne(query, AccountNode.class);
     }
 
     public SubNode findById(Object id) {
@@ -120,7 +120,7 @@ public class MongoTemplateWrapper extends ServiceBase {
 
         // call onAfterLoad on all results
         // if (ret != null && ret.getMappedResults() != null) {
-        //     ret.getMappedResults().forEach(n -> svc_mongoUtil.validate(n));
+        // ret.getMappedResults().forEach(n -> svc_mongoUtil.validate(n));
         // }
 
         return ret;
@@ -128,7 +128,12 @@ public class MongoTemplateWrapper extends ServiceBase {
 
     public SubNode save(SubNode node) {
         MongoUtil.validate(node);
-        return mt.save(node);
+        SubNode ret = mt.save(node);
+        AccountNode dbRoot = svc_mongoRead.getDbRoot();
+        if (dbRoot != null && dbRoot.getId().equals(ret.getId())) {
+            svc_mongoRead.setRootNode((AccountNode)ret);
+        }
+        return ret;
     }
 
     public IndexOperations indexOps() {

@@ -228,7 +228,7 @@ public class EmailService extends ServiceBase {
 
     private void queueMail(String recipients, String subject, String content) {
         SubNode outboxNode = getSystemOutbox();
-        SubNode outboundEmailNode = svc_mongoCreate.createNode(outboxNode.getPath() + "/?", NodeType.NONE.s());
+        SubNode outboundEmailNode = svc_mongoCreate.createNode(outboxNode.getPath() + "/?", NodeType.NONE.s(), null);
         outboundEmailNode.setOwner(TL.getSC().getUserNodeObjId());
         outboundEmailNode.set(NodeProp.EMAIL_CONTENT, content);
         outboundEmailNode.set(NodeProp.EMAIL_SUBJECT, subject);
@@ -255,9 +255,9 @@ public class EmailService extends ServiceBase {
             if (outboxNode != null) {
                 return outboxNode;
             }
-            svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.OUTBOX, "Outbox", null, true, null, null);
+            svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.OUTBOX, "Outbox", null, null, true, null, null);
             outboxNode = svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.OUTBOX + "/" + NodePath.SYSTEM,
-                    "System Messages", null, true, null, null);
+                    "System Messages", null, null, true, null, null);
             return outboxNode;
         }
     }

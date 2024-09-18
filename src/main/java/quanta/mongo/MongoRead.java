@@ -59,9 +59,9 @@ public class MongoRead extends ServiceBase {
         }
     }
 
-    public void setRootNode(SubNode node) {
+    public void setRootNode(AccountNode node) {
         synchronized (rootLock) {
-            dbRoot = (AccountNode) node;
+            dbRoot = node;
         }
     }
 
@@ -966,7 +966,7 @@ public class MongoRead extends ServiceBase {
 
         SubNode node = findSubNodeByType(userNode, type);
         if (node == null && autoCreate) {
-            node = svc_mongoCreate.createNode(userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true, true,
+            node = svc_mongoCreate.createNode(userNode, null, type, null, 0L, CreateNodeLocation.LAST, null, null, true, true,
                     null);
             node.setOwner(userNode.getId());
             node.setContent(content);
