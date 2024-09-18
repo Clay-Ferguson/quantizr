@@ -1437,7 +1437,6 @@ public class UserManagerService extends ServiceBase {
             throw new RuntimeEx("createUser should not be called for admin user.");
         }
         svc_auth.requireAdmin();
-        // todo-0: this will need to pass the Class<T> to be created.
         userNode = (AccountNode) svc_mongoCreate.createNode(usersNode, NodeType.ACCOUNT.s(), AccountNode.class, null,
                 CreateNodeLocation.LAST, true, null);
 

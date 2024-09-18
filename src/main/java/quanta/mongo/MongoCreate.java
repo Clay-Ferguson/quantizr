@@ -1,5 +1,6 @@
 package quanta.mongo;
 
+import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class MongoCreate extends ServiceBase {
     }
 
     public SubNode createNode(String path) {
-        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, NodeType.NONE.s(), null); // done
+        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, NodeType.NONE.s(), null); 
         svc_mongoUpdate.updateParentHasChildren(node);
         return node;
     }
@@ -73,7 +74,7 @@ public class MongoCreate extends ServiceBase {
         }
         // SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, type, null);
         SubNode node = nodeClass == null ? new SubNode(TL.getSC().getUserNodeObjId(), path, type, null)
-                : NodeFactory.createNode(nodeClass, TL.getSC().getUserNodeObjId(), path, type, null);
+                : createNode(nodeClass, TL.getSC().getUserNodeObjId(), path, type, null);
         svc_mongoUpdate.updateParentHasChildren(node);
         return node;
     }
@@ -84,9 +85,6 @@ public class MongoCreate extends ServiceBase {
      * node. Only nodes considered to be on the root.
      *
      * relPath can be null if no path is known
-     * 
-     * todo-0: Every node create now needs to have a Class passed in so it can return the correct type
-     * of node, and will have a return type I guess sof Class<T>
      */
     public SubNode createNode(SubNode parent, String relPath, String type, Class<? extends SubNode> nodeClass,
             Long ordinal, CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId,
@@ -119,7 +117,7 @@ public class MongoCreate extends ServiceBase {
 
         // SubNode node = new SubNode(ownerId, path, type, ordinal);
         SubNode node = nodeClass == null ? new SubNode(ownerId, path, type, ordinal)
-                : NodeFactory.createNode(nodeClass, ownerId, path, type, ordinal);
+                : createNode(nodeClass, ownerId, path, type, ordinal);
         if (updateParent && parent != null) {
             parent.setHasChildren(true);
             svc_mongoUpdate.saveSession(false);
@@ -131,6 +129,18 @@ public class MongoCreate extends ServiceBase {
             }
         }
         return node;
+    }
+
+    // Factory method for creating instances with parameterized constructor
+    public static <T extends SubNode> T createNode(Class<T> nodeClass, ObjectId owner, String path, String type,
+            Long ordinal) {
+        try {
+            Constructor<T> constructor =
+                    nodeClass.getConstructor(ObjectId.class, String.class, String.class, Long.class);
+            return constructor.newInstance(owner, path, type, ordinal);
+        } catch (Exception e) {
+            throw new RuntimeEx("Failed to create node instance", e);
+        }
     }
 
     private Long prepOrdinalForLocation(CreateNodeLocation location, SubNode parent, Long ordinal,
