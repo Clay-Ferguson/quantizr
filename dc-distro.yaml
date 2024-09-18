@@ -267,6 +267,8 @@ services:
             - '${QAI_PORT}:${QAI_PORT}'
 
         volumes:
+            - /home/clay/ferguson/Quantizr/src:/projects
+            - /home/clay/quanta-localhost-dev/log:/data
             - "${DEPLOY_TARGET}/log:/log"
 networks:
     bridge:
