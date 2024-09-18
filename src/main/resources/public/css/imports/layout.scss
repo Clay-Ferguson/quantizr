@@ -1,3 +1,20 @@
+.documentItem {
+    padding-top: 10px;
+    border-bottom: 3px dotted $nodeBorderBottomColor;
+    padding-bottom: $tinyGap;
+}
+
+.indentedDocumentItem {
+    border-left: 1px solid gray;
+}
+
+.documentItemHighlight {
+    border: 3px solid olivedrab;
+    padding: 10px;
+    border-radius: $border-radius;
+    margin-bottom: 4px;
+}
+
 .collapsibleMarkdown {
     margin-left: $mediumGap;
     margin-bottom: $smallGap;

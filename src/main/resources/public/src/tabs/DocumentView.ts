@@ -102,11 +102,9 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
     /* overridable (don't use arrow function) */
     // Note: It's important to have 'this.data.id' as a classname on every item, even though it's
     // not for styling, it's essentially to support DOM finding.
-    renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
-        const ast = getAs();
-        const allowHeader = this.allowHeader && (S.util.showMetaData(ast, node) || ast.userPrefs.editMode);
-        return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, "userFeedItem",
-            "userFeedItemHighlight", null);
+    renderItem(_node: NodeInfo, _i: number, _rowCount: number, _jumpButton: boolean): Comp {
+        console.error("renderItem not overridden from DocumentView base class.");
+        return null;
     }
 
     addPaginationBar = (children: Comp[]) => {

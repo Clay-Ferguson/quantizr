@@ -20,7 +20,6 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
     }
 
     override renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
-
         const ast = getAs();
         // Our header base in this scenario has the edit controls intermingled with the rest, so for
         // now if either of these user prefs is active we show the header bar.
@@ -30,8 +29,8 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         // compact view. We could make this paragraph spacing a user preference...some day. Note:
         // It's important to have 'this.data.id' as a classname on every item, even though it's not
         // for styling, it's essentially to support DOM finding.
-        const itemClass = (allowHeader ? "userFeedItem" : "marginBottom");
-        const itemClassHighlight = (allowHeader ? "userFeedItemHighlight" : "marginBottom");
+        let itemClass = (allowHeader ? "documentItem" : "marginBottom");
+        const itemClassHighlight = (allowHeader ? "documentItemHighlight" : "marginBottom");
 
         const rootSlashesMatch = this.data.props.node.path.match(/\//g);
         const nodeSlashesMatch = node.path.match(/\//g);
@@ -39,7 +38,10 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         let style = null;
         if (!ast.mobileMode && ast.docIndent) {
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
-            style = indentLevel > 0 ? { marginLeft: "" + (indentLevel * 25) + "px" } : null;
+            if (indentLevel > 0) {
+                style = { marginLeft: "" + (indentLevel * 25) + "px" };
+                itemClass += " indentedDocumentItem"; 
+            }
         }
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, itemClass, itemClassHighlight, style);
     }
