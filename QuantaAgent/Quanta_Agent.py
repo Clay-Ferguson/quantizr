@@ -72,6 +72,7 @@ if __name__ == "__main__":
     cfg = AppConfig.get_config(None)
     
     Utils.init_logging(cfg.data_folder + "/quanta_agent.log")
+    print("Quanta Agent Started")
 
     AppUtils.setup_page(st, cfg, "Quanta: AI Tools")
     show_ai_model_picker(st)
