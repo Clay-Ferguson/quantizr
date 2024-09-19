@@ -2,6 +2,7 @@ import os
 import sys
 from fastapi import FastAPI, Header
 from pydantic import BaseModel, Field
+from langchain_community.chat_models import ChatPerplexity
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
@@ -19,14 +20,16 @@ sys.path.append(PRJ_DIR)
 from common.python.agent.app_agent import QuantaAgent
 from common.python.utils import RefactorMode, Utils
 
-# #ai-model
+# #ai-model (WARNING: These values are in a Java file too (AIModel.java))
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
 ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
 OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
-PPLX_MODEL_COMPLETION_ONLINE = "llama-3-sonar-large-32k-online" 
-PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3-70b-instruct"
-PPLX_MODEL_COMPLETION_CHAT = "llama-3-sonar-large-32k-chat"
+
+PPLX_MODEL_COMPLETION_ONLINE = "llama-3.1-sonar-huge-128k-online" # ok 
+PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3.1-70b-instruct" # ok
+PPLX_MODEL_COMPLETION_CHAT = "llama-3.1-sonar-large-128k-chat" # ok
+
 GEMINI_MODEL_COMPLETION_CHAT = "gemini-1.5-pro"
 GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 
@@ -182,7 +185,6 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
             verbose=True,
         )
     elif req.service == "perplexity":
-        # todo-0: oops Perplexity code is not even imported!
         llm = ChatPerplexity(
             model=req.model,
             temperature=req.temperature,

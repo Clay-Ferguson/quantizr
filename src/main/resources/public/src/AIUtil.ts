@@ -76,7 +76,7 @@ export class AIUtil {
         if (S.quanta.config.usePplxAi) {
             this.aiServices.push(//
                 {
-                    name: J.AIModel.PPLX,
+                    name: J.AIModel.PPLX_CHAT,
                     description: "Perplexity: Basic",
                     longDescription: "Perplexity's best high-end powerful general-purpose AI"
                 },
