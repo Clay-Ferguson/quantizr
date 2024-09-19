@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# During development, when the app is already running, and we know only Java files have changed
+# we can use this script to rebuild the app and update the running container.
+
 clear
 # show commands as they are run.
 # set -x

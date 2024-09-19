@@ -54,7 +54,6 @@ echo "Image is in repo: ${DOCKER_IMAGE}"
 imageCheck ${QAI_IMAGE}
 echo "Image is in repo: ${QAI_IMAGE}"
 
-
 # Uncomment this to see the final docker-compose file
 # docker-compose -f ${dc_yaml} config > final-${dc_yaml}
 
