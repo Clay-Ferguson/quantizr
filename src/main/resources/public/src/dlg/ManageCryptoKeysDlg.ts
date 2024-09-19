@@ -37,10 +37,10 @@ export class ManageCryptoKeysDlg extends DialogBase {
                 getValue: (): string => this.getState<LS>().keyType
             }),
             new ButtonBar([
-                new Button("New Key", this.newKey),
+                new Button("New Key", this._newKey),
                 // new Button("Remove Key", this.removeKey),
-                state.keyType !== "sym" ? new Button("Publish Public Key", this.publishKey) : null,
-                new Button("Import Key", this.importKey)
+                state.keyType !== "sym" ? new Button("Publish Public Key", this._publishKey) : null,
+                new Button("Import Key", this._importKey)
             ], "marginBottom"),
             new TextContent(state.keyJson, "cryptoKeyTextContent", true),
             new ButtonBar([
@@ -75,7 +75,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
         this.preLoad();
     }
 
-    newKey = async () => {
+    _newKey = async () => {
         const dlg = new ConfirmDlg("Gernerate new Crypto Key Pair?", "Warning",
             "btn-danger", "alert alert-danger");
         await dlg.open();
@@ -85,7 +85,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
         this.preLoad();
     }
 
-    publishKey = async (): Promise<void> => {
+    _publishKey = async (): Promise<void> => {
         const dlg = new ConfirmDlg("Publish Public Crypto Key?", "Warning",
             "btn-danger", "alert alert-danger");
         await dlg.open();
@@ -94,14 +94,14 @@ export class ManageCryptoKeysDlg extends DialogBase {
         S.crypto.initKeys(S.quanta.userName, false, true, false, state.keyType);
     }
 
-    importKey = async (): Promise<void> => {
+    _importKey = async (): Promise<void> => {
         const state: LS = this.getState<LS>();
         const dlg = new ImportCryptoKeyDlg(state.keyType, this.getKeyTypeName(state.keyType));
         await dlg.open();
         this.preLoad();
     }
 
-    getKeyTypeName = (abbrev: string): string => {
+    getKeyTypeName(abbrev: string): string {
         switch (abbrev) {
             case "sig": return "Signature Key";
             case "asym": return "Asymmetric Key";

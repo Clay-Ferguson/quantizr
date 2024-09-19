@@ -57,14 +57,14 @@ export class SignupDlg extends DialogBase {
                     ])
                 ], "captchaPanel marginTop"),
                 new ButtonBar([
-                    new Button("Create Account", this.signup, null, "btn-primary"),
+                    new Button("Create Account", this._signup, null, "btn-primary"),
                     new Button("Cancel", this._close, { className: "float-end" })
                 ], "marginTop")
             ])
         ];
     }
 
-    signup = () => {
+    _signup = async () => {
         if (this.adminCreatingUser) {
             // this string is just to make the validator succeed, and used as an extra confirmation
             // on the server that the intent of the admin is the creation of a new user. This is not
@@ -76,20 +76,14 @@ export class SignupDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        this.signupNow();
-    }
-
-    signupNow = async () => {
+        
         const res = await S.rpcUtil.rpc<J.SignupRequest, J.SignupResponse>("signup", {
             userName: this.userNameState.getValue(),
             password: this.passwordState.getValue(),
             email: this.emailState.getValue(),
             captcha: this.captchaState.getValue()
         });
-        this.signupResponse(res);
-    }
 
-    signupResponse = async (res: J.SignupResponse): Promise<void> => {
         if (res.code == C.RESPONSE_CODE_OK) {
             this.close();
 
@@ -110,6 +104,5 @@ export class SignupDlg extends DialogBase {
             this.emailState.setError(res.emailError);
             this.captchaState.setError(res.captchaError);
         }
-        return null;
     }
 }

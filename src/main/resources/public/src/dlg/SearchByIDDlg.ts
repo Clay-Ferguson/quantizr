@@ -25,16 +25,16 @@ export class SearchByIDDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                this.searchTextField = new TextField({ label: "Node ID", enter: this.search, val: this.searchTextState }),
+                this.searchTextField = new TextField({ label: "Node ID", enter: this._search, val: this.searchTextState }),
                 new ButtonBar([
-                    new Button("Search", this.search, null, "btn-primary"),
+                    new Button("Search", this._search, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    search = async () => {
+    _search = async () => {
         if (!this.validate()) {
             return;
         }

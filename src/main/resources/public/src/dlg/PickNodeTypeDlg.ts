@@ -34,7 +34,7 @@ export class PickNodeTypeDlg extends DialogBase {
             PickNodeTypeDlg.dirtyCounter++;
             if (PickNodeTypeDlg.dirtyCounter >= 2) {
                 PickNodeTypeDlg.searchDirty = false;
-                setTimeout(PickNodeTypeDlg.inst.typeSearch, 10);
+                setTimeout(PickNodeTypeDlg.inst._typeSearch, 10);
             }
         }
     }, 500);
@@ -63,7 +63,7 @@ export class PickNodeTypeDlg extends DialogBase {
                     labelClass: "txtFieldLabelShort",
                     val: this.searchTextState,
                     placeholder: "Search for...",
-                    enter: this.typeSearch,
+                    enter: this._typeSearch,
                     outterClass: "typeSearchField"
                 })),
                 new Checkbox("Schema.org", { className: "marginRight" }, {
@@ -76,20 +76,20 @@ export class PickNodeTypeDlg extends DialogBase {
                 }),
                 new NodeTypeListBox(this.valIntf, this.searchTextState.getValue()),
                 new ButtonBar([
-                    new Button("Ok", this.setNodeType, null, "btn-primary"),
+                    new Button("Ok", this._setNodeType, null, "btn-primary"),
                     new Button("Cancel", this._close)
                 ], "marginTop")
             ])
         ];
     }
 
-    typeSearch = () => {
+    _typeSearch = () => {
         this.mergeState<LS>({});
         // warning: keep the fat arrow function here.
         setTimeout(() => this.searchTextField.focus(), 50);
     }
 
-    setNodeType = () => {
+    _setNodeType = () => {
         this.chosenType = this.getState<LS>().selType;
         S.props.addRecentType(this.chosenType);
         this.close();

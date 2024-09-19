@@ -194,7 +194,7 @@ export class SearchContentDlg extends DialogBase {
 
                 new ButtonBar([
                     new Button("Search", () => this.search(false), null, "btn-primary"),
-                    new Button("Graph", this.graph),
+                    new Button("Graph", this._graph),
                     // todo-2: this is currently not implemented on the server.
                     // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
                     new Button("Close", this._close, null, "btn-secondary float-end")
@@ -203,7 +203,7 @@ export class SearchContentDlg extends DialogBase {
         ];
     }
 
-    createSearchFieldIconButtons = (): Comp => {
+    createSearchFieldIconButtons(): Comp {
         return new ButtonBar([
             new Button("Clear", () => {
                 this.searchTextState.setValue("");
@@ -222,7 +222,7 @@ export class SearchContentDlg extends DialogBase {
         ], "float-end tinyMarginTop");
     }
 
-    addTagsToSearchField = (dlg: SelectTagsDlg) => {
+    addTagsToSearchField(dlg: SelectTagsDlg) {
         let val = this.searchTextState.getValue();
         val = val.trim();
         const tags: string[] = val.split(" ");
@@ -248,7 +248,7 @@ export class SearchContentDlg extends DialogBase {
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText = val);
     }
 
-    graph = () => {
+    _graph = () => {
         const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
@@ -260,7 +260,8 @@ export class SearchContentDlg extends DialogBase {
         S.render.showGraph(null, SearchContentDlg.defaultSearchText);
     }
 
-    deleteMatches = async () => {
+    // currently not used.
+    _deleteMatches = async () => {
         const dlg = new ConfirmDlg("Permanently delete ALL MATCHING Nodes", "WARNING",
             "btn-danger", "alert alert-danger");
         await dlg.open();
@@ -269,7 +270,7 @@ export class SearchContentDlg extends DialogBase {
         }
     }
 
-    search = async (deleteMatches: boolean) => {
+    async search(deleteMatches: boolean) {
         const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");

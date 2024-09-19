@@ -45,7 +45,7 @@ export class UserProfileDlg extends DialogBase {
         return this.getUserName();
     }
 
-    getUserName = (): string => {
+    getUserName(): string {
         const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
@@ -85,12 +85,12 @@ export class UserProfileDlg extends DialogBase {
                         new Div(null, { className: "float-end" }, [
                             state.userProfile.blocked ? new Span("You Blocked", {
                                 className: "blockingText",
-                                onClick: this.unblockUser,
+                                onClick: this._unblockUser,
                                 title: "Click to Unblock user"
                             }) : null,
                             state.userProfile.following ? new Span("You Follow", {
                                 className: "followingText",
-                                onClick: this.deleteFriend,
+                                onClick: this._deleteFriend,
                                 title: "Click to Unfollow user"
                             }) : null,
                         ])
@@ -106,7 +106,7 @@ export class UserProfileDlg extends DialogBase {
                 getAs().isAdminUser ? new UserAdminPanel(this) : null,
 
                 new ButtonBar([
-                    (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this.save, null, "btn-primary"),
+                    (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this._save, null, "btn-primary"),
 
                     // only local users might have set their 'home' node (named a node 'home')
                     state.userProfile.homeNodeId ? new Button("Home", () => this.openUserNodeByName(state, "home")) : null, //
@@ -118,16 +118,16 @@ export class UserProfileDlg extends DialogBase {
                     }), //
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Message", this.sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
+                        ? new Button("Message", this._sendMessage, { title: "Compose a new message to " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Interactions", this.previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
+                        ? new Button("Interactions", this._previousMessages, { title: "Show interactions between you and " + state.userProfile.userName }) : null,
 
                     !ast.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Follow", this.addFriend) : null,
+                        ? new Button("Follow", this._addFriend) : null,
 
                     !ast.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== getAs().userName
-                        ? new Button("Block", this.blockUser) : null,
+                        ? new Button("Block", this._blockUser) : null,
 
                     (getAs().isAnonUser || this.readOnly) ? null : new Button("Settings", () => {
                         this.close();
@@ -143,7 +143,7 @@ export class UserProfileDlg extends DialogBase {
         return children;
     }
 
-    deleteFriend = async () => {
+    _deleteFriend = async () => {
         if (!this.userNodeId) return;
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
@@ -152,7 +152,7 @@ export class UserProfileDlg extends DialogBase {
         this.reload();
     }
 
-    unblockUser = async () => {
+    _unblockUser = async () => {
         if (!this.userNodeId) return;
         await S.rpcUtil.rpc<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
@@ -161,7 +161,7 @@ export class UserProfileDlg extends DialogBase {
         this.reload();
     }
 
-    openUserNodeByType = (state: LS, type: string) => {
+    openUserNodeByType(state: LS, type: string) {
         this.close();
         setTimeout(() => S.nav.openContentNode("~" + state.userProfile.userName + "~" + type, false), 100);
     }
@@ -170,12 +170,12 @@ export class UserProfileDlg extends DialogBase {
      * NOTE: There's two different URL formats here because there's two different ways to access a
      * named node (which are: via url, or via a parameter on the url)
      */
-    openUserNodeByName = (state: LS, nodeName: string) => {
+    openUserNodeByName(state: LS, nodeName: string) {
         this.close();
         setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName, false), 100);
     }
 
-    reload = async () => {
+    async reload() {
         const res = await S.rpcUtil.rpc<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId: this.userNodeId
         });
@@ -192,7 +192,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    save = async () => {
+    _save = async () => {
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
@@ -202,23 +202,16 @@ export class UserProfileDlg extends DialogBase {
             displayName: this.displayNameState.getValue(),
             recentTypes: ast.userProfile.recentTypes
         });
-        this.saveResponse(res);
+        
+        if (res?.code == C.RESPONSE_CODE_OK) {
+            this.close();
+            dispatch("SaveUserPerferences", s => {
+                s.displayName = this.displayNameState.getValue();
+            });
+        }
     }
 
-    publish = async () => {
-        const ast = getAs();
-        const res = await S.rpcUtil.rpc<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
-            userName: null,
-            userTags: ast.userProfile.userTags,
-            blockedWords: ast.userProfile.blockedWords,
-            userBio: this.bioState.getValue(),
-            displayName: this.displayNameState.getValue(),
-            recentTypes: ast.userProfile.recentTypes
-        });
-        this.saveResponse(res);
-    }
-
-    addFriend = async () => {
+    _addFriend = async () => {
         const state: any = this.getState<LS>();
         const res = await S.rpcUtil.rpc<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName,
@@ -236,7 +229,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    currentlyEditingWarning = (): boolean => {
+    currentlyEditingWarning(): boolean {
         const ast = getAs();
         if (ast.editNode) {
             S.util.showMessage("You must first finish editing the node.", "Warning");
@@ -245,7 +238,7 @@ export class UserProfileDlg extends DialogBase {
         return false;
     }
 
-    sendMessage = () => {
+    _sendMessage = () => {
         if (this.currentlyEditingWarning()) return;
         this.close();
         setTimeout(() => {
@@ -253,7 +246,7 @@ export class UserProfileDlg extends DialogBase {
         }, 10);
     }
 
-    previousMessages = async () => {
+    _previousMessages = async () => {
         if (this.currentlyEditingWarning()) return;
 
         this.close();
@@ -263,7 +256,7 @@ export class UserProfileDlg extends DialogBase {
         }, 10);
     }
 
-    blockUser = async () => {
+    _blockUser = async () => {
         const state: any = this.getState<LS>();
         const res = await S.rpcUtil.rpc<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
@@ -283,15 +276,6 @@ export class UserProfileDlg extends DialogBase {
         super.close();
         if (!this.readOnly) {
             S.user.queryUserProfile(this.userNodeId);
-        }
-    }
-
-    saveResponse = (res: J.SaveUserPreferencesResponse) => {
-        if (res?.code == C.RESPONSE_CODE_OK) {
-            this.close();
-            dispatch("SaveUserPerferences", s => {
-                s.displayName = this.displayNameState.getValue();
-            });
         }
     }
 

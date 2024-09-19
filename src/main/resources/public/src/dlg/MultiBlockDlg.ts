@@ -26,14 +26,14 @@ export class MultiBlockDlg extends DialogBase {
                 new TextContent("Enter Fediverse Usernames (one per line)"),
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Block All", this.block, null, "btn-primary"),
+                    new Button("Block All", this._block, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    block = async () => {
+    _block = async () => {
         await S.rpcUtil.rpc<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: this.userNamesState.getValue()
         });

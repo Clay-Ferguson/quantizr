@@ -33,14 +33,14 @@ export class UploadFromUrlDlg extends DialogBase {
                     })
                 ]),
                 new ButtonBar([
-                    new Button("Upload", this.upload, null, "btn-primary"),
+                    new Button("Upload", this._upload, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    upload = async () => {
+    _upload = async () => {
         if (!this.validate()) {
             return;
         }
@@ -50,10 +50,7 @@ export class UploadFromUrlDlg extends DialogBase {
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue()
         });
-        this.uploadFromUrlResponse(res);
-    }
-
-    uploadFromUrlResponse = (res: J.UploadFromUrlResponse) => {
+        
         if (S.util.checkSuccess("Upload from URL", res)) {
             this.close();
 

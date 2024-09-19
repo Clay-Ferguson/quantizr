@@ -44,7 +44,7 @@ export class SelectTagsDlg extends DialogBase {
         });
     }
 
-    makeDefaultSelectedTags = (): Set<string> => {
+    makeDefaultSelectedTags(): Set<string> {
         const tagSet = new Set<string>();
 
         if (this.curTags) {
@@ -65,18 +65,18 @@ export class SelectTagsDlg extends DialogBase {
                 buttons = [
                     new Button("Match All", () => {
                         this.matchAll = true;
-                        this.select();
+                        this._select();
                     }, null, "btn-primary"),
                     new Button("Match Any", () => {
                         this.matchAny = true;
-                        this.select();
+                        this._select();
                     })
                 ];
                 break;
             case "edit":
                 buttons = [
-                    new Button("Ok", () => this.select(), null, "btn-primary"),
-                    new Button("Clear", () => this.clear())
+                    new Button("Ok", this._select, null, "btn-primary"),
+                    new Button("Clear", this._clear)
                 ];
                 break;
         }
@@ -93,7 +93,7 @@ export class SelectTagsDlg extends DialogBase {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
                         if (checked && this.getState<LS>().suggestedTags.length === 0) {
-                            setTimeout(this.updateSuggestTags, 250);
+                            setTimeout(this._updateSuggestTags, 250);
                         }
                     },
                     getValue: (): boolean => this.getState<LS>().suggestTags
@@ -101,9 +101,9 @@ export class SelectTagsDlg extends DialogBase {
                 this.createTagsPickerList(),
                 new ButtonBar([
                     ...buttons,
-                    new Button("Edit Tags", this.edit),
+                    new Button("Edit Tags", this._edit),
                     new Button("Cancel", () => {
-                        this.clear();
+                        this._clear();
                         this.close();
                     }, null, "btn-secondary float-end")
                 ], "marginTop")
@@ -111,7 +111,7 @@ export class SelectTagsDlg extends DialogBase {
         ];
     }
 
-    updateSuggestTags = async () => {
+    _updateSuggestTags = async () => {
         const node = getAs().node;
 
         const res = await S.rpcUtil.rpc<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
@@ -138,7 +138,7 @@ export class SelectTagsDlg extends DialogBase {
     // also hidden from GUI text
     </pre>
     */
-    parseTags = (): Tag[] => {
+    parseTags(): Tag[] {
         if (!getAs().userProfile?.userTags) return null;
         const tags: Tag[] = [];
         // todo-2: in the TTS engine we have something like this done differently. Research which is best
@@ -172,7 +172,7 @@ export class SelectTagsDlg extends DialogBase {
         return tags;
     }
 
-    createTagsPickerList = (): Div => {
+    createTagsPickerList(): Div {
         const state = this.getState<LS>();
         let div: Div = null;
 
@@ -202,7 +202,7 @@ export class SelectTagsDlg extends DialogBase {
         return div;
     }
 
-    processAddCheckboxOrHeading = (div: Div, tagObj: Tag) => {
+    processAddCheckboxOrHeading(div: Div, tagObj: Tag) {
         let attribs: any = null;
         if (tagObj.description && tagObj.tag) {
             // we only prefix with Tag: to move it over so the mouse doesn't cover it up.
@@ -231,7 +231,7 @@ export class SelectTagsDlg extends DialogBase {
         }
     }
 
-    select = () => {
+    _select = () => {
         const state = this.getState<LS>();
         const editVal = this.editFieldState.getValue();
         if (editVal) {
@@ -241,11 +241,11 @@ export class SelectTagsDlg extends DialogBase {
         this.close();
     }
 
-    clear = () => {
+    _clear = () => {
         this.mergeState({ selectedTags: new Set<string>() });
     }
 
-    edit = async () => {
+    _edit = async () => {
         await S.edit._editHashtags();
         const tags = this.parseTags();
         this.mergeState({ tags });

@@ -35,10 +35,10 @@ export class SharingDlg extends DialogBase {
                 numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
                 new EditPrivsTable((userName: string, allowAppends: boolean) => {
                     this.shareNodeToUser(userName, allowAppends);
-                }, ast.editNode.ac, this.removePrivilege),
+                }, ast.editNode.ac, this._removePrivilege),
                 S.props.isShared(ast.editNode) ? new Div("Remove All", {
                     className: "marginRight float-end clickable",
-                    onClick: this.removeAllPrivileges
+                    onClick: this._removeAllPrivileges
                 }) : null,
                 new Clearfix(),
                 ast.editNode.ac?.length > 0 ? new Checkbox("Unpublished", null, {
@@ -81,7 +81,7 @@ export class SharingDlg extends DialogBase {
         ];
     }
 
-    shareImmediate = async (names: string[]) => {
+    async shareImmediate(names: string[]) {
         const ast = getAs();
         await S.rpcUtil.rpc<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: ast.editNode.id,
@@ -98,7 +98,7 @@ export class SharingDlg extends DialogBase {
     /*
      * Gets privileges from server and saves into state.
      */
-    reload = async () => {
+    async reload() {
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: ast.editNode.id
@@ -107,7 +107,7 @@ export class SharingDlg extends DialogBase {
         S.edit.updateNode(ast.editNode);
     }
 
-    removeAllPrivileges = async () => {
+    _removeAllPrivileges = async () => {
         this.dirty = true;
         const ast = getAs();
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
@@ -136,7 +136,7 @@ export class SharingDlg extends DialogBase {
         }
     }
 
-    removePrivilege = async (principalNodeId: string, privilege: string) => {
+    _removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
         const ast = getAs();
         await S.rpcUtil.rpc<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
@@ -147,7 +147,7 @@ export class SharingDlg extends DialogBase {
         this.removePrivilegeResponse();
     }
 
-    removePrivilegeResponse = async () => {
+    async removePrivilegeResponse() {
         const ast = getAs();
         const res = await S.rpcUtil.rpc<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: ast.editNode.id
@@ -158,7 +158,7 @@ export class SharingDlg extends DialogBase {
     }
 
     // userName="public", or a username
-    shareNodeToUser = async (userName: string, allowAppends: boolean) => {
+    async shareNodeToUser(userName: string, allowAppends: boolean) {
         this.dirty = true;
         const ast = getAs();
         if (S.props.isEncrypted(ast.editNode)) {

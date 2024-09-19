@@ -142,23 +142,6 @@ export class Edit {
         }
     }
 
-    private joinNodesResponse(res: J.JoinNodesResponse): any {
-        const ast = getAs();
-        if (S.util.checkSuccess("Join node", res)) {
-            S.nodeUtil._clearSelNodes();
-            S.view.refreshTree({
-                nodeId: ast.node.id,
-                zeroOffset: false,
-                highlightId: null,
-                scrollToTop: false,
-                allowScroll: true,
-                setTab: true,
-                forceRenderParent: false,
-                jumpToRss: false
-            });
-        }
-    }
-
     public async initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean,
         showJumpButton: boolean, afterEditJumpToId: string) {
 
@@ -179,37 +162,9 @@ export class Edit {
         }
     }
 
-    /* nodeId is optional and represents what to highlight after the paste if anything */
-    private moveNodesResponse(res: J.MoveNodesResponse, nodeId: string, pasting: boolean) {
-        if (S.util.checkSuccess("Move nodes", res)) {
-            dispatch("SetNodesToMove", s => {
-                s.nodesToMove = null;
-                s.cutCopyOp = null;
-            });
-
-            // if pasting do a kind of refresh which will maintain us at the same page parent.
-            if (pasting) {
-                S.view.refreshTree({
-                    nodeId: null,
-                    zeroOffset: false,
-                    highlightId: nodeId,
-                    scrollToTop: false,
-                    allowScroll: true,
-                    setTab: true,
-                    forceRenderParent: false,
-                    jumpToRss: false
-                });
-            }
-            else {
-                S.view.jumpToId(nodeId);
-            }
-        }
-    }
-
     private setNodePositionResponse(res: J.SetNodePositionResponse, id: string) {
         if (S.util.checkSuccess("Change node position", res)) {
             S.view.jumpToId(id, true);
-
             S.util.notifyNodeMoved();
         }
     }
@@ -920,7 +875,21 @@ export class Edit {
                 nodeIds: selNodesArray,
                 joinToParent
             });
-            this.joinNodesResponse(res);
+            const ast = getAs();
+
+            if (S.util.checkSuccess("Join node", res)) {
+                S.nodeUtil._clearSelNodes();
+                S.view.refreshTree({
+                    nodeId: ast.node.id,
+                    zeroOffset: false,
+                    highlightId: null,
+                    scrollToTop: false,
+                    allowScroll: true,
+                    setTab: true,
+                    forceRenderParent: false,
+                    jumpToRss: false
+                });
+            }
         }
     }
 
@@ -953,9 +922,7 @@ export class Edit {
             return;
         }
 
-        await promiseDispatch("ClearSelectNode", s => {
-            s.selectedNodes.clear();
-        });
+        await promiseDispatch("ClearSelectNode", s => s.selectedNodes.clear());
 
         // now we can run this method and we know it will only delete one node.
         this._deleteSelNodes(evt, id);
@@ -970,9 +937,7 @@ export class Edit {
 
         // if a nodeId was specified we use it as the selected node to delete
         if (id) {
-            await promiseDispatch("SelectNode", s => {
-                S.nav.setNodeSel(true, id, s);
-            });
+            await promiseDispatch("SelectNode", s => S.nav.setNodeSel(true, id, s));
         }
 
         const ast = getAs();
@@ -1006,9 +971,7 @@ export class Edit {
         dispatch("AfterDeleteCleanup", s => {
             // remove this node from all data from all the tabs, so they all refresh without
             // the deleted node without being queries from the server again.
-            selNodesArray.forEach(id => {
-                S.srch.removeNodeById(id, s);
-            });
+            selNodesArray.forEach(id => S.srch.removeNodeById(id, s));
             s.selectedNodes.clear();
         });
     }
@@ -1086,7 +1049,23 @@ export class Edit {
             copyPaste: ast.cutCopyOp === "copy",
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
-        this.moveNodesResponse(res, nodeId, true);
+        if (S.util.checkSuccess("Move nodes", res)) {
+            dispatch("SetNodesToMove", s => {
+                s.nodesToMove = null;
+                s.cutCopyOp = null;
+            });
+
+            S.view.refreshTree({
+                nodeId: null,
+                zeroOffset: false,
+                highlightId: nodeId,
+                scrollToTop: false,
+                allowScroll: true,
+                setTab: true,
+                forceRenderParent: false,
+                jumpToRss: false
+            });
+        }
     }
 
     _pasteSelNodes_InlineAbove = (evt: Event, id: string) => {
@@ -1268,10 +1247,6 @@ export class Edit {
             delimiter
         });
         S.nodeUtil.applyNodeChanges(res?.nodeChanges);
-        this.splitNodeResponse(res);
-    }
-
-    splitNodeResponse(res: J.SplitNodeResponse) {
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree({
                 nodeId: null,

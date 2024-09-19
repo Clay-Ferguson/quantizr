@@ -26,14 +26,14 @@ export class SendFeedbackDlg extends DialogBase {
                     rows: 7,
                 }, SendFeedbackDlg.promptState, null, false, 3, this.promptScrollPos),
                 new ButtonBar([
-                    new Button("Send", this.send, null, "btn-primary"),
+                    new Button("Send", this._send, null, "btn-primary"),
                     new Button("Cancel", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    send = async () => {
+    _send = async () => {
         const res = await S.rpcUtil.rpc<J.SendFeedbackRequest, J.SendFeedbackResponse>("sendFeedback", {
             message: SendFeedbackDlg.promptState.getValue()
         });

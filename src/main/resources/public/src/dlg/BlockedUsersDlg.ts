@@ -46,7 +46,7 @@ export class BlockedUsersDlg extends DialogBase {
         return `${this.title} (${count})`;
     }
 
-    override preLoad = async () => {
+    override async preLoad() {
         const res = await S.rpcUtil.rpc<J.GetPeopleRequest, J.GetPeopleResponse>("getPeople", {
             nodeId: null,
             type: "blocks",

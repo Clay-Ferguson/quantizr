@@ -49,7 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { id: "dropzoneInput", style: { display: "none" } }),
 
                 new ButtonBar([
-                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
+                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this._upload, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -68,12 +68,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new Div("Existing Data"),
                 new ButtonBar([
                     !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
-                        onClick: this.uploadFromClipboard,
+                        onClick: this._uploadFromClipboard,
                         title: "Upload from Clipboard"
                     }),
 
                     new IconButton("fa-cloud", "URL", {
-                        onClick: this.uploadFromUrl,
+                        onClick: this._uploadFromUrl,
                         title: "Upload from Web/URL"
                     }),
                 ])
@@ -88,7 +88,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             if (dlg.uploadRequested) {
                                 this.dropzone.addFile(new File([dlg.blob], "audio-recording.opus", { type: dlg.blobType }));
                                 this.runButtonEnablement();
-                                this.upload();
+                                this._upload();
                             }
                         },
                         title: "Record Audio as Attachment"
@@ -103,7 +103,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 dlg.blobType = S.util.chopAtLastChar(dlg.blobType, ";");
                                 this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
                                 this.runButtonEnablement();
-                                this.upload();
+                                this._upload();
                             }
                         },
                         title: "Record Video as Attachment"
@@ -113,7 +113,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         ]);
     }
 
-    uploadFromClipboard = async () => {
+    _uploadFromClipboard = async () => {
         const blob = await S.util.readClipboardFile();
         if (blob) {
             this.immediateUploadFiles([blob]);
@@ -123,7 +123,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
     }
 
-    immediateUploadFiles = async (files: File[]) => {
+    async immediateUploadFiles(files: File[]) {
         const ast = getAs();
         await S.domUtil.uploadFilesToNode(files, ast.editNode?.id, false);
         this.close();
@@ -132,7 +132,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
     }
 
-    uploadFromUrl = () => {
+    _uploadFromUrl = () => {
         S.attachment.openUploadFromUrlDlg(this.nodeId, () => {
             this.close();
             if (this.afterUploadFunc) {
@@ -141,7 +141,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
-    upload = async (): Promise<boolean> => {
+    _upload = async (): Promise<boolean> => {
         if (this.filesAreValid()) {
             const files = this.dropzone.getAcceptedFiles();
             if (files) {
@@ -155,7 +155,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return true;
     }
 
-    configureDropZone = () => {
+    configureDropZone() {
         /* Limit based on user quota for our user accounts */
         const maxFileSize = getAs().userPrefs.maxUploadFileSize;
 
@@ -301,12 +301,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.dropzone.addFile(this.autoAddFile);
 
                 // let's click the upload button too, automatically
-                setTimeout(this.upload, 250);
+                setTimeout(this._upload, 250);
             }
         }
     }
 
-    updateFileList = async (dropzoneEvt: any) => {
+    async updateFileList(dropzoneEvt: any) {
         this.fileList = dropzoneEvt.getAddedFiles();
         this.fileList = this.fileList.concat(dropzoneEvt.getQueuedFiles());
 
@@ -323,7 +323,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         }
     }
 
-    filesAreValid = (): boolean => {
+    filesAreValid(): boolean {
         if (!this.fileList || this.fileList.length === 0 || this.fileList.length > this.maxFiles) {
             return false;
         }
@@ -337,11 +337,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         return true;
     }
 
-    hasAnyZipFiles = (): boolean => {
+    hasAnyZipFiles(): boolean {
         return this.fileList.some(file => file.name?.toLowerCase().endsWith(".zip"));
     }
 
-    runButtonEnablement = () => {
+    runButtonEnablement() {
         const valid = this.filesAreValid();
         this.uploadButton.setEnabled(valid);
     }

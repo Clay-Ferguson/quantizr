@@ -48,13 +48,11 @@ export class Attach {
         const bin = att.bin;
         if (bin) {
             let ret: string = S.rpcUtil.getRpcPath() + urlPart + "/" + bin + "?nodeId=" + nodeId + "&att=" + attName;
-
             if (downloadLink) {
                 ret += "&download=true";
             }
             return ret;
         }
-
         return null;
     }
 

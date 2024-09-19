@@ -31,14 +31,14 @@ export class ResetPasswordDlg extends DialogBase {
                 new TextField({ label: "User Name", val: this.userState }),
                 new TextField({ label: "Email Address", val: this.emailState }),
                 new ButtonBar([
-                    new Button("Reset Password", this.resetPassword, null, "btn-primary"),
+                    new Button("Reset Password", this._resetPassword, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    resetPassword = async () => {
+    _resetPassword = async () => {
         if (!this.validate()) {
             return;
         }
@@ -47,10 +47,7 @@ export class ResetPasswordDlg extends DialogBase {
             user: this.userState.getValue(),
             email: this.emailState.getValue()
         });
-        this.resetPasswordResponse(res);
-    }
 
-    resetPasswordResponse = (res: J.ResetPasswordResponse) => {
         if (S.util.checkSuccess("Reset password", res)) {
             this.close();
             S.util.showMessage("Password reset email was sent. Check your email.", "Note");

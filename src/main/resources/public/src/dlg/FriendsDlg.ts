@@ -68,7 +68,7 @@ export class FriendsDlg extends DialogBase {
         return `${this.title} (${count})`;
     }
 
-    override preLoad = async () => {
+    override async preLoad() {
         this.mergeState<LS>({
             selections: new Set<string>(),
             loading: true

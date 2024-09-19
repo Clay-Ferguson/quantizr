@@ -44,7 +44,7 @@ export class VideoPlayerDlg extends DialogBase {
         super.close();
     }
 
-    destroyPlayer = () => {
+    destroyPlayer() {
         const player = this.videoPlayer ? this.videoPlayer.getVideoElement() : null;
         if (player) {
             player.pause();

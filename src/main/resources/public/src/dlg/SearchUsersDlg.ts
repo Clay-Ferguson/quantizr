@@ -32,9 +32,9 @@ export class SearchUsersDlg extends DialogBase {
         return [
             new Div(null, null, [
                 getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", {className: "borderBottom"}) : null,
-                this.searchTextField = new TextField({ label: "User", enter: this.search, val: this.searchTextState }),
+                this.searchTextField = new TextField({ label: "User", enter: this._search, val: this.searchTextState }),
                 new ButtonBar([
-                    new Button("Search", this.search, null, "btn-primary"),
+                    new Button("Search", this._search, null, "btn-primary"),
                     // this Graph button will work, but why graph users? ... there are no linkages
                     // between them... yet. todo: however the VERY amazing feature of showing a true
                     // "Graph of Who is Following Who" would be possible and not even all that
@@ -47,7 +47,7 @@ export class SearchUsersDlg extends DialogBase {
         ];
     }
 
-    search = async () => {
+    _search = async () => {
         if (!this.validate()) {
             return;
         }

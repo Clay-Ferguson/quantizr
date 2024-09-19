@@ -22,22 +22,21 @@ export class SetNodeUsingJsonDlg extends DialogBase {
                 new Div("Enter the new JSON for the Node"),
                 new TextArea(null, { rows: 15 }, this.textState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Save", this.save, null, "btn-primary"),
+                    new Button("Save", this._save, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
-    reload = async () => {
+    async reload() {
         const res = await S.rpcUtil.rpc<J.GetNodeJsonRequest, J.GetNodeJsonResponse>("getNodeJson", {
             nodeId: this.nodeId
         });
-
         this.textState.setValue(res.json);
     }
 
-    save = async () => {
+    _save = async () => {
         const json = this.textState.getValue();
         await S.rpcUtil.rpc<J.SaveNodeJsonRequest, J.SaveNodeJsonResponse>("saveNodeJson", {
             json
