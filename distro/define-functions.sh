@@ -35,10 +35,16 @@ imageCheck () {
 # try running this docker-comkpose with "--no-cache" option like this:
 #     docker-compose -f ${dc_yaml} build --no-cache
 dockerBuild () {
-    echo "dockerBuild: app"
+    echo "dockerBuild: full app"
     # docker-compose -f ${dc_yaml} build --no-cache
     docker-compose -f ${dc_yaml} build --parallel
     verifySuccess "Docker Compose: build app"
+}
+
+dockerBuildService () {
+    echo "dockerBuild: Service $1"
+    docker-compose -f ${dc_yaml} build $1
+    verifySuccess "Docker Compose: build $1"
 }
 
 dockerUp() {
