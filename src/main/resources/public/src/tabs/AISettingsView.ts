@@ -75,14 +75,14 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         placeholder: "List folders to include (optional)"
                     }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos) : null,
                     S.quanta.config.aiAgentEnabled ? new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }) : null,
-                    new Button("Save", this.save, { className: "marginTop" })
+                    new Button("Save", this._save, { className: "marginTop" })
                 ]) : null,
             ])
         ];
         return true;
     }
 
-    save = async () => {
+    _save = async () => {
         await S.util.saveUserPrefs(s => {
             s.userPrefs.aiAgentFileExtensions = this.fileExtState.getValue();
             s.userPrefs.aiAgentFoldersToInclude = this.foldersToIncludeState.getValue();
@@ -91,7 +91,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
         S.util.flashMessage("Saved settings", "Note");
     }
 
-    settingsLink = (name: string, onClick: () => void, moreClasses: string = ""): Div => {
+    settingsLink(name: string, onClick: () => void, moreClasses: string = ""): Div {
         return new Div(name, {
             className: "settingsLink " + moreClasses,
             onClick

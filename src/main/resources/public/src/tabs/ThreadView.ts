@@ -116,17 +116,14 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     _saveAsPDF = async () => {
         const dlg =new ExportDlg("thread-view", getAs().threadViewFromNodeId, true);
         await dlg.open();
-        this.exportResponse(dlg.res);
-    }
-
-    exportResponse(res: J.ExportResponse) {
+        
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
         eventually the plan is to have the export return the actual md5 of the export for use here
         */
         // disp=inline (is the other)
-        const downloadLink = S.util.getHostAndPort() + "/f/export/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
+        const downloadLink = S.util.getHostAndPort() + "/f/export/" + dlg.res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
-        if (S.util.checkSuccess("Export", res)) {
+        if (S.util.checkSuccess("Export", dlg.res)) {
             new MessageDlg(
                 "Export successful.<p>Use the download link below now, to get the file.",
                 "Export",

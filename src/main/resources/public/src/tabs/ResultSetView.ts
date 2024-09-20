@@ -137,7 +137,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
             "userFeedItemHighlight", null);
     }
 
-    addPaginationBar = (children: Comp[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) => {
+    addPaginationBar(children: Comp[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) {
         let moreButton: IconButton = null;
         if (this.data.id === C.TAB_TIMELINE) {
             this.showPageNumber = false;

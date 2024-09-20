@@ -44,7 +44,6 @@ export class EditPrivsTableRow extends ListBoxRow {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
         }
 
-        const displayName = this.aclEntry.displayName;
         const userNameDisp = S.util.getFriendlyPrincipalName(this.aclEntry);
         const isPublic = this.aclEntry.principalName === PrincipalName.PUBLIC;
 
@@ -69,7 +68,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 ]),
                 new Div(null, { className: "sharingDisplayName" }, [
                     isPublic ? new Div("Public (Everyone)", { className: "largeFont" })
-                        : new Div(displayName, {
+                        : new Div(this.aclEntry.displayName, {
                             className: "friendName",
                             [C.USER_ID_ATTR]: this.aclEntry.principalNodeId,
                             onClick: S.nav._clickToOpenUserProfile

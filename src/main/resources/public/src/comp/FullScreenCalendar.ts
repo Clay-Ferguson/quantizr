@@ -19,8 +19,8 @@ export class FullScreenCalendar extends Main {
     }
 
     override compRender(): ReactNode {
-        const state = getAs();
-        const nodeId = state.fullScreenConfig.nodeId;
+        const ast = getAs();
+        const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);
 
         if (!node) {
@@ -48,8 +48,8 @@ export class FullScreenCalendar extends Main {
                 selectable: false,
                 selectMirror: true,
                 dayMaxEvents: true,
-                weekends: state.calendarShowWeekends,
-                initialEvents: state.calendarData,
+                weekends: ast.calendarShowWeekends,
+                initialEvents: ast.calendarData,
                 dateClick: this.dateClick,
                 eventContent: (eventContent: any) => createElement("div", null,
                     createElement("b", null, eventContent.timeText + " -> "),
@@ -75,7 +75,7 @@ export class FullScreenCalendar extends Main {
                         text: "weekend",
                         click: () => {
                             dispatch("Action_CalendarToggleWeekends", s => {
-                                s.calendarShowWeekends = !state.calendarShowWeekends;
+                                s.calendarShowWeekends = !ast.calendarShowWeekends;
                                 return s;
                             });
                         }

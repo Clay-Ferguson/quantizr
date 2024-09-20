@@ -178,7 +178,6 @@ export class SelectTagsDlg extends DialogBase {
 
         if (state.tags?.length > 0) {
             div = new Div(null, { className: "marginBottom" });
-
             state.tags.forEach(tagObj => this.processAddCheckboxOrHeading(div, tagObj));
 
             if (state.suggestTags && state.suggestedTags.length > 0) {
@@ -189,7 +188,6 @@ export class SelectTagsDlg extends DialogBase {
                     if (state.tags.find(o => o.tag === tagObj.tag)) {
                         return;
                     }
-
                     this.processAddCheckboxOrHeading(div, tagObj);
                 });
             }
@@ -198,7 +196,6 @@ export class SelectTagsDlg extends DialogBase {
         if (!div || !div.hasChildren()) {
             div = new Div("You haven't added any tags yet. Use the `Edit Tags` button to add some.");
         }
-
         return div;
     }
 

@@ -88,7 +88,7 @@ export class LoginDlg extends DialogBase {
                 userName: usr,
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),
-                dst: S.util.daylightSavingsTime,
+                dst: S.util._daylightSavingsTime,
                 sigKey: S.crypto.sigKey,
                 asymEncKey: S.crypto.asymEncKey
             }, false, true);

@@ -41,7 +41,7 @@ export class CalcType extends TypeBase {
             log: (v: any) => {
                 win.q.logs.push(v);
             },
-            formatCurrency: S.util.formatCurrency
+            formatCurrency: S.util._formatCurrency
         };
 
         let script = "";

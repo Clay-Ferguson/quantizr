@@ -931,7 +931,7 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
-     * todo-1: This is very low hanging fruit to make this a feature on the Search menu. In other words
+     * todo-2: This is very low hanging fruit to make this a feature on the Search menu. In other words
      * implementing an "All Named Nodes" search would be trivial with this.
      */
     public Iterable<SubNode> getNamedNodes(SubNode node) {

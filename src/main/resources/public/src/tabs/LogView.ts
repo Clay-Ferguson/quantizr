@@ -25,7 +25,7 @@ export class LogView extends AppTab<any, LogView> implements LogViewIntf {
         // })();
     }
 
-    log = (msg: string): any => {
+    log(msg: string): any {
         LogView.logs += msg;
         LogView.logs += "\n";
     }

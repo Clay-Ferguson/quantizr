@@ -47,8 +47,8 @@ export class AdminView extends AppTab<any, AdminView> {
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("Run JUnit Tests", () => S.view.runServerCommand("getTestResults", "run", "Test Results", null)),
                         this.settingsLink("Show Test Results", () => S.view.runServerCommand("getTestResults", null, "Test Results", null)),
-                        this.settingsLink("Send Email", S.util.sendTestEmail),
-                        this.settingsLink("Server Log Text", S.util.sendLogText),
+                        this.settingsLink("Send Email", S.util._sendTestEmail),
+                        this.settingsLink("Server Log Text", S.util._sendLogText),
                         this.settingsLink("Redis PubSub Test", () => S.view.runServerCommand("redisPubSubTest", null, "Redis PubSub Test", null)), //
                     ]),
                     new Div(null, { className: settingsCol }, [

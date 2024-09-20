@@ -97,7 +97,7 @@ export class Util {
         return "fa-file";
     }
 
-    findFirstVisibleElm = (parentId: string, childrenClass: string): Element => {
+    findFirstVisibleElm(parentId: string, childrenClass: string): Element {
         const parent: HTMLElement = document.getElementById(parentId);
         if (parent) {
             const containerRect = parent.getBoundingClientRect();
@@ -122,7 +122,7 @@ export class Util {
 
     // accepts letters, numbers, underscore, dash.
     // todo-2: enforce this same rule on the server side
-    validUsername = (v: string): boolean => {
+    validUsername(v: string): boolean {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
 
@@ -131,12 +131,12 @@ export class Util {
     This is the only time and place we ever do this kind of hack, and it's purely for performances
     and make HTML renders significantly faster by avoiding 100s of function object creates per page
     render */
-    allowIdFromEvent = (evt: Event, id: string): string => {
+    allowIdFromEvent(evt: Event, id: string): string {
         if (id) return id;
         return S.domUtil.getNodeIdFromDom(evt);
     }
 
-    formatMemory = (val: number): string => {
+    formatMemory(val: number): string {
         // put these vals in const file KB,MB,GB
         if (val < 1024) {
             if (val < 1) {
@@ -166,7 +166,7 @@ export class Util {
         return null;
     }
 
-    hashOfString = (s: string): string => {
+    hashOfString(s: string): string {
         let hash = 0;
         let i = 0;
         let chr = 0;
@@ -200,19 +200,19 @@ export class Util {
         return JSON.stringify(sortedObj);
     }
 
-    hashOfObject = (obj: any): string => {
+    hashOfObject(obj: any): string {
         return this.hashOfString(this.stringifyObject(obj));
     }
 
     /* Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can
     either be an actual extension or else a full filename including extension */
-    getFileTypeFormFileName = (fileName: string): string => {
+    getFileTypeFormFileName(fileName: string): string {
         const ext: string = this.getFileExtensionFromFileName(fileName);
         if (!ext) return;
         return this.fileExtensionTypes.get(ext.toLowerCase());
     }
 
-    getFileExtensionFromFileName = (fileName: string): string => {
+    getFileExtensionFromFileName(fileName: string): string {
         let ext = "";
         const idx = fileName.lastIndexOf(".");
         if (idx !== -1) {
@@ -221,20 +221,20 @@ export class Util {
         return ext;
     }
 
-    isEditableFile = (fileName: string): boolean => {
+    isEditableFile(fileName: string): boolean {
         const ext = this.getFileExtensionFromFileName(fileName);
         return this.editableExtensions[ext];
     }
 
-    isImageFileName = (fileName: string): boolean => {
+    isImageFileName(fileName: string): boolean {
         return this.getFileTypeFormFileName(fileName) === "img";
     }
 
-    isAudioFileName = (fileName: string): boolean => {
+    isAudioFileName(fileName: string): boolean {
         return this.getFileTypeFormFileName(fileName) === "audio";
     }
 
-    isVideoFileName = (fileName: string): boolean => {
+    isVideoFileName(fileName: string): boolean {
         return this.getFileTypeFormFileName(fileName) === "video";
     }
 
@@ -242,7 +242,7 @@ export class Util {
     // _buf2hex = (buffer: Uint8Array): string =>
     //     buffer.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
 
-    buf2hex = (arr: Uint8Array): string => {
+    buf2hex(arr: Uint8Array): string {
         let hexStr = "";
         if (arr) {
             for (const a of arr) {
@@ -253,7 +253,7 @@ export class Util {
         return hexStr;
     }
 
-    hex2buf = (str: string): Uint8Array => {
+    hex2buf(str: string): Uint8Array {
         if (!str) {
             return new Uint8Array([]);
         }
@@ -266,7 +266,7 @@ export class Util {
         return new Uint8Array(a);
     }
 
-    chopAtLastChar = (str: string, char: string): string => {
+    chopAtLastChar(str: string, char: string): string {
         const idx = str.lastIndexOf(char);
         if (idx !== -1) {
             return str.substring(0, idx);
@@ -276,7 +276,7 @@ export class Util {
         }
     }
 
-    stripAllLeading = (s: string, char: string): string => {
+    stripAllLeading(s: string, char: string): string {
         if (!s) return s;
         while (s.startsWith(char)) {
             s = s.substring(char.length);
@@ -284,7 +284,7 @@ export class Util {
         return s;
     }
 
-    stripIfStartsWith = (s: string, str: string): string => {
+    stripIfStartsWith(s: string, str: string): string {
         if (!s) return s;
         if (s.startsWith(str)) {
             return s.substring(str.length);
@@ -293,7 +293,7 @@ export class Util {
     }
 
     /* chops 'str' off 's' if exists */
-    stripIfEndsWith = (s: string, str: string): string => {
+    stripIfEndsWith(s: string, str: string): string {
         if (s.endsWith(str)) {
             return s.substring(0, s.length - str.length);
         }
@@ -301,7 +301,7 @@ export class Util {
     }
 
     // gets how many of the first chars in 's' match 'char'
-    countLeadingChars = (s: string, char: string): number => {
+    countLeadingChars(s: string, char: string): number {
         if (!s) return 0;
         let count = 0;
         for (let i = 0; i < s.length; i++) {
@@ -315,7 +315,7 @@ export class Util {
         return count;
     }
 
-    trimLeadingChars = (s: string, char: string) => {
+    trimLeadingChars(s: string, char: string) {
         if (!s) return s;
         // this would trim leading and trailing: .replace(/^#+|#+$/g, '');
         return s.replace(new RegExp(`^${char}+`, "g"), "");
@@ -327,27 +327,27 @@ export class Util {
         return a.slice(0);
     }
 
-    arrayIndexOfItemByProp = (props: PropertyInfo[], propName: string, propVal: string): number => {
+    arrayIndexOfItemByProp(props: PropertyInfo[], propName: string, propVal: string): number {
         for (let i = 0; i < props.length; i++) {
             if (props[i][propName] === propVal) {
                 return i;
             }
         }
         return -1;
-    };
+    }
 
-    arrayMoveItem = (a: any[], fromIndex: number, toIndex: number) => {
+    arrayMoveItem(a: any[], fromIndex: number, toIndex: number) {
         a.splice(toIndex, 0, a.splice(fromIndex, 1)[0]);
-    };
+    }
 
-    stdTimezoneOffset = (date: Date) => {
+    stdTimezoneOffset(date: Date) {
         const jan = new Date(date.getFullYear(), 0, 1);
         const jul = new Date(date.getFullYear(), 6, 1);
         return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
     }
 
     // add with sign=1, subtract with sign=-1
-    addTimezoneOffset = (date: Date, sign: number): Date => {
+    addTimezoneOffset(date: Date, sign: number): Date {
         const tzOffsetMinutes = date.getTimezoneOffset();
 
         // make the time value in our current local timezone
@@ -355,15 +355,15 @@ export class Util {
         return new Date(adjustedTime);
     }
 
-    getDayOfWeek = (date: Date): string => {
+    getDayOfWeek(date: Date): string {
         return this.weekday[date.getDay()];
     }
 
-    dst = (date: Date) => {
+    dst(date: Date) {
         return date.getTimezoneOffset() < this.stdTimezoneOffset(date);
     }
 
-    indexOfObject = (arr: any[], obj: any) => {
+    indexOfObject(arr: any[], obj: any) {
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] === obj) {
                 return i;
@@ -372,7 +372,7 @@ export class Util {
         return -1;
     }
 
-    assert = (check: boolean, op: string) => {
+    assert(check: boolean, op: string) {
         if (!check) {
             throw new Error("OP FAILED: " + op);
         }
@@ -380,11 +380,11 @@ export class Util {
 
     /* I'm duplicating toJson for now, because i always expect "prettyPrint", so i need to refactor
     to be all prettyPrint */
-    prettyPrint = (obj: any): string => {
+    prettyPrint(obj: any): string {
         return obj ? JSON.stringify(obj, null, 4) : "null"
     }
 
-    getParameterByName = (name?: any, url?: any): string => {
+    getParameterByName(name?: any, url?: any): string {
         if (!name) return null;
         url = url || window.location.href;
         const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
@@ -398,11 +398,11 @@ export class Util {
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    getHostAndPort = (): string => {
+    getHostAndPort(): string {
         return location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
     }
 
-    logErr = (ex: any, message: string = "") => {
+    logErr(ex: any, message: string = "") {
         let stack;
         if (!ex.stack) {
             try {
@@ -418,7 +418,7 @@ export class Util {
         console.error(message + ": " + ex.message + "\nSTACK: " + stack);
     }
 
-    isElmVisible = (elm: HTMLElement) => {
+    isElmVisible(elm: HTMLElement) {
         return elm?.offsetHeight > 0;
     }
 
@@ -428,7 +428,7 @@ export class Util {
      * to call checkSuccess inside every response method instead, if we want that response to print
      * a message to the user when fail happens.
      */
-    checkSuccess = (opFriendlyName: string, res: J.ResponseBase): boolean => {
+    checkSuccess(opFriendlyName: string, res: J.ResponseBase): boolean {
         if ((!res || res.code != C.RESPONSE_CODE_OK) && !(res as any).errorShown) {
             this.showMessage(opFriendlyName + " failed: " + (res?.message ? res.message : ""), "Warning");
         }
@@ -436,43 +436,43 @@ export class Util {
         return res.code == C.RESPONSE_CODE_OK;
     }
 
-    flashMessage = (message: string, title: string, preformatted: boolean = false) => {
+    flashMessage(message: string, title: string, preformatted: boolean = false) {
         new MessageDlg(message, title, null, null, preformatted, 3000, "appModalContNarrowWidth").open();
     }
 
-    flashMessageQuick = (message: string, title: string, preformatted: boolean = false) => {
+    flashMessageQuick(message: string, title: string, preformatted: boolean = false) {
         new MessageDlg(message, title, null, null, preformatted, 2000, "appModalContNarrowWidth").open();
     }
 
-    showMessage = (message: string, title: string = null, preformatted: boolean = false): Promise<DialogBase> => {
+    showMessage(message: string, title: string = null, preformatted: boolean = false): Promise<DialogBase> {
         if (!message) return;
         return new MessageDlg(message, title, null, null, preformatted, 0, null).open();
     }
 
-    addAllToSet = (set: Set<string>, array: any[]) => {
+    addAllToSet(set: Set<string>, array: any[]) {
         if (!array) return;
         array.forEach(v => {
             set.add(v);
         });
     }
 
-    isObject = (obj: any): boolean => {
+    isObject(obj: any): boolean {
         return obj && obj.length !== 0;
     }
 
-    currentTimeMillis = (): number => {
+    currentTimeMillis(): number {
         // warning DO NOT USE getMilliseconds, which is only 0 thru 999
         return new Date().getTime();
     }
 
-    insertString = (val: string, text: string, position: number): string => {
+    insertString(val: string, text: string, position: number): string {
         return [val.slice(0, position), text, val.slice(position)].join("");
     }
 
     /*
      * displays message (msg) of object is not of specified type
      */
-    verifyType = (obj: any, type: string, msg: string) => {
+    verifyType(obj: any, type: string, msg: string) {
         if (typeof obj !== type) {
             this.showMessage(msg, "Warning");
             return false;
@@ -482,7 +482,7 @@ export class Util {
 
     /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as
     part of processing so it's debatable wether the overhead of that is better for large objects */
-    getPropertyCount = (obj: any): number => {
+    getPropertyCount(obj: any): number {
         if (!obj) return 0;
         const names: string[] = Object.getOwnPropertyNames(obj);
         return names ? names.length : 0;
@@ -490,7 +490,7 @@ export class Util {
 
     /* Iterates by calling callback with property key/value pairs for each property in the object
     check to see if tyescript has a better native way to iterate 'hasOwn' properties */
-    forEachProp = (obj: any, callback: I.PropertyIterator) => {
+    forEachProp(obj: any, callback: I.PropertyIterator) {
         if (!obj) return;
         const names: any[] = Object.getOwnPropertyNames(obj);
         names?.forEach(prop => {
@@ -501,7 +501,7 @@ export class Util {
     }
 
     /* iterates over an object creating a string containing it's keys */
-    printKeys = (obj: any): string => {
+    printKeys(obj: any): string {
         if (!obj) {
             return "null";
         }
@@ -525,13 +525,13 @@ export class Util {
 
     * ex: let example = InstanceLoader.getInstance<NamedThing>(window, 'ExampleClass', args...);
     */
-    getInstance = <T>(context: any, name: string, ...args: any[]): T => {
+    getInstance<T>(context: any, name: string, ...args: any[]): T {
         const instance = Object.create(context[name].prototype);
         instance.constructor.apply(instance, args);
         return <T>instance;
     }
 
-    clipboardReadable = (): boolean => {
+    clipboardReadable(): boolean {
         const allowed = (typeof (navigator as any)?.clipboard?.read) === "function";
         if (!allowed) {
             // looks like on localhost (http) we always end up here unable to access clipboard but the
@@ -541,7 +541,7 @@ export class Util {
         return allowed;
     }
 
-    copyToClipboard = async (text: string): Promise<void> => {
+    async copyToClipboard(text: string): Promise<void> {
         try {
             // Use the Clipboard API to write text
             await navigator?.clipboard?.writeText(text);
@@ -575,7 +575,7 @@ export class Util {
         }
     }
 
-    formatDateTime = (date: Date): string => {
+    formatDateTime(date: Date): string {
         let hours = date.getHours();
         const minutes = date.getMinutes();
         const ampm = hours >= 12 ? "pm" : "am";
@@ -589,7 +589,7 @@ export class Util {
         return (date.getMonth() + 1) + "-" + date.getDate() + "-" + year + " " + strTime;
     }
 
-    formatDateShort = (date: Date): string => {
+    formatDateShort(date: Date): string {
         let year = date.getFullYear();
         if (year > 2000) {
             year -= 2000;
@@ -597,7 +597,7 @@ export class Util {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + year;
     }
 
-    removeHtmlTags = (text: string) => {
+    removeHtmlTags(text: string) {
         if (!text) return text;
         text = text.replaceAll("```", " ");
         const doc = new DOMParser().parseFromString(text, "text/html");
@@ -605,7 +605,7 @@ export class Util {
         return ret.trim();
     }
 
-    getBrowserMemoryInfo = (): string => {
+    getBrowserMemoryInfo(): string {
         // todo-2: research this. According to TypeScript typings there shouldn't even be a 'memory' attribute so this
         // must be some undocumented feature of Chrome?
         if ((performance as any).memory) {
@@ -616,16 +616,16 @@ export class Util {
         return null;
     }
 
-    perfStart = (): number => {
+    perfStart(): number {
         return performance.now();
     }
 
-    perfEnd = (message: string, startTime: number) => {
+    perfEnd(message: string, startTime: number) {
         const endTime = performance.now();
         console.log(message + " Time=" + (endTime - startTime));
     }
 
-    buildCalendarData = (items: J.CalendarItem[]): any[] => {
+    buildCalendarData(items: J.CalendarItem[]): any[] {
         if (!items) return [];
         const ret: any[] = [];
 
@@ -641,11 +641,11 @@ export class Util {
         return ret;
     }
 
-    formatCurrency = (n: number): string => {
+    _formatCurrency = (n: number): string => {
         return currencyFormatter.format(n);
     }
 
-    showBrowserInfo = () => {
+    _showBrowserInfo = () => {
         let info = "Browser: " + navigator.userAgent || navigator.vendor || (window as any).opera + "\n  ";
         info += "\n\nType: ";
         if (clientInfo.isMobileOrTablet) {
@@ -658,20 +658,20 @@ export class Util {
         this.showMessage(info, "Browser Info");
     }
 
-    switchBrowsingMode = () => {
+    _switchBrowsingMode = () => {
         dispatch("SwitchBrowsingMode", s => {
             s.mobileMode = !s.mobileMode;
             S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false");
         });
     }
     
-    sendTestEmail = async () => {
+    _sendTestEmail = async () => {
         await S.rpcUtil.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         this.showMessage("Send Test Email Initiated.", "Note");
     }
 
     // Send emial using the user's default email client
-    sendEmail = (recipient: string, subject: string, body: string, html: boolean = false) => {
+    sendEmail(recipient: string, subject: string, body: string, html: boolean = false) {
         if (html) {
             body = encodeURIComponent(`<!DOCTYPE html><html><body>${body}</body></html>`);
         }
@@ -684,7 +684,7 @@ export class Util {
     }
 
     // Send emial using the user's default email client
-    sendTextMessage = (phone: string, body: string) => {
+    sendTextMessage(phone: string, body: string) {
         // Create the mailto link
         const mailtoLink = `sms:${phone}?body=${encodeURIComponent(body)}`;
 
@@ -696,7 +696,7 @@ export class Util {
     // for the purpose of either checking that logging is working, after a live edit of the logger
     // config file or as a text marker for identifying when specific things are happening by
     // injecting into log file some notes or text.
-    sendLogText = async () => {
+    _sendLogText = async () => {
         const text = window.prompt("Enter text to log on server: ");
         if (text) {
             await S.rpcUtil.rpc<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
@@ -704,7 +704,7 @@ export class Util {
         }
     }
 
-    showSystemNotification = (title: string, message: string) => {
+    showSystemNotification(title: string, message: string) {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission((_status) => { // status is "granted", if accepted by user
                 message = this.removeHtmlTags(message);
@@ -726,7 +726,7 @@ export class Util {
 
     // todo-2: We need to accumulate these alerts into a list that's only displayed if the user clicks a
     // notification icon at the top of page. Pull them up in a listbox dialog.
-    showPageMessage = (message: string) => {
+    showPageMessage(message: string) {
         // This outter timer is a very slight hack because when the page re-renders currently it resets
         // pageMessage, so we sneak in here behind that to set this.
         setTimeout(() => {
@@ -741,7 +741,7 @@ export class Util {
         }, 500);
     }
 
-    loadBookmarks = async () => {
+    _loadBookmarks = async () => {
         const ast = getAs();
         if (!ast.isAnonUser) {
             const res = await S.rpcUtil.rpc<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", null, true);
@@ -751,7 +751,7 @@ export class Util {
         }
     }
 
-    playAudioIfRequested = () => {
+    playAudioIfRequested() {
         const audioUrl = this.getParameterByName("audioUrl");
         if (audioUrl) {
             const startTimeStr = this.getParameterByName("t");
@@ -761,28 +761,28 @@ export class Util {
     }
 
     // caller can optionally pass in the type, and yes for now 'id' is not used, but I want it as a param.
-    notifyNodeUpdated = (_id: string, type: string) => {
+    notifyNodeUpdated(_id: string, type: string) {
         if (type === J.NodeType.BOOKMARK) {
-            setTimeout(S.util.loadBookmarks, 100);
+            setTimeout(S.util._loadBookmarks, 100);
         }
     }
 
-    notifyNodeDeleted = () => {
+    notifyNodeDeleted() {
         const ast = getAs();
         // Update bookmarks, but only if user is viewing the bookmarks page.
         if (ast.node?.type === J.NodeType.BOOKMARK_LIST) {
-            setTimeout(S.util.loadBookmarks, 100);
+            setTimeout(S.util._loadBookmarks, 100);
         }
     }
 
-    notifyNodeMoved = () => {
+    notifyNodeMoved() {
         const ast = getAs();
         if (ast.node?.type === J.NodeType.BOOKMARK_LIST) {
-            setTimeout(S.util.loadBookmarks, 100);
+            setTimeout(S.util._loadBookmarks, 100);
         }
     }
 
-    checkChangePassword = () => {
+    checkChangePassword() {
         const passCode = this.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
@@ -820,13 +820,13 @@ export class Util {
         }
     }
 
-    setUserPreferences = (flag: boolean) => {
+    setUserPreferences(flag: boolean) {
         if (flag !== getAs().userPrefs.editMode) {
             this.saveUserPrefs(s => s.userPrefs.editMode = flag);
         }
     }
 
-    saveUserPrefs = async (mod: StateModFunc) => {
+    async saveUserPrefs(mod: StateModFunc) {
         await promiseDispatch("SetUserPreferences", s => {
             mod(s);
         });
@@ -840,12 +840,12 @@ export class Util {
         }
     }
 
-    countChars = (val: string, char: string): number => {
+    countChars(val: string, char: string): number {
         if (!val) return 0;
         return val.split(char).length - 1;
     }
 
-    setInitialStateVars = async (res: J.LoginResponse) => {
+    async setInitialStateVars(res: J.LoginResponse) {
         if (!res) return;
 
         const voice = await S.localDB.getVal(C.LOCALDB_VOICE_INDEX);
@@ -881,21 +881,21 @@ export class Util {
 
     /* show metadata if the user has the setting ON or if on POSTS node or a COMMENT node as the
         top page-root node */
-    showMetaData = (ast: AppState, node: NodeInfo) => {
+    showMetaData(ast: AppState, node: NodeInfo) {
         return ast.userPrefs.showMetaData ||
             J.NodeType.POSTS === node?.type ||
             J.NodeType.COMMENT === node?.type;
     }
 
-    fullscreenViewerActive = (): boolean => {
+    fullscreenViewerActive(): boolean {
         return getAs().fullScreenConfig.type !== I.FullScreenType.NONE;
     }
 
-    ctrlKeyCheck = (): boolean => {
+    ctrlKeyCheck(): boolean {
         return S.quanta.ctrlKey && (new Date().getTime() - S.quanta.ctrlKeyTime) < 5000;
     }
 
-    readClipboardFile = (): Promise<any> => {
+    readClipboardFile(): Promise<any> {
         return new Promise<any>((resolve, _reject) => {
             const navigatorAny = navigator as any;
             if (navigatorAny && navigatorAny.clipboard) {
@@ -920,7 +920,7 @@ export class Util {
         });
     }
 
-    resumeEditingOfAbandoned = async () => {
+    _resumeEditingOfAbandoned = async () => {
         const editorData = await S.localDB.getVal(C.STORE_EDITOR_DATA);
         if (editorData?.nodeId && editorData?.content) {
             await S.localDB.setVal(C.STORE_EDITOR_DATA, null);
@@ -928,18 +928,18 @@ export class Util {
         }
     }
 
-    startTour = (name: string) => {
+    startTour(name: string) {
         const tour = S.tourUtils.tours.find(t => t.name == name);
         if (tour) {
             dispatch("SetTour", s => s.tour = tour);
         }
     }
 
-    getFriendlyPrincipalName = (ac: J.AccessControlInfo) => {
+    getFriendlyPrincipalName(ac: J.AccessControlInfo) {
         return ac.principalName;
     }
 
-    willRenderDocIndex = (ast: AppState = null): boolean => {
+    willRenderDocIndex(ast: AppState = null): boolean {
         const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT, ast);
         if (!data || !data.props) return false;
         const info = data.props as DocumentRSInfo;
@@ -959,7 +959,7 @@ export class Util {
         return false;
     }
 
-    getNodeFromEvent = (evt: Event): NodeInfo => {
+    getNodeFromEvent(evt: Event): NodeInfo {
         const nodeId = S.domUtil.getNodeIdFromDom(evt);
         if (!nodeId) return;
         return S.nodeUtil.findNode(nodeId);
@@ -967,7 +967,7 @@ export class Util {
 
     // You can use "* " to not do opengraph, and that you can use "- " to 
     // show opengraph but not the link url, and "-- " to show opengraph but without long description and without the link url.
-    removeHiddenUrls = (content: string): string => {
+    removeHiddenUrls(content: string): string {
         if (!content || content.toLowerCase().indexOf("http") === -1) return content;
 
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
@@ -994,5 +994,5 @@ export class Util {
 
     // Leave this at the END of the module since it makes calls to methods that might not be created at
     // arbitrary earlier places in the code.
-    daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;
+    _daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;
 }

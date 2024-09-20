@@ -63,7 +63,6 @@ export class ManageStorageDlg extends DialogBase {
                 used = (res.binTotal * 100 / res.binQuota).toFixed(1) + "%";
             }
         }
-
         const quota = S.util.formatMemory(res.binQuota);
 
         const info = //

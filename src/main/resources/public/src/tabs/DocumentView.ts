@@ -107,7 +107,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         return null;
     }
 
-    addPaginationBar = (children: Comp[]) => {
+    addPaginationBar(children: Comp[]) {
         const buttonBarComps: Comp[] = [];
         const results = this.data?.props?.results;
         let maxPage = Math.floor(results.length / J.ConstantInt.DOC_ITEMS_PER_PAGE);

@@ -51,7 +51,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     [C.WORD_ATTR]: word,
-                    onClick: StatisticsView.searchWord
+                    onClick: StatisticsView._searchWord
                 }));
             });
         }
@@ -63,7 +63,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
                 wordPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
                     [C.WORD_ATTR]: word,
-                    onClick: StatisticsView.searchWord
+                    onClick: StatisticsView._searchWord
                 }));
             });
         }
@@ -82,7 +82,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
         return true;
     }
 
-    static searchWord = (evt: Event, word: string) => {
+    static _searchWord = (evt: Event, word: string) => {
         if (!word) {
             word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
         }

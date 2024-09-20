@@ -71,7 +71,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    scanDevices = async () => {
+    async scanDevices() {
         const audioInputOptions: any[] = [];
         const videoInputOptions: any[] = [];
 
@@ -80,7 +80,6 @@ export class MediaRecorderDlg extends DialogBase {
 
         // We have to call this first in case it would ask the user for permission.
         await navigator.mediaDevices.getUserMedia(this.videoMode ? { audio: true, video: true } : { audio: true });
-
         const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
         devices.forEach(device => {
@@ -107,7 +106,6 @@ export class MediaRecorderDlg extends DialogBase {
                 videoInputOptions.push({ key: device.deviceId, val: device.label });
             }
         });
-
         this.mergeState<LS>({ audioInput, videoInput, audioInputOptions, videoInputOptions });
     }
 
@@ -181,17 +179,17 @@ export class MediaRecorderDlg extends DialogBase {
             new Div(null, null, [
                 this.status = state.status ? new Div(state.status, { className: "alert alert-info largerFont" }) : null,
                 new ButtonBar([
-                    state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this.newRecording, null, "btn-primary"),
+                    state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this._newRecording, null, "btn-primary"),
 
                     // This didn't work for video (only audio) which actually means my wild guess to
                     // just combine chunks isn't the correct way to accomplish this, and so I"m just
                     // disabling it until I have time to research.
                     // state.recording || !this.continuable ? null : new Button("Continue Recording", this.continueRecording, null),
 
-                    state.recording ? new Button("Stop", this.stop, null) : null,
-                    state.recording || !this.continuable ? null : new Button("Play", this.play, null),
-                    (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this.save, null),
-                    new Button(this.allowSave ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
+                    state.recording ? new Button("Stop", this._stop, null) : null,
+                    state.recording || !this.continuable ? null : new Button("Play", this._play, null),
+                    (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this._save, null),
+                    new Button(this.allowSave ? "Cancel" : "Close", this._cancel, null, "btn-secondary float-end")
                 ]),
                 this.videoMode ? this.videoPlayer : null,
                 new Div(null, { className: "marginTop" }, [audioSelect, videoSelect])
@@ -199,9 +197,9 @@ export class MediaRecorderDlg extends DialogBase {
         ];
     }
 
-    resetStream = async () => {
+    async resetStream() {
         try {
-            this.stop();
+            this._stop();
 
             // stop() doesn't always nullify 'recorder' but we do it here. Any time stream is changing
             // we force it to recreate the recorder object.
@@ -224,13 +222,13 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    newRecording = () => {
+    _newRecording = () => {
         this.recorded = true;
         this.chunks = [];
         this.continueRecording();
     }
 
-    continueRecording = async () => {
+    async continueRecording() {
         if (!this.recorder) {
             // I experimented with passing mimeTypes to Chrome and only the webm one seems to be
             // supported, so we don't need these options. May be smarter to just let the browser use
@@ -254,10 +252,10 @@ export class MediaRecorderDlg extends DialogBase {
         this.recordingTime = 0;
 
         this.mergeState<LS>({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
-        this.recordingTimer = setInterval(this.recordingTimeslice, 1000);
+        this.recordingTimer = setInterval(this._recordingTimeslice, 1000);
     }
 
-    displayStream = () => {
+    displayStream() {
         if (this.videoPlayer && this.stream) {
             this.videoPlayer.onMount((elm: HTMLElement) => {
                 (elm as HTMLVideoElement).srcObject = this.stream;
@@ -265,7 +263,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    recordingTimeslice = () => {
+    _recordingTimeslice = () => {
         document.getElementById(this.status.getId()).innerHTML = (this.videoMode ? "Recording Video: " : "Recording Audio: ") + (++this.recordingTime) + "s";
     }
 
@@ -273,7 +271,7 @@ export class MediaRecorderDlg extends DialogBase {
         this.cancelTimer();
     }
 
-    cancelTimer = () => {
+    cancelTimer() {
         if (this.recordingTimer) {
             clearInterval(this.recordingTimer);
             this.recordingTimer = null;
@@ -281,7 +279,7 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     // stop recording
-    stop = () => {
+    _stop = () => {
         if (!this.recordingTimer) return;
         this.continuable = true;
         this.cancelTimer();
@@ -291,10 +289,10 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    play = () => {
+    _play = () => {
         if (this.recordingTimer) return;
         this.cancelTimer();
-        this.stop();
+        this._stop();
 
         if (this.blob) {
             const url = URL.createObjectURL(this.blob);
@@ -317,7 +315,7 @@ export class MediaRecorderDlg extends DialogBase {
         this.stream?.getTracks().forEach((track: any) => track.stop());
     }
 
-    cancel = async () => {
+    _cancel = async () => {
         if (this.recorded) {
             const dlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
                 "btn-danger", "alert alert-danger");
@@ -336,20 +334,20 @@ export class MediaRecorderDlg extends DialogBase {
         this.stopAndCleanupVideo();
     }
 
-    stopAndCleanupVideo = () => {
+    stopAndCleanupVideo() {
         this.cancelTimer();
-        this.stop();
+        this._stop();
         this.closeStream();
         this.cleanup();
     }
 
-    cancelImmediate = () => {
+    cancelImmediate() {
         this.stopAndCleanupVideo();
         this.close();
     }
 
-    save = () => {
-        this.stop();
+    _save = () => {
+        this._stop();
         this.closeStream();
         this.cancelTimer();
         this.uploadRequested = true;

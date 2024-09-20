@@ -72,7 +72,7 @@ export class TTSView extends AppTab<any, TTSView> {
             // happen.
             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
             onMouseOut: () => { S.quanta.selectedForTts = null; },
-            onClick: () => S.speech.appendSelOrClipboard(),
+            onClick: S.speech._appendSelOrClipboard,
             title: "Text-to-Speech: Append more text from...\n\nText Area below, Selected Text, or Clipboard"
         }) : null;
 
@@ -90,13 +90,13 @@ export class TTSView extends AppTab<any, TTSView> {
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-pause fa-2x bigMarginRight clickable",
-            onClick: () => S.speech.pauseSpeaking(),
+            onClick: S.speech._pauseSpeaking,
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
             className: "fa fa-play fa-2x bigMarginRight clickable",
-            onClick: () => S.speech.resumeSpeaking(),
+            onClick: S.speech._resumeSpeaking,
             title: "Resume Speaking Text"
         }) : null;
 

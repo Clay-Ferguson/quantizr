@@ -290,7 +290,7 @@ export class Quanta {
 
         if (initialTab === C.TAB_FEED) {
             if (S.quanta.config.search) {
-                StatisticsView.searchWord(null, S.quanta.config.search);
+                StatisticsView._searchWord(null, S.quanta.config.search);
             }
             else {
                 S.tabUtil.selectTab(initialTab);

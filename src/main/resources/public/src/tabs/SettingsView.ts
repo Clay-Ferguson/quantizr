@@ -83,7 +83,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
                 }),
 
-                this.settingsLink(ast.mobileMode ? "Switch to Desktop Browser" : "Switch to Moble Browser", S.util.switchBrowsingMode, "marginTop"),
+                this.settingsLink(ast.mobileMode ? "Switch to Desktop Browser" : "Switch to Moble Browser", S.util._switchBrowsingMode, "marginTop"),
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //
@@ -96,7 +96,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     ]),
                     new Div(null, { className: settingsCol }, [
                         this.settingsLink("My GEO Location", S.nav._geoLocation), //
-                        this.settingsLink("About Browser", S.util.showBrowserInfo)
+                        this.settingsLink("About Browser", S.util._showBrowserInfo)
                     ])
                 ], horzClass),
 
@@ -106,7 +106,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                         this.settingsLink("Bulk Delete", S.edit._bulkDelete)
                     ]),
                     new Div(null, { className: settingsCol }, [
-                        this.settingsLink("Close Account", S.user.closeAccount)
+                        this.settingsLink("Close Account", S.user._closeAccount)
                     ])
                 ], horzClass)
             ])

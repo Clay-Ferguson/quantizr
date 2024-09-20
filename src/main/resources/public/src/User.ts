@@ -10,7 +10,7 @@ import { NodeInfo, PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class User {
-    closeAccount = async () => {
+    _closeAccount = async () => {
         let dlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account");
         await dlg.open();
         if (!dlg.yes) {
@@ -70,7 +70,7 @@ export class User {
                 userName: callUsr,
                 password: callPwd,
                 tzOffset: new Date().getTimezoneOffset(),
-                dst: S.util.daylightSavingsTime,
+                dst: S.util._daylightSavingsTime,
                 sigKey: S.crypto.sigKey,
                 asymEncKey: S.crypto.asymEncKey
             }, false, true);
@@ -168,13 +168,13 @@ export class User {
                     if (usr !== PrincipalName.ADMIN) {
                         this.checkMessages();
                     }
-                    S.util.loadBookmarks();
+                    S.util._loadBookmarks();
                     S.histUtil.loadHistoryData();
                 }, 500);
 
                 // todo-2: technically this delay is a bit of a hack because we really need a way to be SURE
                 // the main app layout has already loaded before we even try to resume editing.
-                setTimeout(S.util.resumeEditingOfAbandoned, 1500);
+                setTimeout(S.util._resumeEditingOfAbandoned, 1500);
             }
 
             await S.util.setInitialStateVars(res);

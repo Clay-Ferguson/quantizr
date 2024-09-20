@@ -21,14 +21,11 @@ export class SearchUsersDlg extends DialogBase {
     constructor() {
         super("Search Users", "appModalContMediumWidth");
         this.onMount(() => this.searchTextField?.focus());
-
-        this.mergeState<LS>({
-        });
+        this.mergeState<LS>({});
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
     }
 
     renderDlg(): Comp[] {
-
         return [
             new Div(null, null, [
                 getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", {className: "borderBottom"}) : null,

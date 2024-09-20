@@ -119,7 +119,7 @@ export class SpeechEngine {
     // Text to Speech
     // --------------------------------------------------------------
 
-    initVoices = () => {
+    initVoices() {
         // need to google "how to verify all voices loaded"
         const interval = setInterval(() => {
             this.getVoices();
@@ -133,7 +133,7 @@ export class SpeechEngine {
         }, 1000);
     }
 
-    speakSelOrClipboard = (allowUseEditField: boolean) => {
+    speakSelOrClipboard(allowUseEditField: boolean) {
         if (allowUseEditField && TTSView.textAreaState.getValue()) {
             this.speakText(TTSView.textAreaState.getValue(), false);
         }
@@ -146,7 +146,7 @@ export class SpeechEngine {
     }
 
     // Append more text to buffer of what's being read.
-    appendSelOrClipboard = async () => {
+    _appendSelOrClipboard = async () => {
         let textToAdd: string = null;
 
         if (TTSView.textAreaState.getValue()) {
@@ -173,7 +173,7 @@ export class SpeechEngine {
         }
     }
 
-    speakClipboard = async () => {
+    async speakClipboard() {
         if (!this.tts) return;
 
         const clipTxt = await (navigator as any)?.clipboard?.readText();
@@ -185,7 +185,7 @@ export class SpeechEngine {
         }
     }
 
-    speakText = async (text: string, selectTab: boolean = true, replayFromIdx: number = -1) => {
+    async speakText(text: string, selectTab: boolean = true, replayFromIdx: number = -1) {
         const ast = getAs();
 
         // if currently speaking we need to shut down and wait 1200ms before trying to speak again,
@@ -202,7 +202,7 @@ export class SpeechEngine {
         }
     }
 
-    jumpToIdx = (idx: number) => {
+    jumpToIdx(idx: number) {
         if (this.queuedSpeech?.length > 1 && idx >= 0 && idx < this.queuedSpeech?.length) {
 
             this.stopSpeaking();
@@ -217,7 +217,7 @@ export class SpeechEngine {
     }
 
     // you can pass null, and this method will repeat it's current text.
-    speakTextNow = async (text: string, selectTab: boolean = true, replayFromIdx: number = -1) => {
+    async speakTextNow(text: string, selectTab: boolean = true, replayFromIdx: number = -1) {
         if (!this.tts || (!text && replayFromIdx === -1)) return;
         this.ttsRunning = true;
         this.createTtsTimer();
@@ -341,7 +341,7 @@ export class SpeechEngine {
         }, 100);
     }
 
-    createTtsTimer = () => {
+    createTtsTimer() {
         // create timer that runs forever and fixes the Chrome bug whenever speech has been
         // running more than ten seconds.
         if (!this.ttsTimer) {
@@ -367,14 +367,14 @@ export class SpeechEngine {
         }
     }
 
-    highlightByIndex = (idx: number) => {
+    highlightByIndex(idx: number) {
         TTSView.ttsHighlightIdx = idx;
         if (TTSView.inst) {
             TTSView.inst.mergeState({});
         }
     }
 
-    parseRateValue = (rate: string) => {
+    parseRateValue(rate: string) {
         switch (rate) {
             case "slowest":
                 return 0.7;
@@ -397,7 +397,7 @@ export class SpeechEngine {
         }
     }
 
-    getVoices = () => {
+    getVoices() {
         if (this.voices) return this.voices;
         this.voices = this.tts.getVoices();
         this.filterVoices();
@@ -407,11 +407,11 @@ export class SpeechEngine {
         };
     }
 
-    ttsSupported = () => {
+    ttsSupported() {
         return this.tts && this.voices && this.voices.length > 0;
     }
 
-    filterVoices = () => {
+    filterVoices() {
         // console.log("TTS: " + this.voices?.length + " voices.");
 
         // filter out voices that don't have english language
@@ -545,7 +545,7 @@ export class SpeechEngine {
         return ret;
     }
 
-    appendTextToBuffer = (text: string) => {
+    appendTextToBuffer(text: string) {
         if (!text) return;
         text = this.preProcessText(text);
 
@@ -565,7 +565,7 @@ export class SpeechEngine {
         });
     }
 
-    splitByQuotations = (text: string): string[] => {
+    splitByQuotations(text: string): string[] {
         text = text.replaceAll("“", "\"");
         text = text.replaceAll("”", "\"");
         const quoteCount = S.util.countChars(text, "\"");
@@ -605,7 +605,7 @@ export class SpeechEngine {
     // text. It's basically a time related thing where if it speaks for more than about 10 seconds
     // at a time it hangs. See the setInterval function in this class for more on the
     // tradeoffs/workarounds related to this.
-    fragmentizeSentencesToQueue = (text: string) => {
+    fragmentizeSentencesToQueue(text: string) {
         const ast = getAs();
         const maxChars = this.MAX_UTTERANCE_CHARS * this.parseRateValue(ast.speechRate);
 
@@ -646,7 +646,7 @@ export class SpeechEngine {
     // We have this push function basically so we can split up quotations. This splitting is what
     // allows us to switch voices if we went to (for quotations) but is also a way to keep the
     // utterances as short ass possible, which is needed to help Chrome not hang.
-    pushTextToQueue = (text: string) => {
+    pushTextToQueue(text: string) {
         if (!this.USE_VOICE2) {
             this.queuedSpeech.push(text);
             return;
@@ -664,7 +664,7 @@ export class SpeechEngine {
     // We manage 'paused & speaking' state ourselves rather than relying on the engine to have those
     // states correct, because TRUST ME at least on Chrome the states are unreliable. If you know
     // you're about to speak some new text you can pass in that text to update screen ASAP
-    stopSpeaking = async () => {
+    async stopSpeaking() {
         if (!this.tts) return;
         this.ttsRunning = false;
         if (this.utter) {
@@ -681,7 +681,7 @@ export class SpeechEngine {
     }
 
     // Using "tts.cancel()" instead of "tts.pause()" to work around Chrome Bug
-    pauseSpeaking = async () => {
+    _pauseSpeaking = async () => {
         if (!this.tts) return;
         this.ttsRunning = false;
 
@@ -692,7 +692,7 @@ export class SpeechEngine {
     }
 
     // Using "jumpToIdx()" instead of "tts.resume()" to work around Chrome Bug
-    resumeSpeaking = async () => {
+    _resumeSpeaking = async () => {
         // we use ttsIdx-1 as out starting point because this index is always kind of 'pre-advanced'
         // to the next utterance once a given utterance is stated.
         this.jumpToIdx(this.ttsIdx - 1);

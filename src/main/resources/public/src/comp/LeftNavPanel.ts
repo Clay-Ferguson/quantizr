@@ -24,7 +24,6 @@ export class LeftNavPanel extends Div {
         });
 
         const ast = getAs();
-
         let cols = ast.userPrefs.mainPanelCols || 6;
         if (cols < 4) cols = 4;
         if (cols > 8) cols = 8;

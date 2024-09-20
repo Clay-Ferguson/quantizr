@@ -26,7 +26,7 @@ import { TTSTab } from "./tabs/data/TTSTab";
 import { AudioPlayerTab } from "./tabs/data/AudioPlayerTab";
 
 export class TabUtil {
-    selectTab = (tabName: string) => {
+    selectTab(tabName: string) {
         if (!tabName) return;
         /* if tab is already active no need to update state now
 
@@ -45,12 +45,12 @@ export class TabUtil {
         });
     }
 
-    makeDomIdForNode = (tabData: TabBase<any>, id: string) => {
+    makeDomIdForNode(tabData: TabBase<any>, id: string) {
         return tabData.id + id;
     }
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
-    selectTabStateOnly = (tabName: string) => {
+    selectTabStateOnly(tabName: string) {
         const ast = getAs();
         if (tabName === C.TAB_MAIN && !ast.node) {
 
@@ -66,7 +66,7 @@ export class TabUtil {
         }
     }
 
-    createAppTabs = async () => {
+    async createAppTabs() {
         await promiseDispatch("initTabs", s => {
             s.tabData = [
                 new GraphTab(),
@@ -106,7 +106,7 @@ export class TabUtil {
         });
     }
 
-    getActiveTabComp = (): AppTab => {
+    getActiveTabComp(): AppTab {
         const ast = getAs();
         if (!ast.tabData) return null;
         const data = ast.tabData.find(d => d.id === ast.activeTab);
@@ -115,13 +115,13 @@ export class TabUtil {
 
     // ast param is important because sometimes we do pass in an 'ast' that's not 'committed' yet
     // for this method to use, and in that case we can't call getAs() to get state
-    getAppTabData = (tabId: string, ast: AppState = null): TabBase => {
+    getAppTabData(tabId: string, ast: AppState = null): TabBase {
         ast = ast || getAs();
         if (!ast.tabData) return null;
         return ast.tabData.find(d => d.id === tabId);
     }
 
-    tabScroll = (tabName: string, pos: number) => {
+    tabScroll(tabName: string, pos: number) {
         if (C.DEBUG_SCROLLING) {
             console.log("Scrolling tab " + tabName + " to offset " + pos);
         }
@@ -132,7 +132,7 @@ export class TabUtil {
     }
 
     // WARNING: This won't apply to (or work) for feed view which has different prop than 'results'
-    resultSetHasData = (id: string) => {
+    resultSetHasData(id: string) {
         const ast = getAs();
         const data = ast.tabData.find(d => d.id === id);
         return data?.props?.results?.length > 0;
@@ -140,7 +140,7 @@ export class TabUtil {
 
     /* This function manages persisting the scroll position when switching from one tab to another,
     to automatically restore the scroll position that was last scroll position on any given tab */
-    tabChanging = (prevTab: string, newTab: string) => {
+    tabChanging(prevTab: string, newTab: string) {
 
         /* Don't run any code here if we aren't actually changing tabs */
         if (prevTab && newTab && prevTab === newTab) {

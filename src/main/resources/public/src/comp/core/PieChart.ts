@@ -29,7 +29,7 @@ export class PieChart extends Div {
         const color = d3.scaleOrdinal(colors);
 
         // Generate the pie
-        const pie = d3.pie().value((d: any) => { return d.value; });
+        const pie = d3.pie().value((d: any) => d.value);
 
         // Generate the arcs
         const arc: any = d3.arc()
@@ -45,9 +45,7 @@ export class PieChart extends Div {
 
         // Draw arc paths
         arcs.append("path")
-            .attr("fill", (_d: any, i: any) => {
-                return color(i);
-            })
+            .attr("fill", (_d: any, i: any) => color(i))
             .attr("d", arc);
 
         arcs.append("text")
@@ -57,8 +55,6 @@ export class PieChart extends Div {
                 return "translate(" + arc.centroid(d) + ")";
             })
             .attr("text-anchor", "middle")
-            .text((_d: any, i: any) => {
-                return this.data[i].label;
-            });
+            .text((_d: any, i: any) => this.data[i].label)
     }
 }

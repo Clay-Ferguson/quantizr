@@ -72,9 +72,9 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     src: AudioPlayerView.sourceUrl,
                     className: "audioPlayer",
                     onPause: () => this.savePlayerInfo(this.player.src, this.player.currentTime),
-                    onTimeUpdate: this.onTimeUpdate,
-                    onCanPlay: this.restoreStartTime,
-                    onEnded: this.onEnded,
+                    onTimeUpdate: this._onTimeUpdate,
+                    onCanPlay: this._restoreStartTime,
+                    onEnded: this._onEnded,
                     controls: "controls",
                     autoPlay: "autoplay",
                     preload: "auto",
@@ -159,7 +159,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
     }
 
     // This makes the sleep timer work "Stop After (mins.)"
-    oneMinuteTimeslice = () => {
+    oneMinuteTimeslice() {
         if (!S.quanta.audioPlaying) return;
         if (this.timeLeftState.getValue()) {
             try {
@@ -176,7 +176,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    updatePlayButton = () => {
+    updatePlayButton() {
         if (!this.player) return;
         this.updatePlayingState();
 
@@ -191,7 +191,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         });
     }
 
-    updatePlayingState = () => {
+    updatePlayingState() {
         S.quanta.audioPlaying = !this.player.paused && !this.player.ended;
     }
 
@@ -203,19 +203,19 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    speed = (rate: number) => {
+    speed(rate: number) {
         if (this.player) {
             this.player.playbackRate = rate;
         }
     }
 
-    skip = (delta: number) => {
+    skip(delta: number) {
         if (this.player) {
             this.player.currentTime += delta;
         }
     }
 
-    restoreStartTime = () => {
+    _restoreStartTime = () => {
         /* makes player always start wherever the user last was when they clicked "pause" */
         if (this.player) {
             if (AudioPlayerView.startTimePendingOverride > 0) {
@@ -230,7 +230,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    onEnded = () => {
+    _onEnded = () => {
         if (this.player) {
             this.player.currentTime = 0;
             this.savePlayerInfo(this.player.src, 0);
@@ -238,13 +238,13 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    onTimeUpdate = () => {
+    _onTimeUpdate = () => {
         if (!this.saveTimer) {
             /* save time offset into browser local storage every 3 seconds */
-            this.saveTimer = setInterval(this.saveTime, 3000);
+            this.saveTimer = setInterval(this._saveTime, 3000);
         }
 
-        this.restoreStartTime();
+        this._restoreStartTime();
 
         if (this.adSegments) {
             for (const seg of this.adSegments) {
@@ -271,7 +271,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    saveTime = () => {
+    _saveTime = () => {
         if (this.player && !this.player.paused) {
             /* this safety check to be sure no hidden audio can still be playing should no longer be
             needed now that I have the close listener even on the dialog, but i'll leave this here
@@ -284,7 +284,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
         }
     }
 
-    savePlayerInfo = (url: string, timeOffset: number) => {
+    savePlayerInfo(url: string, timeOffset: number) {
         const urlHash = S.util.hashOfString(url);
         localStorage[urlHash] = timeOffset;
     }
