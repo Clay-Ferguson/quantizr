@@ -592,7 +592,7 @@ export class EditNodeDlg extends DialogBase {
                 }
             });
         }
-        _.propsParent.ordinalSortChildren();
+        _.propsParent.children?.sort((a: any, b: any) => a.ordinal - b.ordinal);
         return ret;
     }
 

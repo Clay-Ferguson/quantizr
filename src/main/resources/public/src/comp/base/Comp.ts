@@ -508,13 +508,6 @@ export abstract class Comp {
             elm.scrollTop = pos;
         }
     }
-
-    // There are a few very special places where we need to sort components that may have been added
-    // in an order we don't want this this is how we do it.
-    // todo-0: we shouldn't do this in this base class, put it in render helper.
-    ordinalSortChildren() {
-        this.children?.sort((a: any, b: any) => a.ordinal - b.ordinal);
-    }
 }
 
 /* We have a wrapper class around this single value so we can pass by reference and store the actual
