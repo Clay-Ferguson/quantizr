@@ -8,7 +8,6 @@ from langchain.chat_models.base import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic.v1.types import SecretStr
 from pydantic import BaseModel
 from typing import List, Optional, Set
 import traceback
@@ -173,7 +172,7 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
                 temperature=req.temperature,
                 max_tokens_to_sample=req.maxTokens,
                 timeout=120,  # timeout in seconds
-                api_key=SecretStr(api_key),
+                api_key=api_key,
             )
     elif req.service == "openai":
         llm = ChatOpenAI(
