@@ -2,22 +2,6 @@ import { Comp } from "../base/Comp";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 import { Constants as C } from "../../Constants";
 
-// see: https://www.npmjs.com/package/react-emoji-render
-// https://codesandbox.io/s/xjpy58llxq
-
-// ************ DO NOT DELETE
-//
-// const parseEmojisAndHtml = value => {
-//     const emojisArray = toArray(value);
-//     const newValue = emojisArray.map((node: any) => {
-//         if (typeof node === "string") {
-//             return <span dangerouslySetInnerHTML={{ __html: node }} />;
-//         }
-//         return node.props.children;
-//     });
-//     return newValue;
-// };
-
 interface LS { // Local State
     content?: string;
 }

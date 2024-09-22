@@ -265,7 +265,7 @@ export abstract class Comp {
         return ret;
     }
 
-    // add type argument here (not 'any')
+    // todo-0: add type argument here (not 'any')
     ensureState(): boolean {
         if (!this.stateMgr) {
             if (!this.rendered) {
