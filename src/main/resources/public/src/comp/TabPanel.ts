@@ -5,11 +5,11 @@ import { AppTab } from "./AppTab";
 import { Comp } from "./base/Comp";
 import { RightNavPanel } from "./RightNavPanel";
 
-export class TabPanel extends Div {
+export class TabPanel extends Comp {
     static inst: TabPanel;
 
     constructor(private customTopComp: Comp = null) {
-        super(null, { id: C.ID_TAB });
+        super({ id: C.ID_TAB });
         TabPanel.inst = this;
         const ast = getAs();
 

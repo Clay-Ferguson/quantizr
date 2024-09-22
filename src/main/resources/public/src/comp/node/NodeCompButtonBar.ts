@@ -14,11 +14,11 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Span } from "../core/Span";
 
-export class NodeCompButtonBar extends Div {
+export class NodeCompButtonBar extends Comp {
 
     constructor(public node: NodeInfo, public isTableCell, public level: number, public allowNodeMove: boolean,
         private extraButtons: Comp[], extraClass: string, public tabData: TabBase<any>) {
-        super(null, {
+        super({
             id: "ncbb_" + node.id,
             className: "nodeCompButtonBar " + (extraClass || "")
         });

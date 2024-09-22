@@ -15,13 +15,13 @@ interface LS { // Local State
     loading?: boolean;
 }
 
-export class OpenGraphPanel extends Div {
+export class OpenGraphPanel extends Comp {
     loading: boolean;
     observer: IntersectionObserver;
 
     constructor(private tabData: TabBase<any>, key: string, private ui: UrlInfo, private wrapperClass: string,
         private imageClass: string, private showTitle: boolean, _allowBookmarkIcon: boolean, private includeImage: boolean) {
-        super(null, {
+        super({
             title: ui.url,
             key
         });

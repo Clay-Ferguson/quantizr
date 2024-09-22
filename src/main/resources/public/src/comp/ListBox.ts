@@ -1,10 +1,10 @@
-import { Div } from "../comp/core/Div";
 import { ValueIntf } from "../Interfaces";
+import { Comp } from "./base/Comp";
 
-export class ListBox extends Div {
+export class ListBox extends Comp {
 
     constructor(public valueIntf: ValueIntf = null) {
-        super(null);
+        super();
         this.setClass("list-group marginBottom");
 
         if (this.valueIntf) {

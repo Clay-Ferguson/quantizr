@@ -4,11 +4,11 @@ import { DocumentRSInfo } from "./DocumentRSInfo";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { S } from "./Singletons";
-import { Div } from "./comp/core/Div";
+import { Comp } from "./comp/base/Comp";
 import { Html } from "./comp/core/Html";
 import { TabBase } from "./intf/TabBase";
 
-export class DocIndexPanel extends Div {
+export class DocIndexPanel extends Comp {
     static initialized: boolean = false;
 
     constructor() {

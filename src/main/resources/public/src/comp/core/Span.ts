@@ -1,28 +1,23 @@
 import { Attribs, CompT, Comp } from "../base/Comp";
 
-interface LS { // Local State
-    content?: string;
-}
-
 export class Span extends Comp {
-
-    constructor(content: string = "", attribs: Attribs = null, children: CompT[] = null) {
+    constructor(content: string = null, attribs: Attribs = null, children: CompT[] = null) {
         super(attribs);
-        this.mergeState<LS>({ content });
+        // NOTE: This class is identical to Div, except for this line that sets 'tag' 
         this.tag = "span";
-        this.children = children;
-    }
 
-  override preRender(): CompT[] | boolean | null {
-        const content = this.getState<LS>().content;
-        if (content) {
-            if (this.children) {
-                return [content, ...this.children];
+        if (children && children.length > 0) {
+            if (content) {
+                this.children = [content, ...children];
             }
             else {
-                return [content];
+                this.children = children;
             }
         }
-        return this.children;
+        else {
+            if (content) {
+                this.children = [content];
+            }
+        }
     }
 }

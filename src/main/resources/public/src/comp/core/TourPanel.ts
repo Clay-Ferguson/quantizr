@@ -1,10 +1,11 @@
 import { dispatch, getAs } from "../../AppContext";
+import { Comp } from "../base/Comp";
 import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Div } from "./Div";
 import { Span } from "./Span";
 
-export class TourPanel extends Div {
+export class TourPanel extends Comp {
 
     constructor() {
         super();

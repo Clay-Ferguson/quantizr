@@ -1,13 +1,14 @@
 import * as I from "../../Interfaces";
 import { Validator } from "../../Validator";
+import { Comp } from "../base/Comp";
 import { Div } from "./Div";
 import { Input } from "./Input";
 
-export class DateField extends Div implements I.ValueIntf {
+export class DateField extends Comp implements I.ValueIntf {
     input: Input;
 
     constructor(private valState: Validator) {
-        super(null);
+        super();
     }
 
     override focus(): void {

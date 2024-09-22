@@ -6,6 +6,7 @@ import { ValueIntf } from "../../Interfaces";
 import { Attachment, NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Validator, ValidatorRuleName } from "../../Validator";
+import { Comp } from "../base/Comp";
 import { NodeCompBinary } from "../node/NodeCompBinary";
 import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
@@ -18,10 +19,10 @@ import { IconButton } from "./IconButton";
 import { Span } from "./Span";
 import { TextField } from "./TextField";
 
-export class EditAttachmentsPanel extends Div {
+export class EditAttachmentsPanel extends Comp {
 
     constructor(private node: NodeInfo, private dlg: EditNodeDlg) {
-        super(null, { className: "binaryEditorSection" });
+        super({ className: "binaryEditorSection" });
     }
 
     override preRender(): boolean | null {

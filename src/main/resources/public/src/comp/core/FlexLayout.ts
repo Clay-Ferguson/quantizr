@@ -1,10 +1,9 @@
 import { Comp } from "../base/Comp";
-import { Div } from "./Div";
 
-export class FlexLayout extends Div {
+export class FlexLayout extends Comp {
 
     constructor(children: Comp[] = null, moreClasses: string = "", attribs: any = null) {
-        super(null, attribs);
+        super(attribs);
         this.attribs.className = "horizontalLayout " + moreClasses;
         this.children = children;
     }

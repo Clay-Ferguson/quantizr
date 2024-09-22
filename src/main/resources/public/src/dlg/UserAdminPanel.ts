@@ -1,5 +1,6 @@
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
@@ -7,10 +8,10 @@ import { AddCreditDlg } from "./AddCreditDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { UserProfileDlg, LS as UserProfileDlgState } from "./UserProfileDlg";
 
-export class UserAdminPanel extends Div {
+export class UserAdminPanel extends Comp {
 
     constructor(private dlg: UserProfileDlg) {
-        super(null);
+        super();
         this.attribs.className = "userAdminPanel";
     }
 

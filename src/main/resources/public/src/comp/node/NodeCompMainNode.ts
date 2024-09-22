@@ -12,10 +12,10 @@ import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
-export class NodeCompMainNode extends Div {
+export class NodeCompMainNode extends Comp {
 
     constructor(public tabData: TabBase<any>) {
-        super(null, {
+        super({
             id: C.TAB_MAIN + getAs().node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"

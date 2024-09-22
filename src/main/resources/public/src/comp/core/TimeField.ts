@@ -1,13 +1,14 @@
 import * as I from "../../Interfaces";
 import { Validator } from "../../Validator";
+import { Comp } from "../base/Comp";
 import { Div } from "./Div";
 import { Input } from "./Input";
 
-export class TimeField extends Div implements I.ValueIntf {
+export class TimeField extends Comp implements I.ValueIntf {
     input: Input;
 
     constructor(private valState: Validator, private extraClass: string = null) {
-        super(null);
+        super();
     }
 
     // Overriding base class so we can focus the correct part of this composite component.

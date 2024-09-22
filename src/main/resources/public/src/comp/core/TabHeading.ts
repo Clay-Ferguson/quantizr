@@ -3,9 +3,8 @@ import { TabBase } from "../../intf/TabBase";
 import { BreadcrumbsPanel } from "../BreadcrumbsPanel";
 import { Comp } from "../base/Comp";
 import { Clearfix } from "./Clearfix";
-import { Div } from "./Div";
 
-export class TabHeading extends Div {
+export class TabHeading extends Comp {
 
     constructor(children: Comp[], data: TabBase) {
         super();

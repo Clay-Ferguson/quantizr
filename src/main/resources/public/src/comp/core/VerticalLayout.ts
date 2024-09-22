@@ -1,7 +1,7 @@
 import { Comp } from "../base/Comp";
 import { Div } from "./Div";
 
-export class VerticalLayout extends Div {
+export class VerticalLayout extends Comp {
 
     constructor(children: Comp[] = null, justify: string = "left-justified") {
         super();

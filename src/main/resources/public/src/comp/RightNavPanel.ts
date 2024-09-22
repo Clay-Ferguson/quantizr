@@ -14,13 +14,13 @@ import { Span } from "./core/Span";
 import { HistoryPanel } from "./HistoryPanel";
 import { TabPanelButtons } from "./TabPanelButtons";
 
-export class RightNavPanel extends Div {
+export class RightNavPanel extends Comp {
     private static scrollPos: number = 0;
     static historyExpanded: boolean = false;
     public static inst: RightNavPanel = null;
 
     constructor() {
-        super(null, {
+        super({
             id: C.ID_RHS,
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"

@@ -1,26 +1,21 @@
-import { Comp, CompT } from "../base/Comp";
-
-interface LS { // Local State
-    content?: string;
-}
+import { Attribs, Comp, CompT } from "../base/Comp";
 
 export class Div extends Comp {
-    constructor(content: string = null, attribs: any = {}, children: CompT[] = null) {
+    constructor(content: string = null, attribs: Attribs = null, children: CompT[] = null) {
         super(attribs);
-        this.mergeState<LS>({ content });
-        this.children = children;
-    }
 
-    override preRender(): CompT[] | boolean | null{
-        const content = this.getState<LS>().content;
-        if (content) {
-            if (this.children) {
-                return [content, ...this.children];
+        if (children && children.length > 0) {
+            if (content) {
+                this.children = [content, ...children];
             }
             else {
-                return [content];
+                this.children = children;
             }
         }
-        return this.children;
+        else {
+            if (content) {
+                this.children = [content];
+            }
+        }
     }
 }

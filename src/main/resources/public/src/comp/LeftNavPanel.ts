@@ -8,16 +8,17 @@ import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { TabPanelButtons } from "./TabPanelButtons";
+import { Comp } from "./base/Comp";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
 import { IconButton } from "./core/IconButton";
 
-export class LeftNavPanel extends Div {
+export class LeftNavPanel extends Comp {
     private static scrollPos: number = 0;
     public static inst: LeftNavPanel = null;
 
     constructor() {
-        super(null, {
+        super({
             id: C.ID_LHS,
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "1"

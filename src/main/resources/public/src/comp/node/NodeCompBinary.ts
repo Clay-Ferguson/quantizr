@@ -9,6 +9,7 @@ import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { FullScreenType } from "../../Interfaces";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Comp } from "../base/Comp";
 import { FlexRowLayout } from "../core/FlexRowLayout";
 import { Img } from "../core/Img";
 import { Span } from "../core/Span";
@@ -17,7 +18,7 @@ interface LS {
     node: NodeInfo;
 }
 
-export class NodeCompBinary extends Div {
+export class NodeCompBinary extends Comp {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
     constructor(public node: NodeInfo, public attName: string, private isEditorEmbed: boolean,

@@ -1,7 +1,7 @@
-import { Div } from "./Div";
+import { Comp } from "../base/Comp";
 
-export class Clearfix extends Div {
+export class Clearfix extends Comp {
     constructor() {
-        super(null, { className: "clearfix" });
+        super({ className: "clearfix" });
     }
 }

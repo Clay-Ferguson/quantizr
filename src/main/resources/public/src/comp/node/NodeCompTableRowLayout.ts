@@ -9,10 +9,10 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompRow } from "./NodeCompRow";
 
-export class NodeCompTableRowLayout extends Div {
+export class NodeCompTableRowLayout extends Comp {
 
     constructor(public node: NodeInfo, private tabData: TabBase<any>, public level: number, public layout: string, public allowNodeMove: boolean, private allowHeaders: boolean) {
-        super(null, { className: "nodeGridTable" });
+        super({ className: "nodeGridTable" });
     }
 
     override preRender(): boolean | null {

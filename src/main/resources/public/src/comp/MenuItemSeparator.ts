@@ -1,8 +1,8 @@
-import { Div } from "../comp/core/Div";
+import { Comp } from "./base/Comp";
 
-export class MenuItemSeparator extends Div {
+export class MenuItemSeparator extends Comp {
 
     constructor() {
-        super(null, { className: "menuItemSeparator" });
+        super({ className: "menuItemSeparator" });
     }
 }

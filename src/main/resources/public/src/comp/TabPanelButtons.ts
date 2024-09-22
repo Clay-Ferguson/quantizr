@@ -9,9 +9,9 @@ import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
 
-export class TabPanelButtons extends Div {
+export class TabPanelButtons extends Comp {
     constructor(private verticalButtons: boolean, public moreClasses: string = "") {
-        super(null);
+        super();
     }
 
     override preRender(): boolean | null {

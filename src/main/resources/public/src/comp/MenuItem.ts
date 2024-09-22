@@ -1,6 +1,5 @@
 import { getAs } from "../AppContext";
 import { S } from "../Singletons";
-import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { Comp } from "./base/Comp";
 import { Checkbox } from "./core/Checkbox";
@@ -10,14 +9,13 @@ import { Tag } from "./core/Tag";
 interface LS { // Local State
     visible: boolean;
     enabled: boolean;
-    content: string;
 }
 
-export class MenuItem extends Div {
+export class MenuItem extends Comp {
 
     constructor(public name: string, public clickFunc: () => void, enabled: boolean = true, private stateFunc: () => boolean = null,
         private treeOp: boolean = null, private moreClasses: string = "", private radioGroup: string = null) {
-        super(name, { key: name });
+        super({ key: name });
         this.mergeState({ visible: true, enabled });
     }
 
@@ -29,13 +27,13 @@ export class MenuItem extends Div {
         let innerClazz: string;
         if (this.stateFunc) {
             if (this.radioGroup) {
-                innerSpan = new RadioButton(state.content, this.stateFunc(), this.radioGroup, null, {
+                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, null, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });
             }
             else {
-                innerSpan = new Checkbox(state.content, { className: "marginRight" }, {
+                innerSpan = new Checkbox(this.name, { className: "marginRight" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });
@@ -43,7 +41,7 @@ export class MenuItem extends Div {
             innerClazz = "listGroupMenuItemCompact " + this.moreClasses;
         }
         else {
-            innerSpan = new Span(state.content);
+            innerSpan = new Span(this.name);
             innerClazz = "listGroupMenuItem " + this.moreClasses;
         }
 

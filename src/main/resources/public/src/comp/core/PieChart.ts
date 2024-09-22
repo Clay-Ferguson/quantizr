@@ -1,12 +1,11 @@
 import * as d3 from "d3";
-import { Div } from "./Div";
 import { Svg } from "./Svg";
-import { CompT } from "../base/Comp";
+import {Comp, CompT } from "../base/Comp";
 
-export class PieChart extends Div {
+export class PieChart extends Comp {
 
     constructor(private width: number, private className: string, private data: any[]) {
-        super(null, { className: "marginBottom" });
+        super({ className: "marginBottom" });
     }
 
     override preRender(): CompT[] | boolean | null {

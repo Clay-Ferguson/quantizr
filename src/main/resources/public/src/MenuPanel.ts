@@ -1,6 +1,5 @@
 import { asyncDispatch, dispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
-import { Div } from "./comp/core/Div";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
@@ -23,11 +22,11 @@ import { PrincipalName } from "./JavaIntf";
 import { S } from "./Singletons";
 import { TTSTab } from "./tabs/data/TTSTab";
 
-export class MenuPanel extends Div {
+export class MenuPanel extends Comp {
     static initialized: boolean = false;
 
     constructor() {
-        super(null, {
+        super({
             id: C.ID_MENU,
             role: "tablist",
             className: "menuPanel"

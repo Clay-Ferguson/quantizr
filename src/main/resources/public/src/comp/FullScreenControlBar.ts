@@ -12,7 +12,7 @@ import { Checkbox } from "./core/Checkbox";
 
 // todo-2: This really needs to be part of the fullscreen viewer classes themselves since each one
 // really might have a different version of this.
-export class FullScreenControlBar extends Div {
+export class FullScreenControlBar extends Comp {
 
     constructor() {
         super();

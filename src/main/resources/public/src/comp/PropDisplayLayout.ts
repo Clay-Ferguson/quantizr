@@ -3,10 +3,10 @@ import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./core/Div";
 
-export class PropDisplayLayout extends Div {
+export class PropDisplayLayout extends Comp {
 
     constructor(private node: NodeInfo) {
-        super(null, {
+        super({
             className: "fieldDisplayPanel"
         });
     }

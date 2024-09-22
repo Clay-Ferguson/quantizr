@@ -16,13 +16,13 @@ import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
-export class NodeCompRow extends Div {
+export class NodeCompRow extends Comp {
 
     constructor(public node: NodeInfo, public tabData: TabBase<any>, private type: TypeIntf,
         public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private internalComp: Div) {
-        super(null, {
+        super({
             id: C.TAB_MAIN + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"

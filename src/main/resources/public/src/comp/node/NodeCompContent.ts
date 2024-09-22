@@ -11,7 +11,7 @@ import { PropTable } from "../PropTable";
 import { NodeCompBinary } from "./NodeCompBinary";
 import { Constants as C } from "../../Constants";
 
-export class NodeCompContent extends Div {
+export class NodeCompContent extends Comp {
     domPreUpdateFunc: (parent: Comp) => void;
     static PRE_PREFIX = "nc_";
 
@@ -29,7 +29,7 @@ export class NodeCompContent extends Div {
             wrapperClass += " docNodeHighlight";
         }
 
-        super(null, {
+        super({
             // nc_ == Node Content (prefix+id will be the ENTIRE row Dom ID)
             id: NodeCompContent.PRE_PREFIX + idPrefix + node?.id,
             className: wrapperClass + " fullWidth"

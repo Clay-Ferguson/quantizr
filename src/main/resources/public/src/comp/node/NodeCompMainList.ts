@@ -1,16 +1,15 @@
 import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
-import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 
-export class NodeCompMainList extends Div {
+export class NodeCompMainList extends Comp {
     constructor(private tabData: TabBase<any>) {
-        super(null, { key: "nodeCompMaiList" });
+        super({ key: "nodeCompMaiList" });
     }
 
     override preRender(): boolean | null {

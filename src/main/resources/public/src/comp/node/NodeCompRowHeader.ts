@@ -10,15 +10,16 @@ import { NodeActionType } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo, NodeType, PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Comp } from "../base/Comp";
 import { Button } from "../core/Button";
 import { SpanHtml } from "../core/SpanHtml";
 import { NodeCompContent } from "./NodeCompContent";
 
-export class NodeCompRowHeader extends Div {
+export class NodeCompRowHeader extends Comp {
     constructor(private node: NodeInfo, private allowAvatars: boolean, private isMainTree: boolean,
         public tabData: TabBase<any>, private jumpButton: boolean,
         private prefix: string, private idx: number, indentLevel: number, isTableCell: boolean) {
-        super(null);
+        super();
 
         const ast = getAs();
         this.attribs.className = (!isTableCell && tabData.id === C.TAB_MAIN && ast.userPrefs.editMode && S.util.showMetaData(ast, this.node)) ? //

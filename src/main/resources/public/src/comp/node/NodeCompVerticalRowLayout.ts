@@ -10,7 +10,7 @@ import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompRow } from "./NodeCompRow";
 
-export class NodeCompVerticalRowLayout extends Div {
+export class NodeCompVerticalRowLayout extends Comp {
     static showSpecialNodes = true;
 
     constructor(public node: NodeInfo, private tabData: TabBase<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {

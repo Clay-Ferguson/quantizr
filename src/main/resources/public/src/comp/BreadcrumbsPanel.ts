@@ -5,9 +5,9 @@ import { Div } from "../comp/core/Div";
 import { Span } from "../comp/core/Span";
 import { Comp } from "./base/Comp";
 
-export class BreadcrumbsPanel extends Div {
+export class BreadcrumbsPanel extends Comp {
     constructor(public breadcrumbs: J.BreadcrumbInfo[]) {
-        super(null, {
+        super({
             className: "breadcrumbPanel"
         });
     }

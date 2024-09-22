@@ -9,10 +9,10 @@ import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { SpanHtml } from "./core/SpanHtml";
 
-export class HistoryPanel extends Div {
+export class HistoryPanel extends Comp {
 
     constructor() {
-        super(null, {
+        super({
             id: C.ID_RHS + "_hist",
             className: "nodeHistoryPanel"
         });
