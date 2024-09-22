@@ -1,4 +1,4 @@
-import { Comp } from "./base/Comp";
+import { Comp, CompT } from "./base/Comp";
 
 interface LS { // Local State
     content?: string;
@@ -6,15 +6,13 @@ interface LS { // Local State
 
 export class Main extends Comp {
 
-    constructor(content: string = "", attribs: any = {}, children: Comp[] = null) {
+    constructor(content: string = "", attribs: any = {}) {
         super(attribs);
-        this.children = children;
         this.mergeState<LS>({ content });
         this.tag = "main";
     }
 
-    override preRender(): boolean | null {
-        this.content = this.getState<LS>().content;
-        return true;
+    override preRender(): CompT[] | boolean | null {
+        return [this.getState<LS>().content];
     }
 }

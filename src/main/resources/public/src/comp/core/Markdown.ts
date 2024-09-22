@@ -1,5 +1,5 @@
 import { createElement, ReactNode } from "react";
-import { Comp } from "../base/Comp";
+import { Comp, CompT } from "../base/Comp";
 import ReactMarkdownComp from "./ReactMarkdownComp";
 
 export class Markdown extends Comp {
@@ -8,7 +8,7 @@ export class Markdown extends Comp {
         this.tag = "div"; //<-- not used
     }
 
-    override compRender(): ReactNode {
+    override compRender(_children: CompT[]): ReactNode {
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did
         delete this.attribs.ref;
 

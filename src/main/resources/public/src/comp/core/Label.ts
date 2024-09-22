@@ -4,7 +4,7 @@ export class Label extends Comp {
 
     constructor(content: string = "", attribs: any = null) {
         super(attribs);
+        this.children = [content];
         this.tag = "label";
-        this.content = content;
     }
 }

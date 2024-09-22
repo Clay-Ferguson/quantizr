@@ -10,6 +10,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
+import { CompT } from "./base/Comp";
 
 export class FullScreenCalendar extends Main {
     static lastClickTime: Date;
@@ -18,7 +19,7 @@ export class FullScreenCalendar extends Main {
         super();
     }
 
-    override compRender(): ReactNode {
+    override compRender(_children: CompT[]): ReactNode {
         const ast = getAs();
         const nodeId = ast.fullScreenConfig.nodeId;
         const node = S.nodeUtil.findNode(nodeId);

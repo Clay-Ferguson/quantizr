@@ -1,5 +1,5 @@
 import { State } from "../../State";
-import { Comp } from "../base/Comp";
+import { Comp, CompT } from "../base/Comp";
 
 interface LS { // Local State
     error: string;
@@ -12,8 +12,7 @@ export class ErrorDiv extends Comp {
         this.attribs.className = "validationError";
     }
 
-    override preRender(): boolean | null {
-        this.content = this.getState<LS>().error;
-        return true;
+    override preRender(): CompT[] | boolean | null {
+        return [this.getState<LS>().error];
     }
 }

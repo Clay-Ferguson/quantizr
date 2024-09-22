@@ -4,7 +4,7 @@ import { S } from "../../Singletons";
 import { State } from "../../State";
 
 export type Attribs = { [k: string]: any };
-
+export type CompT = Comp | ReactNode;
 
 /* Base class for all components which encapsulates a lot of React functionality so that our
 implementation code can ignore those details. */
@@ -18,8 +18,6 @@ export abstract class Comp {
 
     // tag can be a string *or* a react functional component
     public tag: any;
-    public content: string = null;
-
     private static guid: number = 0;
 
     // this option allows the ability to use the DOM explorer in browsers to see the class name of
@@ -34,10 +32,11 @@ export abstract class Comp {
 
     /** 
      * Note: NULL elements are allowed in this array and simply don't render anything, and are
-     * required to be tolerated and ignored WARNING: TypeScript is NOT enforcing that children be
-     * private here.
+     * required to be tolerated and ignored:
+     * 
+     * WARNING: TypeScript is NOT enforcing that children be private here.
      */
-    public children: any[];
+    public children: CompT[];
 
     // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
@@ -142,7 +141,7 @@ export abstract class Comp {
         // else we add 'func' to the queue of functions to call when component does get mounted.
         const elm = this.getRef();
         if (elm) {
-            this.runQueuedFuncs(elm); 
+            this.runQueuedFuncs(elm);
             func(elm);
             return;
         }
@@ -180,31 +179,33 @@ export abstract class Comp {
 
     /* Returns true if there are any non-null children */
     hasChildren(): boolean {
-        return !!this.content || this.children?.some(child => !!child);
+        return this.children?.some(child => !!child);
     }
 
     // We take an array of 'any', because some of the children may be strings.
     private createChildren(children: any[]): ReactNode[] {
-        if (!this.content && (!children || children.length === 0)) {
+        if (!children || children.length === 0) {
             if (this.debug) console.log("createChildren: no children for " + this.getCompClass());
             return null;
         }
 
-        let arr = this.content ? [this.content] : [];
+        let arr = [];
         if (children) {
             arr = children.reduce((acc: any[], child: any) => {
                 if (child instanceof Comp) {
                     try {
                         child.parent = this; // only done for debugging.
+                        // let's make debug recursive in all child components
+                        if (child.parent.debug) {
+                            child.debug = true;
+                        }
+
                         acc.push(createElement(child._render, child.attribs));
                     }
                     catch (e) {
                         S.util.logErr(e, "Failed to render child " + child.getCompClass() + " attribs.key=" + child.attribs.key);
                     }
                 } else if (child) {
-                    if (child === this.content) {
-                        console.error("child is same as content, skipping: " + child);
-                    }
                     acc.push(child);
                 }
                 return acc;
@@ -233,7 +234,7 @@ export abstract class Comp {
     /* Renders this node to a specific tag, including support for non-React children Note: Tag can
     also be a type here, not just a string.
     */
-    reactNode(type: any): ReactNode {
+    reactNode(type: any, renderChildren: CompT[] = null): ReactNode {
         let ret: ReactNode = null;
 
         // If this is a raw HTML component just render using 'attribs', which is what react expects.
@@ -242,7 +243,7 @@ export abstract class Comp {
         }
         else {
             try {
-                const children = this.createChildren(this.children);
+                const children = this.createChildren(renderChildren);
 
                 if (this.debug)
                     console.log("reactNode: " + this.getCompClass() + " childCount=" + children?.length);
@@ -265,7 +266,7 @@ export abstract class Comp {
     }
 
     // add type argument here (not 'any')
-    checkState(): boolean {
+    ensureState(): boolean {
         if (!this.stateMgr) {
             if (!this.rendered) {
                 // we allow a lazy creation of a State as long as component hasn't rendered yet.
@@ -283,18 +284,22 @@ export abstract class Comp {
     }
 
     mergeState<T>(moreState: T): void {
-        if (!this.checkState()) return;
+        if (!this.ensureState()) return;
         this.stateMgr.mergeState(moreState);
     }
 
     setState<T>(newState: T) {
-        if (!this.checkState()) return;
+        if (!this.ensureState()) return;
         this.stateMgr.setState(newState);
     }
 
     getState<T>(): T {
-        if (!this.checkState()) return null;
+        if (!this.ensureState()) return null;
         return this.stateMgr.getState();
+    }
+
+    managesState(): boolean {
+        return !!this.stateMgr;
     }
 
     /* Classes don't override or alter this method directly, but can alter _domAddEvent instead */
@@ -354,13 +359,23 @@ export abstract class Comp {
                 console.log("render: " + this.getCompClass() + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
-            if (this.preRender() === false) {
+            const preRenderResult = this.preRender();
+            let children: CompT[] = null;
+
+            if (preRenderResult === true) {
+                children = this.children;
+            }
+            else if (preRenderResult === false) {
                 this.preRenderRejected = true;
                 if (this.debug)
                     console.log("preRender Rejected: " + this.getCompClass());
                 return null;
             }
-            const ret = this.compRender();
+            else {
+                children = preRenderResult as CompT[];
+            }
+            
+            const ret = this.compRender(children);
             // if (this.debug) { // console.log("render done: " + this.getCompClass() + " counter="
             //     + Comp.renderCounter + " ID=" + this.getId());
             // }
@@ -417,18 +432,17 @@ export abstract class Comp {
         this.domAddFuncs = null;
     }
 
-    /* Intended to be optionally overridable to set children, and the ONLY thing to be done in this
-    method should be just to set the children. To indicate to NOT render the component at all return
-    false from this method. Returning null means this component is not saying anything about rendering. */
-    preRender(): boolean | null {
-        return null;
+    /* Returns the final children to be rendered, or "false" to say we shouldn't render this entire
+    component. Null or empty array return means empty children, but we do render */
+    preRender(): boolean | null | CompT[] {
+        return this.children;
     }
 
     // This is the function you override/define to implement the actual render method, which is
     // simple and decoupled from state management aspects that are wrapped in 'render' which is what
     // calls this, and the ONLY function that calls this.
-    compRender(): ReactNode {
-        return this.reactNode(this.tag || "div");
+    compRender(children: CompT[]): ReactNode {
+        return this.reactNode(this.tag || "div", children);
     }
 
     scrollDomAddEvent() {
@@ -497,8 +511,9 @@ export abstract class Comp {
 
     // There are a few very special places where we need to sort components that may have been added
     // in an order we don't want this this is how we do it.
+    // todo-0: we shouldn't do this in this base class, put it in render helper.
     ordinalSortChildren() {
-        this.children?.sort((a, b) => a.ordinal - b.ordinal);
+        this.children?.sort((a: any, b: any) => a.ordinal - b.ordinal);
     }
 }
 

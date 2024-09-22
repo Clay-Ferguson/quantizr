@@ -3,7 +3,7 @@ import { dispatch, getAs } from "../../AppContext";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { TabBase } from "../../intf/TabBase";
-import { Comp } from "../base/Comp";
+import { Comp, CompT } from "../base/Comp";
 import ReactMarkdownComp from "../core/ReactMarkdownComp";
 import { NodeInfo } from "../../JavaIntf";
 import { UrlInfo } from "../../plugins/base/TypeBase";
@@ -134,7 +134,7 @@ export class NodeCompMarkdown extends Comp {
         return true;
     }
 
-    override compRender(): ReactNode {
+    override compRender(_children: CompT[]): ReactNode {
         const state = this.getState<LS>();
 
         // ReactMarkdown can't have this 'ref' and would throw a warning if we did

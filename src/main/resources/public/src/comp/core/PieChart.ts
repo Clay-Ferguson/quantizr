@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { Div } from "./Div";
 import { Svg } from "./Svg";
+import { CompT } from "../base/Comp";
 
 export class PieChart extends Div {
 
@@ -8,9 +9,8 @@ export class PieChart extends Div {
         super(null, { className: "marginBottom" });
     }
 
-    override preRender(): boolean | null {
-        this.children = [new Svg(null, { className: this.className })];
-        return true;
+    override preRender(): CompT[] | boolean | null {
+        return [new Svg({ className: this.className })];
     }
 
     override _domPreUpdateEvent = () => {

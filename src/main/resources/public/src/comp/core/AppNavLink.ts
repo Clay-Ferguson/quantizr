@@ -7,10 +7,10 @@ export class AppNavLink extends Comp {
     constructor(content: string = "", func: () => void, moreClasses: string = "") {
         super(null);
         this.attribs.className = (getAs().mobileMode ? "tabSubOptionsItemMobile" : "tabSubOptionsItem") + " " + moreClasses;
+        this.children = [content];
         this.attribs.onClick = () => {
             PubSub.pub(C.PUBSUB_closeNavPanel);
             func();
         }
-        this.content = content;
     }
 }

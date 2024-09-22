@@ -26,12 +26,12 @@ export class PropTable extends Comp {
                     title: "Property: " + prop.name + (comment ? ("\n\n" + comment) : ""),
                     className: "propTableRow"
                 }, [
-                    new PropTableCell(label, {
+                    new PropTableCell({
                         className: "propTableNameCol"
-                    }),
-                    new PropTableCell(displayVal, {
+                    }, [label]),
+                    new PropTableCell({
                         className: "propTableValCol"
-                    })
+                    }, [displayVal])
                 ]);
                 ptr.ordinal = propConfig?.ord || 200;
                 children.push(ptr);

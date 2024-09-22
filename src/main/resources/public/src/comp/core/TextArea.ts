@@ -1,7 +1,7 @@
 import * as I from "../../Interfaces";
 import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
-import { ScrollPos } from "../base/Comp";
+import { CompT, ScrollPos } from "../base/Comp";
 import { ErrorDiv } from "./ErrorDiv";
 import { Label } from "./Label";
 import { Span } from "./Span";
@@ -78,9 +78,9 @@ export class TextArea extends Span implements I.TextEditorIntf {
         this.onMount(() => this.input?.focus());
     }
 
-    override preRender(): boolean | null {
+    override preRender(): CompT[] | boolean | null {
         const state = this.getState<LS>();
-        const children = [new ErrorDiv(this.valState.e)];
+        const children: CompT[] = [new ErrorDiv(this.valState.e)];
 
         if (this.label) {
             children.push(new Label(this.label, {
@@ -131,7 +131,6 @@ export class TextArea extends Span implements I.TextEditorIntf {
         // });
 
         children.push(this.input = new TextareaTag(att, this.valState, this.calcRows, this.minRows, this.scrollPos));
-        this.children = children;
-        return true;
+        return children;
     }
 }

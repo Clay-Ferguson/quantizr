@@ -4,8 +4,12 @@ export class Li extends Comp {
 
     constructor(content: string = "", attribs: any = null, children: Comp[] = null) {
         super(attribs);
-        this.children = children;
+        if (children) {
+            this.children = [content, ...children];
+        }
+        else {
+            this.children = [content];
+        }
         this.tag = "li";
-        this.content = content;
     }
 }

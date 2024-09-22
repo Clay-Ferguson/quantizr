@@ -1,11 +1,10 @@
-import { Comp } from "./base/Comp";
+import { Comp, CompT } from "./base/Comp";
 
 export class PropTableCell extends Comp {
 
-    constructor(content: string = null, attribs: any = {}, children: Comp[] = null) {
+    constructor(attribs: any = {}, children: CompT[] = null) {
         super(attribs);
         this.children = children;
         this.tag = "td";
-        this.content = content;
     }
 }
