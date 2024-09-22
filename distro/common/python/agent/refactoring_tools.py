@@ -2,7 +2,7 @@
 
 import os
 from typing import Dict, Optional, Type
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 from .models import TextBlock
 from ..file_utils import FileUtils
@@ -28,10 +28,9 @@ class UpdateBlockTool(BaseTool):
 
     # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
     # fine even without mentioning "block_update" in those instructions.
-    name = "update_block"
-    description = (
-        "useful for when you need to update named blocks of text to set new content"
-    )
+    name: str = "update_block"
+    description: str = "useful for when you need to update named blocks of text to set new content"
+    
     args_schema: Type[BaseModel] = UpdateBlockInput
     return_direct: bool = False
     blocks: Dict[str, TextBlock] = {}
@@ -81,8 +80,9 @@ class UpdateBlockTool(BaseTool):
 class CreateFileTool(BaseTool):
     """Tool to create a new file."""
 
-    name = "create_file"
-    description = "useful for when you need to create a new file"
+    name: str = "create_file"
+    description: str = "useful for when you need to create a new file"
+    
     args_schema: Type[BaseModel] = CreateFileInput
     return_direct: bool = False
     base_path: str = ""
@@ -120,13 +120,12 @@ class CreateFileTool(BaseTool):
 class UpdateFileTool(BaseTool):
     """Tool to update a file by writing all new content to the file"""
 
-    name = "update_file"
-    description = (
-        "useful for when you need to update an existing file with all new content"
-    )
+    name: str = "update_file"
+    description: str = "useful for when you need to update an existing file with all new content"
+    
     args_schema: Type[BaseModel] = UpdateFileInput
     return_direct: bool = False
-    base_path = ""
+    base_path: str = ""
 
     def __init__(self, description, base_path: str):
         super().__init__(description=description)

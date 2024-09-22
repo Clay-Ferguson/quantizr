@@ -34,6 +34,7 @@ imageCheck () {
 # If you get the buld error: failed to solve: failed to walk: resolve : lstat /var/lib/docker/overlay2/diff: no such file or directory
 # try running this docker-comkpose with "--no-cache" option like this:
 #     docker-compose -f ${dc_yaml} build --no-cache
+# NOTE: There's a --verbose option that can be added to the build command to see more details, in the latest version?
 dockerBuild () {
     echo "dockerBuild: full app"
     # docker-compose -f ${dc_yaml} build --no-cache
