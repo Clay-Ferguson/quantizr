@@ -24,11 +24,9 @@ ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
 ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
 OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
-
-PPLX_MODEL_COMPLETION_ONLINE = "llama-3.1-sonar-huge-128k-online" # ok 
-PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3.1-70b-instruct" # ok
-PPLX_MODEL_COMPLETION_CHAT = "llama-3.1-sonar-large-128k-chat" # ok
-
+PPLX_MODEL_COMPLETION_ONLINE = "llama-3.1-sonar-huge-128k-online" 
+PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3.1-70b-instruct" 
+PPLX_MODEL_COMPLETION_CHAT = "llama-3.1-sonar-large-128k-chat" 
 GEMINI_MODEL_COMPLETION_CHAT = "gemini-1.5-pro"
 GEMINI_FLASH_MODEL_COMPLETION_CHAT = "gemini-1.5-flash"
 
@@ -166,38 +164,39 @@ def buildMessages(req):
 
 def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     llm: BaseChatModel = None;
+    timeout = 120  # timeout in seconds
+    
     if req.service == "anthropic":
         llm = ChatAnthropic(
-                model_name=req.model,
-                temperature=req.temperature,
-                max_tokens_to_sample=req.maxTokens,
-                timeout=120,  # timeout in seconds
-                api_key=api_key,
-            )
+            model=req.model,
+            temperature=req.temperature,
+            max_tokens=req.maxTokens,
+            timeout=timeout,
+            api_key=api_key,
+        )
     elif req.service == "openai":
         llm = ChatOpenAI(
             model=req.model,
             temperature=req.temperature,
             max_tokens=req.maxTokens,
-            timeout=120,  # timeout in seconds
-            api_key=api_key,
-            verbose=True,
+            timeout=timeout,
+            api_key=api_key
         )
     elif req.service == "perplexity":
         llm = ChatPerplexity(
             model=req.model,
             temperature=req.temperature,
-            max_tokens_to_sample=req.maxTokens,
-            request_timeout=120,  # timeout in seconds
-            pplx_api_key=api_key,
+            max_tokens=req.maxTokens,
+            timeout=timeout,
+            api_key=api_key,
         )
     elif req.service == "gemini":
         llm = ChatGoogleGenerativeAI(
             model=req.model,
             temperature=req.temperature,
-            max_tokens_to_sample=req.maxTokens,
-            request_timeout=120,  # timeout in seconds
-            google_api_key=api_key,
+            max_tokens=req.maxTokens,
+            timeout=timeout,
+            api_key=api_key,
         )
     else:
         raise ValueError(f"Unsupported service: {req.service}")
