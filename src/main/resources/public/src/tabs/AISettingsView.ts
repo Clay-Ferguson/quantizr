@@ -14,8 +14,11 @@ import { Validator } from "../Validator";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { ScrollPos } from "../comp/base/Comp";
+import { FlexLayout } from "../comp/core/FlexLayout";
 
 export class AISettingsView extends AppTab<any, AISettingsView> {
+    maxWordsState: Validator = new Validator();
+    temperatureState: Validator = new Validator();
     fileExtState: Validator = new Validator("");
     foldersToIncludeState: Validator = new Validator();
     foldersToIncludeScrollPos = new ScrollPos();
@@ -25,6 +28,8 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
         data.inst = this;
         this.fileExtState.setValue(getAs().userPrefs.aiAgentFileExtensions);
         this.foldersToIncludeState.setValue(getAs().userPrefs.aiAgentFoldersToInclude);
+        this.maxWordsState.setValue(""+getAs().userPrefs.aiMaxWords);
+        this.temperatureState.setValue(""+getAs().userPrefs.aiTemperature);
     }
 
     sectionTitle(title: string): Heading {
@@ -75,8 +80,21 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         placeholder: "List folders to include (optional)"
                     }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos) : null,
                     S.quanta.config.aiAgentEnabled ? new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }) : null,
-                    new Button("Save", this._save, { className: "marginTop" })
                 ]) : null,
+                new FlexLayout([
+                    new TextField({
+                        label: "Max Response Words",
+                        val: this.maxWordsState,
+                        inputClass: "maxResponseWords",
+                    }),
+                    new TextField({
+                        label: "Creativity (0.0-1.0, Default=0.7)",
+                        val: this.temperatureState,
+                        inputClass: "aiTemperature",
+                        outterClass: "marginLeft"
+                    }),
+                ]),
+                new Button("Save", this._save, { className: "bigMarginTop" })
             ])
         ];
         return true;
@@ -86,6 +104,8 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
         await S.util.saveUserPrefs(s => {
             s.userPrefs.aiAgentFileExtensions = this.fileExtState.getValue();
             s.userPrefs.aiAgentFoldersToInclude = this.foldersToIncludeState.getValue();
+            s.userPrefs.aiMaxWords = parseInt(this.maxWordsState.getValue());
+            s.userPrefs.aiTemperature = parseFloat(this.temperatureState.getValue());
         });
         // flash confirmation message
         S.util.flashMessage("Saved settings", "Note");

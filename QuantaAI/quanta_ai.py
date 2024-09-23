@@ -68,12 +68,13 @@ def api_query(req: AIRequest,
     ) -> AIResponse:
     try:        
         # Log the request as pretty json
-        print(f"REQ received: prompt={req.prompt}\n    service={req.service}\n    codingAgent={req.codingAgent}\n    foldersToInclude: {req.foldersToInclude}")
-        
-        # for now we'll max out at 100k tokens allowed
-        # todo-0: This is going to disable large refactorings. Need to think this thru.
-        if (req.maxTokens > 100000): 
-            req.maxTokens = 100000
+        print(f"""REQ received: prompt={req.prompt}
+service: {req.service}
+codingAgent: {req.codingAgent}
+foldersToInclude: {req.foldersToInclude}
+maxTokens: {req.maxTokens}
+temperature: {req.temperature}
+""")
             
         llm = getChatModel(req, api_key)
         

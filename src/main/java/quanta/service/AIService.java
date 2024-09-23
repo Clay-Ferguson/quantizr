@@ -64,6 +64,8 @@ public class AIService extends ServiceBase {
             input = question;
         }
 
+        // todo-0: need to know the max tokens for each model, and allow anything <= 0 to be passed
+        // to trigger the default value
         Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 4000;
         system.setModel(svc.getModel());
         svc_aiUtil.ensureDefaults(system);
@@ -98,7 +100,7 @@ public class AIService extends ServiceBase {
 
         request.setModel(svc.getModel());
         request.setService(svc.getService());
-        request.setTemperature(0.7f);
+        request.setTemperature(system.getTemperature().floatValue());
         request.setMaxTokens(maxTokens);
         request.setCredit(balance.floatValue());
         request.setCodingAgent(agentic);

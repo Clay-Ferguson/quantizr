@@ -628,6 +628,8 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_AI_SERVICE, reqUserPrefs.getAiService());
             prefsNode.set(NodeProp.USER_PREF_AI_FILE_EXTENSIONS, reqUserPrefs.getAiAgentFileExtensions());
             prefsNode.set(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE, reqUserPrefs.getAiAgentFoldersToInclude());
+            prefsNode.set(NodeProp.USER_PREF_AI_MAX_WORDS, reqUserPrefs.getAiMaxWords());
+            prefsNode.set(NodeProp.USER_PREF_AI_TEMPERATURE, reqUserPrefs.getAiTemperature());
 
             userPrefs.setEditMode(reqUserPrefs.isEditMode());
             userPrefs.setAiMode(reqUserPrefs.getAiMode());
@@ -639,6 +641,8 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setAiService(reqUserPrefs.getAiService());
             userPrefs.setAiAgentFileExtensions(reqUserPrefs.getAiAgentFileExtensions());
             userPrefs.setAiAgentFoldersToInclude(reqUserPrefs.getAiAgentFoldersToInclude());
+            userPrefs.setAiMaxWords(reqUserPrefs.getAiMaxWords());
+            userPrefs.setAiTemperature(reqUserPrefs.getAiTemperature());
             return null;
         });
         return res;
@@ -925,6 +929,18 @@ public class UserManagerService extends ServiceBase {
             }
             userPrefs.setAiAgentFileExtensions(aiAgentFileExtensions);
             userPrefs.setAiAgentFoldersToInclude(prefsNode.getStr(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE));
+
+            try {
+                userPrefs.setAiMaxWords(Integer.parseInt(prefsNode.getStr(NodeProp.USER_PREF_AI_MAX_WORDS)));
+            } catch (Exception e) {
+                userPrefs.setAiMaxWords(4000);
+            }
+
+            try {
+                userPrefs.setAiTemperature(Double.parseDouble(prefsNode.getStr(NodeProp.USER_PREF_AI_TEMPERATURE)));
+            } catch (Exception e) {
+                userPrefs.setAiTemperature(0.7);
+            }
 
             return null;
         });
@@ -1414,7 +1430,7 @@ public class UserManagerService extends ServiceBase {
         if (adminNode == null) {
             // if account didn't exist we create, and we have to create as "SubNode" because our creation
             // code doesn't support creating AccountNodes (yet, and may never)
-            adminNode = (AccountNode)svc_snUtil.ensureNodeExists("/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(),
+            adminNode = (AccountNode) svc_snUtil.ensureNodeExists("/", NodePath.ROOT, "Root", NodeType.REPO_ROOT.s(),
                     AccountNode.class, true, null, null);
             adminNode.set(NodeProp.USER, PrincipalName.ADMIN.s());
             adminNode.set(NodeProp.USER_PREF_EDIT_MODE, false);
@@ -1423,7 +1439,8 @@ public class UserManagerService extends ServiceBase {
             adminNode.set(NodeProp.USER_PREF_SHOW_REPLIES, Boolean.TRUE);
             svc_mongoUpdate.save(adminNode);
         }
-        usersNode = svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
+        usersNode =
+                svc_snUtil.ensureNodeExists(NodePath.ROOT_PATH, NodePath.USER, null, "Users", null, true, null, null);
         svc_mongoUtil.createPublicNodes();
     }
 

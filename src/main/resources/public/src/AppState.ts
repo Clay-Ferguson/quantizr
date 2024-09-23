@@ -126,6 +126,8 @@ export class AppState {
         aiService: J.AIModel.OPENAI,
         aiAgentFileExtensions: "txt,md,html,htm,java,js,css,ts,tsx,py,sh,sql,json,yaml,yml,xml,properties,ini,conf,config,env,log,mdx,jsx,tsx,graphql,mdx,md,markdown",
         aiAgentFoldersToInclude: "",
+        aiMaxWords: 4000,
+        aiTemperature: 0.7,
     };
 
     exportSettings: ExportSettings = {

@@ -33,43 +33,64 @@ public class AIUtil extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIUtil.class);
 
     public void ensureDefaults(SystemConfig system) {
+        if (system.getMaxWords() == null) {
+            system.setMaxWords(1000);
+        }
         if (system.getTemperature() == null) {
             system.setTemperature(0.7);
         }
     }
 
     public void parseAIConfig(SubNode node, SystemConfig system) {
-        if (StringUtils.isEmpty(system.getPrompt()) && node.hasProp(NodeProp.AI_PROMPT.s())) {
+        if (node.hasProp(NodeProp.AI_PROMPT.s())) {
             system.setPrompt(node.getStr(NodeProp.AI_PROMPT.s()));
+            verifyOnlyAgent(node, system);
         }
 
-        if (StringUtils.isEmpty(system.getFoldersToInclude()) && node.hasProp(NodeProp.AI_FOLDERS_TO_INCLUDE.s())) {
+        if (node.hasProp(NodeProp.AI_FOLDERS_TO_INCLUDE.s())) {
             system.setFoldersToInclude(node.getStr(NodeProp.AI_FOLDERS_TO_INCLUDE.s()));
+            verifyOnlyAgent(node, system);
         }
 
-        if (StringUtils.isEmpty(system.getFileExtensions()) && node.hasProp(NodeProp.AI_FILE_EXTENSIONS.s())) {
+        if (node.hasProp(NodeProp.AI_FILE_EXTENSIONS.s())) {
             system.setFileExtensions(node.getStr(NodeProp.AI_FILE_EXTENSIONS.s()));
+            verifyOnlyAgent(node, system);
         }
 
-        if (StringUtils.isEmpty(system.getService()) && node.hasProp(NodeProp.AI_SERVICE.s())) {
+        if (node.hasProp(NodeProp.AI_SERVICE.s())) {
             system.setService(node.getStr(NodeProp.AI_SERVICE.s()));
+            verifyOnlyAgent(node, system);
         }
 
-        if (StringUtils.isEmpty(system.getTemplate()) && node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
+        if (node.hasProp(NodeProp.AI_QUERY_TEMPLATE.s())) {
             String queryTemplate = node.getStr(NodeProp.AI_QUERY_TEMPLATE.s());
             queryTemplate = removeHtmlComments(queryTemplate);
             queryTemplate = injectTemplateContext(node, queryTemplate);
 
             // When we set this, that means this will be the FINAL format for the question, also we're in writing mode here
             system.setTemplate(queryTemplate);
+            verifyOnlyAgent(node, system);
         }
 
-        if (system.getMaxWords() == null && node.hasProp(NodeProp.AI_MAX_WORDS.s())) {
+        if (node.hasProp(NodeProp.AI_MAX_WORDS.s())) {
             system.setMaxWords(Integer.valueOf(node.getStr(NodeProp.AI_MAX_WORDS.s())));
+            verifyOnlyAgent(node, system);
         }
 
-        if (system.getTemperature() == null && node.hasProp(NodeProp.AI_TEMPERATURE.s())) {
+        if (node.hasProp(NodeProp.AI_TEMPERATURE.s())) {
             system.setTemperature(Double.valueOf(node.getStr(NodeProp.AI_TEMPERATURE.s())));
+            verifyOnlyAgent(node, system);
+        }
+    }
+
+    public void verifyOnlyAgent(SubNode node, SystemConfig system) {
+        if (system.getAgentNodeId() == null) {
+            system.setAgentNodeId(node.getIdStr());
+        }
+        else {
+            if (!system.getAgentNodeId().equals(node.getIdStr())) {
+                throw new RuntimeEx("Multiple Agent Nodes defined in the same context.");
+            }
         }
     }
 

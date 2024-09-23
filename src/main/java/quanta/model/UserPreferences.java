@@ -22,6 +22,8 @@ public class UserPreferences {
     private String aiService;
     private String aiAgentFileExtensions;
     private String aiAgentFoldersToInclude;
+    private Integer aiMaxWords;
+    private Double aiTemperature;
 
     @JsonProperty(required = false)
     private long maxUploadFileSize;
@@ -124,6 +126,22 @@ public class UserPreferences {
 
     public void setAiMode(String aiMode) {
         this.aiMode = aiMode;
+    }
+
+    public Integer getAiMaxWords() {
+        return aiMaxWords;
+    }
+
+    public void setAiMaxWords(Integer aiMaxWords) {
+        this.aiMaxWords = aiMaxWords;
+    }
+
+    public Double getAiTemperature() {
+        return aiTemperature;
+    }
+
+    public void setAiTemperature(Double aiTemperature) {
+        this.aiTemperature = aiTemperature;
     }
 
     public UserPreferences() {}
