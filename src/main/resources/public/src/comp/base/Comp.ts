@@ -265,15 +265,14 @@ export abstract class Comp {
         return ret;
     }
 
-    // todo-0: add type argument here (not 'any')
-    ensureState(): boolean {
+    ensureState<T>(): boolean {
         if (!this.stateMgr) {
             if (!this.rendered) {
                 // we allow a lazy creation of a State as long as component hasn't rendered yet.
                 // This is because the 'useState' can only be called inside the render method due to
                 // the "Rules of Hooks". The normal pattern is that a component will call mergeState
                 // in the constructor to initialize some state
-                this.stateMgr = new State<any>(null);
+                this.stateMgr = new State<T>(null);
             }
             else {
                 console.error("non-state component " + this.getCompClass() + " attempted to use stateMgr, after renderd");
