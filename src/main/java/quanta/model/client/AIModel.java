@@ -28,8 +28,6 @@ public enum AIModel {
     private final String model;
     private final String costCode;
     private final boolean allowSystemPrompt;
-
-    // todo-0: need to show this value in the UI (in terms of words or divided by 5)
     private final int contextLength;
 
     private AIModel(String value, String service, String model, String description, String costCode, boolean allowSystemPrompt, int contextLength) {

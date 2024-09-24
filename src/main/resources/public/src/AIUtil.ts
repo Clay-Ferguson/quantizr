@@ -4,8 +4,6 @@ import { S } from "./Singletons";
 import { Div } from "./comp/core/Div";
 import { Span } from "./comp/core/Span";
 
-// todo-0: we need to be building this from the AIModel.java class somehow, and not replicating any 
-// info here, and also show pricing in GUI comming from the server side
 export class AIService {
     name: string;
     description: string;
