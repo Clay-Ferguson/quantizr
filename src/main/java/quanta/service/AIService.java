@@ -64,9 +64,10 @@ public class AIService extends ServiceBase {
             input = question;
         }
 
-        // todo-0: need to know the max tokens for each model, and allow anything <= 0 to be passed
-        // to trigger the default value
-        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 4000;
+        Integer maxTokens = system.getMaxWords() != null ? system.getMaxWords() * 5 : 1000;
+        if (maxTokens > svc.getContextLength() && svc.getContextLength() > 0) {
+            maxTokens = svc.getContextLength();
+        }
         system.setModel(svc.getModel());
         svc_aiUtil.ensureDefaults(system);
         String apiKey = getApiKey(svc.getService());

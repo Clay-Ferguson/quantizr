@@ -206,93 +206,71 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
 # https://www.anthropic.com/pricing#anthropic-api
 # https://openai.com/api/pricing/
 # https://ai.google.dev/pricing
+# https://docs.perplexity.ai/guides/model-cards
 # #ai-model
 def calculate_cost(input_tokens, output_tokens, model) -> float:
+    # prices per magatoken
     input_ppm = 0
     output_ppm = 0
+    price_per_req = 0
 
     # We detect using startswith, because the actual model used will be slightly different than the
     # one specified
     if model == OPENAI_MODEL_COMPLETION:
-        # prices per kilotoken
-        input_ppk = 0.005
-        output_ppk = 0.015
-        return (input_tokens * input_ppk / 1000) + (output_tokens * output_ppk / 1000)
+        input_ppm = 5.0
+        output_ppm = 15.0
     
     if model == OPENAI_MODEL_COMPLETION_MINI:
-        # prices per kilotoken
         input_ppm = 0.15
         output_ppm = 0.6
-        return (input_tokens * input_ppm / 1000000) + (output_tokens * output_ppm / 1000000)
 
     elif model == ANTH_OPUS_MODEL_COMPLETION_CHAT:
-        # prices per megatoken
         input_ppm = 15
         output_ppm = 75
-        return (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
 
     elif model == ANTH_SONNET_MODEL_COMPLETION_CHAT:
-        # prices per megatoken
         input_ppm = 3.0
         output_ppm = 15.0
-        return (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
 
-    # 70B model
     elif model == PPLX_MODEL_COMPLETION_CHAT:
-        # prices per megatoken
         input_ppm = 1.0
         output_ppm = 1.0
-        return (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
 
-    # 70B model
     elif model == PPLX_MODEL_COMPLETION_LLAMA3:
-        # prices per megatoken
         input_ppm = 1.0
         output_ppm = 1.0
-        return (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
 
-    # 70B model
     elif model == PPLX_MODEL_COMPLETION_ONLINE:
         input_ppm = 1.0
         output_ppm = 1.0
-        input_price_per_req = 0.005
-        return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
+        price_per_req = 0.005
 
     elif model == GEMINI_MODEL_COMPLETION_CHAT:
-        if (input_tokens <= 128000):
+        if (input_tokens <= 128_000):
             input_ppm = 3.5
         else:
             input_ppm = 7.0
             
-        if (output_tokens <= 128000):
+        if (output_tokens <= 128_000):
             output_ppm = 10.5
         else:
             output_ppm = 21.0
-            
-        input_price_per_req = 0.005
-        return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
+        price_per_req = 0.005
                
     elif model == GEMINI_FLASH_MODEL_COMPLETION_CHAT:
-        if (input_tokens <= 128000):
+        if (input_tokens <= 128_000):
             input_ppm = 0.075
         else:
             input_ppm = 0.15
             
-        if (output_tokens <= 128000):
+        if (output_tokens <= 128_000):
             output_ppm = 0.3
         else:
             output_ppm = 0.6
-            
-        input_price_per_req = 0.005
-        return input_price_per_req + (input_tokens * input_ppm / 1000000) + \
-               (output_tokens * output_ppm / 1000000)
-
+        price_per_req = 0.005
+       
     else:
         raise RuntimeError(f"Model not supported: {model} is not supported.")
+    
+    return price_per_req + (input_tokens * input_ppm / 1000_000) + (output_tokens * output_ppm / 1000_000)
 

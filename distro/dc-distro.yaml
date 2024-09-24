@@ -54,8 +54,12 @@ services:
             - '${MONGO_KEY}:/data/mongo-key:ro'
             - '${INIT_REPLICA}:/init/init-replica.sh'
 
-        # command: mongod --config /etc/mongod.conf
-        command: ["--config", "/etc/mongod.conf"]
+        command: [
+            "--config", "/etc/mongod.conf",
+            "--setParameter", "diagnosticDataCollectionEnabled=false",
+            "--profile", "0",
+            "--slowms", "-1"
+        ]
 
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         # don't publish to outside world

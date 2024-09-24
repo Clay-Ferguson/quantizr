@@ -4,6 +4,8 @@ import { S } from "./Singletons";
 import { Div } from "./comp/core/Div";
 import { Span } from "./comp/core/Span";
 
+// todo-0: we need to be building this from the AIModel.java class somehow, and not replicating any 
+// info here, and also show pricing in GUI comming from the server side
 export class AIService {
     name: string;
     description: string;
@@ -28,12 +30,12 @@ export class AIUtil {
             this.aiServices.push({
                 name: J.AIModel.OPENAI,
                 description: "OpenAI: ChatGPT-4o",
-                longDescription: "The most powerful version of OpenAI's intelligent general-purpose AI"
+                longDescription: "The most powerful version of OpenAI's intelligent general-purpose AI (128K context)"
             });
             this.aiServices.push({
                 name: J.AIModel.OPENAI_MINI,
                 description: "OpenAI: ChatGPT-4o Mini",
-                longDescription: "The less expensive version of OpenAI's intelligent general-purpose AI"
+                longDescription: "The less expensive version of OpenAI's intelligent general-purpose AI (128K context)"
             });
         }
 
@@ -41,12 +43,12 @@ export class AIUtil {
             this.aiServices.push({
                 name: J.AIModel.GEMINI,
                 description: "Google: Gemini 1.5 Pro",
-                longDescription: "Google's best general-purpose AI"
+                longDescription: "Google's best general-purpose AI (1 million context)"
             });
             this.aiServices.push({
                 name: J.AIModel.GEMINI_FLASH,
                 description: "Google: Gemini 1.5 Flash",
-                longDescription: "Google's best cost effective general-purpose AI"
+                longDescription: "Google's best cost effective general-purpose AI (2 million context)"
             });
         }
 
@@ -55,7 +57,7 @@ export class AIUtil {
                 {
                     name: J.AIModel.PPLX_LLAMA3,
                     description: "Meta: Llama 3",
-                    longDescription: "Meta's Open Source Llama 3"
+                    longDescription: "Meta's Open Source Llama 3 (131K context)"
                 });
         }
 
@@ -64,12 +66,12 @@ export class AIUtil {
                 {
                     name: J.AIModel.ANTH,
                     description: "Anthropic: Claude 3 Opus",
-                    longDescription: "Anthropic's very powerful general-purpose AI"
+                    longDescription: "Anthropic's very powerful general-purpose AI (200K context)"
                 },
                 {
                     name: J.AIModel.ANTH_SONNET,
                     description: "Anthropic: Claude 3.5 Sonnet",
-                    longDescription: "Anthropic's most powerful general-purpose AI"
+                    longDescription: "Anthropic's most powerful general-purpose AI (200K context)"
                 });
         }
 
@@ -78,12 +80,12 @@ export class AIUtil {
                 {
                     name: J.AIModel.PPLX_CHAT,
                     description: "Perplexity: Basic",
-                    longDescription: "Perplexity's best high-end powerful general-purpose AI"
+                    longDescription: "Perplexity's best high-end powerful general-purpose AI (127K context)"
                 },
                 {
                     name: J.AIModel.PPLX_ONLINE,
                     description: "Perplexity: Recent News Aware",
-                    longDescription: "Perplexity's AI which has access to the latest news and content from from the web"
+                    longDescription: "Perplexity's AI which has access to the latest news and content from from the web (127K context)"
                 });
         }
     }

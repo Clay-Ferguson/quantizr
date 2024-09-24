@@ -5,16 +5,20 @@ import com.fasterxml.jackson.annotation.JsonValue;
 // #ai-model (WARNING: These values are in a Python file too (quanta_ai.py))
 // Encapsulates a specific AI service including a specific service and model
 public enum AIModel {
-    NONE("[null]", null, null, null, null, false), //
-    OPENAI("openAi", "openai", "gpt-4o", "OpenAI: ChatGPT-4o", "OAI", true), //
-    OPENAI_MINI("openAiMini", "openai", "gpt-4o-mini", "OpenAI: ChatGPT-4o Mini", "OAM", true), //
-    PPLX_CHAT("pplxAi", "perplexity", "llama-3.1-sonar-large-128k-chat", "Perplexity: Basic", "PPB", true), //
-    PPLX_ONLINE("pplxAi_online",  "perplexity", "llama-3.1-sonar-huge-128k-online", "Perplexity: Recent News Aware", "PPN", false), //
-    PPLX_LLAMA3("llama3",  "perplexity", "llama-3.1-70b-instruct", "Meta: Llama 3", "PPL", true), //
-    ANTH("anthAi",  "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true), // Opus (most powerful)
-    ANTH_SONNET("anthAi_sonnet",  "anthropic", "claude-3-5-sonnet-20240620", "Anthropic: Claude 3.5 Sonnet", "ACS", true), // Sonnet
-    GEMINI("geminiAi",  "gemini", "gemini-1.5-pro", "Google: Gemini 1.5 Pro", "GEM", true), //
-    GEMINI_FLASH("geminiFlashAi",  "gemini", "gemini-1.5-flash", "Google: Gemini 1.5 Flash", "GFL", true);
+    NONE("[null]", null, null, null, null, false, 0), //
+    
+    OPENAI("openAi", "openai", "gpt-4o", "OpenAI: ChatGPT-4o", "OAI", true, 128_000), //
+    OPENAI_MINI("openAiMini", "openai", "gpt-4o-mini", "OpenAI: ChatGPT-4o Mini", "OAM", true, 128_000), //
+    
+    PPLX_CHAT("pplxAi", "perplexity", "llama-3.1-sonar-large-128k-chat", "Perplexity: Basic", "PPB", true, 127_000), //
+    PPLX_ONLINE("pplxAi_online",  "perplexity", "llama-3.1-sonar-huge-128k-online", "Perplexity: Recent News Aware", "PPN", false, 127_000), //
+    PPLX_LLAMA3("llama3",  "perplexity", "llama-3.1-70b-instruct", "Meta: Llama 3", "PPL", true, 131_000), //
+    
+    ANTH("anthAi",  "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true, 200_000), // Opus (most powerful)
+    ANTH_SONNET("anthAi_sonnet",  "anthropic", "claude-3-5-sonnet-20240620", "Anthropic: Claude 3.5 Sonnet", "ACS", true, 200_000), // Sonnet
+    
+    GEMINI("geminiAi",  "gemini", "gemini-1.5-pro", "Google: Gemini 1.5 Pro", "GEM", true, 2_000_000), //
+    GEMINI_FLASH("geminiFlashAi",  "gemini", "gemini-1.5-flash", "Google: Gemini 1.5 Flash", "GFL", true, 1_000_000);
 
     @JsonValue
     private final String value;
@@ -25,13 +29,17 @@ public enum AIModel {
     private final String costCode;
     private final boolean allowSystemPrompt;
 
-    private AIModel(String value, String service, String model, String description, String costCode, boolean allowSystemPrompt) {
+    // todo-0: need to show this value in the UI (in terms of words or divided by 5)
+    private final int contextLength;
+
+    private AIModel(String value, String service, String model, String description, String costCode, boolean allowSystemPrompt, int contextLength) {
         this.value = value;
         this.service = service;
         this.model = model;
         this.description = description;
         this.costCode = costCode;
         this.allowSystemPrompt = allowSystemPrompt;
+        this.contextLength = contextLength;
     }
 
     public static AIModel fromString(String name) {
@@ -60,6 +68,10 @@ public enum AIModel {
 
     public String getCostCode() {
         return costCode;
+    }
+
+    public int getContextLength() {
+        return contextLength;
     }
 
     public String toString() {
