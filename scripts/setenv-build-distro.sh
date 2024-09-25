@@ -11,7 +11,6 @@ export PRJROOT=$(dirname "$FOLDER")
 export PRJPARENT=$(dirname "$PRJROOT")
 
 export VITE_SCRIPT=vite-build
-export SASS_SCRIPT=sass-prod
 
 export DOCKER_IMAGE=quanta
 export QAI_IMAGE=qai

@@ -29,16 +29,15 @@ fi
 
 yarn run eslint .
 verifySuccess "ESLint"
-
-yarn run ${SASS_SCRIPT}
-verifySuccess "yarn sass run: ${SASS_SCRIPT}"
+yarnCheck
 
 yarn run ${VITE_SCRIPT}
 verifySuccess "yarn run vite: ${VITE_SCRIPT}"
+yarnCheck
 
 # Note: quanta.scss specifies this: $fa-font-path: "../fonts/fa"; pointing to this fonts folder.
 # The rest of the font awesome config is accomplished simply by including the font-awesome scss 
 # folder (in node_modules) into our SCSS main file (quanta.css).
-# See 
+# todo-0: review this re recent changes to bootstrap build with vite
 rsync -aAX --delete --force "./node_modules/font-awesome/fonts/" "./fonts/fa/"
 

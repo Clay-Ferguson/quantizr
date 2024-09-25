@@ -28,10 +28,16 @@ export default defineConfig({
         // }),
         react()
     ],
-    resolve: {
-        alias: {
-            "~bootstrap": path.resolve(__dirname, "node_modules/bootstrap"),
-        }
+    // NOTE: This entire css section was an attempt (which didn't work) to get rid of deprecation warnings related to even the latest packages of things
+    // being problematic thru no fault of my own and with no solution I can do.  I'm just going to ignore them for now.
+    // see: https://stackoverflow.com/questions/68147471/how-to-set-sassoptions-in-vite
+    css: {
+        preprocessorOptions: {
+            scss: {
+                api: 'modern-compiler', // or 'modern'
+                quietDeps: true
+            },
+        },
     },
     base: "/dist"
 });

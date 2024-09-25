@@ -22,6 +22,16 @@ serviceCheck () {
     fi
 }
 
+# It's too easy to run something that can cause this file to exist and that really can scre
+# up the project since we're using yarn. So we check for it, a lot.
+yarnCheck () {
+    if [ -e "${PRJROOT}/src/main/resources/public/package-lock.json" ]; then
+        echo "Oops. package-lock.json found. This should not exist with 'yarn' being used."
+        read -p "Press ENTER."
+        exit $?
+    fi
+}
+
 imageCheck () {
     if docker images --format '{{.Repository}}:{{.Tag}}' | grep "^$1:"; then
         echo "image $1 exists"

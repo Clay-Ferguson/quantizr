@@ -21,10 +21,10 @@ $disabled-body-color: gray; //darken($body-color, 90%);
 $custom-control-indicator-size: 1.75rem; // This gives us awesome large checkboxes and radio buttons!!
 $form-select-indicator-color: lightGray;
 
-@import "../node_modules/bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap";
 
 $fa-font-path: "../fonts/fa";
-@import "../node_modules/font-awesome/scss/font-awesome";
+@import "font-awesome/scss/font-awesome";
 
 @import "bootswatch.scss";
 @import "bootstrap-icons/font/bootstrap-icons.css";

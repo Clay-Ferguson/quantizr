@@ -1,4 +1,4 @@
-import "./quanta.css"
+import "../css/quanta.scss"
 import * as bootstrap from "bootstrap";
 import React from "react";
 import { createRoot } from "react-dom/client";

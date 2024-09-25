@@ -1,8 +1,6 @@
 import eslint from "@eslint/js";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import typescript from "@typescript-eslint/parser";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
 
 export default [
   eslint.configs.recommended,
@@ -21,9 +19,7 @@ export default [
       },
     },
     plugins: {
-      "@typescript-eslint": tseslint,
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
+      "@typescript-eslint": tseslint
     },
     rules: {
       ...tseslint.configs.recommended.rules,
@@ -44,11 +40,7 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-empty-object-type": "off",
-      "@typescript-eslint/unbound-method": "error", 
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
-      ],
+      "@typescript-eslint/unbound-method": "error"
     },
   },
   {

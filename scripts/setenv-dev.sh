@@ -15,7 +15,6 @@ source ./define-functions.sh
 source ./define-functions-dev.sh
 
 export VITE_SCRIPT=vite-build
-export SASS_SCRIPT=sass-dev
 export DOCKER_IMAGE=quanta-dev
 export QAI_IMAGE=qai-dev
 
