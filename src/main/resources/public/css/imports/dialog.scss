@@ -1,3 +1,24 @@
+.searchDlgOrderBy {
+    width: 12rem;
+    margin-left: $bigGap;
+}
+
+.searchDlgSearchRoot {
+    width: 12rem;
+}
+
+.tagIndent {
+    margin-left: 2rem;
+}
+
+.dragTargetDlgSection {
+    margin-top: $smallGap;
+    border: 1px solid gray;
+    padding: $smallGap;
+    border-radius: $border-radius;
+    background-color: #17202A;
+}
+
 .appModalTitleNormal {
     font-size: 130%;
     border-top-left-radius: $dlg-border-radius;
@@ -194,4 +215,19 @@
     border-radius: $border-radius;
     border: 2px solid $modal-content-border-color;
     padding: $smallGap;
+}
+
+.helpPanel {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid gray;
+    padding-top: $smallGap;
+    padding-left: $smallGap;
+    padding-right: $smallGap;
+}
+
+.binary-link {
+    margin-left: $smallGap;
+    // margin-bottom: $smallGap;
+    min-height: 2.2em;
 }

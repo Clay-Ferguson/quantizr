@@ -1,3 +1,7 @@
+.lhsHeaderPanel {
+    margin-bottom: $smallGap;
+}
+
 .documentItem {
     padding-top: 10px;
     border-bottom: 3px dotted $nodeBorderBottomColor;
@@ -374,4 +378,72 @@ ul {
 
 ol {
     margin-bottom: 1rem !important;
+}
+
+.fieldDisplayPanel {
+    margin-left: $smallGap;
+    margin-bottom: $smallGap;
+    border-top: 1px dotted $nodeBorderBottomColor;
+    border-right: 1px dotted $nodeBorderBottomColor;
+}
+
+.fieldDisplayLabel {
+    margin-left: $smallGap;
+    margin-top: $tinyGap;
+}
+
+.fieldDisplayVal {
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    font-size: 115%;
+    margin-left: $smallGap;
+    color: green;
+}
+
+.calcOutputArea {
+    font-family: Courier New, Courier, Lucida Sans Typewriter, Lucida Typewriter, monospace;
+    font-size: 120%;
+    margin-left: $smallGap;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 2px solid olivedrab;
+    margin-top: 12px;
+    padding: 8px;
+}
+
+.settingsCol {
+    width: 50%;
+}
+
+.mobileSettingsCol {
+    width: 100%;
+}
+
+.settingsPanel {
+    margin-left: $smallGap;
+    width: 100%;
+}
+
+.settingsSection {
+    width: 100%;
+}
+
+.settingsLink {
+    cursor: pointer;
+    font-size: 120%;
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsButton {
+    margin-left: $bigGap;
+    margin-bottom: $smallGap;
+}
+
+.settingsSectionTitle {
+    margin-top: 24px;
+    margin-bottom: 8px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    text-align: center;
+    margin-right: $bigGap;
 }
