@@ -7,7 +7,6 @@ from streamlit_chat import message
 from langchain.schema import HumanMessage, AIMessage, BaseMessage
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
-from pydantic import SecretStr
 from langchain.chat_models.base import BaseChatModel
 from app_utils import AppUtils
 from common.python.agent.app_agent import QuantaAgent
@@ -34,22 +33,19 @@ class AppAgentGUI:
             llm = ChatOpenAI(
                 model=self.cfg.openai_model,
                 temperature=0.0, # Use zero temp for code refactoring,
-                api_key=self.cfg.openai_api_key,
-                verbose=True,
+                api_key=self.cfg.openai_api_key
             )
         elif st.session_state.p_ai_service == AIService.ANTHROPIC.value:
              llm = ChatAnthropic(
                 model_name=self.cfg.anth_model,
                 temperature=0.0, # Use zero temp for code refactoring,
-                timeout=60,  # timeout in seconds
-                api_key=SecretStr(self.cfg.anth_api_key),
+                api_key=self.cfg.anth_api_key,
             )
         elif st.session_state.p_ai_service == AIService.GEMINI.value:
             llm = ChatGoogleGenerativeAI(
                 model=self.cfg.gemini_model,
                 temperature=0.0,
-                request_timeout=60,
-                google_api_key=self.cfg.gemini_api_key,
+                api_key=self.cfg.gemini_api_key,
         )
         else:
             raise Exception(f"Invalid AI Service: {st.session_state.p_ai_service}")

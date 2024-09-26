@@ -8,7 +8,6 @@ from langchain.chat_models.base import BaseChatModel
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic.v1.types import SecretStr
 from app_config import AppConfig
 from app_utils import AppUtils 
 from common.python.utils import AIService
@@ -62,20 +61,19 @@ class AppChatbotGUI:
             llm = ChatOpenAI(
                 model=self.cfg.openai_model,
                 temperature=temperature,
-                api_key=self.cfg.openai_api_key,
-                verbose=True,
+                api_key=self.cfg.openai_api_key
             )
         elif ai_service == AIService.ANTHROPIC.value:
             llm = ChatAnthropic(
-                model_name=self.cfg.anth_model,
+                model=self.cfg.anth_model,
                 temperature=temperature,
-                timeout=60,  # timeout in seconds
                 api_key=self.cfg.anth_api_key,
             )
         elif ai_service == AIService.GEMINI.value:
             llm = ChatGoogleGenerativeAI(
                 model=self.cfg.gemini_model,
-                google_api_key=self.cfg.gemini_api_key,
+                temperature=temperature,
+                api_key=self.cfg.gemini_api_key,
         )
         else:
             raise Exception(f"Invalid AI Service: {ai_service}")
