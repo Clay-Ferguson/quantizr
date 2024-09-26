@@ -164,7 +164,7 @@ export class RightNavPanel extends Comp {
                         }
                     }, [
                         !ast.isAnonUser && !ast.mobileMode ? new Icon({
-                            className: "fa fa-gear fa-lg microMarginRight",
+                            className: "fa fa-gear fa-lg marginRight",
                         }) : null,
                         !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
                             className: "smallMarginRight",

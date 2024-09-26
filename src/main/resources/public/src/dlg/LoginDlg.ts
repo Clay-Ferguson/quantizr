@@ -34,7 +34,7 @@ export class LoginDlg extends DialogBase {
             ]),
             new ButtonBar([
                 new Button("Login", this._login, null, "btn-primary ui-login"),
-                new Button("Signup", S.user.userSignup),
+                // new Button("Signup", S.user.userSignup),
                 new Button("Close", () => {
                     this.close();
                     S.util._loadAnonPageHome();

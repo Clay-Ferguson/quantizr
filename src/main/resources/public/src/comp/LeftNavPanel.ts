@@ -7,10 +7,8 @@ import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
-import { TabPanelButtons } from "./TabPanelButtons";
 import { Comp } from "./base/Comp";
 import { FlexRowLayout } from "./core/FlexRowLayout";
-import { Icon } from "./core/Icon";
 import { IconButton } from "./core/IconButton";
 
 export class LeftNavPanel extends Comp {
@@ -79,25 +77,21 @@ export class LeftNavPanel extends Comp {
                             onClick: S.nav._showMyNewMessages,
                             title: "Show your new messages"
                         }) : null,
-                        ast.userName && ast.isAnonUser ? new Icon({
-                            className: "fa fa-bars fa-2x clickable",
-                            onClick: () => {
-                                dispatch("ToggleLHS", s => {
-                                    s.anonShowLHSMenu = !s.anonShowLHSMenu;
-                                })
-                            },
-                            title: "Show Menu"
-                        }) : null,
+                        // ast.userName && ast.isAnonUser ? new Icon({
+                        //     className: "fa fa-bars fa-2x clickable",
+                        //     onClick: () => dispatch("ToggleLHS", s => s.anonShowLHSMenu = !s.anonShowLHSMenu),
+                        //     title: "Show Menu"
+                        // }) : null,
                         !ast.showRhs ? new IconButton("fa-sitemap fa-lg", null, {
                             onClick: () => new NavPanelDlg().open(),
                             id: "navMenu"
                         }, "btn-primary menuButton", "off") : null
                     ])
                 ]),
-                ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
+                // ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,
                 docIndexToggle,
-                showDocIndex ? new DocIndexPanel() : null,
-                showDocIndex ? null : new MenuPanel()
+                !ast.isAnonUser && showDocIndex ? new DocIndexPanel() : null,
+                ast.isAnonUser || showDocIndex ? null : new MenuPanel()
             ])
         ];
 

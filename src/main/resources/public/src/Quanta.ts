@@ -195,9 +195,7 @@ export class Quanta {
 
                 if ((window.innerWidth < 1024 && this.screenWidth >= 1024) ||
                     (window.innerWidth >= 1024 && this.screenWidth < 1024)) {
-                    dispatch("browserResize", s => {
-                        s.showRhs = window.innerWidth >= 1024;
-                    });
+                    dispatch("browserResize", s => s.showRhs = window.innerWidth >= 1024);
                 }
                 this.screenWidth = window.innerWidth;
             });

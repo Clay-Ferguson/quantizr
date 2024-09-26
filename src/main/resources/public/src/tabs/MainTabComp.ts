@@ -1,6 +1,6 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
-import { Comp } from "../comp/base/Comp";
+import { Comp, CompT } from "../comp/base/Comp";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Html } from "../comp/core/Html";
@@ -21,7 +21,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         data.inst = this;
     }
 
-    override preRender(): boolean | null {
+    override preRender(): boolean | null | CompT[] {
         const ast = getAs();
 
         let contentDiv: Comp = null;
@@ -52,36 +52,42 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
         const isRootNode = ast.node.path === "/r";
         const parentVisible = S.nav.parentVisibleToUser();
 
-        if (ast.node && ((!ast.mobileMode && !isRootNode) || parentVisible))
-            this.headingBar = new TabHeading([
-                new Div(null, { className: "float-end" }, [
-                    // save screen space for mobile
-                    !ast.mobileMode && !isRootNode ? new Icon({
-                        className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
-                        title: "Previous Sibling Node",
-                        onClick: S.nav._navToPrev
-                    }) : null,
+        if (ast.node && ((!ast.mobileMode && !isRootNode) || parentVisible)) {
+            const headingBarItems = [];
+            if (!ast.isAnonUser && !ast.mobileMode && !isRootNode) {
+                headingBarItems.push(new Icon({
+                    className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
+                    title: "Previous Sibling Node",
+                    onClick: S.nav._navToPrev
+                }));
+                headingBarItems.push(new Icon({
+                    className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
+                    title: "Next Sibling Node",
+                    [C.NODE_ID_ATTR]: ast.node.id,
+                    onClick: S.nav._navToNext
+                }));
+            }
 
-                    !ast.mobileMode && !isRootNode ? new Icon({
-                        className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
-                        title: "Next Sibling Node",
-                        [C.NODE_ID_ATTR]: ast.node.id,
-                        onClick: S.nav._navToNext
-                    }) : null,
+            if (parentVisible) {
+                headingBarItems.push(new IconButton("fa-folder", "Up", {
+                    [C.NODE_ID_ATTR]: ast.node.id,
+                    onClick: S.nav._navUpLevelClick,
+                    title: "Go to Parent Node"
+                }, "btn-primary"));
+            }
 
-                    parentVisible ?
-                        new IconButton("fa-folder", "Up", {
-                            [C.NODE_ID_ATTR]: ast.node.id,
-                            onClick: S.nav._navUpLevelClick,
-                            title: "Go to Parent Node"
-                        }, "btn-primary") : null
-                ]),
-            ], this.data);
-
-        this.children = [
-            this.headingBar,
-            contentDiv
-        ];
+            if (headingBarItems.length > 0) {
+                this.headingBar = new TabHeading([
+                    new Div(null, { className: "float-end" }, headingBarItems),
+                ], this.data);
+            }
+            else {
+                if (!this.attribs.className) 
+                    this.attribs.className = "";
+                this.attribs.className += " bigPaddingTop";
+            }
+        }   
+        this.children = [this.headingBar, contentDiv];
         return true;
     }
 }
