@@ -26,9 +26,15 @@ serviceCheck () {
 # up the project since we're using yarn. So we check for it, a lot.
 yarnCheck () {
     if [ -e "${PRJROOT}/src/main/resources/public/package-lock.json" ]; then
+        echo "*******************************************************"
         echo "Oops. package-lock.json found. This should not exist with 'yarn' being used."
-        read -p "Press ENTER."
-        exit $?
+        rm ${PRJROOT}/src/main/resources/public/package-lock.json
+        echo "Deleted package-lock.json. Continuing..."
+        echo "*******************************************************"
+        # read -p "Press ENTER."
+        # exit $?
+    else
+        echo "No package-lock.json found ($1)  Good."
     fi
 }
 

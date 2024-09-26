@@ -11,6 +11,7 @@ fi
 
 echo "Running build.sh for $quanta_domain"
 
+yarnCheck "Before main build"
 rm -rf ${PRJROOT}/target/*
 rm -rf ${PRJROOT}/bin/*
 
@@ -35,6 +36,7 @@ echo "mvn install the /pom/common/pom.xml into repo"
 # WARNING: DO NOT DELETE: After you upgrade to a new version of Java, you MUST run this command with "clean" in it!
 # mvn -T 1C clean install -Dmaven.javadoc.skip=true
 mvn -T 1C install -Dmaven.javadoc.skip=true
+yarnCheck "After mvn run"
 
 verifySuccess "Maven install common pom"
 
@@ -52,6 +54,7 @@ echo "Maven package ${mvn_profile}"
 # Always do the same profile here (dev-vscode)
 mvn -T 1C package -DskipTests=true -Pdev-vscode
 verifySuccess "Maven install commmon dev-vscode (typescript gen)"
+yarnCheck "After mvn packaging"
 
 cd ${PRJROOT}/src/main/resources/public
 . ./build.sh
@@ -64,3 +67,4 @@ cd ${PRJROOT}
 # Then this is the actual maven full build of the server springboot app
 mvn -T 1C clean package -DskipTests=true -P${mvn_profile}
 verifySuccess "Maven Build"
+yarnCheck "Before main full build"
