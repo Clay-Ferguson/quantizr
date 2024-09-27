@@ -97,7 +97,7 @@ services:
         #     retries: 30
 
     pgdb-dev:
-        image: postgres
+        image: postgres:16
         deploy:
             # Don't want a restart policy for DEV!
             # restart_policy:
