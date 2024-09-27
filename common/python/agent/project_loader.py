@@ -56,7 +56,7 @@ class ProjectLoader:
 
                 # If we're parsing the prompt
                 if in_prompt:
-                    if trimmed == "go hal":
+                    if trimmed == "?":
                         self.parsed_prompt = parsed_prompt
                         self.file_with_prompt = path
                         in_prompt = False

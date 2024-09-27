@@ -77,6 +77,9 @@ class QuantaAgent:
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
         
+        if (self.parse_prompt and not self.prj_loader.parsed_prompt):
+            raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' followed the prompt.")
+        
         # if we just got our prompt from scanning files then set it in self.prompt
         if (self.prj_loader.parsed_prompt):
             self.prompt = self.prj_loader.parsed_prompt
@@ -98,7 +101,12 @@ class QuantaAgent:
                 user_system_prompt, self.source_folder, self.folders_to_include, self.ext_set
             )
         
-        self.build_system_prompt(user_system_prompt)
+        if (self.parse_prompt): 
+            self.system_prompt = PromptUtils.get_template(
+                "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
+            )
+        else:
+            self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:
             # If dry_run is True, we simulate the AI response by reading from a file
@@ -121,7 +129,7 @@ class QuantaAgent:
             self.human_message = HumanMessage(content=self.prompt)
             messages.append(self.human_message)
 
-            if self.mode != RefactorMode.NONE.value:
+            if not self.parse_prompt and self.mode != RefactorMode.NONE.value:
                 # https://python.langchain.com/v0.2/docs/tutorials/agents/
                 tools = []
 
@@ -131,7 +139,8 @@ class QuantaAgent:
                         CreateFileTool("File Creator Tool", self.source_folder),
                         UpdateFileTool("File Updater Tool", self.source_folder),
                     ]
-                print("Created Agent Tools")
+                    print("Created Agent Tools")
+                    
                 agent_executor = chat_agent_executor.create_tool_calling_executor(
                     llm, tools
                 )
@@ -141,7 +150,6 @@ class QuantaAgent:
                 resp_messages = response["messages"]
                 new_messages = resp_messages[initial_message_len:]
                 self.answer = ""
-                self.clean_answer = ""
                 ai_response: int = 0
                 
                 # Scan all the new messages for AI responses, which may contain tool calls
@@ -153,12 +161,10 @@ class QuantaAgent:
                             content = Utils.get_tool_calls_str(message)
                             # print(f"TOOL CALLS:\n{content}")
                         self.answer += f"AI Response {ai_response}:\n{content}\n\n==============\n\n"  # type: ignore
-                        self.clean_answer += f"{content}\n"
 
                 # Agents may add multiple new messages, so we need to update the messages list
                 # This [:] syntax is a way to update the list in place
                 messages[:] = resp_messages
-
             else:
                 print("Running without tools")
                 response = llm.invoke(messages)
@@ -184,8 +190,8 @@ Final Prompt:
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
 
-        if self.parse_prompt and self.clean_answer:
-            self.inject_answer(self.prj_loader.file_with_prompt, self.clean_answer)
+        if self.parse_prompt and self.answer:
+            self.inject_answer(self.prj_loader.file_with_prompt, self.answer)
             
         if self.mode == RefactorMode.REFACTOR.value:
             ProjectMutator(
@@ -216,10 +222,11 @@ Final Prompt:
         
         with FileUtils.open_writable_file(file_with_prompt) as file:
             for line in lines:
-                if line.strip() == "go hal":
-                    file.write("-go hal")
+                if line.strip() == "?":
+                    file.write("-?\n")
                     if not wrote:
                         file.write(answer)
+                        file.write("\n----\n\n")
                         wrote = True
                 else:
                     file.write(line)

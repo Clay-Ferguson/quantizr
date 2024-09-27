@@ -98,26 +98,28 @@ Developer teams can theoretically use a standard where (perhaps only temporarily
 
 # `Ok Hal` Feature
 
-You can ask questions anywhere in your code using `ok hal...prompt...go hal` pattern. This is best demonstrated with a simple example. Let's say somewhere in your project files you have the following lines of text:
+You can ask questions anywhere in your code using `ok hal...[prompt]...?` pattern. This is best demonstrated with a simple example. Let's say somewhere in your project files you have the following lines of text:
 
 ```txt
 ok hal
-What is the capital of France?
-go hal
+Show in Python how to get current time and print it as a string.
+?
 ```
-Once you've saved the file you can click `Run HAL` button in the Coding Agent panel, and it will think for a minute and then edit your file automatically and inject the answer directly below the question, so you'll end up with this:
+Note that the `ok hal` is above the prompt and `?` is below the prompt. This is how the AI will find and answer the question in your code, by injecting the answer directly into the code below the question itself. Once you've saved the file you can click `Run HAL` button in the Coding Agent panel, and the AI will edit your file automatically and inject the answer directly below the question, so you'll end up with this:
 
 ```txt
 ok hal
-What is the capital of France
--go hal
+Show in Python how to get current time and print it as a string.
+-?
+import datetime
 
-The capital of France is Paris.
+current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+print(current_time)
 ```
 
-*Note that a dash was inserted in front of `go hal` after the edit. This is so that once the answer is inserted if you accidentally run Hal again nothing will happen the second time.*
+*Note that a dash was inserted in front of `?` after the edit. This is so that once the answer is inserted if you accidentally run Hal again nothing will happen the second time.*
 
-The prompt you put between `ok hal/go hal` can be as long as you want and you can also use any of your code blocks that you've defined in your project. The only difference between this feature and the normal Web Browser-based Coding Agent is that the question (AI Prompt) is gotten directly from your project files, and the anser is inserted just below the question.
+The prompt you put between `ok hal...?` can be as long as you want, with any number of lines of text.
 
 Caveat: The `Ok Hal` feature currently doesn't understand what kind of file you're editing so if you say something like "Show me an example of a `for loop`" and you're in Java file, it won't know you want a Java for loop unless you tell it. This limitation will be fixed soon. (todo-0)
 
