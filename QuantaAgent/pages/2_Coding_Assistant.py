@@ -21,8 +21,8 @@ class AppAgentGUI:
     def __init__(self):
         self.cfg = AppConfig.get_config(None)
 
-    def ask_ai(self):
-        """Ask the AI."""
+    def ask_ai(self, parse_prompt: bool = False):
+        """Ask the AI. If ParsePrompt is True, then the prompt is extracted from the project files."""
         # initialize message history
         if "p_agent_messages" not in st.session_state:
             messages: List[BaseMessage] = []
@@ -52,7 +52,7 @@ class AppAgentGUI:
 
         # handle user input
         user_input = st.session_state.p_agent_user_input
-        if user_input:
+        if user_input or parse_prompt:
             with st.spinner("Thinking..."):
                 agent = QuantaAgent()
                 agent.run(
@@ -62,12 +62,16 @@ class AppAgentGUI:
                     "",
                     st.session_state.p_agent_messages,
                     user_input,
+                    parse_prompt,
                     self.cfg.source_folder,
                     "",
                     self.cfg.data_folder,
                     AppConfig.ext_set,
                     llm
                 )
+                if parse_prompt:
+                    user_input = agent.prj_loader.parsed_prompt
+                    
                 st.session_state.p_user_inputs[id(agent.human_message)] = user_input
                 st.session_state.p_agent_user_input = ""
 
@@ -98,10 +102,12 @@ class AppAgentGUI:
                 label="Ask the AI a Question (or ask for a Code Refactor to be done): ",
                 key="p_agent_user_input",
             )
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
-                st.form_submit_button("Ask AI", on_click=self.ask_ai)
+                st.form_submit_button("Ask AI", on_click=lambda: self.ask_ai(False))
             with col2:
+                st.form_submit_button("Run HAL", on_click=lambda: self.ask_ai(True))
+            with col3:
                 st.form_submit_button("Clear", on_click=self.clear_agent_state)
 
     def clear_agent_state(self):

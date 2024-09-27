@@ -9,8 +9,12 @@ class FileUtils:
     
     @staticmethod
     def open_file(filename: str) -> TextIOWrapper:
-        """Reads a file and returns the content."""
+        """Opens file for reading."""
         return open(filename, "r", encoding="utf-8")
+    
+    def open_writable_file(filename: str) -> TextIOWrapper:
+        """Opens file for writing."""
+        return open(filename, "w", encoding="utf-8")
 
     @staticmethod
     def write_file(filename: str, content: str):

@@ -15,6 +15,32 @@ You're probably a developer if you're even reading this so be sure to check out 
 * Refactor files or entire projects 
 * Answers questions specifically about named blocks, or specific files and folders of your code
 * Create new Software Projects based on a description/prompt.
+* Answers questions in your code by putting the answers directly in the code. See "Ok Hal" section, below.
+
+# `Ok Hal` Feature
+
+You can ask questions anywhere in your code using `ok hal...prompt...go hal` pattern. This is best demonstrated with a simple example. Let's say somewhere in your project files you have the following lines of text:
+
+```txt
+ok hal
+What is the capital of France?
+go hal
+```
+Once you've saved the file you can click `Run HAL` button in the Coding Agent panel, and it will think for a minute and then edit your file automatically and inject the anser directly below the question, so you'll end up with this:
+
+```txt
+ok hal
+What is the capital of France
+-go hal
+
+The capital of France is Paris.
+```
+
+*Note that a dash was inserted in front of `go hal` after the edit. This is so that once the answer is inserted if you accidentally run Hal again nothing will happen the second time.*
+
+The prompt you put between `ok hal/go hal` can be as long as you want and you can also use any of your code blocks that you've defined in your project. The only difference between this feature and the normal Web Browser-based Coding Agent is that the question (AI Prompt) is gotten directly from your project files, and the anser is inserted just below the question.
+
+Caveat: The `Ok Hal` feature currently doesn't understand what kind of file you're editing so if you say something like "Show me an example of a `for loop`" and you're in Java file, it won't know you want a Java for loop unless you tell it. This limitation willb e fixed soon. (todo-0)
 
 # Project Summary
 

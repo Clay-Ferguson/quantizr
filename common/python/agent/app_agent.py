@@ -1,6 +1,7 @@
 """This is the main agent module that scans the source code and generates the AI prompt."""
 
 import os
+import re
 import time
 from typing import List, Set
 from .project_loader import ProjectLoader
@@ -39,6 +40,7 @@ class QuantaAgent:
         self.folders_to_include: List[str] = []
         self.data_folder = ""
         self.dry_run: bool = False
+        self.parse_prompt: bool = False
     
     def run(
         self,
@@ -48,6 +50,7 @@ class QuantaAgent:
         output_file_name: str,
         messages: List[BaseMessage],
         input_prompt: str,
+        parse_prompt: bool,
         source_folder: str,
         folders_to_include: List[str],
         data_folder: str,
@@ -61,8 +64,9 @@ class QuantaAgent:
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include)
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, parse_prompt)
         self.prompt = input_prompt
+        self.parse_prompt = parse_prompt
         self.mode = mode
         self.ext_set = ext_set
 
@@ -72,6 +76,10 @@ class QuantaAgent:
 
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
+        
+        # if we just got our prompt from scanning files then set it in self.prompt
+        if (self.prj_loader.parsed_prompt):
+            self.prompt = self.prj_loader.parsed_prompt
 
         self.prompt = self.insert_blocks_into_prompt(self.prompt)
         self.prompt = PromptUtils.insert_files_into_prompt(
@@ -133,6 +141,7 @@ class QuantaAgent:
                 resp_messages = response["messages"]
                 new_messages = resp_messages[initial_message_len:]
                 self.answer = ""
+                self.clean_answer = ""
                 ai_response: int = 0
                 
                 # Scan all the new messages for AI responses, which may contain tool calls
@@ -144,6 +153,7 @@ class QuantaAgent:
                             content = Utils.get_tool_calls_str(message)
                             # print(f"TOOL CALLS:\n{content}")
                         self.answer += f"AI Response {ai_response}:\n{content}\n\n==============\n\n"  # type: ignore
+                        self.clean_answer += f"{content}\n"
 
                 # Agents may add multiple new messages, so we need to update the messages list
                 # This [:] syntax is a way to update the list in place
@@ -174,6 +184,9 @@ Final Prompt:
         FileUtils.write_file(filename, output)
         print(f"Wrote Log File: {filename}")
 
+        if self.parse_prompt and self.clean_answer:
+            self.inject_answer(self.prj_loader.file_with_prompt, self.clean_answer)
+            
         if self.mode == RefactorMode.REFACTOR.value:
             ProjectMutator(
                 self.mode,
@@ -185,6 +198,31 @@ Final Prompt:
                 self.prj_loader.blocks,
                 self.ext_set
             ).run()
+
+    def remove_thinking_tags(self, text: str) -> str:
+        """Removes the thinking tags from the prompt."""
+        # Use regex to find and remove content between <thinking> tags
+        pattern = r'<thinking>.*?</thinking>'
+        cleaned_text = re.sub(pattern, '', text, flags=re.DOTALL)
+        return cleaned_text
+        
+    def inject_answer(self, file_with_prompt: str, answer: str):
+        """Injects the AI answer into the file that contains the prompt."""
+        answer = self.remove_thinking_tags(answer)
+        wrote = False
+        
+        with FileUtils.open_file(file_with_prompt) as file:
+            lines = file.readlines()
+        
+        with FileUtils.open_writable_file(file_with_prompt) as file:
+            for line in lines:
+                if line.strip() == "go hal":
+                    file.write("-go hal")
+                    if not wrote:
+                        file.write(answer)
+                        wrote = True
+                else:
+                    file.write(line)
 
     def build_system_prompt(self, user_system_prompt: str):
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,
