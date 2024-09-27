@@ -74,7 +74,7 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: ${mongoPassword}
 
     pgdb-distro:
-        image: postgres
+        image: postgres:16
         deploy:
             # Don't want a restart policy for DEV!
             # restart_policy:

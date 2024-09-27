@@ -14,12 +14,18 @@ class ProjectLoader:
     file_names: List[str] = []
     folder_names: List[str] = []
     folders_to_include: List[str] = []
+    parse_prompt: bool = False
+    parsed_prompt: str = ""
+    file_with_prompt: str = ""
 
     # folders_to_include is a newline (\n) separated list of folders to include in the scan
-    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str]):
+    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], parse_prompt: bool = False):
         self.source_folder_len = source_folder_len
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
+        self.parse_prompt = parse_prompt
+        self.parsed_prompt = ""
+        self.file_with_prompt = ""
         
         
     def reset(self):
@@ -41,12 +47,27 @@ class ProjectLoader:
         with FileUtils.open_file(path) as file:
             block: Optional[TextBlock] = None
             block_on: bool = True
+            in_prompt: bool = False
+            parsed_prompt: str = ""
 
             for line in file:  # NOTE: There's no way do to typesafety in loop vars
                 # Print each line; using end='' to avoid adding extra newline
                 trimmed: str = line.strip()
 
-                if Utils.is_tag_line(trimmed, TAG_BLOCK_BEGIN):
+                # If we're parsing the prompt
+                if in_prompt:
+                    if trimmed == "go hal":
+                        self.parsed_prompt = parsed_prompt
+                        self.file_with_prompt = path
+                        in_prompt = False
+                    else:  
+                        parsed_prompt += line+"\n"
+
+                # If we're parsing the prompt, and the line equals "ok hal", then we're done
+                if trimmed == "ok hal" and self.parse_prompt and not self.parsed_prompt:
+                    in_prompt = True
+                    
+                elif Utils.is_tag_line(trimmed, TAG_BLOCK_BEGIN):
                     name: Optional[str] = Utils.parse_name_from_tag_line(
                         trimmed, TAG_BLOCK_BEGIN
                     )
@@ -58,18 +79,22 @@ class ProjectLoader:
                         n = name if name is not None else ""
                         block = TextBlock(relative_file_name, n, "", False)
                         self.blocks[n] = block
+                        
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_END):
                     if block is None:
                         raise Exception(
                             f"""Encountered {TAG_BLOCK_END} without a corresponding {TAG_BLOCK_BEGIN}""")
                     block = None
+                    
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_OFF):
                     if block is not None:
                         block.updateable = False
                         block_on = False
+                        
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_ON):
                     if block is not None:
                         block_on = True
+                        
                 else:
                     if block is not None and block_on:
                         block.content += line
