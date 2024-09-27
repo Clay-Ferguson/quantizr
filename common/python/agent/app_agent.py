@@ -34,6 +34,7 @@ class QuantaAgent:
         self.answer: str = ""
         self.mode = RefactorMode.NONE.value
         self.prompt: str = ""
+        self.prompt_code: str = ""
         self.system_prompt: str = ""
         self.prj_loader = None
         self.source_folder = ""
@@ -82,7 +83,10 @@ class QuantaAgent:
         
         # if we just got our prompt from scanning files then set it in self.prompt
         if (self.prj_loader.parsed_prompt):
-            self.prompt = self.prj_loader.parsed_prompt
+            self.prompt, self.prompt_code = self.parse_prompt_and_code(self.prj_loader.parsed_prompt)
+        
+        if (self.prompt_code): 
+            self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
 
         self.prompt = self.insert_blocks_into_prompt(self.prompt)
         self.prompt = PromptUtils.insert_files_into_prompt(
@@ -102,9 +106,14 @@ class QuantaAgent:
             )
         
         if (self.parse_prompt): 
-            self.system_prompt = PromptUtils.get_template(
-                "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
-            )
+            if (self.prompt_code):  
+                self.system_prompt = PromptUtils.get_template(
+                    "../common/python/agent/prompt_templates/okhal_system_prompt_with_code.txt"
+                )
+            else:
+                self.system_prompt = PromptUtils.get_template(
+                    "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
+                )
         else:
             self.build_system_prompt(user_system_prompt)
 
@@ -204,6 +213,26 @@ Final Prompt:
                 self.prj_loader.blocks,
                 self.ext_set
             ).run()
+
+    def parse_prompt_and_code(self, prompt: str) -> str:
+        """Takes the prompt and divides it at the line containing a '-' character (if there is one)
+        and returns the top half as the prompt, and the bottom half as the code, otherwise the
+        input prompt is sent back as prompt and code sent back as empty string
+        """
+        prompt_lines = prompt.split("\n")
+        prompt = ""
+        code = ""
+        in_code = False
+
+        for line in prompt_lines:
+            if line.strip() == "-":
+                in_code = True
+            elif in_code:
+                code += line + "\n"
+            else:
+                prompt += line + "\n"
+
+        return prompt, code
 
     def remove_thinking_tags(self, text: str) -> str:
         """Removes the thinking tags from the prompt."""

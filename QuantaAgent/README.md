@@ -123,6 +123,55 @@ The prompt you put between `ok hal...?` can be as long as you want, with any num
 
 Caveat: The `Ok Hal` feature currently doesn't understand what kind of file you're editing so if you say something like "Show me an example of a `for loop`" and you're in Java file, it won't know you want a Java for loop unless you tell it. This limitation will be fixed soon. (todo-0)
 
+## `Ok Hal` For Refactoring
+
+Read the above section `Ok Hal Feature` before reading this section. Once you understand the basic `Ok Hal` syntax you can optionally use this slightly more complex form of it which is specifically for `Refactoring` existing code blocks which works as follows: Instead of having your prompt be the only thing between the `ok hal` and the `?` you can use this new syntax (notice the `-` separating prompt from existing code) which simply adds in a line with a dash to break apart the designation of the prompt and the code you want refactored.
+
+Before you run Hal:
+
+```
+ok hal
+Show me how to iterate this array using 'forEach'
+-
+let array = ['a', 'b', 'c'];
+
+for (let i = 0; i < array.length; i++) {
+    console.log(array[i]);
+}
+?
+```
+
+After you run Hal:
+```
+ok hal
+Show me how to iterate this array using 'forEach'
+-
+let array = ['a', 'b', 'c'];
+
+for (let i = 0; i < array.length; i++) {
+    console.log(array[i]);
+}
+-?
+let array = ['a', 'b', 'c'];
+
+array.forEach(function(element) {
+    console.log(element);
+});
+```
+
+## Why use the `ok hal` Feature
+
+At first it may seem awkward that there are two or three new elements of syntax you have to remember to use this feature, and that might seem difficult compared to using other tools like `Microsoft/Github Copilot` which lets you hightlight blocks of text and then ask questions about the highlighted text, however in reality the `ok hal` approach in this app [arguably] has several benefits:
+
+* By wrapping your existing code temporarily with `ok hal` and `?` and getting your ansers injected directly into the code in the location it belongs that actually saves steps and can be immediately DIFFed either using your code editor DIFF tool, or visually.
+
+* Often your LLM instructions (prompt) is the same, or near same, as the documentation you'll be writing for new code so you can just leave it in place, where it already is in your code.
+
+* Your focus never leaves the code you're working on. You never have to highlight code blocks, or click "accept" to inject them,because you can do all your editing right in place, and never have to deal with a chat window at all, just your code itself.
+
+* However by far the most important reason this approach is good is that you're not locked into Microsoft's LLMs, or even any specific IDE either. We use LangChain so you can call into any LLM you want.
+
+* This Agent is completely external to your IDE, so you can use it with any IDE.
 
 # Technical Documentation
 
