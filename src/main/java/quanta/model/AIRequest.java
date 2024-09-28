@@ -12,6 +12,7 @@ public class AIRequest {
     private Float temperature;
     private Integer maxTokens;
     private Boolean codingAgent;
+    private Boolean runHal;
     private String agentFileExtensions;
 
     // how much user has left in their account
@@ -103,5 +104,13 @@ public class AIRequest {
 
     public void setAgentFileExtensions(String agentFileExtensions) {
         this.agentFileExtensions = agentFileExtensions;
+    }
+
+    public Boolean getRunHal() {
+        return runHal;
+    }
+
+    public void setRunHal(Boolean runHal) {
+        this.runHal = runHal;
     }
 }

@@ -482,6 +482,9 @@ export interface ResetPasswordRequest extends RequestBase {
     email: string;
 }
 
+export interface RunHalRequest extends RequestBase {
+}
+
 export interface SaveNodeJsonRequest extends RequestBase {
     json: string;
 }
@@ -897,6 +900,9 @@ export interface RenderNodeResponse extends ResponseBase {
 }
 
 export interface ResetPasswordResponse extends ResponseBase {
+}
+
+export interface RunHalResponse extends ResponseBase {
 }
 
 export interface SaveNodeJsonResponse extends ResponseBase {

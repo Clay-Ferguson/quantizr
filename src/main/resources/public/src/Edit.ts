@@ -1174,6 +1174,13 @@ export class Edit {
         await dlg.open();
     }
 
+    _runHal = async () => {
+        const res = await S.rpcUtil.rpc<J.RunHalRequest, J.RunHalResponse>("runHal", {});
+        if (res.code === C.RESPONSE_CODE_OK) {
+            // todo-0: flash a message to the user that the HAL ran
+        }
+    }
+
     async generateBookByAI(node: NodeInfo) {
         const dlg = new GenerateBookByAIDlg(node);
         await dlg.open();

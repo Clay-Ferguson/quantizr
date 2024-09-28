@@ -1,5 +1,6 @@
 package quanta.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,13 +13,17 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.AIResponse;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
+import quanta.model.UserPreferences;
+import quanta.model.client.AIModel;
 import quanta.model.client.Constant;
 import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
+import quanta.model.client.SystemConfig;
 import quanta.mongo.MongoTranMgr;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
@@ -26,6 +31,7 @@ import quanta.rest.request.GetNodeJsonRequest;
 import quanta.rest.request.InitNodeEditRequest;
 import quanta.rest.request.LikeNodeRequest;
 import quanta.rest.request.LinkNodesRequest;
+import quanta.rest.request.RunHalRequest;
 import quanta.rest.request.SaveNodeJsonRequest;
 import quanta.rest.request.SaveNodeRequest;
 import quanta.rest.request.SearchAndReplaceRequest;
@@ -35,6 +41,7 @@ import quanta.rest.response.GetNodeJsonResponse;
 import quanta.rest.response.InitNodeEditResponse;
 import quanta.rest.response.LikeNodeResponse;
 import quanta.rest.response.LinkNodesResponse;
+import quanta.rest.response.RunHalResponse;
 import quanta.rest.response.SaveNodeJsonResponse;
 import quanta.rest.response.SaveNodeResponse;
 import quanta.rest.response.SearchAndReplaceResponse;
@@ -48,6 +55,7 @@ import quanta.util.SubNodeUtil;
 import quanta.util.TL;
 import quanta.util.Util;
 import quanta.util.XString;
+import quanta.util.val.Val;
 
 /**
  * Service for editing content of nodes. That is, this method updates property values of nodes. As
@@ -89,6 +97,27 @@ public class NodeEditService extends ServiceBase {
                 return null;
             });
         });
+        return res;
+    }
+
+    public RunHalResponse runHal(RunHalRequest req) {
+        RunHalResponse res = new RunHalResponse();
+        UserPreferences userPrefs = TL.getSC().getUserPreferences();
+        String aiService = userPrefs.getAiService();
+        AIModel svc = AIModel.fromString(aiService);
+        if (svc != null) {
+            SystemConfig system = new SystemConfig();
+            system.setFileExtensions(userPrefs.getAiAgentFileExtensions());
+            system.setFoldersToInclude(userPrefs.getAiAgentFoldersToInclude());
+            system.setMaxWords(userPrefs.getAiMaxWords());
+            system.setTemperature(userPrefs.getAiTemperature());
+
+            Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
+            AIResponse aiResponse = svc_ai.getAnswer(true, true, null, null, system, svc, userCredit);
+
+            // todo-0: this needs to send back the current credit like other methods do
+            // res.setGptCredit(userCredit.getVal());
+        }
         return res;
     }
 
@@ -205,7 +234,7 @@ public class NodeEditService extends ServiceBase {
                 node.set(NodeProp.CRYPTO_SIG.s(), Constant.SIG_TBD.s());
                 reSigning = true;
             }
-        } 
+        }
 
         // for now only admin user is REQUIRED to have signed nodes.
         if (!reSigning && svc_prop.isRequireCrypto() && TL.hasAdminPrivileges()) {

@@ -47,7 +47,7 @@ class AIResponse(BaseModel):
 # NOTE: Optional is not enough to make the field optional. You need to also default value to `Field(default=None)`
 class AIRequest(BaseModel):
     systemPrompt: Optional[str] = Field(default=None)
-    prompt: str
+    prompt: Optional[str] = Field(default=None)
     foldersToInclude: Optional[str] = Field(default=None)
     messages: Optional[List[AIBaseMessage]] = Field(default=None)
     service: str
@@ -56,6 +56,7 @@ class AIRequest(BaseModel):
     maxTokens: int
     credit: float
     codingAgent: bool
+    runHal: bool
     agentFileExtensions: Optional[str]
 
 @app.get("/")
@@ -111,6 +112,7 @@ temperature: {req.temperature}
                 "",
                 messages,
                 req.prompt,
+                req.runHal,
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
                 folders_to_include,

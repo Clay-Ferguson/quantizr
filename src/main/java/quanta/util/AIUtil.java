@@ -281,7 +281,7 @@ public class AIUtil extends ServiceBase {
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
         AIModel svc = AIModel.fromString(req.getAiService());
-        aiResponse = svc_ai.getAnswer(false, null, sb.toString(), system, svc, userCredit);
+        aiResponse = svc_ai.getAnswer(false, false, null, sb.toString(), system, svc, userCredit);
 
         if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
@@ -426,7 +426,7 @@ public class AIUtil extends ServiceBase {
                             ```
                             """;
 
-            aiResponse = svc_ai.getAnswer(false, null, prompt, null, svc, userCredit);
+            aiResponse = svc_ai.getAnswer(false, false, null, prompt, null, svc, userCredit);
             res.setGptCredit(userCredit.getVal());
         }
         String answer = aiResponse.getContent();

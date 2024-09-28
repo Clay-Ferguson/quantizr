@@ -325,7 +325,7 @@ public class MongoCreate extends ServiceBase {
                     svc = AIModel.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null,
+                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), false, parentNode, null,
                         system, svc, userCredit);
 
                 res.setGptCredit(userCredit.getVal());

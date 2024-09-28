@@ -381,6 +381,7 @@ export class MenuPanel extends Comp {
                 new MenuItem("Configure Agent", MenuPanel.configureAgent, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Ask About Subgraph", MenuPanel.openAiAskDoc, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
+                S.quanta.config.aiAgentEnabled ? new MenuItem("Run HAL", S.edit._runHal, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true) : null,
                 new MenuItemSeparator(),
                 ast.isAnonUser ? null : new MenuItem("Chat Mode", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
                     () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
