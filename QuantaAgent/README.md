@@ -1,13 +1,8 @@
 # About Quanta Agent 
 
-This is a standalone Streamlit app. To run it you only need this folder (QuantaAgent), as well as the `common` folder that's adjacent to it. The rest of the folders in the Quantizr monorepo can be omitted. 
+This is a command line-only AI Agent Deamon. To run it you only need this folder (QuantaAgent), as well as the `common` folder that's adjacent to it. The rest of the folders in the Quantizr monorepo can be omitted. 
 
 Quant Agent is a tool to automate querying AIs (LLMs) about your codebase, which can also automatically refactor your actual project files, from high level human language instructions of what changes you'd like to make. You can ask the tool anything about your project, ask for any kind of refactoring you'd like to do in your project, or even ask the tool to create entirely new projects all on it's own.
-
-You're probably a developer if you're even reading this so be sure to check out the [Developer Notes](./docs/developer-notes.md)
-
-
-![Agent Conversation](docs/images/conversation.png)
 
 # Tool Features
 
@@ -19,7 +14,6 @@ You're probably a developer if you're even reading this so be sure to check out 
 
 # Project Summary
 
-* Streamlit GUI
 * Written 100% in Python
 * Open Source Python (MIT License)
 * Uses Python Langchain giving you flexibility in which LLM you use, including either locally hosted LLMs or Cloud AI Services.
@@ -28,14 +22,14 @@ You're probably a developer if you're even reading this so be sure to check out 
 
 If you're a software developer and you want to be able to ask AI (like OpenAI's ChatGPT for example) questions about your code, this tool helps do that. This tool can also implement entire complex features in your code base, by updating existing entire files, or by updating only specific labeled `Named Blocks` to add code to specific locations in specific files as directed by you. 
 
-The `Block Syntax` as well as `File and Folder Syntax` in the following document are describing features of Quanta, in the following link, but those syntaxes also apply to this Streamlit app, so read this for more info:
+The `Block Syntax` as well as `File and Folder Syntax` in the following document are describing features of Quanta, in the following link, but those syntaxes also apply to this Daemon Agent app, so read this for more info:
 
 https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md#using-the-coding-agent
 
 
 # To Run the App
 
-    ./run_streamlit.sh
+    ./run_agent.sh
 
 ## Configuration
 
@@ -44,7 +38,7 @@ To use this tool, follow these steps:
 1) Edit the `config.yaml` to make it point to a software project folder you want to analyze.
 2) Put your `OpenAI API Key` in the `config.yaml` (or command line, or env var)
 3) Create an empty `data` folder where your output files will go (also in `config.yaml`)
-4) Run the Streamlit-based Web interface with this command: `streamlit run Quanta_Agent.py`, and just use the app like a chatbot or and agent which can do code refactoring just like an expert software developer!
+4) Run with `./run_agent.sh`
 
 *Tip: When requesting project refactorings, it's best to be in a clean project version, so that if you don't like the changes the tool made to your code you can roll them back easily, using `git`.
 

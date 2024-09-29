@@ -7,7 +7,7 @@ export PATH="$conda_path/bin:$PATH"
 source $conda_path/bin/activate quanta_agent
 
 if [[ "$CONDA_DEFAULT_ENV" == "quanta_agent" ]]; then
-  streamlit run Quanta_Agent.py
+  python3 Quanta_Agent.py
 else
   echo "Failed to set Conda Environment: Expected quanta_agent but found $CONDA_DEFAULT_ENV"
   sleep 10s

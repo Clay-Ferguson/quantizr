@@ -2,25 +2,22 @@
 
 import os
 import re
-from typing import List, Set, Optional
+from typing import List, Set
 import argparse
 import configargparse
-
 
 class AppConfig:
     """Loads configuration from config.yaml and secrets.yaml files."""
 
     ext_list: List[str] = []
-    ext_set: Set[str] = set()
+    ext_set: Set[str] = set()    
+    cfg: argparse.Namespace = None
 
-    @classmethod
-    def get_config(cls, config_file: Optional[str] = None) -> argparse.Namespace:
+    @staticmethod
+    def init_config():
         """Loads configuration from config.yaml and secrets.yaml files."""
 
-        # Both of these config files are optional, because the ArgParser can load
-        # from command line arguments or environment variables as well.
-        if config_file is None:
-            config_file = "config/config.yaml"
+        config_file = "config.yaml"
         secrets_file: str = "../../secrets/secrets.yaml"
 
         if not os.path.isfile(config_file):
@@ -74,8 +71,10 @@ class AppConfig:
             help="Update mode for the files (files or blocks)",
         )
 
-        options = p.parse_args()
-
-        AppConfig.ext_list = re.split(r"\s*,\s*", options.scan_extensions)
+        AppConfig.cfg = p.parse_args()        
+        AppConfig.ext_list = re.split(r"\s*,\s*", AppConfig.cfg.scan_extensions)
         AppConfig.ext_set = set(AppConfig.ext_list)
-        return options
+        if (AppConfig.cfg):
+            print("Configuration loaded")   
+        else:
+            print("Configuration load failed")

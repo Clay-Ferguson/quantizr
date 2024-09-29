@@ -165,6 +165,7 @@ def buildMessages(req):
 
     return messages
 
+# todo-0: QuantaAgent is not getting this thru a method. We need to use that same method here.
 def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
     llm: BaseChatModel = None;
     timeout = 120  # timeout in seconds

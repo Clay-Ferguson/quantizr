@@ -58,9 +58,6 @@ class QuantaAgent:
         ext_set: Set[str],
         llm: BaseChatModel
     ):
-        """Runs the agent. We assume that if messages is not `None` then we are in the Streamlit GUI mode, and these messages
-        represent the chatbot context. If messages is `None` then we are in the CLI mode, and we will use the `prompt` parameter
-        alone without any prior context."""
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
