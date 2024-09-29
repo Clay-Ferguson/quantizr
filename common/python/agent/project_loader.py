@@ -116,7 +116,8 @@ class ProjectLoader:
             self.folder_names.append(short_dir)
 
             for filename in filenames:
-                if Utils.has_included_file_extension(self.ext_set, filename) and Utils.has_included_folder(self.folders_to_include, short_dir):
+                if (Utils.has_included_file_extension(self.ext_set, filename) and 
+                    Utils.has_included_folder(self.folders_to_include, short_dir)):
                     # print(f"visit file {filename} in {dirpath}")
                     # build the full path
                     path: str = os.path.join(dirpath, filename)

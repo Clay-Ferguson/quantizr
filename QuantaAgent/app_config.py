@@ -11,7 +11,9 @@ class AppConfig:
 
     ext_list: List[str] = []
     ext_set: Set[str] = set()    
-    cfg: argparse.Namespace = None
+    cfg: argparse.Namespace
+    source_folder_len: int
+    folders_to_include: List[str] = []
 
     @staticmethod
     def init_config():
@@ -52,6 +54,7 @@ class AppConfig:
         p.add_argument("--gemini_model", required=True, help="Anthropic model name")
 
         p.add_argument("--ai_service", required=True, help="AI Service")
+        p.add_argument("--folders_to_include", required=True, help="AI Service")
         p.add_argument(
             "--scan_extensions",
             required=True,
@@ -73,7 +76,10 @@ class AppConfig:
 
         AppConfig.cfg = p.parse_args()        
         AppConfig.ext_list = re.split(r"\s*,\s*", AppConfig.cfg.scan_extensions)
+        AppConfig.folders_to_include = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_include)
         AppConfig.ext_set = set(AppConfig.ext_list)
+        AppConfig.source_folder_len = len(AppConfig.cfg.source_folder)
+        
         if (AppConfig.cfg):
             print("Configuration loaded")   
         else:

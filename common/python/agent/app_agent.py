@@ -62,7 +62,7 @@ class QuantaAgent:
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
-        self.source_folder_len: int = len(source_folder)
+        self.source_folder_len: int = len(source_folder)  # todo-0: Need to only ever get this this from AppConfig
         self.folders_to_include = folders_to_include
         self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, parse_prompt)
         self.prompt = input_prompt

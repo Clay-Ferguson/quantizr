@@ -16,7 +16,8 @@ if __name__ == "__main__":
     print("Quanta Agent Starting...")
     AppConfig.init_config()
     Utils.init_logging(AppConfig.cfg.data_folder + "/quanta_agent.log")
-    monitor = FolderMonitor(AppConfig.ext_set, AppConfig.cfg)
+        
+    monitor = FolderMonitor(AppConfig.ext_set, AppConfig.folders_to_include, AppConfig.cfg, AppConfig.source_folder_len)
     monitor.start()
     
     try:

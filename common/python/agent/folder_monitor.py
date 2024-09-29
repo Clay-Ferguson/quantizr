@@ -1,4 +1,6 @@
 import time
+import os
+from typing import List
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import threading
@@ -10,15 +12,21 @@ class FileChangeHandler(FileSystemEventHandler):
     
     # we have this flag so we can disable the file watching when we know we're the ones changing the file
     active = True
+    folders_to_include: List[str]
+    source_folder_len: int
     
-    def __init__(self, ext_set, cfg):
+    def __init__(self, ext_set, folders_to_include: List[str], cfg, source_folder_len: int):
         self.ext_set = ext_set
+        self.folders_to_include = folders_to_include
         self.cfg = cfg
-         
+        self.source_folder_len = source_folder_len
+        
     def on_modified(self, event):
         if not event.is_directory:
-            if self.active and Utils.has_included_file_extension(self.ext_set, event.src_path):
-                # todo-0: finish this: and Utils.has_included_folder(self.folders_to_include, short_dir)):
+            dirpath = os.path.dirname(event.src_path)
+            short_dir: str = dirpath[self.source_folder_len :]
+            if (self.active and Utils.has_included_file_extension(self.ext_set, event.src_path)
+                 and Utils.has_included_folder(self.folders_to_include, short_dir)):
                 print(f"File Changed: {event.src_path}")
                 try :
                     self.active = True
@@ -29,20 +37,24 @@ class FileChangeHandler(FileSystemEventHandler):
                     self.active = False
 
 class FolderMonitor:
-    def __init__(self, ext_set, cfg):
+    def __init__(self, ext_set, folders_to_include: List[str], cfg, source_folder_len):
         self.ext_set = ext_set
+        self.folders_to_include = folders_to_include
+        print(f"Including SubFolders: {self.folders_to_include}")
+        
         self.cfg = cfg
+        self.source_folder_len = source_folder_len
         self.observer = Observer()
         self.stop_event = threading.Event()
 
     def start(self):
-        event_handler = FileChangeHandler(self.ext_set, self.cfg)   
+        event_handler = FileChangeHandler(self.ext_set, self.folders_to_include, self.cfg, self.source_folder_len)   
         self.observer.schedule(event_handler, self.cfg.source_folder, recursive=True)
         self.observer.start()
         
         monitor_thread = threading.Thread(target=self._run)
         monitor_thread.start()
-        print(f"Monitoring Folder: {self.cfg.source_folder}")
+        print(f"Monitoring Root Folder: {self.cfg.source_folder}")
 
     def _run(self):
         try:

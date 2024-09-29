@@ -16,8 +16,12 @@ gemini_model: "gemini-1.5-pro"
 
 mode: "none"
 ai_service: "openai"
-source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
 scan_extensions: ".java, .sql, .py, .html, .htm, .js, .ts, .css"
 data_folder: "/home/clay/ai-agent-temp"
- 
 
+source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
+
+# The folders to include in the scan, relative to (i.e. contained within) the source_folder.
+# If not specified, the entire project is scanned.
+folders_to_include: ""
+ 

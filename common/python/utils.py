@@ -81,6 +81,7 @@ class Utils:
         if folders == None or len(folders) == 0:
             return True
         
+        # Note: If there's no folders we have an empty string in here but it still works.
         for folder in folders:
             if short_folder.startswith(folder):
                 return True
