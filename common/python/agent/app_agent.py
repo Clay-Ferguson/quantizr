@@ -28,6 +28,8 @@ from .prompt_utils import PromptUtils
 
 class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
+    
+    prj_loader: ProjectLoader | None
 
     def __init__(self):
         self.ts: str = str(int(time.time() * 1000))
@@ -211,7 +213,7 @@ Final Prompt:
                 self.ext_set
             ).run()
 
-    def parse_prompt_and_code(self, prompt: str) -> str:
+    def parse_prompt_and_code(self, prompt: str) -> tuple[str, str]:
         """Takes the prompt and divides it at the line containing a '-' character (if there is one)
         and returns the top half as the prompt, and the bottom half as the code, otherwise the
         input prompt is sent back as prompt and code sent back as empty string
@@ -281,7 +283,7 @@ Final Prompt:
     def add_block_handling_instructions(self):
         """Adds instructions for updating blocks. If the prompt contains ${BlockName} tags, then we need to provide
         instructions for how to provide the new block content."""
-        if self.mode == RefactorMode.REFACTOR.value and len(self.prj_loader.blocks) > 0:
+        if self.mode == RefactorMode.REFACTOR.value and self.prj_loader is not None and len(self.prj_loader.blocks) > 0:
             self.system_prompt += PromptUtils.get_template(
                 "../common/python/agent/prompt_templates/block_access_instructions.txt"
             )
@@ -312,7 +314,7 @@ Final Prompt:
         Returns true only if someblocks were inserted.
         """
         # As performance boost, if self.prompt does not contain "block(" then return False
-        if "block(" not in prompt:
+        if "block(" not in prompt or self.prj_loader is None or self.prj_loader.blocks is None:
             return prompt
         
         # ret = False

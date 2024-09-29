@@ -13,7 +13,7 @@ class AIUtils:
     """AI Utilities Class"""
     
     @staticmethod
-    def ask_agent(parse_prompt: bool = False, cfg: argparse.Namespace = None, ext_set: Set[str] = []) -> None: 
+    def ask_agent(parse_prompt: bool, cfg: argparse.Namespace, ext_set: Set[str]) -> None: 
         """Ask the AI. If ParsePrompt is True, then the prompt is extracted from the project files."""
         print("Running ask_agent")
         messages: List[BaseMessage] = []
@@ -31,7 +31,7 @@ class AIUtils:
             prompt,
             parse_prompt,
             cfg.source_folder,
-            "",
+            [],
             cfg.data_folder,
             ext_set,
             llm
@@ -41,7 +41,7 @@ class AIUtils:
     def create_llm(
             ai_service: str,
             temperature: float,
-            cfg: AppConfig
+            cfg: argparse.Namespace
         ) -> BaseChatModel:
             """Creates a language model based on the AI service."""
             print("Creating LLM: "+ai_service)
@@ -54,10 +54,10 @@ class AIUtils:
                 )
             elif ai_service == AIService.ANTHROPIC.value:
                 llm = ChatAnthropic(
-                    model=cfg.anth_model,
+                    model=cfg.anth_model, # type: ignore
                     temperature=temperature,
-                    api_key=cfg.anth_api_key,
-                )
+                    api_key=cfg.anth_api_key
+                ) # type: ignore 
             elif ai_service == AIService.GEMINI.value:
                 llm = ChatGoogleGenerativeAI(
                     model=cfg.gemini_model,

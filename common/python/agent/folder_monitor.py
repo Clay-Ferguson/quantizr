@@ -17,8 +17,8 @@ class FileChangeHandler(FileSystemEventHandler):
          
     def on_modified(self, event):
         if not event.is_directory:
-            # todo-0: check the folder location to. We filter by folders too
             if self.active and Utils.has_included_file_extension(self.ext_set, event.src_path):
+                # todo-0: finish this: and Utils.has_included_folder(self.folders_to_include, short_dir)):
                 print(f"File Changed: {event.src_path}")
                 try :
                     self.active = True

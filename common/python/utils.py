@@ -72,7 +72,6 @@ class Utils:
     @staticmethod
     def has_included_file_extension(ext_set: Set[str], file_name: str) -> bool:
         """Returns True if the file's extension should be included in the scan."""
-        # return file_name.endswith(tuple(AppConfig.ext_set)) # <--- AI suggested this. Didn't investigate further
         _, ext = os.path.splitext(file_name)
         return ext.lower() in ext_set
     

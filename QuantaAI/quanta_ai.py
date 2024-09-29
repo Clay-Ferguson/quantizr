@@ -93,11 +93,12 @@ temperature: {req.temperature}
             return AIResponse(content=None, cost=None, error="Insufficient credit. Add funds to your account, using `Menu -> AI -> Settings -> Add Credit`")         
 
         answer: str = ""
-        response: BaseMessage = None
+        response: BaseMessage | None = None
         if req.codingAgent:
             print("CodingAgent mode")
-             # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
-            ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
+            if req.agentFileExtensions is not None:
+                # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
+                ext_set: Set[str] = {f".{ext.strip()}" for ext in req.agentFileExtensions.split(',')}
 
             folders_to_include = []
             if req.foldersToInclude:
@@ -106,12 +107,12 @@ temperature: {req.temperature}
             messages = buildContext(req)
             agent = QuantaAgent()
             agent.run(
-                req.systemPrompt,
+                req.systemPrompt if req.systemPrompt else "",
                 req.service,
                 RefactorMode.REFACTOR.value,
                 "",
                 messages,
-                req.prompt,
+                req.prompt if req.prompt else "",
                 req.runHal,
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
@@ -119,12 +120,12 @@ temperature: {req.temperature}
                 "/data",
                 ext_set,
                 llm)
-            answer = messages[-1].content
+            answer = messages[-1].content # type: ignore
         else:
             print("Chat mode")
             messages = buildMessages(req)
             response = llm.invoke(messages)
-            answer = response.content
+            answer = response.content # type: ignore
 
         # Estimate output tokens
         output_tokens = int((len(answer)+3) / 3)        
@@ -167,14 +168,14 @@ def buildMessages(req):
 
 # todo-0: QuantaAgent is not getting this thru a method. We need to use that same method here.
 def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
-    llm: BaseChatModel = None;
+    llm: BaseChatModel | None = None
     timeout = 120  # timeout in seconds
     
     if req.service == "anthropic":
         llm = ChatAnthropic(
-            model=req.model,
+            model=req.model, # type: ignore
             temperature=req.temperature,
-            max_tokens=req.maxTokens,
+            max_tokens=req.maxTokens, # type: ignore
             timeout=timeout,
             api_key=api_key,
         )
@@ -198,13 +199,13 @@ def getChatModel(req: AIRequest, api_key) -> BaseChatModel:
         llm = ChatGoogleGenerativeAI(
             model=req.model,
             temperature=req.temperature,
-            max_tokens=req.maxTokens,
+            max_tokens=req.maxTokens, # type: ignore
             timeout=timeout,
             api_key=api_key,
         )
     else:
         raise ValueError(f"Unsupported service: {req.service}")
-    return llm
+    return llm # type: ignore
 
 # https://www.anthropic.com/pricing#anthropic-api
 # https://openai.com/api/pricing/
