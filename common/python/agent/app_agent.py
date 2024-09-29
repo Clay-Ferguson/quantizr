@@ -3,7 +3,6 @@
 import os
 import re
 import time
-import pprint
 from typing import List, Set
 from .project_loader import ProjectLoader
 from .project_mutator import ProjectMutator
@@ -174,35 +173,9 @@ class QuantaAgent:
                 for message in new_messages:
                     if isinstance(message, AIMessage):
                         resp_idx += 1
-                            
                         # print(f"AI Response {resp_idx}:")
                         # pprint.pprint(message)
-                        
-                        # todo-0: refactor this into an append_message function
-                        if isinstance(message.content, str):
-                            if (len(message.content) > 0):
-                                self.answer += message.content
-                        else:
-                            if isinstance(message.content, list): 
-                                # if message.content is a list
-                                for item in message.content:
-                                    if isinstance(item, dict) and "type" in item and item["type"] == "tool_use":
-                                        if (resp_idx > 1):
-                                            self.answer += "\n\n"
-                                        tool_name = item["name"]
-                                        self.answer += f"Tool Used: {tool_name}\n"
-                                        # self.answer += f"Args:\n"
-                                        # for key, value in item["input"].items():
-                                        #     self.answer += f"  {key}: {value}\n"  
-                                    elif isinstance(item, dict) and "text" in item:
-                                        if (resp_idx > 1):
-                                            self.answer += "\n\n"
-                                        self.answer += item["text"]
-                                    else:
-                                        val = str(item)
-                                        if (resp_idx > 1 and len(val) > 0):
-                                            self.answer += "\n\n"
-                                        self.answer += val
+                        self.answer = self.append_message(message, self.answer)
                            
                 # Agents may add multiple new messages, so we need to update the messages list
                 # This [:] syntax is a way to update the list in place
@@ -246,6 +219,21 @@ Final Prompt:
                 self.prj_loader.blocks,
                 self.ext_set
             ).run()
+
+    def append_message(self, message: AIMessage, answer: str) -> str:
+        if isinstance(message.content, str):
+            answer += message.content + "\n"
+        else:
+            if isinstance(message.content, list): 
+                # if message.content is a list
+                for item in message.content:
+                    if isinstance(item, dict) and "type" in item and item["type"] == "tool_use":
+                        answer += "Tool Used: " + item["name"] + "\n"
+                    elif isinstance(item, dict) and "text" in item:
+                        answer += item["text"] + "\n"
+                    else:
+                        answer += str(item) + "\n"
+        return answer
 
     def parse_prompt_and_code(self, prompt: str) -> tuple[str, str]:
         """Takes the prompt and divides it at the line containing a '-' character (if there is one)
