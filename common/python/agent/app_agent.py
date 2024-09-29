@@ -3,6 +3,7 @@
 import os
 import re
 import time
+import pprint
 from typing import List, Set
 from .project_loader import ProjectLoader
 from .project_mutator import ProjectMutator
@@ -62,7 +63,7 @@ class QuantaAgent:
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
-        self.source_folder_len: int = len(source_folder)  # todo-0: Need to only ever get this this from AppConfig
+        self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
         self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, parse_prompt)
         self.prompt = input_prompt
@@ -86,6 +87,8 @@ class QuantaAgent:
         
         if (self.prompt_code): 
             self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
+
+        raw_prompt = self.prompt
 
         self.prompt = self.insert_blocks_into_prompt(self.prompt)
         self.prompt = PromptUtils.insert_files_into_prompt(
@@ -136,8 +139,15 @@ class QuantaAgent:
 
             self.human_message = HumanMessage(content=self.prompt)
             messages.append(self.human_message)
+            
+            # default to using tools if we are not parsing the prompt
+            use_tools = not self.parse_prompt
+                        
+            # but if we mention any blocks, files or folders in the prompt then we must use tools
+            if not use_tools and ("block(" in raw_prompt or "file(" in raw_prompt or "folder(" in raw_prompt):
+                use_tools = True
 
-            if not self.parse_prompt and self.mode != RefactorMode.NONE.value:
+            if use_tools and self.mode != RefactorMode.NONE.value:
                 # https://python.langchain.com/v0.2/docs/tutorials/agents/
                 tools = []
 
@@ -154,22 +164,46 @@ class QuantaAgent:
                 )
                 initial_message_len = len(messages)
                 response = agent_executor.invoke({"messages": messages})
-                print(f"Response: {response}")
+                # print(f"Response: {response}") This prints too much
                 resp_messages = response["messages"]
                 new_messages = resp_messages[initial_message_len:]
                 self.answer = ""
-                ai_response: int = 0
+                resp_idx: int = 0
                 
                 # Scan all the new messages for AI responses, which may contain tool calls
                 for message in new_messages:
                     if isinstance(message, AIMessage):
-                        ai_response += 1
-                        content = message.content
-                        if not content:
-                            content = Utils.get_tool_calls_str(message)
-                            # print(f"TOOL CALLS:\n{content}")
-                        self.answer += f"AI Response {ai_response}:\n{content}\n\n==============\n\n"  # type: ignore
-
+                        resp_idx += 1
+                            
+                        # print(f"AI Response {resp_idx}:")
+                        # pprint.pprint(message)
+                        
+                        # todo-0: refactor this into an append_message function
+                        if isinstance(message.content, str):
+                            if (len(message.content) > 0):
+                                self.answer += message.content
+                        else:
+                            if isinstance(message.content, list): 
+                                # if message.content is a list
+                                for item in message.content:
+                                    if isinstance(item, dict) and "type" in item and item["type"] == "tool_use":
+                                        if (resp_idx > 1):
+                                            self.answer += "\n\n"
+                                        tool_name = item["name"]
+                                        self.answer += f"Tool Used: {tool_name}\n"
+                                        # self.answer += f"Args:\n"
+                                        # for key, value in item["input"].items():
+                                        #     self.answer += f"  {key}: {value}\n"  
+                                    elif isinstance(item, dict) and "text" in item:
+                                        if (resp_idx > 1):
+                                            self.answer += "\n\n"
+                                        self.answer += item["text"]
+                                    else:
+                                        val = str(item)
+                                        if (resp_idx > 1 and len(val) > 0):
+                                            self.answer += "\n\n"
+                                        self.answer += val
+                           
                 # Agents may add multiple new messages, so we need to update the messages list
                 # This [:] syntax is a way to update the list in place
                 messages[:] = resp_messages

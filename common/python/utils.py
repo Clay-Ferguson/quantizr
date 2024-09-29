@@ -19,7 +19,6 @@ class AIService(Enum):
     ANTHROPIC = "anth"
     GEMINI = "gemini"
 
-
 class RefactorMode(Enum):
     REFACTOR = "refactor"
     NONE = "none"
@@ -54,20 +53,6 @@ class Utils:
     def debug(message: str):
         """Logs a debug message."""
         logging.debug(message)
-
-    @staticmethod
-    def get_tool_calls_str(message: BaseMessage) -> str:
-        """Returns a string representation of the tool calls in the message."""
-        ret = ""
-        if isinstance(message, AIMessage):
-            # First check if message object has message.tool_calls that is an array
-            if hasattr(message, "tool_calls") and isinstance(message.tool_calls, list):
-                # If it does, we iterate over the tool_calls and return the summary
-                for tool_call in message.tool_calls:
-                    if hasattr(message, "name"):
-                        ret += f"Tool Call: {tool_call}\n"
-
-        return ret
 
     @staticmethod
     def has_included_file_extension(ext_set: Set[str], file_name: str) -> bool:

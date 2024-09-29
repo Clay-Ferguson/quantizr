@@ -13,23 +13,22 @@ class AIUtils:
     """AI Utilities Class"""
     
     @staticmethod
-    def ask_agent(parse_prompt: bool, cfg: argparse.Namespace, ext_set: Set[str]) -> None: 
+    def ask_agent(cfg: argparse.Namespace, ext_set: Set[str]) -> None: 
         """Ask the AI. If ParsePrompt is True, then the prompt is extracted from the project files."""
         print("Running ask_agent")
         messages: List[BaseMessage] = []
         mode = RefactorMode.REFACTOR.value
-        service = AIService.ANTHROPIC.value
-        llm: BaseChatModel = AIUtils.create_llm(service, 0.0, cfg)
+        llm: BaseChatModel = AIUtils.create_llm(cfg.ai_service, 0.0, cfg)
         prompt = ""
         agent = QuantaAgent()
         agent.run(
             "",
-            service,
+            cfg.ai_service,
             mode,
             "",
             messages,
             prompt,
-            parse_prompt,
+            True,
             cfg.source_folder,
             [],
             cfg.data_folder,
@@ -45,24 +44,28 @@ class AIUtils:
         ) -> BaseChatModel:
             """Creates a language model based on the AI service."""
             print("Creating LLM: "+ai_service)
+            timeout = 120  # timeout in seconds
             
             if ai_service == AIService.OPENAI.value:
                 llm = ChatOpenAI(
                     model=cfg.openai_model,
                     temperature=temperature,
-                    api_key=cfg.openai_api_key
+                    api_key=cfg.openai_api_key,
+                    timeout=timeout
                 )
             elif ai_service == AIService.ANTHROPIC.value:
                 llm = ChatAnthropic(
                     model=cfg.anth_model, # type: ignore
                     temperature=temperature,
-                    api_key=cfg.anth_api_key
+                    api_key=cfg.anth_api_key,
+                    timeout=timeout
                 ) # type: ignore 
             elif ai_service == AIService.GEMINI.value:
                 llm = ChatGoogleGenerativeAI(
                     model=cfg.gemini_model,
                     temperature=temperature,
                     api_key=cfg.gemini_api_key,
+                    timeout=timeout
             )
             else:
                 raise Exception(f"Invalid AI Service: {ai_service}")

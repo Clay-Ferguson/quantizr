@@ -1,6 +1,7 @@
 import time
 import os
-from typing import List
+import argparse
+from typing import List, Set
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import threading
@@ -12,10 +13,8 @@ class FileChangeHandler(FileSystemEventHandler):
     
     # we have this flag so we can disable the file watching when we know we're the ones changing the file
     active = True
-    folders_to_include: List[str]
-    source_folder_len: int
     
-    def __init__(self, ext_set, folders_to_include: List[str], cfg, source_folder_len: int):
+    def __init__(self, ext_set: Set[str], folders_to_include: List[str], cfg: argparse.Namespace, source_folder_len: int):
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
         self.cfg = cfg
@@ -30,14 +29,14 @@ class FileChangeHandler(FileSystemEventHandler):
                 print(f"File Changed: {event.src_path}")
                 try :
                     self.active = True
-                    AIUtils.ask_agent(True, self.cfg, self.ext_set)
+                    AIUtils.ask_agent(self.cfg, self.ext_set)
                 except Exception as e:
                     print(f"Error: {e}")
                 finally:
                     self.active = False
 
 class FolderMonitor:
-    def __init__(self, ext_set, folders_to_include: List[str], cfg, source_folder_len):
+    def __init__(self, ext_set: Set[str], folders_to_include: List[str], cfg: argparse.Namespace, source_folder_len: int):
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
         print(f"Including SubFolders: {self.folders_to_include}")
