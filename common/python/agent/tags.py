@@ -5,10 +5,6 @@ from typing import Dict
 AGENT_INSTRUCTIONS = "\n----\nCoding Agent Instructions:\n"
 GENERAL_INSTRUCTIONS = "\n----\nGeneral Instructions:\n"
 
-# block_begin/end are used like this in source code projects:
-#     // block_begin: block_name
-# and are also used in the responses from the LLM to indicate blocks of code
-# but the LLM responses don't start with comment characters.
 TAG_BLOCK_BEGIN = "block_begin"
 TAG_BLOCK_END = "block_end"
 

@@ -61,7 +61,19 @@ class ProjectLoader:
                         self.file_with_prompt = path
                         in_prompt = False
                     else:  
-                        parsed_prompt += line+"\n"
+                        prompt_line = trimmed
+                        
+                        # todo-0: put this stuff in a method
+                        if prompt_line.startswith("// "):
+                            prompt_line = prompt_line[3:]
+                        elif prompt_line.startswith("# "):
+                            prompt_line = prompt_line[2:]
+                        elif prompt_line.startswith("/* "):
+                            prompt_line = prompt_line[3:]
+                        elif prompt_line.endswith("*/"):
+                            prompt_line = prompt_line[:-2]
+                       
+                        parsed_prompt += prompt_line+"\n"
 
                 # If we're parsing the prompt, and the line equals "ok hal", then we're done
                 if trimmed == "ok hal" and self.parse_prompt and not self.parsed_prompt:

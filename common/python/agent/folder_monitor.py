@@ -11,9 +11,6 @@ from common.python.utils import Utils
 
 class FileChangeHandler(FileSystemEventHandler):
     
-    # we have this flag so we can disable the file watching when we know we're the ones changing the file
-    active = True
-    
     def __init__(self, ext_set: Set[str], folders_to_include: List[str], cfg: argparse.Namespace, source_folder_len: int):
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
@@ -21,21 +18,32 @@ class FileChangeHandler(FileSystemEventHandler):
         self.source_folder_len = source_folder_len
         
     def on_modified(self, event):
+        if not FolderMonitor.active or time.time() - FolderMonitor.last_change_time < 5:
+            return
         if not event.is_directory:
             dirpath = os.path.dirname(event.src_path)
             short_dir: str = dirpath[self.source_folder_len :]
-            if (self.active and Utils.has_included_file_extension(self.ext_set, event.src_path)
+            if (Utils.has_included_file_extension(self.ext_set, event.src_path)
                  and Utils.has_included_folder(self.folders_to_include, short_dir)):
+                
+                # if there's no query to the agent, then return
+                if not AIUtils.file_contains_line(event.src_path, "ok hal"):
+                    return
+                
                 print(f"File Changed: {event.src_path}")
-                try :
-                    self.active = True
-                    AIUtils.ask_agent(self.cfg, self.ext_set)
+                try:
+                    FolderMonitor.active = False
+                    AIUtils.ask_agent(self.cfg, self.ext_set, self.folders_to_include)
                 except Exception as e:
                     print(f"Error: {e}")
                 finally:
-                    self.active = False
+                    FolderMonitor.last_change_time = time.time()
+                    FolderMonitor.active = True
 
 class FolderMonitor:
+    active = True
+    last_change_time = 0.0
+    
     def __init__(self, ext_set: Set[str], folders_to_include: List[str], cfg: argparse.Namespace, source_folder_len: int):
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include

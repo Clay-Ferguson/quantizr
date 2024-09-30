@@ -13,7 +13,15 @@ class AIUtils:
     """AI Utilities Class"""
     
     @staticmethod
-    def ask_agent(cfg: argparse.Namespace, ext_set: Set[str]) -> None: 
+    def file_contains_line(file_path, find_line):
+        with open(file_path, "r") as file:
+            for line in file:
+                if line.strip()==find_line:
+                    return True
+        return False
+    
+    @staticmethod
+    def ask_agent(cfg: argparse.Namespace, ext_set: Set[str], folders_to_include: List[str]) -> None: 
         """Ask the AI. If ParsePrompt is True, then the prompt is extracted from the project files."""
         print("Running ask_agent")
         messages: List[BaseMessage] = []
@@ -30,7 +38,7 @@ class AIUtils:
             prompt,
             True,
             cfg.source_folder,
-            [],
+            folders_to_include,
             cfg.data_folder,
             ext_set,
             llm

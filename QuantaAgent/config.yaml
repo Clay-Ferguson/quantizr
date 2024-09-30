@@ -21,12 +21,11 @@ mode: "none"
 # GEMINI = "gemini"
 ai_service: "anth"
 
-scan_extensions: ".java, .sql, .py, .html, .htm, .js, .ts, .css"
+scan_extensions: ".java, .py, .html, .htm, .ts, .scss"
 data_folder: "/home/clay/ai-agent-temp"
 
-source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
+source_folder: "/home/clay/ferguson/Quantizr"
 
 # The folders to include in the scan, relative to (i.e. contained within) the source_folder.
 # If not specified, the entire project is scanned.
-folders_to_include: ""
- 
+folders_to_include: "/src/main/java,/src/main/resources/public/src"
