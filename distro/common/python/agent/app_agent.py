@@ -255,31 +255,38 @@ Final Prompt:
 
         return prompt, code
 
-    def remove_thinking_tags(self, text: str) -> str:
-        """Removes the thinking tags from the prompt."""
-        # Use regex to find and remove content between <thinking> tags
-        pattern = r'<thinking>.*?</thinking>'
-        cleaned_text = re.sub(pattern, '', text, flags=re.DOTALL)
-        return cleaned_text
+    # def remove_thinking_tags(self, text: str) -> str:
+    #     """Removes the thinking tags from the prompt."""
+    #     # Use regex to find and remove content between <thinking> tags
+    #     pattern = r'<thinking>.*?</thinking>'
+    #     cleaned_text = re.sub(pattern, '', text, flags=re.DOTALL)
+    #     return cleaned_text
         
     def inject_answer(self, file_with_prompt: str, answer: str):
         """Injects the AI answer into the file that contains the prompt."""
-        answer = self.remove_thinking_tags(answer)
         wrote = False
         
         with FileUtils.open_file(file_with_prompt) as file:
             lines = file.readlines()
         
         with FileUtils.open_writable_file(file_with_prompt) as file:
+            ready_to_write = False
             for line in lines:
-                if line.strip() == "?":
-                    file.write("-?\n")
+                trimmed = line.strip()
+                if trimmed == "ok hal":
+                    ready_to_write = True
+                    file.write("-"+trimmed+"\n")
+                    
+                # todo-0: Change docs that mention "-?". We now put dash in front of 'ok hal' instead
+                elif trimmed == "?" and ready_to_write:
+                    file.write(line)
                     if not wrote:
                         file.write(answer)
                         file.write("\n----\n\n")
                         wrote = True
                 else:
                     file.write(line)
+            print("Wrote File: "+file_with_prompt)
 
     def build_system_prompt(self, user_system_prompt: str):
         """Adds all the instructions to the prompt. This includes instructions for inserting blocks, files,
