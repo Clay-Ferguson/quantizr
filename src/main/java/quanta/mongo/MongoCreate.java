@@ -63,7 +63,7 @@ public class MongoCreate extends ServiceBase {
     }
 
     public SubNode createNode(String path) {
-        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, NodeType.NONE.s(), null); 
+        SubNode node = new SubNode(TL.getSC().getUserNodeObjId(), path, NodeType.NONE.s(), null);
         svc_mongoUpdate.updateParentHasChildren(node);
         return node;
     }
@@ -325,7 +325,7 @@ public class MongoCreate extends ServiceBase {
                     svc = AIModel.fromString(system.getService());
                 }
                 Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), false, parentNode, null,
+                aiResponse = svc_ai.getAnswer(Constant.AI_MODE_AGENT.s().equals(req.getAiMode()), parentNode, null,
                         system, svc, userCredit);
 
                 res.setGptCredit(userCredit.getVal());
@@ -351,8 +351,8 @@ public class MongoCreate extends ServiceBase {
                 req.getProperties().add(new PropertyInfo(NodeProp.AI_SERVICE.s(), req.getAiService()));
 
             }
-            newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, null, 0L, createLoc, req.getProperties(),
-                    null, true, true, nodeChanges);
+            newNode = svc_mongoCreate.createNode(parentNode, null, typeToCreate, null, 0L, createLoc,
+                    req.getProperties(), null, true, true, nodeChanges);
             if (req.isPendingEdit()) {
                 newNode.setPath(svc_mongoUtil.setPendingPathState(newNode.getPath(), true));
             }

@@ -31,7 +31,6 @@ import quanta.rest.request.GetNodeJsonRequest;
 import quanta.rest.request.InitNodeEditRequest;
 import quanta.rest.request.LikeNodeRequest;
 import quanta.rest.request.LinkNodesRequest;
-import quanta.rest.request.RunHalRequest;
 import quanta.rest.request.SaveNodeJsonRequest;
 import quanta.rest.request.SaveNodeRequest;
 import quanta.rest.request.SearchAndReplaceRequest;
@@ -41,7 +40,6 @@ import quanta.rest.response.GetNodeJsonResponse;
 import quanta.rest.response.InitNodeEditResponse;
 import quanta.rest.response.LikeNodeResponse;
 import quanta.rest.response.LinkNodesResponse;
-import quanta.rest.response.RunHalResponse;
 import quanta.rest.response.SaveNodeJsonResponse;
 import quanta.rest.response.SaveNodeResponse;
 import quanta.rest.response.SearchAndReplaceResponse;
@@ -97,27 +95,6 @@ public class NodeEditService extends ServiceBase {
                 return null;
             });
         });
-        return res;
-    }
-
-    public RunHalResponse runHal(RunHalRequest req) {
-        RunHalResponse res = new RunHalResponse();
-        UserPreferences userPrefs = TL.getSC().getUserPreferences();
-        String aiService = userPrefs.getAiService();
-        AIModel svc = AIModel.fromString(aiService);
-        if (svc != null) {
-            SystemConfig system = new SystemConfig();
-            system.setFileExtensions(userPrefs.getAiAgentFileExtensions());
-            system.setFoldersToInclude(userPrefs.getAiAgentFoldersToInclude());
-            system.setMaxWords(userPrefs.getAiMaxWords());
-            system.setTemperature(userPrefs.getAiTemperature());
-
-            Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
-            AIResponse aiResponse = svc_ai.getAnswer(true, true, null, null, system, svc, userCredit);
-
-            // todo-0: this needs to send back the current credit like other methods do
-            // res.setGptCredit(userCredit.getVal());
-        }
         return res;
     }
 

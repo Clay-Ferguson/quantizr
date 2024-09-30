@@ -67,7 +67,8 @@ public class AIUtil extends ServiceBase {
             queryTemplate = removeHtmlComments(queryTemplate);
             queryTemplate = injectTemplateContext(node, queryTemplate);
 
-            // When we set this, that means this will be the FINAL format for the question, also we're in writing mode here
+            // When we set this, that means this will be the FINAL format for the question, also we're in
+            // writing mode here
             system.setTemplate(queryTemplate);
             verifyOnlyAgent(node, system);
         }
@@ -86,12 +87,12 @@ public class AIUtil extends ServiceBase {
     public void verifyOnlyAgent(SubNode node, SystemConfig system) {
         if (system.getAgentNodeId() == null) {
             system.setAgentNodeId(node.getIdStr());
-        }
-        else {
-            // todo-0: This bizarrely started happening in the middie of a conversation, so I'm disabling it until I have time 
+        } else {
+            // todo-0: This bizarrely started happening in the middie of a conversation, so I'm disabling it
+            // until I have time
             // to look into it.
             // if (!system.getAgentNodeId().equals(node.getIdStr())) {
-            //     throw new RuntimeEx("Multiple Agent Nodes defined in the same context.");
+            // throw new RuntimeEx("Multiple Agent Nodes defined in the same context.");
             // }
         }
     }
@@ -283,7 +284,7 @@ public class AIUtil extends ServiceBase {
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
         AIModel svc = AIModel.fromString(req.getAiService());
-        aiResponse = svc_ai.getAnswer(false, false, null, sb.toString(), system, svc, userCredit);
+        aiResponse = svc_ai.getAnswer(false, null, sb.toString(), system, svc, userCredit);
 
         if (aiResponse != null) {
             res.setGptCredit(userCredit.getVal());
@@ -350,7 +351,7 @@ public class AIUtil extends ServiceBase {
 
         // node that will be the parent of the book
         SubNode parentNode = svc_mongoRead.getNode(req.getNodeId());
-       svc_auth.ownerAuth(parentNode);
+        svc_auth.ownerAuth(parentNode);
 
         Val<BigDecimal> userCredit = new Val<>(BigDecimal.ZERO);
         AIResponse aiResponse = null;
@@ -428,7 +429,7 @@ public class AIUtil extends ServiceBase {
                             ```
                             """;
 
-            aiResponse = svc_ai.getAnswer(false, false, null, prompt, null, svc, userCredit);
+            aiResponse = svc_ai.getAnswer(false, null, prompt, null, svc, userCredit);
             res.setGptCredit(userCredit.getVal());
         }
         String answer = aiResponse.getContent();

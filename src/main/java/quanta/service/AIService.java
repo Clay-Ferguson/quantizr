@@ -34,7 +34,7 @@ import quanta.util.val.Val;
 public class AIService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(AIService.class);
 
-    public AIResponse getAnswer(boolean agentic, boolean runHal, SubNode node, String question, SystemConfig system, AIModel svc,
+    public AIResponse getAnswer(boolean agentic, SubNode node, String question, SystemConfig system, AIModel svc,
             Val<BigDecimal> userCredit) {
         if (svc == null) {
             throw new RuntimeEx("No AI service selected.");
@@ -105,7 +105,6 @@ public class AIService extends ServiceBase {
         request.setCredit(balance.floatValue());
         request.setCodingAgent(agentic);
         request.setAgentFileExtensions(system.getFileExtensions());
-        request.setRunHal(runHal);
 
         log.debug("AI Req: USER: " + TL.getSC().getUserName() + " AI Service: " + svc.getService() + ", Model="
                 + svc.getModel() + ": " + XString.prettyPrint(request));

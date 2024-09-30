@@ -76,7 +76,6 @@ import quanta.rest.request.RenderCalendarRequest;
 import quanta.rest.request.RenderDocumentRequest;
 import quanta.rest.request.RenderNodeRequest;
 import quanta.rest.request.ResetPasswordRequest;
-import quanta.rest.request.RunHalRequest;
 import quanta.rest.request.SaveNodeJsonRequest;
 import quanta.rest.request.SaveNodeRequest;
 import quanta.rest.request.SavePublicKeyRequest;
@@ -425,12 +424,6 @@ public class AppController extends ServiceBase implements ErrorController {
     public Object updateFriendNode(@RequestBody UpdateFriendNodeRequest req, HttpSession session) {
         return svc_callProc.run("updateFriendNode", true, true, req, session,
                 () -> svc_friend.cm_updateFriendNode(req));
-    }
-
-    @RequestMapping(value = API_PATH + "/runHal", method = RequestMethod.POST)
-    @ResponseBody
-    public Object runHal(@RequestBody RunHalRequest req, HttpSession session) {
-        return svc_callProc.run("runHal", false, false, req, session, () -> svc_edit.runHal(req));
     }
 
     @RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)

@@ -56,7 +56,6 @@ class AIRequest(BaseModel):
     maxTokens: int
     credit: float
     codingAgent: bool
-    runHal: bool
     agentFileExtensions: Optional[str]
 
 @app.get("/")
@@ -113,7 +112,7 @@ temperature: {req.temperature}
                 "",
                 messages,
                 req.prompt if req.prompt else "",
-                req.runHal,
+                False,
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
                 folders_to_include,
@@ -223,7 +222,7 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
         input_ppm = 5.0
         output_ppm = 15.0
     
-    if model == OPENAI_MODEL_COMPLETION_MINI:
+    elif model == OPENAI_MODEL_COMPLETION_MINI:
         input_ppm = 0.15
         output_ppm = 0.6
 

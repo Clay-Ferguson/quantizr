@@ -16,7 +16,7 @@ cd ${PRJROOT}
 dockerBuildService qai-dev
 
 # get rid of AI log file
-rm ${QUANTA_BASE}/log/quanta_ai.log
+sudo rm -f ${QUANTA_BASE}/log/quanta_ai.log
 
 cd ${PRJROOT}
 QAI_SERVICE_ID=$(docker service ls --filter name=quanta-stack-dev_qai-dev --quiet)
