@@ -28,4 +28,4 @@ source_folder: "/home/clay/ferguson/Quantizr"
 
 # The folders to include in the scan, relative to (i.e. contained within) the source_folder.
 # If not specified, the entire project is scanned.
-folders_to_include: "/src/main/java,/src/main/resources/public/src"
+folders_to_include: "/src/main/java,/src/main/resources/public/src,/QuantaAgent"

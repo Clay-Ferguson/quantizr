@@ -61,21 +61,9 @@ class ProjectLoader:
                         self.file_with_prompt = path
                         in_prompt = False
                     else:  
-                        prompt_line = trimmed
-                        
-                        # todo-0: put this stuff in a method
-                        if prompt_line.startswith("// "):
-                            prompt_line = prompt_line[3:]
-                        elif prompt_line.startswith("# "):
-                            prompt_line = prompt_line[2:]
-                        elif prompt_line.startswith("/* "):
-                            prompt_line = prompt_line[3:]
-                        elif prompt_line.endswith("*/"):
-                            prompt_line = prompt_line[:-2]
-                       
+                        prompt_line = self.strip_comment_chars(trimmed)
                         parsed_prompt += prompt_line+"\n"
 
-                # If we're parsing the prompt, and the line equals "ok hal", then we're done
                 if trimmed == "ok hal" and self.parse_prompt and not self.parsed_prompt:
                     in_prompt = True
                     
@@ -110,6 +98,19 @@ class ProjectLoader:
                 else:
                     if block is not None and block_on:
                         block.content += line
+
+    def strip_comment_chars(self, line: str) -> str:
+        if line.startswith("// "):
+            line = line[3:]
+        elif line.startswith("# "):
+            line = line[2:]
+        elif line.startswith("* "):
+            line = line[2:]
+        elif line.startswith("/* "):
+            line = line[3:]
+        elif line.endswith(" */"):
+            line = line[:-3]
+        return line                            
 
     def scan_directory(self, scan_dir: str):
         """Scans the directory for files with the specified extensions. The purpose of this scan

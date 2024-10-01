@@ -99,23 +99,23 @@ ok hal
 Show in Python how to get current time and print it as a string.
 ?
 ```
+
 Note that the `ok hal` is above the prompt and `?` is below the prompt. This is how the AI will find and answer the question in your code, by injecting the answer directly into the code below the question itself. Once you've saved the file you can click `Run HAL` button in the Coding Agent panel, and the AI will edit your file automatically and inject the answer directly below the question, so you'll end up with this:
 
 ```txt
-ok hal
+-ok hal
 Show in Python how to get current time and print it as a string.
--?
+?
 import datetime
 
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 print(current_time)
 ```
 
-*Note that a dash was inserted in front of `?` after the edit. This is so that once the answer is inserted if you accidentally run Hal again nothing will happen the second time.*
+*Note that a dash was inserted in front of `ok hal` after the edit. This is so that once the answer is inserted if you accidentally run Hal again nothing will happen the second time.*
 
-The prompt you put between `ok hal...?` can be as long as you want, with any number of lines of text.
+The prompt you put between `ok hal...?` can be as long as you want, with any number of lines of text. The Coding Agent will also understand what kind of file you're working in, and it will give appropriate answers. For example, if you're editing a Python file and ask for how to do something like `"Show me how to write to a text file`" the Agent will give you the correct anser for the Python language.
 
-Caveat: The `Ok Hal` feature currently doesn't understand what kind of file you're editing so if you say something like "Show me an example of a `for loop`" and you're in Java file, it won't know you want a Java for loop unless you tell it. This limitation will be fixed soon. (todo-0)
 
 ## `Ok Hal` For Refactoring
 
@@ -137,7 +137,7 @@ for (let i = 0; i < array.length; i++) {
 
 After you run Hal:
 ```
-ok hal
+-ok hal
 Show me how to iterate this array using 'forEach'
 -
 let array = ['a', 'b', 'c'];
@@ -145,7 +145,7 @@ let array = ['a', 'b', 'c'];
 for (let i = 0; i < array.length; i++) {
     console.log(array[i]);
 }
--?
+?
 let array = ['a', 'b', 'c'];
 
 array.forEach(function(element) {

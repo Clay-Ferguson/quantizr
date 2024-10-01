@@ -26,7 +26,7 @@ class FileChangeHandler(FileSystemEventHandler):
             if (Utils.has_included_file_extension(self.ext_set, event.src_path)
                  and Utils.has_included_folder(self.folders_to_include, short_dir)):
                 
-                # if there's no query to the agent, then return
+                # if there's no query to the agent in this file, then return
                 if not AIUtils.file_contains_line(event.src_path, "ok hal"):
                     return
                 

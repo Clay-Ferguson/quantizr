@@ -77,8 +77,14 @@ class QuantaAgent:
         # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
         self.prj_loader.scan_directory(self.source_folder)
         
-        if (self.parse_prompt and not self.prj_loader.parsed_prompt):
-            raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' followed the prompt.")
+        if self.parse_prompt: 
+            if not self.prj_loader.parsed_prompt:
+                raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' followed the prompt.")
+            
+            if (self.prj_loader.file_with_prompt):
+                # get file extension from file_with_prompt filename
+                ext = os.path.splitext(self.prj_loader.file_with_prompt)[1]
+                self.prompt = self.prompt + self.get_file_type_mention(ext);
         
         # if we just got our prompt from scanning files then set it in self.prompt
         if (self.prj_loader.parsed_prompt):
@@ -115,6 +121,7 @@ class QuantaAgent:
                 self.system_prompt = PromptUtils.get_template(
                     "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
                 )
+            
         else:
             self.build_system_prompt(user_system_prompt)
 
@@ -235,6 +242,29 @@ Final Prompt:
                         answer += str(item) + "\n"
         return answer
 
+    def get_file_type_mention(self, ext: str) -> str:
+        file_type = ""
+        if ext == ".py":
+            file_type = "Python"
+        elif ext == ".js":
+            file_type = "JavaScript"
+        elif ext == ".html":
+            file_type = "HTML"
+        elif ext == ".css":
+            file_type = "CSS"
+        elif ext == ".json":
+            file_type = "JSON"
+        elif ext == ".txt":
+            file_type = "Text"
+        elif ext == ".md":
+            file_type = "Markdown"
+        elif ext == ".java":
+            file_type = "Java"
+        
+        if file_type:
+            return f"\nI'm working in a {file_type} file. "
+        return ""
+
     def parse_prompt_and_code(self, prompt: str) -> tuple[str, str]:
         """Takes the prompt and divides it at the line containing a '-' character (if there is one)
         and returns the top half as the prompt, and the bottom half as the code, otherwise the
@@ -277,7 +307,6 @@ Final Prompt:
                     ready_to_write = True
                     file.write("-"+trimmed+"\n")
                     
-                # todo-0: Change docs that mention "-?". We now put dash in front of 'ok hal' instead
                 elif trimmed == "?" and ready_to_write:
                     file.write(line)
                     if not wrote:
