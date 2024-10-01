@@ -1,10 +1,23 @@
 # About Quanta Agent 
 
-This is a command line-only AI Agent Deamon. To run it you only need this folder (QuantaAgent), as well as the `common` folder that's adjacent to it. The rest of the folders in the Quantizr monorepo can be omitted. 
+Quanta Agent is a deamon that runs in the background and will monitor a file system for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the ansers directly into the files in realtime. For example, you could go in one of you files and type these lines (below), and the answer (Paris) would magically appear below the question itself! All you have to do is save the file, and then answer will then be saved into it a few seconds later. Note that the "ok hal" text is what designates that there's a question for the AI to answer.
+
+```txt
+ok hal
+What's the capital of France?
+?
+```
+
+If you're asking questions about the rest of your code base, or want to do refactoring on your project, you can still ask the question from within any file, but in that case when you use the `file(), folder(), or block()` syntax the Agent knows it's free to refactor any of your files to perform the chagnes you've requested by mentioning those files, folders, or Named Blocks. There's a link to where you can learn about this more advanced "files, folders, and blocks" features later in this document"
+
+
+# Tool Features
+
+This is a command line-only AI Agent Deamon. To run it you only need this folder (QuantaAgent), as well as the `common` folder that's adjacent to it, in the GitHub `quantizr` project. The rest of the folders in the Quantizr monorepo can be omitted. 
 
 Quant Agent is a tool to automate querying AIs (LLMs) about your codebase, which can also automatically refactor your actual project files, from high level human language instructions of what changes you'd like to make. You can ask the tool anything about your project, ask for any kind of refactoring you'd like to do in your project, or even ask the tool to create entirely new projects all on it's own.
 
-# Tool Features
+## Basic Capabilities/Features
 
 * Answers questions about software projects
 * Refactor files or entire projects 
@@ -47,12 +60,6 @@ To use this tool, follow these steps:
 
 * Q: How does `Quanta Agent` compare to other `AI Coding Assistants` like Devin, Pythagora (GPT Pilot), and MetaGPT?
 * A: `Quanta Agent` allows a more targeted and specific analysis on your software project than the other tools, which results in less API token consumption and therefore lowers Cloud API costs. This is because `Quanta Agent` will only be able to see the parts of your code that you're referencing in your prompt, and it will only try to make modifications in those areas of the code. So not only is `Quanta Agent` very cheap due to using fewer API tokens, but you will also get the best possible results from LLMs by keeping your prompts down to where they contain only the relevant parts of your codebase. That is, smaller shorter prompts always give the best results. 
-
-# Output Log Files
-
-Every time you run an LLM query the full prompt, system prompt, and answer will be automatically saved into a new log file in the `data` folder.
-
-Example log files can be found in this project's [Data Folder](/data)
 
 
 # Background and Inspiration
