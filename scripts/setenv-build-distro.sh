@@ -30,7 +30,7 @@ export DOCKER_ENV=distro
 export mvn_profile=prod
 
 # deploy target folder is where we will be running the app from or what will become the ZIP file content
-export DEPLOY_TARGET=/home/clay/ferguson/Quantizr/distro
+export DEPLOY_TARGET=/home/clay/ferguson/distro
 mkdir -p ${DEPLOY_TARGET}
 
 # Note: define-functions.sh is where we pass the ARGS into dockerfile

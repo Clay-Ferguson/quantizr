@@ -42,7 +42,6 @@ cp ${PRJROOT}/dc-distro.yaml                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile-distro                 ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile-qai                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint-distro.sh              ${DEPLOY_TARGET}
-cp ${PRJROOT}/distro/README.md                  ${DEPLOY_TARGET}
 
 rsync -av --exclude='__pycache__' ${PRJROOT}/QuantaAI/      ${DEPLOY_TARGET}/QuantaAI/
 rsync -av --exclude='__pycache__' ${PRJROOT}/common/        ${DEPLOY_TARGET}/common/
