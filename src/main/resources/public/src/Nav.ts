@@ -278,12 +278,13 @@ export class Nav {
         }
     }
 
-    showAudioPlayerTab(mediaUrl: string, startTime: number=0, title: string=null, subTitle: string=null) {
-        AudioPlayerTab.tabShown = true; 
+    showAudioPlayerTab(audioNodeId: string, mediaUrl: string, startTime: number = 0, title: string = null, subTitle: string = null) {
+        AudioPlayerTab.tabShown = true;
         AudioPlayerView.sourceUrl = mediaUrl;
         AudioPlayerView.startTimePendingOverride = startTime;
         AudioPlayerView.customTitle = title;
         AudioPlayerView.customSubTitle = subTitle;
+        AudioPlayerView.audioNodeId = audioNodeId;
         S.tabUtil.selectTab(C.TAB_AUDIO_PLAYER);
     }
 

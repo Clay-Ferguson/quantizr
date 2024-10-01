@@ -89,7 +89,7 @@ export class Util {
 
     getFileIcon(mime: string) {
         if (!mime) return "fa-file";
-        if (mime=="application/pdf") return "fa-file-pdf-o";
+        if (mime == "application/pdf") return "fa-file-pdf-o";
         if (mime.startsWith("text")) return "fa-file-text-o";
         if (mime.startsWith("image")) return "fa-file-image-o";
         if (mime.startsWith("audio")) return "fa-file-audio-o";
@@ -664,7 +664,7 @@ export class Util {
             S.localDB.setVal(C.LOCALDB_MOBILE_MODE, s.mobileMode ? "true" : "false");
         });
     }
-    
+
     _sendTestEmail = async () => {
         await S.rpcUtil.rpc<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         this.showMessage("Send Test Email Initiated.", "Note");
@@ -756,7 +756,8 @@ export class Util {
         if (audioUrl) {
             const startTimeStr = this.getParameterByName("t");
             const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
-            setTimeout(() => S.nav.showAudioPlayerTab(audioUrl, startTime), 500);
+            // todo-0: can we set the audioNodeId here?
+            setTimeout(() => S.nav.showAudioPlayerTab(null, audioUrl, startTime), 500);
         }
     }
 

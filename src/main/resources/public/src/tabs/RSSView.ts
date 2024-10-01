@@ -356,9 +356,9 @@ export class RSSView extends AppTab<any, RSSView> {
                 if (enc.type && enc.type.indexOf("audio/") !== -1) {
                     audioUrl = enc.url;
                     const downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
-                    const audioButton = new Button("Play Audio", () => 
-                        S.nav.showAudioPlayerTab(enc.url, 0, feed.title, entry.title), 
-                    { className: "marginTop" }, "btn-primary");
+                    const audioButton = new Button("Play Audio", () =>
+                        S.nav.showAudioPlayerTab(null, enc.url, 0, feed.title, entry.title),
+                        { className: "marginTop" }, "btn-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));
                 }
             });

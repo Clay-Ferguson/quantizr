@@ -185,7 +185,7 @@ export class NodeCompBinary extends Comp {
         else if (S.props.hasVideo(node, this.attName)) {
             this.children = [
                 new FlexRowLayout([
-                    this.isEditorEmbed ? null : new IconButton("fa-play", "Video", {
+                    this.isEditorEmbed ? null : new IconButton("fa-play", "Play Video", {
                         onClick: () => {
                             new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
                         }
@@ -199,8 +199,12 @@ export class NodeCompBinary extends Comp {
         else if (S.props.hasAudio(node, this.attName)) {
             this.children = [
                 new FlexRowLayout([
-                    this.isEditorEmbed ? null : new IconButton("fa-play", "Audio", {
-                        onClick: () => S.nav.showAudioPlayerTab(S.attachment.getStreamUrlForNodeAttachment(node, this.attName))
+                    this.isEditorEmbed ? null : new IconButton("fa-play", "Play Audio", {
+                        onClick: () => {
+                            const att = S.props.getAttachment(this.attName, node);
+                            if (!att) return null;
+                            S.nav.showAudioPlayerTab(node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, null, att.fileName);
+                        }
                     }, "btn-primary marginRight"),
                     new Span(null, {
                         className: "downloadLink marginRight"

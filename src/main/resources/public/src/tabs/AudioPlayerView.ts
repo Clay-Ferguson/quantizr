@@ -1,3 +1,4 @@
+import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { AudioPlayer } from "../comp/core/AudioPlayer";
@@ -6,6 +7,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
+import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import * as I from "../Interfaces";
@@ -27,6 +29,7 @@ import { Validator } from "../Validator";
  */
 export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
 
+    public static audioNodeId: string;
     public static customTitle: string;
     public static customSubTitle: string;
     public customDiv: Comp;
@@ -63,11 +66,15 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
 
         this.children = [
             this.headingBar = new TabHeading([
+                AudioPlayerView.audioNodeId ? new IconButton("fa-arrow-left", null, {
+                    onClick: () => S.view.jumpToId(getAs().repliesViewNodeId),
+                    title: "Go back..."
+                }, "marginRight") : null,
                 new Div("Audio Player", { className: "tabTitle" })
             ], null),
             new Div(null, { className: "bigMarginTop bigMarginRight" }, [
                 AudioPlayerView.customTitle ? new Heading(2, AudioPlayerView.customTitle) : null,
-                AudioPlayerView.customSubTitle ? new Heading(4, AudioPlayerView.customSubTitle) : null,
+                AudioPlayerView.customSubTitle ? new Heading(5, AudioPlayerView.customSubTitle) : null,
                 this.audioPlayer = new AudioPlayer({
                     src: AudioPlayerView.sourceUrl,
                     className: "audioPlayer",
