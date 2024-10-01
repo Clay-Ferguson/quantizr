@@ -19,7 +19,8 @@ public enum NodeProp {
      * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
      * the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc"), AUDIO_URL("sn:audioUrl"),
+    RSS_FEED_SRC("sn:rssFeedSrc"), //
+    AUDIO_URL("sn:audioUrl"), //
 
     USER_PREF_PUBLIC_KEY("sn:publicKey"), //
     USER_PREF_PUBLIC_SIG_KEY("sn:publicSigKey"), //

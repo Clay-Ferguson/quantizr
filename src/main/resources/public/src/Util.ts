@@ -751,16 +751,6 @@ export class Util {
         }
     }
 
-    playAudioIfRequested() {
-        const audioUrl = this.getParameterByName("audioUrl");
-        if (audioUrl) {
-            const startTimeStr = this.getParameterByName("t");
-            const startTime = startTimeStr ? parseInt(startTimeStr) : 0;
-            // todo-0: can we set the audioNodeId here?
-            setTimeout(() => S.nav.showAudioPlayerTab(null, audioUrl, startTime), 500);
-        }
-    }
-
     // caller can optionally pass in the type, and yes for now 'id' is not used, but I want it as a param.
     notifyNodeUpdated(_id: string, type: string) {
         if (type === J.NodeType.BOOKMARK) {

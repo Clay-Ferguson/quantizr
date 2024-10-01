@@ -214,7 +214,6 @@ export class Quanta {
 
             S.rpcUtil.initRpcTimer();
             S.util.checkChangePassword();
-            S.util.playAudioIfRequested();
 
             if (this.config.config) {
                 dispatch("configUpdates", _s => {
