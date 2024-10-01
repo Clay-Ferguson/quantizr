@@ -98,7 +98,7 @@
             * [File and Folder Syntax](#file-and-folder-syntax)
                 * [File Example](#file-example)
         * [Creating Custom Coding Agents](#creating-custom-coding-agents)
-        * [Quanta Agent Standalone App](#quanta-agent-standalone-app)
+        * [Quanta Agent Command Line Tool](#quanta-agent-command-line-tool)
 * [Customizing Content Display](#customizing-content-display)
     * [Image Layout](#image-layout)
         * [Example Layout 1 ](#example-layout-1-)
@@ -142,7 +142,6 @@
         * [Enter RSS URLs](#enter-rss-urls)
         * [Request to View Feeds](#request-to-view-feeds)
         * [Have Fun Reading the News](#have-fun-reading-the-news)
-    * [Comment on a Podcast](#comment-on-a-podcast)
 * [Encryption](#encryption)
     * [Encrypting a Node](#encrypting-a-node)
     * [Technical Notes](#technical-notes)
@@ -457,7 +456,6 @@ Here's what the above example is like you can see how it works:
 -**Collapsible Heading**-
 
 This is the text that was hidden until you clicked the Collapsible Heading
-
 
 
 
@@ -1204,9 +1202,6 @@ Remember, there's an "Export to PDF" feature in Quanta too, so if you do want to
 
 The Coding Agent is only available for local deployments that you run yourself, and is not available on quanta.wiki website because it requires direct access to your code so it can read the code, analyze it, and make changes to it, automatically in real-time.
 
-Note: The Coding Agent is also available as a Streamlit app that's checked into the `quantizr` monorepo on Github in the [QuantaAgent folder](https://github.com/Clay-Ferguson/quantizr/tree/main/QuantaAgent). The [README](https://github.com/Clay-Ferguson/quantizr/blob/main/QuantaAgent/README.md)
- in the Coding Agent project contains all the docs on how to use it.
-
 #### Enabling Coding Agent Features
 
 The docker compose file named `dc-dev.yaml` shows an example of a setup that enables the Coding Agent in the QAI Microservice (which enables the Coding Agent in the Quanta app also). The important parts of that yaml that activate the Coding Agent are 1) the two volumes named `/projects` and `/data` in the QAI service configuration, and 2) the variable `aiAgentEnabled: "true"` that's defined in the Quanta service itself which tells the app to enable the agent. After these two changes the Coding Agent features in the app will become available.
@@ -1309,13 +1304,16 @@ You can then start asking questions or requesting refactoring to be done, and th
 
 The way you submit requests (i.e. prompts) to the agent is to create a subnode anywhere under the `SQL Coding Agent` node (or any node you've configured to be an agent) and enter node content/questions like, for example, "What are the names of our SQL tables?" and then click `Ask AI` button. The system will notice your question is being asked within a part of the tree under the `SQL Coding Agent` and will therefore let that specific Agent handle the question, and give you the answer, or do whatever refactoring you've asked for.
 
-#### Quanta Agent Standalone App
+#### Quanta Agent Command Line Tool
 
-The original form of the Quanta Agent was a Streamlit app, that can run all by itself (outside of the Quanta app) as a pure Python app that you can run locally, and this app is still available, although it's now just sitting in a folder named `QuantaAgent` inside the quantizr monorepo.
+There's a separate [QuantaAgent Command Line Tool](https://github.com/Clay-Ferguson/quantizr/tree/main/QuantaAgent) (written in Python) that can run all by itself (outside of the Quanta app) as a pure Python app that you can run locally, and this app is available in a folder named `QuantaAgent` inside the quantizr monorepo.
+ 
+The [README](https://github.com/Clay-Ferguson/quantizr/blob/main/QuantaAgent/README.md)
+ in the Coding Agent project contains all the docs on how to use it.
 
-To run this standalone Python app, you can just take the `QuantaAgent` and `common` folders out of the root of the monorepo and put them somewhere in some other folder (but as siblings, in same parent folder), and then you can just run the `Quanta_Agent.py` script and it should just work as a Streamlit app.
+To run this standalone Python app, you can just take the `QuantaAgent` and `common` folders out of the root of the monorepo and put them somewhere in some other folder (but as siblings, in same parent folder), and then you can just run the `Quanta_Agent.py` script.
 
-The `QuantaAgent` folder itself contains only files related to the `Streamlit` app, and all of the actual implementation of the AI Agent is contained in the `common` folder so that it can be shared by both the Quanta AI Microservice (QAI) and the Streamlit app.
+The `QuantaAgent` folder itself contains only files related to the Command Line tool, and all of the actual implementation of the AI Agent is contained in the `common` folder so that it can be shared by both the Quanta AI Microservice (QAI) and the Command Line app.
 
 **[ChatGPT Example Q&A](#chatgpt-examples)**
 
@@ -1749,21 +1747,6 @@ After clicking `View Feed` the app will switch over to the `RSS Feed Tab` to dis
 You can update your list of URLs any time, and everything will just continue to work. There's no need to go thru the process again of creating a new node whenever you want to modify your subscriptions, because you can simply edit the list of URLs any time, using the Node Editor.
 
 <img src='attachments/6572288dfc3f094a7cc0ae67_p.png' style='width:100%'/>
-
-
-### Comment on a Podcast
-
-The Audio Player has a "Post" button, so you can share the article title and link along with a comment/post.
-
-When posting this way the link that gets included points back to the Quanta app, with a URL that will start playing the audio at the time offset that was automatically embedded into the link (or audio podcasts only) 
-
-This means your comment can be specific to what was being said at that specific point in the audio podcast.
-
-Here's a screenshot of the audio player, showing this "Post" button:
-
-
-
-![file-p](attachments/622512ed67a3a60f9a5d3210_p.png)
 
 
 ## Encryption
