@@ -566,7 +566,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String relPath = fullPath.substring(rootPathParent.length());
         try {
             node.directSetPath(relPath);
-            json = XString.prettyPrint(node);
+            json = svc_snUtil.toCanonicalJson(node);
         } finally {
             node.directSetPath(fullPath);
         }

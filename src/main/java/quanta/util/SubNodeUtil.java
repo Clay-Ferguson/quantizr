@@ -8,6 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeMetaInfo;
@@ -28,6 +34,26 @@ import quanta.util.val.Val;
 public class SubNodeUtil extends ServiceBase {
     @SuppressWarnings("unused")
     private Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+
+    private static final ObjectMapper mapper =
+            JsonMapper.builder().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+                    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+                    .serializationInclusion(JsonInclude.Include.NON_NULL).build();
+
+    public String toCanonicalJson(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+        if (obj instanceof String) {
+            return (String) obj;
+        }
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return "";
+        }
+    }
 
     public void removeProp(List<PropertyInfo> list, String name) {
         if (list == null || name == null) {
