@@ -30,6 +30,7 @@ class QuantaAgent:
     """Scans the source code and generates the AI prompt."""
     
     prj_loader: ProjectLoader | None
+    ok_hal: str
 
     def __init__(self):
         self.ts: str = str(int(time.time() * 1000))
@@ -58,7 +59,8 @@ class QuantaAgent:
         folders_to_include: List[str],
         data_folder: str,
         ext_set: Set[str],
-        llm: BaseChatModel
+        llm: BaseChatModel,
+        ok_hal: str
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
@@ -67,6 +69,7 @@ class QuantaAgent:
         self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, parse_prompt)
         self.prompt = input_prompt
         self.parse_prompt = parse_prompt
+        self.ok_hal = ok_hal
         self.mode = mode
         self.ext_set = ext_set
 
@@ -79,7 +82,7 @@ class QuantaAgent:
         
         if self.parse_prompt: 
             if not self.prj_loader.parsed_prompt:
-                raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' followed the prompt.")
+                raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' terminator line after the prompt.")
             
             if (self.prj_loader.file_with_prompt):
                 # get file extension from file_with_prompt filename
@@ -213,7 +216,7 @@ Final Prompt:
         print(f"Wrote Log File: {filename}")
 
         if self.parse_prompt and self.answer:
-            self.inject_answer(self.prj_loader.file_with_prompt, self.answer)
+            self.inject_answer(self.prj_loader.file_with_prompt, self.answer, self.ok_hal)
             
         if self.mode == RefactorMode.REFACTOR.value:
             ProjectMutator(
@@ -292,7 +295,7 @@ Final Prompt:
     #     cleaned_text = re.sub(pattern, '', text, flags=re.DOTALL)
     #     return cleaned_text
         
-    def inject_answer(self, file_with_prompt: str, answer: str):
+    def inject_answer(self, file_with_prompt: str, answer: str, ok_hal: str):
         """Injects the AI answer into the file that contains the prompt."""
         wrote = False
         
@@ -303,7 +306,7 @@ Final Prompt:
             ready_to_write = False
             for line in lines:
                 trimmed = line.strip()
-                if trimmed == "ok hal":
+                if trimmed == ok_hal:
                     ready_to_write = True
                     file.write("-"+trimmed+"\n")
                     

@@ -41,7 +41,8 @@ class AIUtils:
             folders_to_include,
             cfg.data_folder,
             ext_set,
-            llm
+            llm,
+            cfg.ok_hal
         )
     
     @staticmethod

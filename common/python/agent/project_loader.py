@@ -19,13 +19,14 @@ class ProjectLoader:
     file_with_prompt: str = ""
 
     # folders_to_include is a newline (\n) separated list of folders to include in the scan
-    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], parse_prompt: bool = False):
+    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], parse_prompt: bool = False, ok_hal: str = ""):
         self.source_folder_len = source_folder_len
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
         self.parse_prompt = parse_prompt
         self.parsed_prompt = ""
         self.file_with_prompt = ""
+        self.ok_hal = ok_hal
         
         
     def reset(self):
@@ -64,7 +65,7 @@ class ProjectLoader:
                         prompt_line = self.strip_comment_chars(trimmed)
                         parsed_prompt += prompt_line+"\n"
 
-                if trimmed == "ok hal" and self.parse_prompt and not self.parsed_prompt:
+                if trimmed == self.ok_hal and self.parse_prompt and not self.parsed_prompt:
                     in_prompt = True
                     
                 elif Utils.is_tag_line(trimmed, TAG_BLOCK_BEGIN):

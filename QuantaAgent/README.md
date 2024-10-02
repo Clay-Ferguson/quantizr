@@ -1,12 +1,14 @@
 # About Quanta Agent 
 
-Quanta Agent is a deamon that runs in the background and will monitor a file system for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the ansers directly into the files in realtime. For example, you could go in one of you files and type these lines (below), and the answer (Paris) would magically appear below the question itself! All you have to do is save the file, and then answer will then be saved into it a few seconds later. Note that the "ok hal" text is what designates that there's a question for the AI to answer.
+Quanta Agent is a deamon that runs in the background and will monitor a file system for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the ansers directly into the files in realtime. For example, you could go in one of you files and type these lines (below), and the answer (Paris) would `magically` appear below the question itself! All you have to do is save the file, and then answer will then be saved into it a few seconds later. 
 
 ```txt
 ok hal
 What's the capital of France?
 ?
 ```
+
+Note that the "ok hal" text is what designates that there's a question for the AI to answer. We call this the `ok hal` line, in the docs, but you can make it use any other string you want by setting the 'ok_hal' config property in the config.yaml file. Another good choice is simply the '>' because it's faster to type. Whatever `ok hal` string you use just needs to be something that will never appear on a line all by itself in any of your project files, of course.
 
 If you're asking questions about the rest of your code base, or want to do refactoring on your project, you can still ask the question from within any file, but in that case when you use the `file(), folder(), or block()` syntax the Agent knows it's free to refactor any of your files to perform the chagnes you've requested by mentioning those files, folders, or Named Blocks. There's a link to where you can learn about this more advanced "files, folders, and blocks" features later in this document"
 

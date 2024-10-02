@@ -118,7 +118,9 @@ temperature: {req.temperature}
                 folders_to_include,
                 "/data",
                 ext_set,
-                llm)
+                llm,
+                ""
+            )
             answer = messages[-1].content # type: ignore
         else:
             print("Chat mode")

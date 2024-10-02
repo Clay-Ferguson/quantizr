@@ -16,6 +16,8 @@ gemini_model: "gemini-1.5-pro"
 
 mode: "none"
 
+ok_hal: ">"
+
 # OPENAI = "openai"
 # ANTHROPIC = "anth"
 # GEMINI = "gemini"
