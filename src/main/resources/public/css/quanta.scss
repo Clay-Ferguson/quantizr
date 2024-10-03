@@ -29,7 +29,8 @@ $fa-font-path: "../fonts/fa";
 @import "bootswatch.scss";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
-$fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
+$fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Verdana, Arial, sans-serif, Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+// $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
 
 // This does work (border around focused edit fields) but we don't need it.
 /*
@@ -66,14 +67,15 @@ $smallBorderSize: 3px;
 $mobileHeaderHeight: 3.5rem;
 $tourPanelHeight: 6rem;
 
-@font-face {
-    font-family: "QuantaCustomFont";
-    /* src: url('../fonts/Roboto-Light.ttf') format('truetype'); */
-    src: url('../fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
+// Currently disabling our current font, just to save on app load time. Leaving for future reference.
+// @font-face {
+//     font-family: "QuantaCustomFont";
+//     /* src: url('../fonts/Roboto-Light.ttf') format('truetype'); */
+//     src: url('../fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype');
+//     font-weight: normal;
+//     font-style: normal;
+//     font-display: swap;
+// }
 
 @import './imports/breadcrumbs.scss';
 @import './imports/button.scss';
@@ -106,4 +108,3 @@ $tourPanelHeight: 6rem;
 @import './imports/tts.scss';
 @import './imports/app.scss';
 @import './imports/graphics.scss';
-

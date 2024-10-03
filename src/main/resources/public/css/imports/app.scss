@@ -3,8 +3,9 @@
 // }
 
 body {
-    font-family: "QuantaCustomFont" !important;
+    font-family: $fontFamily !important;
 }
+
 
 .fullWidth {
     width: 100%;
