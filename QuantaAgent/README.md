@@ -176,7 +176,5 @@ At first it may seem awkward that there are two or three new elements of syntax 
 
 * This Agent is completely external to your IDE, so you can use it with any IDE.
 
-# Technical Documentation
 
-Be sure to check the  [Docs Folder](/docs) for technical information about this project and how to run it.
 
