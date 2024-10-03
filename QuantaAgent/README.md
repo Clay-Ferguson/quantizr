@@ -1,6 +1,6 @@
 # About Quanta Agent 
 
-Quanta Agent is a deamon that runs in the background and will monitor a file system for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the ansers directly into the files in realtime. For example, you could go in one of you files and type these lines (below), and the answer (Paris) would `magically` appear below the question itself! All you have to do is save the file, and then answer will then be saved into it a few seconds later. 
+Quanta Agent is a Python-based deamon that runs in the background and will monitor a file system folder for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the answers directly into the files in realtime. For example, you could go into one of your files and type these lines (below), and the answer (Paris) would `automagically` appear below the question itself, after a second or two! All you have to do is save the file, and the answer will then be saved into it a few seconds later. 
 
 ```txt
 ok hal
