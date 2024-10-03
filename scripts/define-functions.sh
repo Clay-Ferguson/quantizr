@@ -33,8 +33,8 @@ yarnCheck () {
         echo "*******************************************************"
         # read -p "Press ENTER."
         # exit $?
-    else
-        echo "No package-lock.json found ($1)  Good."
+    # else
+    #     echo "No package-lock.json found ($1)  Good."
     fi
 }
 
