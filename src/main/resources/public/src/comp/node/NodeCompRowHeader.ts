@@ -106,7 +106,7 @@ export class NodeCompRowHeader extends Comp {
                 else {
                     if (S.speech.ttsSupported()) {
                         children.push(new Icon({
-                            className: "fa fa-volume-up fa-lg rowHeaderIcon",
+                            className: "fa fa-volume-high fa-lg rowHeaderIcon",
                             title: "Speech-to-Text (Read Aloud)",
                             onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                             onMouseOut: () => { S.quanta.selectedForTts = null; },

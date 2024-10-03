@@ -11,7 +11,7 @@ import { TypeBase } from "./base/TypeBase";
 the default */
 export class TextType extends TypeBase {
     constructor() {
-        super(J.NodeType.PLAIN_TEXT, "Text", "fa-file-text", true);
+        super(J.NodeType.PLAIN_TEXT, "Text", "fa-file-lines", true);
     }
 
     override render = (node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {

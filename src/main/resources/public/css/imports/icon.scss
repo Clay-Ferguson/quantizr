@@ -1,3 +1,13 @@
+// https://fontawesome.com/search?q=android&o=r&m=free&f=classic
+
+.appIcon {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .signatureIcon {
     color: darkkhaki;
     margin-right: $smallGap;
@@ -85,8 +95,7 @@
     color: darkgreen;
 }
 
-.iconToggle {
-}
+.iconToggle {}
 
 .iconToggleOn {
     @extend .iconToggle;
@@ -123,4 +132,3 @@
 .xlIcon {
     font-size: 2em;
 }
-

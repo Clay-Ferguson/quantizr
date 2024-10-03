@@ -18,7 +18,23 @@ export default defineConfig({
     build: {
         chunkSizeWarningLimit: 3000,
         minify: process.env.DOCKER_ENV === "dev" ? false : true,
-        sourcemap: process.env.DOCKER_ENV === "dev" ? true : false
+        sourcemap: process.env.DOCKER_ENV === "dev" ? true : false,
+
+        // begin font-awesome support
+        rollupOptions: {
+            output: {
+                assetFileNames: (assetInfo) => {
+                    let extType = assetInfo.name.split('.').at(1);
+                    if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+                        extType = 'img';
+                    } else if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
+                        extType = 'fonts';
+                    }
+                    return `assets/${extType}/[name]-[hash][extname]`;
+                },
+            },
+        },
+        // end font-awesome support
     },
     plugins: [
         // Latest version of this plugin is able to ignore node_modules any longer so it throws a false positive.
@@ -34,6 +50,7 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
+                additionalData: `$fa-font-path: "/fonts/fontawesome";`,
                 api: 'modern-compiler', // or 'modern'
                 quietDeps: true
             },

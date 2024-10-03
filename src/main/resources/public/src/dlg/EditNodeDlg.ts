@@ -215,7 +215,7 @@ export class EditNodeDlg extends DialogBase {
             span = span || new Span();
             span.addChild(new Icon({
                 title: "Node Type: Unknown",
-                className: "fa fa-question-circle fa-lg dlgIcon clickable",
+                className: "fa fa-circle-question fa-lg dlgIcon clickable",
                 onClick: this._openChangeNodeTypeDlg
             }));
             span.addChild(new Span("Unknown Type", { className: "marginRight" }));
@@ -372,7 +372,7 @@ export class EditNodeDlg extends DialogBase {
                     new Div(null, { className: "float-end" }, [
                         // ADD PROP ICON
                         new Icon({
-                            className: "fa fa-plus-circle fa-lg clickable marginRight tinyMarginBottom",
+                            className: "fa fa-circle-plus fa-lg clickable marginRight tinyMarginBottom",
                             onClick: async () => {
                                 dispatch("setPropsPanelExpanded", s => {
                                     s.propsPanelExpanded = true;
@@ -753,7 +753,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Share Node"
             }, "ui-editor-share") : null,
 
-            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-plus-circle", null, {
+            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-circle-plus", null, {
                 onClick: async () => {
                     dispatch("setPropsPanelExpanded", s => {
                         s.propsPanelExpanded = true;
@@ -777,12 +777,12 @@ export class EditNodeDlg extends DialogBase {
 
             // show Calendar Entry button only if this node is not a Calendar Entry nor CALENDAR type.
             // Note: CALENDAR types contain Calendar Entries but are not themselves Calendar Entries.
-            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar-plus-o", null, {
+            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar-plus", null, {
                 title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
                 onClick: () => this.utl.addDateProperty()
             }) : null,
 
-            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-android fa-lg", "Ask AI", {
+            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-robot fa-lg", "Ask AI", {
                 onClick: this._askAI,
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService
             }) : null,
@@ -1023,7 +1023,7 @@ export class EditNodeDlg extends DialogBase {
             }),
 
             new Icon({
-                className: "fa fa-lg fa-smile-o editorIcon",
+                className: "fa fa-lg fa-face-smile editorIcon",
                 title: "Insert emoji at cursor",
                 onClick: () => this.utl.insertEmoji()
             }),
@@ -1035,7 +1035,7 @@ export class EditNodeDlg extends DialogBase {
             }),
 
             !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new Icon({
-                className: "fa fa-lg fa-volume-up editorIcon",
+                className: "fa fa-lg fa-volume-high editorIcon",
                 onMouseOver: () => { S.quanta.selectedForTts = window.getSelection().toString(); },
                 onMouseOut: () => { S.quanta.selectedForTts = null; },
                 onClick: () => this.utl.speakerClickInEditor(),

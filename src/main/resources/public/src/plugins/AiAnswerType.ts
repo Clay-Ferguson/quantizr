@@ -8,7 +8,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class AiAnswerType extends TypeBase {
     constructor() {
-        super(J.NodeType.AI_ANSWER, "AI Answer", "fa-android", false);
+        super(J.NodeType.AI_ANSWER, "AI Answer", "fa-robot", false);
     }
 
     // For now i'm not sure how we should indicate visibly that a node is a comment, so I'm just not

@@ -36,7 +36,3 @@ yarn run ${VITE_SCRIPT}
 verifySuccess "yarn run vite: ${VITE_SCRIPT}"
 yarnCheck "After Vite Build"
 
-# Note: quanta.scss specifies this: $fa-font-path: "../fonts/fa"; pointing to this fonts folder.
-# todo-0: review this re recent changes to bootstrap build with vite
-rsync -aAX --delete --force "./node_modules/font-awesome/fonts/" "./fonts/fa/"
-

@@ -23,8 +23,12 @@ $form-select-indicator-color: lightGray;
 
 @import "bootstrap/scss/bootstrap";
 
-$fa-font-path: "../fonts/fa";
-@import "font-awesome/scss/font-awesome";
+$fa-font-path: "@fortawesome/fontawesome-free/webfonts";
+@import "@fortawesome/fontawesome-free/scss/fontawesome";
+@import "@fortawesome/fontawesome-free/scss/solid";
+@import "@fortawesome/fontawesome-free/scss/regular";
+@import "@fortawesome/fontawesome-free/scss/brands"; // todo-0: probably don't need brands?
+
 
 @import "bootswatch.scss";
 @import "bootstrap-icons/font/bootstrap-icons.css";

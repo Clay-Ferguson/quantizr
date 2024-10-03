@@ -88,12 +88,12 @@ export class Util {
     }
 
     getFileIcon(mime: string) {
-        if (!mime) return "fa-file";
-        if (mime == "application/pdf") return "fa-file-pdf-o";
-        if (mime.startsWith("text")) return "fa-file-text-o";
-        if (mime.startsWith("image")) return "fa-file-image-o";
-        if (mime.startsWith("audio")) return "fa-file-audio-o";
-        if (mime.startsWith("video")) return "fa-file-video-o";
+        if (!mime) return "fa-file-lines";
+        if (mime == "application/pdf") return "fa-file-pdf";
+        if (mime.startsWith("text")) return "fa-file-lines";
+        if (mime.startsWith("image")) return "fa-file-image";
+        if (mime.startsWith("audio")) return "fa-file-audio";
+        if (mime.startsWith("video")) return "fa-file-video";
         return "fa-file";
     }
 

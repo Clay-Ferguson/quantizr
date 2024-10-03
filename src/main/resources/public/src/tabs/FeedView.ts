@@ -37,7 +37,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         // const newItems: any = null;
         // if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
         //     newItems = new Icon({
-        //         className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
+        //         className: "fa fa-lightbulb fa-lg feedDirtyIcon marginRight",
         //         title: "New content available. Refresh!"
         //     });
         // }
@@ -239,7 +239,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     subHeading = "From Follows";
                     break;
 
-                case J.Constant.FEED_LOCAL: 
+                case J.Constant.FEED_LOCAL:
                     subHeading = "Local Users";
                     break;
 

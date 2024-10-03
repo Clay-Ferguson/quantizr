@@ -5,7 +5,7 @@ export class Icon extends Comp {
 
     constructor(attribs: any = null, private label: string = null) {
         super(attribs);
-        this.attribs.className += getAs().mobileMode ? " mobileIcon" : "";
+        this.attribs.className += getAs().mobileMode ? " appIcon mobileIcon" : " appIcon";
         this.tag = "i";
     }
 
