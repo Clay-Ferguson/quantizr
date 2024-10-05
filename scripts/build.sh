@@ -22,25 +22,19 @@ rm -rf ${PRJROOT}/bin/*
 # cp ${PRJROOT}/src/main/resources/public/node_modules/marked/marked.min.js \
 #    ${PRJROOT}/src/main/resources/public/export-includes/marked.min.js
 
-cd ${PRJROOT}/pom/common
+cd ${PRJROOT}
 
 # build with apidocs
 # mvn install javadoc:javadoc 
 
 # build without apidocs
-# WARNING: This pom.xml (in common folder) and is SEPARATE and just a way
-# to simplify the POMs by separately installing all the common stuff
-# from this common pom. Both POMS are necessary!
-echo "mvn install the /pom/common/pom.xml into repo"
+echo "mvn install the pom-common.xml into repo"
 
 # WARNING: DO NOT DELETE: After you upgrade to a new version of Java, you MUST run this command with "clean" in it!
 # mvn -T 1C clean install -Dmaven.javadoc.skip=true
-mvn -T 1C install -Dmaven.javadoc.skip=true
+mvn -f pom-common.xml -T 1C install -Dmaven.javadoc.skip=true
 yarnCheck "After mvn run"
-
 verifySuccess "Maven install common pom"
-
-cd ${PRJROOT}
 
 # These aren't normally needed, so I'll just keep commented out most of time. Tip: Only run any of these AFTER
 # you've successfully run a build, and if you changed a bunch of stuff delete ".m2" folder on your machine first!
@@ -52,7 +46,7 @@ cd ${PRJROOT}
 echo "Maven package ${mvn_profile}"
 # This run is required only to ensure TypeScript generated files are up to date.
 # Always do the same profile here (dev-vscode)
-mvn -T 1C package -DskipTests=true -Pdev-vscode
+mvn -f pom.xml -T 1C package -DskipTests=true -Pdev-vscode
 verifySuccess "Maven install commmon dev-vscode (typescript gen)"
 yarnCheck "After mvn packaging"
 
@@ -65,6 +59,6 @@ cd ${PRJROOT}
 # mvn -T 1C clean package -DskipTests=true -Dmaven.compiler.showDeprecation=true -P${mvn_profile}
 
 # Then this is the actual maven full build of the server springboot app
-mvn -T 1C clean package -DskipTests=true -P${mvn_profile}
+mvn -f pom.xml -T 1C clean package -DskipTests=true -P${mvn_profile}
 verifySuccess "Maven Build"
 yarnCheck "Before main full build"
