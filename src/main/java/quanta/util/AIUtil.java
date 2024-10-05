@@ -88,11 +88,10 @@ public class AIUtil extends ServiceBase {
         if (system.getAgentNodeId() == null) {
             system.setAgentNodeId(node.getIdStr());
         } else {
-            // todo-0: This bizarrely started happening in the middie of a conversation, so I'm disabling it
-            // until I have time to look into it.
-            // if (!system.getAgentNodeId().equals(node.getIdStr())) {
-            // throw new RuntimeEx("Multiple Agent Nodes defined in the same context.");
-            // }
+            if (!system.getAgentNodeId().equals(node.getIdStr())) {
+                throw new RuntimeEx("Multiple Agent Nodes defined in the same context. Nodes: "
+                        + system.getAgentNodeId() + " and " + node.getIdStr());
+            }
         }
     }
 
