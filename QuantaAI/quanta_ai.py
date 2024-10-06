@@ -103,6 +103,9 @@ temperature: {req.temperature}
             if req.foldersToInclude:
                 folders_to_include = req.foldersToInclude.split("\n")
 
+            # todo-0: Implement foldersToExclude
+            folders_to_exclude = []
+
             messages = buildContext(req)
             agent = QuantaAgent()
             agent.run(
@@ -116,6 +119,7 @@ temperature: {req.temperature}
                 # Note: These folders are defined by the docker compose yaml file as volumes.
                 "/projects",
                 folders_to_include,
+                folders_to_exclude,
                 "/data",
                 ext_set,
                 llm,

@@ -19,7 +19,7 @@ if __name__ == "__main__":
         
     # WARNING: We must pass all these values into the FolderMonitor class because it runs a thread and so based on how Python
     #          works, it will not be able to access the AppConfig values directly.
-    monitor = FolderMonitor(AppConfig.ext_set, AppConfig.folders_to_include, AppConfig.cfg, AppConfig.source_folder_len)
+    monitor = FolderMonitor(AppConfig.ext_set, AppConfig.folders_to_include, AppConfig.folders_to_exclude, AppConfig.cfg, AppConfig.source_folder_len)
     monitor.start()
     
     try:

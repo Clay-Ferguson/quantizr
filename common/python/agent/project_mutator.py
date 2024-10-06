@@ -19,12 +19,14 @@ class ProjectMutator:
 
     blocks: Dict[str, TextBlock] = {}
     folders_to_include: List[str] = []
+    folders_to_exclude: List[str] = []
 
     def __init__(
         self,
         mode: str,
         source_folder: str,
         folders_to_include: List[str],
+        folders_to_exclude: List[str],
         ai_answer: str,
         ts: str,
         suffix: Optional[str],
@@ -41,6 +43,7 @@ class ProjectMutator:
         self.blocks = blocks
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
+        self.folders_to_exclude = folders_to_exclude
 
     def run(self):
         """Performs all the project mutations which may be new files, updated files, or updated blocks in files."""
@@ -166,7 +169,9 @@ class ProjectMutator:
                 short_dir: str = dirpath[self.source_folder_len :]
                  
                 # Check the file extension
-                if Utils.has_included_file_extension(self.ext_set, filename)  and Utils.has_included_folder(self.folders_to_include, short_dir):
+                if (Utils.has_included_file_extension(self.ext_set, filename) 
+                    and Utils.has_included_folder(self.folders_to_include, short_dir) 
+                    and not Utils.has_included_folder(self.folders_to_exclude, short_dir)):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # Call the visitor function for each file

@@ -21,7 +21,7 @@ class AIUtils:
         return False
     
     @staticmethod
-    def ask_agent(cfg: argparse.Namespace, ext_set: Set[str], folders_to_include: List[str]) -> None: 
+    def ask_agent(cfg: argparse.Namespace, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]) -> None: 
         """Ask the AI. If ParsePrompt is True, then the prompt is extracted from the project files."""
         print("Running ask_agent")
         messages: List[BaseMessage] = []
@@ -39,6 +39,7 @@ class AIUtils:
             True,
             cfg.source_folder,
             folders_to_include,
+            folders_to_exclude,
             cfg.data_folder,
             ext_set,
             llm,

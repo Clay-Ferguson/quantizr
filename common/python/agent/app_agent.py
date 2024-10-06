@@ -42,6 +42,7 @@ class QuantaAgent:
         self.prj_loader = None
         self.source_folder = ""
         self.folders_to_include: List[str] = []
+        self.folders_to_exclude: List[str] = []
         self.data_folder = ""
         self.dry_run: bool = False
         self.parse_prompt: bool = False
@@ -57,6 +58,7 @@ class QuantaAgent:
         parse_prompt: bool,
         source_folder: str,
         folders_to_include: List[str],
+        folders_to_exclude: List[str],
         data_folder: str,
         ext_set: Set[str],
         llm: BaseChatModel,
@@ -66,7 +68,8 @@ class QuantaAgent:
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, parse_prompt)
+        self.folders_to_exclude = folders_to_exclude
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, parse_prompt)
         self.prompt = input_prompt
         self.parse_prompt = parse_prompt
         self.ok_hal = ok_hal
@@ -103,7 +106,7 @@ class QuantaAgent:
             self.prompt, self.source_folder, self.prj_loader.file_names
         )
         self.prompt = PromptUtils.insert_folders_into_prompt(
-            self.prompt, self.source_folder, self.folders_to_include, self.ext_set
+            self.prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
         )
         
         if user_system_prompt:
@@ -112,7 +115,7 @@ class QuantaAgent:
                 user_system_prompt, self.source_folder, self.prj_loader.file_names
             )
             user_system_prompt = PromptUtils.insert_folders_into_prompt(
-                user_system_prompt, self.source_folder, self.folders_to_include, self.ext_set
+                user_system_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
             )
         
         if (self.parse_prompt): 
@@ -223,6 +226,7 @@ Final Prompt:
                 self.mode,
                 self.source_folder,
                 self.folders_to_include,
+                self.folders_to_exclude,
                 self.answer,
                 self.ts,
                 None,

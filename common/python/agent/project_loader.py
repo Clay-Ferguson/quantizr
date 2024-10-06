@@ -14,15 +14,17 @@ class ProjectLoader:
     file_names: List[str] = []
     folder_names: List[str] = []
     folders_to_include: List[str] = []
+    folders_to_exclude: List[str] = []
     parse_prompt: bool = False
     parsed_prompt: str = ""
     file_with_prompt: str = ""
 
     # folders_to_include is a newline (\n) separated list of folders to include in the scan
-    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], parse_prompt: bool = False, ok_hal: str = ""):
+    def __init__(self, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str], parse_prompt: bool = False, ok_hal: str = ""):
         self.source_folder_len = source_folder_len
         self.ext_set = ext_set
         self.folders_to_include = folders_to_include
+        self.folders_to_exclude = folders_to_exclude
         self.parse_prompt = parse_prompt
         self.parsed_prompt = ""
         self.file_with_prompt = ""
@@ -131,7 +133,8 @@ class ProjectLoader:
 
             for filename in filenames:
                 if (Utils.has_included_file_extension(self.ext_set, filename) and 
-                    Utils.has_included_folder(self.folders_to_include, short_dir)):
+                    Utils.has_included_folder(self.folders_to_include, short_dir) and
+                    not Utils.has_included_folder(self.folders_to_exclude, short_dir)):
                     # print(f"visit file {filename} in {dirpath}")
                     # build the full path
                     path: str = os.path.join(dirpath, filename)

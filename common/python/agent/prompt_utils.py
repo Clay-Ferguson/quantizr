@@ -47,7 +47,7 @@ class PromptUtils:
 """
 
     @staticmethod
-    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str]) -> str:
+    def build_folder_content(folder_path: str, source_folder_len: int, ext_set: Set[str], folders_to_include: List[str], folders_to_exclude: List[str]) -> str:
         """Builds the content of a folder. Which will contain all the filenames and their content."""
         print(f"Building content for folder: {folder_path}")
 
@@ -65,7 +65,9 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 short_dir: str = dirpath[source_folder_len :]
                 
                 # Check the file extension
-                if Utils.has_included_file_extension(ext_set, filename) and Utils.has_included_folder(folders_to_include, short_dir):
+                if (Utils.has_included_file_extension(ext_set, filename) 
+                    and Utils.has_included_folder(folders_to_include, short_dir) 
+                    and not Utils.has_included_folder(folders_to_exclude, short_dir)):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder
@@ -103,7 +105,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
 
     @staticmethod
     def insert_folders_into_prompt(
-        prompt: str, source_folder: str, folders_to_include: List[str], ext_set: Set[str]
+        prompt: str, source_folder: str, folders_to_include: List[str], folders_to_exclude: List[str], ext_set: Set[str]
     ) -> str:
         """
         Substitute entire folder contents into the prompt. Prompts can contain ${FolderName} tags,
@@ -127,7 +129,8 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                     folder,
                     source_folder_len,
                     ext_set,
-                    folders_to_include
+                    folders_to_include,
+                    folders_to_exclude
                 )
                 prompt = prompt.replace(
                     f"folder({folder_name})", content
