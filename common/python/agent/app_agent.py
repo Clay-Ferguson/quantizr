@@ -69,7 +69,7 @@ class QuantaAgent:
         self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, parse_prompt)
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, parse_prompt, ok_hal)
         self.prompt = input_prompt
         self.parse_prompt = parse_prompt
         self.ok_hal = ok_hal
