@@ -66,8 +66,7 @@ Below is the content of the files in the folder named {folder_path} (using {TAG_
                 
                 # Check the file extension
                 if (Utils.has_included_file_extension(ext_set, filename) 
-                    and Utils.has_included_folder(folders_to_include, short_dir) 
-                    and not Utils.has_included_folder(folders_to_exclude, short_dir)):
+                    and Utils.allow_folder(folders_to_include,folders_to_exclude, short_dir)):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # get the file name relative to the source folder

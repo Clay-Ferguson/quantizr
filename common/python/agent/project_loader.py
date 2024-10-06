@@ -133,8 +133,7 @@ class ProjectLoader:
 
             for filename in filenames:
                 if (Utils.has_included_file_extension(self.ext_set, filename) and 
-                    Utils.has_included_folder(self.folders_to_include, short_dir) and
-                    not Utils.has_included_folder(self.folders_to_exclude, short_dir)):
+                    Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)):
                     # print(f"visit file {filename} in {dirpath}")
                     # build the full path
                     path: str = os.path.join(dirpath, filename)

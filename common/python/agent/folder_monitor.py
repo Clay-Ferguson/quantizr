@@ -25,8 +25,7 @@ class FileChangeHandler(FileSystemEventHandler):
             dirpath = os.path.dirname(event.src_path)
             short_dir: str = dirpath[self.source_folder_len :]
             if (Utils.has_included_file_extension(self.ext_set, event.src_path)
-                 and Utils.has_included_folder(self.folders_to_include, short_dir)
-                 and not Utils.has_included_folder(self.folders_to_exclude, short_dir)):
+                 and Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)):
                 
                 # if there's no query to the agent in this file, then return
                 if not AIUtils.file_contains_line(event.src_path, self.cfg.ok_hal):

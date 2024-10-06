@@ -61,14 +61,17 @@ class Utils:
         return ext.lower() in ext_set
     
     @staticmethod
-    def has_included_folder(folders: List[str], short_folder: str) -> bool:
+    def allow_folder(folders_to_include: List[str], folders_to_exclude: List[str], short_dir: str) -> bool:
         """Returns True if the file's path should be included in the scan."""
-        if folders == None or len(folders) == 0:
-            return True
-        
+        return ((len(folders_to_include)==0 or Utils.has_folder(folders_to_include, short_dir))
+                 and (len(folders_to_exclude)==0 or not Utils.has_folder(folders_to_exclude, short_dir)));
+    
+    @staticmethod
+    def has_folder(folders: List[str], short_folder: str) -> bool:
+        """Returns True if the file's path should be included in the scan."""
         # Note: If there's no folders we have an empty string in here but it still works.
         for folder in folders:
-            if short_folder.startswith(folder):
+            if folder and short_folder.startswith(folder):
                 return True
         return False
 

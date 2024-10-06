@@ -170,8 +170,7 @@ class ProjectMutator:
                  
                 # Check the file extension
                 if (Utils.has_included_file_extension(self.ext_set, filename) 
-                    and Utils.has_included_folder(self.folders_to_include, short_dir) 
-                    and not Utils.has_included_folder(self.folders_to_exclude, short_dir)):
+                    and Utils.allow_folder(self.folders_to_include, self.folders_to_exclude, short_dir)):
                     # build the full path
                     path: str = os.path.join(dirpath, filename)
                     # Call the visitor function for each file

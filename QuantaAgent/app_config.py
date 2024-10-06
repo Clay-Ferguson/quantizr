@@ -81,6 +81,11 @@ class AppConfig:
         AppConfig.ext_list = re.split(r"\s*,\s*", AppConfig.cfg.scan_extensions)
         AppConfig.folders_to_include = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_include)
         AppConfig.folders_to_exclude = re.split(r"\s*,\s*", AppConfig.cfg.folders_to_exclude)
+        
+        # remove all empty strings from folders_to_include and folders_to_exclude
+        AppConfig.folders_to_include = list(filter(None, AppConfig.folders_to_include))
+        AppConfig.folders_to_exclude = list(filter(None, AppConfig.folders_to_exclude))
+        
         AppConfig.ext_set = set(AppConfig.ext_list)
         AppConfig.source_folder_len = len(AppConfig.cfg.source_folder)
         
