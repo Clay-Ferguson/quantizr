@@ -24,6 +24,8 @@ ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
 ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
 OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
+OPENAI_MODEL_COMPLETION_O1_PREVIEW = "o1-preview"
+OPENAI_MODEL_COMPLETION_O1_MINI = "o1-mini"
 PPLX_MODEL_COMPLETION_ONLINE = "llama-3.1-sonar-huge-128k-online" 
 PPLX_MODEL_COMPLETION_LLAMA3 = "llama-3.1-70b-instruct" 
 PPLX_MODEL_COMPLETION_CHAT = "llama-3.1-sonar-large-128k-chat" 
@@ -231,6 +233,15 @@ def calculate_cost(input_tokens, output_tokens, model) -> float:
     elif model == OPENAI_MODEL_COMPLETION_MINI:
         input_ppm = 0.15
         output_ppm = 0.6
+
+    elif OPENAI_MODEL_COMPLETION_O1_PREVIEW:
+        # Not a typo! These are in dollars!
+        input_ppm = 15.0
+        output_ppm = 60.0
+        
+    elif OPENAI_MODEL_COMPLETION_O1_MINI:
+        input_ppm = 3.0
+        output_ppm = 12.0
 
     elif model == ANTH_OPUS_MODEL_COMPLETION_CHAT:
         input_ppm = 15

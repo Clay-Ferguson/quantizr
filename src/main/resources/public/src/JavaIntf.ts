@@ -1098,6 +1098,8 @@ export const enum AIModel {
     NONE = "[null]",
     OPENAI = "openAi",
     OPENAI_MINI = "openAiMini",
+    OPENAI_O1_PREVIEW = "openAi_o1Preview",
+    OPENAI_O1_MINI = "openAi_o1Mini",
     PPLX_CHAT = "pplxAi",
     PPLX_ONLINE = "pplxAi_online",
     PPLX_LLAMA3 = "llama3",
