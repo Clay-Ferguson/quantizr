@@ -16,7 +16,7 @@ import quanta.rest.response.GraphResponse;
 import quanta.util.TL;
 import quanta.util.XString;
 
-@Component 
+@Component
 public class GraphNodesService extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(GraphNodesService.class);
     private int guid = 0;
@@ -41,13 +41,14 @@ public class GraphNodesService extends ServiceBase {
             // If search text provided run subgraph search.
             else {
                 int limit = TL.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-                results = svc_mongoRead.searchSubGraph(node, null, req.getSearchText(), null, null, limit, 0, true, false,
-                        null, true, false, false, false);
+                results = svc_mongoRead.searchSubGraph(node, null, req.getSearchText(), null, null, limit, 0, true,
+                        false, null, true, false, false, false);
             }
+
             // Construct the GraphNode object for each result and add to mapByPath
             for (SubNode n : results) {
                 try {
-                   svc_auth.readAuth(node);
+                    svc_auth.readAuth(node);
                     GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(),
                             StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching, n.getLinks());
                     mapByPath.put(gn.getPath(), gn);
@@ -55,6 +56,7 @@ public class GraphNodesService extends ServiceBase {
                     // ignore
                 }
             }
+
             // processNodes ensuring we have a coherent/complete/consistent tree (no orphans)
             processNodes(rootPath, rootLevel, mapByPath);
             res.setRootNode(gnode);

@@ -27,8 +27,6 @@ interface Tag {
 }
 
 export class SelectTagsDlg extends DialogBase {
-    matchAny = false;
-    matchAll = false;
     indenting = false;
     editFieldState: Validator = new Validator();
 
@@ -63,14 +61,7 @@ export class SelectTagsDlg extends DialogBase {
         switch (this.modeOption) {
             case "search":
                 buttons = [
-                    new Button("Match All", () => {
-                        this.matchAll = true;
-                        this._select();
-                    }, null, "btn-primary"),
-                    new Button("Match Any", () => {
-                        this.matchAny = true;
-                        this._select();
-                    })
+                    new Button("Ok", this._select, null, "btn-primary"),
                 ];
                 break;
             case "edit":

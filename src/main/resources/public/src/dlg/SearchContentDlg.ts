@@ -231,17 +231,10 @@ export class SearchContentDlg extends DialogBase {
             const amtags: string[] = mtag.split(" ");
             amtags.forEach(tag => {
                 const quoteTag = "\"" + tag + "\"";
-                if (!tags.includes(tag) && !tags.includes(quoteTag)) {
-                    if (dlg.matchAny) {
-                        if (val) val += " ";
-                        val += tag;
-                        tags.push(tag);
-                    }
-                    else {
-                        if (val) val += " ";
-                        val += quoteTag;
-                        tags.push(quoteTag);
-                    }
+                if (!tags.includes(quoteTag)) {
+                    if (val) val += " ";
+                    val += quoteTag;
+                    tags.push(quoteTag);
                 }
             });
         });
