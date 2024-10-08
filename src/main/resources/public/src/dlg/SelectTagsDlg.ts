@@ -48,8 +48,12 @@ export class SelectTagsDlg extends DialogBase {
         if (this.curTags) {
             const tags = this.curTags.split(" ");
             tags?.forEach(t => {
-                t = t.replaceAll("\"", "");
-                tagSet.add(t);
+                if (!t) return;
+                t = t.trim();
+                if (!t) return;
+                if (t.startsWith("\"#") && t.endsWith("\"")) {
+                    tagSet.add(t);
+                }
             });
         }
 

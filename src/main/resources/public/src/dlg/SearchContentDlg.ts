@@ -224,19 +224,27 @@ export class SearchContentDlg extends DialogBase {
     addTagsToSearchField(dlg: SelectTagsDlg) {
         let val = this.searchTextState.getValue();
         val = val.trim();
-        const tags: string[] = val.split(" ");
 
         dlg.getState<SelectTagsDlgLS>().selectedTags.forEach(mtag => {
             const amtags: string[] = mtag.split(" ");
             amtags.forEach(tag => {
+                if (!tag) return;
+                tag = tag.trim();
+                if (!tag) return;
+
+                // if tag is alread in quotes remove the quotes
+                if (tag.startsWith("\"") && tag.endsWith("\"")) {
+                    tag = tag.substring(1, tag.length - 1);
+                }
+
                 const quoteTag = "\"" + tag + "\"";
-                if (!tags.includes(quoteTag)) {
+                if (val.indexOf(quoteTag) == -1) {
                     if (val) val += " ";
                     val += quoteTag;
-                    tags.push(quoteTag);
                 }
             });
         });
+
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText = val);
     }
 
