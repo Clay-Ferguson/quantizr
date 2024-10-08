@@ -54,18 +54,32 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
 
         if (ast.node && ((!ast.mobileMode && !isRootNode) || parentVisible)) {
             const headingBarItems = [];
-            if (!ast.isAnonUser && !ast.mobileMode && !isRootNode) {
+
+            if (!ast.isAnonUser && !ast.mobileMode) {
                 headingBarItems.push(new Icon({
-                    className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
-                    title: "Previous Sibling Node",
-                    onClick: S.nav._navToPrev
+                    className: "fa fa-search fa-lg buttonBarIcon",
+                    title: "Search under this Node",
+                    onClick: S.srch._openSearchDlg
                 }));
                 headingBarItems.push(new Icon({
-                    className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
-                    title: "Next Sibling Node",
-                    [C.NODE_ID_ATTR]: ast.node.id,
-                    onClick: S.nav._navToNext
+                    className: "fa fa-timeline fa-lg buttonBarIcon",
+                    title: "Timeline under this Node",
+                    onClick: S.srch._timeline
                 }));
+
+                if (!isRootNode) {
+                    headingBarItems.push(new Icon({
+                        className: "fa fa-chevron-circle-left fa-lg buttonBarIcon",
+                        title: "Previous Sibling Node",
+                        onClick: S.nav._navToPrev
+                    }));
+                    headingBarItems.push(new Icon({
+                        className: "fa fa-chevron-circle-right fa-lg buttonBarIcon",
+                        title: "Next Sibling Node",
+                        [C.NODE_ID_ATTR]: ast.node.id,
+                        onClick: S.nav._navToNext
+                    }));
+                }
             }
 
             if (parentVisible) {
@@ -82,11 +96,11 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 ], this.data);
             }
             else {
-                if (!this.attribs.className) 
+                if (!this.attribs.className)
                     this.attribs.className = "";
                 this.attribs.className += " bigPaddingTop";
             }
-        }   
+        }
         this.children = [this.headingBar, contentDiv];
         return true;
     }

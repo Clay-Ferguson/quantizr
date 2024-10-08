@@ -8,6 +8,7 @@ import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { DocumentRSInfo } from "./DocumentRSInfo";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
@@ -28,6 +29,10 @@ import { TimelineTab } from "./tabs/data/TimelineTab";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Search {
+    _openSearchDlg = () => {
+        new SearchContentDlg().open();
+    }
+
     async findSharedNodes(node: NodeInfo, page: number, type: string, shareTarget: string, accessOption: string) {
         const res = await S.rpcUtil.rpc<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
@@ -258,6 +263,10 @@ export class Search {
         });
     }
 
+    _timeline = () => {
+        this.timeline(null, "mtm", null, "by Modify Time (recursive)", 0, true);
+    }
+
     async timelineAfterUserInput(prop: string) {
         let description = prop === "ctm" ? "by Create Time" : "by Modify Time";
         let recursive = false;
@@ -273,7 +282,7 @@ export class Search {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    async timeline(nodeId: string, prop: string, timeRangeType: string, timelineDescription: string, page: number, 
+    async timeline(nodeId: string, prop: string, timeRangeType: string, timelineDescription: string, page: number,
         recursive: boolean) {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change
@@ -529,7 +538,7 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page
      */
-    renderSearchResultAsListItem(node: NodeInfo, tabData: TabBase<any>, jumpButton: boolean, allowHeader: boolean, 
+    renderSearchResultAsListItem(node: NodeInfo, tabData: TabBase<any>, jumpButton: boolean, allowHeader: boolean,
         outterClass: string, outterClassHighlight: string,
         extraStyle: any): Comp {
         const ast = getAs();

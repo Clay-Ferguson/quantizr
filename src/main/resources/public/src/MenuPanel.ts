@@ -10,7 +10,6 @@ import { PickNodeTypeDlg } from "./dlg/PickNodeTypeDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
-import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SendFeedbackDlg } from "./dlg/SendFeedbackDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
@@ -79,7 +78,6 @@ export class MenuPanel extends Comp {
     static showPublicWritableShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.WRITE); }
     static showPublicReadonlyShares = () => { S.srch.findShares(PrincipalName.PUBLIC, J.PrivilegeType.READ); }
     static showAllShares = () => { S.srch.findShares(null, null); }
-    static searchByContent = () => { new SearchContentDlg().open(); };
     static searchByName = () => { new SearchByNameDlg().open(); }
     static searchById = () => { new SearchByIDDlg().open(); };
     static findUsers = () => { new SearchUsersDlg().open(); };
@@ -206,7 +204,7 @@ export class MenuPanel extends Comp {
             ], null));
 
             children.push(new Menu("Search", [
-                new MenuItem("By Content", MenuPanel.searchByContent, onMainTab && !!hltNode, null, true), //
+                new MenuItem("By Content", S.srch._openSearchDlg, onMainTab && !!hltNode, null, true), //
                 new MenuItem("By Node Name", MenuPanel.searchByName), //
                 new MenuItem("By Node ID", MenuPanel.searchById), //
 
