@@ -32,7 +32,7 @@ export class NodeCompContent extends Comp {
         super({
             // nc_ == Node Content (prefix+id will be the ENTIRE row Dom ID)
             id: NodeCompContent.PRE_PREFIX + idPrefix + node?.id,
-            className: wrapperClass + " fullWidth"
+            className: wrapperClass + " fullWidth nodeText"
         });
     }
 

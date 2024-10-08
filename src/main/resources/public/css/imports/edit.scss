@@ -21,7 +21,9 @@ code {
     word-wrap: break-word;
 }
 
-.mkCont table, th, td {
+.mkCont table,
+th,
+td {
     border: 1px solid $nodeBorderBottomColor;
     border-collapse: collapse;
 }
@@ -94,7 +96,7 @@ th {
 }
 
 .mkCont {
-    padding: .3rem 1rem 1rem 1rem;
+    padding: .3rem 1rem 0rem 1rem;
 }
 
 .mkCont h1 {
@@ -135,7 +137,7 @@ th {
     margin-bottom: 5px;
 }
 
-.mkCont .katex { 
+.mkCont .katex {
     font-size: 1.4rem;
     background-color: white;
     color: black;
@@ -144,7 +146,7 @@ th {
     border: 1px solid gray;
     line-height: 1.7em;
 }
-  
+
 .txtFieldLabelShort {
     margin-right: .25rem;
 }

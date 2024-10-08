@@ -1,3 +1,8 @@
+.nodeText {
+    width: 100%;
+    padding: 0.5rem 0 0 0.5rem;
+}
+
 .pageNodeCutMessage {
     border: 2px dotted green !important;
     padding: $smallGap;
@@ -22,7 +27,7 @@
     padding: 0 6px 0 6px;
     margin-top: 4px;
     margin-bottom: 8px;
-    background-color:orange;
+    background-color: orange;
     color: black;
     cursor: pointer;
     display: inline-block;
@@ -266,7 +271,7 @@ i'm backing out for now
 
 .activeRow {
     border-left: $highlightBorderSize solid $primary;
-    border-bottom: 3px solid $primary; 
+    border-bottom: 3px solid $primary;
     padding-left: 0;
 }
 
@@ -282,17 +287,17 @@ i'm backing out for now
 
 .inactiveRow {
     border-left: $highlightBorderSize solid transparent;
-    border-bottom: 3px dotted gray; 
+    border-bottom: 3px dotted gray;
 }
 
 .inactiveRowIndented {
     border-left: 1px solid gray;
-    border-bottom: 3px dotted gray; 
+    border-bottom: 3px dotted gray;
     padding-left: $highlightBorderSizeMinus1;
 }
 
 .inactiveRowCell {
-    border-left: $highlightBorderSize solid transparent; 
+    border-left: $highlightBorderSize solid transparent;
 }
 
 .inactiveRow:hover {
@@ -370,7 +375,7 @@ i'm backing out for now
     @extend .priorityTag;
     background-color: yellow;
     color: black;
-}       
+}
 
 .priorityTag4 {
     @extend .priorityTag;
