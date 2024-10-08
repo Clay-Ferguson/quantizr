@@ -202,7 +202,7 @@ export class SelectTagsDlg extends DialogBase {
         }
 
         if (!tagObj.tag) {
-            div.addChild(new Heading(4, tagObj.description, { className: "marginTop" }));
+            div.addChild(new Heading(6, tagObj.description, { className: "marginTop" }));
             this.indenting = true;
         }
         else {

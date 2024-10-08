@@ -189,7 +189,7 @@ export class SearchContentDlg extends DialogBase {
                     new Div(null, null, [
                         requirePriorityCheckbox
                     ])
-                ], "bigMarginBottom"),
+                ], "bigMarginBottom bigMarginTop"),
 
                 new ButtonBar([
                     new Button("Search", () => this.search(false), null, "btn-primary"),

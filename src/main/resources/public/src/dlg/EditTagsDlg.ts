@@ -20,7 +20,7 @@ export class EditTagsDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new Div("Enter custom hashtags, each on a separate line below. Hashtags must start with #."),
+                new Div("Enter custom hashtags, each on a separate line. Tags must start with #. Use '//' prefix to add comments. Blank lines are ignored. Text not starting with `#` will be displayed as headings in the Tags Picker Dialog."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Save", this._save, null, "btn-primary"),
