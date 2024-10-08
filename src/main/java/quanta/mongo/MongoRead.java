@@ -707,8 +707,18 @@ public class MongoRead extends ServiceBase {
                 List<String> quotedStrings = XString.extractQuotedStrings(text, "or");
                 if (!quotedStrings.isEmpty()) {
                     List<Criteria> orCriteria = new ArrayList<>();
+
                     for (String quotedString : quotedStrings) {
                         orCriteria.add(Criteria.where(prop).regex(quotedString, caseSensitive ? "" : "i"));
+
+                        /*
+                         * Since we do a direct property search, we have a special case here were we need to search the
+                         * TAGs field, to find tags, which doesnt't need to be done in the 'else' flow path though
+                         * because that path is using TextCriteria which will search all fields.
+                         */
+                        if (quotedString.startsWith("#") && !quotedString.contains(" ")) {
+                            orCriteria.add(Criteria.where(SubNode.TAGS).regex(quotedString, caseSensitive ? "" : "i"));
+                        }
                     }
                     ands.add(new Criteria().orOperator(orCriteria.toArray(new Criteria[0])));
                 } else {
@@ -966,8 +976,8 @@ public class MongoRead extends ServiceBase {
 
         SubNode node = findSubNodeByType(userNode, type);
         if (node == null && autoCreate) {
-            node = svc_mongoCreate.createNode(userNode, null, type, null, 0L, CreateNodeLocation.LAST, null, null, true, true,
-                    null);
+            node = svc_mongoCreate.createNode(userNode, null, type, null, 0L, CreateNodeLocation.LAST, null, null, true,
+                    true, null);
             node.setOwner(userNode.getId());
             node.setContent(content);
             node.touch();
