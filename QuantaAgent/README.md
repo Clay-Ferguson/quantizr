@@ -1,6 +1,6 @@
 # About Quanta Agent 
 
-Quanta Agent is a Python-based deamon that runs in the background and will monitor a file system folder for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the answers directly into the files in realtime. For example, you could go into one of your files and type these lines (below), and the answer (Paris) would `automagically` appear below the question itself, after a second or two! All you have to do is save the file, and the answer will then be saved into it a few seconds later. 
+Quanta Agent is a Python-based deamon that runs in the background and will monitor a file system folder for changes, notice files that have AI prompts in them, and then answer those prompts by inserting the answers directly into your project files in realtime. For example, you could go into one of your files and type these lines (below), and the answer (Paris) would `automagically` appear below the question itself, after a second or two! All you have to do is save the file, and the answer will then be saved into it a few seconds later. 
 
 ```txt
 ok hal
@@ -10,7 +10,9 @@ What's the capital of France?
 
 Note that the "ok hal" text is what designates that there's a question for the AI to answer. We call this the `ok hal` line, in the docs, but you can make it use any other string you want by setting the 'ok_hal' config property in the config.yaml file. Another good choice is simply the '>' because it's faster to type. Whatever `ok hal` string you use just needs to be something that will never appear on a line all by itself in any of your project files, of course.
 
-If you're asking questions about the rest of your code base, or want to do refactoring on your project, you can still ask the question from within any file, but in that case when you use the `file(), folder(), or block()` syntax the Agent knows it's free to refactor any of your files to perform the chagnes you've requested by mentioning those files, folders, or Named Blocks. There's a link to where you can learn about this more advanced "files, folders, and blocks" features later in this document"
+If you're asking questions about the rest of your code base, or want to do refactoring on your project, you can still ask the question from within any file, but in that case when you use the `file(), folder(), or block()` syntax the Agent knows it's free to refactor any of your files to perform the changes you've requested by mentioning those files, folders, or Named Blocks. 
+
+[Learn more about the 'file, folder, block' prompting syntax](https://github.com/Clay-Ferguson/quantizr/blob/main/docs/user-guide/index.md#using-the-coding-agent)
 
 
 # Tool Features
@@ -34,6 +36,8 @@ Quant Agent is a tool to automate querying AIs (LLMs) about your codebase, which
 * Uses Python Langchain giving you flexibility in which LLM you use, including either locally hosted LLMs or Cloud AI Services.
 
 *Note: Current codebase only includes OpenAI ChatGPT, and Anthropic Claud connectivity, but with Langchain it's easy to add support for the other Cloud AIs or Local LLMS.*
+
+# Prompting Syntax
 
 If you're a software developer and you want to be able to ask AI (like OpenAI's ChatGPT for example) questions about your code, this tool helps do that. This tool can also implement entire complex features in your code base, by updating existing entire files, or by updating only specific labeled `Named Blocks` to add code to specific locations in specific files as directed by you. 
 
