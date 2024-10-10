@@ -18,9 +18,8 @@ public enum AIModel {
             "PPN", false, 127_000), //
     PPLX_LLAMA3("llama3", "perplexity", "llama-3.1-70b-instruct", "Meta: Llama 3", "PPL", true, 131_000), //
 
-    ANTH("anthAi", "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true, 200_000), // Opus
-                                                                                                             // (most
-                                                                                                             // powerful)
+    ANTH("anthAi", "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true, 200_000), //
+
     ANTH_SONNET("anthAi_sonnet", "anthropic", "claude-3-5-sonnet-20240620", "Anthropic: Claude 3.5 Sonnet", "ACS", true,
             200_000), // Sonnet
 
