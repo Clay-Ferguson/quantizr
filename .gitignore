@@ -21,3 +21,5 @@ src/main/resources/public/src/quanta.css
 src/main/resources/public/src/quanta.css.map
 
 QuantaAI/__pycache__/
+QuantaAgent/__pycache__/
+QuantaGradio/__pycache__/
