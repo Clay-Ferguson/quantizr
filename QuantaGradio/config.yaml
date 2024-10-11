@@ -26,7 +26,7 @@ ai_service: "anth"
 scan_extensions: ".py,.md"
 data_folder: "/home/clay/ai-agent-temp"
 
-source_folder: "/home/clay/ferguson/Quanta Browser"
+source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
 
 # The folders to include/exclude in the scan, relative to (i.e. contained within) the source_folder. In other words
 # these folders will be directly concatenated to the source_folder to form the full paths to the folders to scan.

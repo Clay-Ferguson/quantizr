@@ -7,11 +7,12 @@ from langchain_core.tools import BaseTool
 from .models import TextBlock
 from ..file_utils import FileUtils
 
+class DummyTestToolInput(BaseModel):
+    input: str = Field(description="Dummy input for testing")
 
 class UpdateBlockInput(BaseModel):
     block_name: str = Field(description="Block Name")
     block_content: str = Field(description="Block Content")
-
 
 class CreateFileInput(BaseModel):
     file_name: str = Field(description="File Name")
@@ -22,6 +23,29 @@ class UpdateFileInput(BaseModel):
     file_name: str = Field(description="File Name")
     file_content: str = Field(description="File Content")
 
+class DummyTestTool(BaseTool):
+    """Dummy tool for testing purposes"""
+
+    # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
+    # fine even without mentioning "block_update" in those instructions.
+    name: str = "test_tool"
+    description: str = "Used for testing that the tools support is working"
+    
+    args_schema: Type[BaseModel] = DummyTestToolInput
+    return_direct: bool = True # todo-0: What does this mean? I'm guessing it means that the tool returns the result directly
+    
+    def __init__(self, description):
+        super().__init__(description=description)
+        print(f"Created DummyTestTool as {description}")
+
+    def _run(
+        self,
+        input: str,
+        # run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        """Use the tool."""
+        print(f"DummyTestTool: {input}")
+        return "Return val from DummyTestTool with input: "+input
 
 class UpdateBlockTool(BaseTool):
     """Tool for updating named blocks of text to set new content"""

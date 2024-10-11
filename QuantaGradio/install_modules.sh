@@ -16,6 +16,7 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
   read -p "Press ENTER. To install modules."
   # WARNING ************************************************************************************************************************
   # WARNING For some reason running the combined pip installs below always failed unril I also ran the 'langchain' one all by itself.
+  #         UPDATE: ditto for 'langgraph'
   # WARNING ************************************************************************************************************************
   pip install \
       gradio \
