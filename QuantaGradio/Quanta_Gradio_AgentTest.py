@@ -29,8 +29,6 @@ class DummyTestToolInput(BaseModel):
 class DummyTestTool(BaseTool):
     """Dummy tool for testing purposes"""
 
-    # Warning there is a reference to this block name in "block_update_instructions.txt", although things do work
-    # fine even without mentioning "block_update" in those instructions.
     name: str = "test_tool"
     description: str = "Used for testing that the tools support is working"
     
