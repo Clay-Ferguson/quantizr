@@ -8,7 +8,6 @@ a basic ChatBot using Gradio and with a basic test tool.
 
 import sys
 import os
-from typing import Set
 import gradio as gr
 
 ABS_FILE = os.path.abspath(__file__)
@@ -26,11 +25,6 @@ if __name__ == "__main__":
 
     async def query_ai(prompt, messages):
         llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
-        
-        # # todo-0: make these NEVER have a period on front of the input string from the config file. To be consistent with java code.
-        # if AppConfig.cfg.scan_extensions is not None:
-        #     # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
-        #     ext_set: Set[str] = {f"{ext.strip()}" for ext in AppConfig.cfg.scan_extensions.split(',')}
 
         agent = QuantaAgent()
         async for result in agent.run_gradio(
@@ -48,18 +42,40 @@ if __name__ == "__main__":
             # Handle each yielded result
             if isinstance(result, list):
                 messages = result
-        yield messages
+        yield messages, ""
 
-    with gr.Blocks() as demo:
+    def clear_history():
+        return []
+
+    # This 'logo' isn't being used, but I leave this in place for future reference in case we
+    # need sayling like this later.
+    css = """
+.logo {
+    width: 100px;
+    height: 100px;
+    margin-right: 1rem;
+}
+"""
+
+    with gr.Blocks(css=css) as demo:
+        #with gr.Row():
+            # todo-2: Tried to add an image, and it works but I can't control width. Will come back to this later.
+            # gr.Image("assets/logo-100px-tr.jpg", width="100px", height="100px")
         gr.Markdown("#### Quanta Coding Agent")
+        
         chatbot = gr.Chatbot(
             type="messages",
             label="Agent",
             avatar_images=(None, "assets/logo-100px-tr.jpg")
         )
-        # todo-0: we need a separate submit button (not hitting ENTER in text field) and a multiline text field for the input
-        input = gr.Textbox(lines=1, label="Chat Message")
-        input.submit(query_ai, [input, chatbot], [chatbot])
-
+        input = gr.Textbox(lines=5, label="Chat Message", placeholder="Type your message here...")
+        
+        with gr.Row():
+            submit_button = gr.Button("Submit")
+            clear_button = gr.Button("Clear")
+            
+        submit_button.click(query_ai, [input, chatbot], [chatbot, input])
+        clear_button.click(clear_history, [], [chatbot])
+    
     demo.launch()         
     
