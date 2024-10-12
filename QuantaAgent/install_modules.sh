@@ -21,7 +21,8 @@ if [[ "$CONDA_DEFAULT_ENV" == "quanta_agent" ]]; then
     langchain-google-genai \
     configargparse \
     langgraph \
-    watchdog
+    watchdog \
+    gradio
 else
   echo "Failed to set Conda Environment: Expected quanta_agent but found $CONDA_DEFAULT_ENV"
   sleep 10s

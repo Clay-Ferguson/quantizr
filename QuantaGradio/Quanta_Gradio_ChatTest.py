@@ -15,7 +15,7 @@ from app_config import AppConfig
 from common.python.agent.ai_utils import AIUtils
 
 if __name__ == "__main__":
-    print("Quanta Gradio Starting...")
+    print("Quanta Gradio Chat Test Starting...")
     AppConfig.init_config()
     llm = AIUtils.create_llm(0.0, AppConfig.cfg)
 
@@ -32,5 +32,4 @@ if __name__ == "__main__":
         return gpt_response.content
 
     gr.ChatInterface(predict, type="messages").launch()            
-    print("Quanta Gradio exiting")
     

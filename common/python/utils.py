@@ -58,7 +58,12 @@ class Utils:
     def has_included_file_extension(ext_set: Set[str], file_name: str) -> bool:
         """Returns True if the file's extension should be included in the scan."""
         _, ext = os.path.splitext(file_name)
-        return ext.lower() in ext_set
+        # if first character of ext is '.' then remove it
+        if ext[0] == '.':
+            ext = ext[1:]
+        ret = ext.lower() in ext_set
+        # print(f"Checking: [{file_name}] - [{ext}] = {ret}")
+        return ret
     
     @staticmethod
     def allow_folder(folders_to_include: List[str], folders_to_exclude: List[str], short_dir: str) -> bool:

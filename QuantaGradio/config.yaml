@@ -16,19 +16,17 @@ gemini_model: "gemini-1.5-pro"
 
 mode: "none"
 
-ok_hal: ">"
-
 # OPENAI = "openai"
 # ANTHROPIC = "anth"
 # GEMINI = "gemini"
 ai_service: "openai"
 
-scan_extensions: ".py,.md,.html,.js,.css"
+scan_extensions: "py,html"
 data_folder: "/home/clay/ai-agent-temp"
 
 source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
 
-# The folders to include/exclude in the scan, relative to (i.e. contained within) the source_folder. In other words
+# Folders to include/exclude in the scan, relative to (i.e. contained within) the source_folder. In other words
 # these folders will be directly concatenated to the source_folder to form the full paths to the folders to scan.
 # If folders_to_include is not specified, the entire project is scanned. If folders_to_exclude is not specified, no
 # folders are excluded.

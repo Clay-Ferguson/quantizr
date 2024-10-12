@@ -14,8 +14,7 @@ from langchain.chat_models.base import BaseChatModel
 import gradio as gr
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
-from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
-from langchain_openai import ChatOpenAI
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 
 from common.python.agent.ai_utils import AIUtils
@@ -35,7 +34,7 @@ class DummyTestTool(BaseTool):
     description: str = "Used for testing that the tools support is working"
     
     args_schema: Type[BaseModel] = DummyTestToolInput
-    return_direct: bool = True # todo-0: What does this mean? I'm guessing it means that the tool returns the result directly
+    return_direct: bool = True 
     
     def __init__(self, description):
         super().__init__(description=description)
@@ -47,7 +46,7 @@ class DummyTestTool(BaseTool):
         return "Return val from DummyTestTool2 with input: "+input
 
 if __name__ == "__main__":
-    print("Quanta Gradio Starting...")
+    print("Quanta Gradio Agent Test Starting...")
     
     # NOTE: You can remove this line of code as long as you just supply the correct 'model' and 'api_key' values on the line below.
     AppConfig.init_config()
@@ -69,10 +68,8 @@ if __name__ == "__main__":
         for msg in messages:
             if msg['role'] == "user":
                 chat_history.append(HumanMessage(content=msg['content']))
-                # print("HISTORY: human: "+msg['content'])
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
-                # print("HISTORY: assistant: "+msg['content'])
     
         agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
         agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
@@ -96,15 +93,10 @@ if __name__ == "__main__":
         chatbot = gr.Chatbot(
             type="messages",
             label="Agent",
-            avatar_images=(
-                None,
-                "https://em-content.zobj.net/source/twitter/141/parrot_1f99c.png",
-            ),
+            avatar_images=(None, "assets/logo-100px-tr.jpg"),
         )
         input = gr.Textbox(lines=1, label="Chat Message")
         input.submit(query_ai, [input, chatbot], [chatbot])
 
     demo.launch()         
               
-    print("Quanta Gradio exiting")
-    

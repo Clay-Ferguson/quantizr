@@ -6,8 +6,6 @@ import time
 from typing import List, Set
 from .project_loader import ProjectLoader
 from .project_mutator import ProjectMutator
-# todo-0: gradio-related dependencies need to be added to all projects
-#         installer script and also the dockerfile for "quanta_ai"
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
@@ -123,18 +121,28 @@ class QuantaAgent:
                 user_system_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
             )
         
-        if (self.parse_prompt): 
-            if (self.prompt_code):  
-                self.system_prompt = PromptUtils.get_template(
-                    "../common/python/agent/prompt_templates/okhal_system_prompt_with_code.txt"
-                )
-            else:
-                self.system_prompt = PromptUtils.get_template(
-                    "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
-                )
-            
-        else:
-            self.build_system_prompt(user_system_prompt)
+        # ========================================================================================================
+        # DO NOT DELETE:
+        # 
+        # These prompots were initially used in the 'ok hal' scenario where I only wanted to be able to ask questions about a specific
+        # file and have the context only be about the provided code within the 'ok hal' block, but then I decided I wanted the 'ok hal' 
+        # to be able to do FULL refactoring of code, just like the Quanta Agent does, so I decided to always use the  `build_system_prompt`
+        # call here to give those full instructions.
+        # I leave this block commented out here for now, because later on we can theoretically have another additional syntax in additionto
+        # the 'ok hal' syntax, which would be a more limited syntax that only allows for asking questions about the provided code only
+        # if (self.parse_prompt): 
+        #     if (self.prompt_code):  
+        #         self.system_prompt = PromptUtils.get_template(
+        #             "../common/python/agent/prompt_templates/okhal_system_prompt_with_code.txt"
+        #         )
+        #     else:
+        #         self.system_prompt = PromptUtils.get_template(
+        #             "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
+        #         )
+        # else:
+        #     self.build_system_prompt(user_system_prompt)
+        # ========================================================================================================
+        self.build_system_prompt(user_system_prompt)
 
         if self.dry_run:
             # If dry_run is True, we simulate the AI response by reading from a file
@@ -240,31 +248,27 @@ Final Prompt:
     # todo-0: eventually we will reduce the duplication between 'run' and 'run_gradio'
     async def run_gradio(
         self,
-        user_system_prompt: str,
         ai_service: str,
-        mode: str,
         output_file_name: str,
-        messages, # todo-0: add type here: List[BaseMessage],
+        messages, 
         input_prompt: str,
-        parse_prompt: bool,
         source_folder: str,
         folders_to_include: List[str],
         folders_to_exclude: List[str],
         data_folder: str,
         ext_set: Set[str],
         llm: BaseChatModel,
-        ok_hal: str,
     ):
         self.data_folder = data_folder
         self.source_folder = source_folder
         self.source_folder_len: int = len(source_folder)
         self.folders_to_include = folders_to_include
         self.folders_to_exclude = folders_to_exclude
-        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, parse_prompt, ok_hal)
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, False, "")
         self.prompt = input_prompt
-        self.parse_prompt = parse_prompt
-        self.ok_hal = ok_hal
-        self.mode = mode
+        self.parse_prompt = False
+        self.ok_hal = ""
+        self.mode = RefactorMode.REFACTOR.value
         self.ext_set = ext_set
 
         # default filename to timestamp if empty
@@ -282,15 +286,6 @@ Final Prompt:
                 # get file extension from file_with_prompt filename
                 ext = os.path.splitext(self.prj_loader.file_with_prompt)[1]
                 self.prompt = self.prompt + self.get_file_type_mention(ext);
-        
-        # if we just got our prompt from scanning files then set it in self.prompt
-        if (self.prj_loader.parsed_prompt):
-            self.prompt, self.prompt_code = self.parse_prompt_and_code(self.prj_loader.parsed_prompt)
-        
-        if (self.prompt_code): 
-            self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
-
-        raw_prompt = self.prompt
 
         self.prompt = self.insert_blocks_into_prompt(self.prompt)
         self.prompt = PromptUtils.insert_files_into_prompt(
@@ -300,26 +295,7 @@ Final Prompt:
             self.prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
         )
         
-        if user_system_prompt:
-            user_system_prompt = self.insert_blocks_into_prompt(user_system_prompt)
-            user_system_prompt = PromptUtils.insert_files_into_prompt(
-                user_system_prompt, self.source_folder, self.prj_loader.file_names
-            )
-            user_system_prompt = PromptUtils.insert_folders_into_prompt(
-                user_system_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
-            )
-        
-        if (self.parse_prompt): 
-            if (self.prompt_code):  
-                self.system_prompt = PromptUtils.get_template(
-                    "../common/python/agent/prompt_templates/okhal_system_prompt_with_code.txt"
-                )
-            else:
-                self.system_prompt = PromptUtils.get_template(
-                    "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
-                )
-        else:
-            self.build_system_prompt(user_system_prompt)
+        self.build_system_prompt("")
 
         tools = [
             UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
@@ -330,22 +306,18 @@ Final Prompt:
             
         chat_prompt_template = ChatPromptTemplate.from_messages([
             SystemMessage(content=self.system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"), # todo-0: if this works, be sure to add to other code
+            MessagesPlaceholder(variable_name="chat_history"),
             HumanMessagePromptTemplate.from_template("Human: {input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
     
         # Convert messages to a format the agent can understand
-        chat_history = []
-        # print("Building History...")
-        
+        chat_history = []        
         for msg in messages:
             if msg['role'] == "user":
                 chat_history.append(HumanMessage(content=msg['content']))
-                # print("HISTORY: human: "+msg['content'])
             elif msg['role'] == "assistant":
                 chat_history.append(AIMessage(content=msg['content']))
-                # print("HISTORY: assistant: "+msg['content'])
 
         agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
         agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})

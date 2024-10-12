@@ -14,14 +14,11 @@ PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
 sys.path.append(PRJ_DIR)
 
 from app_config import AppConfig
-from common.python.agent.ai_utils import AIUtils
 
 if __name__ == "__main__":
     print("Quanta Gradio Image Gen Starting...")
     AppConfig.init_config()
-        
     openai.api_key = AppConfig.cfg.openai_api_key
-    print( f"openai.api key: {openai.api_key}")
 
     def generate_image(prompt):
         try:
@@ -44,10 +41,9 @@ if __name__ == "__main__":
         fn=generate_image,
         inputs=gr.Textbox(lines=2, placeholder="Enter your image description here..."),
         outputs="image",
-        title="Text to Image Generation with DALL-E",
+        title="Image Gen with OpenAI DALL-E 3",
         description="Enter a description and click 'Submit' to generate an image."
     )
 
     iface.launch()        
-    print("Quanta Gradio Image Gen exiting")
     
