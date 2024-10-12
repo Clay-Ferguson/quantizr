@@ -10,13 +10,15 @@ import os
 from typing import Type
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
-
+from langchain.chat_models.base import BaseChatModel
 import gradio as gr
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
 from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
+
+from common.python.agent.ai_utils import AIUtils
 
 ABS_FILE = os.path.abspath(__file__)
 PRJ_DIR = os.path.dirname(os.path.dirname(ABS_FILE))
@@ -50,12 +52,7 @@ if __name__ == "__main__":
     # NOTE: You can remove this line of code as long as you just supply the correct 'model' and 'api_key' values on the line below.
     AppConfig.init_config()
     
-    llm = ChatOpenAI(
-                    model=AppConfig.cfg.openai_model, # type: ignore
-                    temperature=1.0,
-                    api_key=AppConfig.cfg.openai_api_key,
-                    timeout=120
-                ) 
+    llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
     
     tools = [DummyTestTool("My Dummy Test Tool")]
     

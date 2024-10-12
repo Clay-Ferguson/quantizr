@@ -26,7 +26,7 @@ class AIUtils:
         print("Running ask_agent")
         messages: List[BaseMessage] = []
         mode = RefactorMode.REFACTOR.value
-        llm: BaseChatModel = AIUtils.create_llm(cfg.ai_service, 0.0, cfg)
+        llm: BaseChatModel = AIUtils.create_llm(0.0, cfg)
         prompt = ""
         agent = QuantaAgent()
         agent.run(
@@ -48,29 +48,28 @@ class AIUtils:
     
     @staticmethod
     def create_llm(
-            ai_service: str,
             temperature: float,
             cfg: argparse.Namespace
         ) -> BaseChatModel:
             """Creates a language model based on the AI service."""
-            print("Creating LLM: "+ai_service)
+            print("Creating LLM: "+cfg.ai_service)
             timeout = 120  # timeout in seconds
             
-            if ai_service == AIService.OPENAI.value:
+            if cfg.ai_service == AIService.OPENAI.value:
                 llm = ChatOpenAI(
                     model=cfg.openai_model,
                     temperature=temperature,
                     api_key=cfg.openai_api_key,
                     timeout=timeout
                 )
-            elif ai_service == AIService.ANTHROPIC.value:
+            elif cfg.ai_service == AIService.ANTHROPIC.value:
                 llm = ChatAnthropic(
                     model=cfg.anth_model, # type: ignore
                     temperature=temperature,
                     api_key=cfg.anth_api_key,
                     timeout=timeout
                 ) # type: ignore 
-            elif ai_service == AIService.GEMINI.value:
+            elif cfg.ai_service == AIService.GEMINI.value:
                 llm = ChatGoogleGenerativeAI(
                     model=cfg.gemini_model,
                     temperature=temperature,
@@ -78,5 +77,5 @@ class AIUtils:
                     timeout=timeout
             )
             else:
-                raise Exception(f"Invalid AI Service: {ai_service}")
+                raise Exception(f"Invalid AI Service: {cfg.ai_service}")
             return llm

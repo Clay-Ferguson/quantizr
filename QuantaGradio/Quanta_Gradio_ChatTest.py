@@ -17,7 +17,7 @@ from common.python.agent.ai_utils import AIUtils
 if __name__ == "__main__":
     print("Quanta Gradio Starting...")
     AppConfig.init_config()
-    llm = AIUtils.create_llm(AppConfig.cfg.ai_service, 0.0, AppConfig.cfg)
+    llm = AIUtils.create_llm(0.0, AppConfig.cfg)
 
     def predict(message, history):
         chat_history = []        

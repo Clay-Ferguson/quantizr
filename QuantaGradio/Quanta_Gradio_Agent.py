@@ -26,22 +26,15 @@ sys.path.append(PRJ_DIR)
 from app_config import AppConfig
 from common.python.agent.ai_utils import AIUtils
 from common.python.agent.app_agent import QuantaAgent
+from langchain.chat_models.base import BaseChatModel
 from common.python.utils import RefactorMode, Utils
-from common.python.agent.refactoring_tools import (
-   DummyTestTool
-)
 
 if __name__ == "__main__":
     print("Quanta Gradio Starting...")
     AppConfig.init_config()
 
     async def query_ai(prompt, messages):
-        llm = ChatOpenAI(
-                    model=AppConfig.cfg.openai_model, # type: ignore
-                    temperature=1.0,
-                    api_key=AppConfig.cfg.openai_api_key,
-                    timeout=120
-                ) 
+        llm: BaseChatModel = AIUtils.create_llm(1.0, AppConfig.cfg)
         
         # todo-0: make these NEVER have a period on front of the input string from the config file. To be consistent with java code.
         if AppConfig.cfg.scan_extensions is not None:
