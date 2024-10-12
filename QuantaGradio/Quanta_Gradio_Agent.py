@@ -57,6 +57,7 @@ if __name__ == "__main__":
             label="Agent",
             avatar_images=(None, "assets/logo-100px-tr.jpg")
         )
+        # todo-0: we need a separate submit button (not hitting ENTER in text field) and a multiline text field for the input
         input = gr.Textbox(lines=1, label="Chat Message")
         input.submit(query_ai, [input, chatbot], [chatbot])
 
