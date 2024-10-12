@@ -14,7 +14,7 @@ from langchain_core.tools import BaseTool
 import gradio as gr
 from gradio import ChatMessage
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
-from langchain.schema import SystemMessage
+from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 
@@ -50,7 +50,6 @@ if __name__ == "__main__":
     # NOTE: You can remove this line of code as long as you just supply the correct 'model' and 'api_key' values on the line below.
     AppConfig.init_config()
     
-    # todo-0: We have a problem here that this returns something other than BaseLanguageModel
     llm = ChatOpenAI(
                     model=AppConfig.cfg.openai_model, # type: ignore
                     temperature=1.0,
@@ -62,19 +61,29 @@ if __name__ == "__main__":
     
     chat_prompt_template = ChatPromptTemplate.from_messages([
         SystemMessage(content="You are a helpful assistant with access to the following tools:"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
+        MessagesPlaceholder(variable_name="chat_history"),
         HumanMessagePromptTemplate.from_template("Human: {input}"),
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
-    
-    agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
-    agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
 
-    async def queryAI(prompt, messages):
+    async def query_ai(prompt, messages):
+        # Convert messages to a format the agent can understand
+        chat_history = []
+        for msg in messages:
+            if msg['role'] == "user":
+                chat_history.append(HumanMessage(content=msg['content']))
+                # print("HISTORY: human: "+msg['content'])
+            elif msg['role'] == "assistant":
+                chat_history.append(AIMessage(content=msg['content']))
+                # print("HISTORY: assistant: "+msg['content'])
+    
+        agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
+        agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
+        
         messages.append(ChatMessage(role="user", content=prompt))
         yield messages
         async for chunk in agent_executor.astream(
-            {"input": prompt}
+            {"input": prompt, "chat_history": chat_history}
         ):
             if "steps" in chunk:
                 for step in chunk["steps"]:
@@ -96,7 +105,7 @@ if __name__ == "__main__":
             ),
         )
         input = gr.Textbox(lines=1, label="Chat Message")
-        input.submit(queryAI, [input, chatbot], [chatbot])
+        input.submit(query_ai, [input, chatbot], [chatbot])
 
     demo.launch()         
               

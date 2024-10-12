@@ -104,6 +104,7 @@ temperature: {req.temperature}
             folders_to_include = []
             if req.foldersToInclude:
                 folders_to_include = req.foldersToInclude.split("\n")
+                folders_to_include = list(filter(None, folders_to_include))
 
             # todo-0: Implement foldersToExclude
             folders_to_exclude = []

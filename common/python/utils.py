@@ -63,8 +63,9 @@ class Utils:
     @staticmethod
     def allow_folder(folders_to_include: List[str], folders_to_exclude: List[str], short_dir: str) -> bool:
         """Returns True if the file's path should be included in the scan."""
-        return ((len(folders_to_include)==0 or Utils.has_folder(folders_to_include, short_dir))
-                 and (len(folders_to_exclude)==0 or not Utils.has_folder(folders_to_exclude, short_dir)));
+        include_passed = len(folders_to_include)==0 or Utils.has_folder(folders_to_include, short_dir)
+        exclude_passed = len(folders_to_exclude)==0 or not Utils.has_folder(folders_to_exclude, short_dir)        
+        return include_passed and exclude_passed
     
     @staticmethod
     def has_folder(folders: List[str], short_folder: str) -> bool:

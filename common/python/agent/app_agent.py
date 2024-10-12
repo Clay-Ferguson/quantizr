@@ -6,7 +6,12 @@ import time
 from typing import List, Set
 from .project_loader import ProjectLoader
 from .project_mutator import ProjectMutator
-from langchain.schema import HumanMessage, AIMessage, BaseMessage, SystemMessage, BaseMessage
+# todo-0: gradio-related dependencies need to be added to all projects
+#         installer script and also the dockerfile for "quanta_ai"
+from gradio import ChatMessage
+from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, MessagesPlaceholder
+from langchain.schema import HumanMessage, SystemMessage, AIMessage, BaseMessage
+from langchain.agents import AgentExecutor, create_openai_tools_agent, load_tools
 from langchain.chat_models.base import BaseChatModel
 from langgraph.prebuilt import chat_agent_executor
 from ..utils import RefactorMode, Utils
@@ -171,9 +176,7 @@ class QuantaAgent:
                     ]
                     print("Created Agent Tools")
                     
-                agent_executor = chat_agent_executor.create_tool_calling_executor(
-                    llm, tools
-                )
+                agent_executor = chat_agent_executor.create_tool_calling_executor(llm, tools)
                 initial_message_len = len(messages)
                 response = agent_executor.invoke({"messages": messages})
                 # print(f"Response: {response}") This prints too much
@@ -199,6 +202,169 @@ class QuantaAgent:
                 self.answer = response.content  # type: ignore
                 messages.append(AIMessage(content=response.content))
 
+        output = f"""AI Model Used: {ai_service}, Mode: {self.mode}, Timestamp: {self.ts}
+____________________________________________________________________________________
+Input Prompt: 
+{input_prompt}
+____________________________________________________________________________________
+LLM Output: 
+{self.answer}
+____________________________________________________________________________________
+System Prompt: 
+{self.system_prompt}
+____________________________________________________________________________________
+Final Prompt: 
+{self.prompt}
+"""
+
+        filename = f"{self.data_folder}/{output_file_name}.txt"
+        FileUtils.write_file(filename, output)
+        print(f"Wrote Log File: {filename}")
+
+        if self.parse_prompt and self.answer:
+            self.inject_answer(self.prj_loader.file_with_prompt, self.answer, self.ok_hal)
+            
+        if self.mode == RefactorMode.REFACTOR.value:
+            ProjectMutator(
+                self.mode,
+                self.source_folder,
+                self.folders_to_include,
+                self.folders_to_exclude,
+                self.answer,
+                self.ts,
+                None,
+                self.prj_loader.blocks,
+                self.ext_set
+            ).run()
+
+    # todo-0: eventually we will reduce the duplication between 'run' and 'run_gradio'
+    async def run_gradio(
+        self,
+        user_system_prompt: str,
+        ai_service: str,
+        mode: str,
+        output_file_name: str,
+        messages, # todo-0: add type here: List[BaseMessage],
+        input_prompt: str,
+        parse_prompt: bool,
+        source_folder: str,
+        folders_to_include: List[str],
+        folders_to_exclude: List[str],
+        data_folder: str,
+        ext_set: Set[str],
+        llm: BaseChatModel,
+        ok_hal: str,
+    ):
+        self.data_folder = data_folder
+        self.source_folder = source_folder
+        self.source_folder_len: int = len(source_folder)
+        self.folders_to_include = folders_to_include
+        self.folders_to_exclude = folders_to_exclude
+        self.prj_loader = ProjectLoader(self.source_folder_len, ext_set, folders_to_include, folders_to_exclude, parse_prompt, ok_hal)
+        self.prompt = input_prompt
+        self.parse_prompt = parse_prompt
+        self.ok_hal = ok_hal
+        self.mode = mode
+        self.ext_set = ext_set
+
+        # default filename to timestamp if empty
+        if output_file_name == "":
+            output_file_name = self.ts
+
+        # Scan the source folder for files with the specified extensions, to build up the 'blocks' dictionary
+        self.prj_loader.scan_directory(self.source_folder)
+        
+        if self.parse_prompt: 
+            if not self.prj_loader.parsed_prompt:
+                raise Exception("Oops. No 'ok hal' prompt was found in the source files, or else no '?' terminator line after the prompt.")
+            
+            if (self.prj_loader.file_with_prompt):
+                # get file extension from file_with_prompt filename
+                ext = os.path.splitext(self.prj_loader.file_with_prompt)[1]
+                self.prompt = self.prompt + self.get_file_type_mention(ext);
+        
+        # if we just got our prompt from scanning files then set it in self.prompt
+        if (self.prj_loader.parsed_prompt):
+            self.prompt, self.prompt_code = self.parse_prompt_and_code(self.prj_loader.parsed_prompt)
+        
+        if (self.prompt_code): 
+            self.prompt += "\n<code>\n" + self.prompt_code + "\n</code>\n"
+
+        raw_prompt = self.prompt
+
+        self.prompt = self.insert_blocks_into_prompt(self.prompt)
+        self.prompt = PromptUtils.insert_files_into_prompt(
+            self.prompt, self.source_folder, self.prj_loader.file_names
+        )
+        self.prompt = PromptUtils.insert_folders_into_prompt(
+            self.prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
+        )
+        
+        if user_system_prompt:
+            user_system_prompt = self.insert_blocks_into_prompt(user_system_prompt)
+            user_system_prompt = PromptUtils.insert_files_into_prompt(
+                user_system_prompt, self.source_folder, self.prj_loader.file_names
+            )
+            user_system_prompt = PromptUtils.insert_folders_into_prompt(
+                user_system_prompt, self.source_folder, self.folders_to_include, self.folders_to_exclude, self.ext_set
+            )
+        
+        if (self.parse_prompt): 
+            if (self.prompt_code):  
+                self.system_prompt = PromptUtils.get_template(
+                    "../common/python/agent/prompt_templates/okhal_system_prompt_with_code.txt"
+                )
+            else:
+                self.system_prompt = PromptUtils.get_template(
+                    "../common/python/agent/prompt_templates/okhal_system_prompt.txt"
+                )
+        else:
+            self.build_system_prompt(user_system_prompt)
+
+        tools = [
+            UpdateBlockTool("Block Updater Tool", self.prj_loader.blocks),
+            CreateFileTool("File Creator Tool", self.source_folder),
+            UpdateFileTool("File Updater Tool", self.source_folder),
+        ]
+        print("Created Agent Tools")
+            
+        chat_prompt_template = ChatPromptTemplate.from_messages([
+            SystemMessage(content=self.system_prompt),
+            MessagesPlaceholder(variable_name="chat_history"), # todo-0: if this works, be sure to add to other code
+            HumanMessagePromptTemplate.from_template("Human: {input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
+        ])
+    
+        # Convert messages to a format the agent can understand
+        chat_history = []
+        # print("Building History...")
+        
+        for msg in messages:
+            if msg['role'] == "user":
+                chat_history.append(HumanMessage(content=msg['content']))
+                # print("HISTORY: human: "+msg['content'])
+            elif msg['role'] == "assistant":
+                chat_history.append(AIMessage(content=msg['content']))
+                # print("HISTORY: assistant: "+msg['content'])
+
+        agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
+        agent_executor = AgentExecutor(agent=agent, tools=tools).with_config({"run_name": "Agent"})
+        
+        messages.append(ChatMessage(role="user", content=self.prompt))
+        yield messages
+        
+        async for chunk in agent_executor.astream(
+            {"input": self.prompt, "chat_history": chat_history}
+        ):
+            if "steps" in chunk:
+                for step in chunk["steps"]:
+                    messages.append(ChatMessage(role="assistant", content=step.action.log,
+                                    metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
+                    yield messages
+            if "output" in chunk:
+                messages.append(ChatMessage(role="assistant", content=chunk["output"]))
+                yield messages
+            
         output = f"""AI Model Used: {ai_service}, Mode: {self.mode}, Timestamp: {self.ts}
 ____________________________________________________________________________________
 Input Prompt: 

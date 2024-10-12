@@ -34,95 +34,66 @@ from common.python.agent.refactoring_tools import (
 if __name__ == "__main__":
     print("Quanta Gradio Starting...")
     AppConfig.init_config()
-    
-    # todo-0: We have a problem here that this returns something other than BaseLanguageModel
-    # llm = AIUtils.create_llm(AppConfig.cfg.ai_service, 0.0, AppConfig.cfg)
-    llm = ChatOpenAI(
+
+    async def query_ai(prompt, messages):
+        llm = ChatOpenAI(
                     model=AppConfig.cfg.openai_model, # type: ignore
                     temperature=1.0,
                     api_key=AppConfig.cfg.openai_api_key,
                     timeout=120
                 ) 
-    
-    tools = [DummyTestTool("My Dummy Test Tool")]
-    
-    promptTemplate = "You are a helpful assistant. Answer the following question: {input}"
-    
-    chat_prompt_template = ChatPromptTemplate.from_messages([
-        SystemMessage(content="You are a helpful assistant with access to the following tools:"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-        HumanMessagePromptTemplate.from_template("Human: {input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
-    
-    agent = create_openai_tools_agent(llm, tools, chat_prompt_template)
-    agent_executor = AgentExecutor(agent=agent, tools=tools).with_config(
-        {"run_name": "Agent"}
-    )
-
-    async def queryAI(prompt, messages):
-        # print("CodingAgent mode")
-        # if AppConfig.cfg.scan_extensions is not None:
-        #     # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
-        #     ext_set: Set[str] = {f".{ext.strip()}" for ext in AppConfig.cfg.scan_extensions.split(',')}
-
-        # folders_to_include = []
-        # if AppConfig.cfg.folders_to_include is not None:
-        #     folders_to_include = AppConfig.cfg.folders_to_include.split("\n")
-
-        # # todo-0: Implement foldersToExclude
-        # folders_to_exclude = []
-
-        # agent = QuantaAgent()
-        # agent.run(
-        #     "", # req.systemPrompt if req.systemPrompt else "",
-        #     "anth", # req.service,
-        #     RefactorMode.REFACTOR.value,
-        #     "",
-        #     messages,
-        #     "What is the capital of France", # req.prompt if req.prompt else "",
-        #     False,
-        #     # Note: These folders are defined by the docker compose yaml file as volumes.
-        #     "/projects",
-        #     folders_to_include,
-        #     folders_to_exclude,
-        #     "/data",
-        #     ext_set,
-        #     llm,
-        #     ""
-        # )
         
-        # begin Gradio
-        messages.append(ChatMessage(role="user", content=prompt))
-        yield messages
-        async for chunk in agent_executor.astream(
-            {"input": prompt}
+        # todo-0: make these NEVER have a period on front of the input string from the config file. To be consistent with java code.
+        if AppConfig.cfg.scan_extensions is not None:
+            # Convert the comma delimted string of extensions (without leading dots) to a set of extensions with dots
+            ext_set: Set[str] = {f"{ext.strip()}" for ext in AppConfig.cfg.scan_extensions.split(',')}
+
+        folders_to_include = []
+        if AppConfig.cfg.folders_to_include is not None:
+            folders_to_include = AppConfig.cfg.folders_to_include.split("\n")
+            # remove empty strings
+            folders_to_include = list(filter(None, folders_to_include))
+
+        # todo-0: Implement foldersToExclude
+        folders_to_exclude = []
+
+        agent = QuantaAgent()
+        async for result in agent.run_gradio(
+            "", # extra user system prompt
+            AppConfig.cfg.ai_service,
+            RefactorMode.REFACTOR.value,
+            "", # output_file_name
+            messages,
+            prompt,
+            False, # parse_prompt
+            # Note: These folders are defined by the docker compose yaml file as volumes.
+            AppConfig.cfg.source_folder,
+            folders_to_include,
+            folders_to_exclude,
+            AppConfig.cfg.data_folder,
+            ext_set,
+            llm,
+            ""
         ):
-            if "steps" in chunk:
-                for step in chunk["steps"]:
-                    messages.append(ChatMessage(role="assistant", content=step.action.log,
-                                    metadata={"title": f"🛠️ Used tool {step.action.tool}"}))
-                    yield messages
-            if "output" in chunk:
-                messages.append(ChatMessage(role="assistant", content=chunk["output"]))
-                yield messages
-        # end gradio
-        # answer = messages[-1].content # type: ignore
+            # Handle each yielded result
+            if isinstance(result, list):
+                messages = result
+        yield messages
 
     with gr.Blocks() as demo:
-        gr.Markdown("# Chat with a LangChain Agent 🦜⛓️ and see its thoughts 💭")
+        gr.Markdown("# Quanta Coding Agent")
         chatbot = gr.Chatbot(
             type="messages",
             label="Agent",
             avatar_images=(
+                # todo-0: put our own bot avatars in from local files.
                 None,
                 "https://em-content.zobj.net/source/twitter/141/parrot_1f99c.png",
             ),
         )
         input = gr.Textbox(lines=1, label="Chat Message")
-        input.submit(queryAI, [input, chatbot], [chatbot])
+        input.submit(query_ai, [input, chatbot], [chatbot])
 
     demo.launch()         
-              
     print("Quanta Gradio exiting")
     

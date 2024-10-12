@@ -7,7 +7,7 @@ export PATH="$conda_path/bin:$PATH"
 source $conda_path/bin/activate quanta_gradio
 
 if [[ "$CONDA_DEFAULT_ENV" == "quanta_gradio" ]]; then
-  python3 Quanta_Gradio_AgentTest.py
+  python3 Quanta_Gradio_Agent.py
 else
   echo "Failed to set Conda Environment: Expected quanta_gradio but found $CONDA_DEFAULT_ENV"
   sleep 10s

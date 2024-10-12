@@ -21,9 +21,9 @@ ok_hal: ">"
 # OPENAI = "openai"
 # ANTHROPIC = "anth"
 # GEMINI = "gemini"
-ai_service: "anth"
+ai_service: "openai"
 
-scan_extensions: ".py,.md"
+scan_extensions: ".py,.md,.html,.js,.css"
 data_folder: "/home/clay/ai-agent-temp"
 
 source_folder: "/home/clay/ferguson/Quantizr/QuantaAgent/test_project"
