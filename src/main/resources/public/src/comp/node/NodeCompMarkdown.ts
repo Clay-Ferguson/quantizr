@@ -74,7 +74,7 @@ export class NodeCompMarkdown extends Comp {
         val = this.translateLaTex(val);
 
         // NOTE: we must call removeHiddenUrls before insertMarkdownLinks because the latter will insert markdown links
-        val = S.util.removeHiddenUrls(val);
+        val = S.util.processLines(val);
         val = this.insertMarkdownLinks(urls, val);
         return val;
     }

@@ -956,17 +956,35 @@ export class Util {
         return S.nodeUtil.findNode(nodeId);
     }
 
-    // You can use "* " to not do opengraph, and that you can use "- " to 
-    // show opengraph but not the link url, and "-- " to show opengraph but without long description and without the link url.
-    removeHiddenUrls(content: string): string {
-        if (!content || content.toLowerCase().indexOf("http") === -1) return content;
+    // We do some line-by-line processing of the content to prepare for rendering as markown.
+    // 1) Processing URLS:
+    //     You can use "* " to not do opengraph, and that you can use "- " to 
+    //     show opengraph but not the link url, and "-- " to show opengraph but without long description and without the link url.
+    //
+    // 2) Making HTML Visible, outside of markdown codeblocks
+    //
+    processLines(content: string): string {
+        // check if we have any content to process before looping all lines
+        if (!content || (content.toLowerCase().indexOf("http") === -1 &&
+            content.toLowerCase().indexOf("<") === -1 && content.indexOf(">") === -1)) return content;
 
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
         let ret = "";
         const lines = content.split("\n");
+        let inCodeBlock = false;
 
         if (lines) {
             lines.forEach(line => {
+                if (line.startsWith("```")) {
+                    inCodeBlock = !inCodeBlock;
+                }
+
+                // make '<' and '>' visible in the content
+                if (!inCodeBlock) {
+                    line = line.replace(/</g, "&lt;");
+                    line = line.replace(/>/g, "&gt;");
+                }
+
                 if (line.startsWith("-")) {
                     if (line.startsWith("- http://") || line.startsWith("- https://") ||
                         line.startsWith("-- http://") || line.startsWith("-- https://")) {
