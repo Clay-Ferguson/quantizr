@@ -4,6 +4,7 @@ import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
+import { HistoryUtil } from "./HistoryUtil";
 import { FullScreenType } from "./Interfaces";
 import * as J from "./JavaIntf";
 import { PrincipalName } from "./JavaIntf";
@@ -104,6 +105,70 @@ export class Quanta {
         }
     }
 
+    _onPopState = async (event) => {
+        // Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
+        HistoryUtil.historyUpdateEnabled = false; //todo-0: use 'finally' to reset back to true
+
+        try {
+            // parse the value of the 'view' parameter in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get("view");
+
+            // first check if we need to navigate to a view (instead of the default being the Folders view)
+            switch (view) {
+                case "doc":
+                    if (S.tabUtil.resultSetHasData(C.TAB_DOCUMENT)) {
+                        S.tabUtil.selectTab(C.TAB_DOCUMENT);
+                        return;
+                    }
+                    break;
+                case "feed":
+                    if (!getAs().isAnonUser || getAs().isAdminUser) {
+                        S.tabUtil.selectTab(C.TAB_FEED);
+                        return;
+                    }
+                    break;
+                case "trending":
+                    if (getAs().statsNodeId !== null) {
+                        S.tabUtil.selectTab(C.TAB_TRENDING);
+                        return;
+                    }
+                    break;
+                case "timeline":
+                    if (S.tabUtil.resultSetHasData(C.TAB_TIMELINE)) {
+                        S.tabUtil.selectTab(C.TAB_TIMELINE);
+                        return;
+                    }
+                    break;
+                case "thread":
+                    // if the Thread View has already been opened, we just go back to it and we don't need the ID
+                    if (getAs().threadViewFromNodeId) { // see also ThreadTab.isVisible()
+                        S.tabUtil.selectTab(C.TAB_THREAD);
+                        return;
+                    }
+                    break;
+                default: break;
+            }
+
+            if (event.state?.nodeId) {
+                await S.view.refreshTree({
+                    nodeId: event.state.nodeId,
+                    zeroOffset: true,
+                    highlightId: event.state.highlightId,
+                    scrollToTop: false,
+                    allowScroll: true,
+                    setTab: true,
+                    forceRenderParent: false,
+                    jumpToRss: false
+                });
+                S.tabUtil.selectTab(C.TAB_MAIN);
+            }
+        }
+        finally {
+            HistoryUtil.historyUpdateEnabled = true;
+        }
+    }
+
     async initApp() {
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
@@ -159,25 +224,9 @@ export class Quanta {
 
             /*
             NOTE: This works in conjunction with pushState, and is part of what it takes to make the
-            back button (browser hisotry) work in the context of SPAs
+            back button (browser hisotry) work in SPAs
             */
-            window.onpopstate = (event) => {
-                Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
-
-                if (event.state && event.state.nodeId) {
-                    S.view.refreshTree({
-                        nodeId: event.state.nodeId,
-                        zeroOffset: true,
-                        highlightId: event.state.highlightId,
-                        scrollToTop: false,
-                        allowScroll: true,
-                        setTab: true,
-                        forceRenderParent: false,
-                        jumpToRss: false
-                    });
-                    S.tabUtil.selectTab(C.TAB_MAIN);
-                }
-            };
+            window.onpopstate = this._onPopState;
 
             this.addPageLevelEventListeners();
             Log.log("initConstants");

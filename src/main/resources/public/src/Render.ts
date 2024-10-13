@@ -436,11 +436,8 @@ export class Render {
                         }
                     }
 
-                    if (s.node && !s.isAnonUser) {
-                        // do this async just for performance
-                        setTimeout(() => {
-                            S.histUtil.updateHistory(targetNode);
-                        }, 10);
+                    if (s.node) {
+                        S.histUtil.updateHistory(targetNode);
                     }
 
                     if (this.debug && s.node) {

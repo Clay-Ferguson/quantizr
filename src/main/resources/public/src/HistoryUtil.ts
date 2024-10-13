@@ -14,6 +14,8 @@ export class HistoryUtil {
     historySaverInterval = null;
     historyDirty = false;
     static NODEHISTORY_KEY = "NodeHistoryData";
+    lastPushedId: string = null;
+    static historyUpdateEnabled = true;
 
     async loadHistoryData() {
         const val: IndexedDBObj = await S.localDB.readObject(HistoryUtil.NODEHISTORY_KEY);
@@ -41,6 +43,8 @@ export class HistoryUtil {
     }
 
     updateHistoryById(nodeId: string, view: string) {
+        if (!HistoryUtil.historyUpdateEnabled) return;
+
         let url = window.location.origin + "?id=" + nodeId;
         if (view) {
             url += "&view=" + view;
@@ -48,16 +52,26 @@ export class HistoryUtil {
         const newHistObj = {
             nodeId
         };
+
         history.pushState(newHistObj, "Open View", url);
+        // console.log("PUSHED STATE(with view) url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
     }
 
     updateHistory(node: NodeInfo) {
+        if (!HistoryUtil.historyUpdateEnabled) return;
+        const ast = getAs();
+
         if (!node) {
-            node = getAs().node;
+            node = ast.node;
         }
         if (!node) {
             return;
         }
+
+        if (this.lastPushedId === node.id) {
+            return;
+        }
+        this.lastPushedId = node.id;
 
         let content = S.nodeUtil.getShortContent(node);
         if (!content) {
@@ -82,16 +96,18 @@ export class HistoryUtil {
             title = content;
         }
 
-        if (newHistObj.nodeId === history.state?.nodeId) {
-            history.replaceState(newHistObj, title, url);
-            // console.log("REPLACED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
-        }
-        else {
-            history.pushState(newHistObj, title, url);
-            // console.log("PUSHED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
-        }
+        // if (newHistObj.nodeId === history.state?.nodeId) {
+        //     history.replaceState(newHistObj, title, url);
+        //     console.log("REPLACED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
+        // }
+        // else {
+        history.pushState(newHistObj, title, url);
+        // console.log("PUSHED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
+        // }
 
-        this.updateNodeHistory(node, false);
+        if (!ast.isAnonUser) {
+            this.updateNodeHistory(node, false);
+        }
     }
 
     // If 'addLater=true' this means we can't alter state right now, because it could destroy text

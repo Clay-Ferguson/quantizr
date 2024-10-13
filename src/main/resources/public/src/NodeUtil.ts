@@ -105,10 +105,6 @@ export class NodeUtil {
             return;
         }
 
-        if (!ust.isAnonUser) {
-            S.histUtil.updateHistory(node);
-        }
-
         // this highlightNodeId is only really used to ensure state change happens, but really
         // everything always keys off parentIdToFocusNodeMap actually reading the value.
         dispatch("highlightNode", s => s.highlightNodeId = node.id);
