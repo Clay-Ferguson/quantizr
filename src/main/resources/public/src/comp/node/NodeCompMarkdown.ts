@@ -20,6 +20,8 @@ export class NodeCompMarkdown extends Comp {
     static COLLAPSE_TITLE_END = "**-";
     static CENTERING_START = "->";
     static CENTERING_END = "<-";
+    static CENTERING_START2 = "-&gt;";
+    static CENTERING_END2 = "&lt;-";
 
 
     // I had this named 'content' but it confused TypeScript and interfered with the Html constructor,
@@ -153,20 +155,6 @@ export class NodeCompMarkdown extends Comp {
         blank line, will be hidden until the user clicks the section title to expand it. 
     */
     processSpecialMarkdown(content: string) {
-        let hasCollapse = false;
-        if (content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_START) != -1 && //
-            content.indexOf(NodeCompMarkdown.COLLAPSE_TITLE_END) != -1) {
-            hasCollapse = true;
-        }
-
-        let hasCentering = false;
-        if (content.indexOf(NodeCompMarkdown.CENTERING_START) != -1 && //
-            content.indexOf(NodeCompMarkdown.CENTERING_END) != -1) {
-            hasCentering = true;
-        }
-
-        if (!hasCollapse && !hasCentering) return null;
-
         content = content || "";
         content = content.replaceAll("\r", "");
         const lines = content.split("\n");
@@ -197,6 +185,12 @@ export class NodeCompMarkdown extends Comp {
             else if (!inGatedSection && line.startsWith(NodeCompMarkdown.CENTERING_START) && //
                 line.endsWith(NodeCompMarkdown.CENTERING_END)) {
                 const centeredText = line.substring(2, line.length - 2).trim();
+                children.push(createElement(ReactMarkdownComp as any, { className: "centeredText" }, centeredText));
+                return;
+            }
+            else if (!inGatedSection && line.startsWith(NodeCompMarkdown.CENTERING_START2) && //
+                line.endsWith(NodeCompMarkdown.CENTERING_END2)) {
+                const centeredText = line.substring(5, line.length - 5).trim();
                 children.push(createElement(ReactMarkdownComp as any, { className: "centeredText" }, centeredText));
                 return;
             }
