@@ -42,12 +42,22 @@ export class HistoryUtil {
         this.historySaverInterval = setInterval(this._historySaverFunc, 5000);
     }
 
-    updateHistoryById(nodeId: string, view: string) {
+    /* Pushes history with nodeId and/or view */
+    pushHistory(nodeId: string, view: string) {
         if (!HistoryUtil.historyUpdateEnabled) return;
 
-        let url = window.location.origin + "?id=" + nodeId;
+        let url = window.location.origin + "?";
+
+        let addedParts = false;
+        if (nodeId) {
+            url += "id=" + nodeId;
+            addedParts = true;
+        }
         if (view) {
-            url += "&view=" + view;
+            if (addedParts) {
+                url += "&";
+            }
+            url += "view=" + view;
         }
         const newHistObj = {
             nodeId
@@ -57,7 +67,7 @@ export class HistoryUtil {
         // console.log("PUSHED STATE(with view) url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
     }
 
-    updateHistory(node: NodeInfo) {
+    pushTreeHistory(node: NodeInfo) {
         if (!HistoryUtil.historyUpdateEnabled) return;
         const ast = getAs();
 
