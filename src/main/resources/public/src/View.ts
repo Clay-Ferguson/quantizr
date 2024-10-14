@@ -314,12 +314,12 @@ export class View {
         });
 
         dispatch("showNodeStats", s => {
-            // lookup data for TAB_TRENDING and set the data with res
-            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_TRENDING);
+            // lookup data for TAB_STATS and set the data with res
+            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_STATS);
             data.props.res = res;
 
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
-            s.activeTab = C.TAB_TRENDING;
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_STATS);
+            s.activeTab = C.TAB_STATS;
             s.statsNodeId = node.id;
         });
     }
@@ -346,10 +346,10 @@ export class View {
         });
 
         dispatch("showNodeStats", s => {
-            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_TRENDING);
+            const data: TabBase = S.tabUtil.getAppTabData(C.TAB_STATS);
             data.props.res = res;
-            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING);
-            s.activeTab = C.TAB_TRENDING;
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_STATS);
+            s.activeTab = C.TAB_STATS;
             s.statsNodeId = node.id;
         });
     }

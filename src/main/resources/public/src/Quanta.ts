@@ -309,7 +309,7 @@ export class Quanta {
                 initialTab = C.TAB_FEED;
                 break;
             case StatisticsTab.URL_PARAM:
-                initialTab = C.TAB_TRENDING;
+                initialTab = C.TAB_STATS;
                 break;
             case ThreadTab.URL_PARAM:
                 initialTab = C.TAB_THREAD;
@@ -322,7 +322,7 @@ export class Quanta {
                 break;
         }
 
-        if (initialTab === C.TAB_TRENDING) {
+        if (initialTab === C.TAB_STATS) {
             S.tabUtil.selectTab(initialTab);
             return;
         }

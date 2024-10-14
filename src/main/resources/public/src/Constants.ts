@@ -45,7 +45,7 @@ export class Constants {
     // note: This tab name does exist in java, so we probably should put it in a constants that comes from JAVA.
     static TAB_FEED: string = "feedTab";
 
-    static TAB_TRENDING: string = "trendingTab";
+    static TAB_STATS: string = "statsTab";
     static TAB_THREAD: string = "threadTab";
     static TAB_REPLIES: string = "repliesTab";
     static TAB_SERVERINFO: string = "serverInfoTab";

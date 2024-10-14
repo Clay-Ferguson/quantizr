@@ -10,10 +10,10 @@ import { StatisticsView } from "../StatisticsView";
 export class StatisticsTab extends TabBase<StatisticsRSInfo> {
     name = "Node Stats";
     tooltip = "Statistics about the node and its children";
-    id = C.TAB_TRENDING;
+    id = C.TAB_STATS;
     props = new StatisticsRSInfo();
     static inst: StatisticsTab = null;
-    static URL_PARAM = "trending"; // todo-0: rename to 'stats'
+    static URL_PARAM = "stats";
 
     constructor() {
         super();
@@ -26,7 +26,7 @@ export class StatisticsTab extends TabBase<StatisticsRSInfo> {
 
     static selectIfOpened(): boolean {
         if (StatisticsTab.inst.isVisible()) {
-            S.tabUtil.selectTab(C.TAB_TRENDING);
+            S.tabUtil.selectTab(C.TAB_STATS);
             return true;
         }
         return false;
