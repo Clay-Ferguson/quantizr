@@ -13,6 +13,7 @@ export class BreadcrumbsPanel extends Comp {
     }
 
     override preRender(): boolean | null {
+        if (!getAs().node) return false;
         this.children = [this.createBreadcrumbs()];
         return true;
     }
@@ -23,7 +24,7 @@ export class BreadcrumbsPanel extends Comp {
         const ast = getAs();
         if (this.breadcrumbs?.length > 0) {
             children = this.breadcrumbs.map(bc => {
-                if (bc.id === ast.node.id) {
+                if (!bc || !ast.node || bc.id === ast.node.id) {
                     // ignore root node or page root node. we don't need it.
                     return null;
                 }
