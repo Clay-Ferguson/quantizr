@@ -2,12 +2,14 @@ import { dispatch, getAs } from "../AppContext";
 import { Comp, ScrollPos } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { TextArea } from "../comp/core/TextArea";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Validator } from "../Validator";
+import { Markdown } from "../comp/core/Markdown";
 
 export class EditTagsDlg extends DialogBase {
     tagsState: Validator = new Validator();
@@ -20,8 +22,21 @@ export class EditTagsDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new Div("Enter custom hashtags, each on a separate line. Tags must start with #. Use '//' prefix to add comments. Blank lines are ignored. Text not starting with `#` will be displayed as headings in the Tags Picker Dialog."),
                 new TextArea("Hashtags", { rows: 15 }, this.tagsState, null, false, 3, this.textScrollPos),
+
+                new CollapsiblePanel("Show Tips", "Hide Tips", null, [
+                    new Markdown(`
+----
+* Enter custom hashtags, each on a separate line. 
+* Tags must start with \'#\'. 
+* Use '//' prefix to add comments. 
+* Blank lines are ignored. 
+* Text not starting with \'#\' (not Hashtags) will be displayed as headings in the Tags Picker Dialog.                      
+`)
+                ], true, (exp: boolean) => {
+                    dispatch("ExpandTagTips", s => s.tagTipsExpanded = exp);
+                }, getAs().tagTipsExpanded, null, "marginTop", "marginTop"),
+
                 new ButtonBar([
                     new Button("Save", this._save, null, "btn-primary"),
                     new Button("Close", this._close, null, "btn-secondary float-end")

@@ -210,7 +210,7 @@ export class SearchContentDlg extends DialogBase {
                     s.highlightText = null;
                 })
             }),
-            !getAs().isAnonUser ? new IconButton("fa-tag fa-lg", "", {
+            !getAs().isAnonUser ? new IconButton("fa-tag fa-lg", "Hashtags", {
                 onClick: async () => {
                     const dlg = new SelectTagsDlg("search", this.searchTextState.getValue(), true);
                     await dlg.open();

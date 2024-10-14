@@ -55,6 +55,7 @@ export class AppState {
     otherAccountNodesExpanded: boolean = false;
     linksToAttachmentsExpanded: boolean = false;
     searchTipsExpanded: boolean = false;
+    tagTipsExpanded: boolean = false;
     aiPromptsExpanded: boolean = false;
 
     /* name of currently logged in user */
