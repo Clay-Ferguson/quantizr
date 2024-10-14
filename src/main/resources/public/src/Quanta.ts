@@ -10,6 +10,12 @@ import * as J from "./JavaIntf";
 import { PrincipalName } from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
+import { AISettingsTab } from "./tabs/data/AISettingsTab";
+import { DocumentTab } from "./tabs/data/DocumentTab";
+import { FeedTab } from "./tabs/data/FeedTab";
+import { StatisticsTab } from "./tabs/data/StatisticsTab";
+import { ThreadTab } from "./tabs/data/ThreadTab";
+import { TimelineTab } from "./tabs/data/TimelineTab";
 import { StatisticsView } from "./tabs/StatisticsView";
 
 export class Quanta {
@@ -107,7 +113,7 @@ export class Quanta {
 
     _onPopState = async (event) => {
         // Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
-        HistoryUtil.historyUpdateEnabled = false; //todo-0: use 'finally' to reset back to true
+        HistoryUtil.historyUpdateEnabled = false;
 
         try {
             // parse the value of the 'view' parameter in the URL
@@ -116,36 +122,23 @@ export class Quanta {
 
             // first check if we need to navigate to a view (instead of the default being the Folders view)
             switch (view) {
-                case "doc":
-                    if (S.tabUtil.resultSetHasData(C.TAB_DOCUMENT)) {
-                        S.tabUtil.selectTab(C.TAB_DOCUMENT);
-                        return;
-                    }
+                case DocumentTab.URL_PARAM:
+                    if (DocumentTab.selectIfOpened()) return;
                     break;
-                case "feed":
-                    if (!getAs().isAnonUser || getAs().isAdminUser) {
-                        S.tabUtil.selectTab(C.TAB_FEED);
-                        return;
-                    }
+                case FeedTab.URL_PARAM:
+                    if (FeedTab.selectIfOpened()) return;
                     break;
-                case "trending":
-                    if (getAs().statsNodeId !== null) {
-                        S.tabUtil.selectTab(C.TAB_TRENDING);
-                        return;
-                    }
+                case StatisticsTab.URL_PARAM:
+                    if (StatisticsTab.selectIfOpened()) return;
                     break;
-                case "timeline":
-                    if (S.tabUtil.resultSetHasData(C.TAB_TIMELINE)) {
-                        S.tabUtil.selectTab(C.TAB_TIMELINE);
-                        return;
-                    }
+                case TimelineTab.URL_PARAM:
+                    if (TimelineTab.selectIfOpened()) return;
                     break;
-                case "thread":
-                    // if the Thread View has already been opened, we just go back to it and we don't need the ID
-                    if (getAs().threadViewFromNodeId) { // see also ThreadTab.isVisible()
-                        S.tabUtil.selectTab(C.TAB_THREAD);
-                        return;
-                    }
+                case ThreadTab.URL_PARAM:
+                    if (ThreadTab.selectIfOpened()) return;
+                    break;
+                case AISettingsTab.URL_PARAM:
+                    if (AISettingsTab.selectIfOpened()) return;
                     break;
                 default: break;
             }
@@ -309,19 +302,19 @@ export class Quanta {
     async initialRender() {
         let initialTab = null;
         switch (this.config.urlView) {
-            case "doc":
+            case DocumentTab.URL_PARAM:
                 initialTab = C.TAB_DOCUMENT;
                 break;
-            case "feed":
+            case FeedTab.URL_PARAM:
                 initialTab = C.TAB_FEED;
                 break;
-            case "trending":
+            case StatisticsTab.URL_PARAM:
                 initialTab = C.TAB_TRENDING;
                 break;
-            case "thread":
+            case ThreadTab.URL_PARAM:
                 initialTab = C.TAB_THREAD;
                 break;
-            case "timeline":
+            case TimelineTab.URL_PARAM:
                 initialTab = C.TAB_TIMELINE;
                 break;
             default:

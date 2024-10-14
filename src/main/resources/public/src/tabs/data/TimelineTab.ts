@@ -12,7 +12,8 @@ export class TimelineTab extends TabBase<TimelineRSInfo> {
     id = C.TAB_TIMELINE;
     props = new TimelineRSInfo();
     static inst: TimelineTab = null;
-    
+    static URL_PARAM = "timeline";
+
     constructor() {
         super();
         TimelineTab.inst = this;
@@ -21,6 +22,15 @@ export class TimelineTab extends TabBase<TimelineRSInfo> {
     isVisible() {
         return S.tabUtil.resultSetHasData(C.TAB_TIMELINE);
     }
+
+    static selectIfOpened(): boolean {
+        if (TimelineTab.inst.isVisible()) {
+            S.tabUtil.selectTab(C.TAB_TIMELINE);
+            return true;
+        }
+        return false;
+    }
+
     constructView(data: TabBase) {
         return new TimelineResultSetView<TimelineRSInfo>(data);
     }

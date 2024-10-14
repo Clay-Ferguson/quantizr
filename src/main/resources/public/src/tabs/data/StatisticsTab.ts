@@ -13,7 +13,8 @@ export class StatisticsTab extends TabBase<StatisticsRSInfo> {
     id = C.TAB_TRENDING;
     props = new StatisticsRSInfo();
     static inst: StatisticsTab = null;
-    
+    static URL_PARAM = "trending"; // todo-0: rename to 'stats'
+
     constructor() {
         super();
         StatisticsTab.inst = this;
@@ -22,7 +23,15 @@ export class StatisticsTab extends TabBase<StatisticsRSInfo> {
     isVisible() {
         return getAs().statsNodeId !== null;
     }
-    
+
+    static selectIfOpened(): boolean {
+        if (StatisticsTab.inst.isVisible()) {
+            S.tabUtil.selectTab(C.TAB_TRENDING);
+            return true;
+        }
+        return false;
+    }
+
     constructView(data: TabBase) {
         return new StatisticsView(data);
     }

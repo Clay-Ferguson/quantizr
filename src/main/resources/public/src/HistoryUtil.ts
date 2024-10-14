@@ -14,7 +14,7 @@ export class HistoryUtil {
     historySaverInterval = null;
     historyDirty = false;
     static NODEHISTORY_KEY = "NodeHistoryData";
-    lastPushedId: string = null;
+    lastPushedUrl: string = null;
     static historyUpdateEnabled = true;
 
     async loadHistoryData() {
@@ -63,6 +63,11 @@ export class HistoryUtil {
             nodeId
         };
 
+        if (this.lastPushedUrl === url) {
+            return;
+        }
+        this.lastPushedUrl = url;
+
         history.pushState(newHistObj, "Open View", url);
         // console.log("PUSHED STATE(with view) url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
     }
@@ -77,11 +82,6 @@ export class HistoryUtil {
         if (!node) {
             return;
         }
-
-        if (this.lastPushedId === node.id) {
-            return;
-        }
-        this.lastPushedId = node.id;
 
         let content = S.nodeUtil.getShortContent(node);
         if (!content) {
@@ -106,14 +106,12 @@ export class HistoryUtil {
             title = content;
         }
 
-        // if (newHistObj.nodeId === history.state?.nodeId) {
-        //     history.replaceState(newHistObj, title, url);
-        //     console.log("REPLACED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
-        // }
-        // else {
+        if (this.lastPushedUrl === url) {
+            return;
+        }
+        this.lastPushedUrl = url;
+
         history.pushState(newHistObj, title, url);
-        // console.log("PUSHED STATE: title: " + title + " url: " + url + ", state: " + JSON.stringify(newHistObj) + " length=" + history.length);
-        // }
 
         if (!ast.isAnonUser) {
             this.updateNodeHistory(node, false);

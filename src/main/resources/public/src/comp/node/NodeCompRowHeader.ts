@@ -122,7 +122,7 @@ export class NodeCompRowHeader extends Comp {
             // if not on main tab or feed tab show a jump to node icon
             if (this.tabData.id !== C.TAB_MAIN) {
                 children.push(new Icon({
-                    title: "Jump To Node",
+                    title: "Jump To Node in Folders View",
                     className: "fa fa-arrow-right fa-lg rowHeaderIcon",
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav._clickSearchNode

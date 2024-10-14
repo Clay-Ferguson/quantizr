@@ -163,7 +163,7 @@ export class NodeCompRow extends Comp {
                 jumpButton = new IconButton("fa-arrow-right", null, {
                     [C.NODE_ID_ATTR]: targetId,
                     onClick: S.nav._jumpToNode,
-                    title: "Jump to Node"
+                    title: "Jump to Node in Folders View"
                 }, "btn-secondary float-end");
             }
         }

@@ -224,7 +224,7 @@ export class EditNodeDlg extends DialogBase {
         if (this.showJumpButton) {
             span = span || new Span();
             span.addChild(new Icon({
-                title: "Jump to Node",
+                title: "Jump to Node in Folders View",
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
                     this.utl.cancelEdit();

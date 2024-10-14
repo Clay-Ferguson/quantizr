@@ -14,6 +14,7 @@ export class FeedTab extends TabBase<FeedViewProps> {
     tooltip = "Reverse-chronological list of Fediverse posts";
     id = C.TAB_FEED;
     props = new FeedViewProps();
+    static URL_PARAM = "feed";
 
     static inst: FeedTab = null;
     constructor() {
@@ -24,6 +25,15 @@ export class FeedTab extends TabBase<FeedViewProps> {
     isVisible() {
         return !getAs().isAnonUser || getAs().isAdminUser;
     }
+
+    static selectIfOpened(): boolean {
+        if (FeedTab.inst.isVisible()) {
+            S.tabUtil.selectTab(C.TAB_FEED);
+            return true;
+        }
+        return false;
+    }
+
     constructView(data: TabBase<FeedViewProps>) {
         return new FeedView(data);
     }

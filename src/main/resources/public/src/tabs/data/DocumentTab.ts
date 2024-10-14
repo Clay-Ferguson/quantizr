@@ -11,8 +11,9 @@ export class DocumentTab extends TabBase<DocumentRSInfo> {
     tooltip = "Document View of Node"
     id = C.TAB_DOCUMENT;
     props = new DocumentRSInfo();
-
     static inst: DocumentTab = null;
+    static URL_PARAM = "doc";
+
     constructor() {
         super();
         DocumentTab.inst = this;
@@ -21,6 +22,15 @@ export class DocumentTab extends TabBase<DocumentRSInfo> {
     isVisible() {
         return S.tabUtil.resultSetHasData(C.TAB_DOCUMENT);
     }
+
+    static selectIfOpened(): boolean {
+        if (DocumentTab.inst.isVisible()) {
+            S.tabUtil.selectTab(C.TAB_DOCUMENT);
+            return true;
+        }
+        return false;
+    }
+
     constructView(data: TabBase) {
         return new DocumentResultSetView<DocumentRSInfo>(data);
     }

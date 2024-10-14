@@ -78,7 +78,7 @@ export class Search {
         const node = res.nodes?.length > 0 ? res.nodes[res.nodes.length - 1] : null;
 
         if (res.nodes?.length > 0) {
-            S.histUtil.pushHistory(nodeId, "thread");
+            S.histUtil.pushHistory(nodeId, ThreadTab.URL_PARAM);
 
             dispatch("RenderThreadResults", s => {
                 s.highlightSearchNodeId = node.id;
@@ -232,7 +232,7 @@ export class Search {
             includeComments: getAs().userPrefs.showReplies
         });
         S.nodeUtil.processInboundNodes(res.searchResults);
-        S.histUtil.pushHistory(rootId, "doc");
+        S.histUtil.pushHistory(rootId, DocumentTab.URL_PARAM);
 
         if (!res.searchResults || res.searchResults.length === 0) {
             dispatch("RenderDocumentResults", s => {
@@ -328,7 +328,7 @@ export class Search {
             return;
         }
 
-        S.histUtil.pushHistory(nodeId, "timeline");
+        S.histUtil.pushHistory(nodeId, TimelineTab.URL_PARAM);
 
         dispatch("RenderTimelineResults", () => {
             S.domUtil.focusId(C.TAB_TIMELINE);

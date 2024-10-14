@@ -296,6 +296,7 @@ export class Nav {
     _showAISettings = () => {
         AISettingsTab.tabShown = true;
         S.tabUtil.selectTab(C.TAB_AI_SETTINGS);
+        S.histUtil.pushHistory(null, AISettingsTab.URL_PARAM);
     }
 
     _showMainMenu = () => {

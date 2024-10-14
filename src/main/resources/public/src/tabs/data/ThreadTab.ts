@@ -13,14 +13,23 @@ export class ThreadTab extends TabBase<ThreadRSInfo> {
     id = C.TAB_THREAD;
     props = new ThreadRSInfo();
     static inst: ThreadTab = null;
-    
+    static URL_PARAM = "thread";
+
     constructor() {
         super();
         ThreadTab.inst = this;
     }
 
-    isVisible() { 
-        return !!getAs().threadViewFromNodeId; 
+    isVisible() {
+        return !!getAs().threadViewFromNodeId;
+    }
+
+    static selectIfOpened(): boolean {
+        if (ThreadTab.inst.isVisible()) {
+            S.tabUtil.selectTab(C.TAB_THREAD);
+            return true;
+        }
+        return false;
     }
 
     constructView(data: TabBase) {
