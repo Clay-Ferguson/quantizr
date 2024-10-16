@@ -22,6 +22,8 @@ public class UserPreferences {
     private String aiService;
     private String aiAgentFileExtensions;
     private String aiAgentFoldersToInclude;
+    private String aiAgentFoldersToExclude;
+
     private Integer aiMaxWords;
     private Double aiTemperature;
 
@@ -118,6 +120,14 @@ public class UserPreferences {
 
     public void setAiAgentFoldersToInclude(String aiAgentFoldersToInclude) {
         this.aiAgentFoldersToInclude = aiAgentFoldersToInclude;
+    }
+
+    public String getAiAgentFoldersToExclude() {
+        return aiAgentFoldersToExclude;
+    }
+
+    public void setAiAgentFoldersToExclude(String aiAgentFoldersToExclude) {
+        this.aiAgentFoldersToExclude = aiAgentFoldersToExclude;
     }
 
     public String getAiMode() {

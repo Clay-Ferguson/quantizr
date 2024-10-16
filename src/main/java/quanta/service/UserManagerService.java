@@ -628,6 +628,7 @@ public class UserManagerService extends ServiceBase {
             prefsNode.set(NodeProp.USER_PREF_AI_SERVICE, reqUserPrefs.getAiService());
             prefsNode.set(NodeProp.USER_PREF_AI_FILE_EXTENSIONS, reqUserPrefs.getAiAgentFileExtensions());
             prefsNode.set(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE, reqUserPrefs.getAiAgentFoldersToInclude());
+            prefsNode.set(NodeProp.USER_PREF_AI_FOLDERS_TO_EXCLUDE, reqUserPrefs.getAiAgentFoldersToExclude());
             prefsNode.set(NodeProp.USER_PREF_AI_MAX_WORDS, reqUserPrefs.getAiMaxWords());
             prefsNode.set(NodeProp.USER_PREF_AI_TEMPERATURE, reqUserPrefs.getAiTemperature());
 
@@ -929,6 +930,7 @@ public class UserManagerService extends ServiceBase {
             }
             userPrefs.setAiAgentFileExtensions(aiAgentFileExtensions);
             userPrefs.setAiAgentFoldersToInclude(prefsNode.getStr(NodeProp.USER_PREF_AI_FOLDERS_TO_INCLUDE));
+            userPrefs.setAiAgentFoldersToExclude(prefsNode.getStr(NodeProp.USER_PREF_AI_FOLDERS_TO_EXCLUDE));
 
             try {
                 userPrefs.setAiMaxWords(Integer.parseInt(prefsNode.getStr(NodeProp.USER_PREF_AI_MAX_WORDS)));

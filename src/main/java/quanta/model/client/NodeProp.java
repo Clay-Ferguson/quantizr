@@ -37,6 +37,7 @@ public enum NodeProp {
     USER_PREF_AI_SERVICE("sn:aiService"), //
     USER_PREF_AI_FILE_EXTENSIONS("sn:aiAgentFileExtensions"), //
     USER_PREF_AI_FOLDERS_TO_INCLUDE("sn:aiAgentFoldersToInclude"), //
+    USER_PREF_AI_FOLDERS_TO_EXCLUDE("sn:aiAgentFoldersToExclude"), //
     USER_PREF_AI_MAX_WORDS("sn:aiMaxWords"), //
     USER_PREF_AI_TEMPERATURE("sn:aiTemp"), //
     SIGNUP_PENDING("sn:signupPending"), //
@@ -121,6 +122,7 @@ public enum NodeProp {
     UNPUBLISHED("unpub"), //
     AI_PROMPT("ai"), //
     AI_FOLDERS_TO_INCLUDE("aiFolders"), //
+    AI_FOLDERS_TO_EXCLUDE("aiFoldersExclude"), //
     AI_FILE_EXTENSIONS("aiFileExt"), //
     AI_SERVICE("aiService"), //
     AI_QUERY_TEMPLATE("aiTemplate"), //

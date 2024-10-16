@@ -21,15 +21,18 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
     temperatureState: Validator = new Validator();
     fileExtState: Validator = new Validator("");
     foldersToIncludeState: Validator = new Validator();
+    foldersToExcludeState: Validator = new Validator();
     foldersToIncludeScrollPos = new ScrollPos();
+    foldersToExcludeScrollPos = new ScrollPos();
 
     constructor(data: TabBase<any, AISettingsView>) {
         super(data);
         data.inst = this;
         this.fileExtState.setValue(getAs().userPrefs.aiAgentFileExtensions);
         this.foldersToIncludeState.setValue(getAs().userPrefs.aiAgentFoldersToInclude);
-        this.maxWordsState.setValue(""+getAs().userPrefs.aiMaxWords);
-        this.temperatureState.setValue(""+getAs().userPrefs.aiTemperature);
+        this.foldersToExcludeState.setValue(getAs().userPrefs.aiAgentFoldersToExclude);
+        this.maxWordsState.setValue("" + getAs().userPrefs.aiMaxWords);
+        this.temperatureState.setValue("" + getAs().userPrefs.aiTemperature);
     }
 
     sectionTitle(title: string): Heading {
@@ -64,7 +67,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
                         S.quanta.config.paymentLink ?
                             new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton")
-                           : new Span("paymentLink not configured"),
+                            : new Span("paymentLink not configured"),
                     ])
                 ], horzClass) : null,
 
@@ -75,11 +78,15 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                 S.quanta.config.aiAgentEnabled ? new Div(null, {
                     className: "bigMarginRight"
                 }, [
-                    S.quanta.config.aiAgentEnabled ? new TextArea("Folders to Include", {
+                    new TextArea("Folders to Include", {
                         rows: 4,
                         placeholder: "List folders to include (optional)"
-                    }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos) : null,
-                    S.quanta.config.aiAgentEnabled ? new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }) : null,
+                    }, this.foldersToIncludeState, null, false, 3, this.foldersToIncludeScrollPos),
+                    new TextArea("Folders to Exclude", {
+                        rows: 4,
+                        placeholder: "List folders to exclude (optional)"
+                    }, this.foldersToExcludeState, null, false, 3, this.foldersToExcludeScrollPos),
+                    new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
                 ]) : null,
                 new FlexLayout([
                     new TextField({
@@ -104,6 +111,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
         await S.util.saveUserPrefs(s => {
             s.userPrefs.aiAgentFileExtensions = this.fileExtState.getValue();
             s.userPrefs.aiAgentFoldersToInclude = this.foldersToIncludeState.getValue();
+            s.userPrefs.aiAgentFoldersToExclude = this.foldersToExcludeState.getValue();
             s.userPrefs.aiMaxWords = parseInt(this.maxWordsState.getValue());
             s.userPrefs.aiTemperature = parseFloat(this.temperatureState.getValue());
         });
