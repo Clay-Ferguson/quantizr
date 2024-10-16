@@ -52,6 +52,11 @@ public class AIUtil extends ServiceBase {
             verifyOnlyAgent(node, system);
         }
 
+        if (node.hasProp(NodeProp.AI_FOLDERS_TO_EXCLUDE.s())) {
+            system.setFoldersToExclude(node.getStr(NodeProp.AI_FOLDERS_TO_EXCLUDE.s()));
+            verifyOnlyAgent(node, system);
+        }
+
         if (node.hasProp(NodeProp.AI_FILE_EXTENSIONS.s())) {
             system.setFileExtensions(node.getStr(NodeProp.AI_FILE_EXTENSIONS.s()));
             verifyOnlyAgent(node, system);

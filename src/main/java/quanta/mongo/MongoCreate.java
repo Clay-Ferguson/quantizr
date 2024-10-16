@@ -318,6 +318,7 @@ public class MongoCreate extends ServiceBase {
                 UserPreferences userPrefs = TL.getSC().getUserPreferences();
                 system.setFileExtensions(userPrefs.getAiAgentFileExtensions());
                 system.setFoldersToInclude(userPrefs.getAiAgentFoldersToInclude());
+                system.setFoldersToExclude(userPrefs.getAiAgentFoldersToExclude());
                 system.setMaxWords(userPrefs.getAiMaxWords());
                 system.setTemperature(userPrefs.getAiTemperature());
                 svc_aiUtil.getAIConfigFromAncestorNodes(parentNode, system);

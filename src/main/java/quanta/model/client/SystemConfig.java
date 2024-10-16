@@ -5,6 +5,7 @@ public class SystemConfig {
     private String agentNodeId;
     private String prompt; // ex: "you are a helpful assistant"
     private String foldersToInclude; // newline delimited list of file paths
+    private String foldersToExclude; // newline delimited list of file paths
     private String template;
     private String model; // ex: "gpt-4"
     private String service;
@@ -34,6 +35,14 @@ public class SystemConfig {
 
     public void setFoldersToInclude(String filesToInclude) {
         this.foldersToInclude = filesToInclude;
+    }
+
+    public String getFoldersToExclude() {
+        return foldersToExclude;
+    }
+
+    public void setFoldersToExclude(String foldersToExclude) {
+        this.foldersToExclude = foldersToExclude;
     }
 
     public String getModel() {

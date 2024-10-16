@@ -8,6 +8,7 @@ public class AIRequest {
     private String systemPrompt;
     private String prompt;
     private String foldersToInclude;
+    private String foldersToExclude;
     private List<AIMessage> messages;
     private Float temperature;
     private Integer maxTokens;
@@ -71,6 +72,14 @@ public class AIRequest {
 
     public void setFoldersToInclude(String filesToInclude) {
         this.foldersToInclude = filesToInclude;
+    }
+
+    public String getFoldersToExclude() {
+        return foldersToExclude;
+    }
+
+    public void setFoldersToExclude(String foldersToExclude) {
+        this.foldersToExclude = foldersToExclude;
     }
 
     public void setMessages(List<AIMessage> messages) {

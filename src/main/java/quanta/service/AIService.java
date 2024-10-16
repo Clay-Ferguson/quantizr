@@ -92,6 +92,7 @@ public class AIService extends ServiceBase {
         request.setSystemPrompt(system.getPrompt());
         request.setPrompt(input);
         request.setFoldersToInclude(system.getFoldersToInclude());
+        request.setFoldersToExclude(system.getFoldersToExclude());
 
         // if we have a template we're in Writing Mode (not conversation mode), so we don't pass context
         if (system.getTemplate() == null) {

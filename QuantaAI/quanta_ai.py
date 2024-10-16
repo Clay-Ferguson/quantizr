@@ -51,6 +51,7 @@ class AIRequest(BaseModel):
     systemPrompt: Optional[str] = Field(default=None)
     prompt: Optional[str] = Field(default=None)
     foldersToInclude: Optional[str] = Field(default=None)
+    foldersToExclude: Optional[str] = Field(default=None)
     messages: Optional[List[AIBaseMessage]] = Field(default=None)
     service: str
     model: str
@@ -74,6 +75,7 @@ def api_query(req: AIRequest,
 service: {req.service}
 codingAgent: {req.codingAgent}
 foldersToInclude: {req.foldersToInclude}
+foldersToExclude: {req.foldersToExclude}
 maxTokens: {req.maxTokens}
 temperature: {req.temperature}
 """)
@@ -106,8 +108,9 @@ temperature: {req.temperature}
                 folders_to_include = req.foldersToInclude.split("\n")
                 folders_to_include = list(filter(None, folders_to_include))
 
-            # todo-0: Implement foldersToExclude
-            folders_to_exclude = []
+            if req.foldersToExclude:
+                folders_to_exclude = req.foldersToExclude.split("\n")
+                folders_to_exclude = list(filter(None, folders_to_exclude))
 
             messages = buildContext(req)
             agent = QuantaAgent()

@@ -111,6 +111,7 @@ export interface SystemConfig {
     agentNodeId: string;
     prompt: string;
     foldersToInclude: string;
+    foldersToExclude: string;
     template: string;
     model: string;
     service: string;

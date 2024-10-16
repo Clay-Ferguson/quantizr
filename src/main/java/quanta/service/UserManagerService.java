@@ -642,6 +642,7 @@ public class UserManagerService extends ServiceBase {
             userPrefs.setAiService(reqUserPrefs.getAiService());
             userPrefs.setAiAgentFileExtensions(reqUserPrefs.getAiAgentFileExtensions());
             userPrefs.setAiAgentFoldersToInclude(reqUserPrefs.getAiAgentFoldersToInclude());
+            userPrefs.setAiAgentFoldersToExclude(reqUserPrefs.getAiAgentFoldersToExclude());
             userPrefs.setAiMaxWords(reqUserPrefs.getAiMaxWords());
             userPrefs.setAiTemperature(reqUserPrefs.getAiTemperature());
             return null;
