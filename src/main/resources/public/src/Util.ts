@@ -971,16 +971,27 @@ export class Util {
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
         let ret = "";
         const lines = content.split("\n");
-        let inCodeBlock = false;
+        let inBackTickBlock = false;
+        let inSpaceBlock = false;
 
         if (lines) {
             lines.forEach(line => {
-                if (line.startsWith("```")) {
-                    inCodeBlock = !inCodeBlock;
+                const trimmedLine = line.trim();
+                const startsWithSpaceIndent = line.startsWith("    ");
+
+                if (trimmedLine.startsWith("```")) {
+                    inBackTickBlock = !inBackTickBlock;
+                }
+
+                if (!inSpaceBlock && trimmedLine.length > 0 && startsWithSpaceIndent) {
+                    inSpaceBlock = true;
+                }
+                else if (inSpaceBlock && !startsWithSpaceIndent) {
+                    inSpaceBlock = false;
                 }
 
                 // make '<' and '>' visible in the content
-                if (!inCodeBlock) {
+                if (!inBackTickBlock && !inSpaceBlock) {
                     line = line.replace(/</g, "&lt;");
                     line = line.replace(/>/g, "&gt;");
                 }
