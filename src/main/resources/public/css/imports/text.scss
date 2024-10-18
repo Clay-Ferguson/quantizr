@@ -25,6 +25,14 @@
     margin: 0 0 0 6px;
 }
 
+.codeBlockExpanded {
+    max-height: none;
+}
+
+.codeBlockCollapsed {
+    max-height: 200px;
+}
+
 .alertText {
     margin-bottom: 0;
     font-size: 120%;

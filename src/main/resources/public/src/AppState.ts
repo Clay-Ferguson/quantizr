@@ -219,6 +219,7 @@ export class AppState {
     nodeHistoryLocked: boolean;
 
     expandedMenus: Set<string> = new Set<string>();
+    expandedCodeBlocks = new Set<string>();
 
     menuIndexToggle: string = "menu";
     showGptCredit: boolean = false;

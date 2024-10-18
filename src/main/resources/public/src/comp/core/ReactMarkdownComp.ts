@@ -9,6 +9,7 @@ import remarkMath from "remark-math";
 
 // Good styles are: a11yDark, nightOwl, oneLight
 import { nightOwl as highlightStyle } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { dispatch, getAs } from "../../AppContext";
 
 const ReactMarkdownComp = forwardRef((props: any, ref) => {
     props = props || {};
@@ -17,7 +18,7 @@ const ReactMarkdownComp = forwardRef((props: any, ref) => {
     if (props.className) props.className += " mkBody";
     else props.className = "mkBody";
     props.components = {
-        code: _codeFunc,
+        code: (arg: any) => _codeFunc(arg, props.nodeId),
         a: _anchorFunc
     }
 
@@ -34,29 +35,44 @@ const _anchorFunc = (props: any) => {
     return createElement("a", { href: props.href, target: "blank" }, props.children);
 }
 
-const _codeFunc = ({ node, inline, className, children, ...props }) => {
+const _codeFunc = (arg: any, nodeId: string) => {
+    const { node, className, children, ...props } = arg;
     const childrenStr = String(children);
-
-    // After upgrading to latest version 'inline' is undefined so we set it ourselves.
-    inline = !childrenStr.includes("\n");
+    const inline = !childrenStr.includes("\n");
     const match = /language-(\w+)/.exec(className || "");
     const language = match ? match[1] : "txt";
+    const ast = getAs();
+    const expClass = ast.expandedCodeBlocks.has(nodeId) ? "codeBlockExpanded" : "codeBlockCollapsed";
+
     return !inline ? (
-        createElement("div", { className: "smallMarginBottom" }, [
+        createElement("div", { className: "marginBottom" }, [
             createElement("div", { className: "codeDivHeader" }, [
                 createElement("span", {
                     className: "markdownLanguage"
                 }, language === "txt" ? "" : language),
-                createElement("i", {
-                    className: "fa fa-clipboard fa-lg clickable float-end clipboardIcon codeIcon",
-                    onClick: () => S.util.copyToClipboard(children.concat())
-                })
+                createElement("span", { className: "float-end" }, [
+                    createElement("span", {
+                        className: "clickable bigMarginRight",
+                        onClick: () => {
+                            dispatch("toggleCodeBlock", s => {
+                                if (s.expandedCodeBlocks.has(nodeId)) {
+                                    s.expandedCodeBlocks.delete(nodeId);
+                                } else {
+                                    s.expandedCodeBlocks.add(nodeId);
+                                }
+                            });
+                        }
+                    }, "Expand/Collapse"),
+                    createElement("i", {
+                        className: "fa fa-clipboard fa-lg clickable clipboardIcon codeIcon",
+                        onClick: () => S.util.copyToClipboard(children.concat())
+                    })
+                ])
             ]),
-
             createElement(Prism as any, {
                 ...props,
                 style: highlightStyle,
-                className: "codeDivBody",
+                className: "codeDivBody " + expClass,
                 language,
                 PreTag: "div"
             }, childrenStr.replace(/\n$/, ""))

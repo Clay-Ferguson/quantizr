@@ -36,6 +36,7 @@ export class NodeCompMarkdown extends Comp {
         super({ key: "ncmkd_" + node.id });
         this.cont = node.renderContent || node.content;
         const ast = getAs();
+        this.attribs.nodeId = node.id; // this 'nodeId' is needed to track expand collapse of code blocks.
         this.attribs.className = "mkCont";
 
         if (extraContainerClass) {
