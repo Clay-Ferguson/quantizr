@@ -204,6 +204,21 @@ export class OpenGraphPanel extends Comp {
                 ]);
             }
             else {
+                if (this.ui?.shortOg) {
+                    this.attribs.className = this.wrapperClass;
+                    this.children = [
+                        new Img({
+                            className: this.imageClass + " openGraphFlowImage",
+                            src: state.og.image
+                        }),
+                        new Anchor(this.ui.url, state.og.title, {
+                            target: "_blank",
+                            className: "openGraphTitle"
+                        })
+                    ];
+                    return true;
+                }
+
                 // if we have an image then render a left-hand side and right-hand side.
                 imgAndDesc = new FlexRowLayout([
                     new Div(null, { className: "openGraphLhs" }, [
@@ -215,7 +230,7 @@ export class OpenGraphPanel extends Comp {
                     this.ui?.shortOg ? null : new Div(null, { className: "openGraphRhs" }, [
                         new Html(state.og.description, { className: "openGraphDesc" })
                     ])
-                ], "smallMarginBottom");
+                ]);
             }
         }
         // if no image just display the description in a div

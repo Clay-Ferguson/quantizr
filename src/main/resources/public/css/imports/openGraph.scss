@@ -9,11 +9,6 @@
     background-color: #17202A;
 }
 
-.openGraphPanelSimple {
-    margin-left: 12px;
-    overflow-x: hidden;
-}
-
 .openGraphPanelRss {
     overflow-x: hidden;
     margin-top: $smallGap;
@@ -43,6 +38,13 @@
 .openGraphNoImage {
     margin-top: 8px;
     margin-right: 8px;
+}
+
+.openGraphFlowImage {
+    float: left;
+    width: 20%;
+    min-width: 100px;
+    margin: 0 $smallGap 0 0;
 }
 
 .openGraphLhs {

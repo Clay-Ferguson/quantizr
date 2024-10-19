@@ -330,7 +330,7 @@ export class TypeBase implements TypeIntf {
                 // allow max of 50 urls.
                 if (count++ < 50) {
                     const og = new OpenGraphPanel(tabData, "og" + count + "_" + comp.getId(), ui,
-                        ui.shortOg ? "openGraphPanelSimple" : "openGraphPanel", "openGraphImage", true, true, true);
+                        "openGraphPanel", "openGraphImage", true, true, true);
                     children.push(og);
 
                     if (tabData) {
