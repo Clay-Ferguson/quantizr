@@ -1,38 +1,24 @@
 
 package quanta.rest.request;
 
+import quanta.model.client.SearchDefinition;
 import quanta.rest.request.base.RequestBase;
 
 public class NodeSearchRequest extends RequestBase {
+	private SearchDefinition searchDefinition;
 	/* Can be 'curNode' (default, null) or 'allNodes' */
 	private String searchRoot;
 	/* Zero offset page number. First page is zero */
 	private int page;
-	/* ascending=asc, descending=desc */
-	private String sortDir;
-	/* property to sort on */
-	private String sortField;
 
 	/* can be node id or path. server interprets correctly no matter which */
 	private String nodeId;
-	private String searchText;
-	private String searchProp;
-
-	// fuzzy means you can get substring searches, where the substring is not on the FIRST characters of
-	// a term
-	private boolean fuzzy;
-	private boolean caseSensitive;
 
 	// special definition name which gives the server a hint about what kind of search this is
 	private String view;
 
 	private String searchType;
 	private String timeRangeType;
-	private boolean recursive;
-	private boolean requirePriority;
-	private boolean requireAttachment;
-
-	private boolean requireDate;
 
 	// Admin can set this, and it will delete all matches to the search results
 	private boolean deleteMatches;
@@ -45,32 +31,8 @@ public class NodeSearchRequest extends RequestBase {
 		return this.page;
 	}
 
-	public String getSortDir() {
-		return this.sortDir;
-	}
-
-	public String getSortField() {
-		return this.sortField;
-	}
-
 	public String getNodeId() {
 		return this.nodeId;
-	}
-
-	public String getSearchText() {
-		return this.searchText;
-	}
-
-	public String getSearchProp() {
-		return this.searchProp;
-	}
-
-	public boolean isFuzzy() {
-		return this.fuzzy;
-	}
-
-	public boolean isCaseSensitive() {
-		return this.caseSensitive;
 	}
 
 	public String getView() {
@@ -85,18 +47,6 @@ public class NodeSearchRequest extends RequestBase {
 		return this.timeRangeType;
 	}
 
-	public boolean isRecursive() {
-		return this.recursive;
-	}
-
-	public boolean isRequirePriority() {
-		return this.requirePriority;
-	}
-
-	public boolean isRequireAttachment() {
-		return this.requireAttachment;
-	}
-
 	public boolean isDeleteMatches() {
 		return this.deleteMatches;
 	}
@@ -109,32 +59,8 @@ public class NodeSearchRequest extends RequestBase {
 		this.page = page;
 	}
 
-	public void setSortDir(final String sortDir) {
-		this.sortDir = sortDir;
-	}
-
-	public void setSortField(final String sortField) {
-		this.sortField = sortField;
-	}
-
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
-	}
-
-	public void setSearchText(final String searchText) {
-		this.searchText = searchText;
-	}
-
-	public void setSearchProp(final String searchProp) {
-		this.searchProp = searchProp;
-	}
-
-	public void setFuzzy(final boolean fuzzy) {
-		this.fuzzy = fuzzy;
-	}
-
-	public void setCaseSensitive(final boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
 	}
 
 	public void setView(final String view) {
@@ -149,28 +75,16 @@ public class NodeSearchRequest extends RequestBase {
 		this.timeRangeType = timeRangeType;
 	}
 
-	public void setRecursive(final boolean recursive) {
-		this.recursive = recursive;
-	}
-
-	public void setRequirePriority(final boolean requirePriority) {
-		this.requirePriority = requirePriority;
-	}
-
-	public void setRequireAttachment(final boolean requireAttachment) {
-		this.requireAttachment = requireAttachment;
-	}
-
 	public void setDeleteMatches(final boolean deleteMatches) {
 		this.deleteMatches = deleteMatches;
 	}
 
-	public boolean isRequireDate() {
-		return requireDate;
+	public SearchDefinition getSearchDefinition() {
+		return searchDefinition;
 	}
 
-	public void setRequireDate(boolean requireDate) {
-		this.requireDate = requireDate;
+	public void setSearchDefinition(SearchDefinition searchDefinition) {
+		this.searchDefinition = searchDefinition;
 	}
 
 	public NodeSearchRequest() {}

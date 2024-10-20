@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.GraphNode;
+import quanta.model.client.SearchDefinition;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.GraphRequest;
 import quanta.rest.response.GraphResponse;
@@ -22,9 +23,10 @@ public class GraphNodesService extends ServiceBase {
     private int guid = 0;
 
     public GraphResponse cm_graphNodes(GraphRequest req) {
+        SearchDefinition def = req.getSearchDefinition();
         HashMap<String, GraphNode> mapByPath = new HashMap<>();
         GraphResponse res = new GraphResponse();
-        boolean searching = !StringUtils.isEmpty(req.getSearchText());
+        boolean searching = !StringUtils.isEmpty(def.getSearchText());
 
         SubNode node = svc_mongoRead.getNode(req.getNodeId());
         GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false, node.getLinks());
@@ -35,14 +37,15 @@ public class GraphNodesService extends ServiceBase {
         try {
             Iterable<SubNode> results = null;
             // Run subgraph query to get all nodes if no search text provided
-            if (StringUtils.isEmpty(req.getSearchText())) {
+            if (StringUtils.isEmpty(def.getSearchText())) {
                 results = svc_mongoRead.getSubGraph(node, null, 0, false, null);
             }
             // If search text provided run subgraph search.
             else {
                 int limit = TL.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-                results = svc_mongoRead.searchSubGraph(node, null, req.getSearchText(), null, null, limit, 0, true,
-                        false, null, true, false, false, false);
+                results = svc_mongoRead.searchSubGraph(node, null, def.getSearchText(), null, null, limit, 0,
+                        def.isFuzzy(), def.isCaseSensitive(), null, def.isRecursive(), def.isRequirePriority(),
+                        def.isRequireAttachment(), def.isRequireDate());
             }
 
             // Construct the GraphNode object for each result and add to mapByPath

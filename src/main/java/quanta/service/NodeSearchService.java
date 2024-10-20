@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.MergedAnnotations.Search;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.model.client.SearchDefinition;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.GetBookmarksRequest;
@@ -74,8 +76,8 @@ public class NodeSearchService extends ServiceBase {
         int counter = 0;
 
         for (SubNode n : nodes) {
-            NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), n, false, counter + 1, false, false,
-                    false, false, null);
+            NodeInfo info =
+                    svc_convert.toNodeInfo(false, TL.getSC(), n, false, counter + 1, false, false, false, false, null);
             if (info != null) {
                 results.add(info);
             }
@@ -87,31 +89,32 @@ public class NodeSearchService extends ServiceBase {
     }
 
     public NodeSearchResponse cm_search(NodeSearchRequest req) {
+        SearchDefinition def = req.getSearchDefinition();
         NodeSearchResponse res = new NodeSearchResponse();
-        String searchText = req.getSearchText();
+        String searchText = def.getSearchText();
 
         // if no search text OR sort order specified that's a bad request.
         if (StringUtils.isEmpty(searchText) && StringUtils.isEmpty(req.getSearchType()) && //
         // note: for timelines this is called but with a sort
-                StringUtils.isEmpty(req.getSortField())) {
+                StringUtils.isEmpty(def.getSortField())) {
             throw new RuntimeEx("Search text or ordering required.");
         }
         List<NodeInfo> searchResults = new LinkedList<>();
         res.setSearchResults(searchResults);
         int counter = 0;
 
-        if ("node.id".equals(req.getSearchProp())) {
+        if ("node.id".equals(def.getSearchProp())) {
             SubNode node = svc_mongoRead.getNode(searchText);
             if (node != null) {
-                NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                        false, false, false, null);
+                NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, false,
+                        false, null);
                 if (info != null) {
                     res.setNode(info);
                     searchResults.add(info);
                 }
             }
         } //
-        else if ("node.name".equals(req.getSearchProp())) {
+        else if ("node.name".equals(def.getSearchProp())) {
             // Undocumented Feature: You can find named nodes using format ":userName:nodeName"
             if (!searchText.contains(":")) {
                 if (TL.getSC().isAdmin()) {
@@ -122,8 +125,8 @@ public class NodeSearchService extends ServiceBase {
             }
             SubNode node = svc_mongoRead.getNode(searchText);
             if (node != null) {
-                NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                        false, false, false, null);
+                NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, false,
+                        false, null);
                 if (info != null) {
                     res.setNode(info);
                     searchResults.add(info);
@@ -144,6 +147,7 @@ public class NodeSearchService extends ServiceBase {
             }
             // else we're doing a normal subgraph search for the text
             else {
+                // &&& right here we need a way to get Criteria from SearchDefinition
                 SubNode searchRoot = null;
 
                 if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRoot())) {
@@ -152,8 +156,8 @@ public class NodeSearchService extends ServiceBase {
                     searchRoot = svc_mongoRead.getNode(req.getNodeId());
                 }
 
-                NodeInfo rootInfo = svc_convert.toNodeInfo( false, TL.getSC(), searchRoot, false, counter + 1,
-                        false, false, false, false, null);
+                NodeInfo rootInfo = svc_convert.toNodeInfo(false, TL.getSC(), searchRoot, false, counter + 1, false,
+                        false, false, false, null);
                 if (rootInfo != null) {
                     res.setNode(rootInfo);
                 }
@@ -171,14 +175,15 @@ public class NodeSearchService extends ServiceBase {
                      */
                     throw new RuntimeEx("Delete Matches not currently implemented.");
                 } else {
-                    for (SubNode node : svc_mongoRead.searchSubGraph(searchRoot, req.getSearchProp(), searchText,
-                            req.getSortField(), req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(),
-                            ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), req.isFuzzy(), req.isCaseSensitive(),
-                            req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority(),
-                            req.isRequireAttachment(), req.isRequireDate())) {
+                    // &&& find this in nodeGraph
+                    for (SubNode node : svc_mongoRead.searchSubGraph(searchRoot, def.getSearchProp(), searchText,
+                            def.getSortField(), def.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(),
+                            ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), def.isFuzzy(), def.isCaseSensitive(),
+                            req.getTimeRangeType(), def.isRecursive(), def.isRequirePriority(),
+                            def.isRequireAttachment(), def.isRequireDate())) {
                         try {
-                            NodeInfo info = svc_convert.toNodeInfo( adminOnly, TL.getSC(), node, false,
-                                    counter + 1, false, false, false, false, null);
+                            NodeInfo info = svc_convert.toNodeInfo(adminOnly, TL.getSC(), node, false, counter + 1,
+                                    false, false, false, false, null);
                             if (info != null) {
                                 searchResults.add(info);
                             }
@@ -193,11 +198,12 @@ public class NodeSearchService extends ServiceBase {
     }
 
     private void searchLinkedNodes(NodeSearchRequest req, NodeSearchResponse res) {
+        SearchDefinition def = req.getSearchDefinition();
         int counter = 0;
-        for (SubNode node : svc_mongoRead.getLinkedNodes(req.getNodeId(), req.getSearchText())) {
+        for (SubNode node : svc_mongoRead.getLinkedNodes(req.getNodeId(), def.getSearchText())) {
             try {
-                NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                        false, false, false, null);
+                NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, false,
+                        false, null);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -211,8 +217,8 @@ public class NodeSearchService extends ServiceBase {
         int counter = 0;
         for (SubNode node : svc_mongoRead.getRdfSubjects(req.getNodeId())) {
             try {
-                NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                        false, false, false, null);
+                NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, false,
+                        false, null);
                 if (info != null) {
                     res.getSearchResults().add(info);
                 }
@@ -222,21 +228,21 @@ public class NodeSearchService extends ServiceBase {
         }
     }
 
-    private void userSearch(String userDoingAction, NodeSearchRequest req,
-            List<NodeInfo> searchResults) {
+    private void userSearch(String userDoingAction, NodeSearchRequest req, List<NodeInfo> searchResults) {
+        SearchDefinition def = req.getSearchDefinition();
         int counter = 0;
         Val<Iterable<SubNode>> accountNodes = new Val<>();
         // Run this as admin because ordinary users don't have access to account nodes.
         svc_arun.run(() -> {
-            if (req.getSearchText().startsWith("email:")) {
-                String email = req.getSearchText().substring(6);
+            if (def.getSearchText().startsWith("email:")) {
+                String email = def.getSearchText().substring(6);
                 accountNodes.setVal(svc_user.getAccountNodes(Criteria.where("p." + NodeProp.EMAIL.s()).is(email), null, //
                         ConstantInt.ROWS_PER_PAGE.val(), //
                         ConstantInt.ROWS_PER_PAGE.val() * req.getPage()));
                 return null;
             } else {
                 accountNodes.setVal(svc_user.getAccountNodes(
-                        Criteria.where("p." + NodeProp.USER.s()).regex(req.getSearchText(), "i"), null, //
+                        Criteria.where("p." + NodeProp.USER.s()).regex(def.getSearchText(), "i"), null, //
                         ConstantInt.ROWS_PER_PAGE.val(), //
                         ConstantInt.ROWS_PER_PAGE.val() * req.getPage()));
             }
@@ -247,8 +253,8 @@ public class NodeSearchService extends ServiceBase {
             // amount).
             for (SubNode node : accountNodes.getVal()) {
                 try {
-                    NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false,
-                            false, false, false, null);
+                    NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false,
+                            false, false, null);
                     if (info != null) {
                         searchResults.add(info);
                     }
@@ -300,8 +306,8 @@ public class NodeSearchService extends ServiceBase {
                     }
                 }
             }
-            NodeInfo info = svc_convert.toNodeInfo( false, TL.getSC(), node, false, counter + 1, false, false,
-                    false, false, null);
+            NodeInfo info = svc_convert.toNodeInfo(false, TL.getSC(), node, false, counter + 1, false, false, false,
+                    false, null);
             if (info != null) {
                 searchResults.add(info);
             }

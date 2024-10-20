@@ -583,7 +583,18 @@ export class Render {
         node = node || S.nodeUtil.getHighlightedNode();
 
         const res = await S.rpcUtil.rpc<J.GraphRequest, J.GraphResponse>("graphNodes", {
-            searchText,
+            searchDefinition: {
+                searchText,
+                sortDir: null,
+                sortField: null,
+                searchProp: null,
+                fuzzy: false,
+                caseSensitive: false,
+                recursive: true,
+                requirePriority: false,
+                requireAttachment: false,
+                requireDate: false
+            },
             nodeId: node.id
         });
 

@@ -150,23 +150,19 @@ export class Search {
         jumpIfSingleResult: boolean, requireDate: boolean): Promise<boolean> {
 
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+            searchDefinition: {
+                searchText, sortDir, sortField, searchProp: prop, fuzzy, caseSensitive,
+                recursive, requirePriority: false,
+                requireAttachment: false,
+                requireDate: false
+            },
             searchRoot,
             page,
             nodeId, // for user searchTypes this node can be null
-            searchText,
-            sortDir,
-            sortField,
-            searchProp: prop,
-            fuzzy,
-            caseSensitive,
             searchType,
             view: "search",
             timeRangeType: null,
-            recursive,
-            requirePriority,
-            requireAttachment,
             deleteMatches,
-            requireDate
         });
 
         // if exactly one search result found we might want to optionally jump to it on the tree
@@ -303,23 +299,21 @@ export class Search {
         // Note: we don't need to pass 'searchRoot' to the browser, but we do set it in this view's
         // data property because we need it on the client side
         const res = await S.rpcUtil.rpc<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+            searchDefinition: {
+                searchText: "", sortDir: "DESC", sortField: prop,
+                searchProp: null, fuzzy: false, caseSensitive: false,
+                recursive,
+                requirePriority: false,
+                requireAttachment: false,
+                requireDate: false
+            },
             searchRoot: null,
             page,
             nodeId,
-            searchText: "",
-            sortDir: "DESC",
-            sortField: prop,
-            searchProp: null,
-            fuzzy: false,
-            caseSensitive: false,
             view: "timeline",
             searchType: null,
             timeRangeType,
-            recursive,
-            requirePriority: false,
-            requireAttachment: false,
             deleteMatches: false,
-            requireDate: false
         });
         S.nodeUtil.processInboundNodes(res.searchResults);
 

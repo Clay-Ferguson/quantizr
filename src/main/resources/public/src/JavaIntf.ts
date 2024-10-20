@@ -107,6 +107,19 @@ export interface SchemaOrgRange {
     id: string;
 }
 
+export interface SearchDefinition {
+    searchText: string;
+    sortDir: string;
+    sortField: string;
+    searchProp: string;
+    fuzzy: boolean;
+    caseSensitive: boolean;
+    recursive: boolean;
+    requirePriority: boolean;
+    requireAttachment: boolean;
+    requireDate: boolean;
+}
+
 export interface SystemConfig {
     agentNodeId: string;
     prompt: string;
@@ -335,7 +348,7 @@ export interface GetUserProfileRequest extends RequestBase {
 
 export interface GraphRequest extends RequestBase {
     nodeId: string;
-    searchText: string;
+    searchDefinition: SearchDefinition;
 }
 
 export interface ImportJsonRequest extends RequestBase {
@@ -416,22 +429,13 @@ export interface NodeFeedRequest extends RequestBase {
 }
 
 export interface NodeSearchRequest extends RequestBase {
+    searchDefinition: SearchDefinition;
     searchRoot: string;
     page: number;
-    sortDir: string;
-    sortField: string;
     nodeId: string;
-    searchText: string;
-    searchProp: string;
-    fuzzy: boolean;
-    caseSensitive: boolean;
     view: string;
     searchType: string;
     timeRangeType: string;
-    recursive: boolean;
-    requirePriority: boolean;
-    requireAttachment: boolean;
-    requireDate: boolean;
     deleteMatches: boolean;
 }
 

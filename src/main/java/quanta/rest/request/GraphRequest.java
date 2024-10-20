@@ -1,30 +1,29 @@
 
 package quanta.rest.request;
 
+import quanta.model.client.SearchDefinition;
 import quanta.rest.request.base.RequestBase;
 
 public class GraphRequest extends RequestBase {
 	/* can be node id or path. server interprets correctly no matter which */
 	private String nodeId;
-	// optional, to perform search to build a graphical result of that.
-	private String searchText;
-	
+	private SearchDefinition searchDefinition;
+
 	public String getNodeId() {
 		return this.nodeId;
 	}
-	
-	public String getSearchText() {
-		return this.searchText;
-	}
-	
+
 	public void setNodeId(final String nodeId) {
 		this.nodeId = nodeId;
 	}
-	
-	public void setSearchText(final String searchText) {
-		this.searchText = searchText;
+
+	public SearchDefinition getSearchDefinition() {
+		return this.searchDefinition;
 	}
 
-	public GraphRequest() {
+	public void setSearchDefinition(final SearchDefinition searchDefinition) {
+		this.searchDefinition = searchDefinition;
 	}
+
+	public GraphRequest() {}
 }
