@@ -72,7 +72,8 @@ public class NodeSearchService extends ServiceBase {
         if (node == null) {
             throw new RuntimeEx("Node not found: " + req.getRootId());
         }
-        List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(node.getIdStr(), req.isIncludeComments());
+        List<SubNode> nodes =
+                svc_mongoRead.getFlatSubGraph(node.getIdStr(), req.isIncludeComments(), req.getSearchDefinition());
         int counter = 0;
 
         for (SubNode n : nodes) {
@@ -147,7 +148,6 @@ public class NodeSearchService extends ServiceBase {
             }
             // else we're doing a normal subgraph search for the text
             else {
-                // &&& right here we need a way to get Criteria from SearchDefinition
                 SubNode searchRoot = null;
 
                 if (Constant.SEARCH_ALL_NODES.s().equals(req.getSearchRoot())) {
@@ -175,7 +175,6 @@ public class NodeSearchService extends ServiceBase {
                      */
                     throw new RuntimeEx("Delete Matches not currently implemented.");
                 } else {
-                    // &&& find this in nodeGraph
                     for (SubNode node : svc_mongoRead.searchSubGraph(searchRoot, def.getSearchProp(), searchText,
                             def.getSortField(), def.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(),
                             ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), def.isFuzzy(), def.isCaseSensitive(),

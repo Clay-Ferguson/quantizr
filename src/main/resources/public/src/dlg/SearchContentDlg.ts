@@ -30,11 +30,13 @@ interface LS { // Local State
     requirePriority?: boolean;
     requireAttachment?: boolean;
     requireDate?: boolean;
+    displayLayout?: string; // doc, list, graph
 }
 
 export class SearchContentDlg extends DialogBase {
     static defaultSearchText: string = "";
     static dlgState: any = {
+        displayLayout: "list",
         fuzzy: false,
         blockedWords: false,
         caseSensitive: false,
@@ -154,41 +156,50 @@ export class SearchContentDlg extends DialogBase {
                     ], null, "searchDlgSearchRoot", {
                         setValue: (val: string) => {
                             SearchContentDlg.dlgState.searchRoot = val;
-
                             this.mergeState<LS>({
                                 searchRoot: val
                             });
                         },
                         getValue: (): string => this.getState<LS>().searchRoot
                     }),
-                    new Div(null, null, [
-                        new Selection(null, "Sort by", [
-                            { key: "mtm", val: "Modify Time" },
-                            { key: "ctm", val: "Create Time" },
-                            { key: "contentLength", val: "Text Length" },
-                            { key: "treeDepth", val: "Tree Depth" },
-                            { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
-                        ], null, "searchDlgOrderBy", {
-                            setValue: (val: string) => {
-                                let sortDir = "DESC";
-                                if (val === J.NodeProp.PRIORITY_FULL) {
-                                    sortDir = "asc";
-                                }
-                                SearchContentDlg.dlgState.sortField = val;
-                                SearchContentDlg.dlgState.sortDir = sortDir;
+                    new Selection(null, "Display Layout", [
+                        { key: "list", val: "List" },
+                        { key: "doc", val: "Document" },
+                        { key: "graph", val: "Graph" }
+                    ], null, "searchDlgDisplayLayout", {
+                        setValue: (val: string) => {
+                            this.mergeState<LS>({
+                                displayLayout: val
+                            });
+                        },
+                        getValue: (): string => this.getState<LS>().displayLayout
+                    }),
+                    new Selection(null, "Sort by", [
+                        { key: "mtm", val: "Modify Time" },
+                        { key: "ctm", val: "Create Time" },
+                        { key: "contentLength", val: "Text Length" },
+                        { key: "treeDepth", val: "Tree Depth" },
+                        { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
+                    ], null, "searchDlgOrderBy", {
+                        setValue: (val: string) => {
+                            let sortDir = "DESC";
+                            if (val === J.NodeProp.PRIORITY_FULL) {
+                                sortDir = "asc";
+                            }
+                            SearchContentDlg.dlgState.sortField = val;
+                            SearchContentDlg.dlgState.sortDir = sortDir;
 
-                                const newState: LS = {
-                                    sortField: val,
-                                    sortDir
-                                }
-                                if (val === J.NodeProp.PRIORITY_FULL) {
-                                    newState.requirePriority = true;
-                                }
-                                this.mergeState<LS>(newState);
-                            },
-                            getValue: (): string => this.getState<LS>().sortField
-                        })
-                    ]),
+                            const newState: LS = {
+                                sortField: val,
+                                sortDir
+                            }
+                            if (val === J.NodeProp.PRIORITY_FULL) {
+                                newState.requirePriority = true;
+                            }
+                            this.mergeState<LS>(newState);
+                        },
+                        getValue: (): string => this.getState<LS>().sortField
+                    }),
                     new Div(null, null, [
                         requirePriorityCheckbox
                     ])
@@ -196,10 +207,9 @@ export class SearchContentDlg extends DialogBase {
 
                 new ButtonBar([
                     new Button("Search", () => this.search(false), null, "btn-primary"),
-                    new Button("Graph", this._graph),
                     // todo-2: this is currently not implemented on the server.
                     // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Cancel", this._close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
@@ -251,7 +261,7 @@ export class SearchContentDlg extends DialogBase {
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText = val);
     }
 
-    _graph = () => {
+    _searchGraphLayout = () => {
         const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
@@ -274,6 +284,52 @@ export class SearchContentDlg extends DialogBase {
     }
 
     async search(deleteMatches: boolean) {
+        switch (this.getState<LS>().displayLayout) {
+            case "list":
+                await this.searchListLayout(deleteMatches);
+                break;
+            case "doc":
+                await this.searchDocLayout();
+                break;
+            case "graph":
+                this._searchGraphLayout();
+                break;
+            default:
+                break;
+        }
+    }
+
+    async searchDocLayout() {
+        const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
+        if (!node) {
+            S.util.showMessage("No node is selected to search under.", "Warning");
+            return;
+        }
+        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
+        const state = this.getState<LS>();
+
+        let requirePriority = state.requirePriority;
+        if (state.sortField !== J.NodeProp.PRIORITY_FULL) {
+            requirePriority = false;
+        }
+
+        await S.srch.showDocument(node.id, true, {
+            searchText: this.searchTextState.getValue(),
+            fuzzy: state.fuzzy,
+            caseSensitive: state.caseSensitive,
+            recursive: state.recursive,
+            sortField: state.sortField,
+            sortDir: state.sortDir,
+            requirePriority: requirePriority,
+            requireAttachment: state.requireAttachment,
+            requireDate: state.requireDate,
+            searchProp: null
+        });
+
+        this.close();
+    }
+
+    async searchListLayout(deleteMatches: boolean) {
         const node = this.searchRoot || S.nodeUtil.getHighlightedNode();
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");

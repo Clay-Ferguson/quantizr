@@ -1,10 +1,16 @@
 .searchDlgOrderBy {
     width: 12rem;
-    margin-left: $bigGap;
+    margin-right: $smallGap;
 }
 
 .searchDlgSearchRoot {
     width: 12rem;
+    margin-right: $smallGap;
+}
+
+.searchDlgDisplayLayout {
+    width: 12rem;
+    margin-right: $smallGap;
 }
 
 .tagIndent {

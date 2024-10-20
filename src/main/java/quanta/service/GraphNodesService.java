@@ -92,7 +92,7 @@ public class GraphNodesService extends ServiceBase {
     }
 
     private void processNodes(String rootPath, int rootLevel, HashMap<String, GraphNode> mapByPath) {
-        // get a collection to hold keys so we don't get concurrent modification
+        // collection to hold keys so we don't get concurrent modification
         // exception when updating the map.
         List<String> keys = new LinkedList<>();
 

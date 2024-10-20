@@ -250,7 +250,7 @@ public class AIUtil extends ServiceBase {
         AskSubGraphResponse res = new AskSubGraphResponse();
 
         // todo-2: in future use cases we'd want to allow includeComments setting
-        List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(req.getNodeId(), true);
+        List<SubNode> nodes = svc_mongoRead.getFlatSubGraph(req.getNodeId(), true, null);
         int counter = 0;
         StringBuilder sb = new StringBuilder();
         SubNode node = svc_mongoRead.getNode(req.getNodeId());

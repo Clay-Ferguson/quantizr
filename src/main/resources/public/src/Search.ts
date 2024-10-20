@@ -222,8 +222,9 @@ export class Search {
         }
     }
 
-    async showDocument(rootId: string, scrollToTop: boolean) {
+    async showDocument(rootId: string, scrollToTop: boolean, searchDefinition: J.SearchDefinition) {
         const res = await S.rpcUtil.rpc<J.RenderDocumentRequest, J.RenderDocumentResponse>("renderDocument", {
+            searchDefinition,
             rootId,
             includeComments: getAs().userPrefs.showReplies
         });
@@ -248,6 +249,10 @@ export class Search {
             info.breadcrumbs = res.breadcrumbs;
             if (scrollToTop) {
                 S.tabUtil.tabScroll(C.TAB_DOCUMENT, 0);
+            }
+
+            if (searchDefinition) {
+                s.highlightText = searchDefinition.searchText;
             }
 
             // set 'results' if this is the top of page being rendered, or else append results if we

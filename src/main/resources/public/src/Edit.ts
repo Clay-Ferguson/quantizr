@@ -357,7 +357,7 @@ export class Edit {
             else if (ast.activeTab === C.TAB_DOCUMENT) {
                 const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
-                    S.srch.showDocument(data.props.node.id, false);
+                    S.srch.showDocument(data.props.node.id, false, null);
                 }
             }
 
@@ -624,7 +624,7 @@ export class Edit {
         else if (ast.activeTab === C.TAB_DOCUMENT) {
             const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
             if (data) {
-                S.srch.showDocument(data.props.node.id, true);
+                S.srch.showDocument(data.props.node.id, true, null);
             }
         }
         else {
@@ -1629,7 +1629,7 @@ export class Edit {
             else if (ast.activeTab === C.TAB_DOCUMENT) {
                 const data: TabBase = S.tabUtil.getAppTabData(C.TAB_DOCUMENT);
                 if (data) {
-                    S.srch.showDocument(data.props.node.id, false);
+                    S.srch.showDocument(data.props.node.id, false, null);
                 }
             }
             else if (ast.activeTab === C.TAB_MAIN && deletedPageNode) {

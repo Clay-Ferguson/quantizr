@@ -469,6 +469,7 @@ export interface RenderCalendarRequest extends RequestBase {
 export interface RenderDocumentRequest extends RequestBase {
     rootId: string;
     includeComments: boolean;
+    searchDefinition: SearchDefinition;
 }
 
 export interface RenderNodeRequest extends RequestBase {

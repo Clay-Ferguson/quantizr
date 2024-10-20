@@ -97,7 +97,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw new RuntimeEx("adminDataFolder does not exist: " + svc_prop.getAdminDataFolder());
         }
         String nodeId = req.getNodeId();
-        TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, null, null);
+        TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, null, null, null);
         node = rootNode.node;
 
         String fileName = svc_snUtil.getExportFileName(req.getFileName(), node);

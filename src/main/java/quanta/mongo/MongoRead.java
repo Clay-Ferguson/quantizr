@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,6 +28,7 @@ import quanta.model.client.NodeLink;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
+import quanta.model.client.SearchDefinition;
 import quanta.mongo.model.AccountNode;
 import quanta.mongo.model.CreateNodeLocation;
 import quanta.mongo.model.SubNode;
@@ -1168,7 +1170,8 @@ public class MongoRead extends ServiceBase {
     }
 
     // If optional idMap is passed in non-null it gets loaded with a map from nodeId to TreeNode
-    public TreeNode getSubGraphTree(String rootId, Criteria criteria, HashMap<String, TreeNode> idMap) {
+    public TreeNode getSubGraphTree(String rootId, Criteria criteria, HashMap<String, TreeNode> idMap,
+            SearchDefinition def) {
         SubNode rootNode = getNode(new ObjectId(rootId));
         if (rootNode == null)
             throw new RuntimeEx("unable to access node: " + rootId);
@@ -1182,8 +1185,43 @@ public class MongoRead extends ServiceBase {
         HashMap<String, TreeNode> nodeMap = new HashMap<>();
         nodeMap.put(rootNode.getPath(), rootTreeNode);
 
+        HashSet<String> whiteListPaths = null;
+
+        /*
+         * If we have a search definition we will be displaying a document that contains only the nodes that
+         * satisfy the search criteria plus their ancestors. This is a way to show a 'tree' of nodes that
+         * are related to a search term.
+         */
+        if (def != null) {
+            whiteListPaths = new HashSet<>();
+            whiteListPaths.add(rootNode.getPath());
+
+            for (SubNode n : svc_mongoRead.searchSubGraph(rootNode, def.getSearchProp(), def.getSearchText(),
+                    def.getSortField(), def.getSortDir(), MAX_TREE_GRAPH_SIZE, 0, def.isFuzzy(), def.isCaseSensitive(),
+                    null, def.isRecursive(), def.isRequirePriority(), def.isRequireAttachment(), def.isRequireDate())) {
+                log.debug("Adding to nodeMap: " + n.getPath());
+                whiteListPaths.add(n.getPath());
+
+                String parentPath = XString.truncAfterLast(n.getPath(), "/");
+                while (parentPath != null && !whiteListPaths.contains(parentPath)
+                        && !parentPath.equals(NodePath.ROOT_PATH) && !parentPath.equals(rootNode.getPath())) {
+                    whiteListPaths.add(parentPath);
+                    log.debug("-- Adding to nodeMap: " + parentPath);
+                    parentPath = XString.truncAfterLast(parentPath, "/");
+                }
+
+                if (nodeMap.size() > MAX_TREE_GRAPH_SIZE) {
+                    throw new RuntimeEx(
+                            "Too much data to return. Max is " + String.valueOf(MAX_TREE_GRAPH_SIZE) + " nodes.");
+                }
+            }
+        }
+
         // first scan to build up the nodes list and nodeMap
         for (SubNode n : getSubGraph(rootNode, null, 0, false, criteria)) {
+            if (whiteListPaths != null && !whiteListPaths.contains(n.getPath())) {
+                continue;
+            }
             nodeMap.put(n.getPath(), new TreeNode(n));
             if (nodeMap.size() > MAX_TREE_GRAPH_SIZE) {
                 throw new RuntimeEx(
@@ -1222,7 +1260,7 @@ public class MongoRead extends ServiceBase {
         return rootTreeNode;
     }
 
-    public List<SubNode> getFlatSubGraph(final String rootId, boolean includeComments) {
+    public List<SubNode> getFlatSubGraph(final String rootId, boolean includeComments, SearchDefinition def) {
         LinkedList<SubNode> doc = new LinkedList<>();
 
         Criteria typeCriteria = null;
@@ -1230,7 +1268,7 @@ public class MongoRead extends ServiceBase {
             typeCriteria = Criteria.where(SubNode.TYPE).ne(NodeType.COMMENT);
         }
 
-        TreeNode rootTreeNode = getSubGraphTree(rootId, typeCriteria, null);
+        TreeNode rootTreeNode = getSubGraphTree(rootId, typeCriteria, null, def);
         traverseTree(rootTreeNode, doc);
         return doc;
     }

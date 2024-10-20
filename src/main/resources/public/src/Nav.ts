@@ -337,7 +337,7 @@ export class Nav {
 
     openDocumentView(evt: Event, id: string) {
         id = S.util.allowIdFromEvent(evt, id);
-        S.srch.showDocument(id, true);
+        S.srch.showDocument(id, true, null);
     }
 
     runTimelineByNodeId(id: string) {

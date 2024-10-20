@@ -83,7 +83,7 @@ public class ExportServiceFlexmark extends ServiceBase {
         }
 
         TreeNode rootNode = req.isThreadAsPDF() ? svc_mongoRead.getThreadGraphTree(nodeId) : //
-                svc_mongoRead.getSubGraphTree(nodeId, null, null);
+                svc_mongoRead.getSubGraphTree(nodeId, null, null, null);
 
         SubNode exportNode = rootNode.node;
         String fileName = svc_snUtil.getExportFileName(req.getFileName(), exportNode);
