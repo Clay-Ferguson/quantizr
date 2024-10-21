@@ -166,13 +166,6 @@ export class OpenGraphPanel extends Comp {
             return true;
         }
 
-        /* If neither a description nor image exists, this will not be interesting enough so don't
-        render */
-        if (!state.og.description && !state.og.image && !state.og.title) {
-            this.children = this.waitIndicator(this.ui.url);
-            return true;
-        }
-
         if (!state.og.url) {
             state.og.url = this.ui.url;
         }
