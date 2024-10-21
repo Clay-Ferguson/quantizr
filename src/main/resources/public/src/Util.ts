@@ -956,46 +956,22 @@ export class Util {
         return S.nodeUtil.findNode(nodeId);
     }
 
+    // todo-0: Ask AI for a better implementation of this
+    //
     // We do some line-by-line processing of the content to prepare for rendering as markown.
-    // 1) Processing URLS:
+    // Processing URLS:
     //     You can use "* " to not do opengraph, and that you can use "- " to 
     //     show opengraph but not the link url, and "-- " to show opengraph but without long description and without the link url.
-    //
-    // 2) Making HTML Visible, outside of markdown codeblocks
-    //
     processLines(content: string): string {
         // check if we have any content to process before looping all lines
-        if (!content || (content.toLowerCase().indexOf("http") === -1 &&
-            content.toLowerCase().indexOf("<") === -1 && content.indexOf(">") === -1)) return content;
+        if (!content || content.toLowerCase().indexOf("http") === -1) return content;
 
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
         let ret = "";
         const lines = content.split("\n");
-        let inBackTickBlock = false;
-        let inSpaceBlock = false;
 
         if (lines) {
             lines.forEach(line => {
-                const trimmedLine = line.trim();
-                const startsWithSpaceIndent = line.startsWith("    ");
-
-                if (trimmedLine.startsWith("```")) {
-                    inBackTickBlock = !inBackTickBlock;
-                }
-
-                if (!inSpaceBlock && trimmedLine.length > 0 && startsWithSpaceIndent) {
-                    inSpaceBlock = true;
-                }
-                else if (inSpaceBlock && !startsWithSpaceIndent) {
-                    inSpaceBlock = false;
-                }
-
-                // make '<' and '>' visible in the content
-                if (!inBackTickBlock && !inSpaceBlock) {
-                    line = line.replace(/</g, "&lt;");
-                    line = line.replace(/>/g, "&gt;");
-                }
-
                 if (line.startsWith("-")) {
                     if (line.startsWith("- http://") || line.startsWith("- https://") ||
                         line.startsWith("-- http://") || line.startsWith("-- https://")) {
@@ -1010,7 +986,6 @@ export class Util {
         }
         return ret;
     }
-
 
     // Leave this at the END of the module since it makes calls to methods that might not be created at
     // arbitrary earlier places in the code.
