@@ -9,6 +9,7 @@ import { UrlInfo } from "../plugins/base/TypeBase";
 import { S } from "../Singletons";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Html } from "./core/Html";
+import { Progress } from "./core/Progress";
 
 interface LS { // Local State
     og: J.OpenGraph;
@@ -152,10 +153,11 @@ export class OpenGraphPanel extends Comp {
     override preRender(): boolean | null {
         const state = this.getState<LS>();
         const ast = getAs();
+
         if (state.loading || !state.og) {
             // be sure to return true to let this render or else we won't get the observer callback,
             // because the observer callback is only called when the element is rendered.
-            this.children = null;
+            this.children = this.waitIndicator(`Loading ${this.ui.url}`);
             return true;
         }
 
@@ -167,8 +169,8 @@ export class OpenGraphPanel extends Comp {
         /* If neither a description nor image exists, this will not be interesting enough so don't
         render */
         if (!state.og.description && !state.og.image && !state.og.title) {
-            this.children = null;
-            return false;
+            this.children = this.waitIndicator(this.ui.url);
+            return true;
         }
 
         if (!state.og.url) {
@@ -252,5 +254,12 @@ export class OpenGraphPanel extends Comp {
             imgAndDesc
         ];
         return true;
+    }
+
+    waitIndicator(msg: string) {
+        return [
+            new Progress(),
+            new Div(msg, { className: "openGraphPanel" })
+        ];
     }
 }
