@@ -38,20 +38,23 @@ const _anchorFunc = (props: any) => {
 const _codeFunc = (arg: any, nodeId: string) => {
     const { node, className, children, ...props } = arg;
     const childrenStr = String(children);
-    const inline = !childrenStr.includes("\n");
+
+    // count number of newlines in childrenStr
+    const newLineCount = (childrenStr.match(/\n/g) || []).length;
     const match = /language-(\w+)/.exec(className || "");
     const language = match ? match[1] : "txt";
     const ast = getAs();
-    const expClass = ast.expandedCodeBlocks.has(nodeId) ? "codeBlockExpanded" : "codeBlockCollapsed";
+    const expanded = ast.expandedCodeBlocks.has(nodeId);
+    const expClass = expanded ? "codeBlockExpanded" : "codeBlockCollapsed";
 
-    return !inline ? (
+    return newLineCount > 0 ? (
         createElement("div", { className: "marginBottom" }, [
             createElement("div", { className: "codeDivHeader" }, [
                 createElement("span", {
                     className: "markdownLanguage"
                 }, language === "txt" ? "" : language),
                 createElement("span", { className: "float-end" }, [
-                    createElement("span", {
+                    newLineCount > 5 ? createElement("span", {
                         className: "clickable bigMarginRight",
                         onClick: () => {
                             dispatch("toggleCodeBlock", s => {
@@ -62,7 +65,7 @@ const _codeFunc = (arg: any, nodeId: string) => {
                                 }
                             });
                         }
-                    }, "Expand/Collapse"),
+                    }, "Expand/Collapse") : null,
                     createElement("i", {
                         className: "fa fa-clipboard fa-lg clickable clipboardIcon codeIcon",
                         onClick: () => S.util.copyToClipboard(children.concat())
