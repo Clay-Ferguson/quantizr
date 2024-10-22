@@ -9,7 +9,6 @@ import { UrlInfo } from "../plugins/base/TypeBase";
 import { S } from "../Singletons";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Html } from "./core/Html";
-import { Progress } from "./core/Progress";
 
 interface LS { // Local State
     og: J.OpenGraph;
@@ -153,20 +152,23 @@ export class OpenGraphPanel extends Comp {
     override preRender(): boolean | null {
         const state = this.getState<LS>();
         const ast = getAs();
-
-        // This works but lots of sites hang, and this is left on the sceen too long and is ugly.
-        // I'll leave this commented out, just so I can have a record of what I tried in case I ever try to work
-        // on some kind loading indicator in the future.
-        // if (state.loading || !state.og) {
-        //     // be sure to return true to let this render or else we won't get the observer callback,
-        //     // because the observer callback is only called when the element is rendered.
-        //     this.children = this.waitIndicator(`Loading ${this.ui.url}`);
-        //     return true;
-        // }
+        if (state.loading || !state.og) {
+            // be sure to return true to let this render or else we won't get the observer callback,
+            // because the observer callback is only called when the element is rendered.
+            this.children = null;
+            return true;
+        }
 
         if (state.og.mime?.startsWith("image/")) {
             this.children = [new Img({ src: this.ui.url, className: "insImgInRow" })];
             return true;
+        }
+
+        /* If neither a description nor image exists, this will not be interesting enough so don't
+        render */
+        if (!state.og.description && !state.og.image && !state.og.title) {
+            this.children = null;
+            return false;
         }
 
         if (!state.og.url) {
@@ -250,12 +252,5 @@ export class OpenGraphPanel extends Comp {
             imgAndDesc
         ];
         return true;
-    }
-
-    waitIndicator(msg: string) {
-        return [
-            new Progress(),
-            new Div(msg, { className: "openGraphPanel" })
-        ];
     }
 }
