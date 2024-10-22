@@ -20,7 +20,7 @@ public enum AIModel {
 
     ANTH("anthAi", "anthropic", "claude-3-opus-20240229", "Anthropic: Claude 3 Opus", "ACL", true, 200_000), //
 
-    ANTH_SONNET("anthAi_sonnet", "anthropic", "claude-3-5-sonnet-20240620", "Anthropic: Claude 3.5 Sonnet", "ACS", true,
+    ANTH_SONNET("anthAi_sonnet", "anthropic", "claude-3-5-sonnet-20241022", "Anthropic: Claude 3.5 Sonnet", "ACS", true,
             200_000), // Sonnet
 
     GEMINI("geminiAi", "gemini", "gemini-1.5-pro", "Google: Gemini 1.5 Pro", "GEM", true, 2_000_000), //

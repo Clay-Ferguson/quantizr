@@ -21,7 +21,7 @@ from common.python.utils import RefactorMode, Utils
 
 # #ai-model (WARNING: These values are in a Java file too (AIModel.java))
 ANTH_OPUS_MODEL_COMPLETION_CHAT = "claude-3-opus-20240229"
-ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20240620"
+ANTH_SONNET_MODEL_COMPLETION_CHAT = "claude-3-5-sonnet-20241022"
 OPENAI_MODEL_COMPLETION = "gpt-4o"
 OPENAI_MODEL_COMPLETION_MINI = "gpt-4o-mini"
 OPENAI_MODEL_COMPLETION_O1_PREVIEW = "o1-preview"
