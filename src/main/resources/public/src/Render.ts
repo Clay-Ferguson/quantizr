@@ -437,7 +437,7 @@ export class Render {
                     }
 
                     if (s.node) {
-                        S.histUtil.pushTreeHistory(targetNode);
+                        S.histUtil.pushTreeHistory(s.node);
                     }
 
                     if (this.debug && s.node) {
