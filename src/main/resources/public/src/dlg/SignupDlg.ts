@@ -57,8 +57,8 @@ export class SignupDlg extends DialogBase {
                     ])
                 ], "captchaPanel marginTop"),
                 new ButtonBar([
-                    new Button("Create Account", this._signup, null, "btn-primary"),
-                    new Button("Cancel", this._close, { className: "float-end" })
+                    new Button("Create Account", this._signup, null, "-primary"),
+                    new Button("Cancel", this._close, { className: "tw-float-right" })
                 ], "marginTop")
             ])
         ];
@@ -76,7 +76,7 @@ export class SignupDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        
+
         const res = await S.rpcUtil.rpc<J.SignupRequest, J.SignupResponse>("signup", {
             userName: this.userNameState.getValue(),
             password: this.passwordState.getValue(),

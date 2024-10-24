@@ -26,8 +26,8 @@ export class AskForPhoneNumber extends DialogBase {
                 new TextContent("Enter phone number to send to:"),
                 new TextField({ label: "Phone Number", val: AskForPhoneNumber.phoneState }),
                 new ButtonBar([
-                    new Button("Ok", this.acceptPhone, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Ok", this.acceptPhone, null, "-primary"),
+                    new Button("Close", this._close, null, "-secondary tw-float-right")
                 ], "marginTop")
             ])
         ];

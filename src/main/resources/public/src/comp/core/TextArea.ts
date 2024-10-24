@@ -1,5 +1,6 @@
 import * as I from "../../Interfaces";
 import { S } from "../../Singletons";
+import { Tailwind } from "../../Tailwind";
 import { Validator } from "../../Validator";
 import { CompT, ScrollPos } from "../base/Comp";
 import { ErrorDiv } from "./ErrorDiv";
@@ -24,9 +25,11 @@ export class TextArea extends Span implements I.TextEditorIntf {
         if (attribs) {
             this.textareaAttribs = { ...this.textareaAttribs, ...attribs };
         }
+
+
         this.textareaAttribs = {
             ...this.textareaAttribs, ...{
-                className: "form-control preTextarea " + moreClasses
+                className: Tailwind.formControl + " preTextarea " + moreClasses
             }
         };
 

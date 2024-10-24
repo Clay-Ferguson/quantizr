@@ -38,8 +38,8 @@ export class EditTagsDlg extends DialogBase {
                 }, getAs().tagTipsExpanded, null, "marginTop", "marginTop"),
 
                 new ButtonBar([
-                    new Button("Save", this._save, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Save", this._save, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

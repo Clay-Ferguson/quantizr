@@ -49,8 +49,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 this.hiddenInputContainer = new Div(null, { id: "dropzoneInput", style: { display: "none" } }),
 
                 new ButtonBar([
-                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this._upload, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this._upload, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];
@@ -71,7 +71,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         onClick: this._uploadFromClipboard,
                         title: "Upload from Clipboard"
                     }),
-
                     new IconButton("fa-cloud", "URL", {
                         onClick: this._uploadFromUrl,
                         title: "Upload from Web/URL"

@@ -70,7 +70,7 @@ export class NodeCompMainNode extends Comp {
                 jumpButton = new IconButton("fa-arrow-right", null, {
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to the Node"
-                }, "btn-secondary float-end");
+                }, "tw-float-right");
             }
         }
 

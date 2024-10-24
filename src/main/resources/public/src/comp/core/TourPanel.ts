@@ -52,13 +52,13 @@ export class TourPanel extends Comp {
                     dispatch("NextTourStep", s => {
                         s.tour.curStep++;
                     });
-                }, null, "btn-primary") : null,
+                }, null, "-primary") : null,
             tour.curStep >= tour.steps.length - 1 ? new Button("Finished!", () => {
                 dispatch("PrevTourStep", s => {
                     s.tour = null;
                 })
-            }, null, "btn-primary") : null
-        ], "float-end"));
+            }, null, "-primary") : null
+        ], "tw-float-right"));
 
 
         if (ast.isAnonUser && tour.expectsLogin) {

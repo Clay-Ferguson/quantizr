@@ -28,17 +28,16 @@ export class LoginDlg extends DialogBase {
                 new TextField({ label: "User", enter: this._login, val: this.userState }),
                 new TextField({ label: "Password", inputType: "password", enter: this._login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [
-                    new Span("Reset Password", { className: "clickable float-end", onClick: this._resetPassword }),
+                    new Span("Reset Password", { className: "clickable tw-float-right", onClick: this._resetPassword }),
                     new Clearfix()
                 ])
             ]),
             new ButtonBar([
-                new Button("Login", this._login, null, "btn-primary ui-login"),
-                // new Button("Signup", S.user.userSignup),
+                new Button("Login", this._login, null, "-primary ui-login"),
                 new Button("Close", () => {
                     this.close();
                     S.util._loadAnonPageHome();
-                }, null, "btn-secondary float-end")
+                }, null, "tw-float-right")
             ], "marginTop")
         ];
     }

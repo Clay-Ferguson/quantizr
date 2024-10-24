@@ -350,7 +350,7 @@ export class TypeBase implements TypeIntf {
                 if (S.props.hasAIConfigProps(node)) {
                     aiConfigDiv = new Div("AI Agent", {
                         onClick: () => S.edit.configureAgent(node),
-                        className: "nodeTags aiTags microMarginBottom float-end",
+                        className: "nodeTags aiTags microMarginBottom tw-float-right",
                         title: "Configure Agent Settings"
                     });
                 }
@@ -362,7 +362,7 @@ export class TypeBase implements TypeIntf {
                         }
                         aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                             new Div("AI Prompt", {
-                                className: "aiPrompt microMarginBottom float-end",
+                                className: "aiPrompt microMarginBottom tw-float-right",
                             }),
                             template ? new Markdown(template, { className: "microMarginBottom" }) : null
                         ]);

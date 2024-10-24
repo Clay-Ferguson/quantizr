@@ -122,7 +122,7 @@ export class AIUtil {
                 className: "aiAnswerFooter"
             }),
             new Span(aiServiceDescript, {
-                className: "aiAnswerFooter float-end"
+                className: "aiAnswerFooter tw-float-right"
             })
         ]);
     }

@@ -5,7 +5,7 @@ export class VerticalLayout extends Comp {
 
     constructor(children: Comp[] = null, justify: string = "left-justified") {
         super();
-        this.attribs.className = "vertical " + justify + " layout vertLayoutRow";
+        this.attribs.className = justify + " vertLayoutRow";
 
         if (children) {
             children = children.map(child => {

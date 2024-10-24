@@ -175,16 +175,16 @@ export class FriendsDlg extends DialogBase {
                         this.mergeState(state);
                     },
                     getValue: (): boolean => state.selectAll
-                }, "float-end") : null,
+                }, "tw-float-right") : null,
                 state.friends?.length > 1 ? new Clearfix() : null,
                 !this.displayOnly && !this.nodeId ? new TextField({ label: "User Names (comma separated)", val: this.userNameState }) : null,
                 new ButtonBar([
-                    !this.displayOnly && !this.nodeId ? new Button("Ok", this._save, null, "btn-primary") : null,
+                    !this.displayOnly && !this.nodeId ? new Button("Ok", this._save, null, "-primary") : null,
                     !this.displayOnly ? new Button("Import", this._import) : null,
                     state.friends?.length > 0 ? new Button("Export", this._export) : null,
-                    new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this._cancel, null, "btn-secondary float-end")
+                    new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this._cancel, null, "tw-float-right")
                 ], "marginTop"),
-                new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
+                new Clearfix() // required in case only ButtonBar children are tw-float-right, which would break layout
             ])
         ];
         return ret;

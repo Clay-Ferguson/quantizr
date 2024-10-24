@@ -73,7 +73,7 @@ export class DomUtil {
         return sanitizedHtml;
     }
 
-    getNodeIdFromDom(evt: Event): string { 
+    getNodeIdFromDom(evt: Event): string {
         return S.domUtil.getPropFromDom(evt, C.NODE_ID_ATTR);
     }
 
@@ -257,7 +257,6 @@ export class DomUtil {
 
         return new Promise<UploadResponse>((resolve, reject) => {
             const formData = new FormData();
-
             files.forEach((file: File) => formData.append("files", file));
             const url = S.rpcUtil.getRpcPath() + "parseFiles";
 

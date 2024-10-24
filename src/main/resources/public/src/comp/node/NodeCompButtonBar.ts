@@ -5,7 +5,6 @@ import { ButtonBar } from "../../comp/core/ButtonBar";
 import { Checkbox } from "../../comp/core/Checkbox";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
-import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import { NodeActionType } from "../../intf/TypeIntf";
@@ -31,8 +30,8 @@ export class NodeCompButtonBar extends Comp {
             return false;
         }
 
-        let openButton: IconButton;
-        let expnButton: IconButton;
+        let openButton: Button;
+        let expnButton: Button;
         let selCheckbox: Checkbox;
         let dragIcon: Icon;
         let createSubNodeButton: Button;
@@ -43,7 +42,7 @@ export class NodeCompButtonBar extends Comp {
 
         const isPageRootNode = ast.node && this.node.id === ast.node.id;
         const type = S.plugin.getType(this.node.type);
-        const specialAccountNode = type?.isSpecialAccountNode() || type?.getTypeName()==J.NodeType.ACCOUNT;
+        const specialAccountNode = type?.isSpecialAccountNode() || type?.getTypeName() == J.NodeType.ACCOUNT;
         if (specialAccountNode) this.allowNodeMove = false;
         let editingAllowed = S.edit.isEditAllowed(this.node);
         let deleteAllowed = false;
@@ -97,20 +96,18 @@ export class NodeCompButtonBar extends Comp {
             const isMine = S.props.isMine(this.node);
 
             if (!(exp && !isMine)) {
-                openButton = new IconButton("fa-folder-open", null, {
+                openButton = new Button(null, S.nav._openNodeById, {
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav._openNodeById,
                     title: "Explore content of this node"
-                }, "btn-primary");
+                }, "-primary", "fa-folder-open");
             }
 
             // for now, let's go back to only showing expand/collapse button for our own nodes
             if (isMine && ast.userPrefs.editMode) {
-                expnButton = allowExpnButton ? new IconButton(expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg", null, {
+                expnButton = new Button(null, S.nav._toggleNodeInlineChildren, {
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav._toggleNodeInlineChildren,
                     title: expandChildren ? "Collapse Children" : "Expand Children"
-                }) : null;
+                }, null, expandChildren ? "fa-caret-up fa-lg" : "fa-caret-down fa-lg");
             }
         }
 
@@ -121,10 +118,11 @@ export class NodeCompButtonBar extends Comp {
          * content, and if they don't have privileges the server side security will let them know.
          * In the future we can add more intelligence to when to show these buttons or not.
          */
+        const dragIconClazz = "fas fa-grip-lines-vertical fa-lg"
         if (ast.userPrefs.editMode) {
             if (!ast.mobileMode && (!type || type.subOrdinal() === -1) && S.props.isMine(this.node)) {
                 dragIcon = new Icon({
-                    className: "bi bi-grip-vertical bi-lg dragIcon",
+                    className: dragIconClazz + " dragIcon",
                     title: "Drag to move this node"
                 });
 
@@ -166,7 +164,7 @@ export class NodeCompButtonBar extends Comp {
                 createSubNodeButton = new Button(null, S.edit._newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"
-                }, "btn-secondary ui-new-node-plus", "fa-plus");
+                }, "ui-new-node-plus", "fa-plus");
             }
 
             const userCanPaste = S.props.isMine(this.node) || ast.isAdminUser || this.node.id === ast.userProfile?.userNodeId;
@@ -176,7 +174,7 @@ export class NodeCompButtonBar extends Comp {
                     editNodeButton = new Button(null, S.edit._runEditNodeByClick, {
                         title: "Edit Node",
                         [C.NODE_ID_ATTR]: this.node.id
-                    }, "btn-secondary ui-edit-node", "fa-edit");
+                    }, "ui-edit-node", "fa-edit");
                 }
             }
 
@@ -192,12 +190,12 @@ export class NodeCompButtonBar extends Comp {
             }
 
             if (!!ast.nodesToMove && userCanPaste) {
-                pasteSpan = new Span(null, { className: "float-end marginLeft" }, [
+                pasteSpan = new Span(null, { className: "tw-float-right marginLeft" }, [
                     new Button("Paste Inside",
-                        S.edit._pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton"),
+                        S.edit._pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "pasteButton"),
 
                     this.node.id !== ast.userProfile?.userNodeId
-                        ? new Button("Paste Here", S.edit._pasteSelNodes_InlineAbove, { [C.NODE_ID_ATTR]: this.node.id }, "btn-secondary pasteButton") : null
+                        ? new Button("Paste Here", S.edit._pasteSelNodes_InlineAbove, { [C.NODE_ID_ATTR]: this.node.id }, "pasteButton") : null
                 ]);
             }
         }
@@ -219,7 +217,7 @@ export class NodeCompButtonBar extends Comp {
             spanArray.push(pasteSpan);
         }
         if (spanArray.some(c => !!c)) {
-            floatEndSpan = new Span(null, { className: "float-end" }, spanArray);
+            floatEndSpan = new Span(null, { className: "tw-float-right" }, spanArray);
         }
 
         let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan];

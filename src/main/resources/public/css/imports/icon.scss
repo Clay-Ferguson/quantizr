@@ -56,10 +56,8 @@
 }
 
 .dragIcon {
-    font-size: 1.5rem;
-    vertical-align: middle;
-    cursor: pointer;
-    display: inline-block;
+    cursor: grab;
+    // display: inline-block;
     margin-right: $smallGap;
 }
 

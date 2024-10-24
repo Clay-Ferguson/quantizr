@@ -25,6 +25,7 @@ import * as J from "../JavaIntf";
 import { PrincipalName, PropertyInfo } from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Validator } from "../Validator";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
@@ -180,7 +181,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium (P3)" },
             { key: "4", val: "Low (P4)" },
             { key: "5", val: "Backlog (P5)" }
-        ], null, "col-3", new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
+        ], null, Tailwind.col_3, new PropValueHolder(ast.editNode, J.NodeProp.PRIORITY, "0"));
     }
 
     override getTitleIconComp(): Comp {
@@ -331,7 +332,7 @@ export class EditNodeDlg extends DialogBase {
         if (editorOpts.nodeName) {
             nodeNameTextField = new TextField({
                 label: "Node Name",
-                outterClass: "col-9",
+                outterClass: Tailwind.col_9 + " tw-pr-4",
                 val: this.nameState,
                 labelClass: "none"
             });
@@ -351,7 +352,7 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection float-end" }, [
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection tw-float-right" }, [
             this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this._removeTag, this._selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
@@ -369,7 +370,7 @@ export class EditNodeDlg extends DialogBase {
                 const state = this.getState<LS>();
                 propsHeaderBar = new Div(null, { className: "editTypesPanelHeader" }, [
                     type?.schemaOrg?.comment ? new Span(type?.schemaOrg?.comment) : null,
-                    new Div(null, { className: "float-end" }, [
+                    new Div(null, { className: "tw-float-right" }, [
                         // ADD PROP ICON
                         new Icon({
                             className: "fa fa-circle-plus fa-lg clickable marginRight tinyMarginBottom",
@@ -405,7 +406,7 @@ export class EditNodeDlg extends DialogBase {
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
             sharingDiv = new Div(null, {
-                className: "float-end clickable marginBottom"
+                className: "tw-float-right clickable marginBottom"
             }, [
                 new Span("Shared to: ", {
                     title: "Node Sharing",
@@ -447,7 +448,7 @@ export class EditNodeDlg extends DialogBase {
                         dispatch("setPropsPanelExpanded", s => {
                             s.propsPanelExpanded = expanded;
                         });
-                    }, getAs().propsPanelExpanded || autoExpandProps, "", "", "float-end", "div");
+                    }, getAs().propsPanelExpanded || autoExpandProps, "", "", "tw-float-right", "div");
             }
             // if schema.org type show properties in visible panel always
             else {
@@ -467,7 +468,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (hasAdvControls) {
             const advancedDiv = new Div(null, { className: "advancedCont" }, [
-                new Div(null, { className: "row align-items-end" }, [
+                new Div(null, { className: Tailwind.row + " align-items-end" }, [
                     editorOpts.nodeName ? nodeNameTextField : null,
                     editorOpts.priority ? this.createPrioritySelection() : null
                 ]),
@@ -481,7 +482,7 @@ export class EditNodeDlg extends DialogBase {
                     dispatch("setMorePanelExpanded", s => {
                         s.morePanelExpanded = expanded;
                     });
-                }, getAs().morePanelExpanded, "marginRight btn-primary", "", "", "div") : null;
+                }, getAs().morePanelExpanded, "marginRight", "", "", "div") : null;
 
             advCollapsePanelContainer = new Div(null, { className: "marginBottom" }, [
                 advCollapsePanel
@@ -740,7 +741,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         return new ButtonBar([
-            new Button("Save", this._save, { title: "Save this node and close editor." }, "btn-primary ui-editor-save"),
+            new Button("Save", this._save, { title: "Save this node and close editor." }, "-primary ui-editor-save"),
 
             allowUpload ? new IconButton("fa-upload", null, {
                 onClick: () => this.utl.upload(null),
@@ -788,7 +789,7 @@ export class EditNodeDlg extends DialogBase {
             }) : null,
 
 
-            new Button("Cancel", () => this.utl.cancelEdit(), null, "btn-secondary"),
+            new Button("Cancel", () => this.utl.cancelEdit()),
         ]);
     }
 
@@ -1055,7 +1056,7 @@ export class EditNodeDlg extends DialogBase {
                 },
                 getValue: (): string => this.utl.getHeadingLevel()
             })
-        ], "float-end microMarginBottom"));
+        ], "tw-float-right microMarginBottom"));
         editItems.push(this.contentEditor as any as Comp);
 
         return new Div(null, { className: "contentEditor" }, editItems);

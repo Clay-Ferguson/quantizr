@@ -23,8 +23,8 @@ export class EditBlockedWordsDlg extends DialogBase {
                 new Div("Content containing these will be filtered from your feed."),
                 new TextArea("Blocked Words", { rows: 15 }, this.wordsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Save", this.save, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Save", this.save, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

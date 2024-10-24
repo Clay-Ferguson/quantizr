@@ -29,11 +29,11 @@ export class FriendsListType extends TypeBase {
             new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
             new Button("Follow Someone", () => {
                 new SearchUsersDlg().open();
-            }, null, "btn-primary"),
+            }, null, "-primary"),
             new Button("Search Follows", () => {
                 const friendsDlg = new FriendsDlg("Follows", null, true);
                 friendsDlg.open();
-            }, null, "btn-primary")
+            }, null, "-primary")
         ]);
     }
 

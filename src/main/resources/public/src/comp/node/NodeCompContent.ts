@@ -163,7 +163,7 @@ export class NodeCompContent extends Comp {
             // if more than two days in future or past we don't show the time, just the date
             const when = (diffDays <= -2 || diffDays >= 2) ? S.util.formatDateShort(dateVal) : S.util.formatDateTime(dateVal);
             children.push(new Div(when + " " + S.util.getDayOfWeek(dateVal) + diffStr, {
-                className: "dateTimeDisplay " + modClass + " float-end"
+                className: "dateTimeDisplay " + modClass + " tw-float-right"
             }));
             children.push(new Clearfix());
         }

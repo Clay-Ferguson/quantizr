@@ -12,6 +12,7 @@ import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { Constants as C } from "../Constants";
 import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 
 export class MainTabComp extends AppTab<any, MainTabComp> {
 
@@ -36,7 +37,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
                 // !ast.mobileMode ? new BreadcrumbsPanel(this.data.props?.breadcrumbs) : null,
-                ast.pageMessage ? new Html(ast.pageMessage, { className: "alert alert-info float-end" }) : null,
+                ast.pageMessage ? new Html(ast.pageMessage, { className: Tailwind.alertInfo + " tw-float-right" }) : null,
                 ast.pageMessage ? new Clearfix() : null,
 
                 // // if we have some parents to display...
@@ -87,12 +88,12 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                     [C.NODE_ID_ATTR]: ast.node.id,
                     onClick: S.nav._navUpLevelClick,
                     title: "Go to Parent Node"
-                }, "btn-primary"));
+                }, "-primary"));
             }
 
             if (headingBarItems.length > 0) {
                 this.headingBar = new TabHeading([
-                    new Div(null, { className: "float-end" }, headingBarItems),
+                    new Div(null, { className: "tw-float-right" }, headingBarItems),
                 ], this.data);
             }
             else {

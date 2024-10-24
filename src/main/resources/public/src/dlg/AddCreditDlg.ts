@@ -26,7 +26,7 @@ export class AddCreditDlg extends DialogBase {
             new Div(null, { className: "marginBottom" }, [
                 new TextField({ label: "Amount", val: this.amtState }),
                 new ButtonBar([
-                    new Button("Add Credit", this._close, null, "btn-primary"),
+                    new Button("Add Credit", this._close, null, "-primary"),
                     new Button("Cancel", this._close)
                 ], "marginTop")
             ])

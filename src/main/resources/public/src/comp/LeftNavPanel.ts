@@ -3,6 +3,7 @@ import { Constants as C } from "../Constants";
 import { DocIndexPanel } from "../DocIndexPanel";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Div } from "../comp/core/Div";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
@@ -35,7 +36,7 @@ export class LeftNavPanel extends Comp {
             leftCols--;
         }
 
-        this.attribs.className = "col-" + leftCols + (ast.tour ? " appColumnTourActive" : " appColumn");
+        this.attribs.className = Tailwind.getColClass(leftCols) + (ast.tour ? " appColumnTourActive" : " appColumn");
         LeftNavPanel.inst = this;
     }
 
@@ -71,7 +72,7 @@ export class LeftNavPanel extends Comp {
                         title: "Go to Portal Home Node"
                     }),
 
-                    new Span(null, { className: "float-end" }, [
+                    new Span(null, { className: "tw-float-right" }, [
                         myMessages ? new Span(myMessages, {
                             className: "newMessagesNote",
                             onClick: S.nav._showMyNewMessages,
@@ -85,7 +86,7 @@ export class LeftNavPanel extends Comp {
                         !ast.showRhs ? new IconButton("fa-sitemap fa-lg", null, {
                             onClick: () => new NavPanelDlg().open(),
                             id: "navMenu"
-                        }, "btn-primary menuButton", "off") : null
+                        }, "-primary menuButton", "off") : null
                     ])
                 ]),
                 // ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,

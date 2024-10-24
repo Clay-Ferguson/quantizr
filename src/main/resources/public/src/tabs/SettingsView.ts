@@ -1,5 +1,6 @@
 import { getAs } from "../AppContext";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { AppTab } from "../comp/AppTab";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
@@ -21,7 +22,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
     }
 
     sectionTitle(title: string): Heading {
-        return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
+        return new Heading(6, title, { className: "settingsSectionTitle " + Tailwind.alertPrimary });
     }
 
     override preRender(): boolean | null {
@@ -35,7 +36,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
             ], null),
 
             new Div(null, { className: "settingsPanel" }, [
-                
+
                 this.sectionTitle("Account"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [

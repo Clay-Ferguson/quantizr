@@ -3,6 +3,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
@@ -206,10 +207,10 @@ export class SearchContentDlg extends DialogBase {
                 ], "bigMarginBottom bigMarginTop"),
 
                 new ButtonBar([
-                    new Button("Search", () => this.search(false), null, "btn-primary"),
+                    new Button("Search", () => this.search(false), null, "-primary"),
                     // todo-2: this is currently not implemented on the server.
-                    // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "btn-danger") : null,
-                    new Button("Cancel", this._close, null, "btn-secondary float-end")
+                    // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "-danger") : null,
+                    new Button("Cancel", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];
@@ -230,8 +231,8 @@ export class SearchContentDlg extends DialogBase {
                     this.addTagsToSearchField(dlg);
                 },
                 title: "Select Hashtags to Search"
-            }, "btn-primary", "off") : null
-        ], "float-end tinyMarginTop");
+            }, "-primary", "off") : null
+        ], "tw-float-right tinyMarginTop");
     }
 
     addTagsToSearchField(dlg: SelectTagsDlg) {
@@ -276,7 +277,7 @@ export class SearchContentDlg extends DialogBase {
     // currently not used.
     _deleteMatches = async () => {
         const dlg = new ConfirmDlg("Permanently delete ALL MATCHING Nodes", "WARNING",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (dlg.yes) {
             this.search(true);

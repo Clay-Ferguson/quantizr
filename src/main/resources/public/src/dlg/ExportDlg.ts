@@ -82,8 +82,8 @@ export class ExportDlg extends DialogBase {
         }));
 
         children.push(new ButtonBar([
-            new Button("Export", this._exportNodes, null, "btn-primary"),
-            new Button("Close", this._close, null, "btn-secondary float-end")
+            new Button("Export", this._exportNodes, null, "-primary"),
+            new Button("Close", this._close, null, "tw-float-right")
         ], "marginTop"));
 
         return children;
@@ -91,7 +91,6 @@ export class ExportDlg extends DialogBase {
 
     contentTypeOptions(): Div {
         return new Div(null, { className: "bigMarginBottom" }, [
-
             new Heading(5, "Content Type", { className: "bigMarginTop" }),
 
             new RadioButtonGroup([
@@ -112,7 +111,7 @@ export class ExportDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => getAs().exportSettings.contentType === exportType
-            }, "form-check-inline marginRight")
+            }, "marginRight")
         ]);
     }
 
@@ -125,7 +124,7 @@ export class ExportDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => getAs().exportSettings.exportType === exportType
-            }, "form-check-inline marginRight")
+            }, "marginRight")
         ]);
     }
 

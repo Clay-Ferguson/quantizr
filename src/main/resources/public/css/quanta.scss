@@ -40,13 +40,6 @@ $fa-font-path: "@fortawesome/fontawesome-free/webfonts";
 $fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Verdana, Arial, sans-serif, Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 // $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
 
-// This does work (border around focused edit fields) but we don't need it.
-/*
-.form-control:focus {
-    border-color: green;
-}
-*/
-
 * {
     outline: none;
 }

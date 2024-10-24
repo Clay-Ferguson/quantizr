@@ -7,6 +7,7 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { SignupDlg } from "../dlg/SignupDlg";
 import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 
 export class AdminView extends AppTab<any, AdminView> {
 
@@ -16,7 +17,7 @@ export class AdminView extends AppTab<any, AdminView> {
     }
 
     sectionTitle(title: string): Heading {
-        return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
+        return new Heading(6, title, { className: "settingsSectionTitle " + Tailwind.alertPrimary });
     }
 
     override preRender(): boolean | null {

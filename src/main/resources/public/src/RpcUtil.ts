@@ -4,6 +4,7 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { Constants as C } from "./Constants";
 import { RpcQueueItem } from "./RpcQueueItem";
+import { Tailwind } from "./Tailwind";
 
 export class RpcUtil {
     log: boolean = false;
@@ -114,7 +115,7 @@ export class RpcUtil {
     */
     rpc<RequestType extends J.RequestBase, ResponseType extends J.ResponseBase> //
         (postName: string, postData: RequestType = null,
-            background: boolean = false, allowErrorDlg: boolean = true, 
+            background: boolean = false, allowErrorDlg: boolean = true,
             lifoQueue = false, compId: string = null): Promise<ResponseType> {
 
         let qi = null;
@@ -411,7 +412,7 @@ export class RpcUtil {
         this.unauthMessageShowing = true;
 
         const dlg = new ConfirmDlg("<p class='alertText'>Unauthorized (or Logged Out)<br><br>Login now?</p>", "Session Message",
-            "btn-info", "alert alert-info");
+            "", Tailwind.alertInfo);
         await dlg.open();
         if (dlg.yes) {
             window.location.href = window.location.origin + "?login=y";

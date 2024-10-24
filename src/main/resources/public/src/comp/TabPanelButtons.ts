@@ -20,7 +20,7 @@ export class TabPanelButtons extends Comp {
                 className: "tabButtonsContainer"
             }, [
                 new Ul(null, {
-                    className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,
+                    className: (this.verticalButtons ? "tw-flex tw-flex-col" : "") + " " + this.moreClasses,
                     id: "navTabs"
                 }, this.buildTabButtons())]
             )
@@ -42,7 +42,7 @@ export class TabPanelButtons extends Comp {
 
     getTabButton(data: TabBase): Li {
         const ast = getAs();
-        let clazz = "nav-link appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : "");
+        let clazz = "appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : "");
 
         // experimental hack. Will write 'good code' for this if I like it.
         if (data.id == C.TAB_TTS && ast.speechSpeaking && !ast.speechPaused) {
@@ -50,7 +50,6 @@ export class TabPanelButtons extends Comp {
         }
 
         return new Li(null, {
-            className: "nav-item",
             style: { display: data.isVisible() ? "inline" : "none" },
             onClick: (event: Event) => {
                 event.stopPropagation();
@@ -61,7 +60,7 @@ export class TabPanelButtons extends Comp {
         }, [
             new Anchor("#" + data.id, data.name, {
                 "data-bs-toggle": "tab",
-                className: "nav-link appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : ""),
+                className: "appNavTab ui-app-tab-btn" + (ast.activeTab === data.id ? " active" : ""),
                 title: data.tooltip
             })
         ]);

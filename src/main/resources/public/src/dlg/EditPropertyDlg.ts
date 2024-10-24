@@ -60,7 +60,7 @@ export class EditPropertyDlg extends DialogBase {
             showSchemaOrg && type?.schemaOrg?.props ? new SchemaOrgPropsTable(type.schemaOrg.props, this) : null,
 
             new ButtonBar([
-                new Button("Save", this._save, null, "btn-primary"),
+                new Button("Save", this._save, null, "-primary"),
                 new Button("Cancel", this._close)
             ], "marginTop")
         ];

@@ -27,8 +27,8 @@ export class SearchByNameDlg extends DialogBase {
             new Div(null, null, [
                 this.searchTextField = new TextField({ label: "Node Name", enter: this._search, val: this.searchTextState }),
                 new ButtonBar([
-                    new Button("Search", this._search, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Search", this._search, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

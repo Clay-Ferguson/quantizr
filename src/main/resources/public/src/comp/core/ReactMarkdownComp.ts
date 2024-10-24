@@ -53,7 +53,7 @@ const _codeFunc = (arg: any, nodeId: string) => {
                 createElement("span", {
                     className: "markdownLanguage"
                 }, language === "txt" ? "" : language),
-                createElement("span", { className: "float-end" }, [
+                createElement("span", { className: "tw-float-right" }, [
                     newLineCount > 5 ? createElement("span", {
                         className: "clickable bigMarginRight",
                         onClick: () => {

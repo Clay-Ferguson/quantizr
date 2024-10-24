@@ -1,3 +1,4 @@
+import { Tailwind } from "../../Tailwind";
 import { Comp } from "../base/Comp";
 
 interface LS { // Local State
@@ -8,7 +9,7 @@ export class TextContent extends Comp {
 
     constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);
-        this.attribs.className = classes || "alert alert-secondary";
+        this.attribs.className = classes || Tailwind.alertSecondary;
         this.setText(text);
         this.tag = this.preformatted ? "pre" : "div";
     }

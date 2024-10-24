@@ -1,4 +1,5 @@
 import * as I from "../../Interfaces";
+import { Tailwind } from "../../Tailwind";
 import { Validator } from "../../Validator";
 import { Comp } from "../base/Comp";
 import { Div } from "./Div";
@@ -30,7 +31,7 @@ export class TimeField extends Comp implements I.ValueIntf {
                 className: this.extraClass + " timeField"
             }, [
                 this.input = new Input({
-                    className: "form-control preTextField",
+                    className: Tailwind.formControl + " preTextField",
                     type: "time"
                 }, this.valState.v)
             ])

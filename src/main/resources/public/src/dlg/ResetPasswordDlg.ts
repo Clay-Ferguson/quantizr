@@ -31,8 +31,8 @@ export class ResetPasswordDlg extends DialogBase {
                 new TextField({ label: "User Name", val: this.userState }),
                 new TextField({ label: "Email Address", val: this.emailState }),
                 new ButtonBar([
-                    new Button("Reset Password", this._resetPassword, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Reset Password", this._resetPassword, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

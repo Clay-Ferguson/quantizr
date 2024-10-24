@@ -6,7 +6,7 @@ import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Span } from "../comp/core/Span";
-import { Spinner } from "../comp/core/Spinner";
+import { Progress } from "../comp/core/Progress";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { SearchContentDlg } from "../dlg/SearchContentDlg";
@@ -27,7 +27,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
         if (!res) {
             this.children = [
                 new Heading(6, "Generating statistics...", { className: "marginTop" }),
-                new Spinner()
+                new Progress()
             ];
             return true;
         }
@@ -87,7 +87,6 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
             word = S.domUtil.getPropFromDom(evt, C.WORD_ATTR);
         }
         if (!word) return;
-
         SearchContentDlg.defaultSearchText = word;
         new SearchContentDlg().open();
     }

@@ -65,7 +65,7 @@ export class UserProfileDlg extends DialogBase {
 
         const profileHeaderImg = this.makeProfileHeaderImg();
         const profileImg = this.makeProfileImg(!!profileHeaderImg);
-    
+
         const children = [
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
@@ -82,7 +82,7 @@ export class UserProfileDlg extends DialogBase {
                                 ? new Heading(4, state.userProfile.displayName || "")
                                 : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
                         ]),
-                        new Div(null, { className: "float-end" }, [
+                        new Div(null, { className: "tw-float-right" }, [
                             state.userProfile.blocked ? new Span("You Blocked", {
                                 className: "blockingText",
                                 onClick: this._unblockUser,
@@ -106,7 +106,7 @@ export class UserProfileDlg extends DialogBase {
                 getAs().isAdminUser ? new UserAdminPanel(this) : null,
 
                 new ButtonBar([
-                    (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this._save, null, "btn-primary"),
+                    (getAs().isAnonUser || this.readOnly) ? null : new Button("Save", this._save, null, "-primary"),
 
                     // only local users might have set their 'home' node (named a node 'home')
                     state.userProfile.homeNodeId ? new Button("Home", () => this.openUserNodeByName(state, "home")) : null, //
@@ -202,7 +202,7 @@ export class UserProfileDlg extends DialogBase {
             displayName: this.displayNameState.getValue(),
             recentTypes: ast.userProfile.recentTypes
         });
-        
+
         if (res?.code == C.RESPONSE_CODE_OK) {
             this.close();
             dispatch("SaveUserPerferences", s => {

@@ -48,7 +48,7 @@ export class MenuItem extends Comp {
         this.children = [
             innerSpan,
             this.treeOp ? new Tag("i", {
-                className: "fa fa-caret-right fa-lg float-end " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
+                className: "fa fa-caret-right fa-lg tw-float-right " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
                 title: "Operates on the selected Tree Nodes(s)",
             }) : null
         ];
@@ -58,7 +58,7 @@ export class MenuItem extends Comp {
         }
 
         this.attribs.style = { display: (state.visible ? "" : "none") };
-        this.attribs.className = innerClazz + " list-group-item-action " + enablementClass + "  listGroupTransparent" +
+        this.attribs.className = innerClazz + enablementClass + "  listGroupTransparent" +
             (getAs().mobileMode ? " mobileMenuText" : "") + " " + this.moreClasses;
         this.attribs.onClick = this._onClick
         return true

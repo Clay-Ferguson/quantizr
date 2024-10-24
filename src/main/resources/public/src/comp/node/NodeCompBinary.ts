@@ -189,7 +189,7 @@ export class NodeCompBinary extends Comp {
                         onClick: () => {
                             new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
                         }
-                    }, "btn-primary marginRight"),
+                    }, "-primary marginRight"),
                     new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
@@ -205,7 +205,7 @@ export class NodeCompBinary extends Comp {
                             if (!att) return null;
                             S.nav.showAudioPlayerTab(node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, null, att.fileName);
                         }
-                    }, "btn-primary marginRight"),
+                    }, "-primary marginRight"),
                     new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])

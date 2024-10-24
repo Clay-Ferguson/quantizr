@@ -35,8 +35,8 @@ export class SplitNodeDlg extends DialogBase {
         }
 
         this.mergeState<LS>({
-            splitMode, 
-            splitType: "inline", 
+            splitMode,
+            splitType: "inline",
             delimiter: "{split}"
         });
     }
@@ -94,7 +94,7 @@ export class SplitNodeDlg extends DialogBase {
             (this.getState<LS>().splitMode === "custom") ? new TextField({ label: "Delimiter", val: this.delimiterState }) : null,
 
             new ButtonBar([
-                new Button("Split", this._splitNodes, null, "btn-primary"),
+                new Button("Split", this._splitNodes, null, "-primary"),
                 new Button("Cancel", this._close)
             ], "marginTop")
         ];

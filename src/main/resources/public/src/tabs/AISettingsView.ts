@@ -15,6 +15,7 @@ import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { ScrollPos } from "../comp/base/Comp";
 import { FlexLayout } from "../comp/core/FlexLayout";
+import { Tailwind } from "../Tailwind";
 
 export class AISettingsView extends AppTab<any, AISettingsView> {
     maxWordsState: Validator = new Validator();
@@ -36,7 +37,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
     }
 
     sectionTitle(title: string): Heading {
-        return new Heading(6, title, { className: "settingsSectionTitle alert alert-primary" });
+        return new Heading(6, title, { className: "settingsSectionTitle " + Tailwind.alertPrimary });
     }
 
     override preRender(): boolean | null {
@@ -66,7 +67,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                     new Div(null, { className: settingsCol }, [
                         ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
                         S.quanta.config.paymentLink ?
-                            new Button("Add Credit", S.user.addAccountCredit, null, "btn btn-primary settingsButton")
+                            new Button("Add Credit", S.user.addAccountCredit, null, "-primary settingsButton")
                             : new Span("paymentLink not configured"),
                     ])
                 ], horzClass) : null,

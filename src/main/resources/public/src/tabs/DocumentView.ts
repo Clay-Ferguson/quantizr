@@ -56,7 +56,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
                     }, "marginRight") : null,
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
-                this.data.props.description ? new Span(this.data.props.description, { className: "float-end smallMarginTop" }) : null,
+                this.data.props.description ? new Span(this.data.props.description, { className: "tw-float-right smallMarginTop" }) : null,
                 this.getFloatRightHeaderComp(),
                 new Clearfix()
             ], this.data),
@@ -156,7 +156,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         }
 
         children.push(
-            new Span("Pg. " + (this.data.props.page + 1) + "/" + maxPage, { className: "marginLeft float-end" }),
+            new Span("Pg. " + (this.data.props.page + 1) + "/" + maxPage, { className: "marginLeft tw-float-right" }),
             new ButtonBar(buttonBarComps, this.pagingContainerClass));
 
         children.push(new Clearfix());

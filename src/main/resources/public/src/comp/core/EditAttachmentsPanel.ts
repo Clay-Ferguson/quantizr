@@ -5,6 +5,7 @@ import { EditNodeDlg, LS as EditNodeDlgState } from "../../dlg/EditNodeDlg";
 import { ValueIntf } from "../../Interfaces";
 import { Attachment, NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Tailwind } from "../../Tailwind";
 import { Validator, ValidatorRuleName } from "../../Validator";
 import { Comp } from "../base/Comp";
 import { NodeCompBinary } from "../node/NodeCompBinary";
@@ -187,7 +188,7 @@ export class EditAttachmentsPanel extends Comp {
             const attachments = S.props.getOrderedAtts(node);
             if (attachments?.length > 1) {
                 const dlg = new ConfirmDlg("Display all images at " + (val === "0" ? "their actual" : val) + " width?", "All Images?",
-                    "btn-info", "alert alert-info");
+                    "", Tailwind.alertInfo);
                 dlg.open().then(() => {
                     if (dlg.yes) {
                         if (!this.node.attachments) return null;

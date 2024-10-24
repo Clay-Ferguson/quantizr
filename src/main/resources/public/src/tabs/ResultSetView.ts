@@ -14,6 +14,7 @@ import { TabBase } from "../intf/TabBase";
 import { NodeInfo } from "../JavaIntf";
 import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 
 export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab> extends AppTab<PT, TT> {
 
@@ -72,11 +73,11 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                     }, "marginRight") : null,
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
-                this.data.props.description ? new Span(this.data.props.description, { className: "float-end smallMarginTop" }) : null,
+                this.data.props.description ? new Span(this.data.props.description, { className: "tw-float-right smallMarginTop" }) : null,
                 this.getFloatRightHeaderComp(),
                 new Clearfix()
             ], this.data),
-            this.showRoot && content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
+            this.showRoot && content ? new TextContent(content, "resultsContentHeading " + Tailwind.alertSecondary) : null,
             // !ast.mobileMode && this.data?.props?.breadcrumbs ? new BreadcrumbsPanel(this.data?.props?.breadcrumbs) : null
         ];
 
@@ -109,7 +110,6 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                 rowCount++;
             });
         }
-
         this.addPaginationBar(children, true, true, false);
         this.children = children;
         return true;
@@ -208,7 +208,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
 
         children.push(
-            this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-end" }) : null,
+            this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "tw-float-right" }) : null,
             new ButtonBar(buttonBarComps, this.pagingContainerClass));
 
         children.push(new Clearfix());

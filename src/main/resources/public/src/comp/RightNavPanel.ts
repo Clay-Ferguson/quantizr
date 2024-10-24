@@ -7,6 +7,7 @@ import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Comp } from "./base/Comp";
 import { FlexRowLayout } from "./core/FlexRowLayout";
 import { Icon } from "./core/Icon";
@@ -51,7 +52,7 @@ export class RightNavPanel extends Comp {
                 this.attribs.className = ast.tour ? "appColumnTourActive" : "appColumn";
             }
             else {
-                this.attribs.className = "col-" + RightNavPanel.calcWidthCols() + (ast.tour ? " appColumnTourActive" : " appColumn");
+                this.attribs.className = Tailwind.getColClass(RightNavPanel.calcWidthCols()) + (ast.tour ? " appColumnTourActive" : " appColumn");
             }
         }
 
@@ -130,7 +131,7 @@ export class RightNavPanel extends Comp {
             });
         }
 
-        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "float-end" }, [
+        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "tw-float-right" }, [
             // Not showing login on this panel in mobileMode, because it's shown at top of page instead
             new Span("Login", {
                 className: "signupLinkText ui-login",
@@ -141,7 +142,7 @@ export class RightNavPanel extends Comp {
             }),
 
             new Span("Signup", {
-                className: "signupLinkText float-end ui-signup",
+                className: "signupLinkText tw-float-right ui-signup",
                 onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.user.userSignup();

@@ -183,7 +183,7 @@ th {
 
 .editPropsTable {
     padding-left: $smallGap;
-    // we can't let this table go full width, because the "+" button for adding properties is a float-end
+    // we can't let this table go full width, because the "+" button for adding properties is a tw-float-right
     // and needs to slide down to the right of the props table. If this is 100% width, then the "+" button
     // will take up vertical space and push the whole table down.
     width: 90%;

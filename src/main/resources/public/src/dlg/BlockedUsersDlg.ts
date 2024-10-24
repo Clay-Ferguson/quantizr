@@ -134,7 +134,7 @@ export class BlockedUsersDlg extends DialogBase {
                         new IconButton("fa-search", null, {
                             onClick: this.userSearch,
                             title: "Search"
-                        }, "btn-secondary")
+                        })
                     ]),
 
                     friendsTagDropDown
@@ -145,9 +145,9 @@ export class BlockedUsersDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Import", this.import),
                     state.friends?.length > 0 ? new Button("Export", this.export) : null,
-                    new Button("Close", this.cancel, null, "btn-secondary float-end")
+                    new Button("Close", this.cancel, null, "tw-float-right")
                 ], "marginTop"),
-                new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
+                new Clearfix() // required in case only ButtonBar children are tw-float-right, which would break layout
             ])
         ];
     }

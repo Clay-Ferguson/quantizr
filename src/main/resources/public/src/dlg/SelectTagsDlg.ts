@@ -56,7 +56,6 @@ export class SelectTagsDlg extends DialogBase {
                 }
             });
         }
-
         return tagSet;
     }
 
@@ -65,12 +64,12 @@ export class SelectTagsDlg extends DialogBase {
         switch (this.modeOption) {
             case "search":
                 buttons = [
-                    new Button("Ok", this._select, null, "btn-primary"),
+                    new Button("Ok", this._select, null, "-primary"),
                 ];
                 break;
             case "edit":
                 buttons = [
-                    new Button("Ok", this._select, null, "btn-primary"),
+                    new Button("Ok", this._select, null, "-primary"),
                     new Button("Clear", this._clear)
                 ];
                 break;
@@ -84,7 +83,7 @@ export class SelectTagsDlg extends DialogBase {
                     val: this.editFieldState,
                     labelClass: "txtFieldLabelShort"
                 }),
-                this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "float-end" }, {
+                this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "tw-float-right" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
                         if (checked && this.getState<LS>().suggestedTags.length === 0) {
@@ -92,7 +91,7 @@ export class SelectTagsDlg extends DialogBase {
                         }
                     },
                     getValue: (): boolean => this.getState<LS>().suggestTags
-                }, "form-switch form-check-inline") : null,
+                }, "inlineBlock") : null,
                 this.createTagsPickerList(),
                 new ButtonBar([
                     ...buttons,
@@ -100,7 +99,7 @@ export class SelectTagsDlg extends DialogBase {
                     new Button("Cancel", () => {
                         this._clear();
                         this.close();
-                    }, null, "btn-secondary float-end")
+                    }, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

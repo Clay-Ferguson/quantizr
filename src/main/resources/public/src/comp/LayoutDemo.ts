@@ -23,6 +23,8 @@ export class LayoutDemo extends Main {
             className: "tw-bg-blue-500 tw-p-4 tw-rounded"
         }));
 
+        children.push(new Progress());
+
         for (let i = 0; i < 10; i++) {
             children.push(new Div("Brick" + i, {
                 className: "brick brickWidth100px brickInline",

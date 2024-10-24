@@ -1,4 +1,5 @@
 import * as I from "../../Interfaces";
+import { Tailwind } from "../../Tailwind";
 import { Validator } from "../../Validator";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
@@ -90,13 +91,14 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
 
         this.input = new Input({
             placeholder: this.cfg.placeholder || "",
-            className: "form-control preTextField " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
+            className: Tailwind.formControl + " preTextField " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
             id: "inputId_" + this.getId()
         }, this.cfg.val.v);
 
+        const inputGroupAddon = "tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-bg-gray-200 tw-text-gray-700 tw-border tw-border-l-0 tw-border-gray-300 tw-rounded-r hover:tw-bg-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"
         const passwordEye = this.cfg.inputType === "password" ? new Span(null, {
-            className: "input-group-addon"
+            className: inputGroupAddon
         }, [
             new Anchor(null, null, {
                 onClick: (evt: Event) => {
@@ -116,7 +118,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         this.children = [
             label,
             new Div(null, {
-                className: "input-group textField"
+                className: "tw-flex textField"
             }, [
                 this.input,
                 passwordEye

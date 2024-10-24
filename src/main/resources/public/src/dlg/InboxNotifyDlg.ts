@@ -32,9 +32,9 @@ export class InboxNotifyDlg extends DialogBase {
                         this.close();
                         S.nav.openContentNode(this.nodeId, false);
                     }) : null,
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop"),
-                new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
+                new Clearfix() // required in case only ButtonBar children are tw-float-right, which would break layout
             ])
         ];
     }

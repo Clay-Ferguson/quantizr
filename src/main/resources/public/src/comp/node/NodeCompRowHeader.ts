@@ -137,7 +137,7 @@ export class NodeCompRowHeader extends Comp {
         }
 
         const floatUpperRightDiv: Div = new Div(null, {
-            className: "float-end floatRightHeaderDiv"
+            className: "tw-float-right floatRightHeaderDiv"
         });
 
         if (showInfo && ast.isAdminUser) {
@@ -249,14 +249,14 @@ export class NodeCompRowHeader extends Comp {
                 editButton = new Button(null, S.edit._runEditNodeByClick, {
                     title: "Edit Node",
                     [C.NODE_ID_ATTR]: this.node.id
-                }, "btn-secondary ui-edit-node", "fa-edit");
+                }, "ui-edit-node", "fa-edit");
             }
 
             if (this.tabData.id == C.TAB_DOCUMENT && insertAllowed && editInsertAllowed) {
                 children.push(new Button(null, S.edit._newSubNode, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Create new SubNode"
-                }, "btn-secondary ui-new-node-plus", "fa-plus"));
+                }, "ui-new-node-plus", "fa-plus"));
 
                 if (editButton) {
                     children.push(editButton);
@@ -270,7 +270,7 @@ export class NodeCompRowHeader extends Comp {
                         S.edit.insertNode(this.node.id, 0, ast);
                     }, {
                         title: "Insert new node"
-                    }, "btn-secondary  ui-new-node-plus plusButtonFloatRight", "fa-plus"));
+                    }, "ui-new-node-plus plusButtonFloatRight", "fa-plus"));
                 }
             }
             else {

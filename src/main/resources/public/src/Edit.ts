@@ -29,6 +29,7 @@ import { MainTab } from "./tabs/data/MainTab";
 import { ThreadTab } from "./tabs/data/ThreadTab";
 import { TimelineTab } from "./tabs/data/TimelineTab";
 import { DocumentResultSetView } from "./tabs/DocumentResultSetView";
+import { Tailwind } from "./Tailwind";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 
 export class Edit {
@@ -286,7 +287,6 @@ export class Edit {
                 else {
                     S.nodeUtil.applyNodeChanges(res?.nodeChanges);
                 }
-
                 this.createSubNodeResponse(res, afterEditJumpToId);
             }
         }
@@ -823,7 +823,7 @@ export class Edit {
         S.nodeUtil._clearSelNodes();
 
         const dlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Clear Inbox",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (dlg.yes) {
             await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
@@ -899,7 +899,7 @@ export class Edit {
     _bulkDelete = async () => {
         const confirmMsg = "Bulk Delete all your nodes *not* rooted in your account?";
         const dlg = new ConfirmDlg(confirmMsg, "Confirm Delete",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (dlg.yes) {
             const res = await S.rpcUtil.rpc<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {

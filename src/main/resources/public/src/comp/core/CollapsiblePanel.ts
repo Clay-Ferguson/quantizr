@@ -32,7 +32,7 @@ export class CollapsiblePanel extends Comp {
 
     override preRender(): boolean | null {
         const state = this.getState<LS>();
-        const style = this.textLink ? "collapsePanelLink" : "btn btn-primary";
+        const style = this.textLink ? "collapsePanelLink" : "";
         const collapseClass = state.expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,
@@ -70,7 +70,7 @@ export class CollapsiblePanel extends Comp {
                 new Div(null, {
                     className: collapseClass
                 },
-                this.compChildren)
+                    this.compChildren)
             ];
         }
         return true;

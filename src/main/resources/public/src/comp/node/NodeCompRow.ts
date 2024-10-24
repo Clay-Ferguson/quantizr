@@ -61,7 +61,7 @@ export class NodeCompRow extends Comp {
                         S.edit.insertNode(this.node.id, 0, ast);
                     }, {
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
-                    }, "btn-secondary  ui-new-node-plus " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
+                    }, "ui-new-node-plus " + (this.isTableCell ? "" : "plusButtonFloatRight"), "fa-plus")
                 ]);
 
                 S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
@@ -164,7 +164,7 @@ export class NodeCompRow extends Comp {
                     [C.NODE_ID_ATTR]: targetId,
                     onClick: S.nav._jumpToNode,
                     title: "Jump to Node in Folders View"
-                }, "btn-secondary float-end");
+                }, "tw-float-right");
             }
         }
 
@@ -184,7 +184,7 @@ export class NodeCompRow extends Comp {
                     [C.NODE_ID_ATTR]: this.node.id,
                     onClick: S.nav._openNodeById,
                     title: "Explore content of this node"
-                }, "btn-primary marginLeft");
+                }, "-primary marginLeft");
             }
 
             this.children = [

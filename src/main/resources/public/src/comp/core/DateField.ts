@@ -24,12 +24,13 @@ export class DateField extends Comp implements I.ValueIntf {
     }
 
     override preRender(): boolean | null {
+        const formControl = "tw-flex-1 tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-l focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-border-blue-500"
         this.children = [
             new Div(null, {
                 className: "dateField"
             }, [
                 this.input = new Input({
-                    className: "form-control preTextField",
+                    className: `${formControl} preTextField`,
                     type: "date"
                 }, this.valState.v)
             ])

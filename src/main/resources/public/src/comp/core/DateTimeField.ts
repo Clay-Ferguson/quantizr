@@ -17,7 +17,7 @@ export class DateTimeField extends Span {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
-                className: "input-group marginRight"
+                className: "tw-flex marginRight"
             }
         };
 
@@ -98,7 +98,7 @@ export class DateTimeField extends Span {
                     const dateStr = isoStr.substring(0, 10);
                     this.dateState.setValue(dateStr);
                     S.util.flashMessage("Added one day", "Note", true);
-                }, { title: "Add Day" }, "btn btn-secondary bigMarginLeft"),
+                }, { title: "Add Day" }),
                 new Button("+W", () => {
                     const date = new Date(this.dateState.getValue());
                     date.setDate(date.getDate() + 7);
@@ -106,7 +106,7 @@ export class DateTimeField extends Span {
                     const dateStr = isoStr.substring(0, 10);
                     this.dateState.setValue(dateStr);
                     S.util.flashMessage("Added one week", "Note", true);
-                }, { title: "Add Week" }, "btn btn-secondary"),
+                }, { title: "Add Week" }),
                 new Button("+M", () => {
                     const date = new Date(this.dateState.getValue());
                     date.setMonth(date.getMonth() + 1);
@@ -114,7 +114,7 @@ export class DateTimeField extends Span {
                     const dateStr = isoStr.substring(0, 10);
                     this.dateState.setValue(dateStr);
                     S.util.flashMessage("Added one month", "Note", true);
-                }, { title: "Add Month" }, "btn btn-secondary"),
+                }, { title: "Add Month" }),
                 new Button("+Y", () => {
                     const date = new Date(this.dateState.getValue());
                     date.setFullYear(date.getFullYear() + 1);
@@ -122,7 +122,7 @@ export class DateTimeField extends Span {
                     const dateStr = isoStr.substring(0, 10);
                     this.dateState.setValue(dateStr);
                     S.util.flashMessage("Added one year", "Note", true);
-                }, { title: "Add Year" }, "btn btn-secondary"),
+                }, { title: "Add Year" }),
                 this.addTag ? new IconButton("fa-bell fa-lg", "", {
                     onClick: () => this.addTag("#due"),
                     title: "Make this a #due date"

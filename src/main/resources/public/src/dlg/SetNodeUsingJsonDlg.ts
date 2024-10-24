@@ -22,8 +22,8 @@ export class SetNodeUsingJsonDlg extends DialogBase {
                 new Div("Enter the new JSON for the Node"),
                 new TextArea(null, { rows: 15 }, this.textState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Save", this._save, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Save", this._save, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

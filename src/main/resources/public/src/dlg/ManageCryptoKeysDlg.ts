@@ -5,6 +5,7 @@ import { Selection } from "../comp/core/Selection";
 import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ImportCryptoKeyDlg } from "./ImportCryptoKeyDlg";
 
@@ -56,7 +57,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
      might end up needing this method in the future */
     removeKey = async () => {
         const dlg = new ConfirmDlg("Remove Crypto Key?", "Warning",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (!dlg.yes) return;
         const state: LS = this.getState<LS>();
@@ -77,7 +78,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
 
     _newKey = async () => {
         const dlg = new ConfirmDlg("Gernerate new Crypto Key Pair?", "Warning",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (!dlg.yes) return;
         const state: LS = this.getState<LS>();
@@ -87,7 +88,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
 
     _publishKey = async (): Promise<void> => {
         const dlg = new ConfirmDlg("Publish Public Crypto Key?", "Warning",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await dlg.open();
         if (!dlg.yes) return;
         const state: LS = this.getState<LS>();

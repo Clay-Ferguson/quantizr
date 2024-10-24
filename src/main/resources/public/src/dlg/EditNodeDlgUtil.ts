@@ -4,6 +4,7 @@ import { SymKeyDataPackage } from "../Crypto";
 import * as J from "../JavaIntf";
 import { Attachment, NodeInfo, PropertyInfo } from "../JavaIntf";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Validator } from "../Validator";
 import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
@@ -17,7 +18,7 @@ import { FriendsDlg, LS as FriendsDlgState } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 export class EditNodeDlgUtil {
-    constructor (private dlg: EditNodeDlg) {
+    constructor(private dlg: EditNodeDlg) {
     }
 
     public countPropsShowing(): number {
@@ -244,7 +245,7 @@ export class EditNodeDlgUtil {
 
     async deletePropsGesture() {
         const confirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await confirmDlg.open();
         if (confirmDlg.yes) {
             this.deleteSelectedProperties();
@@ -332,7 +333,7 @@ export class EditNodeDlgUtil {
         if (this.dlg.getState<EditNodeDlgState>().selectedAttachments?.size === 0) return;
 
         const confirmDlg = new ConfirmDlg("Delete the selected Attachments?", "Confirm Delete",
-            "btn-danger", "alert alert-danger");
+            "-danger", Tailwind.alertDanger);
         await confirmDlg.open();
         if (!confirmDlg.yes) return;
 

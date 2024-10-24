@@ -89,7 +89,7 @@ export class NodeCompVerticalRowLayout extends Comp {
                         }
                     }, {
                         title: "Insert new node"
-                    }, "btn-secondary plusButtonFloatRight ui-new-node-plus", "fa-plus")
+                    }, "plusButtonFloatRight ui-new-node-plus", "fa-plus")
                 ]));
 
                 S.domUtil.setDropHandler(insertButton.attribs, (evt: DragEvent) => {
@@ -112,7 +112,7 @@ export class NodeCompVerticalRowLayout extends Comp {
                 if (lastNode) {
                     const userCanPaste = (S.props.isMine(lastNode) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
                     if (!!ast.nodesToMove && userCanPaste) {
-                        comps.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "btn-secondary pasteButton marginLeft"));
+                        comps.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "pasteButton marginLeft"));
                     }
                 }
             }

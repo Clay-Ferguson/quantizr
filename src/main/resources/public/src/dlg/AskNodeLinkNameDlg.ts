@@ -38,8 +38,8 @@ export class AskNodeLinkNameDlg extends DialogBase {
                 })
             ]),
             new ButtonBar([
-                new Button("Save", this.save, null, "btn-primary"),
-                this.editExisting ? new Button("Delete", this.delete, null, "btn-danger") : null,
+                new Button("Save", this.save, null, "-primary"),
+                this.editExisting ? new Button("Delete", this.delete, null, "-danger") : null,
                 new Button("Cancel", () => {
                     this.link = null;
                     this.close()

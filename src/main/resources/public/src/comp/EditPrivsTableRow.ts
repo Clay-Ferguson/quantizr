@@ -18,7 +18,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
-        const div = new Div(null, { className: "float-end tinyMarginAll" });
+        const div = new Div(null, { className: "tw-float-right tinyMarginAll" });
 
         aclEntry.privileges.forEach(privilege => {
             div.addChild(

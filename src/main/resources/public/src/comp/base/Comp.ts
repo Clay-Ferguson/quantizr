@@ -373,7 +373,7 @@ export abstract class Comp {
             else {
                 children = preRenderResult as CompT[];
             }
-            
+
             const ret = this.compRender(children);
             // if (this.debug) { // console.log("render done: " + this.getCompClass() + " counter="
             //     + Comp.renderCounter + " ID=" + this.getId());

@@ -16,7 +16,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
 
         // turn the top more button off for infinite scrolling
         this.allowTopMoreButton = false;
-        this.pagingContainerClass = "float-end";
+        this.pagingContainerClass = "tw-float-right";
     }
 
     override renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
@@ -40,7 +40,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
             const indentLevel = (nodeSlashesMatch ? nodeSlashesMatch.length : 0) - (rootSlashesMatch ? rootSlashesMatch.length : 0);
             if (indentLevel > 0) {
                 style = { marginLeft: "" + (indentLevel * 25) + "px" };
-                itemClass += " indentedDocumentItem"; 
+                itemClass += " indentedDocumentItem";
             }
         }
         return S.srch.renderSearchResultAsListItem(node, this.data, jumpButton, allowHeader, itemClass, itemClassHighlight, style);
@@ -48,7 +48,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
 
     override getFloatRightHeaderComp(): Comp {
         const ast = getAs();
-        return new Div(null, { className: "float-end" }, [
+        return new Div(null, { className: "tw-float-right" }, [
             ast.mobileMode ? null : new Checkbox("Images", {
                 className: "marginLeft",
                 title: "Display inline images"

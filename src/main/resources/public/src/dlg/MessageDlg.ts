@@ -33,7 +33,7 @@ export class MessageDlg extends DialogBase {
                     if (this.callback) {
                         this.callback();
                     }
-                }, null, "btn-primary")
+                }, null, "-primary")
             ], "marginTop") : null
         ];
     }

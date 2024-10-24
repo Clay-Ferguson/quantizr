@@ -5,6 +5,7 @@ import * as J from "./JavaIntf";
 import { Attachment, NodeInfo } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { Tailwind } from "./Tailwind";
 import { FullScreenGraphViewer } from "./comp/FullScreenGraphViewer";
 import { Comp } from "./comp/base/Comp";
 import { AppNavLink } from "./comp/core/AppNavLink";
@@ -194,7 +195,7 @@ export class Render {
         const byIdUrlDocView = byIdUrl + "&view=doc";
         const byIdUrlTimelineView = byIdUrl + "&view=timeline";
         const pathPart = S.nodeUtil.getPathPartForNamedNode(node);
-        children.push(new Div("Click any link to copy to clipboard.", { className: "alert alert-info" }));
+        children.push(new Div("Click any link to copy to clipboard.", { className: Tailwind.alertInfo }));
 
         children.push(this.titleDiv("By ID"), //
             new Div(byIdUrl, {
@@ -290,7 +291,7 @@ export class Render {
                 attComps.push(new Tag("hr"));
                 const bin = att ? att.bin : null;
                 if (bin) {
-                    attComps.push(new Div(null, { className: "float-end" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
+                    attComps.push(new Div(null, { className: "tw-float-right" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
                     attComps.push(this.titleDiv(att.fileName + " (" + S.util.formatMemory(att.size) + " " + att.mime + ")"));
                     const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
 
@@ -335,7 +336,6 @@ export class Render {
                             })
                         ]);
                     }
-
                     attComps.push(linkGroup);
                 }
             }
@@ -535,7 +535,7 @@ export class Render {
     }
 
     newUserAccountTips(): Div {
-        return new Div(null, { className: "bigMargin alert alert-info" }, [
+        return new Div(null, { className: "bigMargin " + Tailwind.alertInfo }, [
             new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "bigMarginBottom" }),
             new Button("View User Guide", () => S.nav.openContentNode(":user-guide", false))
         ]);
@@ -615,7 +615,7 @@ export class Render {
         return new Div(null, {
             title: "Click to copy to clipboard",
             onClick: () => S.util.copyToClipboard(node.tags),
-            className: "clickable float-end " + moreClasses
+            className: "clickable tw-float-right " + moreClasses
         }, spans);
     }
 
@@ -647,7 +647,7 @@ export class Render {
                     //         title: "Send Private Message",
                     //         [C.NODE_ID_ATTR]: nodeId
                     //     }) : null,
-                    // ], null, "float-end"),
+                    // ], null, "tw-float-right"),
                     // new Clearfix(),
 
                     new Div(displayName, {
@@ -787,7 +787,7 @@ export class Render {
             const clazz = credit < 1 ? "accountCreditLow" : "accountCredit";
             const msg = credit < 1 ? " (Running low! Click to add funds)" : "";
             return new Div("Credit: $" + credit.toFixed(6) + msg, {
-                className: clazz + " float-end",
+                className: clazz + " tw-float-right",
                 onClick: S.user.addAccountCredit
             });
         }
@@ -799,11 +799,11 @@ export class Render {
         const question = ast.nodesToDel.length === 1 ? "Delete" : "Delete " + ast.nodesToDel.length + " nodes";
         return new Div(null, { className: "deleteQuestion" }, [
             new Span(question, {
-                className: "alert alert-danger askDeleteQuestion",
+                className: Tailwind.alertDanger + " askDeleteQuestion",
                 onClick: () => S.edit.immediateDeleteSelNodes(getAs().nodesToDel)
             }),
             new Span("Cancel", {
-                className: "alert alert-info askDeleteQuestion",
+                className: Tailwind.alertInfo + " askDeleteQuestion",
                 onClick: S.edit._endDelete
             })
         ]);

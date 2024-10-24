@@ -9,7 +9,7 @@ import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
-import { Spinner } from "../comp/core/Spinner";
+import { Progress } from "../comp/core/Progress";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
@@ -66,7 +66,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
 
         const topChildren: Comp[] = [
-            new Div(null, { className: "float-end" }, [
+            new Div(null, { className: "tw-float-right" }, [
                 new FlexRowLayout([
                     //  newItems,
                     ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
@@ -121,7 +121,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             children.push(new Div(null, null, [
                 new Div(null, {
                     className: "progressSpinner"
-                }, [new Spinner()])
+                }, [new Progress()])
             ]));
         }
         else if (this.data.props.refreshCounter === 0) {
@@ -189,17 +189,17 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         });
                     }
                 }
-                children.push(new ButtonBar([moreButton], "text-center marginTop marginBottom"));
+                children.push(new ButtonBar([moreButton], "tw-text-center marginTop marginBottom"));
             }
         }
 
         this.children = [
             this.headingBar = new TabHeading([
                 this.renderHeading(),
-                new Div(null, { className: "float-end" }, [
+                new Div(null, { className: "tw-float-right" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
                     // todo-2: we'll eventually have this as an admin option
-                    // ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "btn-primary")
+                    // ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "-primary")
                 ])
             ], this.data),
             new Div(null, { className: "feedView" }, children)
@@ -250,7 +250,6 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                 default: break;
             }
         }
-
         return subHeading ? subHeading : "";
     }
 

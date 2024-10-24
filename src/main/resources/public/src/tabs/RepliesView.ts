@@ -72,7 +72,6 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
                 });
                 children.push(new Div(null, null, subComps));
             }
-
             i++;
             rowCount++;
         });

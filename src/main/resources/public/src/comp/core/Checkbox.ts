@@ -13,7 +13,7 @@ export class Checkbox extends Comp {
 
         this.valueIntf = this.valueIntf || new Value<string>(this, "val");
         this.outterClassName = this.attribs.className || "";
-        this.layoutClass = this.layoutClass || "form-check-inline";
+        this.layoutClass = this.layoutClass || "tw-inline-flex tw-items-center";
         this.tag = "span";
     }
 
@@ -23,14 +23,14 @@ export class Checkbox extends Comp {
         // but it adds space to the right NOTE: custom-switch or custom-checkbox will work here with
         // all other things being identical! The custom-switch shows a little slider switch button
         // instead of a box with a check.
-        this.attribs.className = "form-check " + this.layoutClass + " " + this.outterClassName + " clickable";
+        this.attribs.className = "tw-relative tw-flex tw-items-start mt-1 " + this.layoutClass + " " + this.outterClassName + " clickable";
         this.children = [
             cbInput = new CheckboxInput({
                 type: "checkbox",
-                className: "form-check-input clickable"
+                className: "tw-w-6 tw-h-6 tw-rounded tw-border-gray-300 tw-text-blue-600 focus:tw-ring-blue-500 clickable"
             }, null, this.valueIntf),
             new Label(this.label || "", {
-                className: "form-check-label clickable " + (this.label ? "checkboxLabel" : ""),
+                className: "tw-ml-2 clickable " + (this.label ? "checkboxLabel" : ""),
                 htmlFor: cbInput.getId(),
                 title: this.attribs.title
             })

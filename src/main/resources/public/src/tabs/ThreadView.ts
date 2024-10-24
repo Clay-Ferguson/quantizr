@@ -32,11 +32,11 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             return true;
         }
 
-        const floatEndDiv = new Div(null, { className: "float-end tinyMarginBottom" }, [
+        const floatEndDiv = new Div(null, { className: "tw-float-right tinyMarginBottom" }, [
             !this.data.props.endReached ? new Button("More History...", this._moreHistory,
-                { className: "float-end tinyMarginBottom" }, "btn-primary") : null,
+                { className: "tw-float-right tinyMarginBottom" }, "-primary") : null,
             new Button("Save as PDF", this._saveAsPDF,
-                { className: "float-end tinyMarginBottom" }),
+                { className: "tw-float-right tinyMarginBottom" }),
         ]);
 
         /*
@@ -94,7 +94,6 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                 });
                 children.push(new Div(null, null, subComps));
             }
-
             i++;
             rowCount++;
         });
@@ -102,7 +101,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         if (lastNode?.type == J.NodeType.AI_ANSWER) {
             children.push(new Button("Ask AI", S.edit._askAiFromThreadView, {
                 [C.NODE_ID_ATTR]: lastNode.id,
-            }, "btn-secondary ui-new-node-plus marginTop", "fa-plus"));
+            }, "ui-new-node-plus marginTop", "fa-plus"));
         }
 
         this.children = children;
@@ -114,9 +113,9 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
     }
 
     _saveAsPDF = async () => {
-        const dlg =new ExportDlg("thread-view", getAs().threadViewFromNodeId, true);
+        const dlg = new ExportDlg("thread-view", getAs().threadViewFromNodeId, true);
         await dlg.open();
-        
+
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but
         eventually the plan is to have the export return the actual md5 of the export for use here
         */

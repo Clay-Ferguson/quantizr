@@ -1,6 +1,7 @@
 import { getAs, promiseDispatch } from "../AppContext";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
+import { Tailwind } from "../Tailwind";
 import { AppTab } from "./AppTab";
 import { Comp } from "./base/Comp";
 import { RightNavPanel } from "./RightNavPanel";
@@ -14,14 +15,14 @@ export class TabPanel extends Comp {
         const ast = getAs();
 
         if (ast.mobileMode) {
-            this.attribs.className = "col-12 tabPanelMobile";
+            this.attribs.className = Tailwind.col_12 + " tabPanelMobile";
         }
         else {
             let panelCols = ast.userPrefs.mainPanelCols || 6;
             if (!ast.showRhs) {
                 panelCols += RightNavPanel.calcWidthCols();
             }
-            this.attribs.className = "col-" + panelCols + " tabPanel" + (ast.tour ? " appColumnTourActive" : " appColumn");
+            this.attribs.className = Tailwind.getColClass(panelCols) + " tabPanel" + (ast.tour ? " appColumnTourActive" : " appColumn");
         }
     }
 

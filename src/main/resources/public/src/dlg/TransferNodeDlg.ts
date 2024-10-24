@@ -47,8 +47,8 @@ export class TransferNodeDlg extends DialogBase {
                     })
                 ], "marginTop"),
                 new ButtonBar([
-                    new Button(TransferNodeDlg.operationName(this.operation), this._transfer, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button(TransferNodeDlg.operationName(this.operation), this._transfer, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];

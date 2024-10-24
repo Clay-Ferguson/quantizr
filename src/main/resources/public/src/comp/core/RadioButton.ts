@@ -15,18 +15,18 @@ export class RadioButton extends Comp {
 
     override preRender(): boolean | null {
         let cbInput = null;
-        this.attribs.className = "form-check " + (this.layoutClass || "");
+        this.attribs.className = "tw-relative tw-flex tw-items-start " + (this.layoutClass || "");
         this.children = [
             cbInput = new CheckboxInput({
                 name: this.groupName,
                 type: "radio",
                 label: this.label,
                 value: "val-" + this.getId(),
-                className: "form-check-input clickable"
+                className: "tw-w-6 tw-h-6 tw-rounded tw-border-gray-300 tw-text-blue-600 focus:tw-ring-blue-500 clickable"
             }, null, this.valueIntf),
             new Label(this.label || "", {
                 htmlFor: cbInput.getId(),
-                className: "form-check-label radioLabel"
+                className: "tw-ml-2 tw-text-sm tw-text-gray-700 radioLabel"
             })
         ];
         return true;

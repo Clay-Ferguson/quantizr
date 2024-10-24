@@ -101,7 +101,7 @@ export class NodeCompMainList extends Comp {
         }
 
         if (firstButton || prevButton || moreButton) {
-            children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginTop marginBottom text-center " + moreClasses));
+            children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginTop marginBottom tw-text-center " + moreClasses));
         }
     }
 }

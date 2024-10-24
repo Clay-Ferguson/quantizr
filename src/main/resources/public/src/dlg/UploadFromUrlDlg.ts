@@ -33,8 +33,8 @@ export class UploadFromUrlDlg extends DialogBase {
                     })
                 ]),
                 new ButtonBar([
-                    new Button("Upload", this._upload, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary float-end")
+                    new Button("Upload", this._upload, null, "-primary"),
+                    new Button("Close", this._close, null, "tw-float-right")
                 ], "marginTop")
             ])
         ];
@@ -50,7 +50,7 @@ export class UploadFromUrlDlg extends DialogBase {
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue()
         });
-        
+
         if (S.util.checkSuccess("Upload from URL", res)) {
             this.close();
 

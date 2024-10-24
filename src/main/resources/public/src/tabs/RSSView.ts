@@ -14,7 +14,7 @@ import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
-import { Spinner } from "../comp/core/Spinner";
+import { Progress } from "../comp/core/Progress";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
@@ -62,13 +62,13 @@ export class RSSView extends AppTab<any, RSSView> {
                 feedContent = new Div(null, { className: "bigMargin" }, [
                     new Heading(4, "Loading..."),
                     ast.rssProgressText ? new Div(ast.rssProgressText, { className: "bigMarginBottom" }) : null,
-                    new Spinner()
+                    new Progress()
                 ]);
             }
             else if (!ast.rssFeedCache[feedSrcHash]) {
                 feedContent = new Div(null, { className: "bigMargin" }, [
                     new Heading(4, "Refreshing..."),
-                    new Spinner()
+                    new Progress()
                 ]);
                 setTimeout(() => {
                     dispatch("RefreshingFeed", s => {
@@ -104,7 +104,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 }, "marginRight"),
                 new Div("RSS Feed", { className: "tabTitle" }),
                 new Checkbox("Headlines Only", {
-                    className: "float-end"
+                    className: "tw-float-right"
                 }, {
                     setValue: (checked: boolean) => {
                         dispatch("SetHeadlinesFlag", () => S.edit.setRssHeadlinesOnly(checked));
@@ -113,7 +113,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 }),
                 new Clearfix()
             ], this.data),
-            feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "float-end") : null,
+            feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "tw-float-right") : null,
             comp,
             feedContent
         ];
@@ -245,7 +245,7 @@ export class RSSView extends AppTab<any, RSSView> {
             feedList.addChild(this.buildFeedItem(feed, item));
         }
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "text-center marginTop marginBottom"));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "tw-text-center marginTop marginBottom"));
         return feedList;
     }
 
@@ -358,7 +358,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     const downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
                     const audioButton = new Button("Play Audio", () =>
                         S.nav.showAudioPlayerTab(null, enc.url, 0, feed.title, entry.title),
-                        { className: "marginTop" }, "btn-primary");
+                        { className: "marginTop" }, "-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));
                 }
             });
@@ -474,7 +474,7 @@ export class RSSView extends AppTab<any, RSSView> {
         const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
         children.push(new Div(null, null, [
-            new Span(null, { className: "float-end" }, [
+            new Span(null, { className: "tw-float-right" }, [
                 footerSpan, postIcon, linkIcon, bookmarkIcon
             ]),
             // is this clearfix needed now that we wrapped this stuff in this div?

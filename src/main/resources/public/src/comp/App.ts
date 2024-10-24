@@ -7,6 +7,7 @@ import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { FullScreenType } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Comp } from "./base/Comp";
 import { Div } from "./core/Div";
 import { Heading } from "./core/Heading";
@@ -66,7 +67,7 @@ export class App extends Main {
 
             this.children = [
                 new Div(null, {
-                    className: "row mainAppRow",
+                    className: Tailwind.row + " mainAppRow",
                     id: "appMainContainer"
                 }, [
                     ast.tour ? new TourPanel() : null,
@@ -112,12 +113,12 @@ export class App extends Main {
             const menuButton = new IconButton("fa-bars fa-lg", null, {
                 onClick: S.nav._showMainMenu,
                 id: "mainMenu"
-            }, "btn-primary menuButton", "off");
+            }, "-primary menuButton", "off");
 
             const navButton = new IconButton("fa-sitemap fa-lg", null, {
                 onClick: () => new NavPanelDlg().open(),
                 id: "navMenu"
-            }, "btn-primary menuButton", "off");
+            }, "-primary menuButton", "off");
 
             const loginButton = ast.isAnonUser ? new Div("Login", {
                 className: "marginTop marginRight clickable",
@@ -134,7 +135,7 @@ export class App extends Main {
                 onClick: S.user.userSignup
             }) : null;
 
-            const floatRightDiv = new Div(null, { className: "float-end" }, [
+            const floatRightDiv = new Div(null, { className: "tw-float-right" }, [
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Div(ast.userName, {
                     className: "clickable marginRight marginTop",

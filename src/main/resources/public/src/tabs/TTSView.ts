@@ -138,7 +138,7 @@ export class TTSView extends AppTab<any, TTSView> {
             this.children = [
                 this.headingBar = new TabHeading([
                     new Div("Text-to-Speech", { className: "tabTitle" }),
-                    new Div(null, { className: "float-end" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+                    new Div(null, { className: "tw-float-right" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
                     new Clearfix()
                 ], null),
                 new FlexRowLayout([

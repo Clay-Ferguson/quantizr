@@ -157,7 +157,7 @@ export abstract class DialogBase extends Comp {
             useTitle ? new Span(useTitle) : null,
             ...(this.getExtraTitleBarComps() || []), // spread operator chokes on null arrays so we check here
 
-            new Div(null, { className: "dlgModalTitleCloseIcon float-end" }, [
+            new Div(null, { className: "dlgModalTitleCloseIcon tw-float-right" }, [
                 new Icon({
                     className: "fa fa-times fa-lg",
                     onClick: () => {

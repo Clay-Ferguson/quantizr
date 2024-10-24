@@ -8,6 +8,7 @@ import { VideoPlayer } from "../comp/core/VideoPlayer";
 import { Constants as C } from "../Constants";
 import { DialogBase, DialogMode } from "../DialogBase";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
@@ -116,7 +117,7 @@ export class MediaRecorderDlg extends DialogBase {
         // regardless of whether currently recrding.
         if (this.videoMode) {
             if (!state.videoInputOptions?.length) {
-                return [new Div("No video input device available yet.", { className: "alert alert-danger" })];
+                return [new Div("No video input device available yet.", { className: Tailwind.alertDanger })];
             }
             this.videoPlayer = new VideoPlayer({
                 style: {
@@ -145,7 +146,7 @@ export class MediaRecorderDlg extends DialogBase {
         }
         else {
             if (!state.audioInputOptions?.length) {
-                return [new Div("No audio input device available yet.", { className: "alert alert-danger" })];
+                return [new Div("No audio input device available yet.", { className: Tailwind.alertDanger })];
             }
         }
 
@@ -177,9 +178,9 @@ export class MediaRecorderDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                this.status = state.status ? new Div(state.status, { className: "alert alert-info largerFont" }) : null,
+                this.status = state.status ? new Div(state.status, { className: Tailwind.alertInfo + " largerFont" }) : null,
                 new ButtonBar([
-                    state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this._newRecording, null, "btn-primary"),
+                    state.recording ? null : new Button(this.allowSave ? "New Recording" : "Start Recording", this._newRecording, null, "-primary"),
 
                     // This didn't work for video (only audio) which actually means my wild guess to
                     // just combine chunks isn't the correct way to accomplish this, and so I"m just
@@ -189,7 +190,7 @@ export class MediaRecorderDlg extends DialogBase {
                     state.recording ? new Button("Stop", this._stop, null) : null,
                     state.recording || !this.continuable ? null : new Button("Play", this._play, null),
                     (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this._save, null),
-                    new Button(this.allowSave ? "Cancel" : "Close", this._cancel, null, "btn-secondary float-end")
+                    new Button(this.allowSave ? "Cancel" : "Close", this._cancel, null, "tw-float-right")
                 ]),
                 this.videoMode ? this.videoPlayer : null,
                 new Div(null, { className: "marginTop" }, [audioSelect, videoSelect])
@@ -318,7 +319,7 @@ export class MediaRecorderDlg extends DialogBase {
     _cancel = async () => {
         if (this.recorded) {
             const dlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
-                "btn-danger", "alert alert-danger");
+                "-danger", Tailwind.alertDanger);
             await dlg.open();
             if (dlg.yes) {
                 this.cancelImmediate();

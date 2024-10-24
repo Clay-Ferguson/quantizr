@@ -16,7 +16,7 @@ export class FullScreenControlBar extends Comp {
 
     constructor() {
         super();
-        this.attribs.className = "float-end fullScreenToolbar";
+        this.attribs.className = "tw-float-right fullScreenToolbar";
     }
 
     override preRender(): boolean | null {
@@ -47,7 +47,7 @@ export class FullScreenControlBar extends Comp {
                     new IconButton("fa-angle-left fa-lg", "", {
                         onClick: S.nav._prevFullScreenImgViewer,
                         title: "View Previous Attachment"
-                    }, "btn-primary", "off"));
+                    }, "-primary", "off"));
             }
 
             if (!onLast) {
@@ -55,7 +55,7 @@ export class FullScreenControlBar extends Comp {
                     new IconButton("fa-angle-right fa-lg", "", {
                         onClick: S.nav._nextFullScreenImgViewer,
                         title: "View Next Attachment"
-                    }, "btn-primary", "off"));
+                    }, "-primary", "off"));
             }
         }
 
@@ -69,7 +69,7 @@ export class FullScreenControlBar extends Comp {
                         });
                     },
                     getValue: (): boolean => ast.showNodeLinksInGraph
-                }, "form-switch form-check-inline"),
+                }, "inlineBlock"),
                 // if there are no force links we should hide this
                 ast.showNodeLinksInGraph ? new Checkbox("RDF Forces", { title: "NodeLinks Force Attractions" }, {
                     setValue: (checked: boolean) => {
@@ -79,24 +79,24 @@ export class FullScreenControlBar extends Comp {
                         });
                     },
                     getValue: (): boolean => ast.attractionLinksInGraph
-                }, "form-switch form-check-inline") : null
+                }, "inlineBlock") : null
             ]));
 
             buttons.push(
                 new IconButton("fa-window-minimize fa-lg", null, {
                     onClick: S.nav._minimizeFullScreenViewer,
                     title: "Minimize Graph"
-                }, "btn-primary", "off"));
+                }, "-primary", "off"));
         }
 
         buttons.push(
             new IconButton("fa-window-close fa-lg", null, {
                 onClick: S.nav._closeFullScreenViewer,
                 title: "Close Viewer (ESC Key)"
-            }, "btn-primary", "off"));
+            }, "-primary", "off"));
 
         if (buttons.length > 0) {
-            comps.push(new ButtonBar(buttons, "float-end"));
+            comps.push(new ButtonBar(buttons, "tw-float-right"));
         }
 
         return comps;

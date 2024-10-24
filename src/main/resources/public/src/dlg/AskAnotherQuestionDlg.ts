@@ -29,8 +29,8 @@ export class AskAboutSubgraphDlg extends DialogBase {
             new Div(null, null, [
                 this.textArea = new TextArea("Ask a Question...", { rows: 15 }, this.questionState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
-                    new Button("Submit", this.askQuestion, null, "btn-primary"),
-                    new Button("Close", this._close, null, "btn-secondary")
+                    new Button("Submit", this.askQuestion, null, "-primary"),
+                    new Button("Close", this._close)
                 ], "marginTop")
             ])
         ];
@@ -46,7 +46,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
             nodeId: this.nodeId,
             question: this.questionState.getValue(),
             nodeIds: S.nodeUtil.getSelNodeIdsArray(),
-            aiService: getAs().userPrefs.aiService, 
+            aiService: getAs().userPrefs.aiService,
         });
 
         this.close();

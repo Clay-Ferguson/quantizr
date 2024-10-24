@@ -13,6 +13,7 @@ import { TextField } from "../comp/core/TextField";
 import * as I from "../Interfaces";
 import { TabBase } from "../intf/TabBase";
 import { S } from "../Singletons";
+import { Tailwind } from "../Tailwind";
 import { Validator } from "../Validator";
 
 /**
@@ -87,18 +88,18 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     preload: "auto",
                     controlsList: "nodownload"
                 }),
-                new Div(null, { className: "row" }, [
+                new Div(null, { className: Tailwind.row }, [
                     new ButtonBar([
                         new Button("1x", () => this.speed(1)),
                         new Button("1.25x", () => this.speed(1.25)),
                         new Button("1.5x", () => this.speed(1.5)),
                         new Button("1.75x", () => this.speed(1.75)),
                         new Button("2x", () => this.speed(2))
-                    ], "col-9"),
+                    ], Tailwind.col_9),
                     new ButtonBar([
                         new Button("< 30s", () => this.skip(-30)),
                         new Button("30s >", () => this.skip(30))
-                    ], "col-3 float-end")
+                    ], Tailwind.col_3 + " tw-float-right")
                 ]),
                 new Div(null, { className: "playerButtonsContainer" }, [
                     this.playButton = new Icon({

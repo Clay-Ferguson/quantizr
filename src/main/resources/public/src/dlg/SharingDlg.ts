@@ -37,7 +37,7 @@ export class SharingDlg extends DialogBase {
                     this.shareNodeToUser(userName, allowAppends);
                 }, ast.editNode.ac, this._removePrivilege),
                 S.props.isShared(ast.editNode) ? new Div("Remove All", {
-                    className: "marginRight float-end clickable",
+                    className: "marginRight tw-float-right clickable",
                     onClick: this._removeAllPrivileges
                 }) : null,
                 new Clearfix(),
@@ -73,9 +73,9 @@ export class SharingDlg extends DialogBase {
                             friendsDlg.getState<FriendsDlgState>().selections.forEach(n => names.push(n));
                             this.shareImmediate(names);
                         }
-                    }, null, "btn-primary"),
-                    isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(PrincipalName.PUBLIC, false), null, "btn-secondary ui-share-make-public"),
-                    new Button("Done", () => this.close(), null, "btn-secondary float-end ui-sharing-done")
+                    }, null, "-primary"),
+                    isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(PrincipalName.PUBLIC, false), null, "ui-share-make-public"),
+                    new Button("Done", () => this.close(), null, "tw-float-right ui-sharing-done")
                 ], "marginTop")
             ])
         ];
