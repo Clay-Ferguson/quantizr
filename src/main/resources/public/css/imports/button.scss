@@ -1,5 +1,3 @@
-/* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
-
 .askDeleteQuestion {
     padding: 5px !important;
     cursor: pointer;
@@ -147,8 +145,6 @@
     margin-right: 0;
 }
 
-// we tack this onto bootstrap btn-group, becasue without it, buttons stretch wider than normal when 
-// wrapped to a new line (position) that where the row isn't full and has space to stretch. 
 .btnGroup {
     display: inline;
 }

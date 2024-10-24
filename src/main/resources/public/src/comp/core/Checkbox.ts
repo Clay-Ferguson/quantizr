@@ -29,8 +29,6 @@ export class Checkbox extends Comp {
                 type: "checkbox",
                 className: "form-check-input clickable"
             }, null, this.valueIntf),
-            // warning without this label element the entire control fails to render, and this is
-            // apparently related to bootstrap itself.
             new Label(this.label || "", {
                 className: "form-check-label clickable " + (this.label ? "checkboxLabel" : ""),
                 htmlFor: cbInput.getId(),

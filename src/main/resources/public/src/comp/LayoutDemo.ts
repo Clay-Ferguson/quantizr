@@ -19,6 +19,10 @@ export class LayoutDemo extends Main {
         }
 
         const children = [];
+        children.push(new Div("Tailwind CSS", {
+            className: "tw-bg-blue-500 tw-p-4 tw-rounded"
+        }));
+
         for (let i = 0; i < 10; i++) {
             children.push(new Div("Brick" + i, {
                 className: "brick brickWidth100px brickInline",

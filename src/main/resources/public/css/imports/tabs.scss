@@ -73,8 +73,6 @@
 
 .mainTabPanel {
     //setting a max-width here ruins the centering horizontally on the page
-    //WARNING: I think the bootstrap 'main' entity is what is setting the width here and it didn't work to chagne it here.
-    // max-width: 750px;
 
     //I'd prefer to have NO margin, but the top margin is getting forced so I'll add a bottom margin for consistency for now
     margin-bottom: $smallGap;

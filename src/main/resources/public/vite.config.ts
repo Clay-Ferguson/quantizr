@@ -55,6 +55,9 @@ export default defineConfig({
                 quietDeps: true
             },
         },
+
+        // Added as part of the tailwindcss setup
+        postcss: './postcss.config.js',
     },
     base: "/dist"
 });
