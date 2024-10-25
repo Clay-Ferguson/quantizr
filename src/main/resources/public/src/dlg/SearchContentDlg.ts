@@ -13,7 +13,6 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
-import { IconButton } from "../comp/core/IconButton";
 import { Markdown } from "../comp/core/Markdown";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
@@ -224,14 +223,13 @@ export class SearchContentDlg extends DialogBase {
                     s.highlightText = null;
                 })
             }),
-            !getAs().isAnonUser ? new IconButton("fa-tag fa-lg", "Hashtags", {
-                onClick: async () => {
-                    const dlg = new SelectTagsDlg("search", this.searchTextState.getValue(), true);
-                    await dlg.open();
-                    this.addTagsToSearchField(dlg);
-                },
+            !getAs().isAnonUser ? new Button("Hashtags", async () => {
+                const dlg = new SelectTagsDlg("search", this.searchTextState.getValue(), true);
+                await dlg.open();
+                this.addTagsToSearchField(dlg);
+            }, {
                 title: "Select Hashtags to Search"
-            }, "-primary", "off") : null
+            }, "-primary", "fa-tag fa-lg") : null
         ], "tw-float-right tinyMarginTop");
     }
 

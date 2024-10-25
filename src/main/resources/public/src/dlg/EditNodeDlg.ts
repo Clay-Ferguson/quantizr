@@ -9,7 +9,6 @@ import { DateTimeField } from "../comp/core/DateTimeField";
 import { Div } from "../comp/core/Div";
 import { EditAttachmentsPanel } from "../comp/core/EditAttachmentsPanel";
 import { Icon } from "../comp/core/Icon";
-import { IconButton } from "../comp/core/IconButton";
 import { Label } from "../comp/core/Label";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
@@ -168,7 +167,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 cols" },
             { key: "c5", val: "5 cols" },
             { key: "c6", val: "6 cols" }
-        ], null, "layoutSelection", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
+        ], null, "layoutSelection tw-inline-flex", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
@@ -283,7 +282,7 @@ export class EditNodeDlg extends DialogBase {
         let propEditFieldContainer: Div = null;
 
         const children = [
-            S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
+            S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", Tailwind.alertPrimary) : null,
             new Div(null, null, [
                 new Div(null, {
                 }, [
@@ -293,7 +292,7 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        const advFlowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
+        const advFlowPanel: Div = new Div(null, { className: "d-flex flex-row flex-wrap marginTop" });
 
         if (ast.editNode.hasChildren) {
             advFlowPanel.addChild(this.createLayoutSelection());
@@ -410,9 +409,7 @@ export class EditNodeDlg extends DialogBase {
             }, [
                 new Span("Shared to: ", {
                     title: "Node Sharing",
-                    onClick: () => {
-                        this.utl.share();
-                    }
+                    onClick: this.utl._share
                 }),
                 ...shareComps,
                 !isPublic ? new Button("Make Public", () => this.makePublic(true), { className: "marginLeft" }) : null,
@@ -743,31 +740,27 @@ export class EditNodeDlg extends DialogBase {
         return new ButtonBar([
             new Button("Save", this._save, { title: "Save this node and close editor." }, "-primary ui-editor-save"),
 
-            allowUpload ? new IconButton("fa-upload", null, {
-                onClick: () => this.utl.upload(null),
+            allowUpload ? new Button(null, () => this.utl.upload(null), {
                 title: "Upload file attachment"
-            }) : null,
+            }, null, "fa-upload") : null,
 
 
-            allowShare ? new IconButton("fa-share-alt", null, {
-                onClick: () => this.utl.share(),
+            allowShare ? new Button(null, this.utl._share, {
                 title: "Share Node"
-            }, "ui-editor-share") : null,
+            }, "ui-editor-share", "fa-share-alt") : null,
 
-            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-circle-plus", null, {
-                onClick: async () => {
-                    dispatch("setPropsPanelExpanded", s => {
-                        s.propsPanelExpanded = true;
-                    });
-                    await this.utl.addProperty();
-                },
+            allowPropAdd && numPropsShowing === 0 ? new Button(null, async () => {
+                dispatch("setPropsPanelExpanded", s => {
+                    s.propsPanelExpanded = true;
+                });
+                await this.utl.addProperty();
+            }, {
                 title: "Add Property"
-            }) : null,
+            }, null, "fa-circle-plus") : null,
 
-            !this.tagsState.getValue() ? new IconButton("fa-tag fa-lg", "", {
-                onClick: this._selectTags,
+            !this.tagsState.getValue() ? new Button("", this._selectTags, {
                 title: "Select Hashtags"
-            }) : null,
+            }, null, "fa-tag fa-lg") : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive()
@@ -778,15 +771,14 @@ export class EditNodeDlg extends DialogBase {
 
             // show Calendar Entry button only if this node is not a Calendar Entry nor CALENDAR type.
             // Note: CALENDAR types contain Calendar Entries but are not themselves Calendar Entries.
-            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ? new IconButton("fa-calendar-plus", null, {
-                title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
-                onClick: () => this.utl.addDateProperty()
-            }) : null,
+            advancedButtons && !datePropExists && ast.editNode.type !== J.NodeType.CALENDAR ?
+                new Button(null, this.utl._addDateProperty, {
+                    title: "Add 'date' property to node\n\nMakes node a Calendar Entry",
+                }, null, "fa-calendar-plus") : null,
 
-            ast.activeTab !== C.TAB_FEED ? new IconButton("fa-robot fa-lg", "Ask AI", {
-                onClick: this._askAI,
+            ast.activeTab !== C.TAB_FEED ? new Button("Ask AI", this._askAI, {
                 title: "Query AI, using this Node as the Question.\n\n" + activeAiService
-            }) : null,
+            }, null, "fa-robot fa-lg") : null,
 
 
             new Button("Cancel", () => this.utl.cancelEdit()),

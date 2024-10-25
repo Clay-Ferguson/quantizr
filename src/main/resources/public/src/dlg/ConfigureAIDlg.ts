@@ -46,18 +46,24 @@ export class ConfigureAgentDlg extends DialogBase {
                 S.quanta.config.aiAgentEnabled ? new TextArea("Folders to Exclude", {
                     rows: 4,
                     placeholder: "List folders to exclude (optional)"
-                }, ConfigureAgentDlg.foldersToExcludeState, null, false, 3, this.foldersToExcludeScrollPos) : null, S.quanta.config.aiAgentEnabled ? new TextField({ label: "File Extensions (ex: java,py,txt)", val: ConfigureAgentDlg.fileExtState }) : null,
+                }, ConfigureAgentDlg.foldersToExcludeState, null, false, 3, this.foldersToExcludeScrollPos) : null, //
+                S.quanta.config.aiAgentEnabled ? new TextField({
+                    label: "File Extensions (ex: java,py,txt)",
+                    val: ConfigureAgentDlg.fileExtState,
+                    outterClass: "marginTop"
+                }) : null,
                 new FlexLayout([
                     new TextField({
                         label: "Max Response Words",
                         val: ConfigureAgentDlg.maxWordsState,
                         inputClass: "maxResponseWords",
+                        outterClass: "marginTop"
                     }),
                     new TextField({
                         label: "Creativity (0.0-1.0, Default=0.7)",
                         val: ConfigureAgentDlg.temperatureState,
                         inputClass: "aiTemperature",
-                        outterClass: "marginLeft"
+                        outterClass: "marginLeft marginTop"
                     }),
                 ]),
                 new ButtonBar([

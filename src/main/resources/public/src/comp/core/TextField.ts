@@ -38,6 +38,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         this.attribs = {
             ...this.attribs, ...{
                 name: this.getId(),
+                // todo-0: oops isn't 'form-inline' from bootstrap?
                 className: (this.cfg.labelLeft ? "form-inline " : "") + (this.cfg.outterClass || "")
             }
         };

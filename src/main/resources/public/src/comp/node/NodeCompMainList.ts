@@ -1,11 +1,11 @@
 import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
-import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Button } from "../core/Button";
 
 export class NodeCompMainList extends Comp {
     constructor(private tabData: TabBase<any>) {
@@ -32,34 +32,31 @@ export class NodeCompMainList extends Comp {
     }
 
     addPaginationButtons(children: Comp[], endReached: boolean, moreClasses: string, pageTop: boolean) {
-        let firstButton: IconButton;
-        let prevButton: IconButton;
-        let moreButton: IconButton;
+        let firstButton: Button;
+        let prevButton: Button;
+        let moreButton: Button;
         const firstChild = S.edit.getFirstChildNode();
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
-            firstButton = new IconButton("fa-angle-double-left", null, {
-                onClick: () => S.view.firstPage(),
+            firstButton = new Button(null, S.view._firstPage, {
                 title: "First Page"
-            });
+            }, null, "fa-angle-double-left");
         }
 
         if (firstChild && firstChild.logicalOrdinal > 0) {
-            prevButton = new IconButton("fa-angle-left", null, {
-                onClick: () => S.view.prevPage(),
+            prevButton = new Button(null, S.view._prevPage, {
                 title: "Previous Page"
-            });
+            }, null, "fa-angle-left");
         }
 
         if (!endReached) {
-            moreButton = new IconButton("fa-angle-right", "More", {
-                onClick: (event: Event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    S.view.nextPage();
-                },
+            moreButton = new Button("More", (event: Event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                S.view.nextPage();
+            }, {
                 title: "Next Page"
-            });
+            }, null, "fa-angle-right");
 
             const buttonCreateTime: number = new Date().getTime();
 

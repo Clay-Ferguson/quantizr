@@ -8,8 +8,8 @@
 
 .adminButton {
     font-weight: bold;
-    color: var(--bs-green);
-    border-bottom: 2px solid var(--bs-green);
+    color: $green;
+    border-bottom: 2px solid $green;
     cursor: pointer;
 }
 
@@ -19,14 +19,14 @@
 
 .tourLink {
     font-weight: bold;
-    color: var(--bs-green);
-    border-bottom: 2px solid var(--bs-green);
+    color: $green;
+    border-bottom: 2px solid $green;
     cursor: pointer;
 }
 
 .hrefLink {
     font-weight: bold;
-    color: var(--bs-green);
+    color: $green;
     cursor: pointer;
 }
 
@@ -63,28 +63,6 @@
     color: yellow;
 }
 
-.btn {
-    border-radius: 0 !important;
-    border: 1px solid slategrey;
-    cursor: pointer !important;
-}
-
-.btn[disabled] {
-    font-style: italic;
-}
-
-.btn:hover {
-    border: 1px solid slategrey;
-}
-
-.btn:active {
-    border: 1px solid slategrey;
-}
-
-.btn:focus {
-    border: 1px solid slategrey;
-}
-
 .errorBackButton {
     margin-top: 1.5rem;
     font-weight: 700;
@@ -97,7 +75,7 @@
 }
 
 .pasteButton {
-    border: 2px dotted var(--bs-green) !important;
+    border: 2px dotted $green !important;
     border-radius: 6px;
     padding: 5px !important;
     cursor: pointer;

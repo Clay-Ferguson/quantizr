@@ -4,9 +4,9 @@ import { FullScreenType } from "../Interfaces";
 import { Attachment } from "../JavaIntf";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { Comp } from "./base/Comp";
+import { Button } from "./core/Button";
 import { ButtonBar } from "./core/ButtonBar";
 import { Checkbox } from "./core/Checkbox";
 
@@ -44,18 +44,16 @@ export class FullScreenControlBar extends Comp {
 
             if (!onFirst) {
                 buttons.push(
-                    new IconButton("fa-angle-left fa-lg", "", {
-                        onClick: S.nav._prevFullScreenImgViewer,
+                    new Button("", S.nav._prevFullScreenImgViewer, {
                         title: "View Previous Attachment"
-                    }, "-primary", "off"));
+                    }, "-primary", "fa-angle-left fa-lg"));
             }
 
             if (!onLast) {
                 buttons.push(
-                    new IconButton("fa-angle-right fa-lg", "", {
-                        onClick: S.nav._nextFullScreenImgViewer,
+                    new Button("", S.nav._nextFullScreenImgViewer, {
                         title: "View Next Attachment"
-                    }, "-primary", "off"));
+                    }, "-primary", "fa-angle-right fa-lg"));
             }
         }
 
@@ -83,17 +81,15 @@ export class FullScreenControlBar extends Comp {
             ]));
 
             buttons.push(
-                new IconButton("fa-window-minimize fa-lg", null, {
-                    onClick: S.nav._minimizeFullScreenViewer,
+                new Button(null, S.nav._minimizeFullScreenViewer, {
                     title: "Minimize Graph"
-                }, "-primary", "off"));
+                }, "-primary", "fa-window-minimize fa-lg"));
         }
 
         buttons.push(
-            new IconButton("fa-window-close fa-lg", null, {
-                onClick: S.nav._closeFullScreenViewer,
+            new Button(null, S.nav._closeFullScreenViewer, {
                 title: "Close Viewer (ESC Key)"
-            }, "-primary", "off"));
+            }, "-primary", "fa-window-close fa-lg"));
 
         if (buttons.length > 0) {
             comps.push(new ButtonBar(buttons, "tw-float-right"));

@@ -74,7 +74,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
 
                 S.quanta.config.aiAgentEnabled ? //
                     new Div("AI Agent Configuration", {
-                        className: "settingsSectionTitle alert alert-primary"
+                        className: "settingsSectionTitle " + Tailwind.alertPrimary
                     }) : null,
                 S.quanta.config.aiAgentEnabled ? new Div(null, {
                     className: "bigMarginRight"
@@ -87,19 +87,23 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         rows: 4,
                         placeholder: "List folders to exclude (optional)"
                     }, this.foldersToExcludeState, null, false, 3, this.foldersToExcludeScrollPos),
-                    new TextField({ label: "File Extensions (ex: java,py,txt)", val: this.fileExtState }),
+                    new TextField({
+                        label: "File Extensions (ex: java,py,txt)", val: this.fileExtState,
+                        outterClass: "marginTop"
+                    }),
                 ]) : null,
                 new FlexLayout([
                     new TextField({
                         label: "Max Response Words",
                         val: this.maxWordsState,
                         inputClass: "maxResponseWords",
+                        outterClass: "marginTop"
                     }),
                     new TextField({
                         label: "Creativity (0.0-1.0, Default=0.7)",
                         val: this.temperatureState,
                         inputClass: "aiTemperature",
-                        outterClass: "marginLeft"
+                        outterClass: "marginLeft marginTop"
                     }),
                 ]),
                 new Button("Save", this._save, { className: "bigMarginTop" })

@@ -1,7 +1,37 @@
 @tailwind base;
+
+// NOTE: Tailwind removes ALL existing styling that browsers provide so we need to build our own H1 thru H6 styling.
+@layer base {
+    h1 {
+        @apply tw-text-4xl tw-mb-4;
+    }
+
+    h2 {
+        @apply tw-text-3xl tw-mb-3;
+    }
+
+    h3 {
+        @apply tw-text-2xl tw-mb-2;
+    }
+
+    h4 {
+        @apply tw-text-xl tw-mb-2;
+    }
+
+    h5 {
+        @apply tw-text-lg tw-mb-2;
+    }
+
+    h6 {
+        @apply tw-text-base tw-mb-2;
+    }
+}
+
 @tailwind components;
 @tailwind utilities;
 
+
+// todo-0: there's probably a lot in this class we can delete?
 @import "variables.scss";
 
 $profileImgSize: 200px;
@@ -25,17 +55,11 @@ $disabled-body-color: gray; //darken($body-color, 90%);
 $custom-control-indicator-size: 1.75rem; // This gives us awesome large checkboxes and radio buttons!!
 $form-select-indicator-color: lightGray;
 
-@import "bootstrap/scss/bootstrap";
-
 $fa-font-path: "@fortawesome/fontawesome-free/webfonts";
 @import "@fortawesome/fontawesome-free/scss/fontawesome";
 @import "@fortawesome/fontawesome-free/scss/solid";
 @import "@fortawesome/fontawesome-free/scss/regular";
 // @import "@fortawesome/fontawesome-free/scss/brands"; // so far we don't need brands
-
-
-@import "bootswatch.scss";
-@import "bootstrap-icons/font/bootstrap-icons.css";
 
 $fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Verdana, Arial, sans-serif, Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 // $fontFamily: 'QuantaCustomFont', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif';
@@ -46,7 +70,7 @@ $fontFamily: -apple-system, BlinkMacSystemFont, "Segoe UI", Verdana, Arial, sans
 
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
-$dlgBorderColor: var(--bs-green);
+$dlgBorderColor: $green;
 $dlgBorderWidth: 2px;
 $createdByMeBackgroundColor: green;
 $createdByMeTextColor: white;

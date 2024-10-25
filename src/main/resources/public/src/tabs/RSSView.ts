@@ -11,10 +11,9 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
-import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
-import { Span } from "../comp/core/Span";
 import { Progress } from "../comp/core/Progress";
+import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMarkdown } from "../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
@@ -98,10 +97,9 @@ export class RSSView extends AppTab<any, RSSView> {
 
         this.children = [
             this.headingBar = new TabHeading([
-                new IconButton("fa-arrow-left", "", {
-                    onClick: () => S.view.jumpToId(ast.rssNode.id),
+                new Button("", () => S.view.jumpToId(ast.rssNode.id), {
                     title: "Back to Folders View"
-                }, "marginRight"),
+                }, "marginRight", "fa-arrow-left"),
                 new Div("RSS Feed", { className: "tabTitle" }),
                 new Checkbox("Headlines Only", {
                     className: "tw-float-right"
@@ -251,30 +249,27 @@ export class RSSView extends AppTab<any, RSSView> {
 
     makeNavButtonBar(page: number, feedSrc: string, feedSrcHash: string, clazz: string): ButtonBar {
         return new ButtonBar([
-            page > 2 ? new IconButton("fa-angle-double-left", null, {
-                onClick: (event: Event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    this.setPage(feedSrc, feedSrcHash, 1);
-                },
+            page > 2 ? new Button(null, (event: Event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                this.setPage(feedSrc, feedSrcHash, 1);
+            }, {
                 title: "First Page"
-            }) : null,
-            page > 1 ? new IconButton("fa-angle-left", null, {
-                onClick: (event: Event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    this.pageBump(feedSrc, feedSrcHash, -1);
-                },
+            }, null, "fa-angle-double-left") : null,
+            page > 1 ? new Button(null, (event: Event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                this.pageBump(feedSrc, feedSrcHash, -1);
+            }, {
                 title: "Previous Page"
-            }) : null,
-            new IconButton("fa-angle-right", "More", {
-                onClick: (event: Event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    this.pageBump(feedSrc, feedSrcHash, 1);
-                },
+            }, null, "fa-angle-left") : null,
+            new Button("More", (event: Event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                this.pageBump(feedSrc, feedSrcHash, 1);
+            }, {
                 title: "Next Page"
-            })
+            }, null, "fa-angle-right")
         ], clazz);
     }
 

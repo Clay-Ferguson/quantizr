@@ -11,6 +11,7 @@ import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
 import { SearchContentDlg } from "../dlg/SearchContentDlg";
 import { TabBase } from "../intf/TabBase";
+import { Tailwind } from "../Tailwind";
 
 export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
     static inst: StatisticsView = null;
@@ -36,7 +37,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
 
         // todo-2: add back in when votes are implemented
         // if (this.res.topVotes?.length > 0) {
-        //     tagPanel.addChild(new Heading(6, "Votes", { className: "trendingSectionTitle alert alert-primary" }));
+        //     tagPanel.addChild(new Heading(6, "Votes", { className: "trendingSectionTitle "+Tailwind.alertPrimary }));
         //     this.res.topVotes.forEach(word => {
         //         tagPanel.addChild(new Span(word, {
         //             className: ast.mobileMode ? "statsWordMobile" : "statsWord",
@@ -46,7 +47,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
         // }
 
         if ((!this.data.props.filter || this.data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
-            tagPanel.addChild(new Heading(6, "Hashtags", { className: "trendingSectionTitle alert alert-primary" }));
+            tagPanel.addChild(new Heading(6, "Hashtags", { className: "trendingSectionTitle " + Tailwind.alertPrimary }));
             res.topTags.forEach(word => {
                 tagPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",
@@ -58,7 +59,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
 
         const wordPanel = new Div(null, { className: "trendingWordStatsArea" });
         if ((!this.data.props.filter || this.data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
-            wordPanel.addChild(new Heading(6, "Words", { className: "trendingSectionTitle alert alert-primary" }));
+            wordPanel.addChild(new Heading(6, "Words", { className: "trendingSectionTitle " + Tailwind.alertPrimary }));
             res.topWords.forEach(word => {
                 wordPanel.addChild(new Span(word, {
                     className: ast.mobileMode ? "statsWordMobile" : "statsWord",

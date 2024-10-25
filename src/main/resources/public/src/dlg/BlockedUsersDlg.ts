@@ -13,7 +13,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
-import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
@@ -93,7 +92,7 @@ export class BlockedUsersDlg extends DialogBase {
                 null, "friendsTagPickerOnEditor alignBottom", {
                 setValue: (val: string) => {
                     this.friendsTagSearch = val;
-                    this.userSearch();
+                    this._userSearch();
                 },
                 getValue: (): string => this.friendsTagSearch
             });
@@ -125,16 +124,15 @@ export class BlockedUsersDlg extends DialogBase {
                         label: "Search",
                         val: this.searchTextState,
                         placeholder: "Search for...",
-                        enter: this.userSearch,
+                        enter: this._userSearch,
                         outterClass: "friendSearchField"
                     })),
 
                     // This div wrapper is to keep the button from stretching wrong
                     new Div(null, { className: "friendSearchButtonDiv" }, [
-                        new IconButton("fa-search", null, {
-                            onClick: this.userSearch,
+                        new Button(null, this._userSearch, {
                             title: "Search"
-                        })
+                        }, null, "fa-search")
                     ]),
 
                     friendsTagDropDown
@@ -177,7 +175,7 @@ export class BlockedUsersDlg extends DialogBase {
         this.preLoad();
     }
 
-    userSearch = () => {
+    _userSearch = () => {
         this.mergeState<LS>({});
         // warning: keep the fat arrow function here.
         setTimeout(() => this.searchTextField.focus(), 50);

@@ -111,7 +111,7 @@ export class ExportDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => getAs().exportSettings.contentType === exportType
-            }, "marginRight")
+            }, "marginRight inlineBlock")
         ]);
     }
 
@@ -124,7 +124,7 @@ export class ExportDlg extends DialogBase {
                     }
                 },
                 getValue: (): boolean => getAs().exportSettings.exportType === exportType
-            }, "marginRight")
+            }, "marginRight inlineBlock")
         ]);
     }
 

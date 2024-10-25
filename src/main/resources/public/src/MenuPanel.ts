@@ -1,4 +1,4 @@
-import { asyncDispatch, dispatch, getAs, promiseDispatch } from "./AppContext";
+import { asyncDispatch, getAs, promiseDispatch } from "./AppContext";
 import { Comp } from "./comp/base/Comp";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
@@ -190,7 +190,7 @@ export class MenuPanel extends Comp {
         children.push(new Menu(C.OPTIONS_MENU_TEXT, [
             ast.isAnonUser ? null : new MenuItem("Edit Mode", MenuPanel.toggleEditMode, allowEditMode && !fullScreenViewer, //
                 MenuPanel.isEditMode, false, "ui-menu-options-editmode"),
-            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, MenuPanel.isInfoMode)
+            new MenuItem("Node Info", MenuPanel.toggleInfoMode, !fullScreenViewer, MenuPanel.isInfoMode, false, "ui-menu-options-infomode")
         ], null, null, "ui-menu-options"));
 
         if (!ast.isAnonUser) {
@@ -414,18 +414,19 @@ export class MenuPanel extends Comp {
             ]));
         }
 
-        if (!ast.mobileMode && S.tourUtils) {
-            S.tourUtils.init();
-            const tourItems = [];
-            S.tourUtils.tours.forEach(tour => {
-                tourItems.push(new MenuItem(tour.name, () => {
-                    dispatch("SetTour", s => s.tour = tour);
-                }, true, null));
-            });
-            if (tourItems.length > 0) {
-                children.push(new Menu("Guided Tours", tourItems, null));
-            }
-        }
+        // todo-0: commented out as part of switching to TailwindCSS becasue this stuff is not yet converted for tailwind.
+        // if (!ast.mobileMode && S.tourUtils) {
+        //     S.tourUtils.init();
+        //     const tourItems = [];
+        //     S.tourUtils.tours.forEach(tour => {
+        //         tourItems.push(new MenuItem(tour.name, () => {
+        //             dispatch("SetTour", s => s.tour = tour);
+        //         }, true, null));
+        //     });
+        //     if (tourItems.length > 0) {
+        //         children.push(new Menu("Guided Tours", tourItems, null));
+        //     }
+        // }
 
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //

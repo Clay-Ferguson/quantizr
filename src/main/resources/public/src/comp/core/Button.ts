@@ -1,10 +1,12 @@
 import { getAs } from "../../AppContext";
 import { Comp } from "../base/Comp";
+import { Progress } from "./Progress";
 import { Tag } from "./Tag";
 
 interface LS { // Local State
     text?: string;
     enabled?: boolean;
+    waiting?: boolean;
 }
 
 export class Button extends Comp {
@@ -13,19 +15,18 @@ export class Button extends Comp {
         super(attribs);
 
         moreClasses = moreClasses || "";
-        moreClasses = moreClasses.replace("btn ", "");
 
         moreClasses += " tw-px-4 tw-py-2 tw-border tw-border-gray-400 tw-border-solid";
         if (moreClasses.indexOf("-primary") != -1) {
             moreClasses = moreClasses.replace("-primary", "");
-            moreClasses += " tw-bg-blue-600 hover:tw-bg-blue-700 tw-text-white";
+            moreClasses += " tw-bg-sky-800 hover:tw-bg-sky-900 tw-text-white";
         }
         else if (moreClasses.indexOf("-danger") != -1) {
             moreClasses = moreClasses.replace("-danger", "");
             moreClasses += " tw-bg-red-500 hover:tw-bg-red-600 tw-text-white";
         }
         else {
-            moreClasses += " tw-bg-gray-600 hover:tw-bg-gray-700 tw-text-white";
+            moreClasses += " tw-bg-gray-700 hover:tw-bg-gray-800 tw-text-white";
         }
 
         this.attribs.type = "button";
@@ -44,10 +45,22 @@ export class Button extends Comp {
         this.mergeState<LS>({ text });
     }
 
-    override preRender(): boolean | null {
-        const text: string = this.getState<LS>().text;
+    replaceWithWaitIcon(): void {
+        this.mergeState({ waiting: true });
+    }
 
-        if (this.getState<LS>().enabled) {
+    override preRender(): boolean | null {
+        const state = this.getState<LS>();
+
+        // this gets activated when the user clicks an infinite scrolling button, so it turns into a spinner
+        // while loading more records
+        if (state.waiting) {
+            this.children = [new Progress()];
+            return true;
+        }
+        const text: string = state.text;
+
+        if (state.enabled) {
             delete this.attribs.disabled;
         }
         else {

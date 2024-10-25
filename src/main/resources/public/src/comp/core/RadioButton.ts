@@ -26,7 +26,7 @@ export class RadioButton extends Comp {
             }, null, this.valueIntf),
             new Label(this.label || "", {
                 htmlFor: cbInput.getId(),
-                className: "tw-ml-2 tw-text-sm tw-text-gray-700 radioLabel"
+                className: "tw-ml-2 tw-text-sm tw-text-white radioLabel"
             })
         ];
         return true;

@@ -1,6 +1,5 @@
 import { getAs } from "../AppContext";
 import { Clearfix } from "../comp/core/Clearfix";
-import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
 import { DialogMode } from "../DialogBase";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
@@ -9,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 import { Comp } from "./base/Comp";
+import { Button } from "./core/Button";
 import { Div } from "./core/Div";
 import { Heading } from "./core/Heading";
 import { Progress } from "./core/Progress";
@@ -110,15 +110,13 @@ export class App extends Main {
             // DO NOT DELETE:
             // Currently we have no need to show the menu to anonymous users, but I want to keep
             // this here for future purposes in case we eventually do need this menu.
-            const menuButton = new IconButton("fa-bars fa-lg", null, {
-                onClick: S.nav._showMainMenu,
+            const menuButton = new Button(null, S.nav._showMainMenu, {
                 id: "mainMenu"
-            }, "-primary menuButton", "off");
+            }, "-primary menuButton", "fa-bars fa-lg");
 
-            const navButton = new IconButton("fa-sitemap fa-lg", null, {
-                onClick: () => new NavPanelDlg().open(),
+            const navButton = new Button(null, () => new NavPanelDlg().open(), {
                 id: "navMenu"
-            }, "-primary menuButton", "off");
+            }, "-primary menuButton", "fa-sitemap fa-lg");
 
             const loginButton = ast.isAnonUser ? new Div("Login", {
                 className: "marginTop marginRight clickable",

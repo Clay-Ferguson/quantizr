@@ -1,11 +1,11 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp, CompT } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Html } from "../comp/core/Html";
 import { Icon } from "../comp/core/Icon";
-import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
@@ -84,11 +84,10 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
             }
 
             if (parentVisible) {
-                headingBarItems.push(new IconButton("fa-folder", "Up", {
+                headingBarItems.push(new Button("Up", S.nav._navUpLevelClick, {
                     [C.NODE_ID_ATTR]: ast.node.id,
-                    onClick: S.nav._navUpLevelClick,
                     title: "Go to Parent Node"
-                }, "-primary"));
+                }, "-primary", "fa-folder"));
             }
 
             if (headingBarItems.length > 0) {

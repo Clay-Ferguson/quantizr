@@ -6,10 +6,10 @@ import { ResultSetInfo } from "../ResultSetInfo";
 import { S } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TabBase } from "../intf/TabBase";
@@ -37,23 +37,22 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         const children: Comp[] = [
             this.headingBar = new TabHeading([
                 (ast.searchViewFromTab || this.data.props.node)
-                    ? new IconButton("fa-arrow-left", "", {
-                        onClick: () => {
-                            if (this.data.props.node) {
-                                S.view.jumpToId(this.data.props.node.id);
-                            }
-                            else if (ast.searchViewFromTab) {
-                                S.tabUtil.selectTab(ast.searchViewFromTab);
-                                setTimeout(() => {
-                                    const data: TabBase = S.tabUtil.getAppTabData(ast.searchViewFromTab);
-                                    if (ast.searchViewFromNode && data.inst) {
-                                        data.inst.scrollToNode(ast.searchViewFromNode.id);
-                                    }
-                                }, 500);
-                            }
-                        },
+                    ? new Button("", () => {
+                        if (this.data.props.node) {
+                            S.view.jumpToId(this.data.props.node.id);
+                        }
+                        else if (ast.searchViewFromTab) {
+                            S.tabUtil.selectTab(ast.searchViewFromTab);
+                            setTimeout(() => {
+                                const data: TabBase = S.tabUtil.getAppTabData(ast.searchViewFromTab);
+                                if (ast.searchViewFromNode && data.inst) {
+                                    data.inst.scrollToNode(ast.searchViewFromNode.id);
+                                }
+                            }, 500);
+                        }
+                    }, {
                         title: "Back to Folders View"
-                    }, "marginRight") : null,
+                    }, "marginRight", "fa-arrow-left") : null,
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
                 this.data.props.description ? new Span(this.data.props.description, { className: "tw-float-right smallMarginTop" }) : null,
@@ -116,43 +115,35 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         }
 
         if (this.data.props.page >= 1) {
-            buttonBarComps.push(new IconButton("fa-angle-double-up fa-lg", null, {
-                onClick: () => {
-                    this.data.props.page = 0;
-                    this.data.scrollPos = 0;
-                    dispatch("pageChange", _s => { });
-                }
-            }));
+            buttonBarComps.push(new Button(null, () => {
+                this.data.props.page = 0;
+                this.data.scrollPos = 0;
+                dispatch("pageChange", _s => { });
+            }, null, null, "fa-angle-double-up fa-lg"));
         }
 
         if (this.data.props.page > 0) {
-            buttonBarComps.push(new IconButton("fa-angle-up fa-lg", null, {
-                onClick: () => {
-                    this.data.props.page--;
-                    this.data.scrollPos = 0;
-                    dispatch("pageChange", _s => { });
-                }
-            }));
+            buttonBarComps.push(new Button(null, () => {
+                this.data.props.page--;
+                this.data.scrollPos = 0;
+                dispatch("pageChange", _s => { });
+            }, null, null, "fa-angle-up fa-lg"));
         }
 
         if (this.data.props.page + 1 < maxPage) {
-            buttonBarComps.push(new IconButton("fa-angle-double-down fa-lg", null, {
-                onClick: () => {
-                    this.data.props.page = maxPage - 1;
-                    this.data.scrollPos = 0;
-                    dispatch("pageChange", _s => { });
-                }
-            }));
+            buttonBarComps.push(new Button(null, () => {
+                this.data.props.page = maxPage - 1;
+                this.data.scrollPos = 0;
+                dispatch("pageChange", _s => { });
+            }, null, null, "fa-angle-double-down fa-lg"));
         }
 
         if (this.data.props.page + 1 < maxPage) {
-            buttonBarComps.push(new IconButton("fa-angle-down fa-lg", null, {
-                onClick: () => {
-                    this.data.props.page++;
-                    this.data.scrollPos = 0;
-                    dispatch("pageChange", _s => { });
-                }
-            }));
+            buttonBarComps.push(new Button(null, () => {
+                this.data.props.page++;
+                this.data.scrollPos = 0;
+                dispatch("pageChange", _s => { });
+            }, null, null, "fa-angle-down fa-lg"));
         }
 
         children.push(

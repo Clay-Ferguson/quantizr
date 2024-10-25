@@ -112,11 +112,11 @@ export class View {
         await S.render.renderPage(res, a.scrollToTop, a.highlightId, a.setTab, a.allowScroll);
     }
 
-    firstPage() {
+    _firstPage = () => {
         this.loadPage(false, 0, false);
     }
 
-    prevPage() {
+    _prevPage = () => {
         const firstChild = S.edit.getFirstChildNode();
         if (firstChild?.logicalOrdinal > 0) {
             let targetOffset = firstChild.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;

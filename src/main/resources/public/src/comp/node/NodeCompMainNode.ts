@@ -2,12 +2,12 @@ import { getAs } from "../../AppContext";
 import { Comp } from "../../comp/base/Comp";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
-import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { TabBase } from "../../intf/TabBase";
 import * as J from "../../JavaIntf";
 import { PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Button } from "../core/Button";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
@@ -67,10 +67,9 @@ export class NodeCompMainNode extends Comp {
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, ast.node);
             if (targetId) {
-                jumpButton = new IconButton("fa-arrow-right", null, {
-                    onClick: () => S.view.jumpToId(targetId),
+                jumpButton = new Button(null, () => S.view.jumpToId(targetId), {
                     title: "Jump to the Node"
-                }, "tw-float-right");
+                }, "tw-float-right", "fa-arrow-right");
             }
         }
 

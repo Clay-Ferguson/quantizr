@@ -16,7 +16,6 @@ import { CollapsiblePanel } from "./CollapsiblePanel";
 import { Div } from "./Div";
 import { FlexRowLayout } from "./FlexRowLayout";
 import { Icon } from "./Icon";
-import { IconButton } from "./IconButton";
 import { Span } from "./Span";
 import { TextField } from "./TextField";
 
@@ -36,14 +35,12 @@ export class EditAttachmentsPanel extends Comp {
         if (atts?.size > 0 || ast.cutAttachmentsFromId) {
             this.addChild(new ButtonBar([
                 new Span(null, { className: "alignBottom" }),
-                atts?.size > 0 ? new IconButton("fa-trash fa-lg", "", {
-                    onClick: () => this.dlg.utl.deleteUploads(),
+                atts?.size > 0 ? new Button("", this.dlg.utl._deleteUploads, {
                     title: "Delete selected Attachments"
-                }) : null,
-                !ast.cutAttachmentsFromId ? new IconButton("fa-cut fa-lg", "", {
-                    onClick: () => this.dlg.utl.cutUploads(),
+                }, null, "fa-trash fa-lg") : null,
+                !ast.cutAttachmentsFromId ? new Button(null, this.dlg.utl._cutUploads, {
                     title: "Cut selected Attachments"
-                }) : null,
+                }, null, "fa-cut fa-lg") : null,
                 ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil._clearCut, { className: "clickable marginLeft" }) : null,
                 ast.cutAttachmentsFromId && ast.editNode.id != ast.cutAttachmentsFromId ? //
                     new Button("Paste", () => S.nodeUtil.paste(this.dlg), {

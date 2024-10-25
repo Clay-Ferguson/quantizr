@@ -1,8 +1,8 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { Constants as C } from "../Constants";
 import { TabBase } from "../intf/TabBase";
@@ -30,23 +30,22 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
         let i = 0;
         const children: Comp[] = [
             this.headingBar = new TabHeading([
-                new IconButton("fa-arrow-left", null, {
-                    onClick: () => {
-                        const ast = getAs();
-                        if (ast.repliesViewFromTab === C.TAB_MAIN) {
-                            // the jumpToId is the best way to get to a node on the main tab.
-                            S.view.jumpToId(ast.repliesViewNodeId);
-                        }
-                        else {
-                            S.tabUtil.selectTab(ast.repliesViewFromTab);
-                            setTimeout(() => {
-                                const data: TabBase = S.tabUtil.getAppTabData(ast.repliesViewFromTab);
-                                data.inst?.scrollToNode(ast.repliesViewNodeId);
-                            }, 700);
-                        }
-                    },
+                new Button(null, () => {
+                    const ast = getAs();
+                    if (ast.repliesViewFromTab === C.TAB_MAIN) {
+                        // the jumpToId is the best way to get to a node on the main tab.
+                        S.view.jumpToId(ast.repliesViewNodeId);
+                    }
+                    else {
+                        S.tabUtil.selectTab(ast.repliesViewFromTab);
+                        setTimeout(() => {
+                            const data: TabBase = S.tabUtil.getAppTabData(ast.repliesViewFromTab);
+                            data.inst?.scrollToNode(ast.repliesViewNodeId);
+                        }, 700);
+                    }
+                }, {
                     title: "Go back..."
-                }, "marginRight"),
+                }, "marginRight", "fa-arrow-left"),
                 new Div(this.data.name, { className: "tabTitle" }),
             ], this.data),
             this.data.props.description ? new Div(this.data.props.description) : null

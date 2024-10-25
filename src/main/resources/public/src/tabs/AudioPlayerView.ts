@@ -7,7 +7,6 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Icon } from "../comp/core/Icon";
-import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import * as I from "../Interfaces";
@@ -67,10 +66,9 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
 
         this.children = [
             this.headingBar = new TabHeading([
-                AudioPlayerView.audioNodeId ? new IconButton("fa-arrow-left", null, {
-                    onClick: () => S.view.jumpToId(getAs().repliesViewNodeId),
+                AudioPlayerView.audioNodeId ? new Button(null, () => S.view.jumpToId(getAs().repliesViewNodeId), {
                     title: "Go back..."
-                }, "marginRight") : null,
+                }, "marginRight", "fa-arrow-left") : null,
                 new Div("Audio Player", { className: "tabTitle" })
             ], null),
             new Div(null, { className: "bigMarginTop bigMarginRight" }, [

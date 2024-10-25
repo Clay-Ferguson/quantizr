@@ -2,7 +2,6 @@ import { S } from "../../Singletons";
 import { Validator } from "../../Validator";
 import { Button } from "./Button";
 import { DateField } from "./DateField";
-import { IconButton } from "./IconButton";
 import { Span } from "./Span";
 import { TextField } from "./TextField";
 import { TimeField } from "./TimeField";
@@ -123,10 +122,9 @@ export class DateTimeField extends Span {
                     this.dateState.setValue(dateStr);
                     S.util.flashMessage("Added one year", "Note", true);
                 }, { title: "Add Year" }),
-                this.addTag ? new IconButton("fa-bell fa-lg", "", {
-                    onClick: () => this.addTag("#due"),
+                this.addTag ? new Button("", () => this.addTag("#due"), {
                     title: "Make this a #due date"
-                }) : null,
+                }, null, "fa-bell fa-lg") : null,
             ])
         ];
         return true;

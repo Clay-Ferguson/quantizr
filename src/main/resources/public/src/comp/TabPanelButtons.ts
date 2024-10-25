@@ -50,6 +50,7 @@ export class TabPanelButtons extends Comp {
         }
 
         return new Li(null, {
+            className: "marginBottom",
             style: { display: data.isVisible() ? "inline" : "none" },
             onClick: (event: Event) => {
                 event.stopPropagation();

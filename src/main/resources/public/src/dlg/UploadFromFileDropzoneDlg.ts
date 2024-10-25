@@ -9,7 +9,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { FlexLayout } from "../comp/core/FlexLayout";
-import { IconButton } from "../comp/core/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
 
@@ -67,21 +66,19 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             new Div(null, { className: "marginRight" }, [
                 new Div("Existing Data"),
                 new ButtonBar([
-                    !S.util.clipboardReadable() ? null : new IconButton("fa-clipboard", "Clipboard", {
-                        onClick: this._uploadFromClipboard,
+                    !S.util.clipboardReadable() ? null : new Button("Clipboard", this._uploadFromClipboard, {
                         title: "Upload from Clipboard"
-                    }),
-                    new IconButton("fa-cloud", "URL", {
-                        onClick: this._uploadFromUrl,
+                    }, null, "fa-clipboard"),
+                    new Button("URL", this._uploadFromUrl, {
                         title: "Upload from Web/URL"
-                    }),
+                    }, null, "fa-cloud"),
                 ])
             ]),
             new Div(null, { className: "marginRight" }, [
                 new Div("Live Recording"),
                 new ButtonBar([
-                    !this.allowRecording ? null : new IconButton("fa-microphone", "Mic", {
-                        onClick: async () => {
+                    !this.allowRecording ? null : new Button("Mic",
+                        async () => {
                             const dlg: MediaRecorderDlg = new MediaRecorderDlg(false, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
@@ -89,24 +86,23 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 this.runButtonEnablement();
                                 this._upload();
                             }
-                        },
+                        }, {
                         title: "Record Audio as Attachment"
-                    }),
+                    }, "fa-microphone"),
 
-                    !this.allowRecording ? null : new IconButton("fa-video-camera", "Webcam", {
-                        onClick: async () => {
-                            const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
-                            await dlg.open();
-                            if (dlg.uploadRequested) {
-                                // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
-                                dlg.blobType = S.util.chopAtLastChar(dlg.blobType, ";");
-                                this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
-                                this.runButtonEnablement();
-                                this._upload();
-                            }
-                        },
+                    !this.allowRecording ? null : new Button("Webcam", async () => {
+                        const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);
+                        await dlg.open();
+                        if (dlg.uploadRequested) {
+                            // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
+                            dlg.blobType = S.util.chopAtLastChar(dlg.blobType, ";");
+                            this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
+                            this.runButtonEnablement();
+                            this._upload();
+                        }
+                    }, {
                         title: "Record Video as Attachment"
-                    })
+                    }, null, "fa-video-camera")
                 ])
             ])
         ]);

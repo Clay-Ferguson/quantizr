@@ -183,7 +183,7 @@ export class RightNavPanel extends Comp {
             //     new ButtonBar([
             //         clipboardPasteButton,
             //         addNoteButton,
-            //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+            //         displayName && !state.isAnonUser ? new Button("fa-database", null, {
             //             title: "Go to your Account Root Node",
             //             onClick: e => S.nav.navHome(state)
             //         }) : null

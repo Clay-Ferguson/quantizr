@@ -7,9 +7,8 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { FlexRowLayout } from "../comp/core/FlexRowLayout";
 import { Heading } from "../comp/core/Heading";
-import { IconButton } from "../comp/core/IconButton";
-import { Selection } from "../comp/core/Selection";
 import { Progress } from "../comp/core/Progress";
+import { Selection } from "../comp/core/Selection";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
@@ -76,23 +75,21 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         outterClass: "feedSearchField marginRight"
                     }) : null,
                     // we show this button just as an icon unless the search field is displaying
-                    new IconButton("fa-search", ast.displayFeedSearch ? "Search" : null, {
-                        onClick: () => {
-                            if (ast.displayFeedSearch) {
-                                S.srch._refreshFeed()
-                            }
-                            else {
-                                dispatch("DisplayFeedSearch", s => {
-                                    s.displayFeedSearch = true;
-                                });
-                            }
-                        },
+                    new Button(ast.displayFeedSearch ? "Search" : null, () => {
+                        if (ast.displayFeedSearch) {
+                            S.srch._refreshFeed()
+                        }
+                        else {
+                            dispatch("DisplayFeedSearch", s => {
+                                s.displayFeedSearch = true;
+                            });
+                        }
+                    }, {
                         title: "Search Feed"
-                    }),
-                    new IconButton("fa-refresh", null, {
-                        onClick: S.srch._refreshFeed,
+                    }, null, "fa-search"),
+                    new Button(null, S.srch._refreshFeed, {
                         title: "Refresh Feed"
-                    }),
+                    }, null, "fa-refresh"),
                     this.data.props.searchTextState.getValue() //
                         ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
@@ -154,13 +151,11 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
             // only show "More" button if we aren't currently editing. Wouldn't make sense to
             // navigate while editing.
             if (!ast.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
-                const moreButton = new IconButton("fa-angle-right", "More", {
-                    onClick: (event: Event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), false);
-                    }
-                });
+                const moreButton = new Button("More", (event: Event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), false);
+                }, null, "fa-angle-right");
                 const buttonCreateTime: number = new Date().getTime();
 
                 if (C.FEED_INFINITE_SCROLL) {

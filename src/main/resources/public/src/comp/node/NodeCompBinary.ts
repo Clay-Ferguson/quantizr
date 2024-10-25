@@ -2,7 +2,6 @@ import { dispatch, getAs } from "../../AppContext";
 import { Anchor } from "../../comp/core/Anchor";
 import { Div } from "../../comp/core/Div";
 import { Icon } from "../../comp/core/Icon";
-import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { DialogMode } from "../../DialogBase";
 import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
@@ -10,6 +9,7 @@ import { FullScreenType } from "../../Interfaces";
 import { NodeInfo } from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { Comp } from "../base/Comp";
+import { Button } from "../core/Button";
 import { FlexRowLayout } from "../core/FlexRowLayout";
 import { Img } from "../core/Img";
 import { Span } from "../core/Span";
@@ -185,11 +185,9 @@ export class NodeCompBinary extends Comp {
         else if (S.props.hasVideo(node, this.attName)) {
             this.children = [
                 new FlexRowLayout([
-                    this.isEditorEmbed ? null : new IconButton("fa-play", "Play Video", {
-                        onClick: () => {
-                            new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
-                        }
-                    }, "-primary marginRight"),
+                    this.isEditorEmbed ? null : new Button("Play Video", () => {
+                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
+                    }, "-primary marginRight", "fa-play"),
                     new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
@@ -199,13 +197,11 @@ export class NodeCompBinary extends Comp {
         else if (S.props.hasAudio(node, this.attName)) {
             this.children = [
                 new FlexRowLayout([
-                    this.isEditorEmbed ? null : new IconButton("fa-play", "Play Audio", {
-                        onClick: () => {
-                            const att = S.props.getAttachment(this.attName, node);
-                            if (!att) return null;
-                            S.nav.showAudioPlayerTab(node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, null, att.fileName);
-                        }
-                    }, "-primary marginRight"),
+                    this.isEditorEmbed ? null : new Button("Play Audio", () => {
+                        const att = S.props.getAttachment(this.attName, node);
+                        if (!att) return null;
+                        S.nav.showAudioPlayerTab(node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, null, att.fileName);
+                    }, "-primary marginRight", "fa-play"),
                     new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])

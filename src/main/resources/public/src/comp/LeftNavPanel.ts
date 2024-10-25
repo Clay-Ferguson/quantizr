@@ -9,8 +9,8 @@ import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { NavPanelDlg } from "../dlg/NavPanelDlg";
 import { Comp } from "./base/Comp";
+import { Button } from "./core/Button";
 import { FlexRowLayout } from "./core/FlexRowLayout";
-import { IconButton } from "./core/IconButton";
 
 export class LeftNavPanel extends Comp {
     private static scrollPos: number = 0;
@@ -83,10 +83,9 @@ export class LeftNavPanel extends Comp {
                         //     onClick: () => dispatch("ToggleLHS", s => s.anonShowLHSMenu = !s.anonShowLHSMenu),
                         //     title: "Show Menu"
                         // }) : null,
-                        !ast.showRhs ? new IconButton("fa-sitemap fa-lg", null, {
-                            onClick: () => new NavPanelDlg().open(),
+                        !ast.showRhs ? new Button(null, () => new NavPanelDlg().open(), {
                             id: "navMenu"
-                        }, "-primary menuButton", "off") : null
+                        }, "-primary menuButton", "fa-sitemap fa-lg") : null
                     ])
                 ]),
                 // ast.isAnonUser && ast.anonShowLHSMenu ? new TabPanelButtons(true, ast.mobileMode ? "rhsMenuMobile" : "rhsMenu") : null,

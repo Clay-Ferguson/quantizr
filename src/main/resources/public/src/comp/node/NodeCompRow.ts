@@ -3,7 +3,6 @@ import { Comp } from "../../comp/base/Comp";
 import { Button } from "../../comp/core/Button";
 import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
-import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { TabBase } from "../../intf/TabBase";
@@ -160,11 +159,10 @@ export class NodeCompRow extends Comp {
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
-                jumpButton = new IconButton("fa-arrow-right", null, {
+                jumpButton = new Button(null, S.nav._jumpToNode, {
                     [C.NODE_ID_ATTR]: targetId,
-                    onClick: S.nav._jumpToNode,
                     title: "Jump to Node in Folders View"
-                }, "tw-float-right");
+                }, "tw-float-right", "fa-arrow-right");
             }
         }
 
@@ -180,11 +178,10 @@ export class NodeCompRow extends Comp {
             const isMine = S.props.isMine(this.node);
             let openButton = null;
             if (!(exp && !isMine)) {
-                openButton = new IconButton("fa-folder-open", null, {
+                openButton = new Button(null, S.nav._openNodeById, {
                     [C.NODE_ID_ATTR]: this.node.id,
-                    onClick: S.nav._openNodeById,
                     title: "Explore content of this node"
-                }, "-primary marginLeft");
+                }, "-primary marginLeft", "fa-folder-open");
             }
 
             this.children = [

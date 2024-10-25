@@ -67,15 +67,15 @@
     margin-left: 10px;
     margin-right: 15px;
     vertical-align: top;
-    color: var(--bs-green);
+    color: $green;
 }
 
 .newMessagesNote {
     cursor: pointer;
     padding: 2px 6px 2px 6px;
     margin-right: $smallGap;
-    color: var(--bs-green);
-    border: 2px solid var(--bs-green);
+    color: $green;
+    border: 2px solid $green;
     border-radius: 4px;
     font-weight: bold;
 }

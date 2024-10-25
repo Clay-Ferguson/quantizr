@@ -2,10 +2,10 @@ import { getAs } from "../AppContext";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { TabHeading } from "../comp/core/TabHeading";
 import { TextContent } from "../comp/core/TextContent";
@@ -54,23 +54,22 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         const children: Comp[] = [
             this.headingBar = new TabHeading([
                 (ast.searchViewFromTab || this.data.props.node) && this.showContentHeading
-                    ? new IconButton("fa-arrow-left", "", {
-                        onClick: () => {
-                            if (this.data.props.node) {
-                                S.view.jumpToId(this.data.props.node.id);
-                            }
-                            else if (ast.searchViewFromTab) {
-                                S.tabUtil.selectTab(ast.searchViewFromTab);
-                                setTimeout(() => {
-                                    const data: TabBase = S.tabUtil.getAppTabData(ast.searchViewFromTab);
-                                    if (ast.searchViewFromNode && data.inst) {
-                                        data.inst.scrollToNode(ast.searchViewFromNode.id);
-                                    }
-                                }, 500);
-                            }
-                        },
+                    ? new Button("", () => {
+                        if (this.data.props.node) {
+                            S.view.jumpToId(this.data.props.node.id);
+                        }
+                        else if (ast.searchViewFromTab) {
+                            S.tabUtil.selectTab(ast.searchViewFromTab);
+                            setTimeout(() => {
+                                const data: TabBase = S.tabUtil.getAppTabData(ast.searchViewFromTab);
+                                if (ast.searchViewFromNode && data.inst) {
+                                    data.inst.scrollToNode(ast.searchViewFromNode.id);
+                                }
+                            }, 500);
+                        }
+                    }, {
                         title: "Back to Folders View"
-                    }, "marginRight") : null,
+                    }, "marginRight", "fa-arrow-left") : null,
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
                 this.data.props.description ? new Span(this.data.props.description, { className: "tw-float-right smallMarginTop" }) : null,
@@ -138,7 +137,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     }
 
     addPaginationBar(children: Comp[], allowInfiniteScroll: boolean, allowMoreButton: boolean, isTopBar: boolean) {
-        let moreButton: IconButton = null;
+        let moreButton: Button = null;
         if (this.data.id === C.TAB_TIMELINE) {
             this.showPageNumber = false;
         }
@@ -148,9 +147,8 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         const leftArrow = reverse ? "down" : "up";
 
         if (!this.data.props.endReached && allowMoreButton) {
-            moreButton = new IconButton("fa-angle-" + rightArrow + " fa-lg", null, {
-                onClick: () => this.pageChange(1)
-            })
+            moreButton = new Button(null, () => this.pageChange(1), {
+            }, null, "fa-angle-" + rightArrow + " fa-lg")
 
             if (allowInfiniteScroll && this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
                 const buttonCreateTime: number = new Date().getTime();
@@ -181,21 +179,15 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
 
         let buttonBarComps: Comp[] = [];
         if (isTopBar) {
-            buttonBarComps.push(new IconButton("fa-refresh", null, {
-                onClick: () => this.pageChange(null)
-            }));
+            buttonBarComps.push(new Button(null, () => this.pageChange(null), null, null, "fa-refresh"));
         }
 
         if (this.data.props.page >= 1) {
-            buttonBarComps.push(new IconButton("fa-angle-double-" + leftArrow + " fa-lg", null, {
-                onClick: () => this.pageChange(0)
-            }));
+            buttonBarComps.push(new Button(null, () => this.pageChange(0), null, null, "fa-angle-double-" + leftArrow + " fa-lg"));
         }
 
         if (this.data.props.page > 0) {
-            buttonBarComps.push(new IconButton("fa-angle-" + leftArrow + " fa-lg", null, {
-                onClick: () => this.pageChange(-1)
-            }));
+            buttonBarComps.push(new Button(null, () => this.pageChange(-1), null, null, "fa-angle-" + leftArrow + " fa-lg"));
         }
         buttonBarComps.push(moreButton);
 

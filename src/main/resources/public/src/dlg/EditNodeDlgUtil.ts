@@ -180,7 +180,7 @@ export class EditNodeDlgUtil {
         return null;
     }
 
-    async addDateProperty() {
+    _addDateProperty = async () => {
         const state = this.dlg.getState<EditNodeDlgState>();
         const ast = getAs();
         ast.editNode.properties = ast.editNode.properties || [];
@@ -207,7 +207,7 @@ export class EditNodeDlgUtil {
         this.dlg.mergeState<EditNodeDlgState>(state);
     }
 
-    async share() {
+    _share = async () => {
         const ast = getAs();
         await S.edit.editNodeSharing(ast.editNode);
         S.edit.updateNode(ast.editNode);
@@ -315,7 +315,7 @@ export class EditNodeDlgUtil {
         }
     }
 
-    async cutUploads() {
+    _cutUploads = async () => {
         const attSet = this.dlg.getState<EditNodeDlgState>().selectedAttachments;
         if (!attSet || attSet.size === 0) return;
 
@@ -329,7 +329,7 @@ export class EditNodeDlgUtil {
         });
     }
 
-    async deleteUploads() {
+    _deleteUploads = async () => {
         if (this.dlg.getState<EditNodeDlgState>().selectedAttachments?.size === 0) return;
 
         const confirmDlg = new ConfirmDlg("Delete the selected Attachments?", "Confirm Delete",

@@ -33,7 +33,7 @@ export class MenuItem extends Comp {
                 });
             }
             else {
-                innerSpan = new Checkbox(this.name, { className: "marginRight" }, {
+                innerSpan = new Checkbox(this.name, { className: "tinyMarginTop marginRight" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });

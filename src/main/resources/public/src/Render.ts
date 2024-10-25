@@ -15,7 +15,6 @@ import { CollapsiblePanel } from "./comp/core/CollapsiblePanel";
 import { Div } from "./comp/core/Div";
 import { FlexRowLayout } from "./comp/core/FlexRowLayout";
 import { Icon } from "./comp/core/Icon";
-import { IconButton } from "./comp/core/IconButton";
 import { Img } from "./comp/core/Img";
 import { Span } from "./comp/core/Span";
 import { Tag } from "./comp/core/Tag";
@@ -770,13 +769,12 @@ export class Render {
                     className: "tagsFlexContainer"
                 }, spans)
             ]),
-            new IconButton("fa-tag", "", {
-                onClick: (evt: Event) => {
-                    evt.stopPropagation();
-                    labelClickFunc();
-                },
+            new Button("", (evt: Event) => {
+                evt.stopPropagation();
+                labelClickFunc();
+            }, {
                 title: "Select Hashtags"
-            })
+            }, null, "fa-tag")
         ]);
     }
 

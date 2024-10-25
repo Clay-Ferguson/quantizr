@@ -5,7 +5,7 @@ import { Validator } from "../../Validator";
 import { CompT, ScrollPos } from "../base/Comp";
 import { ErrorDiv } from "./ErrorDiv";
 import { Label } from "./Label";
-import { Span } from "./Span";
+import { Div } from "./Div";
 import { TextareaTag } from "./TextareaTag";
 
 interface LS { // Local State
@@ -13,7 +13,7 @@ interface LS { // Local State
     enabled?: boolean;
 }
 
-export class TextArea extends Span implements I.TextEditorIntf {
+export class TextArea extends Div implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
@@ -21,6 +21,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         public calcRows: boolean = false, private minRows: number = 3, private scrollPos: ScrollPos = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
+        this.attribs.className = "marginTop";
 
         if (attribs) {
             this.textareaAttribs = { ...this.textareaAttribs, ...attribs };
@@ -87,8 +88,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
         if (this.label) {
             children.push(new Label(this.label, {
-                htmlFor: "ta_" + this.getId(),
-                className: "marginTop"
+                htmlFor: "ta_" + this.getId()
             }));
         }
 

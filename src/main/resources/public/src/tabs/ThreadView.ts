@@ -1,21 +1,20 @@
 import { getAs } from "../AppContext";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
+import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { TabHeading } from "../comp/core/TabHeading";
+import { VerticalLayout } from "../comp/core/VerticalLayout";
 import { Constants as C } from "../Constants";
+import { ExportDlg } from "../dlg/ExportDlg";
+import { MessageDlg } from "../dlg/MessageDlg";
 import { TabBase } from "../intf/TabBase";
+import * as J from "../JavaIntf";
 import { NodeInfo } from "../JavaIntf";
 import { S } from "../Singletons";
 import { ThreadRSInfo } from "../ThreadRSInfo";
-import * as J from "../JavaIntf";
-import { MessageDlg } from "../dlg/MessageDlg";
-import { VerticalLayout } from "../comp/core/VerticalLayout";
-import { Anchor } from "../comp/core/Anchor";
-import { ExportDlg } from "../dlg/ExportDlg";
 
 export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<PT>> {
 
@@ -47,25 +46,24 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
         let i = 0;
         const children: Comp[] = [
             this.headingBar = new TabHeading([
-                new IconButton("fa-arrow-left", null, {
-                    onClick: () => {
-                        const ast = getAs();
-                        if (ast.threadViewFromTab === C.TAB_MAIN) {
-                            // the jumpToId is the best way to get to a node on the main tab.
-                            S.view.jumpToId(ast.threadViewFromNodeId);
-                        }
-                        else {
-                            S.tabUtil.selectTab(ast.threadViewFromTab);
-                            setTimeout(() => {
-                                const data: TabBase = S.tabUtil.getAppTabData(ast.threadViewFromTab);
-                                if (ast.threadViewFromNodeId && data.inst) {
-                                    data.inst.scrollToNode(ast.threadViewFromNodeId);
-                                }
-                            }, 500);
-                        }
-                    },
+                new Button(null, () => {
+                    const ast = getAs();
+                    if (ast.threadViewFromTab === C.TAB_MAIN) {
+                        // the jumpToId is the best way to get to a node on the main tab.
+                        S.view.jumpToId(ast.threadViewFromNodeId);
+                    }
+                    else {
+                        S.tabUtil.selectTab(ast.threadViewFromTab);
+                        setTimeout(() => {
+                            const data: TabBase = S.tabUtil.getAppTabData(ast.threadViewFromTab);
+                            if (ast.threadViewFromNodeId && data.inst) {
+                                data.inst.scrollToNode(ast.threadViewFromNodeId);
+                            }
+                        }, 500);
+                    }
+                }, {
                     title: "Go back..."
-                }, "marginRight"),
+                }, "marginRight", "fa-arrow-left"),
                 new Div(this.data.name, { className: "tabTitle" }),
                 floatEndDiv,
                 new Clearfix()

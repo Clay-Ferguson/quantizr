@@ -37,11 +37,15 @@ export class Tailwind {
         }
     }
 
-    static alertPrimary = "tw-bg-blue-100 tw-text-blue-700 tw-px-4 tw-py-3 tw-rounded tw-relative tw-border tw-border-blue-400";
-    static alertSecondary = "tw-bg-gray-100 tw-text-gray-700 tw-p-4 tw-mb-4 tw-rounded-lg tw-border tw-border-gray-200";
-    static alertDanger = "tw-bg-red-100 tw-border tw-border-red-400 tw-text-red-700 tw-px-4 tw-py-3 tw-rounded tw-relative";
-    static alertInfo = "tw-bg-blue-100 tw-border tw-border-blue-200 tw-text-blue-800 tw-px-4 tw-py-3 tw-rounded tw-relative"
+    // static alertPrimary = "tw-bg-blue-600 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative tw-border tw-border-blue-400";
+    static alertSecondary = "tw-bg-slate-700 tw-text-white tw-p-4 tw-mb-4 tw-rounded-lg tw-border tw-border-gray-200";
+    static alertPrimary = this.alertSecondary; // todo-0: change eventually
+    static alertDanger = "tw-bg-red-400 tw-border tw-border-red-400 tw-text-red-700 tw-px-4 tw-py-3 tw-rounded tw-relative";
+    static alertInfo = "tw-bg-blue-400 tw-border tw-border-blue-200 tw-text-blue-800 tw-px-4 tw-py-3 tw-rounded tw-relative"
 
-    static formControl = "tw-block tw-w-full tw-px-3 tw-py-1.5 tw-text-base tw-font-normal tw-text-gray-700 tw-bg-white tw-bg-clip-padding tw-border tw-border-solid tw-border-gray-300 tw-rounded tw-transition tw-ease-in-out tw-m-0 focus:tw-text-gray-700 focus:tw-bg-white focus:tw-border-blue-600 focus:tw-outline-none";
+    static formControl = "tw-block tw-w-full tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-600 tw-p-2 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-border-transparent";
+
+    // same as formControl but withou w-full
+    static formControlFit = "tw-block tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-600 tw-p-2 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-border-transparent";
 }
 

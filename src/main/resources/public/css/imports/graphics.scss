@@ -11,7 +11,7 @@
 
 .selectPowerFactorDropDown {
     display: inline-block;
-    width: 10rem;   
+    width: 10rem;
     margin-right: $bigGap;
 }
 
@@ -20,7 +20,7 @@
 .graphPopup {
     border-radius: $border-radius;
     background-color: $modal-content-bg;
-    border: 2px solid var(--bs-green);
+    border: 2px solid $green;
     max-width: 30%;
     margin: $smallGap !important;
     padding: $smallGap !important;
