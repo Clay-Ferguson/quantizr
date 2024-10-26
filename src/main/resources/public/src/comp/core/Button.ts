@@ -55,6 +55,7 @@ export class Button extends Comp {
         // this gets activated when the user clicks an infinite scrolling button, so it turns into a spinner
         // while loading more records
         if (state.waiting) {
+            this.attribs.className = "";
             this.children = [new Progress()];
             return true;
         }

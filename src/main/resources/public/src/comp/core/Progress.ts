@@ -13,7 +13,7 @@ export class Progress extends Comp {
 
     override preRender(): boolean | null {
         this.children = [new Div(null, {
-            className: "tw-animate-spin tw-rounded-full tw-h-8 tw-w-8 tw-border-4 tw-border-blue-500 tw-border-t-transparent",
+            className: "tw-animate-spin tw-rounded-full tw-h-8 tw-w-8 tw-border-4 tw-border-green-500 tw-border-t-transparent",
         })];
         return true;
     }
