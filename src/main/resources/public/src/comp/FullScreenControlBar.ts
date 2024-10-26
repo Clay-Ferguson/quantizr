@@ -16,7 +16,7 @@ export class FullScreenControlBar extends Comp {
 
     constructor() {
         super();
-        this.attribs.className = "tw-float-right fullScreenToolbar";
+        this.attribs.className = "float-right fullScreenToolbar";
     }
 
     override preRender(): boolean | null {
@@ -92,7 +92,7 @@ export class FullScreenControlBar extends Comp {
             }, "-primary", "fa-window-close fa-lg"));
 
         if (buttons.length > 0) {
-            comps.push(new ButtonBar(buttons, "tw-float-right"));
+            comps.push(new ButtonBar(buttons, "float-right"));
         }
 
         return comps;

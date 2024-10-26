@@ -45,7 +45,7 @@ export class EditPropertyDlg extends DialogBase {
         let textField: TextField = null;
         const ret = [
             !getAs().showSchemaOrgProps
-                ? new Div(null, { className: "marginBottom" }, [
+                ? new Div(null, { className: "mb-3" }, [
                     textField = new TextField({
                         label: "Name",
                         val: this.nameState

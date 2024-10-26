@@ -33,7 +33,7 @@ export class ConfigureAgentDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new FlexLayout([
-                    new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "marginBottom bigMarginRight", ConfigureAgentDlg.aiServiceState),
+                    new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "mb-3 mr-6", ConfigureAgentDlg.aiServiceState),
                 ]),
                 new TextArea("System Prompt", {
                     rows: 7,
@@ -69,7 +69,7 @@ export class ConfigureAgentDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Save", this.save, null, "-primary"),
                     new Button("Reset", this.reset, null, "-secondary"),
-                    new Button("Cancel", this._close, null, "-secondary tw-float-right")
+                    new Button("Cancel", this._close, null, "-secondary float-right")
                 ], "mt-3")
             ])
         ];

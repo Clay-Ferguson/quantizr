@@ -9,7 +9,7 @@ export class RadioButton extends Comp {
     constructor(public label: string, public checked: boolean, public groupName: string, attribs: any, private valueIntf: ValueIntf,
         private layoutClass: string = null) {
         super(attribs);
-        this.attribs.className += " tw-relative tw-flex tw-items-start " + (this.layoutClass || "");
+        this.attribs.className += " relative flex items-start " + (this.layoutClass || "");
         valueIntf = this.valueIntf || new Value<string>(this, "val");
         this.tag = "span";
     }
@@ -22,11 +22,11 @@ export class RadioButton extends Comp {
                 type: "radio",
                 label: this.label,
                 value: "val-" + this.getId(),
-                className: "tw-w-6 tw-h-6 tw-rounded tw-border-gray-300 tw-text-blue-600 focus:tw-ring-blue-500 cursor-pointer"
+                className: "w-6 h-6 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
             }, null, this.valueIntf),
             new Label(this.label || "", {
                 htmlFor: cbInput.getId(),
-                className: "tw-ml-2 tw-text-sm tw-text-white radioLabel"
+                className: "ml-2 text-sm text-white radioLabel"
             })
         ];
         return true;

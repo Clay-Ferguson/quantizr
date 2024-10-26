@@ -23,7 +23,7 @@ export class AddCreditDlg extends DialogBase {
 
     renderDlg(): Comp[] {
         return [
-            new Div(null, { className: "marginBottom" }, [
+            new Div(null, { className: "mb-3" }, [
                 new TextField({ label: "Amount", val: this.amtState }),
                 new ButtonBar([
                     new Button("Add Credit", this._close, null, "-primary"),

@@ -131,7 +131,7 @@ export class RightNavPanel extends Comp {
             });
         }
 
-        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "tw-float-right" }, [
+        const loginSignupDiv = ast.isAnonUser && !ast.mobileMode ? new Div(null, { className: "float-right" }, [
             // Not showing login on this panel in mobileMode, because it's shown at top of page instead
             new Span("Login", {
                 className: "signupLinkText ui-login",
@@ -142,7 +142,7 @@ export class RightNavPanel extends Comp {
             }),
 
             new Span("Signup", {
-                className: "signupLinkText tw-float-right ui-signup",
+                className: "signupLinkText float-right ui-signup",
                 onClick: () => {
                     PubSub.pub(C.PUBSUB_closeNavPanel);
                     S.user.userSignup();
@@ -153,12 +153,12 @@ export class RightNavPanel extends Comp {
         let scrollDiv = null;
         const creditDiv = ast.showGptCredit ? S.render.buildCreditDiv() : null;
 
-        const rightNavDiv = new Div(null, { className: "float-left" }, [
+        const rightNavDiv = new Div(null, { className: "float-left w-full" }, [
             new FlexRowLayout([
                 avatarImg,
                 new Div(null, null, [
                     new Div(null, {
-                        className: "marginBottom cursor-pointer",
+                        className: "mb-3 cursor-pointer",
                         onClick: () => {
                             PubSub.pub(C.PUBSUB_closeNavPanel);
                             new UserProfileDlg(null).open();
@@ -168,7 +168,7 @@ export class RightNavPanel extends Comp {
                             className: "fa fa-gear fa-lg mr-3",
                         }) : null,
                         !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
-                            className: "smallMarginRight",
+                            className: "mr-3",
                         }) : null,
                     ]),
                     loginSignupDiv,
@@ -179,7 +179,7 @@ export class RightNavPanel extends Comp {
                     addNoteButton
                 ]),
             ], "fullWidth"),
-            // new Div(null, { className: "marginBottom" }, [
+            // new Div(null, { className: "mb-3" }, [
             //     new ButtonBar([
             //         clipboardPasteButton,
             //         addNoteButton,

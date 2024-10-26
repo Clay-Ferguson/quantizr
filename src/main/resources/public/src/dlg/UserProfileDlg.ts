@@ -82,7 +82,7 @@ export class UserProfileDlg extends DialogBase {
                                 ? new Heading(4, state.userProfile.displayName || "")
                                 : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
                         ]),
-                        new Div(null, { className: "tw-float-right" }, [
+                        new Div(null, { className: "float-right" }, [
                             state.userProfile.blocked ? new Span("You Blocked", {
                                 className: "blockingText",
                                 onClick: this._unblockUser,

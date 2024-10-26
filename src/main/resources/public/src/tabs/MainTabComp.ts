@@ -37,7 +37,7 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
                 className: ast.rendering ? "compHidden" : "compVisible"
             }, [
                 // !ast.mobileMode ? new BreadcrumbsPanel(this.data.props?.breadcrumbs) : null,
-                ast.pageMessage ? new Html(ast.pageMessage, { className: Tailwind.alertInfo + " tw-float-right" }) : null,
+                ast.pageMessage ? new Html(ast.pageMessage, { className: Tailwind.alertInfo + " float-right" }) : null,
                 ast.pageMessage ? new Clearfix() : null,
 
                 // // if we have some parents to display...
@@ -92,13 +92,13 @@ export class MainTabComp extends AppTab<any, MainTabComp> {
 
             if (headingBarItems.length > 0) {
                 this.headingBar = new TabHeading([
-                    new Div(null, { className: "tw-float-right" }, headingBarItems),
+                    new Div(null, { className: "float-right" }, headingBarItems),
                 ], this.data);
             }
             else {
                 if (!this.attribs.className)
                     this.attribs.className = "";
-                this.attribs.className += " bigPaddingTop";
+                this.attribs.className += " pt-6";
             }
         }
         this.children = [this.headingBar, contentDiv];

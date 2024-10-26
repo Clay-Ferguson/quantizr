@@ -16,17 +16,17 @@ export class Button extends Comp {
 
         moreClasses = moreClasses || "";
 
-        moreClasses += " tw-px-4 tw-py-2 tw-border tw-border-gray-400 tw-border-solid cursor-pointer";
+        moreClasses += " px-4 py-2 border border-gray-400 border-solid cursor-pointer";
         if (moreClasses.indexOf("-primary") != -1) {
             moreClasses = moreClasses.replace("-primary", "");
-            moreClasses += " tw-bg-sky-800 hover:tw-bg-sky-900 tw-text-white";
+            moreClasses += " bg-sky-800 hover:bg-sky-900 text-white";
         }
         else if (moreClasses.indexOf("-danger") != -1) {
             moreClasses = moreClasses.replace("-danger", "");
-            moreClasses += " tw-bg-red-500 hover:tw-bg-red-600 tw-text-white";
+            moreClasses += " bg-red-500 hover:bg-red-600 text-white";
         }
         else {
-            moreClasses += " tw-bg-gray-700 hover:tw-bg-gray-800 tw-text-white";
+            moreClasses += " bg-gray-700 hover:bg-gray-800 text-white";
         }
 
         this.attribs.type = "button";

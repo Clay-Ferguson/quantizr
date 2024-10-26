@@ -27,7 +27,7 @@ export class MultiBlockDlg extends DialogBase {
                 new TextArea("User Names", { rows: 15 }, this.userNamesState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Block All", this._block, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

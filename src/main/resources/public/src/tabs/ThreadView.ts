@@ -31,11 +31,11 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
             return true;
         }
 
-        const floatEndDiv = new Div(null, { className: "tw-float-right tinyMarginBottom" }, [
+        const floatEndDiv = new Div(null, { className: "float-right mb-2" }, [
             !this.data.props.endReached ? new Button("More History...", this._moreHistory,
-                null, "tw-float-right tinyMarginBottom -primary") : null,
+                null, "float-right mb-2 -primary") : null,
             new Button("Save as PDF", this._saveAsPDF, null,
-                "tw-float-right tinyMarginBottom"),
+                "float-right mb-2"),
         ]);
 
         /*

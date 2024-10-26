@@ -27,13 +27,13 @@ export class MenuItem extends Comp {
         let innerClazz: string;
         if (this.stateFunc) {
             if (this.radioGroup) {
-                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, { className: "tinyMarginTop mr-3" }, {
+                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, { className: "mt-2 mr-3" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });
             }
             else {
-                innerSpan = new Checkbox(this.name, { className: "tinyMarginTop mr-3" }, {
+                innerSpan = new Checkbox(this.name, { className: "mt-2 mr-3" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });
@@ -48,7 +48,7 @@ export class MenuItem extends Comp {
         this.children = [
             innerSpan,
             this.treeOp ? new Tag("i", {
-                className: "fa fa-caret-right fa-lg tw-float-right " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
+                className: "fa fa-caret-right fa-lg float-right " + (state.enabled ? "menuIcon" : "menuIconDisabled"),
                 title: "Operates on the selected Tree Nodes(s)",
             }) : null
         ];

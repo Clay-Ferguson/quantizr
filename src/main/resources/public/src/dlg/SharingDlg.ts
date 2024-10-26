@@ -32,12 +32,12 @@ export class SharingDlg extends DialogBase {
 
         return [
             new Div(null, null, [
-                numShares > 0 ? new Div("The following people have access to this node...", { className: "marginBottom" }) : null,
+                numShares > 0 ? new Div("The following people have access to this node...", { className: "mb-3" }) : null,
                 new EditPrivsTable((userName: string, allowAppends: boolean) => {
                     this.shareNodeToUser(userName, allowAppends);
                 }, ast.editNode.ac, this._removePrivilege),
                 S.props.isShared(ast.editNode) ? new Div("Remove All", {
-                    className: "mr-3 tw-float-right cursor-pointer",
+                    className: "mr-3 float-right cursor-pointer",
                     onClick: this._removeAllPrivileges
                 }) : null,
                 new Clearfix(),
@@ -75,7 +75,7 @@ export class SharingDlg extends DialogBase {
                         }
                     }, null, "-primary"),
                     isPublic ? null : new Button("Make Public", () => this.shareNodeToUser(PrincipalName.PUBLIC, false), null, "ui-share-make-public"),
-                    new Button("Done", () => this.close(), null, "tw-float-right ui-sharing-done")
+                    new Button("Done", () => this.close(), null, "float-right ui-sharing-done")
                 ], "mt-3")
             ])
         ];

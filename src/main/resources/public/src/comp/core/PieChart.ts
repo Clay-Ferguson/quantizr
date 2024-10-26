@@ -1,11 +1,11 @@
 import * as d3 from "d3";
 import { Svg } from "./Svg";
-import {Comp, CompT } from "../base/Comp";
+import { Comp, CompT } from "../base/Comp";
 
 export class PieChart extends Comp {
 
     constructor(private width: number, private className: string, private data: any[]) {
-        super({ className: "marginBottom" });
+        super({ className: "mb-3" });
     }
 
     override preRender(): CompT[] | boolean | null {

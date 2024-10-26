@@ -53,19 +53,19 @@ export class RSSView extends AppTab<any, RSSView> {
             */
             if (ast.rssFeedCache[feedSrcHash] === "failed") {
                 feedContent = new Div("Feed Failed: " + feedSrc, {
-                    className: "marginAll"
+                    className: "m-3"
                 });
             }
             // if it's currently loading show the spinner
             else if (ast.rssFeedCache[feedSrcHash] === "loading") {
-                feedContent = new Div(null, { className: "bigMargin" }, [
+                feedContent = new Div(null, { className: "m-6" }, [
                     new Heading(4, "Loading..."),
-                    ast.rssProgressText ? new Div(ast.rssProgressText, { className: "bigMarginBottom" }) : null,
+                    ast.rssProgressText ? new Div(ast.rssProgressText, { className: "mb-6" }) : null,
                     new Progress()
                 ]);
             }
             else if (!ast.rssFeedCache[feedSrcHash]) {
-                feedContent = new Div(null, { className: "bigMargin" }, [
+                feedContent = new Div(null, { className: "m-6" }, [
                     new Heading(4, "Refreshing..."),
                     new Progress()
                 ]);
@@ -102,7 +102,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 }, "mr-3", "fa-arrow-left"),
                 new Div("RSS Feed", { className: "tabTitle" }),
                 new Checkbox("Headlines Only", {
-                    className: "tw-float-right"
+                    className: "float-right"
                 }, {
                     setValue: (checked: boolean) => {
                         dispatch("SetHeadlinesFlag", () => S.edit.setRssHeadlinesOnly(checked));
@@ -111,7 +111,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 }),
                 new Clearfix()
             ], this.data),
-            feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "tw-float-right") : null,
+            feedReady ? this.makeNavButtonBar(page, feedSrc, feedSrcHash, "float-right") : null,
             comp,
             feedContent
         ];
@@ -235,7 +235,7 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         if (feedOut.length > 0) {
-            const feedOutDiv = new Div(null, { className: "marginBottom ml-3" }, feedOut);
+            const feedOutDiv = new Div(null, { className: "mb-3 ml-3" }, feedOut);
             feedList.addChild(feedOutDiv);
         }
 
@@ -243,7 +243,7 @@ export class RSSView extends AppTab<any, RSSView> {
             feedList.addChild(this.buildFeedItem(feed, item));
         }
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "tw-text-center mt-3 marginBottom"));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "text-center mt-3 mb-3"));
         return feedList;
     }
 
@@ -318,7 +318,7 @@ export class RSSView extends AppTab<any, RSSView> {
         let anchor: Anchor = null;
         if (entry.title) {
             if (entry.link) {
-                headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                headerDivChildren.push(new Div(null, { className: "mb-3" }, [
                     anchor = new Anchor(entry.link, null, {
                         className: "rssAnchor",
                         target: "_blank",
@@ -327,7 +327,7 @@ export class RSSView extends AppTab<any, RSSView> {
                 ]));
             }
             else {
-                headerDivChildren.push(new Div(entry.title, { className: "marginBottom" }));
+                headerDivChildren.push(new Div(entry.title, { className: "mb-3" }));
             }
         }
 
@@ -354,7 +354,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     const audioButton = new Button("Play Audio", () =>
                         S.nav.showAudioPlayerTab(null, enc.url, 0, feed.title, entry.title),
                         null, "mt-3", "-primary");
-                    children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));
+                    children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons mb-3"));
                 }
             });
         }
@@ -406,7 +406,7 @@ export class RSSView extends AppTab<any, RSSView> {
 
         if (!entry.title && entry.description) {
             if (entry.link) {
-                children.push(new Div(null, { className: "marginBottom" }, [
+                children.push(new Div(null, { className: "mb-3" }, [
                     anchor = new Anchor(entry.link, null, {
                         className: "rssAnchor",
                         target: "_blank",
@@ -414,7 +414,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     })
                 ]));
             } else {
-                children.push(new Div(entry.description, { className: "marginBottom" }))
+                children.push(new Div(entry.description, { className: "mb-3" }))
             }
         }
         else if (!ast.userPrefs.rssHeadlinesOnly) {
@@ -469,7 +469,7 @@ export class RSSView extends AppTab<any, RSSView> {
         const footerSpan = new Span(entry.publishDate, { className: "mr-3" });
 
         children.push(new Div(null, null, [
-            new Span(null, { className: "tw-float-right" }, [
+            new Span(null, { className: "float-right" }, [
                 footerSpan, postIcon, linkIcon, bookmarkIcon
             ]),
             // is this clearfix needed now that we wrapped this stuff in this div?

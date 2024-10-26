@@ -35,7 +35,7 @@ export class ExportDlg extends DialogBase {
 
         if (!this.exportingThread) {
             children.push(new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }));
-            children.push(new Heading(5, "File Type", { className: "bigMarginTop" }));
+            children.push(new Heading(5, "File Type", { className: "mt-6" }));
             children.push(new RadioButtonGroup([
                 this.makeFileTypeRadioBtn("ZIP", "zip"),
                 this.makeFileTypeRadioBtn("TAR", "tar"),
@@ -46,7 +46,7 @@ export class ExportDlg extends DialogBase {
             if (ast.exportSettings.exportType === "zip" || ast.exportSettings.exportType === "tar" || ast.exportSettings.exportType === "tar.gz") children.push(this.contentTypeOptions());
         }
 
-        if (hasOptions) children.push(new Heading(5, "Options", { className: "bigMarginTop" }));
+        if (hasOptions) children.push(new Heading(5, "Options", { className: "mt-6" }));
 
         if (this.exportingThread || ast.exportSettings.contentType === "html") children.push(new Checkbox("IDs", null, {
             setValue: (checked: boolean) => dispatch("exportSetting", s => { s.exportSettings.includeIDs = checked; }),
@@ -83,15 +83,15 @@ export class ExportDlg extends DialogBase {
 
         children.push(new ButtonBar([
             new Button("Export", this._exportNodes, null, "-primary"),
-            new Button("Close", this._close, null, "tw-float-right")
+            new Button("Close", this._close, null, "float-right")
         ], "mt-3"));
 
         return children;
     }
 
     contentTypeOptions(): Div {
-        return new Div(null, { className: "bigMarginBottom" }, [
-            new Heading(5, "Content Type", { className: "bigMarginTop" }),
+        return new Div(null, { className: "mb-6" }, [
+            new Heading(5, "Content Type", { className: "mt-6" }),
 
             new RadioButtonGroup([
                 this.contentTypeRadioButton("HTML", "html"),

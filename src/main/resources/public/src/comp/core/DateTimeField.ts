@@ -16,7 +16,7 @@ export class DateTimeField extends Span {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
-                className: "tw-flex mr-3"
+                className: "flex mr-3"
             }
         };
 
@@ -89,7 +89,7 @@ export class DateTimeField extends Span {
                 outterTagName: "span",
                 val: this.durationState
             }) : null,
-            new Span(null, { className: "bigMarginLeft" }, [
+            new Span(null, { className: "ml-6" }, [
                 new Button("+D", () => {
                     const date = new Date(this.dateState.getValue());
                     date.setDate(date.getDate() + 1);

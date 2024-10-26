@@ -137,7 +137,7 @@ export class NodeCompRowHeader extends Comp {
         }
 
         const floatUpperRightDiv: Div = new Div(null, {
-            className: "tw-float-right floatRightHeaderDiv"
+            className: "float-right floatRightHeaderDiv"
         });
 
         if (showInfo && ast.isAdminUser) {
@@ -156,7 +156,7 @@ export class NodeCompRowHeader extends Comp {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
-                    className: iconClass + (type.schemaOrg ? " microMarginRight" : " mr-3"),
+                    className: iconClass + (type.schemaOrg ? " mr-1" : " mr-3"),
                     title: "Node Type: " + type.getName()
                 }));
 

@@ -28,7 +28,7 @@ export class FullScreenCalendar extends Main {
             console.log("Can't find nodeId " + nodeId);
         }
 
-        this.attribs.className = "marginAll";
+        this.attribs.className = "m-3";
 
         this.children = [
             createElement(FullCalendar, {

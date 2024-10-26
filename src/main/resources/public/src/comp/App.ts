@@ -133,7 +133,7 @@ export class App extends Main {
                 onClick: S.user.userSignup
             }) : null;
 
-            const floatRightDiv = new Div(null, { className: "tw-float-right" }, [
+            const floatRightDiv = new Div(null, { className: "float-right" }, [
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Div(ast.userName, {
                     className: "cursor-pointer mr-3 mt-3",

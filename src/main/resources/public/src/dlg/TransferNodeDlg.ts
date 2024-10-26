@@ -48,7 +48,7 @@ export class TransferNodeDlg extends DialogBase {
                 ], "mt-3"),
                 new ButtonBar([
                     new Button(TransferNodeDlg.operationName(this.operation), this._transfer, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

@@ -23,7 +23,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
 
                 ast.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
                     S.view.runServerCommand("getServerInfo", null, "Info View", null);
-                }, null, "tw-float-right") : null,
+                }, null, "float-right") : null,
 
                 new Heading(3, ast.serverInfoTitle),
 

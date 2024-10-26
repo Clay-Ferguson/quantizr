@@ -66,7 +66,7 @@ export class TTSView extends AppTab<any, TTSView> {
         });
 
         const appendTextBtn = !ast.mobileMode && S.speech.queuedSpeech?.length > 0 ? new Icon({
-            className: "fa fa-circle-plus fa-2x cursor-pointer bigMarginRight",
+            className: "fa fa-circle-plus fa-2x cursor-pointer mr-6",
             // This mouseover stuff is compensating for the fact that when the onClick gets called
             // it's a problem that by then the text selection "might" have gotten lost. This can
             // happen.
@@ -77,25 +77,25 @@ export class TTSView extends AppTab<any, TTSView> {
         }) : null;
 
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
-            className: "fa fa-refresh fa-2x bigMarginRight cursor-pointer",
+            className: "fa fa-refresh fa-2x mr-6 cursor-pointer",
             onClick: () => S.speech.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
         const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-stop fa-2x bigMarginRight cursor-pointer",
+            className: "fa fa-stop fa-2x mr-6 cursor-pointer",
             onClick: () => S.speech.stopSpeaking(),
             title: "Stop Speaking Text"
         }) : null;
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-pause fa-2x bigMarginRight cursor-pointer",
+            className: "fa fa-pause fa-2x mr-6 cursor-pointer",
             onClick: S.speech._pauseSpeaking,
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-play fa-2x bigMarginRight cursor-pointer",
+            className: "fa fa-play fa-2x mr-6 cursor-pointer",
             onClick: S.speech._resumeSpeaking,
             title: "Resume Speaking Text"
         }) : null;
@@ -138,14 +138,14 @@ export class TTSView extends AppTab<any, TTSView> {
             this.children = [
                 this.headingBar = new TabHeading([
                     new Div("Text-to-Speech", { className: "tabTitle" }),
-                    new Div(null, { className: "tw-float-right" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
+                    new Div(null, { className: "float-right" }, [appendTextBtn, stopBtn, pauseBtn, resumeBtn, speakAgainBtn, speakBtn]),
                     new Clearfix()
                 ], null),
                 new FlexRowLayout([
                     this.makeVoiceChooser(C.LOCALDB_VOICE_INDEX, true),
                     S.speech.USE_VOICE2 ? this.makeVoiceChooser(C.LOCALDB_VOICE2_INDEX, false) : null,
                     this.makeRateChooser(),
-                    new Checkbox("Text Input", { className: "bigMarginLeft mt-3" }, {
+                    new Checkbox("Text Input", { className: "ml-6 mt-3" }, {
                         setValue: (checked: boolean) => dispatch("setTtsInput", s => {
                             if (!checked) {
                                 TTSView.textAreaState.setValue("");

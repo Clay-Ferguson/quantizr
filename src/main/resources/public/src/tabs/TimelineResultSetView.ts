@@ -28,7 +28,7 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
 
     override extraPagingComps(): Comp[] {
         return [
-            new Checkbox("Live", { className: "bigMarginLeft" }, {
+            new Checkbox("Live", { className: "ml-6" }, {
                 setValue: (checked: boolean) => {
                     // dispatch now for rapid screen refresh
                     dispatch("AutoRefresh", (s) => {
@@ -55,6 +55,6 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
     }
 
     override getFloatRightHeaderComp(): Comp {
-        return new Button("Post", S.edit._postFromTimeline, null, "tw-float-right -primary mr-3")
+        return new Button("Post", S.edit._postFromTimeline, null, "float-right -primary mr-3")
     }
 }

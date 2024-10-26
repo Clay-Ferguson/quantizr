@@ -192,7 +192,7 @@ export class NodeCompBinary extends Comp {
                     new Span(null, {
                         className: "downloadLink mr-3"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
-                ], "marginBottom")
+                ], "mb-3")
             ];
         }
         else if (S.props.hasAudio(node, this.attName)) {
@@ -206,7 +206,7 @@ export class NodeCompBinary extends Comp {
                     new Span(null, {
                         className: "downloadLink mr-3"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
-                ], "marginBottom")
+                ], "mb-3")
             ];
         }
         /*
@@ -234,7 +234,7 @@ export class NodeCompBinary extends Comp {
                     className: "binary-link"
                 }, [
                     new Icon({
-                        className: "fa " + fileIcon + " fa-lg smallMarginRight xlIcon"
+                        className: "fa " + fileIcon + " fa-lg mr-3 xlIcon"
                     }),
                     new Span(null, null, [
                         new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {

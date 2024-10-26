@@ -58,11 +58,11 @@ export class TourPanel extends Comp {
                     s.tour = null;
                 })
             }, null, "-primary") : null
-        ], "tw-float-right"));
+        ], "float-right"));
 
 
         if (ast.isAnonUser && tour.expectsLogin) {
-            children.push(new Div("*** NOTE: This tour requires you to be logged in, for the steps to work.", { className: "bigMarginLeft mt-3" }));
+            children.push(new Div("*** NOTE: This tour requires you to be logged in, for the steps to work.", { className: "ml-6 mt-3" }));
         }
 
         this.children = children;

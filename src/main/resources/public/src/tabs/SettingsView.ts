@@ -27,7 +27,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const horzClass = "mt-3 marginBottom settingsSection";
+        const horzClass = "mt-3 mb-3 settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
         this.children = [
@@ -59,14 +59,14 @@ export class SettingsView extends AppTab<any, SettingsView> {
                 this.sectionTitle("View"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        new Checkbox("Comments", { className: "bigMarginLeft" }, {
+                        new Checkbox("Comments", { className: "ml-6" }, {
                             setValue: async (checked: boolean) => S.edit.setShowReplies(checked),
                             getValue: (): boolean => ast.userPrefs.showReplies
                         })
                     ]),
 
                     new Div(null, { className: settingsCol }, [
-                        new Checkbox("Properties", { className: "bigMarginLeft" }, {
+                        new Checkbox("Properties", { className: "ml-6" }, {
                             setValue: async (checked: boolean) => S.util.saveUserPrefs(s => s.userPrefs.showProps = checked),
                             getValue: (): boolean => ast.userPrefs.showProps
                         }),
@@ -79,7 +79,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     { key: "6", val: "Medium" },
                     { key: "7", val: "Wide" },
                     { key: "8", val: "Very Wide" }
-                ], "contentWidthSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
+                ], "contentWidthSelection", "ml-6 mt-6 mb-6", {
                     setValue: (val: string) => S.edit.setMainPanelCols(parseInt(val)),
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
                 }),

@@ -76,7 +76,7 @@ export class StatisticsView extends AppTab<StatisticsRSInfo, StatisticsView> {
                 new Div("Node Stats", { className: "tabTitle" })
             ], null),
             res.stats ? new TextContent(res.stats, "mt-3", true) : null,
-            hasTop100s ? new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }) : null,
+            hasTop100s ? new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "mb-3" }) : null,
             tagPanel.hasChildren() ? tagPanel : null,
             wordPanel.hasChildren() ? wordPanel : null
         ];

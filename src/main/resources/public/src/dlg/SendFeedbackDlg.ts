@@ -21,13 +21,13 @@ export class SendFeedbackDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new Div("Send us any feedback, questions, or comments.", { className: "marginBottom" }),
+                new Div("Send us any feedback, questions, or comments.", { className: "mb-3" }),
                 new TextArea("Comments", {
                     rows: 7,
                 }, SendFeedbackDlg.promptState, null, false, 3, this.promptScrollPos),
                 new ButtonBar([
                     new Button("Send", this._send, null, "-primary"),
-                    new Button("Cancel", this._close, null, "tw-float-right")
+                    new Button("Cancel", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

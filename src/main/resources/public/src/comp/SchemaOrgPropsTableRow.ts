@@ -34,7 +34,7 @@ export class SchemaOrgPropsTableRow extends ListBoxRow {
                     getValue: (): boolean => this.dlg.getState<EditPropertyDlgState>().selections.has(this.prop.label)
                 }),
                 new Div(this.prop.label, { className: "propNameInList" }),
-                new Div(this.makeRangesListString(), { className: "propRangesInList tw-float-right" })
+                new Div(this.makeRangesListString(), { className: "propRangesInList float-right" })
             ])
         ];
         return true;

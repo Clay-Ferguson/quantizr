@@ -2,22 +2,22 @@ console.log("entering Tailwind.ts");
 
 export class Tailwind {
 
-    // NOTE: Add tw--mx-4 to compensate for the padding for the first and last columns
-    static row = "tw-flex tw-flex-wrap";
+    // NOTE: Add -mx-4 to compensate for the padding for the first and last columns
+    static row = "flex flex-wrap";
 
-    // NOTE: Adding tw-px-4 to each column to add padding between columns
-    static col_1 = "tw-w-1/12";
-    static col_2 = "tw-w-2/12";
-    static col_3 = "tw-w-3/12";
-    static col_4 = "tw-w-4/12";
-    static col_5 = "tw-w-5/12";
-    static col_6 = "tw-w-6/12";
-    static col_7 = "tw-w-7/12";
-    static col_8 = "tw-w-8/12";
-    static col_9 = "tw-w-9/12";
-    static col_10 = "tw-w-10/12";
-    static col_11 = "tw-w-11/12";
-    static col_12 = "tw-w-full";
+    // NOTE: Adding px-4 to each column to add padding between columns
+    static col_1 = "w-1/12";
+    static col_2 = "w-2/12";
+    static col_3 = "w-3/12";
+    static col_4 = "w-4/12";
+    static col_5 = "w-5/12";
+    static col_6 = "w-6/12";
+    static col_7 = "w-7/12";
+    static col_8 = "w-8/12";
+    static col_9 = "w-9/12";
+    static col_10 = "w-10/12";
+    static col_11 = "w-11/12";
+    static col_12 = "w-full";
 
     static getColClass(col: number): string {
         switch (col) {
@@ -37,15 +37,15 @@ export class Tailwind {
         }
     }
 
-    // static alertPrimary = "tw-bg-blue-600 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative tw-border tw-border-blue-400";
-    static alertSecondary = "tw-bg-slate-700 tw-text-white tw-p-4 tw-mb-4 tw-rounded-lg tw-border tw-border-gray-200";
+    // static alertPrimary = "bg-blue-600 text-white px-4 py-3 rounded relative border border-blue-400";
+    static alertSecondary = "bg-slate-700 text-white p-4 mb-4 rounded-lg border border-gray-200";
     static alertPrimary = this.alertSecondary; // todo-0: change eventually
-    static alertDanger = "tw-bg-red-400 tw-border tw-border-red-400 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative";
-    static alertInfo = "tw-bg-blue-400 tw-border tw-border-blue-200 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative"
+    static alertDanger = "bg-red-400 border border-red-400 text-white px-4 py-3 rounded relative";
+    static alertInfo = "bg-blue-400 border border-blue-200 text-white px-4 py-3 rounded relative"
 
-    static formControl = "tw-text-base tw-block tw-w-full tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-500 tw-p-2 focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-green-400";
+    static formControl = "text-base block w-full bg-gray-900 text-white placeholder-gray-400 border border-gray-500 p-2 focus:outline-none focus:ring-1 focus:ring-green-400";
 
     // same as formControl but withou w-full
-    static formControlFit = "tw-text-base tw-block tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-500 tw-p-2 focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-green-400";
+    static formControlFit = "text-base block bg-gray-900 text-white placeholder-gray-400 border border-gray-500 p-2 focus:outline-none focus:ring-1 focus:ring-green-400";
 }
 

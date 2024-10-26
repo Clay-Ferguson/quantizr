@@ -3,27 +3,27 @@
 // NOTE: Tailwind removes ALL existing styling that browsers provide so we need to build our own H1 thru H6 styling.
 @layer base {
     h1 {
-        @apply tw-text-4xl tw-mb-4;
+        @apply text-4xl mb-4;
     }
 
     h2 {
-        @apply tw-text-3xl tw-mb-3;
+        @apply text-3xl mb-3;
     }
 
     h3 {
-        @apply tw-text-2xl tw-mb-2;
+        @apply text-2xl mb-2;
     }
 
     h4 {
-        @apply tw-text-xl tw-mb-2;
+        @apply text-xl mb-2;
     }
 
     h5 {
-        @apply tw-text-lg tw-mb-2;
+        @apply text-lg mb-2;
     }
 
     h6 {
-        @apply tw-text-base tw-mb-2;
+        @apply text-base mb-2;
     }
 }
 

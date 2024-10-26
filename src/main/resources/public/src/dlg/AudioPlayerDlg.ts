@@ -57,7 +57,7 @@ export class AudioPlayerDlg extends DialogBase {
                 ]),
                 new Div(null, { className: "row" }, [
                     new ButtonBar([
-                        new Button("Close", this.destroyPlayer, null, "tw-float-right")
+                        new Button("Close", this.destroyPlayer, null, "float-right")
                     ], "align-items-end"),
                 ])
             ])

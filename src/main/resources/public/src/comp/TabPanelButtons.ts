@@ -20,7 +20,7 @@ export class TabPanelButtons extends Comp {
                 className: "tabButtonsContainer"
             }, [
                 new Ul(null, {
-                    className: (this.verticalButtons ? "tw-flex tw-flex-col" : "") + " " + this.moreClasses,
+                    className: (this.verticalButtons ? "flex flex-col" : "") + " " + this.moreClasses,
                     id: "navTabs"
                 }, this.buildTabButtons())]
             )
@@ -50,7 +50,7 @@ export class TabPanelButtons extends Comp {
         }
 
         return new Li(null, {
-            className: "marginBottom",
+            className: "mb-3",
             style: { display: data.isVisible() ? "inline" : "none" },
             onClick: (event: Event) => {
                 event.stopPropagation();

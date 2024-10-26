@@ -24,7 +24,7 @@ export class EditBlockedWordsDlg extends DialogBase {
                 new TextArea("Blocked Words", { rows: 15 }, this.wordsState, null, false, 3, this.textScrollPos),
                 new ButtonBar([
                     new Button("Save", this.save, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

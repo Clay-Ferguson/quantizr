@@ -18,7 +18,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
         const writable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
-        const div = new Div(null, { className: "tw-float-right tinyMarginAll" });
+        const div = new Div(null, { className: "float-right tinym-3" });
 
         aclEntry.privileges.forEach(privilege => {
             div.addChild(
@@ -61,7 +61,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                     ]) : null,
                     isPublic ? new Div(null, { className: "friendListImgDiv centerChild" }, [
                         new Icon({
-                            className: "fa fa-globe fa-3x sharingIcon marginAll",
+                            className: "fa fa-globe fa-3x sharingIcon m-3",
                             title: "Node is Public"
                         })
                     ]) : null

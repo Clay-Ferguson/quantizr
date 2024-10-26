@@ -34,7 +34,7 @@ export class UploadFromUrlDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Upload", this._upload, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

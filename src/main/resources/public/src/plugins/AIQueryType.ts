@@ -28,7 +28,7 @@ export class AIQueryType extends TypeBase {
     //                 S.domUtil.focusId(C.TAB_RSS);
     //                 S.tabUtil.tabScroll(C.TAB_RSS, 0);
     //             });
-    //         }, null, "-primary tw-float-right ui-rss-view-feed-btn"),
+    //         }, null, "-primary float-right ui-rss-view-feed-btn"),
     //         baseComp
     //     ]);
     // }

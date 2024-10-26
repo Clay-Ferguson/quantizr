@@ -79,11 +79,11 @@ export class SelectTagsDlg extends DialogBase {
             new Div(null, null, [
                 new TextField({
                     label: "Tag",
-                    outterClass: "noPaddingRight marginBottom",
+                    outterClass: "noPaddingRight mb-3",
                     val: this.editFieldState,
                     labelClass: "txtFieldLabelShort"
                 }),
-                this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "tw-float-right" }, {
+                this.allowSuggestTags ? new Checkbox("Suggest Tags", { className: "float-right" }, {
                     setValue: (checked: boolean) => {
                         this.mergeState({ suggestTags: checked });
                         if (checked && this.getState<LS>().suggestedTags.length === 0) {
@@ -99,7 +99,7 @@ export class SelectTagsDlg extends DialogBase {
                     new Button("Cancel", () => {
                         this._clear();
                         this.close();
-                    }, null, "tw-float-right")
+                    }, null, "float-right")
                 ], "mt-3")
             ])
         ];
@@ -171,7 +171,7 @@ export class SelectTagsDlg extends DialogBase {
         let div: Div = null;
 
         if (state.tags?.length > 0) {
-            div = new Div(null, { className: "marginBottom" });
+            div = new Div(null, { className: "mb-3" });
             state.tags.forEach(tagObj => this.processAddCheckboxOrHeading(div, tagObj));
 
             if (state.suggestTags && state.suggestedTags.length > 0) {

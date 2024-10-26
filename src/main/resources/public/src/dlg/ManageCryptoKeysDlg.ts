@@ -42,7 +42,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
                 // new Button("Remove Key", this.removeKey),
                 state.keyType !== "sym" ? new Button("Publish Public Key", this._publishKey) : null,
                 new Button("Import Key", this._importKey)
-            ], "marginBottom"),
+            ], "mb-3"),
             new TextContent(state.keyJson, "cryptoKeyTextContent", true),
             new ButtonBar([
                 new Button("Close", this._close)

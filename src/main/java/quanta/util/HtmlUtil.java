@@ -5,7 +5,7 @@ import java.util.List;
 
 public class HtmlUtil {
     public static String htmlH(int level, String heading) {
-        return "<h" + String.valueOf(level) + " class='marginTop'>\n" + heading + "</h" + String.valueOf(level) + ">\n";
+        return "<h" + String.valueOf(level) + " class='mt-3'>\n" + heading + "</h" + String.valueOf(level) + ">\n";
     }
 
     public static String htmlTable(String table) {

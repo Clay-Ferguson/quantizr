@@ -58,7 +58,7 @@ export class SignupDlg extends DialogBase {
                 ], "captchaPanel mt-3"),
                 new ButtonBar([
                     new Button("Create Account", this._signup, null, "-primary"),
-                    new Button("Cancel", this._close, { className: "tw-float-right" })
+                    new Button("Cancel", this._close, { className: "float-right" })
                 ], "mt-3")
             ])
         ];

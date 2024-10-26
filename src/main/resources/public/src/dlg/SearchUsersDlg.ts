@@ -28,7 +28,7 @@ export class SearchUsersDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", { className: "bigMarginBottom" }) : null,
+                getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", { className: "mb-6" }) : null,
                 this.searchTextField = new TextField({ label: "User", enter: this._search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this._search, null, "-primary"),
@@ -38,7 +38,7 @@ export class SearchUsersDlg extends DialogBase {
                     // difficult based on the existing code already written.
                     // new Button("Graph", this.graph, null, "-primary"),
                     // we can steal the 'graph' from from the other dialogs when needed.
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

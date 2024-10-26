@@ -149,7 +149,7 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): boolean => this.getState<LS>().requireDate
                     }, "mt-3")
-                ], "marginBottom"),
+                ], "mb-3"),
 
                 new FlexRowLayout([
                     new Selection(null, "Search in", [
@@ -205,13 +205,13 @@ export class SearchContentDlg extends DialogBase {
                     new Div(null, null, [
                         requirePriorityCheckbox
                     ])
-                ], "bigMarginBottom bigMarginTop"),
+                ], "mb-6 mt-6"),
 
                 new ButtonBar([
                     new Button("Search", () => this.search(false), null, "-primary"),
                     // todo-2: this is currently not implemented on the server.
                     // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "-danger") : null,
-                    new Button("Cancel", this._close, null, "tw-float-right")
+                    new Button("Cancel", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];
@@ -232,7 +232,7 @@ export class SearchContentDlg extends DialogBase {
             }, {
                 title: "Select Hashtags to Search"
             }, "-primary", "fa-tag fa-lg") : null
-        ], "tw-float-right tinyMarginTop");
+        ], "float-right mt-2");
     }
 
     addTagsToSearchField(dlg: SelectTagsDlg) {

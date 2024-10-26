@@ -37,7 +37,7 @@ export class InboxNodeType extends TypeBase {
             new Heading(4, "Inbox"),
             new ButtonBar([
                 new Button("Clear Inbox", () => S.edit.clearInbox())
-            ], null, "tw-float-right marginBottom"),
+            ], null, "float-right mb-3"),
             new Clearfix()
         ], "systemNodeContent");
     }

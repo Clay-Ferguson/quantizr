@@ -40,7 +40,7 @@ export class EditTagsDlg extends DialogBase {
 
                 new ButtonBar([
                     new Button("Save", this._save, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

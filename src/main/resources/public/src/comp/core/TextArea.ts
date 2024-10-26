@@ -18,10 +18,14 @@ export class TextArea extends Div implements I.TextEditorIntf {
     textareaAttribs: any = {};
 
     constructor(private label: string, attribs: any, private valState: Validator, moreClasses: string = "",
-        public calcRows: boolean = false, private minRows: number = 3, private scrollPos: ScrollPos = null) {
+        public calcRows: boolean = false, private minRows: number = 3, private scrollPos: ScrollPos = null, outterClasses: string = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
-        this.attribs.className = "mt-3";
+
+        // todo-0: look for all places we need a gap above the textarea and add a 'mt-3' class to the outterClasses 
+        if (outterClasses) {
+            this.attribs.className = outterClasses; // "mt-3"; 
+        }
 
         if (attribs) {
             this.textareaAttribs = { ...this.textareaAttribs, ...attribs };

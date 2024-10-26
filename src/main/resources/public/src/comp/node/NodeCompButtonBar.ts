@@ -190,7 +190,7 @@ export class NodeCompButtonBar extends Comp {
             }
 
             if (!!ast.nodesToMove && userCanPaste) {
-                pasteSpan = new Span(null, { className: "tw-float-right ml-3" }, [
+                pasteSpan = new Span(null, { className: "float-right ml-3" }, [
                     new Button("Paste Inside",
                         S.edit._pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "pasteButton"),
 
@@ -217,7 +217,7 @@ export class NodeCompButtonBar extends Comp {
             spanArray.push(pasteSpan);
         }
         if (spanArray.some(c => !!c)) {
-            floatEndSpan = new Span(null, { className: "tw-float-right" }, spanArray);
+            floatEndSpan = new Span(null, { className: "float-right" }, spanArray);
         }
 
         let btnArray: Comp[] = [openButton, expnButton, /* upLevelButton,*/ createSubNodeButton, editNodeButton, floatEndSpan];

@@ -32,7 +32,7 @@ export class GenerateBookByAIDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                new Div("You must mention that you're creating a book, describe what the book is about, and who the target audience is. An example is given below, but you can word it however you want and the AI will understand.", { className: "marginBottom" }),
+                new Div("You must mention that you're creating a book, describe what the book is about, and who the target audience is. An example is given below, but you can word it however you want and the AI will understand.", { className: "mb-3" }),
                 new TextArea("Describe Book", {
                     rows: 7,
                 }, GenerateBookByAIDlg.promptState, null, false, 3, this.promptScrollPos),
@@ -41,7 +41,7 @@ export class GenerateBookByAIDlg extends DialogBase {
                         label: "Number of Chapters",
                         val: GenerateBookByAIDlg.numChapters,
                         inputClass: "numChapters",
-                        outterClass: "bigMarginRight"
+                        outterClass: "mr-6"
 
                     }),
                     new TextField({
@@ -52,7 +52,7 @@ export class GenerateBookByAIDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Generate", this._generate, null, "-primary"),
-                    new Button("Cancel", this._close, null, "tw-float-right")
+                    new Button("Cancel", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

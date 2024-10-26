@@ -49,7 +49,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 new ButtonBar([
                     this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this._upload, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

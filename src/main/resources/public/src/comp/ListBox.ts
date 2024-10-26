@@ -5,7 +5,7 @@ export class ListBox extends Comp {
 
     constructor(public valueIntf: ValueIntf = null) {
         super();
-        this.setClass("marginBottom");
+        this.setClass("mb-3");
 
         if (this.valueIntf) {
             this.mergeState({ value: valueIntf.getValue() });

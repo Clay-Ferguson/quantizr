@@ -136,16 +136,16 @@ export class BlockedUsersDlg extends DialogBase {
                     ]),
 
                     friendsTagDropDown
-                ], "flexRowAlignBottom marginBottom") : null,
+                ], "flexRowAlignBottom mb-3") : null,
                 message ? new Div(message)
                     : new FriendsTable(filteredFriends, false, this),
                 state.friends?.length > 1 ? new Clearfix() : null,
                 new ButtonBar([
                     new Button("Import", this.import),
                     state.friends?.length > 0 ? new Button("Export", this.export) : null,
-                    new Button("Close", this.cancel, null, "tw-float-right")
+                    new Button("Close", this.cancel, null, "float-right")
                 ], "mt-3"),
-                new Clearfix() // required in case only ButtonBar children are tw-float-right, which would break layout
+                new Clearfix() // required in case only ButtonBar children are float-right, which would break layout
             ])
         ];
     }

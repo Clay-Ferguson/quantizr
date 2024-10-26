@@ -71,7 +71,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                 }, "mr-3", "fa-arrow-left") : null,
                 new Div("Audio Player", { className: "tabTitle" })
             ], null),
-            new Div(null, { className: "bigMarginTop bigMarginRight" }, [
+            new Div(null, { className: "mt-6 mr-6" }, [
                 AudioPlayerView.customTitle ? new Heading(2, AudioPlayerView.customTitle) : null,
                 AudioPlayerView.customSubTitle ? new Heading(5, AudioPlayerView.customSubTitle) : null,
                 this.audioPlayer = new AudioPlayer({
@@ -97,7 +97,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     new ButtonBar([
                         new Button("< 30s", () => this.skip(-30)),
                         new Button("30s >", () => this.skip(30))
-                    ], Tailwind.col_3 + " tw-float-right")
+                    ], Tailwind.col_3 + " float-right")
                 ]),
                 new Div(null, { className: "playerButtonsContainer" }, [
                     this.playButton = new Icon({

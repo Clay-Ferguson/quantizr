@@ -69,7 +69,7 @@ export class NodeCompMainNode extends Comp {
             if (targetId) {
                 jumpButton = new Button(null, () => S.view.jumpToId(targetId), {
                     title: "Jump to the Node"
-                }, "tw-float-right", "fa-arrow-right");
+                }, "float-right", "fa-arrow-right");
             }
         }
 

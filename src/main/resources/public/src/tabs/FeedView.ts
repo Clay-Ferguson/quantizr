@@ -65,7 +65,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         }
 
         const topChildren: Comp[] = [
-            new Div(null, { className: "tw-float-right" }, [
+            new Div(null, { className: "float-right" }, [
                 new FlexRowLayout([
                     //  newItems,
                     ast.displayFeedSearch || this.data.props.searchTextState.getValue() ? new TextField({
@@ -94,7 +94,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         ? new Button("Clear", () => this.clearSearch(), null, "feedClearButton") : null,
 
                     // DO NOT DELETE (this will likely be brought back, in future design)
-                    // new Checkbox("Live", { className: "bigMarginLeft" }, {
+                    // new Checkbox("Live", { className: "ml-6" }, {
                     //     setValue: (checked: boolean) => {
                     //         // dispatch now for rapid screen refresh
                     //         dispatch("AutoRefresh", (s) => {
@@ -105,7 +105,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     //     },
                     //     getValue: (): boolean => getAs().userPrefs.autoRefreshFeed
                     // })
-                ], "flexRowAlignBottom tinyMarginTop tinyMarginBottom")
+                ], "flexRowAlignBottom mt-2 mb-2")
             ]),
             new Clearfix()
         ];
@@ -184,14 +184,14 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         });
                     }
                 }
-                children.push(new ButtonBar([moreButton], "tw-text-center mt-3 marginBottom"));
+                children.push(new ButtonBar([moreButton], "text-center mt-3 mb-3"));
             }
         }
 
         this.children = [
             this.headingBar = new TabHeading([
                 this.renderHeading(),
-                new Div(null, { className: "tw-float-right" }, [
+                new Div(null, { className: "float-right" }, [
                     ast.isAnonUser ? null : friendsTagDropDown,
                     // todo-2: we'll eventually have this as an admin option
                     // ast.isAnonUser ? null : new Button("Post", () => S.edit.addNode(null, J.NodeType.COMMENT, false, null, null, true, false), null, "-primary")

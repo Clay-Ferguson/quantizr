@@ -277,7 +277,7 @@ export class TypeBase implements TypeIntf {
         //             new Button("Decrypt", () => {
         //                 markdownComp.decrypt();
         //             })
-        //         ], null, "ml-3 marginBottom")
+        //         ], null, "ml-3 mb-3")
         //     ]);
         // }
         const ast = getAs();
@@ -287,7 +287,7 @@ export class TypeBase implements TypeIntf {
         if (oneOf) {
             const children: Comp[] = [];
             for (const o of oneOf) {
-                children.push(new Div("*  " + o.name + ` (${o.replies?.totalItems} votes)`, { className: "bigMarginLeft marginBottom" }));
+                children.push(new Div("*  " + o.name + ` (${o.replies?.totalItems} votes)`, { className: "ml-6 mb-3" }));
             }
             choices = new Div(null, { className: "mt-3" }, children);
         }
@@ -350,7 +350,7 @@ export class TypeBase implements TypeIntf {
                 if (S.props.hasAIConfigProps(node)) {
                     aiConfigDiv = new Div("AI Agent", {
                         onClick: () => S.edit.configureAgent(node),
-                        className: "nodeTags aiTags microMarginBottom tw-float-right",
+                        className: "nodeTags aiTags mb-1 float-right",
                         title: "Configure Agent Settings"
                     });
                 }
@@ -362,9 +362,9 @@ export class TypeBase implements TypeIntf {
                         }
                         aiConfigDiv = new Div(null, { className: template ? "aiConfigSection" : null }, [
                             new Div("AI Prompt", {
-                                className: "aiPrompt microMarginBottom tw-float-right",
+                                className: "aiPrompt mb-1 float-right",
                             }),
-                            template ? new Markdown(template, { className: "microMarginBottom" }) : null
+                            template ? new Markdown(template, { className: "mb-1" }) : null
                         ]);
                     }
                 }
@@ -376,7 +376,7 @@ export class TypeBase implements TypeIntf {
                     aiConfigDiv,
                     comp,
                     choices,
-                    S.render.renderTagsDiv(node, isRoot ? "smallMarginBottom" : "microMarginBottom"),
+                    S.render.renderTagsDiv(node, isRoot ? "mb-2" : "mb-1"),
                     footerComp,
                     new Clearfix(),
                 ])

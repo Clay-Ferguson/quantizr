@@ -292,7 +292,7 @@ export class Render {
                 const bin = att ? att.bin : null;
                 if (bin) {
                     hasAtts = true;
-                    attComps.push(new Div(null, { className: "tw-float-right" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
+                    attComps.push(new Div(null, { className: "float-right" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
                     attComps.push(this.titleDiv(att.fileName + " (" + S.util.formatMemory(att.size) + " " + att.mime + ")"));
                     const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
 
@@ -344,7 +344,7 @@ export class Render {
             if (hasAtts) {
                 children.push(new CollapsiblePanel("Show Attachment URLs", "Hide Attachment URLs", null, attComps, true, (exp: boolean) => {
                     dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
-                }, getAs().linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
+                }, getAs().linksToAttachmentsExpanded, "m-3", "attachmentLinksPanel", ""));
             }
         }
 
@@ -536,8 +536,8 @@ export class Render {
     }
 
     newUserAccountTips(): Div {
-        return new Div(null, { className: "bigMargin " + Tailwind.alertInfo }, [
-            new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "bigMarginBottom" }),
+        return new Div(null, { className: "m-6 " + Tailwind.alertInfo }, [
+            new Div("You haven't created any content here yet. See the User Guide to learn how.", { className: "mb-6" }),
             new Button("View User Guide", () => S.nav.openContentNode(":user-guide", false))
         ]);
     }
@@ -616,7 +616,7 @@ export class Render {
         return new Div(null, {
             title: "Click to copy to clipboard",
             onClick: () => S.util.copyToClipboard(node.tags),
-            className: "cursor-pointer tw-float-right " + moreClasses
+            className: "cursor-pointer float-right " + moreClasses
         }, spans);
     }
 
@@ -632,7 +632,7 @@ export class Render {
 
         const attribs: any = {};
         if (className) attribs.className = className;
-        const tagsDiv = this.renderTagsDiv(node, "microMarginBottom");
+        const tagsDiv = this.renderTagsDiv(node, "mb-1");
 
         return new Div(null, attribs, [
             new FlexRowLayout([
@@ -648,7 +648,7 @@ export class Render {
                     //         title: "Send Private Message",
                     //         [C.NODE_ID_ATTR]: nodeId
                     //     }) : null,
-                    // ], null, "tw-float-right"),
+                    // ], null, "float-right"),
                     // new Clearfix(),
 
                     new Div(displayName, {
@@ -787,7 +787,7 @@ export class Render {
             const clazz = credit < 1 ? "accountCreditLow" : "accountCredit";
             const msg = credit < 1 ? " (Running low! Click to add funds)" : "";
             return new Div("Credit: $" + credit.toFixed(6) + msg, {
-                className: clazz + " tw-float-right",
+                className: clazz + " float-right",
                 onClick: S.user.addAccountCredit
             });
         }

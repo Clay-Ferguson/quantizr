@@ -26,7 +26,7 @@ export class FriendsListType extends TypeBase {
     override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, "Follows"),
-            new Div("These are the people you follow. Delete from this list to unfollow.", { className: "marginAll" }),
+            new Div("These are the people you follow. Delete from this list to unfollow.", { className: "m-3" }),
             new Button("Follow Someone", () => {
                 new SearchUsersDlg().open();
             }, null, "-primary"),

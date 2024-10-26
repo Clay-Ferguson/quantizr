@@ -42,7 +42,7 @@ export class PropTable extends Comp {
 
         this.attribs.className = "scrollingPropsTable";
         this.children = [
-            new Table({ className: "customScrollBar smallMarginRight" }, children)
+            new Table({ className: "customScrollBar mr-3" }, children)
         ];
         return true;
     }

@@ -16,7 +16,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
 
         // turn the top more button off for infinite scrolling
         this.allowTopMoreButton = false;
-        this.pagingContainerClass = "tw-float-right";
+        this.pagingContainerClass = "float-right";
     }
 
     override renderItem(node: NodeInfo, _i: number, _rowCount: number, jumpButton: boolean): Comp {
@@ -29,8 +29,8 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         // compact view. We could make this paragraph spacing a user preference...some day. Note:
         // It's important to have 'this.data.id' as a classname on every item, even though it's not
         // for styling, it's essentially to support DOM finding.
-        let itemClass = (allowHeader ? "documentItem" : "marginBottom");
-        const itemClassHighlight = (allowHeader ? "documentItemHighlight" : "marginBottom");
+        let itemClass = (allowHeader ? "documentItem" : "mb-3");
+        const itemClassHighlight = (allowHeader ? "documentItemHighlight" : "mb-3");
 
         const rootSlashesMatch = this.data.props.node.path.match(/\//g);
         const nodeSlashesMatch = node.path.match(/\//g);
@@ -48,7 +48,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
 
     override getFloatRightHeaderComp(): Comp {
         const ast = getAs();
-        return new Div(null, { className: "tw-float-right" }, [
+        return new Div(null, { className: "float-right" }, [
             ast.mobileMode ? null : new Checkbox("Images", {
                 className: "ml-3",
                 title: "Display inline images"

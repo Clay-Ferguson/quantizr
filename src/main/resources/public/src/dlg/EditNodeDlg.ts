@@ -167,7 +167,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 cols" },
             { key: "c5", val: "5 cols" },
             { key: "c6", val: "6 cols" }
-        ], null, "layoutSelection tw-inline-flex", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
+        ], null, "layoutSelection inline-flex", new PropValueHolder(ast.editNode, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
@@ -315,12 +315,12 @@ export class EditNodeDlg extends DialogBase {
             // This is the container that holds the custom properties if provided, or else the
             // name+content textarea at the top of not
             mainPropsTable = new Div(null, {
-                className: "marginBottom"
+                className: "mb-3"
             });
         }
         else {
             propsParent = new Div(null, {
-                className: "editPropsTable marginBottom" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
+                className: "editPropsTable mb-3" + (flexPropsEditPanel ? " flexPropsEditPanel" : "")
             });
             mainPropsTable = propsParent;
         }
@@ -331,7 +331,7 @@ export class EditNodeDlg extends DialogBase {
         if (editorOpts.nodeName) {
             nodeNameTextField = new TextField({
                 label: "Node Name",
-                outterClass: Tailwind.col_9 + " tw-pr-4",
+                outterClass: Tailwind.col_9 + " pr-4",
                 val: this.nameState,
                 labelClass: "none"
             });
@@ -351,7 +351,7 @@ export class EditNodeDlg extends DialogBase {
             propsVisible = true;
         }
 
-        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection tw-float-right" }, [
+        const tagsEditRow = editorOpts.tags ? new Div(null, { className: "editorTagsSection float-right" }, [
             this.tagsState.getValue() ? S.render.renderTagsStrDiv(this.tagsState.getValue(), null, this._removeTag, this._selectTags) : null,
             this.utl.renderLinksEditing()
         ]) : null;
@@ -369,10 +369,10 @@ export class EditNodeDlg extends DialogBase {
                 const state = this.getState<LS>();
                 propsHeaderBar = new Div(null, { className: "editTypesPanelHeader" }, [
                     type?.schemaOrg?.comment ? new Span(type?.schemaOrg?.comment) : null,
-                    new Div(null, { className: "tw-float-right" }, [
+                    new Div(null, { className: "float-right" }, [
                         // ADD PROP ICON
                         new Icon({
-                            className: "fa fa-circle-plus fa-lg cursor-pointer mr-3 tinyMarginBottom",
+                            className: "fa fa-circle-plus fa-lg cursor-pointer mr-3 mb-2",
                             onClick: async () => {
                                 dispatch("setPropsPanelExpanded", s => {
                                     s.propsPanelExpanded = true;
@@ -383,7 +383,7 @@ export class EditNodeDlg extends DialogBase {
                         }),
                         // DELETE PROP ICON
                         state.selectedProps.size > 0 ? new Icon({
-                            className: "fa fa-trash fa-lg cursor-pointer mr-3 tinyMarginBottom",
+                            className: "fa fa-trash fa-lg cursor-pointer mr-3 mb-2",
                             onClick: () => this.utl.deletePropsGesture(),
                             title: "Delete property"
                         }) : null
@@ -405,7 +405,7 @@ export class EditNodeDlg extends DialogBase {
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
             sharingDiv = new Div(null, {
-                className: "tw-float-right cursor-pointer marginBottom"
+                className: "float-right cursor-pointer mb-3"
             }, [
                 new Span("Shared to: ", {
                     title: "Node Sharing",
@@ -414,7 +414,7 @@ export class EditNodeDlg extends DialogBase {
                 ...shareComps,
                 !isPublic ? new Button("Make Public", () => this.makePublic(true), { className: "ml-3" }) : null,
                 unpublished ? new Icon({
-                    className: "fa fa-eye-slash fa-lg sharingIcon ml-3 microMarginRight",
+                    className: "fa fa-eye-slash fa-lg sharingIcon ml-3 mr-1",
                     title: "Node is Unpublished\n\nWill not appear in feed"
                 }) : null
             ]);
@@ -445,7 +445,7 @@ export class EditNodeDlg extends DialogBase {
                         dispatch("setPropsPanelExpanded", s => {
                             s.propsPanelExpanded = expanded;
                         });
-                    }, getAs().propsPanelExpanded || autoExpandProps, "", "", "tw-float-right", "div");
+                    }, getAs().propsPanelExpanded || autoExpandProps, "", "", "float-right", "div");
             }
             // if schema.org type show properties in visible panel always
             else {
@@ -481,7 +481,7 @@ export class EditNodeDlg extends DialogBase {
                     });
                 }, getAs().morePanelExpanded, "mr-3", "", "", "div") : null;
 
-            advCollapsePanelContainer = new Div(null, { className: "marginBottom" }, [
+            advCollapsePanelContainer = new Div(null, { className: "mb-3" }, [
                 advCollapsePanel
             ]);
         }
@@ -833,7 +833,7 @@ export class EditNodeDlg extends DialogBase {
         // Warning: Don't put any left/right margins on this row because the widths to allow widths
         // that sum to precisely 100% to work correctly. Adding a margin would make it wrap
         // prematurely.
-        const rowAttribs: any = { className: "marginBottom" };
+        const rowAttribs: any = { className: "mb-3" };
         const propConfig = type?.getPropConfig(propEntry.name);
         const ordinal: number = propConfig?.ord || 200; // 200 is just a high enough number to fall below numered ones
         const tableRow = new Div(null, rowAttribs);
@@ -1048,7 +1048,7 @@ export class EditNodeDlg extends DialogBase {
                 },
                 getValue: (): string => this.utl.getHeadingLevel()
             })
-        ], "tw-float-right microMarginBottom"));
+        ], "float-right mb-1"));
         editItems.push(this.contentEditor as any as Comp);
 
         return new Div(null, { className: "contentEditor" }, editItems);

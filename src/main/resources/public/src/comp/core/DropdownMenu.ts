@@ -6,7 +6,7 @@ import { Ul } from "./Ul";
 export class DropdownMenu extends Comp {
     constructor(private items: Comp[], moreClasses: string = "") {
         super(null);
-        this.attribs.className = "tw-relative tw-inline-block tw-text-left " + moreClasses;
+        this.attribs.className = "relative inline-block text-left " + moreClasses;
         this.tag = "span";
     }
 
@@ -20,7 +20,7 @@ export class DropdownMenu extends Comp {
                 "aria-expanded": "false"
             }),
             new Ul(null, {
-                className: "tw-absolute tw-right-0 tw-z-10 tw-mt-2 tw-w-56 tw-origin-top-right tw-rounded-md tw-bg-white tw-shadow-lg tw-ring-1 tw-ring-black tw-ring-opacity-5 focus:tw-outline-none",
+                className: "absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none",
                 "aria-labelledby": id,
             }, this.items)
         ];

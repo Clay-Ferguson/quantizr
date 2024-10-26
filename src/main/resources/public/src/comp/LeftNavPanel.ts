@@ -48,7 +48,7 @@ export class LeftNavPanel extends Comp {
 
         const docIndexToggle = showDocIndex ? new FlexRowLayout([
             new Span("Doc Index", {
-                className: "bigMarginRight cursor-pointer" + (ast.menuIndexToggle == "index" ? " activeTab" : " inactiveTab"),
+                className: "mr-6 cursor-pointer" + (ast.menuIndexToggle == "index" ? " activeTab" : " inactiveTab"),
                 onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "index")
             }),
             new Span("Menu", {
@@ -72,7 +72,7 @@ export class LeftNavPanel extends Comp {
                         title: "Go to Portal Home Node"
                     }),
 
-                    new Span(null, { className: "tw-float-right" }, [
+                    new Span(null, { className: "float-right" }, [
                         myMessages ? new Span(myMessages, {
                             className: "newMessagesNote",
                             onClick: S.nav._showMyNewMessages,

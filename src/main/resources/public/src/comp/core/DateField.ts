@@ -24,7 +24,7 @@ export class DateField extends Comp implements I.ValueIntf {
     }
 
     override preRender(): boolean | null {
-        const formControl = "tw-flex-1 tw-px-3 tw-py-2 tw-border tw-border-gray-300 tw-rounded-l focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-border-blue-500"
+        const formControl = "flex-1 px-3 py-2 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         this.children = [
             new Div(null, {
                 className: "dateField"

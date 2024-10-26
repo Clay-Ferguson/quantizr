@@ -93,7 +93,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
             id: "inputId_" + this.getId()
         }, this.cfg.val.v);
 
-        const inputGroupAddon = "tw-inline-flex tw-items-center tw-px-4 tw-py-2 tw-bg-gray-200 tw-text-gray-700 tw-border tw-border-l-0 tw-border-gray-300 tw-rounded-r hover:tw-bg-gray-300 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500"
+        const inputGroupAddon = "inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 border border-l-0 border-gray-300 rounded-r hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
         const passwordEye = this.cfg.inputType === "password" ? new Span(null, {
             className: inputGroupAddon
         }, [
@@ -115,7 +115,7 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         this.children = [
             label,
             new Div(null, {
-                className: "tw-flex textField"
+                className: "flex textField"
             }, [
                 this.input,
                 passwordEye

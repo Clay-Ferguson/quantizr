@@ -164,7 +164,7 @@ export class EditAttachmentsPanel extends Comp {
             if (content.indexOf(`{{${fileName}}}`) === -1) {
                 fileNameTagTip = new Div(`Insert {{${fileName}}} in text`, {
                     title: "Click to insert File Tag",
-                    className: "cursor-pointer smallMarginTop",
+                    className: "cursor-pointer mt-2",
                     onClick: () => {
                         this.dlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
                     }
@@ -173,9 +173,9 @@ export class EditAttachmentsPanel extends Comp {
         }
 
         const aiPrompt = att.aiPrompt ? new CollapsiblePanel("Show AI Prompt", "Hide AI Prompt", null,
-            [new Div(att.aiPrompt, { className: "smallMarginTop ml-3" })], true, (exp: boolean) => {
+            [new Div(att.aiPrompt, { className: "mt-2 ml-3" })], true, (exp: boolean) => {
                 dispatch("ExpandAIPrompt", s => s.aiPromptsExpanded = exp);
-            }, getAs().aiPromptsExpanded, null, "smallMarginTop", "smallMarginTop") : null;
+            }, getAs().aiPromptsExpanded, null, "mt-2", "mt-2") : null;
 
         return new Div(null, { className: "binaryEditorItem" }, [
             topBinRow, fileNameTagTip, aiPrompt

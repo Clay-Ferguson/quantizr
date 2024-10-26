@@ -177,7 +177,7 @@ export class OpenGraphPanel extends Comp {
 
         // todo-2: this is broken, removing for now.
         // const bookmarkIcon = this.allowBookmarkIcon && state.og.url && !ast.isAnonUser ? new Icon({
-        //     className: "fa fa-bookmark fa-lg ogBookmarkIcon tw-float-right",
+        //     className: "fa fa-bookmark fa-lg ogBookmarkIcon float-right",
         //     onClick: () => S.edit.addLinkBookmark(state.og.url, null)
         // }) : null;
 

@@ -48,14 +48,14 @@ const _codeFunc = (arg: any, nodeId: string) => {
     const expClass = expanded ? "codeBlockExpanded" : "codeBlockCollapsed";
 
     return newLineCount > 0 ? (
-        createElement("div", { className: "marginBottom" }, [
+        createElement("div", { className: "mb-3" }, [
             createElement("div", { className: "codeDivHeader" }, [
                 createElement("span", {
                     className: "markdownLanguage"
                 }, language === "txt" ? "" : language),
-                createElement("span", { className: "tw-float-right" }, [
+                createElement("span", { className: "float-right" }, [
                     newLineCount > 5 ? createElement("span", {
-                        className: "cursor-pointer bigMarginRight",
+                        className: "cursor-pointer mr-6",
                         onClick: () => {
                             dispatch("toggleCodeBlock", s => {
                                 if (s.expandedCodeBlocks.has(nodeId)) {

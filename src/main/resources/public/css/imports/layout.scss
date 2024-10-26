@@ -1,3 +1,20 @@
+/* Tailwind CSS Cheatsheet
+
+ml = margin left
+mr = margin right
+mt = margin top
+mb = margin bottom
+
+for padding we have: pl, pr, pt, pb
+
+ml-0.5 = 2px
+ml-1 = 4px
+ml-2 = 8px
+ml-3 = 12px
+ml-4 = 16px
+ml-6 = 24px
+*/
+
 .lhsHeaderPanel {
     margin-bottom: $smallGap;
 }
@@ -155,99 +172,10 @@
     margin-right: $mediumGap;
 }
 
-.microMarginTop {
-    margin-top: $microGap;
-}
-
-.microMarginBottom {
-    margin-bottom: $microGap;
-}
-
-.microMarginRight {
-    margin-right: $microGap;
-}
-
-
-.mediumPaddingTop {
-    padding-top: $mediumGap;
-}
-
-.smallMarginTop {
-    margin-top: $tinyGap;
-}
-
-.smallMarginBottom {
-    margin-bottom: $tinyGap;
-}
-
-.smallMarginRight {
-    margin-right: $smallGap;
-}
-
-.bigMarginBottom {
-    margin-bottom: $bigGap;
-}
-
-.bigMarginRight {
-    margin-right: $bigGap;
-}
-
-.bigPaddingRight {
-    padding-right: $bigGap;
-}
-
-.bigPaddingTop {
-    padding-top: $bigGap;
-}
-
-.bigMarginTop {
-    margin-top: $bigGap;
-}
-
-.bigMarginLeft {
-    margin-left: $bigGap;
-}
-
-.bigMargin {
-    margin: $bigGap;
-}
-
-.microMarginTop {
-    margin-top: $microGap;
-}
-
-.marginBottom {
-    margin-bottom: $smallGap;
-}
-
-.bigMarginBottom {
-    margin-bottom: $bigGap;
-}
-
 .marginBottomIfNotLast {
     &:not(:last-child) {
         margin-bottom: $smallGap;
     }
-}
-
-.marginAll {
-    margin: $smallGap;
-}
-
-.microMarginAll {
-    margin: $microGap;
-}
-
-.tinyMarginAll {
-    margin: $tinyGap;
-}
-
-.tinyMarginTop {
-    margin-top: $tinyGap;
-}
-
-.tinyMarginBottom {
-    margin-bottom: $tinyGap;
 }
 
 .flexAlignChildrenTop {

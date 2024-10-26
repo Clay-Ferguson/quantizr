@@ -242,7 +242,7 @@ export class NodeUtil {
                     onClick: () => this.removePublicShare(node, editorDlg)
                 }, [
                     new Icon({
-                        className: "fa fa-globe fa-lg sharingIcon microMarginRight",
+                        className: "fa fa-globe fa-lg sharingIcon mr-1",
                         title: "Node is Public"
                     }),
                     new Span("Public" + this.getPublicPrivilegsSuffix(PrincipalName.PUBLIC, node))

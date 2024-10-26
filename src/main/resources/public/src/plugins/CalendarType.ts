@@ -41,7 +41,7 @@ export class CalendarType extends TypeBase {
                 new Button("Calendar", () => {
                     S.render.showCalendar(node.id);
                 }, null)
-            ], "ml-3 marginBottom")
+            ], "ml-3 mb-3")
         ]);
     }
 }

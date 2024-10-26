@@ -21,7 +21,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     showContentHeading: boolean = true;
-    pagingContainerClass: string = "marginBottom mt-3";
+    pagingContainerClass: string = "mb-3 mt-3";
 
     constructor(data: TabBase<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);
@@ -72,7 +72,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
                     }, "mr-3", "fa-arrow-left") : null,
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
-                this.data.props.description ? new Span(this.data.props.description, { className: "tw-float-right smallMarginTop" }) : null,
+                this.data.props.description ? new Span(this.data.props.description, { className: "float-right mt-2" }) : null,
                 this.getFloatRightHeaderComp(),
                 new Clearfix()
             ], this.data),
@@ -195,11 +195,11 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         }
 
         if (this.data.props.endReached && !isTopBar && this.showPageNumber) {
-            buttonBarComps.push(new Span("*** Last Page ***", { className: "bigMarginLeft" }));
+            buttonBarComps.push(new Span("*** Last Page ***", { className: "ml-6" }));
         }
 
         children.push(
-            this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "tw-float-right" }) : null,
+            this.showPageNumber ? new Span("Pg. " + (this.data.props.page + 1), { className: "float-right" }) : null,
             new ButtonBar(buttonBarComps, this.pagingContainerClass));
 
         children.push(new Clearfix());

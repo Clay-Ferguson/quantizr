@@ -20,7 +20,7 @@ export class LayoutDemo extends Main {
 
         const children = [];
         children.push(new Div("Tailwind CSS", {
-            className: "tw-bg-blue-500 tw-p-4 tw-rounded"
+            className: "bg-blue-500 p-4 rounded"
         }));
 
         children.push(new Progress());

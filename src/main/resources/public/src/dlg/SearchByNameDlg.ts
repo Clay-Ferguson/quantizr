@@ -28,7 +28,7 @@ export class SearchByNameDlg extends DialogBase {
                 this.searchTextField = new TextField({ label: "Node Name", enter: this._search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this._search, null, "-primary"),
-                    new Button("Close", this._close, null, "tw-float-right")
+                    new Button("Close", this._close, null, "float-right")
                 ], "mt-3")
             ])
         ];

@@ -48,7 +48,7 @@ export class PasteOrLinkDlg extends DialogBase {
             ]),
             new ButtonBar([
                 new Button("Cancel", this._close)
-            ], "mt-3 tw-float-right"),
+            ], "mt-3 float-right"),
             new Clearfix()
         ];
     }

@@ -42,7 +42,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const horzClass = "mt-3 marginBottom settingsSection";
+        const horzClass = "mt-3 mb-3 settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
         const aiService: AIService = S.aiUtil.getServiceByName(getAs().userPrefs.aiService);
@@ -58,11 +58,11 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                 aiOptions?.length ? this.sectionTitle("AI - Artificial Intelligence") : null,
                 aiOptions?.length ? new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [
-                        new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "bigMarginLeft bigMarginTop bigMarginBottom", {
+                        new Selection(null, "AI Service", aiOptions, "aiServiceSelection", "ml-6 mt-6 mb-6", {
                             setValue: (val: string) => S.edit.setAiService(val),
                             getValue: (): string => "" + getAs().userPrefs.aiService
                         }),
-                        aiModelInfo ? new Div(aiModelInfo, { className: "bigMarginLeft" }) : null
+                        aiModelInfo ? new Div(aiModelInfo, { className: "ml-6" }) : null
                     ]),
                     new Div(null, { className: settingsCol }, [
                         ast.userProfile?.balance ? this.settingsLink("Credit: $" + ast.userProfile.balance?.toFixed(6), () => { }) : null,
@@ -77,7 +77,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         className: "settingsSectionTitle " + Tailwind.alertPrimary
                     }) : null,
                 S.quanta.config.aiAgentEnabled ? new Div(null, {
-                    className: "bigMarginRight"
+                    className: "mr-6"
                 }, [
                     new TextArea("Folders to Include", {
                         rows: 4,
@@ -106,7 +106,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         outterClass: "ml-3 mt-3"
                     }),
                 ]),
-                new Button("Save", this._save, { className: "bigMarginTop" })
+                new Button("Save", this._save, { className: "mt-6" })
             ])
         ];
         return true;

@@ -36,7 +36,7 @@ export class HistoryPanel extends Comp {
                 className: "cursor-pointer",
                 onClick: S.histUtil._clearHistory
             }),
-            new Checkbox("Lock", { className: "lockFont marginBottom tw-float-right" }, {
+            new Checkbox("Lock", { className: "lockFont mb-3 float-right" }, {
                 setValue: HistoryPanel._historyLockChanged,
                 getValue: (): boolean => ast.nodeHistoryLocked
             }, "formCheckInlineNoMargin")
