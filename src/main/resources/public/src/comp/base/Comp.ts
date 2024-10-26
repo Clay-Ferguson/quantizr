@@ -441,7 +441,19 @@ export abstract class Comp {
     // simple and decoupled from state management aspects that are wrapped in 'render' which is what
     // calls this, and the ONLY function that calls this.
     compRender(children: CompT[]): ReactNode {
-        return this.reactNode(this.tag || "div", children);
+        const ret = this.reactNode(this.tag || "div", children);
+
+        /* This -float-right class is just a marker to allow us to float the div to the right in cases where 
+        there are issues that would have (in older code) required us to use clearfix because of the issue where
+        sometimes (especially if the float right thing is the last thing in a container) the container would not
+        expand to contain the float right thing. */
+        if (this.attribs.className && this.attribs.className.indexOf("-float-right") != -1) {
+            // Let's not burn any CPU to remove this. It's not hurting anything.
+            // this.attribs.className = this.attribs.className.replace("-float-right", "");
+            return createElement("div", { className: "flex justify-end" }, ret);
+        }
+
+        return ret;
     }
 
     scrollDomAddEvent() {

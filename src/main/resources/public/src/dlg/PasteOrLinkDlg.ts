@@ -49,7 +49,7 @@ export class PasteOrLinkDlg extends DialogBase {
             ]),
             new ButtonBar([
                 new Button("Cancel", this._close)
-            ], "mt-3 flex justify-end"),
+            ], "mt-3 -float-right"),
         ];
     }
 }
