@@ -112,7 +112,7 @@ export class NodeCompVerticalRowLayout extends Comp {
                 if (lastNode) {
                     const userCanPaste = (S.props.isMine(lastNode) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
                     if (!!ast.nodesToMove && userCanPaste) {
-                        comps.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "pasteButton marginLeft"));
+                        comps.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "pasteButton ml-3"));
                     }
                 }
             }

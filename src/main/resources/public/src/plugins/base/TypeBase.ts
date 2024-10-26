@@ -277,7 +277,7 @@ export class TypeBase implements TypeIntf {
         //             new Button("Decrypt", () => {
         //                 markdownComp.decrypt();
         //             })
-        //         ], null, "marginLeft marginBottom")
+        //         ], null, "ml-3 marginBottom")
         //     ]);
         // }
         const ast = getAs();
@@ -310,7 +310,7 @@ export class TypeBase implements TypeIntf {
             // The reason we don't sanitize for admin users is mainly because we need the code containing the
             // donations link to work, but there may also be other times we want the admin allowed to embed raw HTML
             const sanitize = node.owner !== PrincipalName.ADMIN;
-            comp = new Html(cont, { className: "marginLeft marginTop" }, null, sanitize);
+            comp = new Html(cont, { className: "ml-3 marginTop" }, null, sanitize);
         }
         // else render as markdown
         else {

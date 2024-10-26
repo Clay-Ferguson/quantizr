@@ -42,11 +42,11 @@ export class EditAttachmentsPanel extends Comp {
                     title: "Cut selected Attachments"
                 }, null, "fa-cut fa-lg") : null,
                 ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil._clearCut, {
-                    className: "cursor-pointer marginLeft"
+                    className: "cursor-pointer ml-3"
                 }) : null,
                 ast.cutAttachmentsFromId && ast.editNode.id != ast.cutAttachmentsFromId ? //
                     new Button("Paste", () => S.nodeUtil.paste(this.dlg), {
-                        className: "cursor-pointer marginLeft"
+                        className: "cursor-pointer ml-3"
                     }) : null
             ], "attachmentButtonBar"));
         }
@@ -126,7 +126,7 @@ export class EditAttachmentsPanel extends Comp {
 
         const fileNameField = new TextField({
             labelClass: "txtFieldLabelShort",
-            outterClass: "fileNameField marginLeft",
+            outterClass: "fileNameField ml-3",
             label: "File Name",
             val: fileNameFieldState
         });
@@ -143,12 +143,12 @@ export class EditAttachmentsPanel extends Comp {
             fileNameField,
             new Div(null, null, [
                 !firstAttachment ? new Icon({
-                    className: "fa fa-lg fa-arrow-up cursor-pointer marginLeft",
+                    className: "fa fa-lg fa-arrow-up cursor-pointer ml-3",
                     title: "Move Attachment Up",
                     onClick: () => this.moveAttUp(att, ast.editNode)
                 }) : null,
                 !lastAttachment ? new Icon({
-                    className: "fa fa-lg fa-arrow-down cursor-pointer marginLeft",
+                    className: "fa fa-lg fa-arrow-down cursor-pointer ml-3",
                     title: "Move Attachment Down",
                     onClick: () => this.moveAttDown(att, ast.editNode)
                 }) : null
@@ -173,7 +173,7 @@ export class EditAttachmentsPanel extends Comp {
         }
 
         const aiPrompt = att.aiPrompt ? new CollapsiblePanel("Show AI Prompt", "Hide AI Prompt", null,
-            [new Div(att.aiPrompt, { className: "smallMarginTop marginLeft" })], true, (exp: boolean) => {
+            [new Div(att.aiPrompt, { className: "smallMarginTop ml-3" })], true, (exp: boolean) => {
                 dispatch("ExpandAIPrompt", s => s.aiPromptsExpanded = exp);
             }, getAs().aiPromptsExpanded, null, "smallMarginTop", "smallMarginTop") : null;
 

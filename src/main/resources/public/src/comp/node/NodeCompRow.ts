@@ -55,7 +55,7 @@ export class NodeCompRow extends Comp {
             if (isMine && this.allowInlineInsertButton && !isPageRootNode && insertAllowed) {
 
                 let insertButton: Button = null;
-                insertInlineButton = new Div(null, { className: "marginLeft" }, [
+                insertInlineButton = new Div(null, { className: "ml-3" }, [
                     insertButton = new Button(null, () => {
                         S.edit.insertNode(this.node.id, 0, ast);
                     }, {
@@ -181,7 +181,7 @@ export class NodeCompRow extends Comp {
                 openButton = new Button(null, S.nav._openNodeById, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Explore content of this node"
-                }, "-primary marginLeft", "fa-folder-open");
+                }, "-primary ml-3", "fa-folder-open");
             }
 
             this.children = [

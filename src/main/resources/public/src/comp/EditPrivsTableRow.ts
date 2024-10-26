@@ -31,7 +31,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                         new Button("Remove", () => {
                             this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
                         })
-                    ], "marginLeft")
+                    ], "ml-3")
                 ])
             );
         });

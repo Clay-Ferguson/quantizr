@@ -103,7 +103,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         label: "Creativity (0.0-1.0, Default=0.7)",
                         val: this.temperatureState,
                         inputClass: "aiTemperature",
-                        outterClass: "marginLeft marginTop"
+                        outterClass: "ml-3 marginTop"
                     }),
                 ]),
                 new Button("Save", this._save, { className: "bigMarginTop" })

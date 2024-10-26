@@ -77,7 +77,7 @@ export class UserProfileDlg extends DialogBase {
                 new FlexRowLayout([
                     profileImg,
                     new Div(null, { className: "userDisplayName" }, [
-                        new Div(null, { className: "marginLeft" }, [
+                        new Div(null, { className: "ml-3" }, [
                             this.readOnly
                                 ? new Heading(4, state.userProfile.displayName || "")
                                 : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })

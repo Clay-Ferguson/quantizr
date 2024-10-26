@@ -235,7 +235,7 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         if (feedOut.length > 0) {
-            const feedOutDiv = new Div(null, { className: "marginBottom marginLeft" }, feedOut);
+            const feedOutDiv = new Div(null, { className: "marginBottom ml-3" }, feedOut);
             feedList.addChild(feedOutDiv);
         }
 

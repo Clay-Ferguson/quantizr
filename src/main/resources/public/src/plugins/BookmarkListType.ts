@@ -23,7 +23,7 @@ export class BookmarkListType extends TypeBase {
     override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
-            new Div("Delete, edit, or order your bookmarks here.", { className: "marginLeft" })
+            new Div("Delete, edit, or order your bookmarks here.", { className: "ml-3" })
         ]);
     }
 

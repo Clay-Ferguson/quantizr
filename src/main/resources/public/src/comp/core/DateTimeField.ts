@@ -80,7 +80,7 @@ export class DateTimeField extends Span {
     override preRender(): boolean | null {
         this.children = [
             new DateField(this.dateState),
-            this.showTime ? new TimeField(this.timeState, "marginLeft") : null,
+            this.showTime ? new TimeField(this.timeState, "ml-3") : null,
             this.durationState ? new TextField({
                 // NO LABEL!: We have no room at top for a label because we're lining up with the
                 // rest of these components vertically which also have no labels. label: "HH:MM",

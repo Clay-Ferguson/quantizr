@@ -63,7 +63,7 @@ export class ConfigureAgentDlg extends DialogBase {
                         label: "Creativity (0.0-1.0, Default=0.7)",
                         val: ConfigureAgentDlg.temperatureState,
                         inputClass: "aiTemperature",
-                        outterClass: "marginLeft marginTop"
+                        outterClass: "ml-3 marginTop"
                     }),
                 ]),
                 new ButtonBar([

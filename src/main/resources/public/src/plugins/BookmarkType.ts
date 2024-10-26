@@ -21,7 +21,7 @@ export class BookmarkType extends TypeBase {
         const audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         return new Div(null, null, [
             new NodeCompMarkdown(node, null, tabData, null),
-            audioUrl ? new Button("Play Audio", () => S.nav.showAudioPlayerTab(node.id, audioUrl), null, "-primary marginLeft") : null
+            audioUrl ? new Button("Play Audio", () => S.nav.showAudioPlayerTab(node.id, audioUrl), null, "-primary ml-3") : null
         ]);
     }
 }

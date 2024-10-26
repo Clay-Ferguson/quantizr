@@ -190,7 +190,7 @@ export class NodeCompButtonBar extends Comp {
             }
 
             if (!!ast.nodesToMove && userCanPaste) {
-                pasteSpan = new Span(null, { className: "tw-float-right marginLeft" }, [
+                pasteSpan = new Span(null, { className: "tw-float-right ml-3" }, [
                     new Button("Paste Inside",
                         S.edit._pasteSelNodesInside, { [C.NODE_ID_ATTR]: this.node.id }, "pasteButton"),
 

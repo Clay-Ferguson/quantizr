@@ -147,7 +147,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
         }
 
         children.push(
-            new Span("Pg. " + (this.data.props.page + 1) + "/" + maxPage, { className: "marginLeft tw-float-right" }),
+            new Span("Pg. " + (this.data.props.page + 1) + "/" + maxPage, { className: "ml-3 tw-float-right" }),
             new ButtonBar(buttonBarComps, this.pagingContainerClass));
 
         children.push(new Clearfix());

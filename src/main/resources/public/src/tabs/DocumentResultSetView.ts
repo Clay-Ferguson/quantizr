@@ -50,7 +50,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
         const ast = getAs();
         return new Div(null, { className: "tw-float-right" }, [
             ast.mobileMode ? null : new Checkbox("Images", {
-                className: "marginLeft",
+                className: "ml-3",
                 title: "Display inline images"
             }, {
                 setValue: (checked: boolean) => {
@@ -63,7 +63,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
                 }
             }),
             ast.mobileMode ? null : new Checkbox("Indent", {
-                className: "marginLeft",
+                className: "ml-3",
                 title: "Indent the Document based on content hierarchy"
             }, {
                 setValue: (checked: boolean) => {
@@ -76,7 +76,7 @@ export class DocumentResultSetView<TT extends DocumentRSInfo> extends DocumentVi
                 }
             }),
             new Checkbox("Comments", {
-                className: "marginLeft",
+                className: "ml-3",
                 title: "Include all the Comment Nodes in the Document"
             }, {
                 setValue: async (checked: boolean) => {

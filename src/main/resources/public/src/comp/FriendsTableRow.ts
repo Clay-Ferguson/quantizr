@@ -62,7 +62,7 @@ export class FriendsTableRow extends ListBoxRow {
                 ]),
 
                 new Div(null, {
-                    className: "marginLeft marginTop",
+                    className: "ml-3 marginTop",
                     [C.USER_ID_ATTR]: this.friend.userNodeId,
                     onClick: S.nav._clickToOpenUserProfile,
                     title: "Click for Profile"

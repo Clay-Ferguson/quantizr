@@ -70,7 +70,7 @@ export class SearchContentDlg extends DialogBase {
                     this.mergeState<LS>({ requirePriority: checked });
                 },
                 getValue: (): boolean => this.getState<LS>().requirePriority
-            }, "marginLeft");
+            }, "ml-3");
         }
 
         return [

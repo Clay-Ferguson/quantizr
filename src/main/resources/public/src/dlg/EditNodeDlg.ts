@@ -412,9 +412,9 @@ export class EditNodeDlg extends DialogBase {
                     onClick: this.utl._share
                 }),
                 ...shareComps,
-                !isPublic ? new Button("Make Public", () => this.makePublic(true), { className: "marginLeft" }) : null,
+                !isPublic ? new Button("Make Public", () => this.makePublic(true), { className: "ml-3" }) : null,
                 unpublished ? new Icon({
-                    className: "fa fa-eye-slash fa-lg sharingIcon marginLeft microMarginRight",
+                    className: "fa fa-eye-slash fa-lg sharingIcon ml-3 microMarginRight",
                     title: "Node is Unpublished\n\nWill not appear in feed"
                 }) : null
             ]);

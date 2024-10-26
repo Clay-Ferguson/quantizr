@@ -25,7 +25,7 @@ export class BlockedUsersType extends TypeBase {
     override render = (_node: NodeInfo, _tabData: TabBase<any>, _rowStyling: boolean, _isTreeView: boolean): Comp => {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName),
-            new Div("These are the people you've blocked. Delete from this list to unblock.", { className: "marginLeft" })
+            new Div("These are the people you've blocked. Delete from this list to unblock.", { className: "ml-3" })
         ]);
     }
 

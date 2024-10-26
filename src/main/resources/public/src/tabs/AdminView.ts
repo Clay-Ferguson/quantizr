@@ -29,7 +29,7 @@ export class AdminView extends AppTab<any, AdminView> {
                 new Div("Admin Console", { className: "tabTitle" })
             ], null),
 
-            new Div(null, { className: "marginLeft" }, [
+            new Div(null, { className: "ml-3" }, [
                 this.sectionTitle("Analytics"),
                 new FlexRowLayout([
                     new Div(null, { className: settingsCol }, [

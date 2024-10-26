@@ -119,11 +119,11 @@ export class NodeCompTableRowLayout extends Comp {
                     }
                 }, {
                     title: "Insert new node"
-                }, "marginLeft marginTop ui-new-node-plus", "fa-plus"));
+                }, "ml-3 marginTop ui-new-node-plus", "fa-plus"));
 
                 const userCanPaste = (S.props.isMine(lastNode) || ast.isAdminUser) && lastNode.id !== ast.userProfile?.userNodeId;
                 if (!!ast.nodesToMove && userCanPaste) {
-                    children.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "pasteButton marginLeft"));
+                    children.push(new Button("Paste Here", S.edit._pasteSelNodes_Inline, { [C.NODE_ID_ATTR]: lastNode.id }, "pasteButton ml-3"));
                 }
             }
         }
