@@ -33,6 +33,32 @@
 // todo-0: there's a lot in this class we can delete, because it was for bootstrap.
 @import "variables.scss";
 
+@layer utilities {
+    ::-webkit-scrollbar {
+        width: 20px;
+        height: 20px;
+        background-color: black;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        background-color: $gray-900;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+        background-color: #444;
+        border: 1px solid gray;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+}
+
 $profileImgSize: 200px;
 $highlightActiveMenuItems: false;
 
@@ -123,7 +149,6 @@ $tourPanelHeight: 6rem;
 @import './imports/player.scss';
 @import './imports/profile.scss';
 @import './imports/rss.scss';
-@import './imports/scrollbar.scss';
 @import './imports/stats.scss';
 @import './imports/tabs.scss';
 @import './imports/tags.scss';
