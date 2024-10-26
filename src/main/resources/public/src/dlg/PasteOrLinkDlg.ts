@@ -1,7 +1,6 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { DialogBase } from "../DialogBase";
@@ -48,8 +47,7 @@ export class PasteOrLinkDlg extends DialogBase {
             ]),
             new ButtonBar([
                 new Button("Cancel", this._close)
-            ], "mt-3 float-right"),
-            new Clearfix()
+            ], "mt-3 flex justify-end"),
         ];
     }
 }

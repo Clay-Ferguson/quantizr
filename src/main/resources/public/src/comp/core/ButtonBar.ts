@@ -14,7 +14,7 @@ export class ButtonBar extends Comp {
 
     override preRender(): boolean | null {
         const props = {
-            className: "inline-flex btnGroup flex-wrap " + (this.extraClass ? this.extraClass : ""),
+            className: "btnGroup flex-wrap " + (this.extraClass ? this.extraClass : ""),
             role: "group"
         };
 
