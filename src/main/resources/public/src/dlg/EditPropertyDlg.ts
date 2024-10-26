@@ -52,7 +52,7 @@ export class EditPropertyDlg extends DialogBase {
                     })
                 ]) : null,
 
-            type?.schemaOrg?.props ? new Checkbox("Schema.org Props", { className: "marginRight" }, {
+            type?.schemaOrg?.props ? new Checkbox("Schema.org Props", { className: "mr-3" }, {
                 setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = checked; }),
                 getValue: (): boolean => getAs().showSchemaOrgProps
             }) : null,

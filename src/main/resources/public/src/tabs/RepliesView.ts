@@ -45,7 +45,7 @@ export class RepliesView<PT extends RepliesRSInfo> extends AppTab<PT, RepliesVie
                     }
                 }, {
                     title: "Go back..."
-                }, "marginRight", "fa-arrow-left"),
+                }, "mr-3", "fa-arrow-left"),
                 new Div(this.data.name, { className: "tabTitle" }),
             ], this.data),
             this.data.props.description ? new Div(this.data.props.description) : null

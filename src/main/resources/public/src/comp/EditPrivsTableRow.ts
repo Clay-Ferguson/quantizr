@@ -24,7 +24,7 @@ export class EditPrivsTableRow extends ListBoxRow {
             div.addChild(
                 new Div(null, null, [
                     new ButtonBar([
-                        new Checkbox("Allow Replies", { className: "marginRight" }, {
+                        new Checkbox("Allow Replies", { className: "mr-3" }, {
                             setValue: (checked: boolean) => this.shareNodeToUserFunc(this.aclEntry.principalName, checked),
                             getValue: (): boolean => writable
                         }),

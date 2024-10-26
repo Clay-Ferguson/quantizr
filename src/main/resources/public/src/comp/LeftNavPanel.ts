@@ -52,7 +52,7 @@ export class LeftNavPanel extends Comp {
                 onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "index")
             }),
             new Span("Menu", {
-                className: "marginRight cursor-pointer" + (ast.menuIndexToggle == "menu" ? " activeTab" : " inactiveTab"),
+                className: "mr-3 cursor-pointer" + (ast.menuIndexToggle == "menu" ? " activeTab" : " inactiveTab"),
                 onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "menu")
             })
         ], "mt-3") : null;

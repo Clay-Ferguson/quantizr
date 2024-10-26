@@ -141,7 +141,7 @@ export class NodeCompRowHeader extends Comp {
         });
 
         if (showInfo && ast.isAdminUser) {
-            floatUpperRightDiv.addChild(new Span(`[${this.node.ordinal}]`, { className: "marginRight" }));
+            floatUpperRightDiv.addChild(new Span(`[${this.node.ordinal}]`, { className: "mr-3" }));
         }
 
         if (showInfo && this.node.timeAgo) {
@@ -156,12 +156,12 @@ export class NodeCompRowHeader extends Comp {
             const iconClass = type.getIconClass();
             if (showInfo && iconClass) {
                 floatUpperRightDiv.addChild(new Icon({
-                    className: iconClass + (type.schemaOrg ? " microMarginRight" : " marginRight"),
+                    className: iconClass + (type.schemaOrg ? " microMarginRight" : " mr-3"),
                     title: "Node Type: " + type.getName()
                 }));
 
                 if (type.schemaOrg) {
-                    floatUpperRightDiv.addChild(new Span(type.getName(), { className: "marginRight" }));
+                    floatUpperRightDiv.addChild(new Span(type.getName(), { className: "mr-3" }));
                 }
             }
         }
@@ -179,7 +179,7 @@ export class NodeCompRowHeader extends Comp {
 
         const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, this.node);
         const unpublishedIcon = unpublished ? new Icon({
-            className: "fa fa-eye-slash fa-lg sharingIcon marginRight",
+            className: "fa fa-eye-slash fa-lg sharingIcon mr-3",
             title: "Node is Unpublished\n\nWill not appear in feed"
         }) : null;
 
@@ -189,7 +189,7 @@ export class NodeCompRowHeader extends Comp {
                 const appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
                 floatUpperRightDiv.addChildren([
                     new Icon({
-                        className: "fa fa-globe fa-lg sharingIcon marginRight",
+                        className: "fa fa-globe fa-lg sharingIcon mr-3",
                         title: "Node is Public\n(" + appendNode + ")"
                     }),
                     unpublishedIcon

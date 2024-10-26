@@ -36,7 +36,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
         // const newItems: any = null;
         // if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
         //     newItems = new Icon({
-        //         className: "fa fa-lightbulb fa-lg feedDirtyIcon marginRight",
+        //         className: "fa fa-lightbulb fa-lg feedDirtyIcon mr-3",
         //         title: "New content available. Refresh!"
         //     });
         // }
@@ -72,7 +72,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         val: this.data.props.searchTextState,
                         placeholder: "Search for...",
                         enter: S.srch._refreshFeed,
-                        outterClass: "feedSearchField marginRight"
+                        outterClass: "feedSearchField mr-3"
                     }) : null,
                     // we show this button just as an icon unless the search field is displaying
                     new Button(ast.displayFeedSearch ? "Search" : null, () => {

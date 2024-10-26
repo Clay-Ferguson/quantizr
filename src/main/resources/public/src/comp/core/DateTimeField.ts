@@ -16,7 +16,7 @@ export class DateTimeField extends Span {
         super(null);
         this.attribs = {
             ...this.attribs, ...{
-                className: "tw-flex marginRight"
+                className: "tw-flex mr-3"
             }
         };
 

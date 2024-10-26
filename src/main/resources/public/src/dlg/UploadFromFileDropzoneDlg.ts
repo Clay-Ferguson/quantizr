@@ -63,7 +63,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         if (this.importMode) return null;
 
         return new FlexLayout([
-            new Div(null, { className: "marginRight" }, [
+            new Div(null, { className: "mr-3" }, [
                 new Div("Existing Data"),
                 new ButtonBar([
                     !S.util.clipboardReadable() ? null : new Button("Clipboard", this._uploadFromClipboard, {
@@ -74,7 +74,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }, null, "fa-cloud"),
                 ])
             ]),
-            new Div(null, { className: "marginRight" }, [
+            new Div(null, { className: "mr-3" }, [
                 new Div("Live Recording"),
                 new ButtonBar([
                     !this.allowRecording ? null : new Button("Mic",

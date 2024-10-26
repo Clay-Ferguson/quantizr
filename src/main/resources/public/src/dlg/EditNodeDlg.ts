@@ -207,7 +207,7 @@ export class EditNodeDlg extends DialogBase {
                 }));
             }
             span.addChild(new Span(type.getName(), {
-                className: "marginRight cursor-pointer",
+                className: "mr-3 cursor-pointer",
                 onClick: this._openChangeNodeTypeDlg
             }));
         }
@@ -218,7 +218,7 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-circle-question fa-lg dlgIcon cursor-pointer",
                 onClick: this._openChangeNodeTypeDlg
             }));
-            span.addChild(new Span("Unknown Type", { className: "marginRight" }));
+            span.addChild(new Span("Unknown Type", { className: "mr-3" }));
         }
 
         if (this.showJumpButton) {
@@ -372,7 +372,7 @@ export class EditNodeDlg extends DialogBase {
                     new Div(null, { className: "tw-float-right" }, [
                         // ADD PROP ICON
                         new Icon({
-                            className: "fa fa-circle-plus fa-lg cursor-pointer marginRight tinyMarginBottom",
+                            className: "fa fa-circle-plus fa-lg cursor-pointer mr-3 tinyMarginBottom",
                             onClick: async () => {
                                 dispatch("setPropsPanelExpanded", s => {
                                     s.propsPanelExpanded = true;
@@ -383,7 +383,7 @@ export class EditNodeDlg extends DialogBase {
                         }),
                         // DELETE PROP ICON
                         state.selectedProps.size > 0 ? new Icon({
-                            className: "fa fa-trash fa-lg cursor-pointer marginRight tinyMarginBottom",
+                            className: "fa fa-trash fa-lg cursor-pointer mr-3 tinyMarginBottom",
                             onClick: () => this.utl.deletePropsGesture(),
                             title: "Delete property"
                         }) : null
@@ -479,7 +479,7 @@ export class EditNodeDlg extends DialogBase {
                     dispatch("setMorePanelExpanded", s => {
                         s.morePanelExpanded = expanded;
                     });
-                }, getAs().morePanelExpanded, "marginRight", "", "", "div") : null;
+                }, getAs().morePanelExpanded, "mr-3", "", "", "div") : null;
 
             advCollapsePanelContainer = new Div(null, { className: "marginBottom" }, [
                 advCollapsePanel
@@ -884,11 +884,11 @@ export class EditNodeDlg extends DialogBase {
                 valEditor = new TextArea(null, {
                     rows: "" + rows,
                     id: "prop_" + ast.editNode.id
-                }, propState, "textareaMin4 marginRight");
+                }, propState, "textareaMin4 mr-3");
             }
             else {
                 valEditor = new TextField({
-                    outterClass: "marginRight",
+                    outterClass: "mr-3",
                     inputClass: S.props.getInputClassForType(propEntry.name),
                     val: propState
                 });
@@ -898,7 +898,7 @@ export class EditNodeDlg extends DialogBase {
         else if (propType === I.DomainType.Number) {
             valEditor = new TextField({
                 inputType: "number",
-                outterClass: "marginRight",
+                outterClass: "mr-3",
                 inputClass: S.props.getInputClassForType(propEntry.name),
                 val: propState
             });

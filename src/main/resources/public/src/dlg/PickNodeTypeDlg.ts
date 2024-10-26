@@ -66,11 +66,11 @@ export class PickNodeTypeDlg extends DialogBase {
                     enter: this._typeSearch,
                     outterClass: "typeSearchField"
                 })),
-                new Checkbox("Schema.org", { className: "marginRight" }, {
+                new Checkbox("Schema.org", { className: "mr-3" }, {
                     setValue: (checked: boolean) => dispatch("SetSchemaOrgProps", s => { s.showSchemaOrgProps = checked; }),
                     getValue: (): boolean => getAs().showSchemaOrgProps
                 }),
-                new Checkbox("Recent", { className: "marginRight" }, {
+                new Checkbox("Recent", { className: "mr-3" }, {
                     setValue: (checked: boolean) => dispatch("RecentProps", s => { s.showRecentProps = checked; }),
                     getValue: (): boolean => getAs().showRecentProps
                 }),

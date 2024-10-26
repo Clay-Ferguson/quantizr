@@ -27,13 +27,13 @@ export class MenuItem extends Comp {
         let innerClazz: string;
         if (this.stateFunc) {
             if (this.radioGroup) {
-                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, { className: "tinyMarginTop marginRight" }, {
+                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, { className: "tinyMarginTop mr-3" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });
             }
             else {
-                innerSpan = new Checkbox(this.name, { className: "tinyMarginTop marginRight" }, {
+                innerSpan = new Checkbox(this.name, { className: "tinyMarginTop mr-3" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });

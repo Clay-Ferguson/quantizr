@@ -99,7 +99,7 @@ export class RSSView extends AppTab<any, RSSView> {
             this.headingBar = new TabHeading([
                 new Button("", () => S.view.jumpToId(ast.rssNode.id), {
                     title: "Back to Folders View"
-                }, "marginRight", "fa-arrow-left"),
+                }, "mr-3", "fa-arrow-left"),
                 new Div("RSS Feed", { className: "tabTitle" }),
                 new Checkbox("Headlines Only", {
                     className: "tw-float-right"
@@ -338,7 +338,7 @@ export class RSSView extends AppTab<any, RSSView> {
         }
 
         children.push(entry.parentFeedTitle ? new Div(null, {
-            // className: "marginRight",
+            // className: "mr-3",
             dangerouslySetInnerHTML: Comp.getDangerousHtml(entry.parentFeedTitle)
         }) : null);
 
@@ -466,7 +466,7 @@ export class RSSView extends AppTab<any, RSSView> {
             }
         }) : null;
 
-        const footerSpan = new Span(entry.publishDate, { className: "marginRight" });
+        const footerSpan = new Span(entry.publishDate, { className: "mr-3" });
 
         children.push(new Div(null, null, [
             new Span(null, { className: "tw-float-right" }, [

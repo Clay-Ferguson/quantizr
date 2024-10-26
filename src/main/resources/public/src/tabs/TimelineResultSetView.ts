@@ -55,6 +55,6 @@ export class TimelineResultSetView<PT extends TimelineRSInfo> extends ResultSetV
     }
 
     override getFloatRightHeaderComp(): Comp {
-        return new Button("Post", S.edit._postFromTimeline, null, "tw-float-right -primary marginRight")
+        return new Button("Post", S.edit._postFromTimeline, null, "tw-float-right -primary mr-3")
     }
 }

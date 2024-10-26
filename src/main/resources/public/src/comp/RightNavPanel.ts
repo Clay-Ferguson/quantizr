@@ -65,7 +65,7 @@ export class RightNavPanel extends Comp {
         }
 
         const clipboardPasteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
-            className: "fa fa-clipboard fa-lg marginRight cursor-pointer",
+            className: "fa fa-clipboard fa-lg mr-3 cursor-pointer",
             onClick: () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES, "Saved in Notes Folder");
@@ -74,7 +74,7 @@ export class RightNavPanel extends Comp {
         }) : null;
 
         const addNoteButton = !ast.isAnonUser && !ast.mobileMode ? new Icon({
-            className: "fa fa-sticky-note stickyNote fa-lg marginRight cursor-pointer",
+            className: "fa fa-sticky-note stickyNote fa-lg mr-3 cursor-pointer",
             onClick: async () => {
                 PubSub.pub(C.PUBSUB_closeNavPanel);
                 let content = null;
@@ -108,7 +108,7 @@ export class RightNavPanel extends Comp {
         }
 
         const textToSpeech = !ast.isAnonUser && !ast.mobileMode && S.speech.ttsSupported() ? new Icon({
-            className: "fa fa-volume-high fa-lg marginRight cursor-pointer",
+            className: "fa fa-volume-high fa-lg mr-3 cursor-pointer",
 
             // This mouseover stuff is compensating for the fact that when the onClick gets called
             // it's a problem that by then the text selection "might" have gotten lost. This can
@@ -165,7 +165,7 @@ export class RightNavPanel extends Comp {
                         }
                     }, [
                         !ast.isAnonUser && !ast.mobileMode ? new Icon({
-                            className: "fa fa-gear fa-lg marginRight",
+                            className: "fa fa-gear fa-lg mr-3",
                         }) : null,
                         !ast.isAnonUser && !ast.mobileMode ? new Span(displayName, {
                             className: "smallMarginRight",

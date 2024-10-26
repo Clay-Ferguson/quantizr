@@ -68,7 +68,7 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
             this.headingBar = new TabHeading([
                 AudioPlayerView.audioNodeId ? new Button(null, () => S.view.jumpToId(getAs().repliesViewNodeId), {
                     title: "Go back..."
-                }, "marginRight", "fa-arrow-left") : null,
+                }, "mr-3", "fa-arrow-left") : null,
                 new Div("Audio Player", { className: "tabTitle" })
             ], null),
             new Div(null, { className: "bigMarginTop bigMarginRight" }, [

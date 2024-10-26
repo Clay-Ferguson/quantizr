@@ -52,7 +52,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
                         }
                     }, {
                         title: "Back to Folders View"
-                    }, "marginRight", "fa-arrow-left") : null,
+                    }, "mr-3", "fa-arrow-left") : null,
                 // include back button if we have a central node this panel is about.
                 this.renderHeading(),
                 this.data.props.description ? new Span(this.data.props.description, { className: "tw-float-right smallMarginTop" }) : null,

@@ -63,7 +63,7 @@ export class ThreadView<PT extends ThreadRSInfo> extends AppTab<PT, ThreadView<P
                     }
                 }, {
                     title: "Go back..."
-                }, "marginRight", "fa-arrow-left"),
+                }, "mr-3", "fa-arrow-left"),
                 new Div(this.data.name, { className: "tabTitle" }),
                 floatEndDiv,
                 new Clearfix()

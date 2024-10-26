@@ -188,9 +188,9 @@ export class NodeCompBinary extends Comp {
                     this.isEditorEmbed ? null : new Button("Play Video", () => {
                         new VideoPlayerDlg("vidPlayer-" + node.id,
                             S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
-                    }, null, "-primary marginRight", "fa-play"),
+                    }, null, "-primary mr-3", "fa-play"),
                     new Span(null, {
-                        className: "downloadLink marginRight"
+                        className: "downloadLink mr-3"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
             ];
@@ -202,9 +202,9 @@ export class NodeCompBinary extends Comp {
                         const att = S.props.getAttachment(this.attName, node);
                         if (!att) return null;
                         S.nav.showAudioPlayerTab(node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, null, att.fileName);
-                    }, null, "-primary marginRight", "fa-play"),
+                    }, null, "-primary mr-3", "fa-play"),
                     new Span(null, {
-                        className: "downloadLink marginRight"
+                        className: "downloadLink mr-3"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
                 ], "marginBottom")
             ];
@@ -238,7 +238,7 @@ export class NodeCompBinary extends Comp {
                     }),
                     new Span(null, null, [
                         new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), fileName || "link", {
-                            className: "downloadLink marginRight",
+                            className: "downloadLink mr-3",
                             title: "Click to download attachment\n\n" + titleSuffix
                         }),
                         viewFileLink
