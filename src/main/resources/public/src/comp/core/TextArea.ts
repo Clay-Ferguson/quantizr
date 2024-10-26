@@ -21,7 +21,7 @@ export class TextArea extends Div implements I.TextEditorIntf {
         public calcRows: boolean = false, private minRows: number = 3, private scrollPos: ScrollPos = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
-        this.attribs.className = "marginTop";
+        this.attribs.className = "mt-3";
 
         if (attribs) {
             this.textareaAttribs = { ...this.textareaAttribs, ...attribs };

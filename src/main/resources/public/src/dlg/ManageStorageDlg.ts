@@ -44,7 +44,7 @@ export class ManageStorageDlg extends DialogBase {
                 new Button("Close", () => {
                     this.close();
                 })
-            ], "marginTop")
+            ], "mt-3")
         ];
     }
 

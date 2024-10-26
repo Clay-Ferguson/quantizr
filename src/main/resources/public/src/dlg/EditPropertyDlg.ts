@@ -62,7 +62,7 @@ export class EditPropertyDlg extends DialogBase {
             new ButtonBar([
                 new Button("Save", this._save, null, "-primary"),
                 new Button("Cancel", this._close)
-            ], "marginTop")
+            ], "mt-3")
         ];
 
         this.onMount(() => textField.focus());

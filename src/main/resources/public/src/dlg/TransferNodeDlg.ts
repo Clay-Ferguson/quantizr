@@ -45,11 +45,11 @@ export class TransferNodeDlg extends DialogBase {
                         setValue: (checked: boolean) => this.mergeState<LS>({ recursive: checked }),
                         getValue: (): boolean => this.getState<LS>().recursive
                     })
-                ], "marginTop"),
+                ], "mt-3"),
                 new ButtonBar([
                     new Button(TransferNodeDlg.operationName(this.operation), this._transfer, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

@@ -78,7 +78,7 @@ export class PickNodeTypeDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Ok", this._setNodeType, null, "-primary"),
                     new Button("Cancel", this._close)
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

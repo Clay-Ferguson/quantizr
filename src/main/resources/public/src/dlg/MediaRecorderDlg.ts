@@ -150,7 +150,7 @@ export class MediaRecorderDlg extends DialogBase {
             }
         }
 
-        const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "marginTop", {
+        const audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "mt-3", {
             setValue: (val: string) => {
                 S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val);
                 this.mergeState<LS>({ audioInput: val });
@@ -163,7 +163,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         let videoSelect = null;
         if (this.videoMode) {
-            videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "marginTop", {
+            videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "mt-3", {
                 setValue: (val: string) => {
                     S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val);
                     this.mergeState<LS>({ videoInput: val });
@@ -193,7 +193,7 @@ export class MediaRecorderDlg extends DialogBase {
                     new Button(this.allowSave ? "Cancel" : "Close", this._cancel, null, "tw-float-right")
                 ]),
                 this.videoMode ? this.videoPlayer : null,
-                new Div(null, { className: "marginTop" }, [audioSelect, videoSelect])
+                new Div(null, { className: "mt-3" }, [audioSelect, videoSelect])
             ])
         ];
     }

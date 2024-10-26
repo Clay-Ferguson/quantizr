@@ -24,7 +24,7 @@ export class ConfirmDlg extends DialogBase {
                         this.close();
                     }, null, this.yesButtonClass || "-primary"),
                     this.showNoButton ? new Button("No", this._close) : null
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

@@ -46,7 +46,7 @@ export class ManageCryptoKeysDlg extends DialogBase {
             new TextContent(state.keyJson, "cryptoKeyTextContent", true),
             new ButtonBar([
                 new Button("Close", this._close)
-            ], "marginTop")
+            ], "mt-3")
         ];
     }
 

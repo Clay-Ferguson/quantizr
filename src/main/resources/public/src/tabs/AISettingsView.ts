@@ -42,7 +42,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const horzClass = "marginTop marginBottom settingsSection";
+        const horzClass = "mt-3 marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
         const aiService: AIService = S.aiUtil.getServiceByName(getAs().userPrefs.aiService);
@@ -89,7 +89,7 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                     }, this.foldersToExcludeState, null, false, 3, this.foldersToExcludeScrollPos),
                     new TextField({
                         label: "File Extensions (ex: java,py,txt)", val: this.fileExtState,
-                        outterClass: "marginTop"
+                        outterClass: "mt-3"
                     }),
                 ]) : null,
                 new FlexLayout([
@@ -97,13 +97,13 @@ export class AISettingsView extends AppTab<any, AISettingsView> {
                         label: "Max Response Words",
                         val: this.maxWordsState,
                         inputClass: "maxResponseWords",
-                        outterClass: "marginTop"
+                        outterClass: "mt-3"
                     }),
                     new TextField({
                         label: "Creativity (0.0-1.0, Default=0.7)",
                         val: this.temperatureState,
                         inputClass: "aiTemperature",
-                        outterClass: "ml-3 marginTop"
+                        outterClass: "ml-3 mt-3"
                     }),
                 ]),
                 new Button("Save", this._save, { className: "bigMarginTop" })

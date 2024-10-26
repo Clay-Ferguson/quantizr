@@ -21,7 +21,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     showContentHeading: boolean = true;
-    pagingContainerClass: string = "marginBottom marginTop";
+    pagingContainerClass: string = "marginBottom mt-3";
 
     constructor(data: TabBase<PT, TT>, private showRoot: boolean = true, private showPageNumber: boolean = true, private infiniteScrolling = false) {
         super(data);

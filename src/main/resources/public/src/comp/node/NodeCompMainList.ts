@@ -24,7 +24,7 @@ export class NodeCompMainList extends Comp {
             const allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;
             children.push(S.render.renderChildren(ast.node, this.tabData, 1, allowNodeMove));
 
-            this.addPaginationButtons(children, ast.endReached, "marginTop marginBottom", false);
+            this.addPaginationButtons(children, ast.endReached, "mt-3 marginBottom", false);
         }
 
         this.children = children;
@@ -98,7 +98,7 @@ export class NodeCompMainList extends Comp {
         }
 
         if (firstButton || prevButton || moreButton) {
-            children.push(new ButtonBar([firstButton, prevButton, moreButton], "marginTop marginBottom tw-text-center " + moreClasses));
+            children.push(new ButtonBar([firstButton, prevButton, moreButton], "mt-3 marginBottom tw-text-center " + moreClasses));
         }
     }
 }

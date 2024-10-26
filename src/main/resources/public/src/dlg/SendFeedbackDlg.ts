@@ -28,7 +28,7 @@ export class SendFeedbackDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Send", this._send, null, "-primary"),
                     new Button("Cancel", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

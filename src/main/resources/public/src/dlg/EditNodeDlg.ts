@@ -292,7 +292,7 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        const advFlowPanel: Div = new Div(null, { className: "d-flex flex-row flex-wrap marginTop" });
+        const advFlowPanel: Div = new Div(null, { className: "d-flex flex-row flex-wrap mt-3" });
 
         if (ast.editNode.hasChildren) {
             advFlowPanel.addChild(this.createLayoutSelection());
@@ -936,7 +936,7 @@ export class EditNodeDlg extends DialogBase {
             editItems.push(checkbox);
         }
         else {
-            editItems.push(new Label(label, { className: "marginTop" }));
+            editItems.push(new Label(label, { className: "mt-3" }));
         }
     }
 

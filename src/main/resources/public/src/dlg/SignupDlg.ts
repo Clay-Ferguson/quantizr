@@ -55,11 +55,11 @@ export class SignupDlg extends DialogBase {
                     new Div(null, null, [
                         new TextField({ label: "Captcha", val: this.captchaState })
                     ])
-                ], "captchaPanel marginTop"),
+                ], "captchaPanel mt-3"),
                 new ButtonBar([
                     new Button("Create Account", this._signup, null, "-primary"),
                     new Button("Cancel", this._close, { className: "tw-float-right" })
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

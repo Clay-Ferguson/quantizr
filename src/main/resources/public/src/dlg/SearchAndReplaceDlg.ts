@@ -28,7 +28,7 @@ export class SearchAndReplaceDlg extends DialogBase {
             new Div(null, null, [
                 new TextField({ label: "Search for", val: this.searchState }),
                 new TextField({ label: "Replace with", val: this.replaceState }),
-                new Div(null, { className: "marginTop" }, [
+                new Div(null, { className: "mt-3" }, [
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean) => this.mergeState<LS>({ recursive: checked }),
                         getValue: (): boolean => this.getState<LS>().recursive
@@ -37,7 +37,7 @@ export class SearchAndReplaceDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Replace", this._replace, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

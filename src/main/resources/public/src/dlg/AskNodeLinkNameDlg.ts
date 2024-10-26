@@ -32,7 +32,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new TextField({ label: "Predicate", val: AskNodeLinkNameDlg.nameState }),
-                new Checkbox("Embed Content", { className: "marginTop" }, {
+                new Checkbox("Embed Content", { className: "mt-3" }, {
                     setValue: (checked: boolean) => this.link.embed = checked,
                     getValue: (): boolean => this.link.embed
                 })
@@ -44,7 +44,7 @@ export class AskNodeLinkNameDlg extends DialogBase {
                     this.link = null;
                     this.close()
                 })
-            ], "marginTop")
+            ], "mt-3")
         ];
     }
 

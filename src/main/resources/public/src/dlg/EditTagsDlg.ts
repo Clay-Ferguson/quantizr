@@ -36,12 +36,12 @@ export class EditTagsDlg extends DialogBase {
                     })
                 ], true, (exp: boolean) => {
                     dispatch("ExpandTagTips", s => s.tagTipsExpanded = exp);
-                }, getAs().tagTipsExpanded, null, "marginTop", "marginTop"),
+                }, getAs().tagTipsExpanded, null, "mt-3", "mt-3"),
 
                 new ButtonBar([
                     new Button("Save", this._save, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

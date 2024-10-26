@@ -184,7 +184,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         });
                     }
                 }
-                children.push(new ButtonBar([moreButton], "tw-text-center marginTop marginBottom"));
+                children.push(new ButtonBar([moreButton], "tw-text-center mt-3 marginBottom"));
             }
         }
 
@@ -257,7 +257,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
 
     // DO NOT DELETE - may be needed in the future.
     // makeFilterButtonsBar = (ast : AppState): Div => {
-    //     return new Div(null, { className: "marginTop" }, [
+    //     return new Div(null, { className: "mt-3" }, [
     //         ast.isAnonUser ? null : new Checkbox("Friends", {
     //             title: "Include nodes posted by your friends"
     //         }, {

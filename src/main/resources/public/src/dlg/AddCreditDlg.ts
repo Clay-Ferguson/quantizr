@@ -28,7 +28,7 @@ export class AddCreditDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Add Credit", this._close, null, "-primary"),
                     new Button("Cancel", this._close)
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

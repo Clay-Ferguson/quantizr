@@ -90,7 +90,7 @@ export class SearchContentDlg extends DialogBase {
                         })
                     ], true, (exp: boolean) => {
                         dispatch("ExpandAttachment", s => s.searchTipsExpanded = exp);
-                    }, getAs().searchTipsExpanded, null, "marginTop", "marginTop")
+                    }, getAs().searchTipsExpanded, null, "mt-3", "mt-3")
                 ]),
                 this.createSearchFieldIconButtons(),
                 new Clearfix(),
@@ -113,42 +113,42 @@ export class SearchContentDlg extends DialogBase {
                             }
                         },
                         getValue: (): boolean => this.getState<LS>().blockedWords
-                    }, "marginTop") : null,
+                    }, "mt-3") : null,
                     new Checkbox("Regex", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState<LS>({ fuzzy: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().fuzzy
-                    }, "marginTop"),
+                    }, "mt-3"),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.caseSensitive = checked;
                             this.mergeState<LS>({ caseSensitive: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().caseSensitive
-                    }, "marginTop"),
+                    }, "mt-3"),
                     new Checkbox("Recursive", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.recursive = checked;
                             this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().recursive
-                    }, "marginTop"),
+                    }, "mt-3"),
                     new Checkbox("Has Attachment", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.requireAttachment = checked;
                             this.mergeState<LS>({ requireAttachment: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().requireAttachment
-                    }, "marginTop"),
+                    }, "mt-3"),
                     new Checkbox("Has Date", null, {
                         setValue: (checked: boolean) => {
                             SearchContentDlg.dlgState.requireDate = checked;
                             this.mergeState<LS>({ requireDate: checked });
                         },
                         getValue: (): boolean => this.getState<LS>().requireDate
-                    }, "marginTop")
+                    }, "mt-3")
                 ], "marginBottom"),
 
                 new FlexRowLayout([
@@ -212,7 +212,7 @@ export class SearchContentDlg extends DialogBase {
                     // todo-2: this is currently not implemented on the server.
                     // ast.isAdminUser ? new Button("Delete Matches", this.deleteMatches, null, "-danger") : null,
                     new Button("Cancel", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

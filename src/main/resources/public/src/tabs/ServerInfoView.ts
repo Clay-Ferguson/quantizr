@@ -19,7 +19,7 @@ export class ServerInfoView extends AppTab<any, ServerInfoView> {
         const ast = getAs();
 
         this.children = [
-            new Div(null, { className: "marginTop" }, [
+            new Div(null, { className: "mt-3" }, [
 
                 ast.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
                     S.view.runServerCommand("getServerInfo", null, "Info View", null);

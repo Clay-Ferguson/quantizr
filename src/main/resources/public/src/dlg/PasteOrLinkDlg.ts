@@ -28,7 +28,7 @@ export class PasteOrLinkDlg extends DialogBase {
                         S.edit.moveNodeByDrop(this.nodeId, this.sourceId, "inline");
                         this.close();
                     })
-                ], "marginTop")
+                ], "mt-3")
             ]),
             new Div(null, { className: "dragTargetDlgSection" }, [
                 new Heading(6, "Link Nodes"),
@@ -44,11 +44,11 @@ export class PasteOrLinkDlg extends DialogBase {
                         run();
                         this.close();
                     }),
-                ], "marginTop")
+                ], "mt-3")
             ]),
             new ButtonBar([
                 new Button("Cancel", this._close)
-            ], "marginTop tw-float-right"),
+            ], "mt-3 tw-float-right"),
             new Clearfix()
         ];
     }

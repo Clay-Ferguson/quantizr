@@ -26,7 +26,7 @@ export class UploadFromUrlDlg extends DialogBase {
         return [
             new Div(null, null, [
                 new TextField({ label: "Upload from URL", val: this.urlState }),
-                new Div(null, { className: "marginTop" }, [
+                new Div(null, { className: "mt-3" }, [
                     new Checkbox("Store a copy on this server", null, {
                         setValue: (checked: boolean) => UploadFromUrlDlg.storeLocally = checked,
                         getValue: (): boolean => UploadFromUrlDlg.storeLocally
@@ -35,7 +35,7 @@ export class UploadFromUrlDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Upload", this._upload, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

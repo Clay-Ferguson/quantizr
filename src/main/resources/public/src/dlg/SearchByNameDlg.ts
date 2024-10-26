@@ -29,7 +29,7 @@ export class SearchByNameDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this._search, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

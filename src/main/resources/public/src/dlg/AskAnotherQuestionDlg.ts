@@ -31,7 +31,7 @@ export class AskAboutSubgraphDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Submit", this.askQuestion, null, "-primary"),
                     new Button("Close", this._close)
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

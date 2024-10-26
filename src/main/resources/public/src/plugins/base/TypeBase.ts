@@ -289,7 +289,7 @@ export class TypeBase implements TypeIntf {
             for (const o of oneOf) {
                 children.push(new Div("*  " + o.name + ` (${o.replies?.totalItems} votes)`, { className: "bigMarginLeft marginBottom" }));
             }
-            choices = new Div(null, { className: "marginTop" }, children);
+            choices = new Div(null, { className: "mt-3" }, children);
         }
 
         let cont = node.renderContent || node.content;
@@ -310,7 +310,7 @@ export class TypeBase implements TypeIntf {
             // The reason we don't sanitize for admin users is mainly because we need the code containing the
             // donations link to work, but there may also be other times we want the admin allowed to embed raw HTML
             const sanitize = node.owner !== PrincipalName.ADMIN;
-            comp = new Html(cont, { className: "ml-3 marginTop" }, null, sanitize);
+            comp = new Html(cont, { className: "ml-3 mt-3" }, null, sanitize);
         }
         // else render as markdown
         else {

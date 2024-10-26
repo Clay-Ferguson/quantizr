@@ -33,7 +33,7 @@ export class ResetPasswordDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Reset Password", this._resetPassword, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

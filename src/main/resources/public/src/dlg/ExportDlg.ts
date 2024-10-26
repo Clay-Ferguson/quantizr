@@ -41,7 +41,7 @@ export class ExportDlg extends DialogBase {
                 this.makeFileTypeRadioBtn("TAR", "tar"),
                 this.makeFileTypeRadioBtn("TAR.GZ", "tar.gz"),
                 this.makeFileTypeRadioBtn("PDF", "pdf")
-            ], "radioButtonsBar marginTop"));
+            ], "radioButtonsBar mt-3"));
 
             if (ast.exportSettings.exportType === "zip" || ast.exportSettings.exportType === "tar" || ast.exportSettings.exportType === "tar.gz") children.push(this.contentTypeOptions());
         }
@@ -84,7 +84,7 @@ export class ExportDlg extends DialogBase {
         children.push(new ButtonBar([
             new Button("Export", this._exportNodes, null, "-primary"),
             new Button("Close", this._close, null, "tw-float-right")
-        ], "marginTop"));
+        ], "mt-3"));
 
         return children;
     }
@@ -98,7 +98,7 @@ export class ExportDlg extends DialogBase {
                 this.contentTypeRadioButton("Markdown", "md"),
                 this.contentTypeRadioButton("JSON", "json"),
                 this.contentTypeRadioButton("Files & Folders", "fs")
-            ], "radioButtonsBar marginTop"),
+            ], "radioButtonsBar mt-3"),
         ]);
     }
 

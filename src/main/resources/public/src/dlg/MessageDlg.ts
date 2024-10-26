@@ -34,7 +34,7 @@ export class MessageDlg extends DialogBase {
                         this.callback();
                     }
                 }, null, "-primary")
-            ], "marginTop") : null
+            ], "mt-3") : null
         ];
     }
 }

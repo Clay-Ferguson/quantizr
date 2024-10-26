@@ -144,7 +144,7 @@ export class BlockedUsersDlg extends DialogBase {
                     new Button("Import", this.import),
                     state.friends?.length > 0 ? new Button("Export", this.export) : null,
                     new Button("Close", this.cancel, null, "tw-float-right")
-                ], "marginTop"),
+                ], "mt-3"),
                 new Clearfix() // required in case only ButtonBar children are tw-float-right, which would break layout
             ])
         ];

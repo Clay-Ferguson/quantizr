@@ -27,7 +27,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
 
     override preRender(): boolean | null {
         const ast = getAs();
-        const horzClass = "marginTop marginBottom settingsSection";
+        const horzClass = "mt-3 marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
         this.children = [
@@ -84,7 +84,7 @@ export class SettingsView extends AppTab<any, SettingsView> {
                     getValue: (): string => "" + getAs().userPrefs.mainPanelCols
                 }),
 
-                this.settingsLink(ast.mobileMode ? "Switch to Desktop Browser" : "Switch to Moble Browser", S.util._switchBrowsingMode, "marginTop"),
+                this.settingsLink(ast.mobileMode ? "Switch to Desktop Browser" : "Switch to Moble Browser", S.util._switchBrowsingMode, "mt-3"),
 
                 // menuItem("Full Repository Export", "fullRepositoryExport", "
                 // S.edit.fullRepositoryExport();") + //

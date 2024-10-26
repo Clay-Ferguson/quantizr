@@ -62,7 +62,7 @@ export class TourPanel extends Comp {
 
 
         if (ast.isAnonUser && tour.expectsLogin) {
-            children.push(new Div("*** NOTE: This tour requires you to be logged in, for the steps to work.", { className: "bigMarginLeft marginTop" }));
+            children.push(new Div("*** NOTE: This tour requires you to be logged in, for the steps to work.", { className: "bigMarginLeft mt-3" }));
         }
 
         this.children = children;

@@ -22,7 +22,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Import", this._import, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

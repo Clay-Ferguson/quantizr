@@ -243,7 +243,7 @@ export class RSSView extends AppTab<any, RSSView> {
             feedList.addChild(this.buildFeedItem(feed, item));
         }
 
-        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "tw-text-center marginTop marginBottom"));
+        feedList.addChild(this.makeNavButtonBar(page, feedSrc, feedSrcHash, "tw-text-center mt-3 marginBottom"));
         return feedList;
     }
 
@@ -353,7 +353,7 @@ export class RSSView extends AppTab<any, RSSView> {
                     const downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null);
                     const audioButton = new Button("Play Audio", () =>
                         S.nav.showAudioPlayerTab(null, enc.url, 0, feed.title, entry.title),
-                        null, "marginTop", "-primary");
+                        null, "mt-3", "-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons marginBottom"));
                 }
             });

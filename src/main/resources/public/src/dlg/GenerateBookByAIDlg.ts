@@ -53,7 +53,7 @@ export class GenerateBookByAIDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Generate", this._generate, null, "-primary"),
                     new Button("Cancel", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

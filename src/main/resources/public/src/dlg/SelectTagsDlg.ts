@@ -100,7 +100,7 @@ export class SelectTagsDlg extends DialogBase {
                         this._clear();
                         this.close();
                     }, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }
@@ -175,7 +175,7 @@ export class SelectTagsDlg extends DialogBase {
             state.tags.forEach(tagObj => this.processAddCheckboxOrHeading(div, tagObj));
 
             if (state.suggestTags && state.suggestedTags.length > 0) {
-                div.addChild(new Heading(4, "Suggestions", { className: "marginTop" }));
+                div.addChild(new Heading(4, "Suggestions", { className: "mt-3" }));
 
                 state.suggestedTags.forEach(tagObj => {
                     // don't duplicate any we've already added above
@@ -201,7 +201,7 @@ export class SelectTagsDlg extends DialogBase {
         }
 
         if (!tagObj.tag) {
-            div.addChild(new Heading(6, tagObj.description, { className: "marginTop" }));
+            div.addChild(new Heading(6, tagObj.description, { className: "mt-3" }));
             this.indenting = true;
         }
         else {

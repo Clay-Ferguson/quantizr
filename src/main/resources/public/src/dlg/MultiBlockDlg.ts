@@ -28,7 +28,7 @@ export class MultiBlockDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Block All", this._block, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

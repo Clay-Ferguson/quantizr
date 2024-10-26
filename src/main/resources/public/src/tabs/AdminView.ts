@@ -21,7 +21,7 @@ export class AdminView extends AppTab<any, AdminView> {
     }
 
     override preRender(): boolean | null {
-        const horzClass = "marginTop marginBottom settingsSection";
+        const horzClass = "mt-3 marginBottom settingsSection";
         const settingsCol = getAs().mobileMode ? "mobileSettingsCol" : "settingsCol";
 
         this.children = [

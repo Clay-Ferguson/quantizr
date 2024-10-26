@@ -183,7 +183,7 @@ export class FriendsDlg extends DialogBase {
                     !this.displayOnly ? new Button("Import", this._import) : null,
                     state.friends?.length > 0 ? new Button("Export", this._export) : null,
                     new Button(!this.nodeId && !this.displayOnly ? "Cancel" : "Close", this._cancel, null, "tw-float-right")
-                ], "marginTop"),
+                ], "mt-3"),
                 new Clearfix() // required in case only ButtonBar children are tw-float-right, which would break layout
             ])
         ];

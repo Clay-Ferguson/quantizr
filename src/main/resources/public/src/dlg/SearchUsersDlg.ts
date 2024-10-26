@@ -39,7 +39,7 @@ export class SearchUsersDlg extends DialogBase {
                     // new Button("Graph", this.graph, null, "-primary"),
                     // we can steal the 'graph' from from the other dialogs when needed.
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

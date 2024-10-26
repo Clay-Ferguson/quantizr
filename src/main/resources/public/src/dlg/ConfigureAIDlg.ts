@@ -50,27 +50,27 @@ export class ConfigureAgentDlg extends DialogBase {
                 S.quanta.config.aiAgentEnabled ? new TextField({
                     label: "File Extensions (ex: java,py,txt)",
                     val: ConfigureAgentDlg.fileExtState,
-                    outterClass: "marginTop"
+                    outterClass: "mt-3"
                 }) : null,
                 new FlexLayout([
                     new TextField({
                         label: "Max Response Words",
                         val: ConfigureAgentDlg.maxWordsState,
                         inputClass: "maxResponseWords",
-                        outterClass: "marginTop"
+                        outterClass: "mt-3"
                     }),
                     new TextField({
                         label: "Creativity (0.0-1.0, Default=0.7)",
                         val: ConfigureAgentDlg.temperatureState,
                         inputClass: "aiTemperature",
-                        outterClass: "ml-3 marginTop"
+                        outterClass: "ml-3 mt-3"
                     }),
                 ]),
                 new ButtonBar([
                     new Button("Save", this.save, null, "-primary"),
                     new Button("Reset", this.reset, null, "-secondary"),
                     new Button("Cancel", this._close, null, "-secondary tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

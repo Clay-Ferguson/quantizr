@@ -29,7 +29,7 @@ export class MultiFollowDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Follow All", this._follow, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

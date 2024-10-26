@@ -40,7 +40,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             new Div(null, null, [
                 this.showAdvancedOptions ? this.buildSourcesComponent() : null,
 
-                new Div("From your Computer (Click Below or Drag-and-Drop)", { className: "marginTop" }),
+                new Div("From your Computer (Click Below or Drag-and-Drop)", { className: "mt-3" }),
 
                 // WARNING: Keep these static IDs here, because when the page rerenders dropzone
                 // knows these IDs and dropzone will malfunction if these IDs change.
@@ -50,7 +50,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this._upload, null, "-primary"),
                     new Button("Close", this._close, null, "tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
 

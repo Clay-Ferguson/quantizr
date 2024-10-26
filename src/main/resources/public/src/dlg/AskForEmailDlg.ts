@@ -28,7 +28,7 @@ export class AskForEmail extends DialogBase {
                 new ButtonBar([
                     new Button("Ok", this.acceptEmail, null, "-primary"),
                     new Button("Close", this._close, null, "-secondary tw-float-right")
-                ], "marginTop")
+                ], "mt-3")
             ])
         ];
     }

@@ -20,7 +20,7 @@ export abstract class DocumentView<PT extends ResultSetInfo, TT extends AppTab> 
     allowTopMoreButton: boolean = true;
     allowHeader: boolean = true;
     showContentHeading: boolean = true;
-    pagingContainerClass: string = "marginBottom marginTop";
+    pagingContainerClass: string = "marginBottom mt-3";
 
     constructor(data: TabBase<PT, TT>) {
         super(data);

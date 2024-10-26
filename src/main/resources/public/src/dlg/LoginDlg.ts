@@ -27,7 +27,7 @@ export class LoginDlg extends DialogBase {
             new Div(null, { c: "LoginContainerDiv" }, [
                 new TextField({ label: "User", enter: this._login, val: this.userState }),
                 new TextField({ label: "Password", inputType: "password", enter: this._login, val: this.pwdState }),
-                new Div(null, { className: "marginTop marginBottom" }, [
+                new Div(null, { className: "mt-3 marginBottom" }, [
                     new Span("Reset Password", { className: "cursor-pointer tw-float-right", onClick: this._resetPassword }),
                     new Clearfix()
                 ])
@@ -38,7 +38,7 @@ export class LoginDlg extends DialogBase {
                     this.close();
                     S.util._loadAnonPageHome();
                 }, null, "tw-float-right")
-            ], "marginTop")
+            ], "mt-3")
         ];
     }
 
