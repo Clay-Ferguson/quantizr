@@ -10,7 +10,6 @@ import { NodeActionType, TypeIntf } from "../../intf/TypeIntf";
 import * as J from "../../JavaIntf";
 import { NodeInfo, PrincipalName } from "../../JavaIntf";
 import { S } from "../../Singletons";
-import { FlexLayout } from "../core/FlexLayout";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
@@ -181,17 +180,19 @@ export class NodeCompRow extends Comp {
                 openButton = new Button(null, S.nav._openNodeById, {
                     [C.NODE_ID_ATTR]: this.node.id,
                     title: "Explore content of this node"
-                }, "-primary ml-3", "fa-folder-open");
+                }, "-primary ml-3 flex-none", "fa-folder-open");
             }
 
             this.children = [
                 this.isTableCell ? null : insertInlineButton,
                 S.render.renderLinkLabel(this.node.id),
                 header,
-                new FlexLayout([
-                    openButton,
-                    new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, "inlineBlock")
-                ], "flexAlignChildrenTop"),
+                new Div(null, { className: "w-full" }, [
+                    new Div(null, { className: "flex items-start" }, [
+                        openButton,
+                        new NodeCompContent(this.node, this.tabData, true, true, this.tabData.id, null, true, "flex-1 min-w-0")
+                    ]),
+                ]),
                 this.internalComp,
                 S.render.renderLinks(this.node, this.tabData)
             ];
