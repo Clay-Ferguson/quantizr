@@ -14,7 +14,7 @@ export class DropdownMenu extends Comp {
         const id = "ddMenu-" + this.getId();
         this.children = [
             new Icon({
-                className: "fa fa-ellipsis-h fa-lg clickable",
+                className: "fa fa-ellipsis-h fa-lg cursor-pointer",
                 id,
                 "data-bs-toggle": "dropdown",
                 "aria-expanded": "false"

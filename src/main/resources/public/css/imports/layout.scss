@@ -231,6 +231,10 @@
     margin-bottom: $smallGap;
 }
 
+.bigMarginBottom {
+    margin-bottom: $bigGap;
+}
+
 .marginBottomIfNotLast {
     &:not(:last-child) {
         margin-bottom: $smallGap;

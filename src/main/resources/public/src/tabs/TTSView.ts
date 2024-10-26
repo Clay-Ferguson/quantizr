@@ -44,7 +44,7 @@ export class TTSView extends AppTab<any, TTSView> {
     override preRender(): boolean | null {
         const ast = getAs();
         const speakBtn = !ast.mobileMode ? new Icon({
-            className: "fa fa-volume-high fa-2x clickable",
+            className: "fa fa-volume-high fa-2x cursor-pointer",
             // This mouseover stuff is compensating for the fact that when the onClick gets called
             // it's a problem that by then the text selection "might" have gotten lost. This can
             // happen.
@@ -66,7 +66,7 @@ export class TTSView extends AppTab<any, TTSView> {
         });
 
         const appendTextBtn = !ast.mobileMode && S.speech.queuedSpeech?.length > 0 ? new Icon({
-            className: "fa fa-circle-plus fa-2x clickable bigMarginRight",
+            className: "fa fa-circle-plus fa-2x cursor-pointer bigMarginRight",
             // This mouseover stuff is compensating for the fact that when the onClick gets called
             // it's a problem that by then the text selection "might" have gotten lost. This can
             // happen.
@@ -77,25 +77,25 @@ export class TTSView extends AppTab<any, TTSView> {
         }) : null;
 
         const speakAgainBtn = ast.ttsRan && S.speech.queuedSpeech?.length > 0 && !ast.mobileMode ? new Icon({
-            className: "fa fa-refresh fa-2x bigMarginRight clickable",
+            className: "fa fa-refresh fa-2x bigMarginRight cursor-pointer",
             onClick: () => S.speech.speakText(null, false, 0),
             title: "Restart from the top"
         }) : null;
 
         const stopBtn = ast.speechSpeaking && !ast.mobileMode ? new Icon({
-            className: "fa fa-stop fa-2x bigMarginRight clickable",
+            className: "fa fa-stop fa-2x bigMarginRight cursor-pointer",
             onClick: () => S.speech.stopSpeaking(),
             title: "Stop Speaking Text"
         }) : null;
 
         const pauseBtn = ast.speechSpeaking && !ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-pause fa-2x bigMarginRight clickable",
+            className: "fa fa-pause fa-2x bigMarginRight cursor-pointer",
             onClick: S.speech._pauseSpeaking,
             title: "Pause Speaking Text"
         }) : null;
 
         const resumeBtn = ast.speechSpeaking && ast.speechPaused && !ast.mobileMode ? new Icon({
-            className: "fa fa-play fa-2x bigMarginRight clickable",
+            className: "fa fa-play fa-2x bigMarginRight cursor-pointer",
             onClick: S.speech._resumeSpeaking,
             title: "Resume Speaking Text"
         }) : null;

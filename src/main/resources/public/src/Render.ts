@@ -284,12 +284,14 @@ export class Render {
         //     }));
 
         const attComps: Comp[] = [];
+        let hasAtts = false;
         if (node.attachments) {
             const atts: Attachment[] = S.props.getOrderedAtts(node);
             for (const att of atts) {
                 attComps.push(new Tag("hr"));
                 const bin = att ? att.bin : null;
                 if (bin) {
+                    hasAtts = true;
                     attComps.push(new Div(null, { className: "tw-float-right" }, [new NodeCompBinary(node, (att as any).key, true, false, true, null)]));
                     attComps.push(this.titleDiv(att.fileName + " (" + S.util.formatMemory(att.size) + " " + att.mime + ")"));
                     const linkGroup = new Div(null, { className: "attachmentLinkGroup" });
@@ -339,7 +341,7 @@ export class Render {
                 }
             }
 
-            if (attComps.length > 0) {
+            if (hasAtts) {
                 children.push(new CollapsiblePanel("Show Attachment URLs", "Hide Attachment URLs", null, attComps, true, (exp: boolean) => {
                     dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
                 }, getAs().linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
@@ -614,7 +616,7 @@ export class Render {
         return new Div(null, {
             title: "Click to copy to clipboard",
             onClick: () => S.util.copyToClipboard(node.tags),
-            className: "clickable tw-float-right " + moreClasses
+            className: "cursor-pointer tw-float-right " + moreClasses
         }, spans);
     }
 
@@ -656,7 +658,7 @@ export class Render {
                         // we use a span because the div stretches across empty space and does a mouse click
                         // when you didn't intend to click the actual name sometimes.
                         new Span("@" + user, {
-                            className: (displayName ? "" : "userName ") + "clickable",
+                            className: (displayName ? "" : "userName ") + "cursor-pointer",
                             onClick
                         })
                     ]),

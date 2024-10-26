@@ -26,13 +26,14 @@ export class EditTagsDlg extends DialogBase {
 
                 new CollapsiblePanel("Show Tips", "Hide Tips", null, [
                     new Markdown(`
-----
 * Enter custom hashtags, each on a separate line. 
 * Tags must start with \'#\'. 
 * Use '//' prefix to add comments. 
 * Blank lines are ignored. 
 * Text not starting with \'#\' (not Hashtags) will be displayed as headings in the Tags Picker Dialog.                      
-`)
+`, {
+                        className: "expandedPanel"
+                    })
                 ], true, (exp: boolean) => {
                     dispatch("ExpandTagTips", s => s.tagTipsExpanded = exp);
                 }, getAs().tagTipsExpanded, null, "marginTop", "marginTop"),

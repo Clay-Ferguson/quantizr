@@ -28,7 +28,7 @@ export class LoginDlg extends DialogBase {
                 new TextField({ label: "User", enter: this._login, val: this.userState }),
                 new TextField({ label: "Password", inputType: "password", enter: this._login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [
-                    new Span("Reset Password", { className: "clickable tw-float-right", onClick: this._resetPassword }),
+                    new Span("Reset Password", { className: "cursor-pointer tw-float-right", onClick: this._resetPassword }),
                     new Clearfix()
                 ])
             ]),

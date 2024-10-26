@@ -276,7 +276,7 @@ export class NodeUtil {
                     props = {
                         [C.USER_ID_ATTR]: ac.principalNodeId,
                         onClick: S.nav._clickToOpenUserProfile,
-                        className: "sharingName clickable",
+                        className: "sharingName cursor-pointer",
                         title
                     }
                 }

@@ -85,7 +85,9 @@ export class SearchContentDlg extends DialogBase {
                         new Markdown(`
 * Use quotes to search for exact phrases or hashtags. 
    - Example: \`"hello world" "#hashtag"\`
-* \`and\` and \`or\` can be used between quoted phrases. ANDing is the default if you don't put and/or between terms.`)
+* \`and\` and \`or\` can be used between quoted phrases. ANDing is the default if you don't put and/or between terms.`, {
+                            className: "expandedPanel"
+                        })
                     ], true, (exp: boolean) => {
                         dispatch("ExpandAttachment", s => s.searchTipsExpanded = exp);
                     }, getAs().searchTipsExpanded, null, "marginTop", "marginTop")

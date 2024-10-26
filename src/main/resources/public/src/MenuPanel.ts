@@ -381,11 +381,11 @@ export class MenuPanel extends Comp {
                 new MenuItem("Generate Book", MenuPanel.generateBookByAI, hltType == J.NodeType.NONE && onMainTab && selNodeIsMine, null, true),
                 new MenuItemSeparator(),
                 ast.isAnonUser ? null : new MenuItem("Chat Mode", MenuPanel.setAiChatMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_CHAT, false, null, "aiModeRadioGroup"),
                 ast.isAnonUser ? null : new MenuItem("Writing Mode", MenuPanel.setAiWritingMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_WRITING, false, "ui-menu-options-editmode", "aiModeRadioGroup"),
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_WRITING, false, null, "aiModeRadioGroup"),
                 ast.isAnonUser || !S.quanta.config.aiAgentEnabled ? null : new MenuItem("Agent Mode", MenuPanel.setAiAgentMode, allowEditMode && !fullScreenViewer, //
-                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, "ui-menu-options-editmode", "aiModeRadioGroup")
+                    () => getAs().userPrefs.aiMode == J.Constant.AI_MODE_AGENT, false, null, "aiModeRadioGroup")
             ], null));
         }
 

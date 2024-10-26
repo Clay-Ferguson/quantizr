@@ -4,7 +4,6 @@ import { Tailwind } from "../../Tailwind";
 import { Comp } from "../base/Comp";
 import { Label } from "./Label";
 import { Select } from "./Select";
-
 export class Selection extends Comp {
 
     constructor(attribs: any, private label: string = null, public selectionOptions: any[] = null, public moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {

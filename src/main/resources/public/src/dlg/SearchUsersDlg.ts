@@ -28,7 +28,7 @@ export class SearchUsersDlg extends DialogBase {
     renderDlg(): Comp[] {
         return [
             new Div(null, null, [
-                getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", { className: "borderBottom" }) : null,
+                getAs().isAdminUser ? new Div("Enter a username to find, or search by email using `email:` prefix in front of the email address", { className: "bigMarginBottom" }) : null,
                 this.searchTextField = new TextField({ label: "User", enter: this._search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this._search, null, "-primary"),

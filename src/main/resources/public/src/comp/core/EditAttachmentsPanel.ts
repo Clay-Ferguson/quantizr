@@ -41,10 +41,12 @@ export class EditAttachmentsPanel extends Comp {
                 !ast.cutAttachmentsFromId ? new Button(null, this.dlg.utl._cutUploads, {
                     title: "Cut selected Attachments"
                 }, null, "fa-cut fa-lg") : null,
-                ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil._clearCut, { className: "clickable marginLeft" }) : null,
+                ast.cutAttachmentsFromId ? new Button("Undo Cut", S.nodeUtil._clearCut, {
+                    className: "cursor-pointer marginLeft"
+                }) : null,
                 ast.cutAttachmentsFromId && ast.editNode.id != ast.cutAttachmentsFromId ? //
                     new Button("Paste", () => S.nodeUtil.paste(this.dlg), {
-                        className: "clickable marginLeft"
+                        className: "cursor-pointer marginLeft"
                     }) : null
             ], "attachmentButtonBar"));
         }
@@ -141,12 +143,12 @@ export class EditAttachmentsPanel extends Comp {
             fileNameField,
             new Div(null, null, [
                 !firstAttachment ? new Icon({
-                    className: "fa fa-lg fa-arrow-up clickable marginLeft",
+                    className: "fa fa-lg fa-arrow-up cursor-pointer marginLeft",
                     title: "Move Attachment Up",
                     onClick: () => this.moveAttUp(att, ast.editNode)
                 }) : null,
                 !lastAttachment ? new Icon({
-                    className: "fa fa-lg fa-arrow-down clickable marginLeft",
+                    className: "fa fa-lg fa-arrow-down cursor-pointer marginLeft",
                     title: "Move Attachment Down",
                     onClick: () => this.moveAttDown(att, ast.editNode)
                 }) : null
@@ -162,7 +164,7 @@ export class EditAttachmentsPanel extends Comp {
             if (content.indexOf(`{{${fileName}}}`) === -1) {
                 fileNameTagTip = new Div(`Insert {{${fileName}}} in text`, {
                     title: "Click to insert File Tag",
-                    className: "clickable smallMarginTop",
+                    className: "cursor-pointer smallMarginTop",
                     onClick: () => {
                         this.dlg?.contentEditor?.insertTextAtCursor(`{{${fileName}}}`);
                     }
@@ -264,7 +266,6 @@ export class EditAttachmentsPanel extends Comp {
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" }
         ];
-
         return new Selection(null, label, options, null, extraClasses, valueIntf);
     }
 
@@ -276,7 +277,6 @@ export class EditAttachmentsPanel extends Comp {
             { key: "ur", val: "Top Right" },
             { key: "ft", val: "File Tag" }
         ];
-
         return new Selection(null, label, options, null, extraClasses, valueIntf);
     }
 }

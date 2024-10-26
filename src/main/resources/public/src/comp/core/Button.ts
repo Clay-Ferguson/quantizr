@@ -10,13 +10,13 @@ interface LS { // Local State
 }
 
 export class Button extends Comp {
-    constructor(text: string, callback: (evt?: Event, id?: string) => void, attribs: any = null, moreClasses: string = "",
+    constructor(text: string, callback: (evt?: Event, id?: string) => void, attribs: object | null = null, moreClasses: string = "",
         private iconClass: string = null) {
         super(attribs);
 
         moreClasses = moreClasses || "";
 
-        moreClasses += " tw-px-4 tw-py-2 tw-border tw-border-gray-400 tw-border-solid";
+        moreClasses += " tw-px-4 tw-py-2 tw-border tw-border-gray-400 tw-border-solid cursor-pointer";
         if (moreClasses.indexOf("-primary") != -1) {
             moreClasses = moreClasses.replace("-primary", "");
             moreClasses += " tw-bg-sky-800 hover:tw-bg-sky-900 tw-text-white";
@@ -31,7 +31,7 @@ export class Button extends Comp {
 
         this.attribs.type = "button";
         this.attribs.onClick = callback;
-        this.attribs.className = (this.attribs.className || "") + " clickable " + //
+        this.attribs.className = (this.attribs.className || "") +
             moreClasses + (getAs().mobileMode ? " mobileButton" : "");
         this.mergeState<LS>({ text, enabled: true });
         this.tag = "button";

@@ -88,7 +88,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             }
                         }, {
                         title: "Record Audio as Attachment"
-                    }, "fa-microphone"),
+                    }, null, "fa-microphone"),
 
                     !this.allowRecording ? null : new Button("Webcam", async () => {
                         const dlg: MediaRecorderDlg = new MediaRecorderDlg(true, true);

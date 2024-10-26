@@ -33,7 +33,7 @@ export class HistoryPanel extends Comp {
         children.push(new Div(null, null, [
             new Span("History", { className: "historyPanelTitle" }),
             new Span("Clear", {
-                className: "clickable",
+                className: "cursor-pointer",
                 onClick: S.histUtil._clearHistory
             }),
             new Checkbox("Lock", { className: "lockFont marginBottom tw-float-right" }, {

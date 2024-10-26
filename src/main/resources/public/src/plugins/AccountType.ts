@@ -37,7 +37,7 @@ export class AccountType extends TypeBase {
             className: "systemNodeContent"
         }, [
             new Heading(4, "User: " + name, {
-                className: "clickable noMargin",
+                className: "cursor-pointer noMargin",
                 onClick: () => {
                     // If we're clicking on our own Account Node, then don't open the
                     // UserProfileDlg. For a person editing their own account this is not a way to

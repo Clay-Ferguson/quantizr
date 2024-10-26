@@ -187,9 +187,9 @@ export class MediaRecorderDlg extends DialogBase {
                     // disabling it until I have time to research.
                     // state.recording || !this.continuable ? null : new Button("Continue Recording", this.continueRecording, null),
 
-                    state.recording ? new Button("Stop", this._stop, null) : null,
-                    state.recording || !this.continuable ? null : new Button("Play", this._play, null),
-                    (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this._save, null),
+                    state.recording ? new Button("Stop", this._stop) : null,
+                    state.recording || !this.continuable ? null : new Button("Play", this._play),
+                    (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this._save),
                     new Button(this.allowSave ? "Cancel" : "Close", this._cancel, null, "tw-float-right")
                 ]),
                 this.videoMode ? this.videoPlayer : null,

@@ -10,7 +10,8 @@
 }
 
 code {
-    font-size: unset;
+    color: lightgreen;
+    font-size: 1.1rem;
 }
 
 .preWordWrap {
@@ -174,6 +175,14 @@ th {
 }
 
 .advancedCont {
+    background-color: #17202A;
+    border: 1px solid $gray-600;
+    margin-bottom: $smallGap;
+    padding: $smallGap;
+    border-radius: $border-radius;
+}
+
+.expandedPanel {
     background-color: #17202A;
     border: 1px solid $gray-600;
     margin-bottom: $smallGap;

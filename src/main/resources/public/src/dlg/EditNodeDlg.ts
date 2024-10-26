@@ -194,7 +194,7 @@ export class EditNodeDlg extends DialogBase {
                 span = span || new Span();
                 span.addChild(new Icon({
                     title: `Node Type: ${type.getName()}`,
-                    className: iconClass + " dlgIcon clickable",
+                    className: iconClass + " dlgIcon cursor-pointer",
                     onClick: this._openChangeNodeTypeDlg
                 }));
             }
@@ -207,7 +207,7 @@ export class EditNodeDlg extends DialogBase {
                 }));
             }
             span.addChild(new Span(type.getName(), {
-                className: "marginRight clickable",
+                className: "marginRight cursor-pointer",
                 onClick: this._openChangeNodeTypeDlg
             }));
         }
@@ -215,7 +215,7 @@ export class EditNodeDlg extends DialogBase {
             span = span || new Span();
             span.addChild(new Icon({
                 title: "Node Type: Unknown",
-                className: "fa fa-circle-question fa-lg dlgIcon clickable",
+                className: "fa fa-circle-question fa-lg dlgIcon cursor-pointer",
                 onClick: this._openChangeNodeTypeDlg
             }));
             span.addChild(new Span("Unknown Type", { className: "marginRight" }));
@@ -372,7 +372,7 @@ export class EditNodeDlg extends DialogBase {
                     new Div(null, { className: "tw-float-right" }, [
                         // ADD PROP ICON
                         new Icon({
-                            className: "fa fa-circle-plus fa-lg clickable marginRight tinyMarginBottom",
+                            className: "fa fa-circle-plus fa-lg cursor-pointer marginRight tinyMarginBottom",
                             onClick: async () => {
                                 dispatch("setPropsPanelExpanded", s => {
                                     s.propsPanelExpanded = true;
@@ -383,7 +383,7 @@ export class EditNodeDlg extends DialogBase {
                         }),
                         // DELETE PROP ICON
                         state.selectedProps.size > 0 ? new Icon({
-                            className: "fa fa-trash fa-lg clickable marginRight tinyMarginBottom",
+                            className: "fa fa-trash fa-lg cursor-pointer marginRight tinyMarginBottom",
                             onClick: () => this.utl.deletePropsGesture(),
                             title: "Delete property"
                         }) : null
@@ -405,7 +405,7 @@ export class EditNodeDlg extends DialogBase {
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
             sharingDiv = new Div(null, {
-                className: "tw-float-right clickable marginBottom"
+                className: "tw-float-right cursor-pointer marginBottom"
             }, [
                 new Span("Shared to: ", {
                     title: "Node Sharing",

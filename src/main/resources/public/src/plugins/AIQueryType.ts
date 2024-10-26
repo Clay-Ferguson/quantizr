@@ -21,7 +21,7 @@ export class AIQueryType extends TypeBase {
     // override render(node: NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean): Comp {
     //     const baseComp = super.render(node, tabData, rowStyling, isTreeView);
     //     return new Div(null, null, [
-    //         new Button("View Feed", () => {
+    //        new Button("View Feed", () => {
     //             dispatch("LoadingFeed", s => {
     //                 s.rssNode = node;
     //                 s.activeTab = C.TAB_RSS;

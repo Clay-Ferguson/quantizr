@@ -91,7 +91,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                         title: "Refresh Feed"
                     }, null, "fa-refresh"),
                     this.data.props.searchTextState.getValue() //
-                        ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
+                        ? new Button("Clear", () => this.clearSearch(), null, "feedClearButton") : null,
 
                     // DO NOT DELETE (this will likely be brought back, in future design)
                     // new Checkbox("Live", { className: "bigMarginLeft" }, {
@@ -155,7 +155,7 @@ export class FeedView extends AppTab<FeedViewProps, FeedView> {
                     event.stopPropagation();
                     event.preventDefault();
                     S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), false);
-                }, null, "fa-angle-right");
+                }, null, null, "fa-angle-right");
                 const buttonCreateTime: number = new Date().getTime();
 
                 if (C.FEED_INFINITE_SCROLL) {

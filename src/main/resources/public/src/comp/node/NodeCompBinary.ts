@@ -186,8 +186,9 @@ export class NodeCompBinary extends Comp {
             this.children = [
                 new FlexRowLayout([
                     this.isEditorEmbed ? null : new Button("Play Video", () => {
-                        new VideoPlayerDlg("vidPlayer-" + node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
-                    }, "-primary marginRight", "fa-play"),
+                        new VideoPlayerDlg("vidPlayer-" + node.id,
+                            S.attachment.getStreamUrlForNodeAttachment(node, this.attName), null, DialogMode.FULLSCREEN).open();
+                    }, null, "-primary marginRight", "fa-play"),
                     new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])
@@ -201,7 +202,7 @@ export class NodeCompBinary extends Comp {
                         const att = S.props.getAttachment(this.attName, node);
                         if (!att) return null;
                         S.nav.showAudioPlayerTab(node.id, S.attachment.getStreamUrlForNodeAttachment(node, this.attName), 0, null, att.fileName);
-                    }, "-primary marginRight", "fa-play"),
+                    }, null, "-primary marginRight", "fa-play"),
                     new Span(null, {
                         className: "downloadLink marginRight"
                     }, [new Anchor(S.attachment.getUrlForNodeAttachment(node, this.attName, true), "Download", { target: "_blank" })])

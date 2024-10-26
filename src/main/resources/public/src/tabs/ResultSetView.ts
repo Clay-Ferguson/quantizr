@@ -147,8 +147,7 @@ export abstract class ResultSetView<PT extends ResultSetInfo, TT extends AppTab>
         const leftArrow = reverse ? "down" : "up";
 
         if (!this.data.props.endReached && allowMoreButton) {
-            moreButton = new Button(null, () => this.pageChange(1), {
-            }, null, "fa-angle-" + rightArrow + " fa-lg")
+            moreButton = new Button(null, () => this.pageChange(1), null, null, "fa-angle-" + rightArrow + " fa-lg")
 
             if (allowInfiniteScroll && this.infiniteScrolling && C.FEED_INFINITE_SCROLL) {
                 const buttonCreateTime: number = new Date().getTime();

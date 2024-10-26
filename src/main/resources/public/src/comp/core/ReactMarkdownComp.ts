@@ -55,7 +55,7 @@ const _codeFunc = (arg: any, nodeId: string) => {
                 }, language === "txt" ? "" : language),
                 createElement("span", { className: "tw-float-right" }, [
                     newLineCount > 5 ? createElement("span", {
-                        className: "clickable bigMarginRight",
+                        className: "cursor-pointer bigMarginRight",
                         onClick: () => {
                             dispatch("toggleCodeBlock", s => {
                                 if (s.expandedCodeBlocks.has(nodeId)) {
@@ -67,7 +67,7 @@ const _codeFunc = (arg: any, nodeId: string) => {
                         }
                     }, "Expand/Collapse") : null,
                     createElement("i", {
-                        className: "fa fa-clipboard fa-lg clickable clipboardIcon codeIcon",
+                        className: "fa fa-clipboard fa-lg cursor-pointer clipboardIcon codeIcon",
                         onClick: () => S.util.copyToClipboard(children.concat())
                     })
                 ])

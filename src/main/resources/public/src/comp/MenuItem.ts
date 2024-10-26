@@ -21,13 +21,13 @@ export class MenuItem extends Comp {
 
     override preRender(): boolean | null {
         const state: LS = this.getState<LS>();
-        const enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
+        const enablementClass = state.enabled ? " mainMenuItemEnabled" : " disabled mainMenuItemDisabled";
 
         let innerSpan: Comp;
         let innerClazz: string;
         if (this.stateFunc) {
             if (this.radioGroup) {
-                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, null, {
+                innerSpan = new RadioButton(this.name, this.stateFunc(), this.radioGroup, { className: "tinyMarginTop marginRight" }, {
                     setValue: this._onClick,
                     getValue: this.stateFunc
                 });

@@ -18,7 +18,6 @@ export interface TextFieldConfig {
     label?: string;
     enter?: () => void;
     inputClass?: string;
-    labelLeft?: boolean;
     labelClass?: string;
     val?: Validator;
     outterClass?: string;
@@ -35,13 +34,10 @@ export class TextField extends Tag implements I.TextEditorIntf, I.ValueIntf {
         // do not pass valState into base class, we want it to have state separately
         super(cfg.outterTagName || "div");
 
-        this.attribs = {
-            ...this.attribs, ...{
-                name: this.getId(),
-                // todo-0: oops isn't 'form-inline' from bootstrap?
-                className: (this.cfg.labelLeft ? "form-inline " : "") + (this.cfg.outterClass || "")
-            }
-        };
+        this.attribs.name = this.getId();
+        if (this.cfg.outterClass) {
+            this.attribs.className = this.cfg.outterClass;
+        }
 
         this.mergeState<LS>({
             inputType: this.cfg.inputType || "text"

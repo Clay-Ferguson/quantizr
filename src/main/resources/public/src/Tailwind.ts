@@ -40,12 +40,12 @@ export class Tailwind {
     // static alertPrimary = "tw-bg-blue-600 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative tw-border tw-border-blue-400";
     static alertSecondary = "tw-bg-slate-700 tw-text-white tw-p-4 tw-mb-4 tw-rounded-lg tw-border tw-border-gray-200";
     static alertPrimary = this.alertSecondary; // todo-0: change eventually
-    static alertDanger = "tw-bg-red-400 tw-border tw-border-red-400 tw-text-red-700 tw-px-4 tw-py-3 tw-rounded tw-relative";
-    static alertInfo = "tw-bg-blue-400 tw-border tw-border-blue-200 tw-text-blue-800 tw-px-4 tw-py-3 tw-rounded tw-relative"
+    static alertDanger = "tw-bg-red-400 tw-border tw-border-red-400 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative";
+    static alertInfo = "tw-bg-blue-400 tw-border tw-border-blue-200 tw-text-white tw-px-4 tw-py-3 tw-rounded tw-relative"
 
-    static formControl = "tw-block tw-w-full tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-600 tw-p-2 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-border-transparent";
+    static formControl = "tw-text-base tw-block tw-w-full tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-500 tw-p-2 focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-green-400";
 
     // same as formControl but withou w-full
-    static formControlFit = "tw-block tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-600 tw-p-2 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-border-transparent";
+    static formControlFit = "tw-text-base tw-block tw-bg-gray-900 tw-text-white tw-placeholder-gray-400 tw-border tw-border-gray-500 tw-p-2 focus:tw-outline-none focus:tw-ring-1 focus:tw-ring-green-400";
 }
 

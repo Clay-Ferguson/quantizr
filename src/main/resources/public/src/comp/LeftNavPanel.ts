@@ -48,11 +48,11 @@ export class LeftNavPanel extends Comp {
 
         const docIndexToggle = showDocIndex ? new FlexRowLayout([
             new Span("Doc Index", {
-                className: "bigMarginRight clickable" + (ast.menuIndexToggle == "index" ? " activeTab" : " inactiveTab"),
+                className: "bigMarginRight cursor-pointer" + (ast.menuIndexToggle == "index" ? " activeTab" : " inactiveTab"),
                 onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "index")
             }),
             new Span("Menu", {
-                className: "marginRight clickable" + (ast.menuIndexToggle == "menu" ? " activeTab" : " inactiveTab"),
+                className: "marginRight cursor-pointer" + (ast.menuIndexToggle == "menu" ? " activeTab" : " inactiveTab"),
                 onClick: () => dispatch("ToggleMenuIndex", s => s.menuIndexToggle = "menu")
             })
         ], "marginTop") : null;
@@ -79,7 +79,7 @@ export class LeftNavPanel extends Comp {
                             title: "Show your new messages"
                         }) : null,
                         // ast.userName && ast.isAnonUser ? new Icon({
-                        //     className: "fa fa-bars fa-2x clickable",
+                        //     className: "fa fa-bars fa-2x cursor-pointer",
                         //     onClick: () => dispatch("ToggleLHS", s => s.anonShowLHSMenu = !s.anonShowLHSMenu),
                         //     title: "Show Menu"
                         // }) : null,

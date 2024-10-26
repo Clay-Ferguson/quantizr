@@ -26,14 +26,11 @@ export class TextArea extends Div implements I.TextEditorIntf {
         if (attribs) {
             this.textareaAttribs = { ...this.textareaAttribs, ...attribs };
         }
-
-
         this.textareaAttribs = {
             ...this.textareaAttribs, ...{
                 className: Tailwind.formControl + " preTextarea " + moreClasses
             }
         };
-
         this.textareaAttribs.rows = this.textareaAttribs.rows || "1";
         this.setWordWrap(true);
         this.setEnabled(true);

@@ -120,7 +120,6 @@ export class AudioPlayerView extends AppTab<any, AudioPlayerView> {
                     this.timeLeftTextField = new TextField({
                         outterClass: "timeRemainingEditField",
                         label: "Timer (mins.)",
-                        labelLeft: true,
                         val: this.timeLeftState
                     })
                 ]),

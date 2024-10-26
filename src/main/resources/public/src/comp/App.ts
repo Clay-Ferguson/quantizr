@@ -119,7 +119,7 @@ export class App extends Main {
             }, "-primary menuButton", "fa-sitemap fa-lg");
 
             const loginButton = ast.isAnonUser ? new Div("Login", {
-                className: "marginTop marginRight clickable",
+                className: "marginTop marginRight cursor-pointer",
                 id: "loginButton",
                 onClick: S.user.userLogin
             }) : null;
@@ -128,7 +128,7 @@ export class App extends Main {
             // header bar needs to be fixed height and signup won't fit. There's a signup button on
             // the Login so users can signup
             const signupButton = ast.isAnonUser && !ast.mobileMode ? new Div("Signup", {
-                className: "marginTop marginRight clickable",
+                className: "marginTop marginRight cursor-pointer",
                 id: "loginButton",
                 onClick: S.user.userSignup
             }) : null;
@@ -136,7 +136,7 @@ export class App extends Main {
             const floatRightDiv = new Div(null, { className: "tw-float-right" }, [
                 loginButton, signupButton,
                 !ast.isAnonUser ? new Div(ast.userName, {
-                    className: "clickable marginRight marginTop",
+                    className: "cursor-pointer marginRight marginTop",
                     // NOTE: No data attribute here. Null opens our own profile
                     onClick: S.nav._clickToOpenUserProfile
                 }) : null
