@@ -81,7 +81,12 @@ const _codeFunc = (arg: any, nodeId: string) => {
             }, childrenStr.replace(/\n$/, ""))
         ])
     ) : (
-        createElement("code", { ...props, className }, children)
+        createElement("code", {
+            ...props,
+            className: (className || "") + " inlineCode cursor-pointer",
+            onClick: () => S.util.copyToClipboard(children.concat()),
+            title: "Click to copy"
+        }, children)
     );
 }
 
