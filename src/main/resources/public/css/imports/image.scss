@@ -1,7 +1,8 @@
 .zoomed {
-    transition: transform 1.5s ease; /* Add a 1.5-second smooth transition for the transform property */
-}  
-      
+    transition: transform 1.5s ease;
+    /* Add a 1.5-second smooth transition for the transform property */
+}
+
 .leftNavLogoImg {
     border: 2px solid purple;
     cursor: pointer;
@@ -91,6 +92,7 @@
     cursor: pointer;
     border: 1px solid gray;
     vertical-align: top;
+    display: inline-block;
 }
 
 .headerImageRHS {
