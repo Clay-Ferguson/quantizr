@@ -30,7 +30,12 @@
     margin-left: $smallGap;
     margin-bottom: $smallGap;
     margin-top: $smallGap;
+
+    // ---- works with "overflow: auto" in parent
     float: left !important;
+    shape-outside: margin-box;
+    // ---- end
+
     border: 1px solid $gray-700;
     border-radius: $border-radius;
     vertical-align: top;
@@ -40,7 +45,12 @@
     margin-left: 24px;
     margin-bottom: $smallGap;
     margin-top: $smallGap;
+
+    // ---- works with "overflow: auto" in parent
     float: right !important;
+    shape-outside: margin-box;
+    // ---- end
+
     border: 1px solid $gray-700;
     border-radius: $border-radius;
     vertical-align: top;

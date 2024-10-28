@@ -15,6 +15,13 @@ ml-4 = 16px
 ml-6 = 24px
 */
 
+/* NOTE: According to AI when this is using as a parent of floated stuff (float left or float right)
+we could also use "display: flow-root", but I'm opting for overflow instead since it won't overwrite
+ display in case display is already set for some other reason. */
+.overflowAuto {
+    overflow: auto;
+}
+
 .lhsHeaderPanel {
     margin-bottom: $smallGap;
 }

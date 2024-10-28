@@ -54,6 +54,7 @@ export class NodeCompContent extends Comp {
         avatar */
         const isAccountNode = this.node.ownerId && this.node.id === this.node.ownerId;
         const showImages = (ast.docImages || this.tabData.id !== C.TAB_DOCUMENT) && S.props.hasBinary(this.node) && !isAccountNode;
+        let floatedImages = false;
         if (showImages) {
             const attachments = S.props.getOrderedAtts(this.node);
             attachments?.forEach(att => {
@@ -70,10 +71,12 @@ export class NodeCompContent extends Comp {
                 // Upper Left
                 else if (att.position === "ul") {
                     clazz = "imgUpperLeft";
+                    floatedImages = true;
                 }
                 // Upper Right
                 else if (att.position === "ur") {
                     clazz = "imgUpperRight";
+                    floatedImages = true;
                 }
                 children.push(new NodeCompBinary(this.node, (att as any).key, false, false, attachments.length > 0, clazz));
             });
@@ -113,6 +116,9 @@ export class NodeCompContent extends Comp {
 
         this.maybeRenderDateTime(children, J.NodeProp.DATE, this.node);
         this.children = children;
+        if (floatedImages) {
+            this.attribs.className = (this.attribs.className || "") + " overflowAuto";
+        }
         return true;
     }
 
