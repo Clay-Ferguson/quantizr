@@ -342,9 +342,10 @@ export class Render {
             }
 
             if (hasAtts) {
-                children.push(new CollapsiblePanel("Show Attachment URLs", "Hide Attachment URLs", null, attComps, true, (exp: boolean) => {
-                    dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
-                }, getAs().linksToAttachmentsExpanded, "m-3", "attachmentLinksPanel", ""));
+                children.push(new CollapsiblePanel("Show Attachment URLs", "Hide Attachment URLs", null,
+                    [new Div(null, { className: "mt-6" }, attComps)], true, (exp: boolean) => {
+                        dispatch("ExpandAttachment", s => s.linksToAttachmentsExpanded = exp);
+                    }, getAs().linksToAttachmentsExpanded, "m-3", "attachmentLinksPanel", ""));
             }
         }
 
