@@ -405,7 +405,7 @@ export class EditNodeDlg extends DialogBase {
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
             sharingDiv = new Div(null, {
-                className: "float-right cursor-pointer mb-3"
+                className: "-float-right cursor-pointer"
             }, [
                 new Span("Shared to: ", {
                     title: "Node Sharing",
