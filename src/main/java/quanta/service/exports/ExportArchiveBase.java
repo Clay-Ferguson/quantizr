@@ -294,7 +294,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return linkName.trim();
     }
 
-
     /*
      * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, because we let
      * exceptions bubble all the way up to abort and even cause the zip file itself (to be deleted)
@@ -370,7 +369,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             switch (req.getContentType()) {
-                // todo-0: we can unify the markdown and html cases here a bit more.
                 case "md":
                     if (doc.length() > 0)
                         doc.append("\n");
@@ -380,7 +378,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     }
 
                     doc.append(contentVal.getVal());
-                    doc.append("\n");
+                    doc.append("\n\n");
                     break;
                 case "html":
                     contentVal.setVal(formatContentForHtml(node, contentVal.getVal()));
@@ -396,11 +394,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         }
                     }
 
-                    /*
-                     * This DIV is put into markdown so we have a target location for the hashmark links in the url, and
-                     * also to make the ToC be able to link to a specific target location in the html
-                     */
-                    doc.append("\n<div id='" + node.getIdStr() + "'/>\n");
+                    if (req.isIncludeToc()) {
+                        doc.append("\n<div id='" + node.getIdStr() + "'></div>\n");
+                    }
                     doc.append(contentVal.getVal());
                     doc.append("\n\n");
                     break;
@@ -499,16 +495,22 @@ public abstract class ExportArchiveBase extends ServiceBase {
             level--;
             int lev = getHeadingLevel(node) - 1;
             String prefix = lev > 0 ? "    ".repeat(lev) : "";
+            String target = null;
             switch (req.getContentType()) {
                 case "md":
-                    String linkHeading = heading.replace(" ", "-").toLowerCase();
-                    toc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+                    target = heading.replace(" ", "-").toLowerCase();
                     break;
                 case "html":
-                    toc.append(prefix + "* [" + heading + "](#" + node.getIdStr() + ")\n");
+                    target = node.getIdStr();
                     break;
                 default:
                     break;
+            }
+
+            if (node.getIdStr().equals(this.node.getIdStr())) {
+                toc.append("#### [" + heading + "](#" + target + ")\n");
+            } else {
+                toc.append(prefix + "* [" + heading + "](#" + target + ")\n");
             }
         }
     }
@@ -715,8 +717,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 default:
                     break;
             }
-        } //
-        else {
+        } else {
             switch (req.getContentType()) {
                 case "html":
                 case "md":
@@ -741,7 +742,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-
     private String insertMdLink(String content, Attachment att, String mdLink) {
         if ("ft".equals(att.getPosition())) {
             content = content.replace("{{" + att.getFileName() + "}}", mdLink);
@@ -749,7 +749,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return content;
     }
 
-    // DO NOT DELETE (until sure we never want clickable images in again)
+    // todo-0: we should be able to bring this back in a way that works for ALL images, so we can simply
+    // add a chunk of JS to the exported HTML that makes this happen
     //
     // private String appendImgLink(String nodeId, String binFileNameStr, String url, Attachment att) {
     // String domId = "img_" + nodeId + "_" + att.getKey();

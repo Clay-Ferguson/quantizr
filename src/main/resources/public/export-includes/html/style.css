@@ -94,22 +94,23 @@
      border: none;
  }
 
+ /* This styles the top left header */
+ .nav h4 a {
+     margin-left: 1rem;
+     color: lightgreen;
+ }
+
  .nav ul li a {
-     font-size: 1.3rem;
+     font-size: 1.2rem;
      color: lightgreen;
  }
 
  .nav ul li ul li a {
-     font-size: 1.2rem;
+     font-size: 1.1rem;
      color: orange;
  }
 
  .nav ul li ul li ul li a {
-     font-size: 1.1rem;
-     color: lightgray;
- }
-
- .nav ul li ul li ul li ul li a {
      font-size: 1rem;
      color: lightgray;
  }
