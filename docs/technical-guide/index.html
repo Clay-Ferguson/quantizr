@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quanta Technical Docs</title>
+    <style>
+        /* Do not remove. This is an insertion tag */
+         /* Ensure full height usage */
+ html,
+ body {
+     font-family: 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important;
+     margin: 0px;
+     padding: 0px;
+     height: 100%;
+     overflow: hidden;
+     background-color: black;
+ }
+
+ /* Main content area styling */
+ .content {
+     background-color: black;
+     color: white;
+     overflow-y: auto;
+     padding: 0 2rem 0 2rem;
+ }
+
+ h1 a {
+     color: lightgreen;
+ }
+
+ h2 a {
+     color: orange;
+ }
+
+ h1 {
+     margin-top: 2.5rem;
+     color: lightgreen;
+     font-size: 1.7rem;
+ }
+
+ h2 {
+     margin-top: 2.5rem;
+     color: orange;
+     font-size: 1.6rem;
+ }
+
+ h3 {
+     font-size: 1.5rem;
+ }
+
+ h4 {
+     font-size: 1.4rem;
+ }
+
+ h5 {
+     font-size: 1.3rem;
+ }
+
+ h6 {
+     font-size: 1.2rem;
+ }
+
+ a {
+     color: white;
+     text-decoration: none;
+ }
+
+ img {
+     border: 1px solid gray;
+     border-radius: 6px;
+ }
+
+ table {
+     border-collapse: collapse;
+     border-spacing: 2px;
+ }
+
+ table,
+ th,
+ td {
+     border: 1px solid gray;
+     padding: 8px;
+ }
+
+ pre {
+     margin: 1rem 1rem 1rem 0;
+     padding: 1rem;
+     border: 1px solid gray;
+     background-color: rgb(41, 52, 68);
+     border-radius: 6px;
+     overflow: auto;
+ }
+
+ code {
+     border: 1px solid gray;
+     padding: 2px;
+     background-color: rgb(41, 52, 68);
+ }
+
+ pre code {
+     border: none;
+ }
+
+ /* This styles the top left header */
+ .nav h4 a {
+     margin-left: 1rem;
+     color: lightgreen;
+ }
+
+ .nav ul li a {
+     font-size: 1.2rem;
+     color: lightgreen;
+ }
+
+ .nav ul li ul li a {
+     font-size: 1.1rem;
+     color: orange;
+ }
+
+ .nav ul li ul li ul li a {
+     font-size: 1rem;
+     color: lightgray;
+ }
+
+        /* Main container using grid */
+        .container {
+            display: grid;
+            grid-template-columns: 30% 70%;
+            height: 100%;
+        }
+
+        /* Left navigation styling */
+        .nav {
+            background-color: black;
+            color: white;
+            overflow-y: auto;
+            border-right: 2px solid gray;
+            padding-right: 1rem;
+        }
+    </style>
+    <link rel="stylesheet" href="prism.css">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="nav">
+            <h4 id="quanta-technical-docs"><a href="#quanta-technical-docs" id="quanta-technical-docs"><a href="#65751c3f5aaa050f4ddd7f9e">Quanta Technical Docs</a></a></h4>
+<ul>
+<li><a href="#66a3d2a4fabccc0b658df141">High Level Architecture</a>
+<ul>
+<li><a href="#66a3d2c5fabccc0b658df142">Docker Compose File Services</a>
+<ul>
+<li><a href="#66a3d358fabccc0b658df147">Quanta</a></li>
+<li><a href="#66a3d374fabccc0b658df148">QAI</a></li>
+<li><a href="#66a3d2f4fabccc0b658df143">Redis</a></li>
+<li><a href="#66a3d31dfabccc0b658df144">MongoDB</a></li>
+<li><a href="#66a3d332fabccc0b658df145">PostgreSQL</a></li>
+<li><a href="#66a3d344fabccc0b658df146">PGAdmin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#667c81718591a5359fcbe42c">App Flow</a></li>
+<li><a href="#65751cfd5aaa050f4ddd7fbc">Docker Install</a>
+<ul>
+<li><a href="#65751d205aaa050f4ddd7fcc">How to Install Docker Compose</a></li>
+<li><a href="#65751d505aaa050f4ddd7fcf">Prerequisite</a></li>
+<li><a href="#65751d505aaa050f4ddd7fd0">Installing Docker</a></li>
+<li><a href="#65751d505aaa050f4ddd7fd1">Allow Docker Command without Sudo</a></li>
+<li><a href="#65751d505aaa050f4ddd7fd2">Installing Docker Compose</a></li>
+<li><a href="#65751d505aaa050f4ddd7fd3">Put Docker in Swarm Mode</a></li>
+</ul>
+</li>
+<li><a href="#65751d575aaa050f4ddd7fd4">How to Build</a>
+<ul>
+<li><a href="#66071955f2b9ce616ca3a23a">Front-End Notes</a>
+<ul>
+<li><a href="#667f11ca8591a5359fcbe431">About Yarn</a></li>
+</ul>
+</li>
+<li><a href="#65751d7b5aaa050f4ddd7fd9">How to Build Quanta - Dev Mode</a></li>
+<li><a href="#65751d935aaa050f4ddd7fdb">Front-end Hot Deploy</a></li>
+<li><a href="#65751d935aaa050f4ddd7fdc">Back-end Hot Deploy</a></li>
+<li><a href="#65751d935aaa050f4ddd7fdd">Production Builds</a></li>
+</ul>
+</li>
+<li><a href="#65751da05aaa050f4ddd7fe0">How to Run</a>
+<ul>
+<li><a href="#65751dcc5aaa050f4ddd7feb">How to Run the Quanta Server</a></li>
+<li><a href="#65751dfc5aaa050f4ddd7ffc">Step 1 - Install Docker</a></li>
+<li><a href="#65751dfc5aaa050f4ddd7ffd">Step 2 - Docker Swarm Mode</a></li>
+<li><a href="#65751dfc5aaa050f4ddd7ffe">Step 3 - Make Runtime Folder</a></li>
+<li><a href="#65751dfc5aaa050f4ddd7fff">Step 4 - Start and Stop the app</a></li>
+<li><a href="#65751dfc5aaa050f4ddd8000">Note 1</a></li>
+<li><a href="#65751de15aaa050f4ddd7ff1">Note 2</a></li>
+</ul>
+</li>
+<li><a href="#65751e225aaa050f4ddd8006">PostgreSQL</a>
+<ul>
+<li><a href="#65751e315aaa050f4ddd800c">PostgreSQL Notes</a></li>
+<li><a href="#65751e565aaa050f4ddd8016">Postgre Docker Compose</a></li>
+<li><a href="#65751e565aaa050f4ddd8017">Postgre Admin</a></li>
+</ul>
+</li>
+<li><a href="#667b2cea74a4837b5459032c">AI Notes</a>
+<ul>
+<li><a href="#667b2cfa74a4837b5459032d">About AI Cloud Services HTTP Calls</a></li>
+</ul>
+</li>
+<li><a href="#65751e735aaa050f4ddd8019">Troubleshooting</a>
+<ul>
+<li><a href="#65751ee85aaa050f4ddd802a">Healthcheck Results</a></li>
+<li><a href="#65751ee85aaa050f4ddd802b">Realtime Monitoring Console</a></li>
+<li><a href="#65751ee85aaa050f4ddd802c">Check to see what Docker has Running</a></li>
+<li><a href="#65751ee85aaa050f4ddd802d">Check Docker Images</a></li>
+<li><a href="#65751ee85aaa050f4ddd802e">Inspect your Docker Repository</a></li>
+<li><a href="#65751ee85aaa050f4ddd802f">Check Docker Logs</a></li>
+<li><a href="#65751ee85aaa050f4ddd8030">Delete all Images</a></li>
+<li><a href="#65751ee85aaa050f4ddd8031">To Remove Most Running things</a></li>
+<li><a href="#65751ee85aaa050f4ddd8032">To Cleanup Disk Space</a></li>
+<li><a href="#6629b03bbb4a731d6c99f433">Docker service fails to start</a></li>
+</ul>
+</li>
+<li><a href="#66f46c214fdbaa627978f216">App Maintenance and Upgrades</a>
+<ul>
+<li><a href="#66f46c8b4fdbaa627978f218">Front End</a></li>
+</ul>
+</li>
+</ul>
+
+        </nav>
+        <main class="content">
+            <div id='65751c3f5aaa050f4ddd7f9e'></div>
+<h1 id="quanta-technical-docs"><a href="#quanta-technical-docs" id="quanta-technical-docs">Quanta Technical Docs</a></h1>
+<div id='65751c505aaa050f4ddd7fab'></div>
+<p>This section is for software developers who will be working on the Quanta code and/or admins deploying an instance of the platform.</p>
+<div id='66a3d2a4fabccc0b658df141'></div>
+<h1 id="high-level-architecture"><a href="#high-level-architecture" id="high-level-architecture">High Level Architecture</a></h1>
+<div id='66a3d2c5fabccc0b658df142'></div>
+<h2 id="docker-compose-file-services"><a href="#docker-compose-file-services" id="docker-compose-file-services">Docker Compose File Services</a></h2>
+<p>We use docker compose yaml as the primary deployment artifact and deploy the app to a docker swarm (Docker needs to be running in swarm mode).  Below are the individual services in the docker compose files:</p>
+<div id='66a3d358fabccc0b658df147'></div>
+<h3 id="quanta"><a href="#quanta" id="quanta">Quanta</a></h3>
+<p>This is the web app itself.</p>
+<div id='66a3d374fabccc0b658df148'></div>
+<h3 id="qai"><a href="#qai" id="qai">QAI</a></h3>
+<p>This service is the AI microservice. The Quanta app communicates to it via REST /HTTP interface. Internally this microservice uses Python and LangChain to provide AI services.</p>
+<div id='66a3d2f4fabccc0b658df143'></div>
+<h3 id="redis"><a href="#redis" id="redis">Redis</a></h3>
+<p>Session data is stored in Redis instead of being managed by Quanta app itself, so that when necessary multiple swarm nodes of Quanta can be run for larger deployments.</p>
+<div id='66a3d31dfabccc0b658df144'></div>
+<h3 id="mongodb"><a href="#mongodb" id="mongodb">MongoDB</a></h3>
+<p>This runs the MongoDB instance, which is the main database for the app. There is only one <code>collection</code> in the DB which represents a <code>Tree Structure</code>. There is a <code>path</code> property in each Document (i.e. DB Record) which is how the tree structure is stored.</p>
+<div id='66a3d332fabccc0b658df145'></div>
+<h3 id="postgresql"><a href="#postgresql" id="postgresql">PostgreSQL</a></h3>
+<p>Runs the PosgreSQL database instance. For any information that doesn't make sense to store on the main <code>Tree</code> structure of the app, we will put in the PostgreSQL database. Currently the only information stored in Postgre is the financial transactions related to the payments and usage of AI services. To allow users to consume as much AI usage from the AI Cloud providers (OpenAI, Anthropic, Perplexity, etc) as they want, in an unlimited way, we let users add credit into their own accounts, and then they're essentially spending their own money as they use the AI. The Quanta website doesn't charge extra for memberships or services.</p>
+<div id='66a3d344fabccc0b658df146'></div>
+<h3 id="pgadmin"><a href="#pgadmin" id="pgadmin">PGAdmin</a></h3>
+<p>This is a service that runs the PG Admin console where the PostgreSQL database can be managed from just for admin purposes.</p>
+<div id='667c81718591a5359fcbe42c'></div>
+<h1 id="app-flow"><a href="#app-flow" id="app-flow">App Flow</a></h1>
+<div id='667c818c8591a5359fcbe42d'></div>
+<p>When someone accesses the site they're automatically sent to the automatically generated node with the path <code>/r/public/home</code>. This node represents the main landing page for the app and is owned by the <code>admin</code> user. The admin user's password is fed into the app thru the docker-compose.yaml file.</p>
+<p>When a user is signed in and they open the app they'll be directed to their account root node. Every user has a private account root node.</p>
+<div id='65751cfd5aaa050f4ddd7fbc'></div>
+<h1 id="docker-install"><a href="#docker-install" id="docker-install">Docker Install</a></h1>
+<div id='66564e44d00d4560d1346a63'></div>
+<p><em>Warning: As of 5/28/2024, when I started using Ubuntu 24.04, the docker install process has changed, and I have not yet updated the below info to represent the new required changes. The below process may have only slightly changed, however. One breaking change was that you'll need to be using 'docker compose' rather than 'docker-compose'</em></p>
+<div id='65751d205aaa050f4ddd7fcc'></div>
+<h2 id="how-to-install-docker-compose"><a href="#how-to-install-docker-compose" id="how-to-install-docker-compose">How to Install Docker Compose</a></h2>
+<p>There's nothing in this file specific to Quanta. This information is just purely about how to install Docker and Docker Compose, and would be the same for any Ubuntu 22.04 instance. This file is provided just as a quick reference.</p>
+<div id='65751d505aaa050f4ddd7fcf'></div>
+<h2 id="prerequisite"><a href="#prerequisite" id="prerequisite">Prerequisite</a></h2>
+<pre><code>sudo apt update
+sudo apt upgrade
+sudo apt install curl
+</code></pre>
+<div id='65751d505aaa050f4ddd7fd0'></div>
+<h2 id="installing-docker"><a href="#installing-docker" id="installing-docker">Installing Docker</a></h2>
+<p>Great instructions can be found here:</p>
+<p><a href="https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04">https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04</a></p>
+<p>Here are the commands in case digitalocean.com is ever not available:</p>
+<pre><code>sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo &quot;deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot; | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+
+sudo apt update
+
+apt-cache policy docker-ce
+
+sudo apt install docker-ce
+
+sudo systemctl status docker
+</code></pre>
+<div id='65751d505aaa050f4ddd7fd1'></div>
+<h2 id="allow-docker-command-without-sudo"><a href="#allow-docker-command-without-sudo" id="allow-docker-command-without-sudo">Allow Docker Command without Sudo</a></h2>
+<p>Note: leave ${USER} in the command below. run verbatim as shown below:</p>
+<p>Run when logged in as 'clay'</p>
+<pre><code>sudo usermod -aG docker ${USER}
+su - ${USER}
+</code></pre>
+<p>Check that it worked:</p>
+<pre><code>groups
+</code></pre>
+<div id='65751d505aaa050f4ddd7fd2'></div>
+<h2 id="installing-docker-compose"><a href="#installing-docker-compose" id="installing-docker-compose">Installing Docker Compose</a></h2>
+<p>Go here to find latest release version:
+<a href="https://github.com/docker/compose/releases">https://github.com/docker/compose/releases</a></p>
+<p>And take the version number that's the latest and embed it into the command below and run...</p>
+<pre><code>sudo curl -L &quot;https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-$(uname -s)-$(uname -m)&quot; -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+</code></pre>
+<p>check the version</p>
+<pre><code>docker-compose -v
+</code></pre>
+<div id='65751d505aaa050f4ddd7fd3'></div>
+<h2 id="put-docker-in-swarm-mode"><a href="#put-docker-in-swarm-mode" id="put-docker-in-swarm-mode">Put Docker in Swarm Mode</a></h2>
+<p>All you need to do is run this command:</p>
+<pre><code>sudo docker swarm init
+</code></pre>
+<p>If you get an error like the following...</p>
+<p>Error response from daemon: could not choose an IP address to advertise since this system has multiple addresses on different interfaces (192.168.1.8 on wlp0s20f3 and 192.168.1.3 on enx3448edafc667) - specify one with --advertise-addr</p>
+<p>...that means you have an Ethernet (enx...) and a wifi (wlp...) connection, so choose probably the ethernet. and run a command like this, to get the warm initialized.</p>
+<pre><code>sudo docker swarm init --advertise-addr 192.168.1.3
+</code></pre>
+<div id='65751d575aaa050f4ddd7fd4'></div>
+<h1 id="how-to-build"><a href="#how-to-build" id="how-to-build">How to Build</a></h1>
+<div id='66071955f2b9ce616ca3a23a'></div>
+<h2 id="front-end-notes"><a href="#front-end-notes" id="front-end-notes">Front-End Notes</a></h2>
+<div id='667f11ca8591a5359fcbe431'></div>
+<h3 id="about-yarn"><a href="#about-yarn" id="about-yarn">About Yarn</a></h3>
+<p>To manually install packages:</p>
+<p>In <code>src/main/resources/public</code> run <code>yarn install</code></p>
+<p>Run <code>yarn outdated</code> to see which package versions are outdated and can be upgraded.</p>
+<p>To update a specific package to latest version:</p>
+<pre><code>yarn upgrade [package-name] --latest
+</code></pre>
+<div id='66071975f2b9ce616ca3a23b'></div>
+<ul>
+<li>
+<p>Deployment is build using <code>vite</code></p>
+</li>
+<li>
+<p>The project uses <code>yarn</code> as the package manager, rather than <code>npm</code>.</p>
+</li>
+<li>
+<p>It's recommended that you use <code>nvm</code> as your way of installing, and managing node versions.</p>
+</li>
+</ul>
+<div id='65751d7b5aaa050f4ddd7fd9'></div>
+<h2 id="how-to-build-quanta---dev-mode"><a href="#how-to-build-quanta---dev-mode" id="how-to-build-quanta---dev-mode">How to Build Quanta - Dev Mode</a></h2>
+<p>To build and start an instance of Quanta on localhost for deveopment use <code>/scripts/build-dev.sh</code> which is configured by the settings in <code>setenv-dev.sh</code></p>
+<div id='65751d935aaa050f4ddd7fdb'></div>
+<h2 id="front-end-hot-deploy"><a href="#front-end-hot-deploy" id="front-end-hot-deploy">Front-end Hot Deploy</a></h2>
+<p>If you have the server running and you then edit only TypeScript files, or other front-end files, and want to test those changes you can run just <code>build-vite.sh</code> to make those changes go live in the running server.</p>
+<div id='65751d935aaa050f4ddd7fdc'></div>
+<h2 id="back-end-hot-deploy"><a href="#back-end-hot-deploy" id="back-end-hot-deploy">Back-end Hot Deploy</a></h2>
+<p>Likewise, if you have the server running and you then edit only Java files, and want to test those changes you can run just <code>build-dev-java.sh</code> to make those changes go live in the server running server.</p>
+<div id='65751d935aaa050f4ddd7fdd'></div>
+<h2 id="production-builds"><a href="#production-builds" id="production-builds">Production Builds</a></h2>
+<p>If you've already understood <code>build-dev.sh</code> and how it works you'll notice <code>build-distro.sh</code> (used for doing production builds) is very similar.</p>
+<p>This script creates the distro folder in <code>[project]/distro</code> and updates the local docker repository with the current file image for the QUANTA_VER that's set. Once the docker image is in the docker repo the app can then be run by using the script in the distro folder.</p>
+<div id='65751da05aaa050f4ddd7fe0'></div>
+<h1 id="how-to-run"><a href="#how-to-run" id="how-to-run">How to Run</a></h1>
+<div id='65751dcc5aaa050f4ddd7feb'></div>
+<h2 id="how-to-run-the-quanta-server"><a href="#how-to-run-the-quanta-server" id="how-to-run-the-quanta-server">How to Run the Quanta Server</a></h2>
+<p>Quanta uses Docker Compose to run. Here are the steps to run an instance of the Quanta server.</p>
+<div id='65751dfc5aaa050f4ddd7ffc'></div>
+<h2 id="step-1---install-docker"><a href="#step-1---install-docker" id="step-1---install-docker">Step 1 - Install Docker</a></h2>
+<p>Install Docker and Docker Compose. You can do that the way you normally do, or if you're not sure how you can refer to the detailed steps in <code>docker-install.md</code> file in this folder.</p>
+<div id='65751dfc5aaa050f4ddd7ffd'></div>
+<h2 id="step-2---docker-swarm-mode"><a href="#step-2---docker-swarm-mode" id="step-2---docker-swarm-mode">Step 2 - Docker Swarm Mode</a></h2>
+<p>You need to have docker running in 'swarm mode'. Again refer to <code>docker-install.md</code> file for complete instructions if you're not sure how to activate swarm mode.</p>
+<div id='65751dfc5aaa050f4ddd7ffe'></div>
+<h2 id="step-3---make-runtime-folder"><a href="#step-3---make-runtime-folder" id="step-3---make-runtime-folder">Step 3 - Make Runtime Folder</a></h2>
+<p>To prepare a folder from which you can run the app, which contains all the configuration files, etc, you can use the <code>build-distro.sh</code> script. Notice you'll need to edit <code>setenv-build-distro.sh</code> to set your own distro folder location in the DEPLOY_TARGET variable, before running the script.</p>
+<p>Note that the <code>distro</code> folder that the script builds doesn't contain the actual compiled binaries but will get those from docker repository when you run the app.</p>
+<div id='65751dfc5aaa050f4ddd7fff'></div>
+<h2 id="step-4---start-and-stop-the-app"><a href="#step-4---start-and-stop-the-app" id="step-4---start-and-stop-the-app">Step 4 - Start and Stop the app</a></h2>
+<p>To run a Quanta instance from the Docker Public Repository you can just run <code>run-distro.sh</code> from the 'distro' folder. To stop the app run <code>stop-distro.sh</code>.</p>
+<div id='65751dfc5aaa050f4ddd8000'></div>
+<h2 id="note-1"><a href="#note-1" id="note-1">Note 1</a></h2>
+<p>You should edit the passwords in the <code>setenv-run-distro.sh</code> file before your first run, because it initializes the MongoDB database and the admin user account with those passwords during the first run.</p>
+<div id='65751de15aaa050f4ddd7ff1'></div>
+<h2 id="note-2"><a href="#note-2" id="note-2">Note 2</a></h2>
+<p>You'll see in the setenv file that the data folder for MongoDB defaults to <code>${DEPLOY_TARGET}/data</code> unless you change it, and when you run the app for the first time that folder must exist, but can be empty. If empty a new database will be created there. Any time you want to wipe the database and start over you can simply delete the files in this data folder (with the server offline) and then restart the server.</p>
+<div id='65751e225aaa050f4ddd8006'></div>
+<h1 id="postgresql-1"><a href="#postgresql-1" id="postgresql-1">PostgreSQL</a></h1>
+<div id='65751e315aaa050f4ddd800c'></div>
+<h2 id="postgresql-notes"><a href="#postgresql-notes" id="postgresql-notes">PostgreSQL Notes</a></h2>
+<p>Postgres is used to hold a transactions table which keeps track of financial expendatures for all users. The only kinds of expendatures currently are the OpenAI API charges, for access to ChatGPT</p>
+<div id='65751e565aaa050f4ddd8016'></div>
+<h2 id="postgre-docker-compose"><a href="#postgre-docker-compose" id="postgre-docker-compose">Postgre Docker Compose</a></h2>
+<p>See the docker compose yaml files for configuration details. Our Postgre instance, like every other component of Quanta is using docker.</p>
+<div id='65751e565aaa050f4ddd8017'></div>
+<h2 id="postgre-admin"><a href="#postgre-admin" id="postgre-admin">Postgre Admin</a></h2>
+<p>In the docker compose yaml file, there is a section (currently commented out) which can run pgAdmin4 right from inside the docker instance, but it's commented because there's currently no justification for consuming expensive server-side resources for managing the database when we can manage it remotely instead.</p>
+<p>The way we do this is by running a separate dockerized pgAdmin4 instance from some other machine like this:</p>
+<pre><code class="language-sh">docker pull dpage/pgadmin4
+docker run -p 5051:80 \
+    -e 'PGADMIN_DEFAULT_EMAIL=user@none.com' \
+    -e 'PGADMIN_DEFAULT_PASSWORD=password' \
+    -d dpage/pgadmin4
+</code></pre>
+<p>Makes server avilable at <a href="http://127.0.0.1:5051">http://127.0.0.1:5051</a></p>
+<p>Or by running an instance of pgAdmin from inside a docker compose file locally as is done in <code>dc-dev.yaml</code>, which is the development config.</p>
+<p>Assuming we're using the config in <code>dc-dev.yaml', once you login to the admin console at</code><a href="http://127.0.0.1:5051`">http://127.0.0.1:5051`</a>, here are the connection settings that can get you connected DB instance of the Quanta app and it's Postgres instance, and in the case below it's the dev db:</p>
+<pre><code class="language-txt">Connection Host: pgdb-host-dev
+Port: 5432 &lt;--- note this is the internal port not the one in our env var
+Maintenance Database: postgres
+User: quanta-pg
+Password: see: ${pgPassword}
+</code></pre>
+<div id='667b2cea74a4837b5459032c'></div>
+<h1 id="ai-notes"><a href="#ai-notes" id="ai-notes">AI Notes</a></h1>
+<div id='667b2cfa74a4837b5459032d'></div>
+<h2 id="about-ai-cloud-services-http-calls"><a href="#about-ai-cloud-services-http-calls" id="about-ai-cloud-services-http-calls">About AI Cloud Services HTTP Calls</a></h2>
+<p>Currently we use direct HTTP calls to the various AI Cloud providers that we support rather than going thru a Java wrapper library. The reason for this because this app was written before there were any good Java AI libraries. As of the time of this writing (6/26/24) there are actually two choices that we could use which are 1) Spring AI and 2) LangChain4J. However the Spring AI is still in early development so it's not a viable choice. I'd prefer to use Spring rather than any other non-Spring library too. So I will wait several more months, or up to a year to see which one (Spring AI vs LangChain4J) ends up being the best choice, and my hunch is that I'll likely opt for Spring.</p>
+<div id='65751e735aaa050f4ddd8019'></div>
+<h1 id="troubleshooting"><a href="#troubleshooting" id="troubleshooting">Troubleshooting</a></h1>
+<div id='65751e7f5aaa050f4ddd801a'></div>
+<p>If something doesn't work, here's some tips to troubleshoot docker and the app. These are just some random notes and commands that might come in handy during troubleshooting something going wrong the app or anything related to docker</p>
+<div id='65751ee85aaa050f4ddd802a'></div>
+<h2 id="healthcheck-results"><a href="#healthcheck-results" id="healthcheck-results">Healthcheck Results</a></h2>
+<pre><code>docker inspect --format &quot;{{json .State.Health }}&quot; &lt;container-name&gt;
+</code></pre>
+<div id='65751ee85aaa050f4ddd802b'></div>
+<h2 id="realtime-monitoring-console"><a href="#realtime-monitoring-console" id="realtime-monitoring-console">Realtime Monitoring Console</a></h2>
+<p>Monitoring CPU &amp; Memory</p>
+<pre><code>docker stats
+</code></pre>
+<div id='65751ee85aaa050f4ddd802c'></div>
+<h2 id="check-to-see-what-docker-has-running"><a href="#check-to-see-what-docker-has-running" id="check-to-see-what-docker-has-running">Check to see what Docker has Running</a></h2>
+<pre><code>docker ps
+docker network ls
+docker service ls
+</code></pre>
+<p>Should show something like these two: 'subnode/repo:quanta1.0.26' and 'mongo:4.0'</p>
+<div id='65751ee85aaa050f4ddd802d'></div>
+<h2 id="check-docker-images"><a href="#check-docker-images" id="check-docker-images">Check Docker Images</a></h2>
+<p><a href="https://docs.docker.com/engine/reference/commandline/image_ls/">https://docs.docker.com/engine/reference/commandline/image_ls/</a></p>
+<pre><code>docker image ls --digests | grep &quot;quanta&quot;
+docker image ls --digests | grep &quot;mongo&quot;
+</code></pre>
+<div id='65751ee85aaa050f4ddd802e'></div>
+<h2 id="inspect-your-docker-repository"><a href="#inspect-your-docker-repository" id="inspect-your-docker-repository">Inspect your Docker Repository</a></h2>
+<pre><code>docker image inspect subnode/repo:quanta1.0.26
+</code></pre>
+<p>The &quot;RepoDigests&quot; in the output should contain the same digest shown in the &quot;hub.docker.com&quot; website.</p>
+<div id='65751ee85aaa050f4ddd802f'></div>
+<h2 id="check-docker-logs"><a href="#check-docker-logs" id="check-docker-logs">Check Docker Logs</a></h2>
+<pre><code>docker logs &lt;container-name&gt;
+docker service logs &lt;service-name&gt;
+
+If container can't even start run `docker ps -a` to get it's container ID, and then run
+docker logs &lt;container_id&gt;
+</code></pre>
+<div id='65751ee85aaa050f4ddd8030'></div>
+<h2 id="delete-all-images"><a href="#delete-all-images" id="delete-all-images">Delete all Images</a></h2>
+<p><a href="https://codenotary.com/blog/extremely-useful-docker-commands">https://codenotary.com/blog/extremely-useful-docker-commands</a></p>
+<p>First stop everything:</p>
+<pre><code>docker stack ls
+
+docker stack rm quanta-stack-local
+docker stack rm quanta-stack-dev
+</code></pre>
+<p>Stop all images</p>
+<pre><code>docker stop $(docker ps -a -q) 
+</code></pre>
+<p>Just as an extra check do a prune first:</p>
+<pre><code>docker system prune -a
+docker image prune -a
+</code></pre>
+<p>Removes all images</p>
+<pre><code>docker rmi -f $(docker images -aq)
+</code></pre>
+<p>Print all images (should be empty now)</p>
+<pre><code>docker images
+</code></pre>
+<p>Stop docker just to force it to reload and know NO images exist
+(just a paranoia step
+)
+sudo systemctl stop docker</p>
+<p>Bring it back up</p>
+<pre><code>sudo systemctl start docker
+</code></pre>
+<h2 id="try-to-pull-again"><a href="#try-to-pull-again" id="try-to-pull-again">Try to Pull again.</a></h2>
+<p>Should tell you image is already up to date</p>
+<pre><code>docker image pull subnode/repo:quanta1.0.26
+</code></pre>
+<div id='65751ee85aaa050f4ddd8031'></div>
+<h2 id="to-remove-most-running-things"><a href="#to-remove-most-running-things" id="to-remove-most-running-things">To Remove Most Running things</a></h2>
+<pre><code>docker kill $(docker ps -q)
+
+docker stack ls
+docker stack rm ${stack_name}
+
+docker service ls
+docker service rm ${serice_name}
+
+docker network ls
+docker network prune
+</code></pre>
+<div id='65751ee85aaa050f4ddd8032'></div>
+<h2 id="to-cleanup-disk-space"><a href="#to-cleanup-disk-space" id="to-cleanup-disk-space">To Cleanup Disk Space</a></h2>
+<pre><code>docker system prune -a
+docker image prune -a
+</code></pre>
+<div id='6629b03bbb4a731d6c99f433'></div>
+<h2 id="docker-service-fails-to-start"><a href="#docker-service-fails-to-start" id="docker-service-fails-to-start">Docker service fails to start</a></h2>
+<div id='6629b099bb4a731d6c99f435'></div>
+<p>Here are some troubleshooting tips from ChatGPT, for the situation where one of the services of the swarm fails to start and <code>docker ps -a</code> also doesn't even show the service. The answer below was given to me during troubleshooting why <code>quanta-stack-distro_quanta-distro</code> was failing to start, and it ended up being an issue with Certbot configuration in my case, but the troubleshooting below will be helpful for many different scenarios.</p>
+<div id='6629b0f6bb4a731d6c99f436'></div>
+<p>When dealing with a Docker service in a Swarm that isn't starting, and where logs aren't showing up, it can be particularly challenging to diagnose the issue. Given that you hinted it might be network-related, especially after recent changes involving certificates and possibly network settings, here are some steps you can follow to troubleshoot the issue:</p>
+<h3 id="1-check-service-status"><a href="#1-check-service-status" id="1-check-service-status">1. Check Service Status</a></h3>
+<p>First, ensure the service is actually recognized and attempted to be started by Docker Swarm:</p>
+<pre><code class="language-bash">docker service ls
+</code></pre>
+<p>Look for the service <code>quanta-stack-distro_quanta-distro</code> and check its REPLICAS column. If the numbers are <code>0/1</code> or similar, it means the service is recognized but no instances are running.</p>
+<h3 id="2-inspect-service"><a href="#2-inspect-service" id="2-inspect-service">2. Inspect Service</a></h3>
+<p>Inspect the service to see if there are any configurations that might be causing issues:</p>
+<pre><code class="language-bash">docker service inspect quanta-stack-distro_quanta-distro
+</code></pre>
+<p>Pay attention to the &quot;Networks&quot; section to see if it's correctly configured. Also, look at the &quot;TaskSpec&quot; to ensure all parameters such as environment variables, mounts, etc., are correctly set.</p>
+<h3 id="3-check-service-tasks"><a href="#3-check-service-tasks" id="3-check-service-tasks">3. Check Service Tasks</a></h3>
+<p>Since <code>docker service logs</code> didn't show anything, check the tasks for the service to see their state:</p>
+<pre><code class="language-bash">docker service ps quanta-stack-distro_quanta-distro --no-trunc
+</code></pre>
+<p>This command shows the tasks and their current state. If tasks are in a &quot;Pending&quot; or &quot;Rejected&quot; state, it can give you clues as to why the service isn't starting.</p>
+<h3 id="4-network-troubleshooting"><a href="#4-network-troubleshooting" id="4-network-troubleshooting">4. Network Troubleshooting</a></h3>
+<p>Since the issue may be network-related:</p>
+<h3 id="a-network-inspect"><a href="#a-network-inspect" id="a-network-inspect">a. Network Inspect</a></h3>
+<p>Inspect the network to which the service is connected:</p>
+<pre><code class="language-bash">docker network inspect [network_name]
+</code></pre>
+<p>Check for any anomalies or misconfigurations, especially related to subnets, gateways, or attached services.</p>
+<h3 id="b-check-connectivity"><a href="#b-check-connectivity" id="b-check-connectivity">b. Check Connectivity</a></h3>
+<p>If possible, try pinging or connecting to relevant network resources or services manually from within another container on the same network.</p>
+<h3 id="5-check-system-resources"><a href="#5-check-system-resources" id="5-check-system-resources">5. Check System Resources</a></h3>
+<p>Sometimes, services fail to start because of insufficient system resources (CPU, memory, disk space):</p>
+<pre><code class="language-bash">df -h
+free -m
+</code></pre>
+<h3 id="6-docker-daemon-and-system-logs"><a href="#6-docker-daemon-and-system-logs" id="6-docker-daemon-and-system-logs">6. Docker Daemon and System Logs</a></h3>
+<p>Since <code>docker service logs</code> isn't showing anything, consider looking at the Docker daemon logs or system logs:</p>
+<pre><code class="language-bash">### For Docker daemon logs (the exact command can vary by system)
+journalctl -u docker.service
+
+### General system logs
+dmesg
+</code></pre>
+<h3 id="7-configuration-issues"><a href="#7-configuration-issues" id="7-configuration-issues">7. Configuration Issues</a></h3>
+<p>Review any recent changes to Docker Compose files or Dockerfile. Ensure that environment variables, especially those related to networks or certificates, are correct.</p>
+<h3 id="8-restart-docker-swarm-services"><a href="#8-restart-docker-swarm-services" id="8-restart-docker-swarm-services">8. Restart Docker Swarm Services</a></h3>
+<p>Sometimes, a simple restart can help if there are transient issues:</p>
+<pre><code class="language-bash">docker service scale quanta-stack-distro_quanta-distro=0
+docker service scale quanta-stack-distro_quanta-distro=1
+</code></pre>
+<h3 id="9-check-certificates-and-ports"><a href="#9-check-certificates-and-ports" id="9-check-certificates-and-ports">9. Check Certificates and Ports</a></h3>
+<p>Ensure that no other service is using the ports assigned to your service and check that the certificates are correctly mounted and valid.</p>
+<h3 id="conclusion"><a href="#conclusion" id="conclusion">Conclusion</a></h3>
+<p>If after all these steps the issue remains unresolved, consider isolating the component outside of Docker Swarm (e.g., in a standalone Docker container) to see if it starts successfully. This can help determine if the issue is with the application itself or the Swarm configuration.</p>
+<div id='66f46c214fdbaa627978f216'></div>
+<h1 id="app-maintenance-and-upgrades"><a href="#app-maintenance-and-upgrades" id="app-maintenance-and-upgrades">App Maintenance and Upgrades</a></h1>
+<div id='66f46c8b4fdbaa627978f218'></div>
+<h2 id="front-end"><a href="#front-end" id="front-end">Front End</a></h2>
+<div id='66f46c3e4fdbaa627978f217'></div>
+<p>To check for updates to NodeJS packages:</p>
+<pre><code class="language-sh">yarn outdated
+</code></pre>
+<p>To upgrade a specific package</p>
+<pre><code class="language-sh">yarn upgrade [package-name]
+</code></pre>
+
+        </main>
+    </div>
+    <script src="prism.js"></script>
+</body>
+
+</html>
