@@ -32,8 +32,6 @@ import quanta.util.StreamUtil;
 import quanta.util.XString;
 import quanta.util.val.Val;
 
-
-
 /**
  * Base class for exporting to archives (ZIP and TAR).
  *

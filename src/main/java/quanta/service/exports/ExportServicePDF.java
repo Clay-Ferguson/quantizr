@@ -34,25 +34,19 @@ import quanta.util.XString;
  */
 @Component
 @Scope("prototype")
-// todo-0: rename this class to ExportServicePDF, ane remove the HTML parts out of it, becasue they
-// should now all be handled in ExportServiceBase
-public class ExportServiceFlexmark extends ServiceBase {
-    private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
+public class ExportServicePDF extends ServiceBase {
+    private static Logger log = LoggerFactory.getLogger(ExportServicePDF.class);
     private String shortFileName;
     private String fullFileName;
     private StringBuilder markdown = new StringBuilder();
-    private String format;
     private ExportRequest req;
     private int baseSlashCount = 0;
 
     /*
      * Exports the node specified in the req. If the node specified is "/", or the repository root, then
      * we don't expect a filename, because we will generate a timestamped one.
-     *
-     * Format can be 'html' or 'pdf'
      */
-    public void export(String format, ExportRequest req, ExportResponse res) {
-        this.format = format;
+    public void export(ExportRequest req, ExportResponse res) {
         this.req = req;
 
         String nodeId = req.getNodeId();
@@ -78,7 +72,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
         SubNode exportNode = rootNode.node;
         String fileName = svc_snUtil.getExportFileName(req.getFileName(), exportNode);
-        shortFileName = fileName + "." + format;
+        shortFileName = fileName + ".pdf";
         fullFileName = svc_prop.getAdminDataFolder() + File.separator + shortFileName;
         boolean wroteFile = false;
         if (req.isUpdateHeadings()) {
@@ -96,20 +90,12 @@ public class ExportServiceFlexmark extends ServiceBase {
             FlexmarkRender flexmarkRender = new FlexmarkRender();
             String body = flexmarkRender.markdownToHtml(markdown.toString());
             String html = generateHtml(body);
-            if ("html".equals(format)) {
-                FileUtils.writeFile(fullFileName, html, false);
-                wroteFile = true;
-            } //
-            else if ("pdf".equals(format)) {
-                out = new FileOutputStream(new File(fullFileName));
-                // This can be improved to not need the physica file but do it either all as streams or in byte
-                // array.
-                PdfConverterExtension.exportToPdf(out, html, "", flexmarkRender.options);
-                wroteFile = true;
-                StreamUtil.close(out);
-            } else {
-                throw new RuntimeEx("invalid format.");
-            }
+
+            out = new FileOutputStream(new File(fullFileName));
+            PdfConverterExtension.exportToPdf(out, html, "", flexmarkRender.options);
+            wroteFile = true;
+            StreamUtil.close(out);
+
         } catch (Exception ex) {
             throw new RuntimeEx(ex);
         } finally {
@@ -125,7 +111,7 @@ public class ExportServiceFlexmark extends ServiceBase {
             return;
         processNode(tn.node);
 
-        if (level == 0 && "pdf".equalsIgnoreCase(format) && req.isIncludeToc()) {
+        if (level == 0 && req.isIncludeToc()) {
             markdown.append("[TOC]");
         }
 
@@ -160,7 +146,7 @@ public class ExportServiceFlexmark extends ServiceBase {
         String content = node.getContent();
         TypeBase plugin = svc_typeMgr.getPluginByType(node.getType());
         if (plugin != null) {
-            content = plugin.formatExportText(format, node);
+            content = plugin.formatExportText("pdf", node);
         }
 
         if (content != null && req.isUpdateHeadings()) {
@@ -263,7 +249,7 @@ public class ExportServiceFlexmark extends ServiceBase {
      * Wraps the generated content (html body part) into a larger complete HTML file
      */
     private String generateHtml(String body) {
-        String ret = XString.getResourceAsString(context, "/public/export-includes/flexmark/html-template.html");
+        String ret = XString.getResourceAsString(context, "/public/export-includes/pdf/html-template.html");
         ret = ret.replace("{{hostAndPort}}", svc_prop.getHostAndPort());
         ret = ret.replace("{{body}}", body);
         return ret;

@@ -219,7 +219,7 @@ public class XString {
     public static String getResourceAsString(ApplicationContext context, String resourceName) {
         InputStream is = null;
         String ret = null;
-        resourceName = "classpath:" + resourceName; // "classpath:/public/export-includes/flexmark/html-template.html";
+        resourceName = "classpath:" + resourceName;
         try {
             Resource resource = context.getResource(resourceName);
             is = resource.getInputStream();

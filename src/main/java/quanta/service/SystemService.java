@@ -33,12 +33,11 @@ import quanta.rest.response.PingResponse;
 import quanta.rest.response.SendLogTextResponse;
 import quanta.rest.response.SendTestEmailResponse;
 import quanta.rest.response.ServerPushInfo;
-import quanta.service.exports.ExportServiceFlexmark;
+import quanta.service.exports.ExportServicePDF;
 import quanta.service.exports.ExportTarService;
 import quanta.service.exports.ExportZipService;
 import quanta.util.Const;
 import quanta.util.DateUtil;
-import quanta.util.ExUtil;
 import quanta.util.TL;
 import quanta.util.XString;
 
@@ -235,7 +234,7 @@ public class SystemService extends ServiceBase {
 
                 svc_email.sendDevEmail("Signature Node Problems", msg);
 
-                svc_crypto.getFailedSigNodes().clear(); 
+                svc_crypto.getFailedSigNodes().clear();
                 svc_crypto.getUnsignedPublicNodes().clear();
             } finally {
                 systemAutoCheckRunning = false;
@@ -309,27 +308,9 @@ public class SystemService extends ServiceBase {
         });
 
         if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-            ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
-            svc.export("pdf", req, res);
-        }
-        // ================================================
-        // // } // // } // res.setSuccess(false);
-        // else if
-        // ("md".equalsIgnoreCase(req.getExportExt()))
-        // { // } // // svc.export(ms, "html", req,
-        // res); // ExportServiceFlexmark svc =
-        // (ExportServiceFlexmark)
-        // context.getBean(ExportServiceFlexmark.class);
-        // // else if
-        // ("html".equalsIgnoreCase(req.getExportExt()))
-        // { // and we don't need these options,
-        // but I'm leaving the code in place for
-        // now. // I think the HTML and MARKDOWN
-        // export as ZIP/TAR formats can suffice
-        // for this // DO NOT DELETE (YET) //
-        // ================================================
-        // //
-        else if ("zip".equalsIgnoreCase(req.getExportExt())) {
+            ExportServicePDF svc = (ExportServicePDF) context.getBean(ExportServicePDF.class);
+            svc.export(req, res);
+        } else if ("zip".equalsIgnoreCase(req.getExportExt())) {
             ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
             svc.export(req, res);
         } //
