@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -12,16 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
-import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
-import com.vladsch.flexmark.ext.tables.TablesExtension;
-import com.vladsch.flexmark.ext.toc.TocExtension;
-import com.vladsch.flexmark.ext.toc.internal.TocOptions;
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.TreeNode;
@@ -33,7 +23,6 @@ import quanta.rest.request.ExportRequest;
 import quanta.rest.response.ExportResponse;
 import quanta.service.AppController;
 import quanta.types.TypeBase;
-import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.ImageUtil;
 import quanta.util.StreamUtil;
@@ -45,6 +34,8 @@ import quanta.util.XString;
  */
 @Component
 @Scope("prototype")
+// todo-0: rename this class to ExportServicePDF, ane remove the HTML parts out of it, becasue they
+// should now all be handled in ExportServiceBase
 public class ExportServiceFlexmark extends ServiceBase {
     private static Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
     private String shortFileName;
@@ -95,46 +86,15 @@ public class ExportServiceFlexmark extends ServiceBase {
         }
         FileOutputStream out = null;
         try {
-            // Let's keep these examples commented until I have time to understand them...
-            //
-            // MutableDataSet options = PegdownOptionsAdapter.flexmarkOptions(
-            // Extensions.ALL & ~(Extensions.ANCHORLINKS | Extensions.EXTANCHORLINKS_WRAP)
-            // , TocExtension.create()).toMutable()
-            // .set(TocExtension.LIST_CLASS, PdfConverterExtension.DEFAULT_TOC_LIST_CLASS)
-            // .toImmutable();
-            /////////////////
-            // options.set(Parser.EXTENSIONS, Arrays.asList(
-            // TocExtension.create(),
-            // AnchorLinkExtension.create()
-            // ));
-            // options.set(AnchorLinkExtension.ANCHORLINKS_WRAP_TEXT, false);
-            // uncomment to convert soft-breaks to hard breaks
-            // options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
-            MutableDataSet options = new MutableDataSet();
-            options.set(Parser.EXTENSIONS, Arrays.asList( //
-                    TablesExtension.create(), //
-                    TocExtension.create(), //
-                    AnchorLinkExtension.create(), //
-                    AutolinkExtension.create()));
-            // We start the TOC at level 2 because level 1 is the title of the document itself, and the root
-            // node.
-            options.set(TocExtension.LEVELS, TocOptions.getLevels(2, 3, 4, 5, 6));
-            // This numbering works in the TOC but I haven't figured out how to number the
-            // actual headings in the body of the document itself.
-            // options.set(TocExtension.IS_NUMBERED, true);
-
-            Parser parser = Parser.builder(options).build();
-            HtmlRenderer renderer = HtmlRenderer.builder(options).build();
             /*
              * if this is the node being exported. PDF generator uses this special '[TOC]' (via TocExtension) as
              * the place where we want the table of contents injected so we can click the "Table of Contents"
              * checkbox in the export, or theoretically we could also insert this [TOC] somewhere else in the
              * text.
              */
-
             recurseNode(rootNode, 0);
-            Node document = parser.parse(markdown.toString());
-            String body = renderer.render(document);
+            FlexmarkRender flexmarkRender = new FlexmarkRender();
+            String body = flexmarkRender.markdownToHtml(markdown.toString());
             String html = generateHtml(body);
             if ("html".equals(format)) {
                 FileUtils.writeFile(fullFileName, html, false);
@@ -144,7 +104,7 @@ public class ExportServiceFlexmark extends ServiceBase {
                 out = new FileOutputStream(new File(fullFileName));
                 // This can be improved to not need the physica file but do it either all as streams or in byte
                 // array.
-                PdfConverterExtension.exportToPdf(out, html, "", options);
+                PdfConverterExtension.exportToPdf(out, html, "", flexmarkRender.options);
                 wroteFile = true;
                 StreamUtil.close(out);
             } else {

@@ -15,10 +15,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.TreeNode;
@@ -28,12 +26,13 @@ import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.ExportRequest;
 import quanta.rest.response.ExportResponse;
-import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.MimeUtil;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
 import quanta.util.val.Val;
+
+
 
 /**
  * Base class for exporting to archives (ZIP and TAR).
@@ -71,15 +70,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
      */
     private final HashSet<String> fileNameSet = new HashSet<>();
 
-    /*
-     * NOTE: We keep separate HTML and MD StringBuilders here for content and toc, so that, in the
-     * future it will be easier to generate exports that contain both HTML and MD content, in the same
-     * file which we don't currently support
-     */
-    private StringBuilder fullHtml = new StringBuilder();
-    private StringBuilder fullMd = new StringBuilder();
-    private StringBuilder htmlToc = new StringBuilder();
-    private StringBuilder mdToc = new StringBuilder();
+    private String docTitle;
+    private StringBuilder doc = new StringBuilder();
+    private StringBuilder toc = new StringBuilder();
 
     // markdown links keyed by link url
     private HashMap<String, MarkdownLink> markdownLinks = new HashMap<>();
@@ -108,9 +101,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         boolean success = false;
         try {
             openOutputStream(fullFileName);
-            if (req.getContentType().equals("html")) {
-                writeRootFiles();
-            }
             rootPathParent = node.getParentPath();
             svc_auth.ownerAuth(node);
             ArrayList<SubNode> nodeStack = new ArrayList<>();
@@ -118,7 +108,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             // process the entire exported tree here
             recurseNode("../", "", rootNode, nodeStack, 0, null);
-
             writeMainFile();
 
             if (problems.length() > 0) {
@@ -151,19 +140,39 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void writeHtmlFile() {
-        StringBuilder out = new StringBuilder();
-        appendHtmlBegin("", out);
-        if (htmlToc.length() > 0) {
-            out.append(htmlToc);
+        FlexmarkRender flexmarkRender = new FlexmarkRender();
+        String tocIns = flexmarkRender.markdownToHtml(toc.toString());
+        String bodyIns = flexmarkRender.markdownToHtml(doc.toString());
+        String html = generateHtml(tocIns, bodyIns);
+        addFileEntry("index.html", html.toString().getBytes(StandardCharsets.UTF_8));
+        addStaticFile("prism.css");
+        addStaticFile("prism.js");
+    }
+
+    private void addStaticFile(String fileName) {
+        addFileEntry(fileName, XString.getResourceAsString(context, "/public/export-includes/html/" + fileName)
+                .getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String generateHtml(String toc, String body) {
+        String templateFile = toc.length() > 0 ? "/public/export-includes/html/html-template-with-toc.html"
+                : "/public/export-includes/html/html-template.html";
+        String ret = XString.getResourceAsString(context, templateFile);
+        ret = ret.replace("/*{{style}}*/",
+                XString.getResourceAsString(context, "/public/export-includes/html/style.css"));
+        if (toc.length() > 0) {
+            ret = ret.replace("{{toc}}", toc);
         }
-        out.append(fullHtml);
-        appendHtmlEnd("", out);
-        addFileEntry("index.html", out.toString().getBytes(StandardCharsets.UTF_8));
+        if (docTitle != null) {
+            ret = ret.replace("{{title}}", docTitle);
+        }
+        ret = ret.replace("{{body}}", body);
+        return ret;
     }
 
     @SuppressWarnings("rawtypes")
     private void writeMarkdownFile() {
-        String content = fullMd.toString();
+        String content = doc.toString();
         // translate all the links to markdown compatable links
         if (content.contains("](")) {
             Iterator iter = markdownLinks.entrySet().iterator();
@@ -181,31 +190,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
 
         if (req.isIncludeToc()) {
-            content = mdToc.toString() + "\n\n" + content;
+            content = toc.toString() + "\n\n" + content;
         }
         addFileEntry("index.md", content.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private void writeRootFiles() {
-        // These files are how our exported HTML content get the ability to render markdown content.
-        writeRootFile("exported.js");
-        writeRootFile("marked.min.js");
-        writeRootFile("exported.css");
-    }
-
-    private void writeRootFile(String fileName) {
-        InputStream is = null;
-        String resourceName = "classpath:/public/export-includes/" + fileName;
-        try {
-            Resource resource = context.getResource(resourceName);
-            is = resource.getInputStream();
-            byte[] targetArray = IOUtils.toByteArray(is);
-            addFileEntry(fileName, targetArray);
-        } catch (Exception e) {
-            throw new RuntimeEx("Unable to write resource: " + resourceName, e);
-        } finally {
-            StreamUtil.close(is);
-        }
     }
 
     private void recurseNode(String rootPath, String parentFolder, TreeNode tn, ArrayList<SubNode> nodeStack, int level,
@@ -309,19 +296,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return linkName.trim();
     }
 
-    private void appendHtmlBegin(String rootPath, StringBuilder html) {
-        html.append("<html>");
-        html.append("<head>\n");
-        html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
-        html.append("</head>\n");
-        html.append("<body>\n");
-    }
-
-    private void appendHtmlEnd(String rootPath, StringBuilder html) {
-        html.append("<script src='" + rootPath + "marked.min.js'></script>");
-        html.append("<script src='" + rootPath + "exported.js'></script>");
-        html.append("</body></html>");
-    }
 
     /*
      * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, because we let
@@ -352,11 +326,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             if (req.isUpdateHeadings()) {
                 int lev = getHeadingLevel(node);
-                content = svc_edit.translateHeadingsForLevel(content, lev);
+                content = svc_edit.translateHeadingsForLevel(content, lev - 1);
             }
 
-            if (writeFile && req.isIncludeToc()) {
-                addToTableOfContents(node, level, content);
+            if (writeFile) {
+                if (req.isIncludeToc()) {
+                    addToTableOfContents(node, level, content);
+                }
+                if (docTitle == null) {
+                    docTitle = extractHeadingText(content);
+                }
             }
 
             List<Attachment> atts = node.getOrderedAttachments();
@@ -367,7 +346,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             // if we have a markdown file, all the attachments go into that folder
             if (req.getContentType().equals("md")) {
-                targetFolder = ""; // svc_fileUtil.getParentPath("index.md");
+                targetFolder = "";
             } else {
                 targetFolder = "." + parentFolder;
             }
@@ -379,7 +358,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (!"ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, true, null, contentVal, deeperPath, targetFolder, writeFile, att);
+                    handleAttachment(node, true, contentVal, deeperPath, targetFolder, writeFile, att);
                 }
             }
 
@@ -393,19 +372,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             switch (req.getContentType()) {
+                // todo-0: we can unify the markdown and html cases here a bit more.
                 case "md":
-                    // if appending to specific named markdown file
+                    if (doc.length() > 0)
+                        doc.append("\n");
 
-                    if (fullMd.length() > 0)
-                        fullMd.append("\n");
                     if (req.isIncludeMetaComments()) {
-                        fullMd.append(buildMarkdownHeader(node));
+                        doc.append(buildMarkdownHeader(node));
                     }
 
-                    fullMd.append(contentVal.getVal() + "\n");
+                    doc.append(contentVal.getVal());
+                    doc.append("\n");
                     break;
                 case "html":
-                    contentVal.setVal(formatContentToHtml(node, contentVal.getVal()));
+                    contentVal.setVal(formatContentForHtml(node, contentVal.getVal()));
                     // special handling for htmlContent we have to do this File Tag injection AFTER the html escaping
                     // and processing that's done in the line above
                     if (atts != null) {
@@ -414,10 +394,17 @@ public abstract class ExportArchiveBase extends ServiceBase {
                             if (!"ft".equals(att.getPosition())) {
                                 continue;
                             }
-                            handleAttachment(node, true, contentVal, null, deeperPath, targetFolder, writeFile, att);
+                            handleAttachment(node, true, contentVal, deeperPath, targetFolder, writeFile, att);
                         }
                     }
-                    fullHtml.append(contentVal.getVal());
+
+                    /*
+                     * This DIV is put into markdown so we have a target location for the hashmark links in the url, and
+                     * also to make the ToC be able to link to a specific target location in the html
+                     */
+                    doc.append("\n<div id='" + node.getIdStr() + "'/>\n");
+                    doc.append(contentVal.getVal());
+                    doc.append("\n\n");
                     break;
                 default:
                     break;
@@ -429,7 +416,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if ("ft".equals(att.getPosition())) {
                         continue;
                     }
-                    handleAttachment(node, false, null, null, deeperPath, targetFolder, writeFile, att);
+                    handleAttachment(node, false, null, deeperPath, targetFolder, writeFile, att);
                 }
             }
 
@@ -484,10 +471,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return sb.toString();
     }
 
-    private void addToTableOfContents(SubNode node, int level, String content) {
-        // add to table of contents
+    private String extractHeadingText(String content) {
         if (content == null)
-            return;
+            return null;
         String headerContent = content.trim();
         if (XString.isMarkdownHeading(headerContent)) {
             // chop string at newline if there's a newline
@@ -498,29 +484,33 @@ public abstract class ExportArchiveBase extends ServiceBase {
             int firstSpace = headerContent.indexOf(" ");
             if (firstSpace != -1) {
                 String heading = headerContent.substring(firstSpace + 1);
-                if (!XString.isValidMarkdownHeading(heading)) {
+                if ("md".equals(req.getContentType()) && !XString.isValidMarkdownHeading(heading)) {
                     problems.append("bad markdown heading: " + heading + "\n");
                 }
-                String linkHeading = heading.replace(" ", "-").toLowerCase();
-                level--;
+                return heading;
+            }
+        }
+        return null;
+    }
 
-                if (req.isIncludeToc()) {
-                    switch (req.getContentType()) {
-                        case "md":
-                            int lev = getHeadingLevel(node) - 1;
-                            String prefix = lev > 0 ? "    ".repeat(lev) : "";
-                            mdToc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
-                            break;
-                        case "html":
-                            String clazz = level == 0 ? "class='topLevelToc'" : "";
-                            htmlToc.append("<div " + clazz + " style='margin-left: " + (25 + level * 25)
-                                    + "px'><a class='tocLink' href='#" + node.getIdStr() + "'>"
-                                    + StringEscapeUtils.escapeHtml4(heading) + "</a></div>\n");
-                            break;
-                        default:
-                            break;
-                    }
-                }
+    private void addToTableOfContents(SubNode node, int level, String content) {
+        if (req.isIncludeToc()) {
+            String heading = extractHeadingText(content);
+            if (heading == null)
+                return;
+            level--;
+            int lev = getHeadingLevel(node) - 1;
+            String prefix = lev > 0 ? "    ".repeat(lev) : "";
+            switch (req.getContentType()) {
+                case "md":
+                    String linkHeading = heading.replace(" ", "-").toLowerCase();
+                    toc.append(prefix + "* [" + heading + "](#" + linkHeading + ")\n");
+                    break;
+                case "html":
+                    toc.append(prefix + "* [" + heading + "](#" + node.getIdStr() + ")\n");
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -673,8 +663,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * If 'content' is passes as non-null then the ONLY thing we do is inject any File Tags onto that
      * content and return the content
      */
-    private void handleAttachment(SubNode node, boolean injectingTag, Val<String> htmlContent, Val<String> mdContent,
-            String deeperPath, String parentFolder, boolean writeFile, Attachment att) {
+    private void handleAttachment(SubNode node, boolean injectingTag, Val<String> content, String deeperPath,
+            String parentFolder, boolean writeFile, Attachment att) {
         String nodeId = node.getIdStr();
 
         String af = getAttachmentFileName(att, node);
@@ -713,6 +703,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         if (mimeType.startsWith("image/")) {
             switch (req.getContentType()) {
+                case "html":
                 case "md":
                     String mdLink = null;
                     if (att.getCssSize() != null
@@ -721,11 +712,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     } else {
                         mdLink = "\n![" + displayName + "](" + fullUrl + ")\n\n";
                     }
-                    processMdAtt(injectingTag, mdContent, att, mdLink);
-                    break;
-                case "html":
-                    String htmlLink = appendImgLink(nodeId, displayName, fullUrl, att);
-                    processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
+                    processMdAtt(injectingTag, content, att, mdLink);
                     break;
                 default:
                     break;
@@ -733,13 +720,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
         } //
         else {
             switch (req.getContentType()) {
+                case "html":
                 case "md":
                     String mdLink = "\n[" + displayName + "](" + fullUrl + ")\n";
-                    processMdAtt(injectingTag, mdContent, att, mdLink);
-                    break;
-                case "html":
-                    String htmlLink = appendNonImgLink(displayName, fullUrl);
-                    processHtmlAtt(injectingTag, htmlContent, att, htmlLink);
+                    processMdAtt(injectingTag, content, att, mdLink);
                     break;
                 default:
                     break;
@@ -747,40 +731,18 @@ public abstract class ExportArchiveBase extends ServiceBase {
         }
     }
 
-    private void processHtmlAtt(boolean injectingTag, Val<String> htmlContent, Attachment att, String imgLink) {
+    private void processMdAtt(boolean injectingTag, Val<String> content, Attachment att, String mdLink) {
         if (injectingTag) {
-            if (htmlContent != null) {
-                htmlContent.setVal(insertHtmlLink(htmlContent.getVal(), att, imgLink));
+            if (content != null) {
+                content.setVal(insertMdLink(content.getVal(), att, mdLink));
             }
         } else {
-            fullHtml.append(imgLink);
-        }
-    }
-
-    private void processMdAtt(boolean injectingTag, Val<String> mdContent, Attachment att, String mdLink) {
-        if (injectingTag) {
-            if (mdContent != null) {
-                mdContent.setVal(insertMdLink(mdContent.getVal(), att, mdLink));
-            }
-        } else {
-            if (req.getContentType().equals("md")) {
-                fullMd.append(mdLink);
+            if (req.getContentType().equals("md") || req.getContentType().equals("html")) {
+                doc.append(mdLink);
             }
         }
     }
 
-    private String insertHtmlLink(String content, Attachment att, String imgLink) {
-        if ("ft".equals(att.getPosition())) {
-            /*
-             * This replacement is kind of tricky because we have to close out the markdown div then inject our
-             * HTML, and then reopen a new div so keep the markdown separate from the RAW html "imgLink" we're
-             * inserting here.
-             */
-            content = content.replace("{{" + att.getFileName() + "}}",
-                    "\n</div>" + imgLink + "<div class='markdown container'>\n");
-        }
-        return content;
-    }
 
     private String insertMdLink(String content, Attachment att, String mdLink) {
         if ("ft".equals(att.getPosition())) {
@@ -789,38 +751,34 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return content;
     }
 
-    private String appendImgLink(String nodeId, String binFileNameStr, String url, Attachment att) {
-        String domId = "img_" + nodeId + "_" + att.getKey();
-        String style = "";
-        if (att.getCssSize() != null && (att.getCssSize().endsWith("%") || att.getCssSize().endsWith("px"))) {
-            style = "style='width:" + att.getCssSize() + "'";
-        }
+    // DO NOT DELETE (until sure we never want clickable images in again)
+    //
+    // private String appendImgLink(String nodeId, String binFileNameStr, String url, Attachment att) {
+    // String domId = "img_" + nodeId + "_" + att.getKey();
+    // String style = "";
+    // if (att.getCssSize() != null && (att.getCssSize().endsWith("%") ||
+    // att.getCssSize().endsWith("px"))) {
+    // style = "style='width:" + att.getCssSize() + "'";
+    // }
+    // return ("<div class='attachment'><img title='" + binFileNameStr + "' id='" + domId + "' " + style
+    // + " onclick='document.getElementById(\"" + domId + "\").style.width=\"100%\"' src='" + url
+    // + "'/></div>");
+    // }
 
-        return ("<div class='attachment'><img title='" + binFileNameStr + "' id='" + domId + "' " + style
-                + " onclick='document.getElementById(\"" + domId + "\").style.width=\"100%\"' src='" + url
-                + "'/></div>");
-    }
-
-    private String appendNonImgLink(String binFileNameStr, String url) {
-        return ("<div class='attachment'><a class='link' target='_blank' href='" + url + "'>" + binFileNameStr
-                + "</a></div>");
-    }
-
-    private String formatContentToHtml(SubNode node, String content) {
-        String escapedContent = StringEscapeUtils.escapeHtml4(content);
+    private String formatContentForHtml(SubNode node, String content) {
         if (node.isType(NodeType.PLAIN_TEXT)) {
-            return "\n<pre>" + escapedContent + "\n</pre>\n";
+            return "\n```\n" + content + "\n```\n";
         } else {
             String prefix = "";
             if (req.isDividerLine()) {
-                prefix += "<hr>";
+                prefix += "\n----\n";
             }
-            if (req.isIncludeIDs()) {
-                prefix += "\n<div class='floatContainer'><div class='floatRight'>\nID:" + node.getIdStr()
-                        + "</div></div>";
+
+            // If ToC is included the IDs will already be in a DIV tag as the ID, so we don't need it here also.
+            if (req.isIncludeIDs() && !req.isIncludeToc()) {
+                prefix += "\n<!-- ID:" + node.getIdStr() + " -->\n";
             }
-            return prefix + "\n<div id='" + node.getIdStr() + "' class='markdown container'>" + escapedContent
-                    + "\n</div>\n";
+            return prefix + "\n" + content + "\n";
         }
     }
 

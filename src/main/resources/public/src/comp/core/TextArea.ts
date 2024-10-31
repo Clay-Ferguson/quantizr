@@ -22,9 +22,8 @@ export class TextArea extends Div implements I.TextEditorIntf {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
-        // todo-0: look for all places we need a gap above the textarea and add a 'mt-3' class to the outterClasses 
         if (outterClasses) {
-            this.attribs.className = outterClasses; // "mt-3"; 
+            this.attribs.className = outterClasses;
         }
 
         if (attribs) {

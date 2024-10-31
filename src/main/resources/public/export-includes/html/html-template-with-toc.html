@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        /* Do not remove. This is an insertion tag */
+        /*{{style}}*/
+
+        /* Main container using grid */
+        .container {
+            display: grid;
+            grid-template-columns: 30% 70%;
+            height: 100%;
+        }
+
+        /* Left navigation styling */
+        .nav {
+            background-color: black;
+            color: white;
+            overflow-y: auto;
+            border-right: 2px solid gray;
+            padding-right: 1rem;
+        }
+    </style>
+    <link rel="stylesheet" href="prism.css">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="nav">
+            {{toc}}
+        </nav>
+        <main class="content">
+            {{body}}
+        </main>
+    </div>
+    <script src="prism.js"></script>
+</body>
+
+</html>

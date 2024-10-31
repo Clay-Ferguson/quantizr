@@ -25,7 +25,7 @@ rm -rf ${PRJROOT}/bin/*
 cd ${PRJROOT}
 
 # build with apidocs
-# mvn install javadoc:javadoc 
+# mvn install
 
 # build without apidocs
 echo "mvn install the pom-common.xml into repo"

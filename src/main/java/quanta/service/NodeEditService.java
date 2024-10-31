@@ -430,6 +430,9 @@ public class NodeEditService extends ServiceBase {
     }
 
     public String translateHeadingsForLevel(final String nodeContent, int level) {
+        if (level < 0) {
+            level = 0;
+        }
         if (nodeContent == null)
             return null;
         StringTokenizer t = new StringTokenizer(nodeContent, "\n", true);

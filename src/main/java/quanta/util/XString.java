@@ -460,7 +460,7 @@ public class XString {
         }
     }
 
-     // Divider is always either "and" or "or".
+    // Divider is always either "and" or "or".
     public static List<String> extractQuotedStrings(String text, String divider) {
         List<String> quotedStrings = new ArrayList<>();
         Pattern pattern = Pattern.compile("\"([^\"]*)\"\\s*(?i:" + divider + ")\\s*\"([^\"]*)\"");

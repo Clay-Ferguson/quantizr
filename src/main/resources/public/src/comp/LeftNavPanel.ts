@@ -42,6 +42,7 @@ export class LeftNavPanel extends Comp {
 
     override preRender(): boolean | null {
         const ast = getAs();
+
         const myMessages = ast.myNewMessageCount > 0
             ? (ast.myNewMessageCount + " new posts") : "";
         let showDocIndex = S.util.willRenderDocIndex();
@@ -72,7 +73,7 @@ export class LeftNavPanel extends Comp {
                         title: "Go to Portal Home Node"
                     }),
 
-                    new Span(null, { className: "float-right" }, [
+                    new Span(null, { className: "-float-right" }, [
                         myMessages ? new Span(myMessages, {
                             className: "newMessagesNote",
                             onClick: S.nav._showMyNewMessages,
