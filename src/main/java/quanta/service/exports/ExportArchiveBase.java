@@ -45,10 +45,19 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private String shortFileName;
     private String fullFileName;
     private String rootPathParent;
-    ExportRequest req;
+
+    private String contentType;
+    private boolean includeToC;
+    private boolean updateHeadings;
+    private boolean includeIDs;
+    private boolean dividerLine;
+    private boolean includeMetaComments;
+    private String targetFileName;
+
     int baseSlashCount = 0;
 
-    // warnings and issues will be written to 'problems.txt' if there were any issues with the export
+    // warnings and issues will be written to 'problems.txt' if there were any
+    // issues with the export
     StringBuilder problems = new StringBuilder();
 
     private class MarkdownLink {
@@ -77,21 +86,42 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private SubNode node;
 
-    public void export(ExportRequest req, ExportResponse res) {
-        // for markdown force updateHeadings and Attachments folder
-        if (req.getContentType().equals("md")) {
-            req.setUpdateHeadings(true);
-        }
+    public void generatePublication(String nodeId) {
+        contentType = "html";
+        includeToC = true;
+        updateHeadings = true;
+        includeIDs = false;
+        dividerLine = false;
+        includeMetaComments = false;
+        targetFileName = null;
+        export(nodeId);
+    }
 
-        this.req = req;
+    public void export(ExportRequest req, ExportResponse res) {
+        contentType = req.getContentType();
+        includeToC = req.isIncludeToc();
+        updateHeadings = req.isUpdateHeadings();
+        includeIDs = req.isIncludeIDs();
+        dividerLine = req.isDividerLine();
+        includeMetaComments = req.isIncludeMetaComments();
+        targetFileName = req.getFileName();
+
+        // for markdown force updateHeadings and Attachments folder
+        if (contentType.equals("md")) {
+            updateHeadings = true;
+        }
+        String outputFile = export(req.getNodeId());
+        res.setFileName(outputFile);
+    }
+
+    public String export(String nodeId) {
         if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
             throw new RuntimeEx("adminDataFolder does not exist: " + svc_prop.getAdminDataFolder());
         }
-        String nodeId = req.getNodeId();
         TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, null, null, null);
         node = rootNode.node;
 
-        String fileName = svc_snUtil.getExportFileName(req.getFileName(), node);
+        String fileName = svc_snUtil.getExportFileName(targetFileName, node);
         shortFileName = fileName + "." + getFileExtension();
         fullFileName = svc_prop.getAdminDataFolder() + File.separator + shortFileName;
         baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
@@ -112,8 +142,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 addFileEntry("export-info.txt", problems.toString().getBytes(StandardCharsets.UTF_8));
             }
 
-            res.setFileName(shortFileName);
             success = true;
+            return shortFileName;
         } catch (Exception ex) {
             throw new RuntimeEx(ex);
         } finally {
@@ -125,7 +155,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void writeMainFile() {
-        switch (req.getContentType()) {
+        switch (contentType) {
             case "md":
                 writeMarkdownFile();
                 break;
@@ -187,7 +217,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
         }
 
-        if (req.isIncludeToc()) {
+        if (includeToC) {
             content = toc.toString() + "\n\n" + content;
         }
         addFileEntry("index.md", content.getBytes(StandardCharsets.UTF_8));
@@ -198,15 +228,17 @@ public abstract class ExportArchiveBase extends ServiceBase {
         SubNode node = tn.node;
         if (node == null)
             return;
-        // If a node has a property "noexport" (added by power users) then this node will not be exported.
+        // If a node has a property "noexport" (added by power users) then this node
+        // will not be exported.
         String noExport = node.getStr(NodeProp.NO_EXPORT);
         if (noExport != null) {
             return;
         }
 
-        // This is the header row at the top of the page. The rest of the page is children of this node
+        // This is the header row at the top of the page. The rest of the page is
+        // children of this node
         boolean doneWithChildren = processNodeExport(parentFolder, "", tn, true, level, true);
-        String folder = req.getContentType().equals("fs") ? getFileNameFromNode(node) : node.getIdStr();
+        String folder = contentType.equals("fs") ? getFileNameFromNode(node) : node.getIdStr();
 
         if (!doneWithChildren && tn.children != null) {
             for (TreeNode c : tn.children) {
@@ -276,14 +308,16 @@ public abstract class ExportArchiveBase extends ServiceBase {
         linkName = XString.repeatingTrimFromFront(linkName, "#");
         linkName = linkName.trim();
 
-        // For any characters in linkName that are not valid for a filename, replace them with a dash
+        // For any characters in linkName that are not valid for a filename, replace
+        // them with a dash
         linkName = linkName.replaceAll("[^a-zA-Z0-9-_]", "-");
 
         // if linkName length is greater than 60, truncate it
         if (linkName.length() > 60) {
             linkName = linkName.substring(0, 60);
 
-            // Now try to break at the last dash rather than chopping off in the middle of a word
+            // Now try to break at the last dash rather than chopping off in the middle of a
+            // word
             int lastDash = linkName.lastIndexOf("-");
             if (lastDash > 40) {
                 linkName = linkName.substring(0, lastDash);
@@ -310,7 +344,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         try {
             SubNode node = tn.node;
             String concatenatedChildren = "";
-            if (req.getContentType().equals("fs")) {
+            if (contentType.equals("fs")) {
                 boolean allChildrenAreLeafs = areAllChildrenAreSimpleLeafs(tn);
                 if (allChildrenAreLeafs) {
                     concatenatedChildren = concatAllChildren(tn);
@@ -321,13 +355,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
             parseMarkdownLinks(content);
             content = content.trim();
 
-            if (req.isUpdateHeadings()) {
+            if (updateHeadings) {
                 int lev = getHeadingLevel(node);
                 content = svc_edit.translateHeadingsForLevel(content, lev - 1);
             }
 
             if (writeFile) {
-                if (req.isIncludeToc()) {
+                if (includeToC) {
                     addToTableOfContents(node, level, content);
                 }
                 if (docTitle == null) {
@@ -336,13 +370,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             List<Attachment> atts = node.getOrderedAttachments();
-            // we save off the 'content' into htmlContent, because we need a copy that doesn't have
-            // attachments inserted into it for the special case of inserting HTML attachments
+            // we save off the 'content' into htmlContent, because we need a copy that
+            // doesn't have
+            // attachments inserted into it for the special case of inserting HTML
+            // attachments
             Val<String> contentVal = new Val<>(content);
             String targetFolder = null;
 
             // if we have a markdown file, all the attachments go into that folder
-            if (req.getContentType().equals("md")) {
+            if (contentType.equals("md")) {
                 targetFolder = "";
             } else {
                 targetFolder = "." + parentFolder;
@@ -359,21 +395,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 }
             }
 
-            switch (req.getContentType()) {
+            switch (contentType) {
                 case "md":
-                case "html":
                     removeSpecialSyntax(contentVal);
-                    break;
-                default:
-                    break;
-            }
-
-            switch (req.getContentType()) {
-                case "md":
                     if (doc.length() > 0)
                         doc.append("\n");
 
-                    if (req.isIncludeMetaComments()) {
+                    if (includeMetaComments) {
                         doc.append(buildMarkdownHeader(node));
                     }
 
@@ -381,8 +409,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     doc.append("\n\n");
                     break;
                 case "html":
+                    removeSpecialSyntax(contentVal);
                     contentVal.setVal(formatContentForHtml(node, contentVal.getVal()));
-                    // special handling for htmlContent we have to do this File Tag injection AFTER the html escaping
+                    // special handling for htmlContent we have to do this File Tag injection AFTER
+                    // the html escaping
                     // and processing that's done in the line above
                     if (atts != null) {
                         for (Attachment att : atts) {
@@ -394,7 +424,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                         }
                     }
 
-                    if (req.isIncludeToc()) {
+                    if (includeToC) {
                         doc.append("\n<div id='" + node.getIdStr() + "'></div>\n");
                     }
                     doc.append(contentVal.getVal());
@@ -406,7 +436,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             if (atts != null) {
                 for (Attachment att : atts) {
-                    // Skip File Tag type attachments because they'll already have been processed above
+                    // Skip File Tag type attachments because they'll already have been processed
+                    // above
                     if ("ft".equals(att.getPosition())) {
                         continue;
                     }
@@ -427,7 +458,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return ret;
     }
 
-    // Tokenize contentVal into lines and remove any lines that are just a single dash, but leave intact
+    // Tokenize contentVal into lines and remove any lines that are just a single
+    // dash, but leave intact
     // any inside code blocks
     private void removeSpecialSyntax(Val<String> contentVal) {
         String[] lines = contentVal.getVal().split("\n");
@@ -478,7 +510,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             int firstSpace = headerContent.indexOf(" ");
             if (firstSpace != -1) {
                 String heading = headerContent.substring(firstSpace + 1);
-                if ("md".equals(req.getContentType()) && !XString.isValidMarkdownHeading(heading)) {
+                if ("md".equals(contentType) && !XString.isValidMarkdownHeading(heading)) {
                     problems.append("bad markdown heading: " + heading + "\n");
                 }
                 return heading;
@@ -488,7 +520,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void addToTableOfContents(SubNode node, int level, String content) {
-        if (req.isIncludeToc()) {
+        if (includeToC) {
             String heading = extractHeadingText(content);
             if (heading == null)
                 return;
@@ -496,7 +528,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             int lev = getHeadingLevel(node) - 1;
             String prefix = lev > 0 ? "    ".repeat(lev) : "";
             String target = null;
-            switch (req.getContentType()) {
+            switch (contentType) {
                 case "md":
                     target = heading.replace(" ", "-").toLowerCase();
                     break;
@@ -528,7 +560,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String json = getNodeJson(node);
         String fullFileName = null;
 
-        switch (req.getContentType()) {
+        switch (contentType) {
             case "fs":
                 fullFileName = parentFolder + "/" + fileName + "/content.md";
                 addFileEntry(fullFileName, content.getBytes(StandardCharsets.UTF_8));
@@ -551,7 +583,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private String getNodeJson(SubNode node) {
         String json;
-        // Pretty print the node having the relative path, and then restore the node to the full path
+        // Pretty print the node having the relative path, and then restore the node to
+        // the full path
         String fullPath = node.getPath();
         String relPath = fullPath.substring(rootPathParent.length());
         try {
@@ -566,13 +599,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private String getAttachmentFileName(Attachment att, SubNode node) {
         String fileName = att.getFileName();
 
-        // we have some possibility of fileName being an actual URL that it was downloaded from so we don't
+        // we have some possibility of fileName being an actual URL that it was
+        // downloaded from so we don't
         // let those be used here and fall back to the key instead
         if (fileName == null || fileName.indexOf("/") != -1) {
             fileName = att.getKey();
         }
 
-        // Some software chokes on spaces in filenames (like VSCode markdown preview), so don't allow that.
+        // Some software chokes on spaces in filenames (like VSCode markdown preview),
+        // so don't allow that.
         fileName = fileName.replace(" ", "_");
         return fileName;
     }
@@ -601,7 +636,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String ext = null;
         String attFileName = null;
 
-        switch (req.getContentType()) {
+        switch (contentType) {
             case "fs":
                 attFileName = getAttachmentFileName(att, node);
                 ext = FilenameUtils.getExtension(attFileName);
@@ -630,13 +665,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
             String binFileName = null;
 
-            switch (req.getContentType()) {
+            switch (contentType) {
                 case "md":
                 case "html":
                     binFileName = "/attachments/" + attFileName;
                     break;
                 default:
-                    String folder = req.getContentType().equals("fs") ? path : node.getIdStr();
+                    String folder = contentType.equals("fs") ? path : node.getIdStr();
                     binFileName = parentFolder + "/" + folder + "/" + attFileName;
                     break;
             }
@@ -678,7 +713,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         String mimeType = att.getMime();
         String fullUrl = null;
 
-        switch (req.getContentType()) {
+        switch (contentType) {
             case "md":
             case "html":
                 fullUrl = "attachments/" + getAttachmentFileNameEx(att, node);
@@ -702,7 +737,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             return;
 
         if (mimeType.startsWith("image/")) {
-            switch (req.getContentType()) {
+            switch (contentType) {
                 case "html":
                 case "md":
                     String mdLink = null;
@@ -718,7 +753,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     break;
             }
         } else {
-            switch (req.getContentType()) {
+            switch (contentType) {
                 case "html":
                 case "md":
                     String mdLink = "\n[" + displayName + "](" + fullUrl + ")\n";
@@ -736,7 +771,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 content.setVal(insertMdLink(content.getVal(), att, mdLink));
             }
         } else {
-            if (req.getContentType().equals("md") || req.getContentType().equals("html")) {
+            if (contentType.equals("md") || contentType.equals("html")) {
                 doc.append(mdLink);
             }
         }
@@ -749,18 +784,22 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return content;
     }
 
-    // todo-0: we should be able to bring this back in a way that works for ALL images, so we can simply
+    // todo-0: we should be able to bring this back in a way that works for ALL
+    // images, so we can simply
     // add a chunk of JS to the exported HTML that makes this happen
     //
-    // private String appendImgLink(String nodeId, String binFileNameStr, String url, Attachment att) {
+    // private String appendImgLink(String nodeId, String binFileNameStr, String
+    // url, Attachment att) {
     // String domId = "img_" + nodeId + "_" + att.getKey();
     // String style = "";
     // if (att.getCssSize() != null && (att.getCssSize().endsWith("%") ||
     // att.getCssSize().endsWith("px"))) {
     // style = "style='width:" + att.getCssSize() + "'";
     // }
-    // return ("<div class='attachment'><img title='" + binFileNameStr + "' id='" + domId + "' " + style
-    // + " onclick='document.getElementById(\"" + domId + "\").style.width=\"100%\"' src='" + url
+    // return ("<div class='attachment'><img title='" + binFileNameStr + "' id='" +
+    // domId + "' " + style
+    // + " onclick='document.getElementById(\"" + domId + "\").style.width=\"100%\"'
+    // src='" + url
     // + "'/></div>");
     // }
 
@@ -769,12 +808,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
             return "\n```\n" + content + "\n```\n";
         } else {
             String prefix = "";
-            if (req.isDividerLine()) {
+            if (dividerLine) {
                 prefix += "\n----\n";
             }
 
-            // If ToC is included the IDs will already be in a DIV tag as the ID, so we don't need it here also.
-            if (req.isIncludeIDs() && !req.isIncludeToc()) {
+            // If ToC is included the IDs will already be in a DIV tag as the ID, so we
+            // don't need it here also.
+            if (includeIDs && !includeToC) {
                 prefix += "\n<!-- ID:" + node.getIdStr() + " -->\n";
             }
             return prefix + "\n" + content + "\n";
@@ -782,7 +822,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     private void addFileEntry(String fileName, byte[] bytes) {
-        // If we have duplicated a filename, number it sequentially to create a unique file
+        // If we have duplicated a filename, number it sequentially to create a unique
+        // file
         if (fileNameSet.contains(fileName)) {
             int idx = 1;
             String numberedFileName = fileName + String.valueOf(idx);
@@ -800,7 +841,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (length <= 0) {
             throw new RuntimeEx("length is required");
         }
-        // If we have duplicated a filename, number it sequentially to create a unique file
+        // If we have duplicated a filename, number it sequentially to create a unique
+        // file
         if (fileNameSet.contains(fileName)) {
             int idx = 1;
             String numberedFileName = fileName + String.valueOf(idx);
