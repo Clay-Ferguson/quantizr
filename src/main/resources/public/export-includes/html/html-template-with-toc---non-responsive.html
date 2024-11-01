@@ -30,8 +30,17 @@
         /* Main container using grid */
         .container {
             display: grid;
-            grid-template-columns: 100%;
+            grid-template-columns: 30% 70%;
             height: 100%;
+        }
+
+        /* Left navigation styling */
+        .nav {
+            background-color: black;
+            color: white;
+            overflow-y: auto;
+            border-right: 2px solid gray;
+            padding-right: 1rem;
         }
     </style>
     <link rel="stylesheet" href="prism.css">
@@ -39,6 +48,9 @@
 
 <body>
     <div class="container">
+        <nav class="nav">
+            {{toc}}
+        </nav>
         <main class="content">
             {{body}}
         </main>

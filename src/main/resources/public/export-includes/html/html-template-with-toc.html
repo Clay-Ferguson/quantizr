@@ -9,11 +9,29 @@
         /* Do not remove. This is an insertion tag */
         /*{{style}}*/
 
+        html,
+        body {
+            font-family: 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important;
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        /* Main content area styling */
+        .content {
+            background-color: black;
+            color: white;
+            overflow-y: auto;
+            padding: 0 2rem 0 2rem;
+        }
+
         /* Main container using grid */
         .container {
             display: grid;
             grid-template-columns: 30% 70%;
-            height: 100%;
+            height: 100vh;
         }
 
         /* Left navigation styling */
@@ -23,6 +41,37 @@
             overflow-y: auto;
             border-right: 2px solid gray;
             padding-right: 1rem;
+        }
+
+        /* Media query for narrow screens */
+        @media screen and (max-width: 900px) {
+
+            html,
+            body {
+                overflow-y: auto;
+                /* Enable main scrollbar for mobile view */
+                height: auto;
+            }
+
+            .container {
+                display: block;
+                height: auto;
+            }
+
+            .nav {
+                border-right: none;
+                border-bottom: 2px solid gray;
+                padding: 1rem;
+                width: auto;
+                overflow-y: visible;
+                /* Remove separate scrollbar */
+            }
+
+            .content {
+                padding: 1rem;
+                overflow-y: visible;
+                /* Remove separate scrollbar */
+            }
         }
     </style>
     <link rel="stylesheet" href="prism.css">
