@@ -192,36 +192,78 @@ export class Render {
         const byIdUrl = window.location.origin + "?id=" + node.id;
         const byIdUrlThreadView = byIdUrl + "&view=thread";
         const byIdUrlDocView = byIdUrl + "&view=doc";
+        const websiteById = window.location.origin + "/pub/id/" + node.id;
         const byIdUrlTimelineView = byIdUrl + "&view=timeline";
         const pathPart = S.nodeUtil.getPathPartForNamedNode(node);
+        const websitePathPart = S.nodeUtil.getPathPartForWebsite(node);
+        const website = S.props.getPropStr(J.NodeProp.WEBSITE, node) ? true : false
         children.push(new Div("Click any link to copy to clipboard.", { className: Tailwind.alertInfo }));
 
-        children.push(this.titleDiv("By ID"), //
-            new Div(byIdUrl, {
-                className: "linkDisplay",
-                title: "Copy to clipboard",
-                onClick: () => S.util.copyToClipboard(byIdUrl)
-            }));
+        if (!node.name) {
+            children.push(this.titleDiv("Node Link"), //
+                new Div(byIdUrl, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(byIdUrl)
+                }));
 
-        const markdownByIdUrl = "[Link](?id=" + node.id + ")";
-        children.push(this.titleDiv("By ID (Markdown)"), //
-            new Div(markdownByIdUrl, {
-                className: "linkDisplay",
-                title: "Copy to clipboard",
-                onClick: () => S.util.copyToClipboard(markdownByIdUrl)
-            }));
+            const markdownByIdUrl = "[Link](?id=" + node.id + ")";
+            children.push(this.titleDiv("Markdown Link"), //
+                new Div(markdownByIdUrl, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(markdownByIdUrl)
+                }));
 
-        if (node.name) {
+            children.push(this.titleDiv("Thread View"), //
+                new Div(byIdUrlThreadView, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(byIdUrlThreadView)
+                }));
+
+            children.push(this.titleDiv("Doc View"), //
+                new Div(byIdUrlDocView, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(byIdUrlDocView)
+                }));
+
+            children.push(this.titleDiv("Timeline View"), //
+                new Div(byIdUrlTimelineView, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(byIdUrlTimelineView)
+                }));
+
+            if (website) {
+                children.push(this.titleDiv("Website"), //
+                    new Div(websiteById, {
+                        className: "linkDisplay",
+                        title: "Copy to clipboard",
+                        onClick: () => S.util.copyToClipboard(websiteById)
+                    }));
+            }
+        }
+        else {
             const byNameUrl = window.location.origin + pathPart;
-            children.push(this.titleDiv("By Name"), //
+            children.push(this.titleDiv("Node Link"), //
                 new Div(byNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
                     onClick: () => S.util.copyToClipboard(byNameUrl)
                 }));
 
+            const markdownByNameUrl = "[Link](" + pathPart + ")";
+            children.push(this.titleDiv("Markdown"), //
+                new Div(markdownByNameUrl, {
+                    className: "linkDisplay",
+                    title: "Copy to clipboard",
+                    onClick: () => S.util.copyToClipboard(markdownByNameUrl)
+                }));
+
             const threadViewByNameUrl = window.location.origin + pathPart + "?view=thread";
-            children.push(this.titleDiv("Thread View (By Name)"), //
+            children.push(this.titleDiv("Thread View"), //
                 new Div(threadViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
@@ -229,7 +271,7 @@ export class Render {
                 }));
 
             const docViewByNameUrl = window.location.origin + pathPart + "?view=doc";
-            children.push(this.titleDiv("Doc View (By Name)"), //
+            children.push(this.titleDiv("Doc View"), //
                 new Div(docViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
@@ -237,42 +279,23 @@ export class Render {
                 }));
 
             const timelineViewByNameUrl = window.location.origin + pathPart + "?view=timeline";
-            children.push(this.titleDiv("Timeline View (By Name)"), //
+            children.push(this.titleDiv("Timeline View"), //
                 new Div(timelineViewByNameUrl, {
                     className: "linkDisplay",
                     title: "Copy to clipboard",
                     onClick: () => S.util.copyToClipboard(timelineViewByNameUrl)
                 }));
 
-            const markdownByNameUrl = "[Link](" + pathPart + ")";
-            children.push(this.titleDiv("By Name (Markdown)"), //
-                new Div(markdownByNameUrl, {
-                    className: "linkDisplay",
-                    title: "Copy to clipboard",
-                    onClick: () => S.util.copyToClipboard(markdownByNameUrl)
-                }));
+            if (website) {
+                const websiteByNameUrl = window.location.origin + websitePathPart;
+                children.push(this.titleDiv("Website"), //
+                    new Div(websiteByNameUrl, {
+                        className: "linkDisplay",
+                        title: "Copy to clipboard",
+                        onClick: () => S.util.copyToClipboard(websiteByNameUrl)
+                    }));
+            }
         }
-
-        children.push(this.titleDiv("Thread View by ID"), //
-            new Div(byIdUrlThreadView, {
-                className: "linkDisplay",
-                title: "Copy to clipboard",
-                onClick: () => S.util.copyToClipboard(byIdUrlThreadView)
-            }));
-
-        children.push(this.titleDiv("Doc View by ID"), //
-            new Div(byIdUrlDocView, {
-                className: "linkDisplay",
-                title: "Copy to clipboard",
-                onClick: () => S.util.copyToClipboard(byIdUrlDocView)
-            }));
-
-        children.push(this.titleDiv("Timeline View by ID"), //
-            new Div(byIdUrlTimelineView, {
-                className: "linkDisplay",
-                title: "Copy to clipboard",
-                onClick: () => S.util.copyToClipboard(byIdUrlTimelineView)
-            }));
 
         // #rss-disable todo-2: rss feeds disabled for now (need to figure out how to format)
         // const rssFeed = window.location.origin + "/rss?id=" + node.id;

@@ -169,6 +169,17 @@ export class NodeUtil {
         }
     }
 
+    getPathPartForWebsite(node: NodeInfo): string {
+        if (!node || !node.name) return null;
+
+        if (node.owner === PrincipalName.ADMIN) {
+            return "/pub/" + node.name;
+        }
+        else {
+            return "/pub/" + node.owner + "/" + node.name;
+        }
+    }
+
     getShortContent(node: NodeInfo): string {
         let content = node.content;
         if (!content) {

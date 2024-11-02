@@ -70,6 +70,7 @@ import quanta.rest.request.NodeFeedRequest;
 import quanta.rest.request.NodeSearchRequest;
 import quanta.rest.request.PasteAttachmentsRequest;
 import quanta.rest.request.PingRequest;
+import quanta.rest.request.RePublishWebsiteRequest;
 import quanta.rest.request.RemovePrivilegeRequest;
 import quanta.rest.request.RemoveSignaturesRequest;
 import quanta.rest.request.RenderCalendarRequest;
@@ -89,7 +90,7 @@ import quanta.rest.request.SendTestEmailRequest;
 import quanta.rest.request.SetCipherKeyRequest;
 import quanta.rest.request.SetExpandedRequest;
 import quanta.rest.request.SetNodePositionRequest;
-import quanta.rest.request.SetUnpublishedRequest;
+import quanta.rest.request.SetSharingOptionRequest;
 import quanta.rest.request.SignNodesRequest;
 import quanta.rest.request.SignSubGraphRequest;
 import quanta.rest.request.SignupRequest;
@@ -100,6 +101,7 @@ import quanta.rest.request.UpdateFriendNodeRequest;
 import quanta.rest.request.UpdateHeadingsRequest;
 import quanta.rest.request.UploadFromUrlRequest;
 import quanta.rest.response.LogoutResponse;
+import quanta.rest.response.RePublishWebsiteResponse;
 import quanta.util.CaptchaMaker;
 import quanta.util.TL;
 
@@ -285,11 +287,11 @@ public class AppController extends ServiceBase implements ErrorController {
         return svc_callProc.run("addPrivilege", true, true, req, session, () -> svc_mongoTrans.cm_addPrivilege(req));
     }
 
-    @RequestMapping(value = API_PATH + "/setUnpublished", method = RequestMethod.POST)
+    @RequestMapping(value = API_PATH + "/setSharingOption", method = RequestMethod.POST)
     @ResponseBody
-    public Object setUnpublished(@RequestBody SetUnpublishedRequest req, HttpSession session) {
-        return svc_callProc.run("setUnpublished", true, true, req, session,
-                () -> svc_mongoTrans.cm_setUnpublished(req));
+    public Object setSharingOption(@RequestBody SetSharingOptionRequest req, HttpSession session) {
+        return svc_callProc.run("setSharingOption", true, true, req, session,
+                () -> svc_mongoTrans.cm_setSharingOption(req));
     }
 
     @RequestMapping(value = API_PATH + "/copySharing", method = RequestMethod.POST)
@@ -512,6 +514,15 @@ public class AppController extends ServiceBase implements ErrorController {
         });
     }
 
+    @RequestMapping(value = API_PATH + "/rePublishWebsite", method = RequestMethod.POST)
+    @ResponseBody
+    public Object rePublishWebsite(@RequestBody RePublishWebsiteRequest req, HttpSession session) {
+        return svc_callProc.run("rePublishWebsite", false, false, req, session, () -> {
+            svc_publication.getPublication(req.getNodeId(), true, null, null, null, null);
+            return new RePublishWebsiteResponse();
+        });
+    }
+
     @RequestMapping(value = {PUBLICATION_PATH + "/id/{id}", PUBLICATION_PATH + "/{nameOnAdminNode}",
             PUBLICATION_PATH + "/{userName}/{nameOnUserNode}"}, method = RequestMethod.GET)
     public void getPublication(//
@@ -521,7 +532,7 @@ public class AppController extends ServiceBase implements ErrorController {
             @PathVariable(value = "id", required = false) String id, HttpSession session,
             HttpServletResponse response) {
         svc_callProc.run("getPublication", false, false, null, session, () -> {
-            svc_publication.getPublication(id, nameOnAdminNode, nameOnUserNode, userName, response);
+            svc_publication.getPublication(id, false, nameOnAdminNode, nameOnUserNode, userName, response);
             return null;
         });
     }

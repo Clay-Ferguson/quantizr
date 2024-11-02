@@ -404,8 +404,9 @@ export class EditNodeDlg extends DialogBase {
         let sharingDivClearFix = null;
         if (shareComps) {
             const unpublished = S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
+            const website = S.props.getPropStr(J.NodeProp.WEBSITE, ast.editNode);
             sharingDiv = new Div(null, {
-                className: "-float-right cursor-pointer"
+                className: "-float-right cursor-pointer mb-3"
             }, [
                 new Span("Shared to: ", {
                     title: "Node Sharing",
@@ -415,8 +416,9 @@ export class EditNodeDlg extends DialogBase {
                 !isPublic ? new Button("Make Public", () => this.makePublic(true), { className: "ml-3" }) : null,
                 unpublished ? new Icon({
                     className: "fa fa-eye-slash fa-lg sharingIcon ml-3 mr-1",
-                    title: "Node is Unpublished\n\nWill not appear in feed"
-                }) : null
+                    title: "Refreshes the published copy of this website"
+                }) : null,
+                website ? new Button("Update Website", () => this.rePublishWebsite(), { className: "ml-3" }) : null,
             ]);
             sharingDivClearFix = new Clearfix();
         }
@@ -537,6 +539,14 @@ export class EditNodeDlg extends DialogBase {
             propsPanel, advCollapsePanelContainer, new Clearfix(), this.renderButtons()];
 
         return children;
+    }
+
+    async rePublishWebsite() {
+        const ast = getAs();
+        await S.rpcUtil.rpc<J.RePublishWebsiteRequest, J.RePublishWebsiteResponse>("rePublishWebsite", {
+            nodeId: ast.editNode.id
+        });
+        S.util.showMessage("Website republished.", "Success");
     }
 
     async makePublic(allowAppends: boolean) {

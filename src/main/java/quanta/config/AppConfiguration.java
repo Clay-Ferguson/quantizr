@@ -69,6 +69,7 @@ public class AppConfiguration implements WebMvcConfigurer {
         reg.addUrlPatterns("/images/*");
         reg.addUrlPatterns("/fonts/*");
         reg.addUrlPatterns("/dist/*");
+        reg.addUrlPatterns("/export-includes/*");
         reg.addUrlPatterns(AppController.API_PATH + "/getOpenGraph");
         return reg;
     }

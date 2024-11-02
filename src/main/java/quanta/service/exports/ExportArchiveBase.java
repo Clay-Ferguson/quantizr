@@ -58,6 +58,8 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private boolean includeMetaComments;
     private String targetFileName;
 
+    private String baseFolder = "";
+
     /*
      * This will be true if we're publishing a node rather than doing an export. A published node is one
      * that will be available under "/pub/" url of web app.
@@ -108,6 +110,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         includeMetaComments = false;
         targetFileName = null;
         publishing = true;
+        baseFolder = "/export-includes/html/";
         export(nodeId);
         return html;
     }
@@ -220,6 +223,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         if (docTitle != null) {
             ret = ret.replace("{{title}}", docTitle);
         }
+        ret = ret.replace("{{baseFolder}}", baseFolder);
         ret = ret.replace("{{body}}", body);
         return ret;
     }

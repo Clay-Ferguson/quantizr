@@ -44,9 +44,10 @@ export class SharingDlg extends DialogBase {
                 ast.editNode.ac?.length > 0 ? new Checkbox("Unpublished", null, {
                     setValue: async (checked: boolean) => {
                         this.dirty = true;
-                        await S.rpcUtil.rpc<J.SetUnpublishedRequest, J.AddPrivilegeResponse>("setUnpublished", {
+                        await S.rpcUtil.rpc<J.SetSharingOptionRequest, J.SetSharingOptionResponse>("setSharingOption", {
                             nodeId: ast.editNode.id,
-                            unpublished: checked
+                            unpublished: checked,
+                            website: S.props.getPropStr(J.NodeProp.WEBSITE, ast.editNode) ? true : false
                         });
                         S.props.setPropVal(J.NodeProp.UNPUBLISHED, ast.editNode, checked ? "true" : null);
                         S.edit.updateNode(ast.editNode);
@@ -54,6 +55,22 @@ export class SharingDlg extends DialogBase {
                     },
                     getValue: (): boolean => {
                         return !!S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode);
+                    }
+                }) : null,
+                S.props.isPublic(ast.editNode) ? new Checkbox("Website", null, {
+                    setValue: async (checked: boolean) => {
+                        this.dirty = true;
+                        await S.rpcUtil.rpc<J.SetSharingOptionRequest, J.SetSharingOptionResponse>("setSharingOption", {
+                            nodeId: ast.editNode.id,
+                            unpublished: S.props.getPropStr(J.NodeProp.UNPUBLISHED, ast.editNode) ? true : false,
+                            website: checked
+                        });
+                        S.props.setPropVal(J.NodeProp.WEBSITE, ast.editNode, checked ? "true" : null);
+                        S.edit.updateNode(ast.editNode);
+                        return null;
+                    },
+                    getValue: (): boolean => {
+                        return !!S.props.getPropStr(J.NodeProp.WEBSITE, ast.editNode);
                     }
                 }) : null,
                 new Checkbox("Apply to Subnodes", null, {

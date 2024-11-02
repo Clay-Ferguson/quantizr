@@ -37,14 +37,14 @@ import quanta.rest.request.CopySharingRequest;
 import quanta.rest.request.GetNodePrivilegesRequest;
 import quanta.rest.request.RemovePrivilegeRequest;
 import quanta.rest.request.SetCipherKeyRequest;
-import quanta.rest.request.SetUnpublishedRequest;
+import quanta.rest.request.SetSharingOptionRequest;
 import quanta.rest.response.AddPrivilegeResponse;
 import quanta.rest.response.CopySharingResponse;
 import quanta.rest.response.CreateSubNodeResponse;
 import quanta.rest.response.GetNodePrivilegesResponse;
 import quanta.rest.response.RemovePrivilegeResponse;
 import quanta.rest.response.SetCipherKeyResponse;
-import quanta.rest.response.SetUnpublishedResponse;
+import quanta.rest.response.SetSharingOptionResponse;
 import quanta.rest.response.base.ResponseBase;
 import quanta.util.Const;
 import quanta.util.TL;
@@ -141,16 +141,14 @@ public class AclService extends ServiceBase {
         return res;
     }
 
-    /*
-     * Adds or updates a new privilege to a node
-     */
-    public SetUnpublishedResponse setUnpublished(SetUnpublishedRequest req) {
+    public SetSharingOptionResponse setSharingOption(SetSharingOptionRequest req) {
         MongoTranMgr.ensureTran();
-        SetUnpublishedResponse res = new SetUnpublishedResponse();
+        SetSharingOptionResponse res = new SetSharingOptionResponse();
         String nodeId = req.getNodeId();
         SubNode node = svc_mongoRead.getNode(nodeId);
         svc_auth.ownerAuth(node);
         node.set(NodeProp.UNPUBLISHED, req.isUnpublished() ? true : null);
+        node.set(NodeProp.WEBSITE, req.isWebsite() ? true : null);
         return res;
     }
 

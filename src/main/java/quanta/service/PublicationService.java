@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.http.HttpServletResponse;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
 import quanta.service.exports.ExportTarService;
 import quanta.util.StreamUtil;
@@ -29,9 +30,9 @@ public class PublicationService extends ServiceBase {
 
     HashMap<String, String> cache = new HashMap<String, String>();
 
-    // todo-0: this method needs to be able to send back an HTML error code of something is wrong
-    public void getPublication(String id, String nameOnAdminNode, String nameOnUserNode, String userName,
-            HttpServletResponse response) {
+    // todo-0: this method needs to be able to send back an HTML error code if something is wrong
+    public void getPublication(String id, boolean updateCache, String nameOnAdminNode, String nameOnUserNode,
+            String userName, HttpServletResponse response) {
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
         String lookup = null;
@@ -47,8 +48,6 @@ public class PublicationService extends ServiceBase {
         }
 
         try {
-            // todo-0: run test proving if user revokes the public sharing then the publication is no longer
-            // available
             SubNode node = svc_mongoRead.getNode(lookup);
 
             /*
@@ -58,12 +57,18 @@ public class PublicationService extends ServiceBase {
             if (node == null)
                 throw new RuntimeEx("Node not found: " + lookup);
 
+            String nodeId = node.getIdStr();
             if (!AclService.isPublic(node)) {
-                cache.remove(lookup);
+                cache.remove(nodeId);
                 throw new RuntimeEx("Node is not public: " + lookup);
             }
 
-            String html = cache.get(lookup);
+            Boolean website = node.getBool(NodeProp.WEBSITE);
+            if (!website) {
+                throw new RuntimeEx("Node is not published as a website: " + lookup);
+            }
+
+            String html = updateCache ? null : cache.get(nodeId);
             if (html == null) {
                 log.debug("GENERATING publication for node: " + lookup);
                 // We can run as admin, because the filtering is done in the service to access only public nodes.
@@ -75,24 +80,22 @@ public class PublicationService extends ServiceBase {
                 if (html == null)
                     throw new RuntimeEx("Failed to generate publication for node: " + lookup);
 
-                // todo-0: sharing dialog needs a button to "Publish" which basically removes the item from the
-                // cache so it will regenerate as needed.
-                // todo-0: Also without that sharing option in place we want to also in that case make the HTML not
-                // be accessible.
-                cache.put(lookup, html);
+                cache.put(nodeId, html);
             } else {
                 log.debug("Using cached publication for node: " + lookup);
             }
 
-            response.setContentType("text/html");
-            response.setContentLength((int) html.length());
-            response.setHeader("Cache-Control", "public, max-age=86400"); // 1 day
+            if (response != null) {
+                response.setContentType("text/html");
+                response.setContentLength((int) html.length());
+                response.setHeader("Cache-Control", "public, max-age=86400"); // 1 day
 
-            InputStream is = new ByteArrayInputStream(html.getBytes());
-            inStream = new BufferedInputStream(is);
-            outStream = new BufferedOutputStream(response.getOutputStream());
-            IOUtils.copy(inStream, outStream);
-            outStream.flush();
+                InputStream is = new ByteArrayInputStream(html.getBytes());
+                inStream = new BufferedInputStream(is);
+                outStream = new BufferedOutputStream(response.getOutputStream());
+                IOUtils.copy(inStream, outStream);
+                outStream.flush();
+            }
         } catch (Exception ex) {
             throw new RuntimeEx(ex);
         } finally {

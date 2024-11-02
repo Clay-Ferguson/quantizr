@@ -120,6 +120,7 @@ public enum NodeProp {
     DATE_FULL("p.date"), //
 
     UNPUBLISHED("unpub"), //
+    WEBSITE("website"), //
     AI_PROMPT("ai"), //
     AI_FOLDERS_TO_INCLUDE("aiFolders"), //
     AI_FOLDERS_TO_EXCLUDE("aiFoldersExclude"), //

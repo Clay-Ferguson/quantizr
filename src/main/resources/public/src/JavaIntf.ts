@@ -452,6 +452,10 @@ export interface PasteAttachmentsRequest extends RequestBase {
 export interface PingRequest extends RequestBase {
 }
 
+export interface RePublishWebsiteRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface RemovePrivilegeRequest extends RequestBase {
     nodeId: string;
     principalNodeId: string;
@@ -553,9 +557,10 @@ export interface SetNodePositionRequest extends RequestBase {
     targetName: string;
 }
 
-export interface SetUnpublishedRequest extends RequestBase {
+export interface SetSharingOptionRequest extends RequestBase {
     nodeId: string;
     unpublished: boolean;
+    website: boolean;
 }
 
 export interface SignNodesRequest extends RequestBase {
@@ -879,6 +884,9 @@ export interface PushPageMessage extends ServerPushInfo {
     subType: string;
 }
 
+export interface RePublishWebsiteResponse extends ResponseBase {
+}
+
 export interface RemovePrivilegeResponse extends ResponseBase {
 }
 
@@ -953,7 +961,7 @@ export interface SetNodePositionResponse extends ResponseBase {
     nodeChanges: NodeChanges;
 }
 
-export interface SetUnpublishedResponse extends ResponseBase {
+export interface SetSharingOptionResponse extends ResponseBase {
 }
 
 export interface SignNodesResponse extends ResponseBase {
@@ -1208,6 +1216,7 @@ export const enum NodeProp {
     DATE = "date",
     DATE_FULL = "p.date",
     UNPUBLISHED = "unpub",
+    WEBSITE = "website",
     AI_PROMPT = "ai",
     AI_FOLDERS_TO_INCLUDE = "aiFolders",
     AI_FOLDERS_TO_EXCLUDE = "aiFoldersExclude",

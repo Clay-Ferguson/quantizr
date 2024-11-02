@@ -27,7 +27,7 @@ import quanta.rest.request.SaveNodeJsonRequest;
 import quanta.rest.request.SaveUserProfileRequest;
 import quanta.rest.request.SearchAndReplaceRequest;
 import quanta.rest.request.SetNodePositionRequest;
-import quanta.rest.request.SetUnpublishedRequest;
+import quanta.rest.request.SetSharingOptionRequest;
 import quanta.rest.request.SignNodesRequest;
 import quanta.rest.request.SignSubGraphRequest;
 import quanta.rest.request.SignupRequest;
@@ -52,7 +52,7 @@ import quanta.rest.response.SaveNodeJsonResponse;
 import quanta.rest.response.SaveUserProfileResponse;
 import quanta.rest.response.SearchAndReplaceResponse;
 import quanta.rest.response.SetNodePositionResponse;
-import quanta.rest.response.SetUnpublishedResponse;
+import quanta.rest.response.SetSharingOptionResponse;
 import quanta.rest.response.SignNodesResponse;
 import quanta.rest.response.SignupResponse;
 import quanta.rest.response.SplitNodeResponse;
@@ -83,8 +83,8 @@ public class MongoTransactional extends ServiceBase {
         return svc_acl.addPrivilege(req);
     }
 
-    public SetUnpublishedResponse cm_setUnpublished(SetUnpublishedRequest req) {
-        return svc_acl.setUnpublished(req);
+    public SetSharingOptionResponse cm_setSharingOption(SetSharingOptionRequest req) {
+        return svc_acl.setSharingOption(req);
     }
 
     public RemovePrivilegeResponse cm_removePrivilege(RemovePrivilegeRequest req) {
