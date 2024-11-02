@@ -56,6 +56,7 @@ public class AppConfiguration implements WebMvcConfigurer {
         reg.addUrlPatterns(AppController.ADMIN_PATH + "/*");
         reg.addUrlPatterns(AppController.API_PATH + "/*");
         reg.addUrlPatterns(AppController.FILE_PATH + "/*");
+        reg.addUrlPatterns(AppController.PUBLICATION_PATH + "/*");
         reg.addUrlPatterns("/stripe/*");
         return reg;
     }

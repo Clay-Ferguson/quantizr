@@ -38,6 +38,7 @@ import quanta.service.NodeRenderService;
 import quanta.service.NodeSearchService;
 import quanta.service.OpenGraphService;
 import quanta.service.PostgresTransactional;
+import quanta.service.PublicationService;
 import quanta.service.PushService;
 import quanta.service.RSSFeedService;
 import quanta.service.RedisService;
@@ -143,6 +144,7 @@ public class ServiceBase {
     public static SchemaOrgService svc_schema;
     public static AIService svc_ai;
     public static TransferService svc_xfer;
+    public static PublicationService svc_publication;
 
     public static boolean initComplete = false;
     public static final Object initLock = new Object();
@@ -228,6 +230,7 @@ public class ServiceBase {
             svc_schema = getBean(ctx, SchemaOrgService.class);
             svc_ai = getBean(ctx, AIService.class);
             svc_xfer = getBean(ctx, TransferService.class);
+            svc_publication = getBean(ctx, PublicationService.class);
             gracefulShutdown = getBean(ctx, GracefulShutdown.class);
 
             // We improve over Spring by only calling PostConstructs once all

@@ -17,15 +17,19 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.TreeNode;
 import quanta.model.client.Attachment;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.PrincipalName;
 import quanta.mongo.model.SubNode;
 import quanta.rest.request.ExportRequest;
 import quanta.rest.response.ExportResponse;
+import quanta.service.AclService;
+import quanta.service.AppController;
 import quanta.util.FileUtils;
 import quanta.util.MimeUtil;
 import quanta.util.StreamUtil;
@@ -54,11 +58,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private boolean includeMetaComments;
     private String targetFileName;
 
+    /*
+     * This will be true if we're publishing a node rather than doing an export. A published node is one
+     * that will be available under "/pub/" url of web app.
+     */
+    private boolean publishing;
+
     int baseSlashCount = 0;
 
     // warnings and issues will be written to 'problems.txt' if there were any
     // issues with the export
     StringBuilder problems = new StringBuilder();
+
+    // When publishing=true, this will hold the output HTML.
+    private String html;
 
     private class MarkdownLink {
         @SuppressWarnings("unused")
@@ -86,7 +99,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
     private SubNode node;
 
-    public void generatePublication(String nodeId) {
+    public String generatePublication(String nodeId) {
         contentType = "html";
         includeToC = true;
         updateHeadings = true;
@@ -94,7 +107,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
         dividerLine = false;
         includeMetaComments = false;
         targetFileName = null;
+        publishing = true;
         export(nodeId);
+        return html;
     }
 
     public void export(ExportRequest req, ExportResponse res) {
@@ -105,6 +120,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         dividerLine = req.isDividerLine();
         includeMetaComments = req.isIncludeMetaComments();
         targetFileName = req.getFileName();
+        publishing = false;
 
         // for markdown force updateHeadings and Attachments folder
         if (contentType.equals("md")) {
@@ -115,20 +131,28 @@ public abstract class ExportArchiveBase extends ServiceBase {
     }
 
     public String export(String nodeId) {
-        if (!FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
+        if (publishing && !FileUtils.dirExists(svc_prop.getAdminDataFolder())) {
             throw new RuntimeEx("adminDataFolder does not exist: " + svc_prop.getAdminDataFolder());
         }
-        TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, null, null, null);
-        node = rootNode.node;
 
-        String fileName = svc_snUtil.getExportFileName(targetFileName, node);
-        shortFileName = fileName + "." + getFileExtension();
-        fullFileName = svc_prop.getAdminDataFolder() + File.separator + shortFileName;
+        Criteria criteria = null;
+        if (publishing) {
+            criteria = Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null);
+        }
+
+        TreeNode rootNode = svc_mongoRead.getSubGraphTree(nodeId, criteria, null, null);
+        node = rootNode.node;
         baseSlashCount = StringUtils.countMatches(node.getPath(), "/");
 
         boolean success = false;
         try {
-            openOutputStream(fullFileName);
+            if (!publishing) {
+                String fileName = svc_snUtil.getExportFileName(targetFileName, node);
+                shortFileName = fileName + "." + getFileExtension();
+                fullFileName = svc_prop.getAdminDataFolder() + File.separator + shortFileName;
+                openOutputStream(fullFileName);
+            }
+
             rootPathParent = node.getParentPath();
             svc_auth.ownerAuth(node);
             ArrayList<SubNode> nodeStack = new ArrayList<>();
@@ -137,8 +161,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             // process the entire exported tree here
             recurseNode("../", "", rootNode, nodeStack, 0, null);
             writeMainFile();
-
-            if (problems.length() > 0) {
+            if (!publishing && problems.length() > 0) {
                 addFileEntry("export-info.txt", problems.toString().getBytes(StandardCharsets.UTF_8));
             }
 
@@ -148,7 +171,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw new RuntimeEx(ex);
         } finally {
             closeOutputStream();
-            if (!success) {
+            if (!success && !publishing) {
                 FileUtils.deleteFile(fullFileName);
             }
         }
@@ -171,10 +194,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
         FlexmarkRender flexmarkRender = new FlexmarkRender();
         String tocIns = flexmarkRender.markdownToHtml(toc.toString());
         String bodyIns = flexmarkRender.markdownToHtml(doc.toString());
-        String html = generateHtml(tocIns, bodyIns);
-        addFileEntry("index.html", html.toString().getBytes(StandardCharsets.UTF_8));
-        addStaticFile("prism.css");
-        addStaticFile("prism.js");
+        html = generateHtml(tocIns, bodyIns);
+
+        if (!publishing) {
+            addFileEntry("index.html", html.toString().getBytes(StandardCharsets.UTF_8));
+            addStaticFile("prism.css");
+            addStaticFile("prism.js");
+        }
     }
 
     private void addStaticFile(String fileName) {
@@ -226,6 +252,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private void recurseNode(String rootPath, String parentFolder, TreeNode tn, ArrayList<SubNode> nodeStack, int level,
             String parentId) {
         SubNode node = tn.node;
+
+        /*
+         * When publishing, we only export nodes that are public. This is a redundant check because the
+         * query criteria itself should have only pulled up public nodes, but we do this check here anyway.
+         */
+        if (publishing && !AclService.isPublic(node)) {
+            return;
+        }
+
         if (node == null)
             return;
         // If a node has a property "noexport" (added by power users) then this node
@@ -370,10 +405,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
             }
 
             List<Attachment> atts = node.getOrderedAttachments();
-            // we save off the 'content' into htmlContent, because we need a copy that
-            // doesn't have
-            // attachments inserted into it for the special case of inserting HTML
-            // attachments
+            /*
+             * we save off the 'content' into htmlContent, because we need a copy that doesn't have attachments
+             * inserted into it for the special case of inserting HTML attachments
+             */
             Val<String> contentVal = new Val<>(content);
             String targetFolder = null;
 
@@ -450,7 +485,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     content += concatenatedChildren;
                     ret = true; // indicates to calling method we're done drilling down
                 }
-                writeFilesForNode(parentFolder, node, content, atts);
+
+                if (!publishing) {
+                    writeFilesForNode(parentFolder, node, content, atts);
+                }
             }
         } catch (Exception ex) {
             throw new RuntimeEx(ex);
@@ -716,7 +754,20 @@ public abstract class ExportArchiveBase extends ServiceBase {
         switch (contentType) {
             case "md":
             case "html":
-                fullUrl = "attachments/" + getAttachmentFileNameEx(att, node);
+                // if publishing on the website we build a path to the URL.
+                if (publishing) {
+                    String bin = att.getBin();
+                    if (bin != null) {
+                        String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
+                        fullUrl = svc_prop.getProtocolHostAndPort() + path;
+                    } else {
+                        fullUrl = att.getUrl();
+                    }
+                }
+                // else we point to the attachments folder
+                else {
+                    fullUrl = "attachments/" + getAttachmentFileNameEx(att, node);
+                }
                 break;
             default:
                 break;

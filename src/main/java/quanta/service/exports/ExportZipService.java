@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 
-@Component 
+@Component
 @Scope("prototype")
 public class ExportZipService extends ExportArchiveBase {
     private static Logger log = LoggerFactory.getLogger(ExportZipService.class);
@@ -30,8 +30,10 @@ public class ExportZipService extends ExportArchiveBase {
     @Override
     public void closeOutputStream() {
         try {
-            out.finish();
-            out.close();
+            if (out != null) {
+                out.finish();
+                out.close();
+            }
         } catch (Exception ex) {
             throw new RuntimeEx(ex);
         }

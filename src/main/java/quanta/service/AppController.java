@@ -114,6 +114,7 @@ public class AppController extends ServiceBase implements ErrorController {
     public static final String API_PATH = "/api";
     public static final String ADMIN_PATH = "/admin";
     public static final String FILE_PATH = "/f";
+    public static final String PUBLICATION_PATH = "/pub";
 
     // NOTE: server.error.path app property points to this.
     private static final String ERROR_MAPPING = "/error";
@@ -507,6 +508,20 @@ public class AppController extends ServiceBase implements ErrorController {
             HttpServletResponse response) {
         svc_callProc.run("file", false, false, null, session, () -> {
             svc_attach.cm_getFile(fileName, disposition, response);
+            return null;
+        });
+    }
+
+    @RequestMapping(value = {PUBLICATION_PATH + "/id/{id}", PUBLICATION_PATH + "/{nameOnAdminNode}",
+            PUBLICATION_PATH + "/{userName}/{nameOnUserNode}"}, method = RequestMethod.GET)
+    public void getPublication(//
+            @PathVariable(value = "nameOnAdminNode", required = false) String nameOnAdminNode,
+            @PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode,
+            @PathVariable(value = "userName", required = false) String userName,
+            @PathVariable(value = "id", required = false) String id, HttpSession session,
+            HttpServletResponse response) {
+        svc_callProc.run("getPublication", false, false, null, session, () -> {
+            svc_publication.getPublication(id, nameOnAdminNode, nameOnUserNode, userName, response);
             return null;
         });
     }

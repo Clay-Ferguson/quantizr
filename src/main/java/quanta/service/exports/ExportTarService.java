@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 
-@Component 
+@Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {
     private static Logger log = LoggerFactory.getLogger(ExportTarService.class);
@@ -38,8 +38,10 @@ public class ExportTarService extends ExportArchiveBase {
     @Override
     public void closeOutputStream() {
         try {
-            out.finish();
-            out.close();
+            if (out != null) {
+                out.finish();
+                out.close();
+            }
         } catch (Exception ex) {
             throw new RuntimeEx(ex);
         }
