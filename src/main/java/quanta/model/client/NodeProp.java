@@ -93,10 +93,11 @@ public enum NodeProp {
     JSON_FILE_SEARCH_RESULT("sn:json"), //
     NOWRAP("sn:nowrap"), //
 
-    BIN("bin"),
+    BIN("bin"), //
+    BIN_WEBSITE("bin-website"), //
 
     // get how many bytes of storage the user currently holds
-    BIN_TOTAL("sn:binTot"),
+    BIN_TOTAL("sn:binTot"), //
 
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota"), //

@@ -40,6 +40,11 @@
         background-color: black;
     }
 
+    /* NOTE: This is only required to keep my Dark Reader extension from messing up the scrollbar */
+    * {
+        scrollbar-color: unset !important;
+    }
+
     ::-webkit-scrollbar-track {
         -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
         box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);

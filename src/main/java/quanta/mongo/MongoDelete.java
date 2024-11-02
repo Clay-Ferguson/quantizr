@@ -392,6 +392,7 @@ public class MongoDelete extends ServiceBase {
             SubNode node = svc_mongoRead.getNodeAP(nodeId);
             if (node == null)
                 continue;
+            svc_publication.cacheRemove(node, false);
             svc_auth.ownerAuth(node);
             svc_mongoRead.hasChildrenConsistencyCheck(node);
 

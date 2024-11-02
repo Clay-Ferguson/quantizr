@@ -1201,6 +1201,7 @@ export const enum NodeProp {
     JSON_FILE_SEARCH_RESULT = "sn:json",
     NOWRAP = "sn:nowrap",
     BIN = "bin",
+    BIN_WEBSITE = "bin-website",
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
     LAST_LOGIN_TIME = "sn:lastLogin",
