@@ -57,7 +57,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private boolean dividerLine;
     private boolean includeMetaComments;
     private String targetFileName;
-
     private String baseFolder = "";
 
     /*
@@ -100,8 +99,9 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private HashMap<String, MarkdownLink> markdownLinks = new HashMap<>();
 
     private SubNode node;
+    private SubNode parentSiteNode;
 
-    public String generatePublication(String nodeId) {
+    public String generatePublication(SubNode parentSiteNode, String nodeId) {
         contentType = "html";
         includeToC = true;
         updateHeadings = true;
@@ -111,6 +111,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         targetFileName = null;
         publishing = true;
         baseFolder = "/export-includes/html/";
+        this.parentSiteNode = parentSiteNode;
         export(nodeId);
         return html;
     }
@@ -160,6 +161,11 @@ public abstract class ExportArchiveBase extends ServiceBase {
             svc_auth.ownerAuth(node);
             ArrayList<SubNode> nodeStack = new ArrayList<>();
             nodeStack.add(node);
+
+            if (publishing && parentSiteNode != null) {
+                String parentSiteUrl = svc_snUtil.getFriendlyHtmlUrl(parentSiteNode);
+                doc.append("[Parent Site](" + parentSiteUrl + ")\n\n");
+            }
 
             // process the entire exported tree here
             recurseNode("../", "", rootNode, nodeStack, 0, null);
@@ -263,7 +269,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         /* If we encounter a Website within a website then build it */
         if (level > 0 && publishing && node.getBool(NodeProp.WEBSITE)) {
             ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
-            String html = svc.generatePublication(node.getIdStr());
+            String html = svc.generatePublication(this.node, node.getIdStr());
             svc_publication.cachePut(node, html);
             publishedSubSite = true;
         }

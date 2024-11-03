@@ -90,7 +90,7 @@ public class PublicationService extends ServiceBase {
                 // We can run as admin, because the filtering is done in the service to access only public nodes.
                 html = svc_arun.run(() -> {
                     ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
-                    String _html = svc.generatePublication(node.getIdStr());
+                    String _html = svc.generatePublication(null, node.getIdStr());
                     return _html;
                 });
                 if (html == null)
