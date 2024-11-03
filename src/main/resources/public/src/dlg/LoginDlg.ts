@@ -1,9 +1,7 @@
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
@@ -27,18 +25,15 @@ export class LoginDlg extends DialogBase {
             new Div(null, { c: "LoginContainerDiv" }, [
                 new TextField({ label: "User", enter: this._login, val: this.userState }),
                 new TextField({ label: "Password", inputType: "password", enter: this._login, val: this.pwdState }),
-                new Div(null, { className: "mt-3 mb-3" }, [
-                    new Span("Reset Password", { className: "cursor-pointer float-right", onClick: this._resetPassword }),
-                    new Clearfix()
-                ])
+                new Div("Reset Password", { className: "cursor-pointer -float-right mt-3", onClick: this._resetPassword }),
             ]),
             new ButtonBar([
                 new Button("Login", this._login, null, "-primary ui-login"),
                 new Button("Close", () => {
                     this.close();
                     S.util._loadAnonPageHome();
-                }, null, "float-right")
-            ], "mt-3")
+                })
+            ])
         ];
     }
 

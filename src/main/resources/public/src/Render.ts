@@ -185,11 +185,6 @@ export class Render {
         }
 
         const children = [];
-
-        /* we need this holder object because we don't have the dialog until it's created */
-        // todo-0: this var is old and can be removed right?
-        const dlgHolder: any = {};
-
         const byIdUrl = window.location.origin + "?id=" + node.id;
         const byIdUrlThreadView = byIdUrl + "&view=thread";
         const byIdUrlDocView = byIdUrl + "&view=doc";
@@ -198,7 +193,8 @@ export class Render {
         const pathPart = S.nodeUtil.getPathPartForNamedNode(node);
         const websitePathPart = S.nodeUtil.getPathPartForWebsite(node);
         const website = S.props.getPropStr(J.NodeProp.WEBSITE, node) ? true : false
-        children.push(new Div("Click any link to copy to clipboard.", { className: Tailwind.alertInfo }));
+
+        children.push(new Div("Click any link to copy to clipboard.", { className: Tailwind.alertInfo + " mb-4" }));
 
         if (!node.name) {
             children.push(this.titleDiv("Node Link"), //
@@ -373,8 +369,8 @@ export class Render {
             }
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
-        dlgHolder.dlg.open();
+        const dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
+        dlg.open();
     }
 
     titleDiv(title: string): Div {

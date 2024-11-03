@@ -10,6 +10,9 @@ export class TextContent extends Comp {
     constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);
         this.attribs.className = classes || Tailwind.alertSecondary;
+        if (preformatted) {
+            this.attribs.className += " overflow-x-auto";
+        }
         this.setText(text);
         this.tag = this.preformatted ? "pre" : "div";
     }
