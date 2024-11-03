@@ -47,6 +47,10 @@ public class XString {
         }
     }
 
+    public static boolean isContentChar(char c) {
+        return Character.isLetterOrDigit(c) || c == '-' || c == '_' || c == '.' || c == '\"' || c == '\'';
+    }
+
     public static String compactPrint(Object obj) {
         if (obj == null)
             return "null";

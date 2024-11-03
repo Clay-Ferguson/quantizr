@@ -155,7 +155,7 @@ public class NodeRenderService extends ServiceBase {
         boolean showReplies = true;
         boolean adminOnly = false;
         SessionContext sc = TL.getSC();
-        HashMap<String, AccountNode> accountNodeMap = new HashMap<>(); 
+        HashMap<String, AccountNode> accountNodeMap = new HashMap<>();
 
         // this is not anon user, we set the flag based on their preferences
         if (sc != null && !sc.isAnon()) {
@@ -256,8 +256,8 @@ public class NodeRenderService extends ServiceBase {
         LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
         res.setBreadcrumbs(breadcrumbs);
         svc_render.getBreadcrumbs(node, breadcrumbs);
-        NodeInfo nodeInfo =
-                svc_render.processRenderNode(adminOnly, req, res, node, scanToNode, -1, 0, limit, showReplies, accountNodeMap);
+        NodeInfo nodeInfo = svc_render.processRenderNode(adminOnly, req, res, node, scanToNode, -1, 0, limit,
+                showReplies, accountNodeMap);
         if (nodeInfo != null) {
             res.setNode(nodeInfo);
         } else {
@@ -626,7 +626,7 @@ public class NodeRenderService extends ServiceBase {
                 lastWordBreak = i;
             }
 
-            if (Character.isLetterOrDigit(c) || (runLen > 0 && (c == ' ' || c == '\''))) {
+            if (XString.isContentChar(c) || (runLen > 0 && (c == ' ' || c == '\''))) {
                 if (runLen == 0) {
                     start = i;
                 }
