@@ -27,6 +27,7 @@ import { S } from "../Singletons";
 import { Tailwind } from "../Tailwind";
 import { Validator } from "../Validator";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
+import { MessageDlg } from "./MessageDlg";
 import { PickNodeTypeDlg } from "./PickNodeTypeDlg";
 import { SelectTagsDlg, LS as SelectTagsDlgLS } from "./SelectTagsDlg";
 
@@ -418,7 +419,7 @@ export class EditNodeDlg extends DialogBase {
                     className: "fa fa-eye-slash fa-lg sharingIcon ml-3 mr-1",
                     title: "Refreshes the published copy of this website"
                 }) : null,
-                website ? new Button("Update Website", () => this.rePublishWebsite(), { className: "ml-3" }) : null,
+                website ? new Button("Build Website", () => this.rePublishWebsite(), { className: "ml-3" }, null, "fa-boxes-packing") : null,
             ]);
             sharingDivClearFix = new Clearfix();
         }
@@ -546,7 +547,19 @@ export class EditNodeDlg extends DialogBase {
         await S.rpcUtil.rpc<J.RePublishWebsiteRequest, J.RePublishWebsiteResponse>("rePublishWebsite", {
             nodeId: ast.editNode.id
         });
-        S.util.showMessage("Website republished.", "Success");
+        const websitePathPart = S.nodeUtil.getPathPartForWebsite(ast.editNode);
+        const websiteByNameUrl = window.location.origin + websitePathPart;
+
+        const children = [
+            new Div("Website Published to...", { className: "largerFont" }), //
+            new Div(websiteByNameUrl, {
+                className: "linkDisplay",
+                title: "Copy to clipboard",
+                onClick: () => S.util.copyToClipboard(websiteByNameUrl)
+            })];
+
+        const dlg = new MessageDlg(null, "Website is Ready", null, new Div(null, null, children), false, 0, null);
+        dlg.open();
     }
 
     async makePublic(allowAppends: boolean) {

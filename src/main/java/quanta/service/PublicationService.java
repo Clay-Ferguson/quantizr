@@ -71,17 +71,19 @@ public class PublicationService extends ServiceBase {
             }
 
             if (!AclService.isPublic(node)) {
-                throw new RuntimeEx("Node is not public: " + lookup);
+                returnError(response, "Node is not public: " + lookup);
+                return;
             }
 
             Boolean website = node.getBool(NodeProp.WEBSITE);
             if (!website) {
-                throw new RuntimeEx("Node is not published as a website: " + lookup);
+                returnError(response, "Node is not published as a website: " + lookup);
+                return;
             }
 
             String html = updateCache ? null : cacheGet(node);
             if (html == null) {
-                log.debug("GENERATING publication for node: " + lookup);
+                // log.debug("GENERATING publication for node: " + lookup);
                 // We can run as admin, because the filtering is done in the service to access only public nodes.
                 html = svc_arun.run(() -> {
                     ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
@@ -93,7 +95,7 @@ public class PublicationService extends ServiceBase {
 
                 cachePut(node, html);
             } else {
-                log.debug("Using cached publication for node: " + lookup);
+                // log.debug("Using cached publication for node: " + lookup);
             }
 
             if (response != null) {
@@ -115,7 +117,8 @@ public class PublicationService extends ServiceBase {
 
     private void returnError(HttpServletResponse response, String message) {
         try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write(message);
         } catch (Exception e) {
             throw new RuntimeEx(e);
         }

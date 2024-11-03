@@ -187,6 +187,7 @@ export class Render {
         const children = [];
 
         /* we need this holder object because we don't have the dialog until it's created */
+        // todo-0: this var is old and can be removed right?
         const dlgHolder: any = {};
 
         const byIdUrl = window.location.origin + "?id=" + node.id;

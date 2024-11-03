@@ -184,6 +184,13 @@ export class NodeCompRowHeader extends Comp {
         }) : null;
 
         if (showInfo) {
+            const website = S.props.getPropStr(J.NodeProp.WEBSITE, this.node);
+            let websiteByNameUrl = null;
+            if (website) {
+                const websitePathPart = S.nodeUtil.getPathPartForWebsite(this.node);
+                websiteByNameUrl = window.location.origin + websitePathPart;
+            }
+
             // If node is shared to public we just show the globe icon and not the rest of the shares that may be present.
             if (S.props.isPublic(this.node)) {
                 const appendNode = S.props.isPublicWritable(this.node) ? "Anyone can reply" : "No Replies Allowed";
@@ -192,7 +199,12 @@ export class NodeCompRowHeader extends Comp {
                         className: "fa fa-globe fa-lg sharingIcon mr-3",
                         title: "Node is Public\n(" + appendNode + ")"
                     }),
-                    unpublishedIcon
+                    unpublishedIcon,
+                    website ? new Icon({
+                        className: "fa fa-boxes-packing fa-lg websiteIcon",
+                        title: "Node is a Website",
+                        onClick: () => S.util.copyToClipboard(websiteByNameUrl)
+                    }) : null
                 ]);
             }
             // Show all the share names

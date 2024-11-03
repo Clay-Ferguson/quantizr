@@ -234,6 +234,7 @@ export class Props {
             J.NodeProp.LAYOUT, //
             J.NodeProp.PRIORITY, //
             J.NodeProp.WEBSITE, //
+            J.NodeProp.BIN_WEBSITE, //
             J.NodeProp.UNPUBLISHED, //
             J.NodeProp.CRYPTO_SIG, //
             J.NodeProp.AI_PROMPT, //
