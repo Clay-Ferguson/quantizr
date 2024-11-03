@@ -42,11 +42,8 @@ public class PublicationService extends ServiceBase {
      */
     HashMap<String, String> adminCache = new HashMap<String, String>();
 
-    // todo-0: this method needs to be able to send back an HTML error code if something is wrong
     public void getPublication(String id, boolean updateCache, String nameOnAdminNode, String nameOnUserNode,
             String userName, HttpServletResponse response) {
-        BufferedInputStream inStream = null;
-        BufferedOutputStream outStream = null;
         String lookup = null;
 
         if (id != null) {
@@ -58,29 +55,35 @@ public class PublicationService extends ServiceBase {
         } else {
             throw new RuntimeEx("No id or name provided");
         }
+        SubNode node = svc_mongoRead.getNode(lookup);
 
+        /*
+         * Note: It doesn't matter if the current owner owns the node or not, and can access, or not because
+         * what we care about here is if the node is public or not.
+         */
+        if (node == null) {
+            returnError(response, "Node not found: " + lookup);
+            return;
+        }
+
+        if (!AclService.isPublic(node)) {
+            returnError(response, "Node is not public: " + lookup);
+            return;
+        }
+
+        Boolean website = node.getBool(NodeProp.WEBSITE);
+        if (!website) {
+            returnError(response, "Node is not published as a website: " + lookup);
+            return;
+        }
+
+        getPublication(node, updateCache, response);
+    }
+
+    public void getPublication(SubNode node, boolean updateCache, HttpServletResponse response) {
+        BufferedInputStream inStream = null;
+        BufferedOutputStream outStream = null;
         try {
-            SubNode node = svc_mongoRead.getNode(lookup);
-            /*
-             * Note: It doesn't matter if the current owner owns the node or not, and can access, or not because
-             * what we care about here is if the node is public or not.
-             */
-            if (node == null) {
-                returnError(response, "Node not found: " + lookup);
-                return;
-            }
-
-            if (!AclService.isPublic(node)) {
-                returnError(response, "Node is not public: " + lookup);
-                return;
-            }
-
-            Boolean website = node.getBool(NodeProp.WEBSITE);
-            if (!website) {
-                returnError(response, "Node is not published as a website: " + lookup);
-                return;
-            }
-
             String html = updateCache ? null : cacheGet(node);
             if (html == null) {
                 // log.debug("GENERATING publication for node: " + lookup);
@@ -91,7 +94,7 @@ public class PublicationService extends ServiceBase {
                     return _html;
                 });
                 if (html == null)
-                    throw new RuntimeEx("Failed to generate publication for node: " + lookup);
+                    throw new RuntimeEx("Failed to generate publication for node");
 
                 cachePut(node, html);
             } else {
@@ -124,7 +127,7 @@ public class PublicationService extends ServiceBase {
         }
     }
 
-    private void cachePut(SubNode node, String html) {
+    public void cachePut(SubNode node, String html) {
         if (html == null) {
             return;
         }

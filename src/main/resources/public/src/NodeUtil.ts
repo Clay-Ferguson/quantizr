@@ -170,9 +170,12 @@ export class NodeUtil {
     }
 
     getPathPartForWebsite(node: NodeInfo): string {
-        if (!node || !node.name) return null;
+        if (!node) return null;
 
-        if (node.owner === PrincipalName.ADMIN) {
+        if (!node.name) {
+            return "/pub/id/" + node.id;
+        }
+        else if (node.owner === PrincipalName.ADMIN) {
             return "/pub/" + node.name;
         }
         else {

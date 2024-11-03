@@ -256,6 +256,17 @@ public abstract class ExportArchiveBase extends ServiceBase {
     private void recurseNode(String rootPath, String parentFolder, TreeNode tn, ArrayList<SubNode> nodeStack, int level,
             String parentId) {
         SubNode node = tn.node;
+        if (node == null)
+            return;
+        boolean publishedSubSite = false;
+
+        /* If we encounter a Website within a website then build it */
+        if (level > 0 && publishing && node.getBool(NodeProp.WEBSITE)) {
+            ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
+            String html = svc.generatePublication(node.getIdStr());
+            svc_publication.cachePut(node, html);
+            publishedSubSite = true;
+        }
 
         /*
          * When publishing, we only export nodes that are public. This is a redundant check because the
@@ -265,8 +276,6 @@ public abstract class ExportArchiveBase extends ServiceBase {
             return;
         }
 
-        if (node == null)
-            return;
         // If a node has a property "noexport" (added by power users) then this node
         // will not be exported.
         String noExport = node.getStr(NodeProp.NO_EXPORT);
@@ -276,10 +285,10 @@ public abstract class ExportArchiveBase extends ServiceBase {
 
         // This is the header row at the top of the page. The rest of the page is
         // children of this node
-        boolean doneWithChildren = processNodeExport(parentFolder, "", tn, true, level, true);
+        boolean doneWithChildren = processNodeExport(parentFolder, "", tn, true, level, true, publishedSubSite);
         String folder = contentType.equals("fs") ? getFileNameFromNode(node) : node.getIdStr();
 
-        if (!doneWithChildren && tn.children != null) {
+        if (!doneWithChildren && tn.children != null && !publishedSubSite) {
             for (TreeNode c : tn.children) {
                 boolean noExp = c.node.hasProp(NodeProp.NO_EXPORT.s());
                 if (noExp) {
@@ -378,7 +387,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
      * Returns true if the children were processed and no further drill down on the tree is needed
      */
     private boolean processNodeExport(String parentFolder, String deeperPath, TreeNode tn, boolean writeFile, int level,
-            boolean isTopRow) {
+            boolean isTopRow, boolean publishedSubSite) {
         boolean ret = false;
         try {
             SubNode node = tn.node;
@@ -399,12 +408,13 @@ public abstract class ExportArchiveBase extends ServiceBase {
                 content = svc_edit.translateHeadingsForLevel(content, lev - 1);
             }
 
+            String title = getTitleFromContent(content);
             if (writeFile) {
                 if (includeToC) {
-                    addToTableOfContents(node, level, content);
+                    addToTableOfContents(node, level, content, publishedSubSite);
                 }
                 if (docTitle == null) {
-                    docTitle = extractHeadingText(content);
+                    docTitle = title;
                 }
             }
 
@@ -451,8 +461,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     removeSpecialSyntax(contentVal);
                     contentVal.setVal(formatContentForHtml(node, contentVal.getVal()));
                     // special handling for htmlContent we have to do this File Tag injection AFTER
-                    // the html escaping
-                    // and processing that's done in the line above
+                    // the html escaping and processing that's done in the line above
                     if (atts != null) {
                         for (Attachment att : atts) {
                             // Process File Tag type attachments here first
@@ -466,8 +475,15 @@ public abstract class ExportArchiveBase extends ServiceBase {
                     if (includeToC) {
                         doc.append("\n<div id='" + node.getIdStr() + "'></div>\n");
                     }
-                    doc.append(contentVal.getVal());
-                    doc.append("\n\n");
+
+                    if (publishedSubSite) {
+                        doc.append("\n\n" + title);
+                        String nodeUrl = svc_snUtil.getFriendlyHtmlUrl(node);
+                        doc.append("\n\n[Link to Content](" + nodeUrl + ")\n\n");
+                    } else {
+                        doc.append(contentVal.getVal());
+                        doc.append("\n\n");
+                    }
                     break;
                 default:
                     break;
@@ -498,6 +514,21 @@ public abstract class ExportArchiveBase extends ServiceBase {
             throw new RuntimeEx(ex);
         }
         return ret;
+    }
+
+    private String getTitleFromContent(String content) {
+        String title = null;
+        int newLineIdx = content.indexOf("\n");
+        if (newLineIdx != -1) {
+            title = content.substring(0, newLineIdx);
+        } else {
+            title = content;
+        }
+        // trim to max of 50 chars
+        if (title.length() > 50) {
+            title = title.substring(0, 50);
+        }
+        return title.trim();
     }
 
     // Tokenize contentVal into lines and remove any lines that are just a single
@@ -561,7 +592,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
         return null;
     }
 
-    private void addToTableOfContents(SubNode node, int level, String content) {
+    private void addToTableOfContents(SubNode node, int level, String content, boolean publishedSubSite) {
         if (includeToC) {
             String heading = extractHeadingText(content);
             if (heading == null)
@@ -572,19 +603,19 @@ public abstract class ExportArchiveBase extends ServiceBase {
             String target = null;
             switch (contentType) {
                 case "md":
-                    target = heading.replace(" ", "-").toLowerCase();
+                    target = "#" + heading.replace(" ", "-").toLowerCase();
                     break;
                 case "html":
-                    target = node.getIdStr();
+                    target = publishedSubSite ? svc_snUtil.getFriendlyHtmlUrl(node) : ("#" + node.getIdStr());
                     break;
                 default:
                     break;
             }
 
             if (node.getIdStr().equals(this.node.getIdStr())) {
-                toc.append("#### [" + heading + "](#" + target + ")\n");
+                toc.append("#### [" + heading + "](" + target + ")\n");
             } else {
-                toc.append(prefix + "* [" + heading + "](#" + target + ")\n");
+                toc.append(prefix + "* [" + heading + "](" + target + ")\n");
             }
         }
     }

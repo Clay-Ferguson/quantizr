@@ -150,6 +150,21 @@ public class SubNodeUtil extends ServiceBase {
         }
     }
 
+    public String getFriendlyHtmlUrl(SubNode node) {
+        // if node doesn't thave a name, make ID-based url
+        if (StringUtils.isEmpty(node.getName())) {
+            return String.format("%s/pub/id/%s", svc_prop.getHostAndPort(), node.getIdStr());
+        } else { // else format this node name based on whether the node is admin owned or not.
+            String owner = svc_mongoRead.getNodeOwner(node);
+            // if admin owns node
+            if (owner.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
+                return String.format("%s/pub/%s", svc_prop.getHostAndPort(), node.getName());
+            } else { // if non-admin owns node
+                return String.format("%s/pub/%s/%s", svc_prop.getHostAndPort(), owner, node.getName());
+            }
+        }
+    }
+
     /**
      * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
      * provides), by creating said node if not already existing or leaving it as is if it does exist.

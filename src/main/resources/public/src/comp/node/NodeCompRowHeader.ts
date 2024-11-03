@@ -201,7 +201,7 @@ export class NodeCompRowHeader extends Comp {
                     }),
                     unpublishedIcon,
                     website ? new Icon({
-                        className: "fa fa-boxes-packing fa-lg websiteIcon",
+                        className: "fa fa-boxes-packing fa-lg websiteIcon mr-3",
                         title: "Node is a Website",
                         onClick: () => S.util.copyToClipboard(websiteByNameUrl)
                     }) : null
