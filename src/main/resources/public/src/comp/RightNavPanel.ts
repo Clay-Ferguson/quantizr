@@ -49,10 +49,10 @@ export class RightNavPanel extends Comp {
 
         if (!ast.mobileMode) {
             if (!ast.showRhs) {
-                this.attribs.className = ast.tour ? "appColumnTourActive" : "appColumn";
+                this.attribs.className = "appColumn";
             }
             else {
-                this.attribs.className = Tailwind.getColClass(RightNavPanel.calcWidthCols()) + (ast.tour ? " appColumnTourActive" : " appColumn");
+                this.attribs.className = Tailwind.getColClass(RightNavPanel.calcWidthCols()) + " appColumn";
             }
         }
 

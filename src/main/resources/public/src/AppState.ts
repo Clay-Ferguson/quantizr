@@ -6,7 +6,6 @@ import { FullScreenConfig, FullScreenType } from "./Interfaces";
 import { TabBase } from "./intf/TabBase";
 import * as J from "./JavaIntf";
 import { NodeInfo, PrincipalName } from "./JavaIntf";
-import { Tour } from "./Tour";
 
 export interface ExportSettings {
     exportType: string;
@@ -174,7 +173,6 @@ export class AppState {
     rssNode: NodeInfo = null;
 
     bookmarks: J.Bookmark[];
-    tour: Tour;
 
     editNode: NodeInfo;
     afterEditJumpToId: string;

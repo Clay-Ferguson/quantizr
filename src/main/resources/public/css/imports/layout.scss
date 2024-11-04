@@ -112,55 +112,6 @@ we could also use "display: flow-root", but I'm opting for overflow instead sinc
     overflow: hidden;
 }
 
-.appColumnTourActive {
-    height: 100%;
-    margin: 0;
-    padding: 0 0 $tourPanelHeight 0;
-    overflow: hidden;
-}
-
-.guidedTourHeading {
-    margin-right: $smallGap;
-    margin-top: $smallGap;
-    font-size: 150%;
-    font-weight: bold;
-    padding: $tinyGap;
-    color: yellow;
-}
-
-.guidedTourInstructions {
-    font-weight: bold;
-}
-
-.tourPanel {
-    border: 2px solid yellow;
-    background-color: $modal-content-bg;
-    z-index: 16000010;
-    padding: $tinyGap;
-
-    // We have to set a fixed height here so that the scrollbars and main
-    // app column heights can adjust a bottom padding and not clip content
-    height: $tourPanelHeight;
-    max-height: $tourPanelHeight;
-}
-
-.tourHighlight {
-    position: relative;
-}
-
-/* bottom line */
-.tourHighlight::after {
-    content: '';
-    position: absolute;
-    background-color: yellow;
-    width: 100%;
-    height: 8px;
-    bottom: -8px;
-    left: 0;
-    animation: blink 1s;
-    animation-iteration-count: infinite;
-}
-
 @keyframes blink {
     50% {
         background-color: transparent;

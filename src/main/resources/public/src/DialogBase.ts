@@ -260,16 +260,8 @@ export abstract class DialogBase extends Comp {
             this.lastPosX = 0;
         }
 
-        const tourPanelElm = document.getElementById("tourPanelId");
-        if (tourPanelElm) {
-            if (this.lastPosY < tourPanelElm.offsetHeight) {
-                this.lastPosY = tourPanelElm.offsetHeight;
-            }
-        }
-        else {
-            if (this.lastPosY < 0) {
-                this.lastPosY = 0;
-            }
+        if (this.lastPosY < 0) {
+            this.lastPosY = 0;
         }
     }
 

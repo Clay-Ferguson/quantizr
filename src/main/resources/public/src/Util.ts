@@ -919,13 +919,6 @@ export class Util {
         }
     }
 
-    startTour(name: string) {
-        const tour = S.tourUtils.tours.find(t => t.name == name);
-        if (tour) {
-            dispatch("SetTour", s => s.tour = tour);
-        }
-    }
-
     getFriendlyPrincipalName(ac: J.AccessControlInfo) {
         return ac.principalName;
     }
@@ -956,8 +949,6 @@ export class Util {
         return S.nodeUtil.findNode(nodeId);
     }
 
-    // todo-0: Ask AI for a better implementation of this
-    //
     // We do some line-by-line processing of the content to prepare for rendering as markown.
     // Processing URLS:
     //     You can use "* " to not do opengraph, and that you can use "- " to 
@@ -965,6 +956,10 @@ export class Util {
     processLines(content: string): string {
         // check if we have any content to process before looping all lines
         if (!content || content.toLowerCase().indexOf("http") === -1) return content;
+
+        // tricky way to check if no lines at all start with '-'. If none do, then we can skip the
+        // whole processing.
+        if (content.indexOf("-") !== 0 && content.indexOf("\n-") === -1) return content;
 
         // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
         let ret = "";

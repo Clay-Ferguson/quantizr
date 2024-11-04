@@ -36,7 +36,7 @@ export class LeftNavPanel extends Comp {
             leftCols--;
         }
 
-        this.attribs.className = Tailwind.getColClass(leftCols) + (ast.tour ? " appColumnTourActive" : " appColumn");
+        this.attribs.className = Tailwind.getColClass(leftCols) + " appColumn";
         LeftNavPanel.inst = this;
     }
 

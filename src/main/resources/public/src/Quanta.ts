@@ -273,7 +273,6 @@ export class Quanta {
                             S.quanta.config.displayUserProfileId = null;
                         }
 
-                        S.tourUtils.init();
                     }, 100);
                 });
             }

@@ -22,7 +22,7 @@ export class TabPanel extends Comp {
             if (!ast.showRhs) {
                 panelCols += RightNavPanel.calcWidthCols();
             }
-            this.attribs.className = Tailwind.getColClass(panelCols) + " tabPanel" + (ast.tour ? " appColumnTourActive" : " appColumn");
+            this.attribs.className = Tailwind.getColClass(panelCols) + " tabPanel appColumn";
         }
     }
 

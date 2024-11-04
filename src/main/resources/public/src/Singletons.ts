@@ -7,7 +7,6 @@ import type { NodeUtil } from "./NodeUtil";
 import type { PluginMgr } from "./PluginMgr";
 import type { Props } from "./Props";
 import type { Quanta } from "./Quanta";
-import type { TourUtils } from "./TourUtils";
 import type { Render } from "./Render";
 import { RpcUtil } from "./RpcUtil";
 import type { Search } from "./Search";
@@ -29,7 +28,6 @@ IMPORTANT: These are all initialied in Factory.ts
 */
 export interface Singletons {
     quanta: Quanta;
-    tourUtils: TourUtils;
     plugin: PluginMgr;
     util: Util;
     aiUtil: AIUtil;

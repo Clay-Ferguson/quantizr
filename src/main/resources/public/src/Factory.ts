@@ -26,7 +26,6 @@ import { ServerPush } from "./ServerPush";
 import { S } from "./Singletons";
 import { SpeechEngine } from "./SpeechEngine";
 import { TabUtil } from "./TabUtil";
-import { TourUtils } from "./TourUtils";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
@@ -43,7 +42,6 @@ export class Factory {
             console.log("Factory.ts creating instances");
 
             S.quanta = new Quanta();
-            S.tourUtils = new TourUtils();
             S.plugin = new PluginMgr();
             S.util = new Util();
             S.aiUtil = new AIUtil();

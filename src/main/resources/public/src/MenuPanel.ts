@@ -414,20 +414,6 @@ export class MenuPanel extends Comp {
             ]));
         }
 
-        // todo-0: commented out as part of switching to TailwindCSS becasue this stuff is not yet converted for tailwind.
-        // if (!ast.mobileMode && S.tourUtils) {
-        //     S.tourUtils.init();
-        //     const tourItems = [];
-        //     S.tourUtils.tours.forEach(tour => {
-        //         tourItems.push(new MenuItem(tour.name, () => {
-        //             dispatch("SetTour", s => s.tour = tour);
-        //         }, true, null));
-        //     });
-        //     if (tourItems.length > 0) {
-        //         children.push(new Menu("Guided Tours", tourItems, null));
-        //     }
-        // }
-
         children.push(new Menu("Help", [
             new MenuItem("User Guide", MenuPanel.openUserGuide), //
             new MenuItem("Main Portal Node", S.util._loadAnonPageHome), //
